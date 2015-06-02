@@ -1,6 +1,8 @@
 opendig
 =======
 
+[![Join the chat at https://gitter.im/namesystem/opendig](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/namesystem/opendig?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Latest Version](https://pypip.in/version/opendig/badge.svg)](https://pypi.python.org/pypi/opendig/)
 [![Downloads](https://pypip.in/download/opendig/badge.svg)](https://pypi.python.org/pypi/opendig/)
 [![License](https://pypip.in/license/opendig/badge.svg)](https://pypi.python.org/pypi/opendig>/)
