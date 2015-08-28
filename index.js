@@ -1,12 +1,7 @@
 'use strict'
 
-function AuthRequest() {
-}
-
-function AuthResponse() {
-}
-
-module.exports = {
-    AuthRequest: AuthRequest,
-    AuthResponse: AuthResponse   
-}
+var exports = {}
+exports.AuthRequest = require('./lib/auth-request')
+exports.AuthResponse = require('./lib/auth-response')
+exports.AuthMessage = require('./lib/auth-message')
+module.exports = exports

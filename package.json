@@ -21,5 +21,14 @@
   "bugs": {
     "url": "https://github.com/onenameio/blockchain-id-auth-js/issues"
   },
-  "homepage": "https://github.com/onenameio/blockchain-id-auth-js#readme"
+  "homepage": "https://github.com/onenameio/blockchain-id-auth-js#readme",
+  "dependencies": {
+    "bitcore": "^0.13.1",
+    "hasprop": "0.0.3",
+    "jsonwebtoken": "^5.0.5",
+    "jsrsasign": "^4.8.4"
+  },
+  "devDependencies": {
+    "tape": "^4.2.0"
+  }
 }
