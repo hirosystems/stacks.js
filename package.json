@@ -1,0 +1,25 @@
+{
+  "name": "idauth",
+  "version": "1.0.0",
+  "description": "Blockchain ID Auth Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onenameio/blockchain-id-auth-js.git"
+  },
+  "keywords": [
+    "blockchain",
+    "id",
+    "auth",
+    "blockchainid"
+  ],
+  "author": "Halfmoon Labs, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/onenameio/blockchain-id-auth-js/issues"
+  },
+  "homepage": "https://github.com/onenameio/blockchain-id-auth-js#readme"
+}
