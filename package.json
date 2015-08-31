@@ -24,6 +24,7 @@
   "homepage": "https://github.com/onenameio/blockchain-id-auth-js#readme",
   "dependencies": {
     "bitcore": "^0.13.1",
+    "ecdsa-key-encoder": "^1.0.3",
     "hasprop": "0.0.3",
     "jsonwebtoken": "^5.0.5",
     "jsrsasign": "^4.8.4"
