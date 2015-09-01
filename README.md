@@ -1,4 +1,4 @@
-# blockchain-id-auth-js
+# blockchain-id-auth-node.js
 
 Note: This library is not yet ready for use. We are currently in the process of porting code over from the python implementation:
 
