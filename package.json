@@ -4,7 +4,7 @@
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
-    "test": "test.js"
+    "test": "node test.js"
   },
   "repository": {
     "type": "git",
@@ -24,10 +24,12 @@
   "homepage": "https://github.com/onenameio/blockchain-id-auth-js#readme",
   "dependencies": {
     "bitcore": "^0.13.1",
+    "bn.js": "^3.1.2",
     "ecdsa-key-encoder": "^1.0.3",
     "hasprop": "0.0.3",
     "jsonwebtoken": "^5.0.5",
-    "jsrsasign": "^4.8.4"
+    "jsrsasign": "^4.8.4",
+    "onename-api": "^1.0.1"
   },
   "devDependencies": {
     "tape": "^4.2.0"
