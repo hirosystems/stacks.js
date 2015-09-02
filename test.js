@@ -12,7 +12,7 @@ var resolver = new OnenameClient(process.env.ONENAME_APP_ID, process.env.ONENAME
 test('testAuthRequest', function(t) {
     t.plan(6)
 
-    var privateKeyHex = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229',
+    var privateKeyHex = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b22901',
         publicKeyHex = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69',
         //privateKeyHex = 'fa2e921324f5c7c9603b421bfedc106cdf5f6bbe8e1e77266f51bb4c7dd403cd',
         //publicKeyHex = '044303d1f2b5a9be69836b6e091af6a38b2cfa060c6f2aabdb7db1939e100d61a533338fff15739c1778f329ea0c0c052c0cec06847bf9dc61fda4cc0961c2ff19',
