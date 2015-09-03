@@ -2,7 +2,7 @@
 
 Blockchain ID authentication library for generating, decoding and verifying auth request and auth response tokens.
 
-[![Read the Wiki](https://raw.githubusercontent.com/blockstack/blockstack/master/images/read-the-wiki.png)](https://github.com/blockstack/blockstack/wiki/Blockchain-ID-Auth)
+[![Read the Wiki](https://raw.githubusercontent.com/blockstack/blockchain-id/master/images/read-the-wiki.png)](https://github.com/blockstack/blockchain-id/wiki/Blockchain-ID-Auth)
 
 ## Installation
 
