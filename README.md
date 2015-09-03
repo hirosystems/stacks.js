@@ -1,13 +1,19 @@
-# Blockchain ID Auth - Node.js
+# Blockchain Auth - Node.js
 
-Blockchain ID authentication library for generating, decoding and verifying auth request and auth response tokens.
+A Blockchain ID authentication library that supports generating, decoding and verifying auth request and auth response tokens.
 
 [![Read the Wiki](https://raw.githubusercontent.com/blockstack/blockstack/master/images/read-the-wiki.png)](https://github.com/blockstack/blockstack/wiki/Blockchain-ID-Auth)
 
-## Installation
+## Getting Started
 
 ```
-$ npm install blockchain-id-auth
+$ npm install blockchain-auth
+```
+
+```js
+var blockchainAuth = require('blockchain-auth'),
+    AuthRequest = blockchainAuth.AuthRequest,
+    AuthResponse = blockchainAuth.AuthResponse
 ```
 
 ## Auth Requests
