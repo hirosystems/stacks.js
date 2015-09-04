@@ -1,6 +1,6 @@
 {
   "name": "blockchain-auth",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
@@ -14,24 +14,40 @@
     "blockchain",
     "id",
     "auth",
-    "blockchainid"
+    "blockchainid",
+    "bitcoin",
+    "authentication",
+    "authorization",
+    "login",
+    "signin",
+    "sso",
+    "crypto",
+    "cryptography"
   ],
-  "author": "Halfmoon Labs, Inc.",
+  "author": {
+    "name": "Halfmoon Labs, Inc.",
+    "email": "hello@onename.com",
+    "url": "https://onename.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/onenameio/blockchain-auth-js/issues"
   },
   "homepage": "https://github.com/onenameio/blockchain-auth-js#readme",
   "dependencies": {
-    "bitcore": "^0.13.1",
-    "bn.js": "^3.1.2",
-    "ecdsa-key-encoder": "^1.0.3",
+    "bitcore": "^0.13.2",
     "hasprop": "0.0.3",
     "jsonwebtoken": "^5.0.5",
-    "jsrsasign": "^4.8.4",
-    "onename-api": "^1.0.1"
+    "key-encoder": "^1.0.2",
+    "keychain-manager": "^1.0.5"
   },
   "devDependencies": {
+    "onename-api": "^1.0.1",
     "tape": "^4.2.0"
-  }
+  },
+  "files": [
+    "lib/",
+    "*.js",
+    "README.md"
+  ]
 }
