@@ -1,6 +1,6 @@
 {
   "name": "blockchain-auth",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onenameio/blockchain-auth-js.git"
+    "url": "git+https://github.com/blockstack/blockchain-auth-js.git"
   },
   "keywords": [
     "blockchain",
@@ -31,9 +31,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/onenameio/blockchain-auth-js/issues"
+    "url": "https://github.com/blockstack/blockchain-auth-js/issues"
   },
-  "homepage": "https://github.com/onenameio/blockchain-auth-js#readme",
+  "homepage": "https://github.com/blockstack/blockchain-auth-js#readme",
   "dependencies": {
     "bitcore": "^0.13.2",
     "hasprop": "0.0.3",
