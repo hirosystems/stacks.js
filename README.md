@@ -87,6 +87,12 @@ var authResponse = new AuthResponse(privateKeyHex, publicKeyHex, challenge, bloc
     decodedAuthResponseToken = authResponse.decode()
 ```
 
+### Signing Anonymous Responses
+
+```js
+var authResponse = new AuthResponse(privateKeyHex, publicKeyHex, challenge)
+```
+
 ### Verifying Responses
 
 ```js
