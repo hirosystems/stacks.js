@@ -1,6 +1,6 @@
 {
   "name": "blockchain-auth",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
