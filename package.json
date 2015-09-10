@@ -1,6 +1,6 @@
 {
   "name": "blockchain-auth",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,8 @@
     "hasprop": "0.0.3",
     "jsonwebtoken": "^5.0.5",
     "key-encoder": "^1.0.2",
-    "keychain-manager": "^1.0.5"
+    "keychain-manager": "^1.0.5",
+    "promise": "^7.0.4"
   },
   "devDependencies": {
     "onename-api": "^1.0.1",
