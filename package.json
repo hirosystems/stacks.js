@@ -1,6 +1,6 @@
 {
   "name": "blockchain-auth",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
@@ -35,10 +35,13 @@
   },
   "homepage": "https://github.com/blockstack/blockchain-auth-js#readme",
   "dependencies": {
-    "bitcore": "^0.13.2",
+    "base64url": "^1.0.4",
+    "bitcore": "^0.13.3",
+    "ecdsa-sig-formatter": "^1.0.2",
+    "elliptic": "^5.1.0",
     "hasprop": "0.0.3",
-    "jsonwebtoken": "^5.0.5",
-    "key-encoder": "^1.0.2",
+    "jwt-js": "^0.2.3",
+    "key-encoder": "^1.1.2",
     "keychain-manager": "^1.0.5",
     "promise": "^7.0.4"
   },

@@ -2,15 +2,13 @@
 
 var test = require('tape'),
     main = require('./index'),
-    jwt = require('jsonwebtoken'),
     AuthRequest = main.AuthRequest,
     AuthResponse = main.AuthResponse,
     AuthVerifier = main.AuthVerifier,
+    Tokenizer = main.Tokenizer,
     OnenameClient = require('onename-api').OnenameClient
 
 var resolver = new OnenameClient(process.env.ONENAME_APP_ID, process.env.ONENAME_APP_SECRET)
-
-/* Test Auth Request */
 
 function testAuthRequest() {
     var privateKeyHex = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b22901',
