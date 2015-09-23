@@ -1,10 +1,10 @@
-# Blockchain Auth
+# Blockchain Auth JS
 
 [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockchain-auth-js.svg)](https://circleci.com/gh/blockstack/blockchain-auth-js/tree/master)
 [![npm](https://img.shields.io/npm/l/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
 [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
 
-[![](https://nodei.co/npm/blockchain-auth.png)](https://www.npmjs.com/package/blockchain-auth)
+[![](https://nodei.co/npm/blockchain-auth.png?downloads=true)](https://www.npmjs.com/package/blockchain-auth)
 
 A Blockchain ID authentication library written in node.js that supports generating, decoding and verifying auth request and auth response tokens.
 
