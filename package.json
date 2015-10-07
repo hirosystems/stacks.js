@@ -1,6 +1,6 @@
 {
   "name": "blockchain-auth",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Blockchain ID Auth Library",
   "main": "index.js",
   "scripts": {
@@ -14,15 +14,23 @@
     "blockchain",
     "id",
     "auth",
-    "blockchainid",
-    "bitcoin",
     "authentication",
+    "bitcoin",
+    "blockchain auth",
+    "blockchain authentication",
+    "blockchainid",
+    "blockchain id",
+    "bitcoin auth",
+    "bitcoin authentication",
+    "bitcoin login",
+    "blockchain login",
     "authorization",
     "login",
     "signin",
     "sso",
     "crypto",
-    "cryptography"
+    "cryptography",
+    "token"
   ],
   "author": {
     "name": "Halfmoon Labs, Inc.",
