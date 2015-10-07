@@ -19,20 +19,18 @@ $ npm install blockchain-auth
 ```js
 var AuthRequest = require('blockchain-auth').AuthRequest,
     AuthResponse = require('blockchain-auth').AuthResponse,
-    verifyAuthMessage = require('blockchain-auth').verifyAuthMessage
+    verifyAuthMessage = require('blockchain-auth').verifyAuthMessage,
     decodeToken = require('blockchain-auth').decodeToken
 ```
+
+## Auth Requests
 
 ### Signing Requests
 
 ```js
-
-var authRequest = new AuthRequest(privateKeyHex)
-
+> var authRequest = new AuthRequest(privateKeyHex)
 authRequest.prepare(appBlockchainId, permissions)
-
-var authRequestToken = authRequest.sign(),
-    decodedAuthRequestToken = authRequest.decode()
+var authRequestToken = authRequest.sign()
 ```
 
 ### Verifying Requests
@@ -43,6 +41,12 @@ verifyAuthMessage(authRequestToken, blockchainIdResolver, function(verified) {
 }, function(err) {
     console.log(err)
 })
+```
+
+### Request Decoding
+
+```js
+> decodeToken(authRequestToken)
 ```
 
 ### Request Format
@@ -66,13 +70,13 @@ verifyAuthMessage(authRequestToken, blockchainIdResolver, function(verified) {
 }
 ```
 
+## Auth Responses
+
 ### Signing Responses
 
 ```js
 var authResponse = new AuthResponse(privateKeyHex)
-
 authResponse.prepare(challenge, userBlockchainId, publicKeychain, chainPath)
-
 var authResponseToken = authResponse.sign()
 ```
 
@@ -80,9 +84,7 @@ var authResponseToken = authResponse.sign()
 
 ```js
 var authResponse = new AuthResponse(privateKeyHex)
-
 authResponse.prepare(challenge)
-
 var authResponseToken = authResponse.sign()
 ```
 
@@ -94,6 +96,12 @@ verifyAuthMessage(authResponseToken, blockchainIdResolver, function(verified) {
 }, function(err) {
     console.log(err)
 })
+```
+
+### Response Decoding
+
+```js
+> decodeToken(authResponseToken)
 ```
 
 ### Response Format
@@ -116,10 +124,4 @@ verifyAuthMessage(authResponseToken, blockchainIdResolver, function(verified) {
     },
     "signature": "MEUCIQDzUaSrgTR_tTpNSVcitKYvYWd3bc3uylMe3xCfo-QclQIgDLN1hgXSyqiEk0AGQ21XB2wzuqrotTmE_yN3pn4f_38"
 }
-```
-
-### Decoding Tokens
-
-```js
-var decodedAuthResponseToken = decodeToken(authResponseToken)
 ```
