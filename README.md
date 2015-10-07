@@ -10,19 +10,40 @@ A Blockchain ID authentication library written in node.js that supports generati
 
 [![Read the Wiki](https://raw.githubusercontent.com/blockstack/blockchain-id/master/images/read-the-wiki.png)](https://github.com/blockstack/blockchain-id/wiki/Blockchain-Auth)
 
-## Getting Started
+## Installation
 
 ```
 $ npm install blockchain-auth
 ```
 
 ```js
-var blockchainAuth = require('blockchain-auth'),
-    AuthRequest = blockchainAuth.AuthRequest,
-    AuthResponse = blockchainAuth.AuthResponse
+var AuthRequest = require('blockchain-auth').AuthRequest,
+    AuthResponse = require('blockchain-auth').AuthResponse,
+    verifyAuthMessage = require('blockchain-auth').verifyAuthMessage
+    decodeToken = require('blockchain-auth').decodeToken
 ```
 
-## Auth Requests
+### Signing Requests
+
+```js
+
+var authRequest = new AuthRequest(privateKeyHex)
+
+authRequest.prepare(appBlockchainId, permissions)
+
+var authRequestToken = authRequest.sign(),
+    decodedAuthRequestToken = authRequest.decode()
+```
+
+### Verifying Requests
+
+```js
+verifyAuthMessage(authRequestToken, blockchainIdResolver, function(verified) {
+    console.log(verified)
+}, function(err) {
+    console.log(err)
+})
+```
 
 ### Request Format
 
@@ -45,23 +66,35 @@ var blockchainAuth = require('blockchain-auth'),
 }
 ```
 
-### Signing Requests
+### Signing Responses
 
 ```js
-var authRequest = new AuthRequest(privateKeyHex, publicKeyHex, issuingDomain, permissions),
-    authRequestToken = authRequest.token(),
-    decodedAuthRequestToken = authRequest.decode()
+var authResponse = new AuthResponse(privateKeyHex)
+
+authResponse.prepare(challenge, userBlockchainId, publicKeychain, chainPath)
+
+var authResponseToken = authResponse.sign()
 ```
 
-### Verifying Requests
+### Signing Anonymous Responses
 
 ```js
-AuthRequest.verify(authRequestToken, resolver, function(err, verified) {
+var authResponse = new AuthResponse(privateKeyHex)
+
+authResponse.prepare(challenge)
+
+var authResponseToken = authResponse.sign()
+```
+
+### Verifying Responses
+
+```js
+verifyAuthMessage(authResponseToken, blockchainIdResolver, function(verified) {
     console.log(verified)
+}, function(err) {
+    console.log(err)
 })
 ```
-
-## Auth Responses
 
 ### Response Format
 
@@ -85,23 +118,8 @@ AuthRequest.verify(authRequestToken, resolver, function(err, verified) {
 }
 ```
 
-### Signing Responses
+### Decoding Tokens
 
 ```js
-var authResponse = new AuthResponse(privateKeyHex, publicKeyHex, challenge, blockchainid, publicKeychain, chainPath),
-    authResponseToken = authResponse.token(),
-    decodedAuthResponseToken = authResponse.decode()
-```
-
-### Signing Anonymous Responses
-
-```js
-var authResponse = new AuthResponse(privateKeyHex, publicKeyHex, challenge)
-```
-
-### Verifying Responses
-
-```js
-AuthResponse.verify(authResponseToken, resolver, function(err, verified) {
-})
+var decodedAuthResponseToken = decodeToken(authResponseToken)
 ```
