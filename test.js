@@ -92,6 +92,9 @@ function testAuthRequest() {
         var authRequestToken = authRequest.sign(),
             decodedAuthRequestToken = decodeToken(authRequestToken)
 
+        console.log(authRequestToken)
+        console.log(decodedAuthRequestToken)
+
         t.ok(authRequest instanceof AuthRequest, 'authRequest should be a valid AuthMessage object')
         t.equal(typeof authRequestToken, 'string', 'token should be a string')
         t.equal(decodedAuthRequestToken.payload.issuer.blockchainid, issuingBlockchainID, 'token blockchain id should match the reference')
