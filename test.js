@@ -55,7 +55,7 @@ function testAuthRequest() {
         var authRequest = new AuthRequest(privateKey)
 
         authRequest.setIssuer({
-            blockchainid: issuingBlockchainID
+            username: issuingBlockchainID
         })
         
         var authRequestToken = authRequest.sign(),
@@ -63,7 +63,7 @@ function testAuthRequest() {
         
         t.ok(authRequest instanceof AuthRequest, 'authRequest should be a valid AuthMessage object')
         t.equal(typeof authRequestToken, 'string', 'token should be a string')
-        t.equal(decodedAuthRequestToken.payload.issuer.blockchainid, issuingBlockchainID, 'token blockchain id should match the reference')
+        t.equal(decodedAuthRequestToken.payload.issuer.username, issuingBlockchainID, 'token blockchain id should match the reference')
 
         verifyAuthMessage(authRequestToken, testBlockchainIDResolver, function(verified) {
             t.equal(verified, true, 'token should be verified')
@@ -80,7 +80,7 @@ function testAuthRequest() {
         var authRequest = new AuthRequest(privateKey)
 
         authRequest.setIssuer({
-            blockchainid: issuingBlockchainID,
+            username: issuingBlockchainID,
             appName: 'Onename',
             appDomain: 'onename.com'
         })
@@ -97,7 +97,7 @@ function testAuthRequest() {
 
         t.ok(authRequest instanceof AuthRequest, 'authRequest should be a valid AuthMessage object')
         t.equal(typeof authRequestToken, 'string', 'token should be a string')
-        t.equal(decodedAuthRequestToken.payload.issuer.blockchainid, issuingBlockchainID, 'token blockchain id should match the reference')
+        t.equal(decodedAuthRequestToken.payload.issuer.username, issuingBlockchainID, 'token blockchain id should match the reference')
 
         verifyAuthMessage(authRequestToken, testBlockchainIDResolver, function(verified) {
             t.equal(verified, true, 'token should be verified')
@@ -122,18 +122,19 @@ function testAuthResponse() {
         privateKeychain = 'xprv9s21ZrQH143K2vRPJpXPhcT12MDpL3rofvjagwKn4yZpPPFpgWn1cy1Wwp3pk78wfHSLcdyZhmEBQsZ29ZwFyTQhhkVVa9QgdTC7hGMB1br',
         chainPath = 'bd62885ec3f0e3838043115f4ce25eedd22cc86711803fb0c19601eeef185e39',
         challenge = '7cd9ed5e-bb0e-49ea-a323-f28bde3a0549',
-        blockchainid = 'ryan.id',
+        username = 'ryan.id',
         sampleToken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZWRBdCI6IjE0NDA3MTM0MTQuODUiLCJjaGFsbGVuZ2UiOiI3Y2Q5ZWQ1ZS1iYjBlLTQ5ZWEtYTMyMy1mMjhiZGUzYTA1NDkiLCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDNmZGQ1N2FkZWMzZDQzOGVhMjM3ZmU0NmIzM2VlMWUwMTZlZGE2YjU4NWMzZTI3ZWE2NjY4NmMyZWE1MzU4NDc5IiwiY2hhaW5QYXRoIjoiYmQ2Mjg4NWVjM2YwZTM4MzgwNDMxMTVmNGNlMjVlZWRkMjJjYzg2NzExODAzZmIwYzE5NjAxZWVlZjE4NWUzOSIsInB1YmxpY0tleWNoYWluIjoieHB1YjY2MU15TXdBcVJiY0ZRVnJRcjRRNGtQamFQNEpqV2FmMzlmQlZLalBkSzZvR0JheUU0NkdBbUt6bzVVRFBRZExTTTlEdWZaaVA4ZWF1eTU2WE51SGljQnlTdlpwN0o1d3N5UVZwaTJheHpaIiwiYmxvY2tjaGFpbmlkIjoicnlhbiJ9fQ.oO7ROPKq3T3X0azAXzHsf6ub6CYy5nUUFDoy8MS22B3TlYisqsBrRtzWIQcSYiFXLytrXwAdt6vjehj3OFioDQ',
         sampleTokenPayload = {"issuedAt": "1440713414.85", "challenge": "7cd9ed5e-bb0e-49ea-a323-f28bde3a0549", "issuer": {"publicKey": "03fdd57adec3d438ea237fe46b33ee1e016eda6b585c3e27ea66686c2ea5358479", "chainPath": "bd62885ec3f0e3838043115f4ce25eedd22cc86711803fb0c19601eeef185e39", "publicKeychain": "xpub661MyMwAqRbcFQVrQr4Q4kPjaP4JjWaf39fBVKjPdK6oGBayE46GAmKzo5UDPQdLSM9DufZiP8eauy56XNuHicBySvZp7J5wsyQVpi2axzZ", "blockchainid": "ryan"}},
         partiallyIdentifiedToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDNmZGQ1N2FkZWMzZDQzOGVhMjM3ZmU0NmIzM2VlMWUwMTZlZGE2YjU4NWMzZTI3ZWE2NjY4NmMyZWE1MzU4NDc5IiwiYmxvY2tjaGFpbmlkIjoicnlhbiIsInB1YmxpY0tleWNoYWluIjoieHB1YjY2MU15TXdBcVJiY0ZRVnJRcjRRNGtQamFQNEpqV2FmMzlmQlZLalBkSzZvR0JheUU0NkdBbUt6bzVVRFBRZExTTTlEdWZaaVA4ZWF1eTU2WE51SGljQnlTdlpwN0o1d3N5UVZwaTJheHpaIn0sImlzc3VlZEF0IjoxNDQxNzU1NjE5MDk2LCJjaGFsbGVuZ2UiOiI3Y2Q5ZWQ1ZS1iYjBlLTQ5ZWEtYTMyMy1mMjhiZGUzYTA1NDkiLCJpYXQiOjE0NDE3NTU2MTl9.1LxW_yg2z40Qd84x0kep0-7TWiDdTEoJbdYFUJ3qt297zxbwo8OOvYW43W6TMT5cloxur5wifq0WoOTdXw4C_Q',
-        incorrectBlockchainID = 'ryanshea.id'
+        invalidUsername = 'ryanshea.id'
 
     test('basicResponse', function(t) {
         t.plan(4)
 
         var authResponse = new AuthResponse(privateKeyHex)
 
-        authResponse.prepare(challenge, blockchainid, publicKeychain, chainPath)
+        authResponse.setChallenge(challenge)
+        authResponse.setIssuer(username, publicKeychain, chainPath)
 
         var authResponseToken = authResponse.sign(),
             decodedAuthResponseToken = decodeToken(authResponseToken)
@@ -164,13 +165,13 @@ function testAuthResponse() {
 
         var authResponse = new AuthResponse(privateKeyHex, publicKeyHex)
 
-        authResponse.prepare(challenge, incorrectBlockchainID, publicKeychain, chainPath)
+        authResponse.setChallenge(challenge)
+        authResponse.setIssuer(invalidUsername, publicKeychain, chainPath)
 
         var authResponseToken = authResponse.sign()
         t.ok(authResponseToken, 'token should have been created')
 
         verifyAuthMessage(authResponseToken, testBlockchainIDResolver, function(verified) {
-            console.log(verified)
             t.equal(verified, false, 'token should be invalid')
         }, function(err) {
             console.log(err)
@@ -182,7 +183,7 @@ function testAuthResponse() {
 
         var authResponse = new AuthResponse(privateKeyHex)
 
-        authResponse.prepare(challenge)
+        authResponse.setChallenge(challenge)
 
         var authResponseToken = authResponse.sign(),
             decodedAuthResponseToken = decodeToken(authResponseToken)
