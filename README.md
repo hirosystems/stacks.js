@@ -40,7 +40,7 @@ var balloonDog = {
 }
 ```
 
-### Sign the profile
+### Transform the profile to signed tokens
 
 ```js
 > var privateKeychain = new PrivateKeychain()
@@ -83,7 +83,7 @@ var balloonDog = {
 ]
 ```
 
-###
+### Recover the profile from the tokens
 
 ```js
 > var publicKeychain = privateKeychain.publicKeychain()
