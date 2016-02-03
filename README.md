@@ -1,5 +1,13 @@
 # Crypto Profiles
 
+A library for working with cryptographically-signed JSON profiles.
+
+This library can be used to:
+
+1. transform a JSON profile into signed tokens
+1. recover a JSON profile from signed tokens
+1. validate signed profile tokens
+
 ### Installation
 
 ```
@@ -8,10 +16,14 @@ $ npm install crypto-profiles
 
 ### Module importing
 
+#### ES6
+
 ```es6
 import { signProfileTokens, getProfileFromTokens } from 'crypto-profiles'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 ```
+
+#### Javascript
 
 ```js
 var signProfileTokens = require('crypto-profiles').signProfileTokens,
