@@ -116,3 +116,23 @@ var balloonDog = {
   dateCreated: '1994-05-09T00:00:00-0400',
   datePublished: '2015-12-10T14:44:26-0500' }
 ```
+
+## Dealing with zonefiles
+
+### Create a zonefile object
+
+```js
+var zonefile = new Zonefile(zonefileStringInput)
+```
+
+### Output the zonefile to JSON
+
+```js
+var zonefileJson = zonefile.toJSON()
+```
+
+### Output the zonefile as a string
+
+```js
+var zonefileString = zonefile.toString()
+```
