@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "dateformat": "^1.0.12",
+    "dns-zonefile": "^0.1.12",
     "elliptic-curve": "^0.1.0",
     "elliptic-keychain": "0.0.1",
     "jwt-js": "^0.5.0"

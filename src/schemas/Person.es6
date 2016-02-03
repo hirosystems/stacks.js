@@ -1,11 +1,5 @@
 class Person {
-  constructor(profile, context) {
-    if (!context) {
-      context = 'http://schema.org/'
-    }
-    if (!profile) {
-      profile = {}
-    }
+  constructor(profile = {}, context = 'http://schema.org/') {
     this.profile = Object.assign({}, {
       '@context': context,
       '@type': 'Person'

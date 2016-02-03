@@ -1,11 +1,5 @@
-class Person {
-  constructor(profile, context) {
-    if (!context) {
-      context = 'http://schema.org/'
-    }
-    if (!profile) {
-      profile = {}
-    }
+class CreativeWork {
+  constructor(profile = {}, context = 'http://schema.org/') {
     this.profile = Object.assign({}, {
       '@context': context,
       '@type': 'CreativeWork'
@@ -13,4 +7,4 @@ class Person {
   }
 }
 
-export default Person
+export default CreativeWork

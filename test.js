@@ -10,7 +10,8 @@ var profileDirectory = require('./sample-data')
 
 var signProfileTokens = require('./index').signProfileTokens,
     getProfileFromTokens = require('./index').getProfileFromTokens,
-    validateTokenRecord = require('./index').validateTokenRecord
+    validateTokenRecord = require('./index').validateTokenRecord,
+    Zonefile = require('./index').Zonefile
 
 var privateKeychain = new PrivateKeychain(),
     publicKeychain = privateKeychain.publicKeychain()
@@ -50,8 +51,44 @@ testTokening(profileDirectory.naval_profile)
 testTokening(profileDirectory.google_id)
 testTokening(profileDirectory.balloondog_art)
 
-/* Other tests */
+/* Zonefile Tests */
+
+var zonefileJsonReference = JSON.parse(fs.readFileSync('./test_data/zonefile_forward.json'))
+var zonefileStringReference = fs.readFileSync('./test_data/zonefile_forward.txt', 'utf-8')
+
+test('zonefileFromJson', function(t) {
+  t.plan(5)
+
+  var zonefile = new Zonefile(zonefileJsonReference)
+  t.ok(zonefile, 'Zonefile object should have been created')
+
+  var zonefileJson = zonefile.toJSON()
+  t.ok(zonefileJson, 'Zonefile JSON should have been created')
+  t.equal(JSON.stringify(zonefileJson), JSON.stringify(zonefileJsonReference), 'Zonefile JSON should match the reference')
+
+  var zonefileString = zonefile.toString()
+  t.ok(zonefileString, 'Zonefile text should have been created')
+  t.equal(zonefileString.split('; NS Records')[1], zonefileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
+})
+
+test('zonefileFromString', function(t) {
+  t.plan(5)
+
+  var zonefile = new Zonefile(zonefileStringReference)
+  t.ok(zonefile, 'Zonefile object should have been created')
+
+  var zonefileJson = zonefile.toJSON()
+  t.ok(zonefileJson, 'Zonefile JSON should have been created')
+  t.equal(JSON.stringify(zonefileJson), JSON.stringify(zonefileJsonReference), 'Zonefile JSON should match the reference')
+
+  var zonefileString = zonefile.toString()
+  t.ok(zonefileString, 'Zonefile text should have been created')
+  t.equal(zonefileString.split('; NS Records')[1], zonefileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
+})
+
+/* Other tests
 
 var Person = require('./index').Person,
     Organization = require('./index').Organization,
     CreativeWork = require('./index').CreativeWork
+*/
