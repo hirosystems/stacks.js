@@ -33,7 +33,7 @@ function testTokening(profile) {
 
     tokenRecords = signProfileTokens([profile], privateKeychain)
     t.ok(tokenRecords, 'Tokens should have been created')
-    console.log(JSON.stringify(tokenRecords, null, 2))
+    //console.log(JSON.stringify(tokenRecords, null, 2))
 
     var tokensVerified = true
     tokenRecords.map(function(tokenRecord) {
@@ -50,12 +50,12 @@ function testTokening(profile) {
     t.plan(2)
 
     var recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
-    console.log(recoveredProfile)
+    //console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile), JSON.stringify(profile), 'Profile should equal the reference')
   })
 }
 
 testTokening(profileDirectory.naval_profile)
-//testTokening(profileDirectory.google_id)
-//testTokening(profileDirectory.balloondog_art)
+testTokening(profileDirectory.google_id)
+testTokening(profileDirectory.balloondog_art)
