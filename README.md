@@ -10,11 +10,15 @@ $ npm install crypto-profiles
 
 ```es6
 import { signProfileTokens, getProfileFromTokens } from 'crypto-profiles'
+import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 ```
 
 ```js
 var signProfileTokens = require('crypto-profiles').signProfileTokens,
     getProfileFromTokens = require('crypto-profiles').getProfileFromTokens
+
+var PrivateKeychain = require('elliptic-keychain').PrivateKeychain,
+    PublicKeychain = require('elliptic-keychain').PublicKeychain
 ```
 
 ### Create a profile
@@ -39,6 +43,7 @@ var balloonDog = {
 ### Sign the profile
 
 ```js
+> var privateKeychain = new PrivateKeychain()
 > var tokenRecords = signProfileTokens([balloonDog], privateKeychain)
 > console.log(tokenRecords)
 [
@@ -81,6 +86,7 @@ var balloonDog = {
 ###
 
 ```js
+> var publicKeychain = privateKeychain.publicKeychain()
 > var recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
 > console.log(recoveredProfile)
 { '@context': 'http://schema.org/',
