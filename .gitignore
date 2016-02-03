@@ -29,3 +29,6 @@ node_modules
 # Other
 unused
 .DS_Store
+
+# Folder to ignore for development with es6
+lib
