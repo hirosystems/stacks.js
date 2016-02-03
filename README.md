@@ -1,5 +1,10 @@
 # Crypto Profiles
 
+[![npm](https://img.shields.io/npm/l/crypto-profiles.svg)](https://www.npmjs.com/package/crypto-profiles)
+[![npm](https://img.shields.io/npm/v/crypto-profiles.svg)](https://www.npmjs.com/package/crypto-profiles)
+[![npm](https://img.shields.io/npm/dm/crypto-profiles.svg)](https://www.npmjs.com/package/crypto-profiles)
+[![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
+
 A library for working with cryptographically-signed JSON profiles.
 
 This library can be used to:
