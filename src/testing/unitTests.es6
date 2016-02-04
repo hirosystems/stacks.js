@@ -80,6 +80,14 @@ function testZonefile() {
     t.ok(zonefileString, 'Zonefile text should have been created')
     t.equal(zonefileString.split('; NS Records')[1], zonefileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
   })
+
+  test('prepareForHostedFile', function(t) {
+    t.plan(2)
+    
+    let fileUrl = 'https://s3.amazonaws.com/mq9/naval.id.json'
+    let zonefile = Zonefile.prepareForHostedFile('naval.id', fileUrl)
+    t.ok(zonefile, 'Zonefile should have been prepared for hosted file')
+  })
 }
 
 function testSchemas() {

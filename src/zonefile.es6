@@ -16,4 +16,15 @@ export class Zonefile {
   toString() {
     return zonefileFormatter.generate(this.toJSON())
   }
+
+  static prepareForHostedFile(origin, tokenFileUrl) {
+    let zonefile = {
+      '$origin': origin,
+      "$ttl": "3600",
+      txt: [
+        { name: '@', txt: tokenFileUrl }
+      ]
+    }
+    return new Zonefile(zonefile)
+  }
 }
