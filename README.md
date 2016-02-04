@@ -36,7 +36,7 @@ $ npm install crypto-profiles
 #### ES6
 
 ```es6
-import { signProfileTokens, getProfileFromTokens } from 'crypto-profiles'
+import { signProfileTokens, getProfileFromTokens, Person } from 'crypto-profiles'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 ```
 
@@ -55,7 +55,7 @@ var PrivateKeychain = require('elliptic-keychain').PrivateKeychain,
 ### Create a profile
 
 ```es6
-let balloonDog = {
+var balloonDog = {
   "@context": "http://schema.org/",
   "@type": "CreativeWork",
   "name": "Balloon Dog",
@@ -74,8 +74,8 @@ let balloonDog = {
 ### Transform the profile to signed tokens
 
 ```js
-> let privateKeychain = new PrivateKeychain()
-> let tokenRecords = signProfileTokens([balloonDog], privateKeychain)
+> var privateKeychain = new PrivateKeychain()
+> var tokenRecords = signProfileTokens([balloonDog], privateKeychain)
 > console.log(tokenRecords)
 [
   {
@@ -117,8 +117,8 @@ let balloonDog = {
 ### Recover the profile from the tokens
 
 ```js
-> let publicKeychain = privateKeychain.publicKeychain()
-> let recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
+> var publicKeychain = privateKeychain.publicKeychain()
+> var recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
 > console.log(recoveredProfile)
 { '@context': 'http://schema.org/',
   '@type': 'CreativeWork',
@@ -131,12 +131,20 @@ let balloonDog = {
   datePublished: '2015-12-10T14:44:26-0500' }
 ```
 
+### Validate the profile
+
+```js
+> var validationResults = Person.validate(recoveredProfile)
+> console.log(validationResults.valid)
+true
+```
+
 ## Zonefiles
 
 ### Create a zonefile object
 
 ```js
-let zonefileData = {
+var zonefileData = {
   "$origin": "MYDOMAIN.COM.",
   "$ttl": 3600,
   "a": [
@@ -145,17 +153,17 @@ let zonefileData = {
   ]
 }
 
-let zonefile = new Zonefile(zonefileData)
+var zonefile = new Zonefile(zonefileData)
 ```
 
 ### Output the zonefile as a string
 
 ```js
-let zonefileString = zonefile.toString()
+var zonefileString = zonefile.toString()
 ```
 
 ### Output the zonefile to JSON
 
 ```js
-let zonefileJson = zonefile.toJSON()
+var zonefileJson = zonefile.toJSON()
 ```
