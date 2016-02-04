@@ -48,8 +48,8 @@ function testTokening(profile) {
 }
 
 function testZonefile() {
-  let zonefileJsonReference = JSON.parse(fs.readFileSync('./docs/zonefiles/zonefile1.json')),
-      zonefileStringReference = fs.readFileSync('./docs/zonefiles/zonefile1.txt', 'utf-8')
+  let zonefileJsonReference = JSON.parse(fs.readFileSync('./docs/zonefiles/zonefile-1.json')),
+      zonefileStringReference = fs.readFileSync('./docs/zonefiles/zonefile-1.txt', 'utf-8')
 
   test('zonefileFromJson', function(t) {
     t.plan(5)
