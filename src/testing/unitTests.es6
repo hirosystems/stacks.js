@@ -12,7 +12,8 @@ let privateKeychain = new PrivateKeychain(),
 let sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
-  google: JSON.parse(fs.readFileSync('./docs/profiles/google.json'))
+  google: JSON.parse(fs.readFileSync('./docs/profiles/google.json')),
+  navalLegacy: JSON.parse(fs.readFileSync('./docs/deprecated/naval.json'))
 }
 
 function testTokening(profile) {
@@ -107,7 +108,7 @@ function testSchemas() {
     let personObject = new Person(sampleProfiles.naval)
     t.ok(personObject, 'Person object should have been created')
 
-    let validationResults = Person.validate(sampleProfiles.naval)
+    let validationResults = Person.validate(sampleProfiles.naval, true)
     t.ok(validationResults.valid, 'Person profile should be valid')
 
     let standaloneProperties = ['taxID', 'birthDate', 'address']
@@ -117,6 +118,16 @@ function testSchemas() {
 
     let profileObject2 = Person.fromTokens(profileTokens, publicKeychain)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
+  })
+
+  test('legacyFormat', function(t) {
+    t.plan(2)
+
+    let profileObject = Person.fromLegacyFormat(sampleProfiles.navalLegacy)
+    t.ok(profileObject, 'Profile object should have been created from legacy formatted profile')
+
+    let validationResults = Person.validate(profileObject.toJSON(), true)
+    t.ok(validationResults, 'Profile should be in a valid format')
   })
 }
 

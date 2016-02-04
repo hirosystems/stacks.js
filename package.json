@@ -21,6 +21,7 @@
     "dns-zonefile": "^0.1.12",
     "elliptic-curve": "^0.1.0",
     "elliptic-keychain": "^0.0.2",
+    "hasprop": "0.0.4",
     "jwt-js": "^0.5.0",
     "schema-inspector": "^1.6.4"
   }

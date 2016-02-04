@@ -1,13 +1,16 @@
 import { getProfileFromTokens, signProfileTokens } from '../tokening'
 import inspector from 'schema-inspector'
 import { Profile } from '../profile'
+import { getPersonFromLegacyFormat } from '../legacy-formats/person'
 
 let schemaDefinition = {
   type: 'object',
+  strict: false,
   properties: {
     '@context': { type: 'string', optional: true },
     '@type': { type: 'string' },
     '@id': { type: 'string', optional: true },
+    name: { type: 'string', optional: true },
     givenName: { type: 'string', optional: true },
     familyName: { type: 'string', optional: true },
     description: { type: 'string', optional: true },
@@ -96,12 +99,18 @@ export class Person extends Profile {
     }, this._profile)
   }
 
-  static validate(profile) {
+  static validate(profile, strict = false) {
+    schemaDefinition['strict'] = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
   static fromTokens(tokenRecords, publicKeychain) {
     let profile = getProfileFromTokens(tokenRecords, publicKeychain)
+    return new Person(profile)
+  }
+
+  static fromLegacyFormat(legacyProfile) {
+    let profile = getPersonFromLegacyFormat(legacyProfile)
     return new Person(profile)
   }
 }
