@@ -10,10 +10,8 @@
 * [Getting Started](#getting-started)
     * [Installation](#installation)
     * [Importing](#importing)
-* [Profiles](#Profiles)
-* [Zonefiles](#Zonefiles)
-
-**Note: this document uses ES6 in its examples but it is compiled down to and is perfectly compatible with use of Javascript (ES5). If you're using the latter, you'll just have to make a few adjustments to the examples below (e.g. use "let" instead of "var").**
+* [Profiles](#profiles)
+* [Zonefiles](#zonefiles)
 
 A library for working with cryptographically-signed JSON profiles.
 
@@ -22,6 +20,8 @@ This library can be used to:
 1. transform a JSON profile into signed tokens
 1. recover a JSON profile from signed tokens
 1. validate signed profile tokens
+
+*Note: this document uses ES6 in its examples but it is compiled down to and is perfectly compatible with use of Javascript (ES5). If you're using the latter, you'll just have to make a few adjustments to the examples below (e.g. use "let" instead of "var").*
 
 ## Getting Started
 
