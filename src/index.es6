@@ -2,4 +2,5 @@
 
 export { signProfileTokens, getProfileFromTokens, validateTokenRecord } from './tokening'
 export { Zonefile } from './zonefile'
-export { Person, Organization, CreativeWork } from './schemas'
+export { Profile } from './profile'
+export { Person, Organization, CreativeWork } from './entities'

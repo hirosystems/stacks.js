@@ -3,7 +3,7 @@ import fs from 'fs'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 import {
   signProfileTokens, getProfileFromTokens, validateTokenRecord, Zonefile,
-  Person, Organization, CreativeWork
+  Profile, Person, Organization, CreativeWork
 } from '../index'
 
 let privateKeychain = new PrivateKeychain(),
@@ -82,11 +82,39 @@ function testZonefile() {
 }
 
 function testSchemas() {
+  test('Profile', function(t) {
+    t.plan(5)
+
+    let profileObject = new Profile(sampleProfiles.naval)
+    t.ok(profileObject, 'Profile object should have been created')
+
+    let validationResults = Profile.validate(sampleProfiles.naval)
+    t.ok(validationResults.valid, 'Profile should be valid')
+
+    let profileJson = profileObject.toJSON()
+    t.ok(profileJson, 'Profile JSON should have been created')  
+
+    let profileTokens = profileObject.toSignedTokens(privateKeychain)
+    t.ok(profileTokens, 'Profile tokens should have been created')
+  
+    let profileObject2 = Profile.fromTokens(profileTokens, publicKeychain)
+    t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
+  })
+
   test('Person', function(t) {
-    t.plan(1)
+    t.plan(4)
+
+    let personObject = new Person(sampleProfiles.naval)
+    t.ok(personObject, 'Person object should have been created')
 
     let validationResults = Person.validate(sampleProfiles.naval)
-    t.ok(validationResults.valid, 'Person profile is valid')
+    t.ok(validationResults.valid, 'Person profile should be valid')
+
+    let profileTokens = personObject.toSignedTokens(privateKeychain)
+    t.ok(profileTokens, 'Person profile tokens should have been created')
+
+    let profileObject2 = Person.fromTokens(profileTokens, publicKeychain)
+    t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
   })
 }
 

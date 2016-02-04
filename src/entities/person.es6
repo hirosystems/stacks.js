@@ -1,11 +1,13 @@
-import { getProfileFromTokens } from '../tokening'
+import { getProfileFromTokens, signProfileTokens } from '../tokening'
 import inspector from 'schema-inspector'
+import { Profile } from '../profile'
 
 let schemaDefinition = {
   type: 'object',
   properties: {
     '@context': { type: 'string', optional: true },
     '@type': { type: 'string' },
+    '@id': { type: 'string', optional: true },
     givenName: { type: 'string', optional: true },
     familyName: { type: 'string', optional: true },
     description: { type: 'string', optional: true },
@@ -55,6 +57,7 @@ let schemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
+          '@id': { type: 'string', optional: true }
         }
       }
     },
@@ -64,12 +67,11 @@ let schemaDefinition = {
       items: {
         type: 'object',
         properties: {
-          '@type': { type: 'string' }
+          '@type': { type: 'string' },
+          '@id': { type: 'string', optional: true }
         }
       }
     },
-    birthDate: { type: 'string', optional: true },
-    taxID: { type: 'string', optional: true },
     address: {
       type: 'object',
       optional: true,
@@ -80,28 +82,26 @@ let schemaDefinition = {
         'postalCode': { type: 'string', optional: true },
         'addressCountry': { type: 'string', optional: true }
       }
-    }
+    },
+    birthDate: { type: 'string', optional: true },
+    taxID: { type: 'string', optional: true }
   }
 }
 
-export class Person {
-  constructor(profile = {}, context = 'http://schema.org/') {
+export class Person extends Profile {
+  constructor(profile = {}) {
+    super(profile)
     this._profile = Object.assign({}, {
-      '@context': context,
       '@type': 'Person'
-    }, profile)
+    }, this._profile)
   }
 
-  profile() {
-    return this._profile
+  static validate(profile) {
+    return inspector.validate(schemaDefinition, profile)
   }
 
   static fromTokens(tokenRecords, publicKeychain) {
     let profile = getProfileFromTokens(tokenRecords, publicKeychain)
     return new Person(profile)
-  }
-
-  static validate(profile) {
-    return inspector.validate(schemaDefinition, profile)
   }
 }

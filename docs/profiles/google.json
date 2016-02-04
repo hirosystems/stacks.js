@@ -13,13 +13,13 @@
   "employee": [
     {
       "@type": "Person",
-      "name": "Larry Page",
-      "id": "larrypage.id"
+      "@id": "larrypage.id",
+      "name": "Larry Page"
     },
     {
       "@type": "Person",
-      "name": "Sergey Brin",
-      "id": "sergeybrin.id"
+      "@id": "sergeybrin.id",
+      "name": "Sergey Brin"
     }
   ],
   "image": [
@@ -31,7 +31,7 @@
   ],
   "parentOrganization": {
     "@type": "Organization",
-    "name": "Alphabet Inc.",
-    "id": "alphabet.id"
+    "@id": "alphabet.id",
+    "name": "Alphabet Inc."
   }
 }

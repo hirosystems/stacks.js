@@ -53,30 +53,22 @@
       "proofType": "signature",
       "proofMessage": "Verifying that +naval is my blockchain ID.",
       "proofSignature": "ICuRA+Dq5Dn8AiY9P+mcLzGyibPgG0ec9CphtMk512uPdB5eAncDSHhQZY/7kycvl6PLFEuR+j3OM/K2Vey1+EU="
-    },
-    {
-      "@type": "Account",
-      "service": "openbazaar",
-      "role": "storage",
-      "data": {
-        "guid": "34e57db64ce7435ab0f759oca31386527c670bd1"
-      }
     }
   ],
   "worksFor": [
     {
       "@type": "Organization",
-      "id": "angellist.id"
+      "@id": "angellist.id"
     }
   ],
   "knows": [
     {
       "@type": "Person",
-      "id": "muneeb.id"
+      "@id": "muneeb.id"
     },
     {
       "@type": "Person",
-      "id": "ryan.id"
+      "@id": "ryan.id"
     }
   ],
   "birthDate": "1973-01-01",

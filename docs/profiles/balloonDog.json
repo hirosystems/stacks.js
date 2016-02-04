@@ -5,8 +5,8 @@
   "creator": [
     {
       "@type": "Person",
-      "name": "Jeff Koons",
-      "id": "therealjeffkoons.id"
+      "@id": "therealjeffkoons.id",
+      "name": "Jeff Koons"
     }
   ],
   "dateCreated": "1994-05-09T00:00:00-0400",
