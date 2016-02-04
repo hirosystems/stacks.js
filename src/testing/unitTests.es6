@@ -110,8 +110,10 @@ function testSchemas() {
     let validationResults = Person.validate(sampleProfiles.naval)
     t.ok(validationResults.valid, 'Person profile should be valid')
 
-    let profileTokens = personObject.toSignedTokens(privateKeychain)
+    let standaloneProperties = ['taxID', 'birthDate', 'address']
+    let profileTokens = personObject.toSignedTokens(privateKeychain, standaloneProperties)
     t.ok(profileTokens, 'Person profile tokens should have been created')
+    fs.writeFileSync('./docs/tokenfiles/naval.json', JSON.stringify(profileTokens, null, 2))
 
     let profileObject2 = Person.fromTokens(profileTokens, publicKeychain)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')

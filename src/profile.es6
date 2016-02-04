@@ -20,8 +20,23 @@ export class Profile {
     return this._profile
   }
 
-  toSignedTokens(privateKeychain) {
-    return signProfileTokens([this.toJSON()], privateKeychain)
+  toSignedTokens(privateKeychain, standaloneProperties = []) {
+    let profileComponents = [],
+        profile = this.toJSON()
+    standaloneProperties.map((property) => {
+      if (profile.hasOwnProperty(property)) {
+        let subprofile = {
+          [property]: profile[property]
+        }
+        profileComponents.push(subprofile)
+        delete profile[property]
+      }
+    })
+    profileComponents = [
+      profile,
+      ...profileComponents
+    ]
+    return signProfileTokens(profileComponents, privateKeychain)
   }
 
   static validate(profile) {

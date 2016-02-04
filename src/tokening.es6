@@ -34,7 +34,9 @@ export function signProfileTokens(profileComponents, privateKeychain, signingAlg
 
     const payload = {
       claim: data,
-      subject: publicKey,
+      subject: {
+        publicKey: publicKey
+      },
       issuedAt: new Date(),
       expiresAt: new Date().setYear(new Date().getFullYear() + 1)
     }
