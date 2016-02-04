@@ -2,10 +2,10 @@
   "name": "crypto-profiles",
   "version": "0.0.1",
   "description": "A JSON profile system where objects are cryptographically signed and reference one-another",
-  "main": "index.js",
+  "main": "lib/index",
   "scripts": {
     "compile": "babel --presets es2015 src -d lib",
-    "test": "npm run compile; node test.js",
+    "test": "npm run compile; node lib/testing/unitTests.js",
     "prepublish": "npm run compile"
   },
   "author": "Halfmoon Labs, Inc.",

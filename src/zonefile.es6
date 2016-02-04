@@ -1,6 +1,6 @@
 import * as zonefileFormatter from 'dns-zonefile'
 
-class Zonefile {
+export class Zonefile {
   constructor(zonefile) {
     if (typeof zonefile === 'object') {
       this.jsonZonefile = JSON.parse(JSON.stringify(zonefile))
@@ -17,5 +17,3 @@ class Zonefile {
     return zonefileFormatter.generate(this.toJSON())
   }
 }
-
-export default Zonefile

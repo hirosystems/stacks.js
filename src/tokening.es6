@@ -5,7 +5,7 @@ import { crypto as hashing } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
 import { secp256k1 } from 'elliptic-curve'
 
-function signProfileTokens(profileComponents, privateKeychain, signingAlgorithm = 'ES256K') {
+export function signProfileTokens(profileComponents, privateKeychain, signingAlgorithm = 'ES256K') {
   if (!privateKeychain instanceof PrivateKeychain) {
     throw new Error('Invalid private keychain')
   }
@@ -57,7 +57,7 @@ function signProfileTokens(profileComponents, privateKeychain, signingAlgorithm 
   return tokenRecords
 }
 
-function validateTokenRecord(tokenRecord, publicKeychain) {
+export function validateTokenRecord(tokenRecord, publicKeychain) {
   if (!publicKeychain) {
     throw new Error('A public keychain is required')
   }
@@ -83,7 +83,7 @@ function validateTokenRecord(tokenRecord, publicKeychain) {
   return
 }
 
-function getProfileFromTokens(tokenRecords, publicKeychain) {
+export function getProfileFromTokens(tokenRecords, publicKeychain) {
   let profile = {}
 
   tokenRecords.map((tokenRecord) => {
@@ -96,10 +96,4 @@ function getProfileFromTokens(tokenRecords, publicKeychain) {
   })
 
   return profile
-}
-
-export default {
-  signProfileTokens,
-  getProfileFromTokens,
-  validateTokenRecord
 }

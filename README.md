@@ -5,6 +5,16 @@
 [![npm](https://img.shields.io/npm/dm/crypto-profiles.svg)](https://www.npmjs.com/package/crypto-profiles)
 [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
 
+## Contents
+
+* [Getting Started](#getting-started)
+    * [Installation](#installation)
+    * [Importing](#importing)
+* [Profiles](#Profiles)
+* [Zonefiles](#Zonefiles)
+
+**Note: this document uses ES6 in its examples but it is compiled down to and is perfectly compatible with use of Javascript (ES5). If you're using the latter, you'll just have to make a few adjustments to the examples below (e.g. use "let" instead of "var").**
+
 A library for working with cryptographically-signed JSON profiles.
 
 This library can be used to:
@@ -13,13 +23,15 @@ This library can be used to:
 1. recover a JSON profile from signed tokens
 1. validate signed profile tokens
 
+## Getting Started
+
 ### Installation
 
 ```
 $ npm install crypto-profiles
 ```
 
-### Module importing
+### Importing
 
 #### ES6
 
@@ -28,9 +40,9 @@ import { signProfileTokens, getProfileFromTokens } from 'crypto-profiles'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 ```
 
-#### Javascript
+#### Node
 
-```js
+```es6
 var signProfileTokens = require('crypto-profiles').signProfileTokens,
     getProfileFromTokens = require('crypto-profiles').getProfileFromTokens
 
@@ -38,10 +50,12 @@ var PrivateKeychain = require('elliptic-keychain').PrivateKeychain,
     PublicKeychain = require('elliptic-keychain').PublicKeychain
 ```
 
+## Profiles
+
 ### Create a profile
 
-```js
-var balloonDog = {
+```es6
+let balloonDog = {
   "@context": "http://schema.org/",
   "@type": "CreativeWork",
   "name": "Balloon Dog",
@@ -60,8 +74,8 @@ var balloonDog = {
 ### Transform the profile to signed tokens
 
 ```js
-> var privateKeychain = new PrivateKeychain()
-> var tokenRecords = signProfileTokens([balloonDog], privateKeychain)
+> let privateKeychain = new PrivateKeychain()
+> let tokenRecords = signProfileTokens([balloonDog], privateKeychain)
 > console.log(tokenRecords)
 [
   {
@@ -103,8 +117,8 @@ var balloonDog = {
 ### Recover the profile from the tokens
 
 ```js
-> var publicKeychain = privateKeychain.publicKeychain()
-> var recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
+> let publicKeychain = privateKeychain.publicKeychain()
+> let recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
 > console.log(recoveredProfile)
 { '@context': 'http://schema.org/',
   '@type': 'CreativeWork',
@@ -117,22 +131,31 @@ var balloonDog = {
   datePublished: '2015-12-10T14:44:26-0500' }
 ```
 
-## Dealing with zonefiles
+## Zonefiles
 
 ### Create a zonefile object
 
 ```js
-var zonefile = new Zonefile(zonefileStringInput)
-```
+let zonefileData = {
+  "$origin": "MYDOMAIN.COM.",
+  "$ttl": 3600,
+  "a": [
+    { "name": "@", "ip": "127.0.0.1" },
+    { "name": "www", "ip": "127.0.0.1" }
+  ]
+}
 
-### Output the zonefile to JSON
-
-```js
-var zonefileJson = zonefile.toJSON()
+let zonefile = new Zonefile(zonefileData)
 ```
 
 ### Output the zonefile as a string
 
 ```js
-var zonefileString = zonefile.toString()
+let zonefileString = zonefile.toString()
+```
+
+### Output the zonefile to JSON
+
+```js
+let zonefileJson = zonefile.toJSON()
 ```

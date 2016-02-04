@@ -1,4 +1,4 @@
-class CreativeWork {
+export class CreativeWork {
   constructor(profile = {}, context = 'http://schema.org/') {
     this.profile = Object.assign({}, {
       '@context': context,
@@ -6,5 +6,3 @@ class CreativeWork {
     }, profile)
   }
 }
-
-export default CreativeWork
