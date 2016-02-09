@@ -31,7 +31,7 @@ export function getPersonFromLegacyFormat(profile) {
 
     if (hasprop(profile, 'location.formatted')) {
         profileData.address = {
-            "@type": "address",
+            "@type": "PostalAddress",
             "addressLocality": profile.location.formatted
         }
     }
@@ -66,8 +66,8 @@ export function getPersonFromLegacyFormat(profile) {
     if (hasprop(profile, 'bitcoin.address')) {
         accounts.push({
             "@type": "Account",
-            "service": "bitcoin",
             "role": "payment",
+            "service": "bitcoin",
             "identifier": profile.bitcoin.address
         })
     }
@@ -98,6 +98,7 @@ export function getPersonFromLegacyFormat(profile) {
             "@type": "Account",
             "role": "key",
             "service": "pgp",
+            "identifier": profile.pgp.fingerprint,
             "contentUrl": profile.pgp.url
         })
     }

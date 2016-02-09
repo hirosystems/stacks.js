@@ -1,6 +1,6 @@
 {
   "name": "crypto-profiles",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A JSON profile system where objects are cryptographically signed and reference one-another",
   "main": "lib/index",
   "scripts": {

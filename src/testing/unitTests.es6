@@ -82,7 +82,7 @@ function testZonefile() {
   })
 
   test('prepareForHostedFile', function(t) {
-    t.plan(2)
+    t.plan(1)
     
     let fileUrl = 'https://s3.amazonaws.com/mq9/naval.id.json'
     let zonefile = Zonefile.prepareForHostedFile('naval.id', fileUrl)
