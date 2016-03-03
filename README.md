@@ -1,6 +1,6 @@
 # Blockchain Auth JS
 
-[![CircleCI](https://img.shields.io/circleci/project/blockstack/blockchain-auth-js.svg)](https://circleci.com/gh/blockstack/blockchain-auth-js/tree/master)
+[![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack-auth-js.svg)](https://circleci.com/gh/blockstack/blockstack-auth-js/tree/master)
 [![npm](https://img.shields.io/npm/l/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
 [![npm](https://img.shields.io/npm/v/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
 [![npm](https://img.shields.io/npm/dm/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
