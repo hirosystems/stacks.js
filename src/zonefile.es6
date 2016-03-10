@@ -18,13 +18,25 @@ export class Zonefile {
   }
 
   static prepareForHostedFile(origin, tokenFileUrl) {
+    if (tokenFileUrl.indexOf('://') < 0) {
+      throw new Error('Invalid token file url')
+    }
+
+    let urlParts = tokenFileUrl.split('://')[1].split('/'),
+        domain = urlParts[0],
+        pathname = '/' + urlParts.slice(1).join('/')
+
     let zonefile = {
-      '$origin': origin,
+      "$origin": origin,
       "$ttl": "3600",
-      txt: [
-        { name: '@', txt: tokenFileUrl }
+      "cname": [
+        { "name": "@", "alias": domain }
+      ],
+      "txt": [
+        { "name": "@", "txt": `pathname: ${pathname}` }
       ]
     }
+    console.log(zonefile)
     return new Zonefile(zonefile)
   }
 }
