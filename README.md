@@ -73,8 +73,8 @@ var balloonDog = {
   "creator": [
     {
       "@type": "Person",
-      "name": "Jeff Koons",
-      "id": "therealjeffkoons.id"
+      "@id": "therealjeffkoons.id",
+      "name": "Jeff Koons"
     }
   ],
   "dateCreated": "1994-05-09T00:00:00-0400",
@@ -90,7 +90,7 @@ var balloonDog = {
 > console.log(tokenRecords)
 [
   {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJuYW1lIjoiSmVmZiBLb29ucyIsImlkIjoidGhlcmVhbGplZmZrb29ucy5pZCJ9XSwiZGF0ZUNyZWF0ZWQiOiIxOTk0LTA1LTA5VDAwOjAwOjAwLTA0MDAiLCJkYXRlUHVibGlzaGVkIjoiMjAxNS0xMi0xMFQxNDo0NDoyNi0wNTAwIn0sInN1YmplY3QiOiIwMmIzMTllZjJkZGM0NjYyNzZiM2QxNDg3MTJlYmM3ZWUxNTkzYzI4YjNkMzdiZDZmZGEyNDI1NjVmZDE0OTAwMmQiLCJpc3N1ZWRBdCI6IjIwMTYtMDItMDNUMDY6MjQ6NDMuNzQ1WiIsImV4cGlyZXNBdCI6MTQ4NjEwMzA4Mzc0NX0.lpw10Jy--NMe2Tn_Rc1AXYm6TcFw1TdbVZ_dBECte5tKTDIbnNNO80mvNkrofT3YZEQb36jLEfiijiao7gM0Cw",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzMTk0YjczMTY5OTIzOTc5NmFiZDNkNjQyZTM2MDcyMDhiYjQ0ZmNhYTM5Y2Q2NDBjNGM1MDM2MGIzNmFhNWZkOSJ9LCJpc3N1ZWRBdCI6IjIwMTctMDMtMTBUMTY6NTY6MTIuNzk5WiIsImV4cGlyZXNBdCI6IjIwMTctMDMtMTBUMTY6NTY6MTIuNzk5WiJ9.pBxK6gIzpsjWhi9L1nhSeNKMbOPIQ89gEfn4SlDapsWXAcmfWsFSPzpe5rmh43IedlkwAzzt0WOkmMwjjjpplw",
     "data": {
       "header": {
         "typ": "JWT",
@@ -104,23 +104,25 @@ var balloonDog = {
           "creator": [
             {
               "@type": "Person",
-              "name": "Jeff Koons",
-              "id": "therealjeffkoons.id"
+              "@id": "therealjeffkoons.id",
+              "name": "Jeff Koons"
             }
           ],
           "dateCreated": "1994-05-09T00:00:00-0400",
           "datePublished": "2015-12-10T14:44:26-0500"
         },
-        "subject": "02b319ef2ddc466276b3d148712ebc7ee1593c28b3d37bd6fda242565fd149002d",
-        "issuedAt": "2016-02-03T06:24:43.745Z",
-        "expiresAt": 1486103083745
+        "subject": {
+          "publicKey": "03194b731699239796abd3d642e3607208bb44fcaa39cd640c4c50360b36aa5fd9"
+        },
+        "issuedAt": "2017-03-10T16:56:12.799Z",
+        "expiresAt": "2017-03-10T16:56:12.799Z"
       },
-      "signature": "lpw10Jy--NMe2Tn_Rc1AXYm6TcFw1TdbVZ_dBECte5tKTDIbnNNO80mvNkrofT3YZEQb36jLEfiijiao7gM0Cw"
+      "signature": "pBxK6gIzpsjWhi9L1nhSeNKMbOPIQ89gEfn4SlDapsWXAcmfWsFSPzpe5rmh43IedlkwAzzt0WOkmMwjjjpplw"
     },
-    "publicKey": "02b319ef2ddc466276b3d148712ebc7ee1593c28b3d37bd6fda242565fd149002d",
-    "parentPublicKey": "027d82d4bc3c270573a6d822b9c1068f721753780b095c35412547ab8d149c4448",
-    "derivationEntropy": "e15dfbe9986d8914fac948a131426c57a940185e298368e22ad34fedeb47a110",
-    "encrypted": false
+    "publicKey": "03194b731699239796abd3d642e3607208bb44fcaa39cd640c4c50360b36aa5fd9",
+    "encrypted": false,
+    "parentPublicKey": "031d9304790e4adca7fac304bddbcb1419db9a6b6b682c2d4e7631d7e238cceffd",
+    "derivationEntropy": "5ee70faa32c3afd79c4276dbe2e1bc33582fbfc6b3e0514eefa547dcea535ed8"
   }
 ]
 ```
@@ -155,7 +157,7 @@ true
 ### Create a zone file object
 
 ```js
-var zonefileData = {
+var zoneFileData = {
   "$origin": "MYDOMAIN.COM.",
   "$ttl": 3600,
   "a": [
@@ -164,28 +166,28 @@ var zonefileData = {
   ]
 }
 
-var zonefile = new Zonefile(zonefileData)
+var zoneFile = new ZoneFile(zoneFileData)
 ```
 
 ### Output the zone file as a string
 
 ```js
-var zonefileString = zonefile.toString()
+var zoneFileString = zoneFile.toString()
 ```
 
 ### Output the zone file to JSON
 
 ```js
-var zonefileJson = zonefile.toJSON()
+var zoneFileJson = zoneFile.toJSON()
 ```
 
 ## Wiki
 
-### Usernames
+### Names
 
 A blockchain ID = a name + a profile, registered on a blockchain.
 
-Let's say you register the username 'alice' within the 'id' namespace, the default namespace for usernames. Then your username would be expressed as `alice.id`.
+Let's say you register the name 'alice' within the 'id' namespace, the default namespace for name. Then your name would be expressed as `alice.id`.
 
 ### Profiles
 

@@ -16,7 +16,7 @@ let sampleProfiles = {
   navalLegacy: JSON.parse(fs.readFileSync('./docs/deprecated/naval.json'))
 }
 
-function testTokening(profile) {
+function testTokening(filename, profile) {
   let tokenRecords = []
 
   test('profileToTokens', function(t) {
@@ -25,6 +25,7 @@ function testTokening(profile) {
     tokenRecords = signRecords([profile], privateKeychain)
     t.ok(tokenRecords, 'Tokens should have been created')
     //console.log(JSON.stringify(tokenRecords, null, 2))
+    fs.writeFileSync('./docs/tokenfiles/' + filename, JSON.stringify(tokenRecords, null, 2))
 
     let tokensVerified = true
     tokenRecords.map(function(tokenRecord) {
@@ -103,10 +104,10 @@ function testSchemas() {
     let profileJson = profileObject.toJSON()
     t.ok(profileJson, 'Profile JSON should have been created')  
 
-    let profileTokens = profileObject.toSignedTokens(privateKeychain)
-    t.ok(profileTokens, 'Profile tokens should have been created')
+    let tokenRecords = profileObject.toSignedTokens(privateKeychain)
+    t.ok(tokenRecords, 'Profile tokens should have been created')
     
-    let profileObject2 = Profile.fromTokens(profileTokens, publicKeychain)
+    let profileObject2 = Profile.fromTokens(tokenRecords, publicKeychain)
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
@@ -120,11 +121,11 @@ function testSchemas() {
     t.ok(validationResults.valid, 'Person profile should be valid')
 
     let standaloneProperties = ['taxID', 'birthDate', 'address']
-    let profileTokens = personObject.toSignedTokens(privateKeychain, standaloneProperties)
-    t.ok(profileTokens, 'Person profile tokens should have been created')
-    fs.writeFileSync('./docs/tokenfiles/naval.json', JSON.stringify(profileTokens, null, 2))
+    let tokenRecords = personObject.toSignedTokens(privateKeychain, standaloneProperties)
+    t.ok(tokenRecords, 'Person profile tokens should have been created')
+    fs.writeFileSync('./docs/tokenfiles/naval-4-tokens.json', JSON.stringify(tokenRecords, null, 2))
 
-    let profileObject2 = Person.fromTokens(profileTokens, publicKeychain)
+    let profileObject2 = Person.fromTokens(tokenRecords, publicKeychain)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
   })
 
@@ -139,8 +140,8 @@ function testSchemas() {
   })
 }
 
-testTokening(sampleProfiles.naval)
-testTokening(sampleProfiles.google)
-testTokening(sampleProfiles.balloonDog)
+testTokening('naval.json', sampleProfiles.naval)
+testTokening('google.json', sampleProfiles.google)
+testTokening('balloonDog.json', sampleProfiles.balloonDog)
 testZoneFile()
 testSchemas()
