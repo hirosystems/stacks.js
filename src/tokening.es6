@@ -15,7 +15,7 @@ export function signRecord(claim, subject, issuerPrivateKey,
 
   const issuedAt = new Date(),
         nextYear = issuedAt.getFullYear() + 1,
-        expiresAt = new Date(issuedAt.setFullYear(nextYear))
+        expiresAt = new Date(new Date().setFullYear(nextYear))
 
   const payload = {
     claim: claim,

@@ -90,7 +90,7 @@ var balloonDog = {
 > console.log(tokenRecords)
 [
   {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzMTk0YjczMTY5OTIzOTc5NmFiZDNkNjQyZTM2MDcyMDhiYjQ0ZmNhYTM5Y2Q2NDBjNGM1MDM2MGIzNmFhNWZkOSJ9LCJpc3N1ZWRBdCI6IjIwMTctMDMtMTBUMTY6NTY6MTIuNzk5WiIsImV4cGlyZXNBdCI6IjIwMTctMDMtMTBUMTY6NTY6MTIuNzk5WiJ9.pBxK6gIzpsjWhi9L1nhSeNKMbOPIQ89gEfn4SlDapsWXAcmfWsFSPzpe5rmh43IedlkwAzzt0WOkmMwjjjpplw",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzYTU5ZGJmZDk2MTJlNDA4ODgxOGM5MGUxOWFmY2Y4ZDE3OTNiMzhhNWMwNDBjMzhkN2QwN2JiN2QzOWQ4NmQ3MiJ9LCJpc3N1ZWRBdCI6IjIwMTYtMDMtMTBUMTc6MDE6MzIuODc5WiIsImV4cGlyZXNBdCI6IjIwMTctMDMtMTBUMTc6MDE6MzIuODc5WiJ9.vEUJzl713FApgDNYzbUue5SDOdeElxEaAnMbmT-A6ihfrnzhOd5WvzlGJwTiz1LbeTruhQgbh_XyCJ6aLxfu6A",
     "data": {
       "header": {
         "typ": "JWT",
@@ -112,17 +112,17 @@ var balloonDog = {
           "datePublished": "2015-12-10T14:44:26-0500"
         },
         "subject": {
-          "publicKey": "03194b731699239796abd3d642e3607208bb44fcaa39cd640c4c50360b36aa5fd9"
+          "publicKey": "03a59dbfd9612e4088818c90e19afcf8d1793b38a5c040c38d7d07bb7d39d86d72"
         },
-        "issuedAt": "2017-03-10T16:56:12.799Z",
-        "expiresAt": "2017-03-10T16:56:12.799Z"
+        "issuedAt": "2016-03-10T17:01:32.879Z",
+        "expiresAt": "2017-03-10T17:01:32.879Z"
       },
-      "signature": "pBxK6gIzpsjWhi9L1nhSeNKMbOPIQ89gEfn4SlDapsWXAcmfWsFSPzpe5rmh43IedlkwAzzt0WOkmMwjjjpplw"
+      "signature": "vEUJzl713FApgDNYzbUue5SDOdeElxEaAnMbmT-A6ihfrnzhOd5WvzlGJwTiz1LbeTruhQgbh_XyCJ6aLxfu6A"
     },
-    "publicKey": "03194b731699239796abd3d642e3607208bb44fcaa39cd640c4c50360b36aa5fd9",
+    "publicKey": "03a59dbfd9612e4088818c90e19afcf8d1793b38a5c040c38d7d07bb7d39d86d72",
     "encrypted": false,
-    "parentPublicKey": "031d9304790e4adca7fac304bddbcb1419db9a6b6b682c2d4e7631d7e238cceffd",
-    "derivationEntropy": "5ee70faa32c3afd79c4276dbe2e1bc33582fbfc6b3e0514eefa547dcea535ed8"
+    "parentPublicKey": "03be573c8dbdd74bbc457f530c4f5898f7147f105af57c1aee20127f981697b884",
+    "derivationEntropy": "35d0d4e73780d7e47b404a961c9005f415db76ae88c1bcd4bdcd742d68670f26"
   }
 ]
 ```
