@@ -1,42 +1,46 @@
 import {
     PrivateKeychain, PublicKeychain, getChildKeypair, getEntropy
 } from 'elliptic-keychain'
-import { crypto as hashing, ECPair } from 'bitcoinjs-lib'
+import { crypto as hashing, ECPair as EllipticKeyPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
 import { secp256k1 } from 'elliptic-curve'
 import * as BigInteger from 'bigi'
 
-export function signRecord(record, subject, issuedAt, expiresAt, issuerPrivateKey, signingAlgorithm = 'ES256K') {
+export function signRecord(claim, subject, issuerPrivateKey,
+                           signingAlgorithm='ES256K') {
 
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
 
+  const issuedAt = new Date(),
+        nextYear = issuedAt.getFullYear() + 1,
+        expiresAt = new Date(issuedAt.setFullYear(nextYear))
+
   const payload = {
-    claim: record,
+    claim: claim,
     subject: subject,
-    issuedAt: issuedAt,
-    expiresAt: expiresAt
+    issuedAt: issuedAt.toISOString(),
+    expiresAt: expiresAt.toISOString()
   }
 
-  const tokenSigner = new TokenSigner(signingAlgorithm, issuerPrivateKey)
-  const token = tokenSigner.sign(payload)
+  const tokenSigner = new TokenSigner(signingAlgorithm, issuerPrivateKey),
+        token = tokenSigner.sign(payload),
+        privateKeyBigInteger = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex')),
+        ellipticKeyPair = new EllipticKeyPair(privateKeyBigInteger, null, {}),
+        issuerPublicKey = ellipticKeyPair.getPublicKeyBuffer().toString('hex')
   
-  const privKeyBigInt = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex'))
-  const ecPair = new ECPair(privKeyBigInt, null, {})
-  const issuerPublicKey = ecPair.getPublicKeyBuffer().toString('hex')
-  
-  const tokenRecord = {
+  return {
     token: token,
     data: decodeToken(token),
     publicKey: issuerPublicKey,
     encrypted: false
   }
-
-  return tokenRecord
 }
 
-export function signProfileTokens(profileComponents, privateKeychain, signingAlgorithm = 'ES256K') {
+export function signRecords(profileComponents, privateKeychain,
+                           signingAlgorithm='ES256K') {
+
   if (!privateKeychain instanceof PrivateKeychain) {
     throw new Error('Invalid private keychain')
   }
@@ -49,7 +53,7 @@ export function signProfileTokens(profileComponents, privateKeychain, signingAlg
       parentPublicKey = privateKeychain.publicKeychain().publicKey('hex')
 
   profileComponents.map((data) => {
-    let derivationEntropy = hashing.sha256(
+    const derivationEntropy = hashing.sha256(
       Buffer.concat([
         privateKeychain.privateKey(),
         new Buffer(JSON.stringify(data))
@@ -60,23 +64,8 @@ export function signProfileTokens(profileComponents, privateKeychain, signingAlg
           privateKey = privateChildKeychain.privateKey('hex'),
           publicKey = privateChildKeychain.publicKeychain().publicKey('hex')
 
-    const issuedAt = new Date()
-    const expiresAt = new Date(issuedAt.getFullYear()+1, 
-                               issuedAt.getMonth(),
-                               issuedAt.getDate(),
-                               issuedAt.getHours(),
-                               issuedAt.getMinutes(),
-                               issuedAt.getSeconds(),
-                               issuedAt.getMilliseconds())
-
     const subject = {publicKey: publicKey}
-    var tokenRecord = signRecord(data,
-                                 subject,
-                                 issuedAt,
-                                 expiresAt,
-                                 privateKey,
-                                 signingAlgorithm)
-
+    let tokenRecord = signRecord(data, subject, privateKey, signingAlgorithm)
     tokenRecord.parentPublicKey = parentPublicKey
     tokenRecord.derivationEntropy = derivationEntropy.toString('hex')
 
@@ -104,7 +93,8 @@ export function validateTokenRecord(tokenRecord, publicKeychain) {
     throw new Error('Token verification failed')
   }
 
-  let childKeychain = publicKeychain.child(new Buffer(tokenRecord.derivationEntropy, 'hex'))
+  let childKeychain = publicKeychain.child(
+    new Buffer(tokenRecord.derivationEntropy, 'hex'))
   if (childKeychain.publicKey('hex') !== tokenRecord.publicKey) {
     throw new Error('Child public key is not a valid child of the parent public key')
   }

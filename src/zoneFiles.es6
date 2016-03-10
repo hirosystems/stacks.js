@@ -1,20 +1,20 @@
-import * as zonefileFormatter from 'dns-zonefile'
+import * as zoneFileFormatter from 'dns-zonefile'
 
-export class Zonefile {
-  constructor(zonefile) {
-    if (typeof zonefile === 'object') {
-      this.jsonZonefile = JSON.parse(JSON.stringify(zonefile))
-    } else if (typeof zonefile === 'string') {
-      this.jsonZonefile = zonefileFormatter.parse(zonefile)
+export class ZoneFile {
+  constructor(zoneFile) {
+    if (typeof zoneFile === 'object') {
+      this.jsonZoneFile = JSON.parse(JSON.stringify(zoneFile))
+    } else if (typeof zoneFile === 'string') {
+      this.jsonZoneFile = zoneFileFormatter.parse(zoneFile)
     }
   }
 
   toJSON() {
-    return this.jsonZonefile
+    return this.jsonZoneFile
   }
 
   toString() {
-    return zonefileFormatter.generate(this.toJSON())
+    return zoneFileFormatter.generate(this.toJSON())
   }
 
   static prepareForHostedFile(origin, tokenFileUrl) {
@@ -26,7 +26,7 @@ export class Zonefile {
         domain = urlParts[0],
         pathname = '/' + urlParts.slice(1).join('/')
 
-    let zonefile = {
+    let zoneFile = {
       "$origin": origin,
       "$ttl": "3600",
       "cname": [
@@ -36,7 +36,6 @@ export class Zonefile {
         { "name": "@", "txt": `pathname: ${pathname}` }
       ]
     }
-    console.log(zonefile)
-    return new Zonefile(zonefile)
+    return new ZoneFile(zoneFile)
   }
 }

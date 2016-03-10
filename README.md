@@ -39,14 +39,14 @@ $ npm install blockstack-profiles
 #### ES6
 
 ```es6
-import { signProfileTokens, getProfileFromTokens, Person } from 'blockstack-profiles'
+import { signRecords, getProfileFromTokens, Person } from 'blockstack-profiles'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 ```
 
 #### Node
 
 ```es6
-var signProfileTokens = require('blockstack-profiles').signProfileTokens,
+var signRecords = require('blockstack-profiles').signRecords,
     getProfileFromTokens = require('blockstack-profiles').getProfileFromTokens
 
 var PrivateKeychain = require('elliptic-keychain').PrivateKeychain,
@@ -86,7 +86,7 @@ var balloonDog = {
 
 ```js
 > var privateKeychain = new PrivateKeychain()
-> var tokenRecords = signProfileTokens([balloonDog], privateKeychain)
+> var tokenRecords = signRecords([balloonDog], privateKeychain)
 > console.log(tokenRecords)
 [
   {
