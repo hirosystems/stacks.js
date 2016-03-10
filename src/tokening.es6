@@ -1,19 +1,47 @@
 import {
     PrivateKeychain, PublicKeychain, getChildKeypair, getEntropy
 } from 'elliptic-keychain'
-import { crypto as hashing } from 'bitcoinjs-lib'
+import { crypto as hashing, ECPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
 import { secp256k1 } from 'elliptic-curve'
+import * as BigInteger from 'bigi'
+
+export function signRecord(record, subject, issuedAt, expiresAt, issuerPrivateKey, signingAlgorithm = 'ES256K') {
+
+  if (signingAlgorithm !== 'ES256K') {
+    throw new Error('Signing algorithm not supported')
+  }
+
+  const payload = {
+    claim: record,
+    subject: subject,
+    issuedAt: issuedAt,
+    expiresAt: expiresAt
+  }
+
+  const tokenSigner = new TokenSigner(signingAlgorithm, issuerPrivateKey)
+  const token = tokenSigner.sign(payload)
+  
+  const privKeyBigInt = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex'))
+  const ecPair = new ECPair(privKeyBigInt, null, {})
+  const issuerPublicKey = ecPair.getPublicKeyBuffer().toString('hex')
+  
+  const tokenRecord = {
+    token: token,
+    data: decodeToken(token),
+    publicKey: issuerPublicKey,
+    encrypted: false
+  }
+
+  return tokenRecord
+}
 
 export function signProfileTokens(profileComponents, privateKeychain, signingAlgorithm = 'ES256K') {
   if (!privateKeychain instanceof PrivateKeychain) {
     throw new Error('Invalid private keychain')
   }
 
-  let ellipticCurve
-  if (signingAlgorithm === 'ES256K') {
-    ellipticCurve = secp256k1
-  } else {
+  if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
 
@@ -32,26 +60,25 @@ export function signProfileTokens(profileComponents, privateKeychain, signingAlg
           privateKey = privateChildKeychain.privateKey('hex'),
           publicKey = privateChildKeychain.publicKeychain().publicKey('hex')
 
-    const payload = {
-      claim: data,
-      subject: {
-        publicKey: publicKey
-      },
-      issuedAt: new Date(),
-      expiresAt: new Date().setYear(new Date().getFullYear() + 1)
-    }
+    const issuedAt = new Date()
+    const expiresAt = new Date(issuedAt.getFullYear()+1, 
+                               issuedAt.getMonth(),
+                               issuedAt.getDate(),
+                               issuedAt.getHours(),
+                               issuedAt.getMinutes(),
+                               issuedAt.getSeconds(),
+                               issuedAt.getMilliseconds())
 
-    const tokenSigner = new TokenSigner(signingAlgorithm, privateKey),
-          token = tokenSigner.sign(payload)
+    const subject = {publicKey: publicKey}
+    var tokenRecord = signRecord(data,
+                                 subject,
+                                 issuedAt,
+                                 expiresAt,
+                                 privateKey,
+                                 signingAlgorithm)
 
-    const tokenRecord = {
-      token: token,
-      data: decodeToken(token),
-      publicKey: publicKey,
-      parentPublicKey: parentPublicKey,
-      derivationEntropy: derivationEntropy.toString('hex'),
-      encrypted: false
-    }
+    tokenRecord.parentPublicKey = parentPublicKey
+    tokenRecord.derivationEntropy = derivationEntropy.toString('hex')
 
     tokenRecords.push(tokenRecord)
   })

@@ -16,6 +16,7 @@
     "tape": "^4.4.0"
   },
   "dependencies": {
+    "bigi" : "^1.4.1",
     "bitcoinjs-lib": "^2.1.4",
     "dateformat": "^1.0.12",
     "dns-zonefile": "^0.1.12",
