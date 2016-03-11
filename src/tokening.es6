@@ -5,17 +5,15 @@ import { crypto as hashing, ECPair as EllipticKeyPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
 import { secp256k1 } from 'elliptic-curve'
 import * as BigInteger from 'bigi'
+import { nextYear } from './utils'
 
 export function signRecord(claim, subject, issuerPrivateKey,
-                           signingAlgorithm='ES256K') {
+                           signingAlgorithm='ES256K', issuedAt=new Date(),
+                           expiresAt=nextYear()) {
 
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
-
-  const issuedAt = new Date(),
-        nextYear = issuedAt.getFullYear() + 1,
-        expiresAt = new Date(new Date().setFullYear(nextYear))
 
   const payload = {
     claim: claim,
@@ -25,11 +23,12 @@ export function signRecord(claim, subject, issuerPrivateKey,
   }
 
   const tokenSigner = new TokenSigner(signingAlgorithm, issuerPrivateKey),
-        token = tokenSigner.sign(payload),
-        privateKeyBigInteger = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex')),
+        token = tokenSigner.sign(payload)
+
+  const privateKeyBigInteger = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex')),
         ellipticKeyPair = new EllipticKeyPair(privateKeyBigInteger, null, {}),
         issuerPublicKey = ellipticKeyPair.getPublicKeyBuffer().toString('hex')
-  
+
   return {
     token: token,
     data: decodeToken(token),

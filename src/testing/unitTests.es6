@@ -13,7 +13,7 @@ let sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
   google: JSON.parse(fs.readFileSync('./docs/profiles/google.json')),
-  navalLegacy: JSON.parse(fs.readFileSync('./docs/deprecated/naval.json'))
+  navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
 }
 
 function testTokening(filename, profile) {
