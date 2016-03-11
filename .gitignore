@@ -32,3 +32,4 @@ unused
 
 # Folder to ignore for development with es6
 lib
+docs

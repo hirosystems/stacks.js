@@ -1,19 +1,51 @@
 import {
     PrivateKeychain, PublicKeychain, getChildKeypair, getEntropy
 } from 'elliptic-keychain'
-import { crypto as hashing } from 'bitcoinjs-lib'
+import { crypto as hashing, ECPair as EllipticKeyPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
 import { secp256k1 } from 'elliptic-curve'
+import * as BigInteger from 'bigi'
 
-export function signProfileTokens(profileComponents, privateKeychain, signingAlgorithm = 'ES256K') {
+export function signRecord(claim, subject, issuerPrivateKey,
+                           signingAlgorithm='ES256K') {
+
+  if (signingAlgorithm !== 'ES256K') {
+    throw new Error('Signing algorithm not supported')
+  }
+
+  const issuedAt = new Date(),
+        nextYear = issuedAt.getFullYear() + 1,
+        expiresAt = new Date(new Date().setFullYear(nextYear))
+
+  const payload = {
+    claim: claim,
+    subject: subject,
+    issuedAt: issuedAt.toISOString(),
+    expiresAt: expiresAt.toISOString()
+  }
+
+  const tokenSigner = new TokenSigner(signingAlgorithm, issuerPrivateKey),
+        token = tokenSigner.sign(payload),
+        privateKeyBigInteger = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex')),
+        ellipticKeyPair = new EllipticKeyPair(privateKeyBigInteger, null, {}),
+        issuerPublicKey = ellipticKeyPair.getPublicKeyBuffer().toString('hex')
+  
+  return {
+    token: token,
+    data: decodeToken(token),
+    publicKey: issuerPublicKey,
+    encrypted: false
+  }
+}
+
+export function signRecords(profileComponents, privateKeychain,
+                           signingAlgorithm='ES256K') {
+
   if (!privateKeychain instanceof PrivateKeychain) {
     throw new Error('Invalid private keychain')
   }
 
-  let ellipticCurve
-  if (signingAlgorithm === 'ES256K') {
-    ellipticCurve = secp256k1
-  } else {
+  if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
 
@@ -21,7 +53,7 @@ export function signProfileTokens(profileComponents, privateKeychain, signingAlg
       parentPublicKey = privateKeychain.publicKeychain().publicKey('hex')
 
   profileComponents.map((data) => {
-    let derivationEntropy = hashing.sha256(
+    const derivationEntropy = hashing.sha256(
       Buffer.concat([
         privateKeychain.privateKey(),
         new Buffer(JSON.stringify(data))
@@ -32,26 +64,10 @@ export function signProfileTokens(profileComponents, privateKeychain, signingAlg
           privateKey = privateChildKeychain.privateKey('hex'),
           publicKey = privateChildKeychain.publicKeychain().publicKey('hex')
 
-    const payload = {
-      claim: data,
-      subject: {
-        publicKey: publicKey
-      },
-      issuedAt: new Date(),
-      expiresAt: new Date().setYear(new Date().getFullYear() + 1)
-    }
-
-    const tokenSigner = new TokenSigner(signingAlgorithm, privateKey),
-          token = tokenSigner.sign(payload)
-
-    const tokenRecord = {
-      token: token,
-      data: decodeToken(token),
-      publicKey: publicKey,
-      parentPublicKey: parentPublicKey,
-      derivationEntropy: derivationEntropy.toString('hex'),
-      encrypted: false
-    }
+    const subject = {publicKey: publicKey}
+    let tokenRecord = signRecord(data, subject, privateKey, signingAlgorithm)
+    tokenRecord.parentPublicKey = parentPublicKey
+    tokenRecord.derivationEntropy = derivationEntropy.toString('hex')
 
     tokenRecords.push(tokenRecord)
   })
@@ -77,7 +93,8 @@ export function validateTokenRecord(tokenRecord, publicKeychain) {
     throw new Error('Token verification failed')
   }
 
-  let childKeychain = publicKeychain.child(new Buffer(tokenRecord.derivationEntropy, 'hex'))
+  let childKeychain = publicKeychain.child(
+    new Buffer(tokenRecord.derivationEntropy, 'hex'))
   if (childKeychain.publicKey('hex') !== tokenRecord.publicKey) {
     throw new Error('Child public key is not a valid child of the parent public key')
   }

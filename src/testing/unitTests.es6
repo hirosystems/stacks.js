@@ -2,7 +2,7 @@ import test from 'tape'
 import fs from 'fs'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 import {
-  signProfileTokens, getProfileFromTokens, validateTokenRecord, Zonefile,
+  signRecords, getProfileFromTokens, validateTokenRecord, ZoneFile,
   Profile, Person, Organization, CreativeWork
 } from '../index'
 
@@ -16,15 +16,16 @@ let sampleProfiles = {
   navalLegacy: JSON.parse(fs.readFileSync('./docs/deprecated/naval.json'))
 }
 
-function testTokening(profile) {
+function testTokening(filename, profile) {
   let tokenRecords = []
 
   test('profileToTokens', function(t) {
     t.plan(2)
 
-    tokenRecords = signProfileTokens([profile], privateKeychain)
+    tokenRecords = signRecords([profile], privateKeychain)
     t.ok(tokenRecords, 'Tokens should have been created')
     //console.log(JSON.stringify(tokenRecords, null, 2))
+    fs.writeFileSync('./docs/tokenfiles/' + filename, JSON.stringify(tokenRecords, null, 2))
 
     let tokensVerified = true
     tokenRecords.map(function(tokenRecord) {
@@ -47,46 +48,46 @@ function testTokening(profile) {
   })
 }
 
-function testZonefile() {
-  let zonefileJsonReference = JSON.parse(fs.readFileSync('./docs/zonefiles/zonefile-1.json')),
-      zonefileStringReference = fs.readFileSync('./docs/zonefiles/zonefile-1.txt', 'utf-8')
+function testZoneFile() {
+  let zoneFileJsonReference = JSON.parse(fs.readFileSync('./docs/zonefiles/zonefile-1.json')),
+      zoneFileStringReference = fs.readFileSync('./docs/zonefiles/zonefile-1.txt', 'utf-8')
 
-  test('zonefileFromJson', function(t) {
+  test('zoneFileFromJson', function(t) {
     t.plan(5)
 
-    let zonefile = new Zonefile(zonefileJsonReference)
-    t.ok(zonefile, 'Zonefile object should have been created')
+    let zoneFile = new ZoneFile(zoneFileJsonReference)
+    t.ok(zoneFile, 'ZoneFile object should have been created')
 
-    let zonefileJson = zonefile.toJSON()
-    t.ok(zonefileJson, 'Zonefile JSON should have been created')
-    t.equal(JSON.stringify(zonefileJson), JSON.stringify(zonefileJsonReference), 'Zonefile JSON should match the reference')
+    let zoneFileJson = zoneFile.toJSON()
+    t.ok(zoneFileJson, 'ZoneFile JSON should have been created')
+    t.equal(JSON.stringify(zoneFileJson), JSON.stringify(zoneFileJsonReference), 'ZoneFile JSON should match the reference')
 
-    let zonefileString = zonefile.toString()
-    t.ok(zonefileString, 'Zonefile text should have been created')
-    t.equal(zonefileString.split('; NS Records')[1], zonefileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
+    let zoneFileString = zoneFile.toString()
+    t.ok(zoneFileString, 'ZoneFile text should have been created')
+    t.equal(zoneFileString.split('; NS Records')[1], zoneFileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
   })
 
-  test('zonefileFromString', function(t) {
+  test('zoneFileFromString', function(t) {
     t.plan(5)
 
-    let zonefile = new Zonefile(zonefileStringReference)
-    t.ok(zonefile, 'Zonefile object should have been created')
+    let zoneFile = new ZoneFile(zoneFileStringReference)
+    t.ok(zoneFile, 'ZoneFile object should have been created')
 
-    let zonefileJson = zonefile.toJSON()
-    t.ok(zonefileJson, 'Zonefile JSON should have been created')
-    t.equal(JSON.stringify(zonefileJson), JSON.stringify(zonefileJsonReference), 'Zonefile JSON should match the reference')
+    let zoneFileJson = zoneFile.toJSON()
+    t.ok(zoneFileJson, 'ZoneFile JSON should have been created')
+    t.equal(JSON.stringify(zoneFileJson), JSON.stringify(zoneFileJsonReference), 'ZoneFile JSON should match the reference')
 
-    let zonefileString = zonefile.toString()
-    t.ok(zonefileString, 'Zonefile text should have been created')
-    t.equal(zonefileString.split('; NS Records')[1], zonefileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
+    let zoneFileString = zoneFile.toString()
+    t.ok(zoneFileString, 'ZoneFile text should have been created')
+    t.equal(zoneFileString.split('; NS Records')[1], zoneFileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
   })
 
   test('prepareForHostedFile', function(t) {
     t.plan(1)
     
-    let fileUrl = 'https://s3.amazonaws.com/mq9/naval.id.json'
-    let zonefile = Zonefile.prepareForHostedFile('naval.id', fileUrl)
-    t.ok(zonefile, 'Zonefile should have been prepared for hosted file')
+    let fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
+    let zoneFile = ZoneFile.prepareForHostedFile('naval.id', fileUrl)
+    t.ok(zoneFile, 'ZoneFile should have been prepared for hosted file')
   })
 }
 
@@ -103,10 +104,10 @@ function testSchemas() {
     let profileJson = profileObject.toJSON()
     t.ok(profileJson, 'Profile JSON should have been created')  
 
-    let profileTokens = profileObject.toSignedTokens(privateKeychain)
-    t.ok(profileTokens, 'Profile tokens should have been created')
-  
-    let profileObject2 = Profile.fromTokens(profileTokens, publicKeychain)
+    let tokenRecords = profileObject.toSignedTokens(privateKeychain)
+    t.ok(tokenRecords, 'Profile tokens should have been created')
+    
+    let profileObject2 = Profile.fromTokens(tokenRecords, publicKeychain)
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
@@ -120,11 +121,11 @@ function testSchemas() {
     t.ok(validationResults.valid, 'Person profile should be valid')
 
     let standaloneProperties = ['taxID', 'birthDate', 'address']
-    let profileTokens = personObject.toSignedTokens(privateKeychain, standaloneProperties)
-    t.ok(profileTokens, 'Person profile tokens should have been created')
-    fs.writeFileSync('./docs/tokenfiles/naval.json', JSON.stringify(profileTokens, null, 2))
+    let tokenRecords = personObject.toSignedTokens(privateKeychain, standaloneProperties)
+    t.ok(tokenRecords, 'Person profile tokens should have been created')
+    fs.writeFileSync('./docs/tokenfiles/naval-4-tokens.json', JSON.stringify(tokenRecords, null, 2))
 
-    let profileObject2 = Person.fromTokens(profileTokens, publicKeychain)
+    let profileObject2 = Person.fromTokens(tokenRecords, publicKeychain)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
   })
 
@@ -139,8 +140,8 @@ function testSchemas() {
   })
 }
 
-testTokening(sampleProfiles.naval)
-testTokening(sampleProfiles.google)
-testTokening(sampleProfiles.balloonDog)
-testZonefile()
+testTokening('naval.json', sampleProfiles.naval)
+testTokening('google.json', sampleProfiles.google)
+testTokening('balloonDog.json', sampleProfiles.balloonDog)
+testZoneFile()
 testSchemas()
