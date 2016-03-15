@@ -1,6 +1,7 @@
 'use strict'
 
-export { signRecord, signRecords, getProfileFromTokens, validateTokenRecord } from './tokening'
+export { signTokenRecord, signTokenRecords } from './tokenSigning'
+export { getProfileFromTokens, verifyTokenRecord } from './tokenVerifying'
 export { ZoneFile } from './zoneFiles'
 export { Profile } from './profile'
 export { Person, Organization, CreativeWork } from './entities'

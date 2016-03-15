@@ -1,4 +1,4 @@
-import { getProfileFromTokens } from '../tokening'
+import { getProfileFromTokens } from '../tokenVerifying'
 import inspector from 'schema-inspector'
 import { Profile } from '../profile'
 import { getPersonFromLegacyFormat } from '../legacy-formats/person'

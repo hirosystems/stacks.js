@@ -1,4 +1,5 @@
-import { getProfileFromTokens, signRecords } from './tokening'
+import { signTokenRecords } from './tokenSigning'
+import { getProfileFromTokens } from './tokenVerifying'
 import inspector from 'schema-inspector'
 
 let schemaDefinition = {
@@ -36,7 +37,7 @@ export class Profile {
       profile,
       ...profileComponents
     ]
-    return signRecords(profileComponents, privateKeychain)
+    return signTokenRecords(profileComponents, privateKeychain)
   }
 
   static validate(profile) {
