@@ -1,6 +1,6 @@
 # Blockstack Profiles
 
-[![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack-profiles.svg)](https://circleci.com/gh/blockstack/blockstack-profiles)
+[![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack-profiles-js.svg)](https://circleci.com/gh/blockstack/blockstack-profiles-js)
 [![npm](https://img.shields.io/npm/l/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
 [![npm](https://img.shields.io/npm/v/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
 [![npm](https://img.shields.io/npm/dm/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
