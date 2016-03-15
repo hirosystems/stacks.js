@@ -1,4 +1,4 @@
-import * as zoneFileFormatter from 'dns-zonefile'
+import zoneFileFormatter from 'dns-zonefile'
 
 export class ZoneFile {
   constructor(zoneFile) {
