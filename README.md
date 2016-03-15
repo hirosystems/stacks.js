@@ -6,11 +6,10 @@
 [![npm](https://img.shields.io/npm/dm/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
 [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
 
-## Contents
+### Contents
 
-* [Getting Started](#getting-started)
-    * [Installation](#installation)
-    * [Importing](#importing)
+* [Installation](#installation)
+* [Importing](#importing)
 * [Registration](#registration)
 * [Profiles](#profiles)
 * [Zonefiles](#zonefiles)
@@ -24,9 +23,7 @@ This library can be used to:
 1. recover a JSON profile from signed tokens
 1. validate signed profile tokens
 
-*Note: this document uses ES6 in its examples but it is compiled down to and is perfectly compatible with use of Javascript (ES5). If you're using the latter, you'll just have to make a few adjustments to the examples below (e.g. use "let" instead of "var").*
-
-## Getting Started
+*Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var").*
 
 ### Installation
 
@@ -39,21 +36,21 @@ $ npm install blockstack-profiles
 #### ES6
 
 ```es6
-import { signRecords, getProfileFromTokens, Person } from 'blockstack-profiles'
+import { signTokenRecords, getProfileFromTokens, Person } from 'blockstack-profiles'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 ```
 
 #### Node
 
 ```es6
-var signRecords = require('blockstack-profiles').signRecords,
+var signTokenRecords = require('blockstack-profiles').signTokenRecords,
     getProfileFromTokens = require('blockstack-profiles').getProfileFromTokens
 
 var PrivateKeychain = require('elliptic-keychain').PrivateKeychain,
     PublicKeychain = require('elliptic-keychain').PublicKeychain
 ```
 
-## Registration
+### Registration
 
 Follow these steps to create and register a profile for a Blockchain ID:
 
@@ -61,9 +58,9 @@ Follow these steps to create and register a profile for a Blockchain ID:
 2. Split up the profile into tokens, sign the tokens, and put them in a token file
 3. Create a zone file that points to the web location of the profile token file
 
-## Profiles
+### Profiles
 
-### Create a profile
+#### Create a profile
 
 ```es6
 var balloonDog = {
@@ -82,11 +79,11 @@ var balloonDog = {
 }
 ```
 
-### Transform the profile to signed tokens
+#### Transform the profile to signed tokens
 
 ```js
 > var privateKeychain = new PrivateKeychain()
-> var tokenRecords = signRecords([balloonDog], privateKeychain)
+> var tokenRecords = signTokenRecords([balloonDog], privateKeychain)
 > console.log(tokenRecords)
 [
   {
@@ -127,7 +124,7 @@ var balloonDog = {
 ]
 ```
 
-### Recover the profile from the tokens
+#### Recover the profile from the tokens
 
 ```js
 > var publicKeychain = privateKeychain.publicKeychain()
@@ -144,7 +141,7 @@ var balloonDog = {
   datePublished: '2015-12-10T14:44:26-0500' }
 ```
 
-### Validate the profile
+#### Validate the profile
 
 ```js
 > var validationResults = Person.validate(recoveredProfile)
@@ -152,9 +149,9 @@ var balloonDog = {
 true
 ```
 
-## Zone Files
+### Zone Files
 
-### Create a zone file object
+#### Create a zone file object
 
 ```js
 var zoneFileData = {
@@ -169,38 +166,38 @@ var zoneFileData = {
 var zoneFile = new ZoneFile(zoneFileData)
 ```
 
-### Output the zone file as a string
+#### Output the zone file as a string
 
 ```js
 var zoneFileString = zoneFile.toString()
 ```
 
-### Output the zone file to JSON
+#### Output the zone file to JSON
 
 ```js
 var zoneFileJson = zoneFile.toJSON()
 ```
 
-## Wiki
+### Wiki
 
-### Names
+#### Names
 
 A blockchain ID = a name + a profile, registered on a blockchain.
 
 Let's say you register the name 'alice' within the 'id' namespace, the default namespace for name. Then your name would be expressed as `alice.id`.
 
-### Profiles
+#### Profiles
 
 Profile schema is taken from schema.org. The schema for a person record can be found at http://schema.org/Person. There are some fields that have yet to be included, like the "account", "key", "policy", "id", and "publicKey" fields. An updated schema definition will be published to a different location that superclasses the schema.org Person definition and adds these fields.
 
-### Profile Storage
+#### Profile Storage
 
 Blockchain ID profiles are stored in two files: a token file and a zone file:
 
 + **token file** - contains signed tokens with profile data
 + **zone file** - describes where to find the token file
 
-### Lookups
+#### Lookups
 
 An identity lookup is performed as follows:
 
@@ -211,7 +208,7 @@ An identity lookup is performed as follows:
 5. parse through the token file for tokens and verify that all the tokens have valid signatures and that they can be tied back to the user's name (by using the public keychain)
 6. grab all of the claims in the tokens and merge them into a single JSON object, which is the user's profile
 
-### Zone files
+#### Zone files
 
 A zone file contains an origin (the name registered), a TTL (not yet supported), and a list of records.
 

@@ -2,7 +2,7 @@ import test from 'tape'
 import fs from 'fs'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 import {
-  signRecords, getProfileFromTokens, validateTokenRecord, ZoneFile,
+  signTokenRecords, getProfileFromTokens, verifyTokenRecord, ZoneFile,
   Profile, Person, Organization, CreativeWork
 } from '../index'
 
@@ -22,7 +22,7 @@ function testTokening(filename, profile) {
   test('profileToTokens', function(t) {
     t.plan(2)
 
-    tokenRecords = signRecords([profile], privateKeychain)
+    tokenRecords = signTokenRecords([profile], privateKeychain)
     t.ok(tokenRecords, 'Tokens should have been created')
     //console.log(JSON.stringify(tokenRecords, null, 2))
     fs.writeFileSync('./docs/tokenfiles/' + filename, JSON.stringify(tokenRecords, null, 2))
@@ -30,7 +30,7 @@ function testTokening(filename, profile) {
     let tokensVerified = true
     tokenRecords.map(function(tokenRecord) {
       try {
-        validateTokenRecord(tokenRecord, publicKeychain)
+        verifyTokenRecord(tokenRecord, publicKeychain)
       } catch(e) {
         throw e
       }
