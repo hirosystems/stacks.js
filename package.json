@@ -1,6 +1,6 @@
 {
-  "name": "blockstack-profiles",
-  "version": "0.1.0",
+  "name": "blockstack",
+  "version": "0.0.0",
   "description": "A JSON profile system where objects are cryptographically signed and reference one-another",
   "main": "lib/index",
   "scripts": {
