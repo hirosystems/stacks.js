@@ -1,6 +1,6 @@
 # Blockstack Profiles
 
-[![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack-profiles.svg)](https://circleci.com/gh/blockstack/blockstack-profiles)
+[![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack-profiles-js/master.svg)](https://circleci.com/gh/blockstack/blockstack-profiles-js/tree/master)
 [![npm](https://img.shields.io/npm/l/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
 [![npm](https://img.shields.io/npm/v/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
 [![npm](https://img.shields.io/npm/dm/blockstack-profiles.svg)](https://www.npmjs.com/package/blockstack-profiles)
@@ -184,7 +184,7 @@ var zoneFileJson = zoneFile.toJSON()
 
 A blockchain ID = a name + a profile, registered on a blockchain.
 
-Let's say you register the name 'alice' within the 'id' namespace, the default namespace for name. Then your name would be expressed as `alice.id`.
+Let's say you register the name 'alice' within the 'id' namespace, the default namespace for identities for people. In this case, your "fully qualified name" name would be expressed as `alice.id`.
 
 #### Profiles
 
