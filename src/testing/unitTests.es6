@@ -71,7 +71,7 @@ function testZoneFile() {
   })
 
   test('zoneFileFromString', function(t) {
-    t.plan(4)
+    t.plan(6)
 
     let zoneFile = new ZoneFile(zoneFileStringReference)
     t.ok(zoneFile, 'ZoneFile object should have been created')
