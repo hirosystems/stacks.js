@@ -1,6 +1,6 @@
 {
   "$origin": "MYDOMAIN.COM.",
-  "$ttl": "3600",
+  "$ttl": 3600,
   "soa": {
     "name": "@",
     "minimum": 86400,

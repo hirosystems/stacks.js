@@ -19,7 +19,7 @@
     "bigi" : "^1.4.1",
     "bitcoinjs-lib": "^2.1.4",
     "dateformat": "^1.0.12",
-    "dns-zonefile": "^0.1.12",
+    "zone-file": "^0.0.0",
     "elliptic-curve": "^0.1.0",
     "elliptic-keychain": "^0.0.2",
     "hasprop": "0.0.4",
