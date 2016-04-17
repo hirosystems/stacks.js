@@ -12,7 +12,7 @@
 * [Importing](#importing)
 * [Registration](#registration)
 * [Profiles](#profiles)
-* [Zonefiles](#zonefiles)
+* [Zone Files](#zone-files)
 * [Wiki](#wiki)
 
 A library for working with cryptographically-signed JSON profiles.
@@ -208,7 +208,7 @@ An identity lookup is performed as follows:
 5. parse through the token file for tokens and verify that all the tokens have valid signatures and that they can be tied back to the user's name (by using the public keychain)
 6. grab all of the claims in the tokens and merge them into a single JSON object, which is the user's profile
 
-#### Zone files
+#### Zone Files
 
 A zone file contains an origin (the name registered), a TTL (not yet supported), and a list of records.
 
