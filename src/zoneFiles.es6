@@ -1,41 +1,31 @@
-import zoneFileFormatter from 'zone-file'
+import { makeZoneFile } from 'blockstack-zones'
 
-export class ZoneFile {
-  constructor(zoneFile) {
-    if (typeof zoneFile === 'object') {
-      this.jsonZoneFile = JSON.parse(JSON.stringify(zoneFile))
-    } else if (typeof zoneFile === 'string') {
-      this.jsonZoneFile = zoneFileFormatter.parse(zoneFile)
-    }
+export function prepareZoneFileForHostedFile(origin, tokenFileUrl) {
+  if (tokenFileUrl.indexOf('://') < 0) {
+    throw new Error('Invalid token file url')
   }
 
-  toJSON() {
-    return this.jsonZoneFile
+  let urlParts = tokenFileUrl.split('://')[1].split('/'),
+      domain = urlParts[0],
+      pathname = '/' + urlParts.slice(1).join('/')
+
+  let zoneFile = {
+    "$origin": origin,
+    "$ttl": 3600,
+    "uri": [
+      {
+        "name": "_http._tcp",
+        "priority": 10,
+        "weight": 1,
+        "target": `${domain}${pathname}`
+      }
+    ]
   }
 
-  toString() {
-    return zoneFileFormatter.generate(this.toJSON())
-  }
+  let zoneFileTemplate = '{$origin}\n\
+{$ttl}\n\
+{uri}\n\
+'
 
-  static prepareForHostedFile(origin, tokenFileUrl) {
-    if (tokenFileUrl.indexOf('://') < 0) {
-      throw new Error('Invalid token file url')
-    }
-
-    let urlParts = tokenFileUrl.split('://')[1].split('/'),
-        domain = urlParts[0],
-        pathname = '/' + urlParts.slice(1).join('/')
-
-    let zoneFile = {
-      "$origin": origin,
-      "$ttl": "3600",
-      "cname": [
-        { "name": "@", "alias": domain }
-      ],
-      "txt": [
-        { "name": "@", "txt": `pathname: ${pathname}` }
-      ]
-    }
-    return new ZoneFile(zoneFile)
-  }
+  return makeZoneFile(zoneFile, zoneFileTemplate)
 }

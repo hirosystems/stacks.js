@@ -3,7 +3,7 @@ import fs from 'fs'
 import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
 import {
   signTokenRecords, getProfileFromTokens, verifyTokenRecord, ZoneFile,
-  Profile, Person, Organization, CreativeWork
+  Profile, Person, Organization, CreativeWork, prepareZoneFileForHostedFile
 } from '../index'
 
 let privateKeychain = new PrivateKeychain(),
@@ -49,51 +49,13 @@ function testTokening(filename, profile) {
 }
 
 function testZoneFile() {
-  let zoneFileJsonReference = JSON.parse(fs.readFileSync('./docs/zonefiles/zonefile-1.json')),
-      zoneFileStringReference = fs.readFileSync('./docs/zonefiles/zonefile-1.txt', 'utf-8')
-
-  test('zoneFileFromJson', function(t) {
-    t.plan(6)
-
-    let zoneFile = new ZoneFile(zoneFileJsonReference)
-    t.ok(zoneFile, 'ZoneFile object should have been created')
-
-    let zoneFileJson = zoneFile.toJSON()
-    t.ok(zoneFileJson, 'ZoneFile JSON should have been created')
-    t.equal(zoneFileJson['$ttl'], zoneFileJsonReference['$ttl'], 'zone file TTL should match reference')
-    t.equal(zoneFileJson['$domain'], zoneFileJsonReference['$domain'], 'zone file domain should match reference')
-    t.equal(zoneFileJson['txt'][0]['txt'], zoneFileJsonReference['txt'][0]['txt'], 'zone file TXT record should match reference')
-    //t.equal(JSON.stringify(zoneFileJson), JSON.stringify(zoneFileJsonReference), 'ZoneFile JSON should match the reference')
-
-    let zoneFileString = zoneFile.toString()
-    t.ok(zoneFileString, 'ZoneFile text should have been created')
-    //t.equal(zoneFileString.toString().split('; NS Records')[1], zoneFileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
-  })
-
-  test('zoneFileFromString', function(t) {
-    t.plan(6)
-
-    let zoneFile = new ZoneFile(zoneFileStringReference)
-    t.ok(zoneFile, 'ZoneFile object should have been created')
-
-    let zoneFileJson = zoneFile.toJSON()
-    t.ok(zoneFileJson, 'ZoneFile JSON should have been created')
-    t.equal(zoneFileJson['$ttl'], zoneFileJsonReference['$ttl'], 'zone file TTL should match reference')
-    t.equal(zoneFileJson['$domain'], zoneFileJsonReference['$domain'], 'zone file domain should match reference')
-    t.equal(zoneFileJson['txt'][0]['txt'], zoneFileJsonReference['txt'][0]['txt'], 'zone file TXT record should match reference')
-    //t.equal(JSON.stringify(zoneFileJson), JSON.stringify(zoneFileJsonReference), 'ZoneFile JSON should match the reference')
-
-    let zoneFileString = zoneFile.toString()
-    t.ok(zoneFileString, 'ZoneFile text should have been created')
-    //t.equal(zoneFileString.split('; NS Records')[1], zoneFileStringReference.split('; NS Records')[1], 'Zonefile text should match the reference')
-  })
-
   test('prepareForHostedFile', function(t) {
     t.plan(1)
     
     let fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
-    let zoneFile = ZoneFile.prepareForHostedFile('naval.id', fileUrl)
-    t.ok(zoneFile, 'ZoneFile should have been prepared for hosted file')
+    let zoneFile = prepareZoneFileForHostedFile('naval.id', fileUrl)
+    //console.log(zoneFile)
+    t.ok(zoneFile, 'Zone file should have been prepared for hosted file')
   })
 }
 
