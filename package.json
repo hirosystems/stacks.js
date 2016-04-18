@@ -1,6 +1,6 @@
 {
-  "name": "blockstack",
-  "version": "0.0.0",
+  "name": "blockstack-profiles",
+  "version": "0.1.1",
   "description": "A JSON profile system where objects are cryptographically signed and reference one-another",
   "main": "lib/index",
   "scripts": {
@@ -16,10 +16,10 @@
     "tape": "^4.4.0"
   },
   "dependencies": {
-    "bigi" : "^1.4.1",
+    "bigi": "^1.4.1",
     "bitcoinjs-lib": "^2.1.4",
+    "blockstack-zones": "0.0.1",
     "dateformat": "^1.0.12",
-    "zone-file": "^0.0.0",
     "elliptic-curve": "^0.1.0",
     "elliptic-keychain": "^0.0.2",
     "hasprop": "0.0.4",
