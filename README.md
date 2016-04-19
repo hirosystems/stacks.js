@@ -36,18 +36,20 @@ $ npm install blockstack-profiles
 #### ES6
 
 ```es6
-import { signTokenRecords, getProfileFromTokens, Person } from 'blockstack-profiles'
-import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
+import {
+  signToken, wrapToken, signTokenRecords,
+  verifyTokenRecord, getProfileFromTokens,
+  Profile, Person, Organization, CreativeWork,
+  prepareZoneFileForHostedFile
+} from 'blockstack-profiles'
+import { PrivateKeychain, PublicKeychain } from 'blockstack-keychain'
 ```
 
 #### Node
 
 ```es6
-var signTokenRecords = require('blockstack-profiles').signTokenRecords,
-    getProfileFromTokens = require('blockstack-profiles').getProfileFromTokens
-
-var PrivateKeychain = require('elliptic-keychain').PrivateKeychain,
-    PublicKeychain = require('elliptic-keychain').PublicKeychain
+var blockstackProfiles = require('blockstack-profiles')
+var blockstackKeychain = require('blockstack-keychain')
 ```
 
 ### Registration
@@ -63,7 +65,7 @@ Follow these steps to create and register a profile for a Blockchain ID:
 #### Create a profile
 
 ```es6
-var balloonDog = {
+let balloonDog = {
   "@context": "http://schema.org/",
   "@type": "CreativeWork",
   "name": "Balloon Dog",
@@ -79,12 +81,72 @@ var balloonDog = {
 }
 ```
 
-#### Transform the profile to signed tokens
+#### Sign a profile as a single token
+
+```es6
+let privateKeychain = new PrivateKeychain(),
+    privateKey = privateKeychain.privateKey('hex'),
+    publicKey = privateKeychain.publicKeychain.publicKey('hex')
+let token = signToken(balloonDog, privateKey, {publicKey: publicKey})
+let tokenRecord = wrapToken(token)
+console.log(token)
+eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzMTc1MTFlOWVhY2Y0MmZlOGY3MTdmNzU3ODc2YzU1YmQ1ZDRjODgxOGViYWMxNzdiMzUwZmEyZDMzMzAwMTA2NiJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDMxNzUxMWU5ZWFjZjQyZmU4ZjcxN2Y3NTc4NzZjNTViZDVkNGM4ODE4ZWJhYzE3N2IzNTBmYTJkMzMzMDAxMDY2In0sImlzc3VlZEF0IjoiMjAxNi0wNC0xOFQyMzo0NTo1Mi40MTFaIiwiZXhwaXJlc0F0IjoiMjAxNy0wNC0xOFQyMzo0NTo1Mi40MTFaIn0.4M-XodG4PaNm1NovKKo3gZVUMwG6aN7W9sVESqdZ4I9UaTB30jEuvqKWyD4aPcckw6SEEbZ1cBwgW9qXNXipzg
+console.log(tokenRecord)
+{
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzMTc1MTFlOWVhY2Y0MmZlOGY3MTdmNzU3ODc2YzU1YmQ1ZDRjODgxOGViYWMxNzdiMzUwZmEyZDMzMzAwMTA2NiJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDMxNzUxMWU5ZWFjZjQyZmU4ZjcxN2Y3NTc4NzZjNTViZDVkNGM4ODE4ZWJhYzE3N2IzNTBmYTJkMzMzMDAxMDY2In0sImlzc3VlZEF0IjoiMjAxNi0wNC0xOFQyMzo0NTo1Mi40MTFaIiwiZXhwaXJlc0F0IjoiMjAxNy0wNC0xOFQyMzo0NTo1Mi40MTFaIn0.4M-XodG4PaNm1NovKKo3gZVUMwG6aN7W9sVESqdZ4I9UaTB30jEuvqKWyD4aPcckw6SEEbZ1cBwgW9qXNXipzg",
+  "data": {
+    "header": {
+      "typ": "JWT",
+      "alg": "ES256K"
+    },
+    "payload": {
+      "claim": {
+        "@context": "http://schema.org/",
+        "@type": "CreativeWork",
+        "name": "Balloon Dog",
+        "creator": [
+          {
+            "@type": "Person",
+            "@id": "therealjeffkoons.id",
+            "name": "Jeff Koons"
+          }
+        ],
+        "dateCreated": "1994-05-09T00:00:00-0400",
+        "datePublished": "2015-12-10T14:44:26-0500"
+      },
+      "subject": {
+        "publicKey": "0317511e9eacf42fe8f717f757876c55bd5d4c8818ebac177b350fa2d333001066"
+      },
+      "issuer": {
+        "publicKey": "0317511e9eacf42fe8f717f757876c55bd5d4c8818ebac177b350fa2d333001066"
+      },
+      "issuedAt": "2016-04-18T23:45:52.411Z",
+      "expiresAt": "2017-04-18T23:45:52.411Z"
+    },
+    "signature": "4M-XodG4PaNm1NovKKo3gZVUMwG6aN7W9sVESqdZ4I9UaTB30jEuvqKWyD4aPcckw6SEEbZ1cBwgW9qXNXipzg"
+  },
+  "encrypted": false,
+  "parentPublicKey": "02b511f1267a77f5814b2c07f03f1f112438d4be6f553dd4b877b2832874b4e706",
+  "derivationEntropy": "1f8eaa7a916f05218cfc6904a3dab1a1ccd3ab69fbdd9d96a24db8c7445d118c"
+}
+```
+
+#### Verify an individual token
 
 ```js
-> var privateKeychain = new PrivateKeychain()
-> var tokenRecords = signTokenRecords([balloonDog], privateKeychain)
-> console.log(tokenRecords)
+try {
+  let decodedToken = verifyTokenRecord(tokenRecords[0], publicKeychain)
+} catch(e) {
+  console.log(e)
+}
+```
+
+#### Transform a profile to multiple signed tokens
+
+```es6
+let privateKeychain = new PrivateKeychain()
+let tokenRecords = signTokenRecords([balloonDog], privateKeychain)
+console.log(tokenRecords)
 [
   {
     "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzYTU5ZGJmZDk2MTJlNDA4ODgxOGM5MGUxOWFmY2Y4ZDE3OTNiMzhhNWMwNDBjMzhkN2QwN2JiN2QzOWQ4NmQ3MiJ9LCJpc3N1ZWRBdCI6IjIwMTYtMDMtMTBUMTc6MDE6MzIuODc5WiIsImV4cGlyZXNBdCI6IjIwMTctMDMtMTBUMTc6MDE6MzIuODc5WiJ9.vEUJzl713FApgDNYzbUue5SDOdeElxEaAnMbmT-A6ihfrnzhOd5WvzlGJwTiz1LbeTruhQgbh_XyCJ6aLxfu6A",
@@ -124,12 +186,12 @@ var balloonDog = {
 ]
 ```
 
-#### Recover the profile from the tokens
+#### Recover a profile from tokens
 
 ```js
-> var publicKeychain = privateKeychain.publicKeychain()
-> var recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
-> console.log(recoveredProfile)
+let publicKeychain = privateKeychain.publicKeychain()
+let recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
+console.log(recoveredProfile)
 { '@context': 'http://schema.org/',
   '@type': 'CreativeWork',
   name: 'Balloon Dog',
@@ -141,41 +203,12 @@ var balloonDog = {
   datePublished: '2015-12-10T14:44:26-0500' }
 ```
 
-#### Validate the profile
+#### Validate profile schema
 
 ```js
-> var validationResults = Person.validate(recoveredProfile)
+> var validationResults = Person.validateSchema(recoveredProfile)
 > console.log(validationResults.valid)
 true
-```
-
-### Zone Files
-
-#### Create a zone file object
-
-```js
-var zoneFileData = {
-  "$origin": "MYDOMAIN.COM.",
-  "$ttl": 3600,
-  "a": [
-    { "name": "@", "ip": "127.0.0.1" },
-    { "name": "www", "ip": "127.0.0.1" }
-  ]
-}
-
-var zoneFile = new ZoneFile(zoneFileData)
-```
-
-#### Output the zone file as a string
-
-```js
-var zoneFileString = zoneFile.toString()
-```
-
-#### Output the zone file to JSON
-
-```js
-var zoneFileJson = zoneFile.toJSON()
 ```
 
 ### Wiki
@@ -207,21 +240,3 @@ An identity lookup is performed as follows:
 4. issue a request to the token file URL and get back the token file
 5. parse through the token file for tokens and verify that all the tokens have valid signatures and that they can be tied back to the user's name (by using the public keychain)
 6. grab all of the claims in the tokens and merge them into a single JSON object, which is the user's profile
-
-#### Zone Files
-
-A zone file contains an origin (the name registered), a TTL (not yet supported), and a list of records.
-
-Each record has a name, class, type, data, and checksums.
-
-If the value of the "name" field is "@", that means the record corresponds to the "zone origin" of the name.
-
-The "class" field corresponds to the namespace of the record's information. In ICANN DNS, this is traditionally "IN" for Internet, but this field could be changed to something else to indicate that the names are registered in a parallel DNS universe.
-
-The "type" field indicates how the record should be resolved. Only "CNAME" is currently supported. This means that the name record should be interpreted as an alias of the URL that is provided in the "data" field.
-
-The "data" field is interpretted in different ways, depending on the value in the "type" field. As mentioned previously, though, the only supported type at the moment is "CNAME", so the "data" field will contain a URL until that changes.
-
-The "checksums" field indicates values in the parsed profile that should be considered "immutable" fields. One can be certain that the values of these fields cannot change because the values of their hashes must correspond to the corresponding values in the checksum records.
-
-The "publicKeychain" field indicates the keychain that was used to sign the tokens found in the token file.

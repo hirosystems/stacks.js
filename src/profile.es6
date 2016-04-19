@@ -40,7 +40,7 @@ export class Profile {
     return signTokenRecords(profileComponents, privateKeychain)
   }
 
-  static validate(profile) {
+  static validateSchema(profile) {
     return inspector.validate(schemaDefinition, profile)
   }
 

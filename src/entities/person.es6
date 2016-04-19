@@ -99,7 +99,7 @@ export class Person extends Profile {
     }, this._profile)
   }
 
-  static validate(profile, strict = false) {
+  static validateSchema(profile, strict = false) {
     schemaDefinition['strict'] = strict
     return inspector.validate(schemaDefinition, profile)
   }

@@ -19,7 +19,7 @@ export class CreativeWork extends Profile {
     }, this._profile)
   }
 
-  static validate(profile) {
+  static validateSchema(profile) {
     return inspector.validate(schemaDefinition, profile)
   }
 

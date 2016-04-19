@@ -1,14 +1,15 @@
 'use strict'
 
-import { signTokenRecord, signTokenRecords } from './tokenSigning'
-import { getProfileFromTokens, verifyTokenRecord } from './tokenVerifying'
+import { signToken, wrapToken, signTokenRecords } from './tokenSigning'
+import { verifyTokenRecord, getProfileFromTokens } from './tokenVerifying'
 import { prepareZoneFileForHostedFile } from './zoneFiles'
 import { Profile } from './profile'
 import { Person, Organization, CreativeWork } from './entities'
 import { nextYear } from './utils'
 
 export {
-  signTokenRecord,
+  signToken,
+  wrapToken,
   signTokenRecords,
   getProfileFromTokens,
   verifyTokenRecord,

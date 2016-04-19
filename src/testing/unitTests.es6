@@ -1,9 +1,11 @@
 import test from 'tape'
 import fs from 'fs'
-import { PrivateKeychain, PublicKeychain } from 'elliptic-keychain'
+import { PrivateKeychain, PublicKeychain } from 'blockstack-keychain'
 import {
-  signTokenRecords, getProfileFromTokens, verifyTokenRecord, ZoneFile,
-  Profile, Person, Organization, CreativeWork, prepareZoneFileForHostedFile
+  signToken, wrapToken, signTokenRecords,
+  getProfileFromTokens, verifyTokenRecord,
+  Profile, Person, Organization, CreativeWork,
+  prepareZoneFileForHostedFile
 } from '../index'
 
 let privateKeychain = new PrivateKeychain(),
@@ -19,7 +21,22 @@ let sampleProfiles = {
 function testTokening(filename, profile) {
   let tokenRecords = []
 
-  test('profileToTokens', function(t) {
+  test('profileToToken', (t) => {
+    t.plan(3)
+
+    let privateKey = privateKeychain.privateKey('hex'),
+        publicKey = publicKeychain.publicKey('hex')
+
+    let token = signToken(profile, privateKey, {publicKey: publicKey})
+    t.ok(token, 'Token must have been created')
+    let tokenRecord = wrapToken(token)
+    t.ok(tokenRecord, 'Token record must have been created')
+
+    let decodedToken = verifyTokenRecord(tokenRecord, publicKey)
+    t.ok(decodedToken, 'Token record must have been verified')
+  })
+
+  test('profileToTokens', (t) => {
     t.plan(2)
 
     tokenRecords = signTokenRecords([profile], privateKeychain)
@@ -28,17 +45,13 @@ function testTokening(filename, profile) {
     fs.writeFileSync('./docs/tokenfiles/' + filename, JSON.stringify(tokenRecords, null, 2))
 
     let tokensVerified = true
-    tokenRecords.map(function(tokenRecord) {
-      try {
-        verifyTokenRecord(tokenRecord, publicKeychain)
-      } catch(e) {
-        throw e
-      }
+    tokenRecords.map((tokenRecord) => {
+      let decodedToken = verifyTokenRecord(tokenRecord, publicKeychain)
     })
     t.equal(tokensVerified, true, 'All tokens should be valid')
   })
 
-  test('tokensToProfile', function(t) {
+  test('tokensToProfile', (t) => {
     t.plan(2)
 
     let recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
@@ -49,7 +62,7 @@ function testTokening(filename, profile) {
 }
 
 function testZoneFile() {
-  test('prepareForHostedFile', function(t) {
+  test('prepareForHostedFile', (t) => {
     t.plan(1)
     
     let fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
@@ -60,13 +73,13 @@ function testZoneFile() {
 }
 
 function testSchemas() {
-  test('Profile', function(t) {
+  test('Profile', (t) => {
     t.plan(5)
 
     let profileObject = new Profile(sampleProfiles.naval)
     t.ok(profileObject, 'Profile object should have been created')
 
-    let validationResults = Profile.validate(sampleProfiles.naval)
+    let validationResults = Profile.validateSchema(sampleProfiles.naval)
     t.ok(validationResults.valid, 'Profile should be valid')
 
     let profileJson = profileObject.toJSON()
@@ -79,13 +92,13 @@ function testSchemas() {
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
-  test('Person', function(t) {
+  test('Person', (t) => {
     t.plan(4)
 
     let personObject = new Person(sampleProfiles.naval)
     t.ok(personObject, 'Person object should have been created')
 
-    let validationResults = Person.validate(sampleProfiles.naval, true)
+    let validationResults = Person.validateSchema(sampleProfiles.naval, true)
     t.ok(validationResults.valid, 'Person profile should be valid')
 
     let standaloneProperties = ['taxID', 'birthDate', 'address']
@@ -97,13 +110,13 @@ function testSchemas() {
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
   })
 
-  test('legacyFormat', function(t) {
+  test('legacyFormat', (t) => {
     t.plan(2)
 
     let profileObject = Person.fromLegacyFormat(sampleProfiles.navalLegacy)
     t.ok(profileObject, 'Profile object should have been created from legacy formatted profile')
 
-    let validationResults = Person.validate(profileObject.toJSON(), true)
+    let validationResults = Person.validateSchema(profileObject.toJSON(), true)
     t.ok(validationResults, 'Profile should be in a valid format')
   })
 }
