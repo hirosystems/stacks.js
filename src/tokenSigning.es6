@@ -41,7 +41,7 @@ export function signToken(claim, signingPrivateKey, subject, issuer=null,
 export function wrapToken(token) {
   return {
     token: token,
-    data: decodeToken(token),
+    decodedToken: decodeToken(token),
     encrypted: false
   }
 }
