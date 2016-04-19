@@ -2,6 +2,7 @@ import { getProfileFromTokens } from '../tokenVerifying'
 import inspector from 'schema-inspector'
 import { Profile } from '../profile'
 import { getPersonFromLegacyFormat } from '../legacy-formats/person'
+import { getName, getVerifiedAccounts, getAvatarUrl } from './personUtils'
 
 let schemaDefinition = {
   type: 'object',
@@ -112,5 +113,17 @@ export class Person extends Profile {
   static fromLegacyFormat(legacyProfile) {
     let profile = getPersonFromLegacyFormat(legacyProfile)
     return new Person(profile)
+  }
+
+  name() {
+    return getName(this._profile)
+  }
+
+  avatarUrl() {
+    return getAvatarUrl(this._profile)
+  }
+
+  verifiedAccounts(verifications) {
+    return getVerifiedAccounts(this._profile, verifications)
   }
 }

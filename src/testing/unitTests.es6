@@ -93,7 +93,7 @@ function testSchemas() {
   })
 
   test('Person', (t) => {
-    t.plan(4)
+    t.plan(7)
 
     let personObject = new Person(sampleProfiles.naval)
     t.ok(personObject, 'Person object should have been created')
@@ -108,6 +108,13 @@ function testSchemas() {
 
     let profileObject2 = Person.fromTokens(tokenRecords, publicKeychain)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
+
+    let name = personObject.name()
+    t.ok(name, 'Name should have been returned')
+    let avatarUrl = personObject.avatarUrl()
+    t.ok(avatarUrl, 'Avatar URL should have been returned')
+    let verifiedAccounts = personObject.verifiedAccounts([])
+    t.ok(verifiedAccounts, 'Verified accounts should have been returned')
   })
 
   test('legacyFormat', (t) => {
