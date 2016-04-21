@@ -18,7 +18,7 @@ export class Profile {
   }
 
   toJSON() {
-    return this._profile
+    return Object.assign({}, this._profile)
   }
 
   toSignedTokens(privateKeychain, standaloneProperties = []) {

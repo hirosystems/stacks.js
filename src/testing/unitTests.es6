@@ -93,7 +93,7 @@ function testSchemas() {
   })
 
   test('Person', (t) => {
-    t.plan(7)
+    t.plan(18)
 
     let personObject = new Person(sampleProfiles.naval)
     t.ok(personObject, 'Person object should have been created')
@@ -111,10 +111,37 @@ function testSchemas() {
 
     let name = personObject.name()
     t.ok(name, 'Name should have been returned')
+    t.equal(name, 'Naval Ravikant', 'Name should match the expected value')
+
+    let givenName = personObject.givenName()
+    t.ok(givenName, 'Given name should have been returned')
+    t.equal(givenName, 'Naval', 'Given name should match the expected value')
+
+    let familyName = personObject.familyName()
+    t.ok(familyName, 'Family name should have been returned')
+    t.equal(familyName, 'Ravikant', 'Family name should match the expected value')
+
+    let description = personObject.description()
+    t.ok(description, 'Avatar URL should have been returned')
+    
     let avatarUrl = personObject.avatarUrl()
     t.ok(avatarUrl, 'Avatar URL should have been returned')
+
     let verifiedAccounts = personObject.verifiedAccounts([])
     t.ok(verifiedAccounts, 'Verified accounts should have been returned')
+    t.equal(verifiedAccounts.length, 0, 'Verified accounts should match the expected value')
+
+    let address = personObject.address()
+    t.ok(address, 'Address should have been returned')
+
+    let birthDate = personObject.birthDate()
+    t.ok(birthDate, 'Birth date should have been returned')
+
+    let connections = personObject.connections()
+    t.ok(connections, 'Connections should have been returned')
+
+    let organizations = personObject.organizations()
+    t.ok(organizations, 'Organizations should have been returned')
   })
 
   test('legacyFormat', (t) => {

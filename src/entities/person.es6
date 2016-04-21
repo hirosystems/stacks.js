@@ -2,7 +2,11 @@ import { getProfileFromTokens } from '../tokenVerifying'
 import inspector from 'schema-inspector'
 import { Profile } from '../profile'
 import { getPersonFromLegacyFormat } from '../legacy-formats/person'
-import { getName, getVerifiedAccounts, getAvatarUrl } from './personUtils'
+import {
+  getName, getFamilyName, getGivenName, getAvatarUrl, getDescription,
+  getVerifiedAccounts, getAddress, getBirthDate,
+  getConnections, getOrganizations
+} from './personUtils'
 
 let schemaDefinition = {
   type: 'object',
@@ -115,15 +119,47 @@ export class Person extends Profile {
     return new Person(profile)
   }
 
+  profile() {
+    return Object.assign({}, this._profile)
+  }
+
   name() {
-    return getName(this._profile)
+    return getName(this.profile())
+  }
+
+  givenName() {
+    return getGivenName(this.profile())
+  }
+
+  familyName() {
+    return getFamilyName(this.profile())
+  }
+
+  description() {
+    return getDescription(this.profile())
   }
 
   avatarUrl() {
-    return getAvatarUrl(this._profile)
+    return getAvatarUrl(this.profile())
   }
 
   verifiedAccounts(verifications) {
-    return getVerifiedAccounts(this._profile, verifications)
+    return getVerifiedAccounts(this.profile(), verifications)
+  }
+
+  address() {
+    return getAddress(this.profile())
+  }
+
+  birthDate() {
+    return getBirthDate(this.profile())
+  }
+
+  connections() {
+    return getConnections(this.profile())
+  }
+
+  organizations() {
+    return getOrganizations(this.profile())
   }
 }
