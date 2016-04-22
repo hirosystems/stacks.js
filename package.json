@@ -21,6 +21,7 @@
     "blockstack-keychain": "0.0.2",
     "blockstack-zones": "0.0.1",
     "dateformat": "^1.0.12",
+    "ecurve": "^1.0.2",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.4",
     "jwt-js": "^0.5.0",
