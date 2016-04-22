@@ -18,7 +18,7 @@ const sampleProfiles = {
   navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
 }
 const sampleTokenFiles = {
-  ryan_apr20: JSON.parse(fs.readFileSync('./docs/tokenfiles/ryan_apr20.json'))
+  ryan_apr20: JSON.parse(fs.readFileSync('./docs/testTokenFiles/ryan_apr20.json'))
 }
 
 function testTokening(filename, profile) {
