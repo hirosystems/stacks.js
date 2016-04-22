@@ -1,7 +1,7 @@
 import { getProfileFromTokens } from '../tokenVerifying'
 import inspector from 'schema-inspector'
 import { Profile } from '../profile'
-import { getPersonFromLegacyFormat } from '../legacy-formats/person'
+import { getPersonFromLegacyFormat } from './personLegacy'
 import {
   getName, getFamilyName, getGivenName, getAvatarUrl, getDescription,
   getVerifiedAccounts, getAddress, getBirthDate,

@@ -3,19 +3,22 @@ import fs from 'fs'
 import { PrivateKeychain, PublicKeychain } from 'blockstack-keychain'
 import {
   signToken, wrapToken, signTokenRecords,
-  getProfileFromTokens, verifyTokenRecord,
+  verifyToken, verifyTokenRecord, getProfileFromTokens,
   Profile, Person, Organization, CreativeWork,
-  prepareZoneFileForHostedFile
+  makeZoneFileForHostedProfile
 } from '../index'
 
 let privateKeychain = new PrivateKeychain(),
     publicKeychain = privateKeychain.publicKeychain()
 
-let sampleProfiles = {
+const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
   google: JSON.parse(fs.readFileSync('./docs/profiles/google.json')),
   navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
+}
+const sampleTokenFiles = {
+  ryan_apr20: JSON.parse(fs.readFileSync('./docs/tokenfiles/ryan_apr20.json'))
 }
 
 function testTokening(filename, profile) {
@@ -61,14 +64,36 @@ function testTokening(filename, profile) {
   })
 }
 
+function testVerifyToken() {
+  const tokenFile = sampleTokenFiles.ryan_apr20,
+        token = tokenFile[0].token
+
+  const publicKey = "02413d7c51118104cfe1b41e540b6c2acaaf91f1e2e22316df7448fb6070d582ec",
+        compressedAddress = "1BTku19roxQs2d54kbYKVTv21oBCuHEApF",
+        uncompressedAddress = "12wes6TQpDF2j8zqvAbXV9KNCGQVF2y7G5"
+
+  test('verifyToken', (t) => {
+    t.plan(3)
+
+    let decodedToken1 = verifyToken(token, publicKey)
+    t.ok(decodedToken1, 'Token should have been verified against a public key')
+
+    let decodedToken2 = verifyToken(token, compressedAddress)
+    t.ok(decodedToken2, 'Token should have been verified against a compressed address')
+
+    let decodedToken3 = verifyToken(token, uncompressedAddress)
+    t.ok(decodedToken3, 'Token should have been verified against an uncompressed address')
+  })
+}
+
 function testZoneFile() {
-  test('prepareForHostedFile', (t) => {
+  test('makeZoneFileForHostedProfile', (t) => {
     t.plan(1)
     
     let fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
-    let zoneFile = prepareZoneFileForHostedFile('naval.id', fileUrl)
+    let zoneFile = makeZoneFileForHostedProfile('naval.id', fileUrl)
     //console.log(zoneFile)
-    t.ok(zoneFile, 'Zone file should have been prepared for hosted file')
+    t.ok(zoneFile, 'Zone file should have been created for hosted profile')
   })
 }
 
@@ -155,6 +180,7 @@ function testSchemas() {
   })
 }
 
+testVerifyToken()
 testTokening('naval.json', sampleProfiles.naval)
 testTokening('google.json', sampleProfiles.google)
 testTokening('balloonDog.json', sampleProfiles.balloonDog)
