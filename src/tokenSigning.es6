@@ -1,43 +1,53 @@
 import {
     PrivateKeychain, PublicKeychain
-} from 'elliptic-keychain'
+} from 'blockstack-keychain'
 import { crypto as hashing, ECPair as EllipticKeyPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner } from 'jwt-js'
 import BigInteger from 'bigi'
 import { nextYear } from './utils'
 
-export function signTokenRecord(claim, subject, issuerPrivateKey,
-                           signingAlgorithm='ES256K', issuedAt=new Date(),
-                           expiresAt=nextYear()) {
+export function signToken(claim, signingPrivateKey, subject, issuer=null,
+                          signingAlgorithm='ES256K', issuedAt=new Date(),
+                          expiresAt=nextYear()) {
 
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
 
+  const privateKeyBigInteger = BigInteger.fromBuffer(new Buffer(signingPrivateKey, 'hex')),
+        ellipticKeyPair = new EllipticKeyPair(privateKeyBigInteger, null, {}),
+        issuerPublicKey = ellipticKeyPair.getPublicKeyBuffer().toString('hex')
+
+  if (issuer === null) {
+    issuer = {
+      publicKey: issuerPublicKey
+    }
+  }
+
   const payload = {
     claim: claim,
     subject: subject,
+    issuer: issuer,
     issuedAt: issuedAt.toISOString(),
     expiresAt: expiresAt.toISOString()
   }
 
-  const tokenSigner = new TokenSigner(signingAlgorithm, issuerPrivateKey),
+  const tokenSigner = new TokenSigner(signingAlgorithm, signingPrivateKey),
         token = tokenSigner.sign(payload)
 
-  const privateKeyBigInteger = BigInteger.fromBuffer(new Buffer(issuerPrivateKey, 'hex')),
-        ellipticKeyPair = new EllipticKeyPair(privateKeyBigInteger, null, {}),
-        issuerPublicKey = ellipticKeyPair.getPublicKeyBuffer().toString('hex')
+  return token
+}
 
+export function wrapToken(token) {
   return {
     token: token,
-    data: decodeToken(token),
-    publicKey: issuerPublicKey,
+    decodedToken: decodeToken(token),
     encrypted: false
   }
 }
 
 export function signTokenRecords(profileComponents, privateKeychain,
-                           signingAlgorithm='ES256K') {
+                                 signingAlgorithm='ES256K') {
 
   if (!privateKeychain instanceof PrivateKeychain) {
     throw new Error('Invalid private keychain')
@@ -63,7 +73,8 @@ export function signTokenRecords(profileComponents, privateKeychain,
           publicKey = privateChildKeychain.publicKeychain().publicKey('hex')
 
     const subject = {publicKey: publicKey}
-    let tokenRecord = signTokenRecord(data, subject, privateKey, signingAlgorithm)
+    let token = signToken(data, privateKey, subject, null, signingAlgorithm),
+        tokenRecord = wrapToken(token)
     tokenRecord.parentPublicKey = parentPublicKey
     tokenRecord.derivationEntropy = derivationEntropy.toString('hex')
 

@@ -18,7 +18,7 @@ export class Profile {
   }
 
   toJSON() {
-    return this._profile
+    return Object.assign({}, this._profile)
   }
 
   toSignedTokens(privateKeychain, standaloneProperties = []) {
@@ -40,7 +40,7 @@ export class Profile {
     return signTokenRecords(profileComponents, privateKeychain)
   }
 
-  static validate(profile) {
+  static validateSchema(profile) {
     return inspector.validate(schemaDefinition, profile)
   }
 

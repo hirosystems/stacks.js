@@ -11,20 +11,20 @@ let schemaDefinition = {
   }
 }
 
-export class Organization extends Profile {
+export class CreativeWork extends Profile {
   constructor(profile = {}) {
     super(profile)
     this._profile = Object.assign({}, {
-      '@type': 'Organization'
+      '@type': 'CreativeWork'
     }, this._profile)
   }
 
-  static validate(profile) {
+  static validateSchema(profile) {
     return inspector.validate(schemaDefinition, profile)
   }
 
   static fromTokens(tokenRecords, publicKeychain) {
     let profile = getProfileFromTokens(tokenRecords, publicKeychain)
-    return new Organization(profile)
+    return new CreativeWork(profile)
   }
 }

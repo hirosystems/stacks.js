@@ -1,6 +1,6 @@
 {
   "name": "blockstack-profiles",
-  "version": "0.2.1",
+  "version": "0.3.3",
   "description": "A JSON profile system where objects are cryptographically signed and reference one-another",
   "main": "lib/index",
   "scripts": {
@@ -18,10 +18,11 @@
   "dependencies": {
     "bigi": "^1.4.1",
     "bitcoinjs-lib": "^2.1.4",
+    "blockstack-keychain": "0.0.2",
     "blockstack-zones": "0.0.1",
     "dateformat": "^1.0.12",
+    "ecurve": "^1.0.2",
     "elliptic-curve": "^0.1.0",
-    "elliptic-keychain": "^0.0.2",
     "hasprop": "0.0.4",
     "jwt-js": "^0.5.0",
     "schema-inspector": "^1.6.4"

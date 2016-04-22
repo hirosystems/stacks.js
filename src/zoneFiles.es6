@@ -1,6 +1,6 @@
 import { makeZoneFile } from 'blockstack-zones'
 
-export function prepareZoneFileForHostedFile(origin, tokenFileUrl) {
+export function makeZoneFileForHostedProfile(origin, tokenFileUrl) {
   if (tokenFileUrl.indexOf('://') < 0) {
     throw new Error('Invalid token file url')
   }
