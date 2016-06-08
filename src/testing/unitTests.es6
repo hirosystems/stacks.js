@@ -1,6 +1,6 @@
 import test from 'tape'
 import fs from 'fs'
-import { PrivateKeychain, PublicKeychain } from 'blockstack-keychain'
+import { PrivateKeychain, PublicKeychain } from 'blockstack-keychains'
 import {
   signToken, wrapToken, signTokenRecords,
   verifyToken, verifyTokenRecord, getProfileFromTokens,

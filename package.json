@@ -1,6 +1,6 @@
 {
   "name": "blockstack-profiles",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "A JSON profile system where objects are cryptographically signed and reference one-another",
   "main": "lib/index",
   "scripts": {
@@ -17,11 +17,11 @@
   },
   "dependencies": {
     "bigi": "^1.4.1",
-    "bitcoinjs-lib": "^2.2.0",
-    "blockstack-keychain": "0.0.2",
+    "bitcoinjs-lib": "git+ssh://git@github.com/shea256/bitcoinjs-lib.git",
+    "blockstack-keychains": "0.0.4",
     "blockstack-zones": "0.0.1",
     "dateformat": "^1.0.12",
-    "ecurve": "^1.0.2",
+    "ecurve": "git+ssh://git@github.com/shea256/ecurve.git",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.4",
     "jwt-js": "^0.5.0",

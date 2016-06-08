@@ -1,6 +1,6 @@
 import {
     PrivateKeychain, PublicKeychain
-} from 'blockstack-keychain'
+} from 'blockstack-keychains'
 import { crypto as hashing, ECPair as EllipticKeyPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner } from 'jwt-js'
 import BigInteger from 'bigi'

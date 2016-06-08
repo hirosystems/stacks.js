@@ -1,6 +1,6 @@
 'use strict'
 
-import { PrivateKeychain, PublicKeychain } from 'blockstack-keychain'
+import { PrivateKeychain, PublicKeychain } from 'blockstack-keychains'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
 
 import BigInteger from 'bigi'
