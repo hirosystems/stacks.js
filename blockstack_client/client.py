@@ -178,7 +178,8 @@ def get_analytics_key( uuid, proxy=None ):
     return key['analytics_key']
 
 
-def analytics_event( event_type, event_payload, config_path=CONFIG_PATH, proxy=None ):
+def analytics_event(event_type, event_payload, config_path=CONFIG_PATH,
+                    proxy=None):
     """
     Log an analytics event
     Return True if logged
@@ -187,7 +188,7 @@ def analytics_event( event_type, event_payload, config_path=CONFIG_PATH, proxy=N
     global ANALYTICS_KEY
 
     try:
-        import mixpanel 
+        import mixpanel
     except:
         log.debug("mixpanel is not installed; no analytics will be reported")
         return False
@@ -199,17 +200,23 @@ def analytics_event( event_type, event_payload, config_path=CONFIG_PATH, proxy=N
 
     if not conf['anonymous_statistics']:
         return False
-   
+
     u = conf['uuid']
     if ANALYTICS_KEY is None:
-        ANALYTICS_KEY = get_analytics_key( u )
+        ANALYTICS_KEY = get_analytics_key(u)
         if ANALYTICS_KEY is None:
             return False
 
-    # log the event
-    log.debug("Track event '%s': %s" % (event_type, event_payload))
+    # set up Mixpanel object
     mp = mixpanel.Mixpanel(ANALYTICS_KEY)
-    mp.track( u, event_type, event_payload )
+
+    # log the specific event
+    log.debug("Track event '%s': %s" % (event_type, event_payload))
+    mp.track(u, event_type, event_payload)
+
+    # log the general event
+    mp.track(u, "Perform action", {})
+
     return True
 
 
