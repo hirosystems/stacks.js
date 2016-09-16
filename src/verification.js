@@ -3,7 +3,7 @@
 import { TokenVerifier, decodeToken } from 'jwt-js'
 import { KeyEncoder } from 'key-encoder'
 import hasprop from 'hasprop'
-import Promise from 'Promise'
+import Promise from 'promise'
 import { PublicKeychain } from 'keychain-manager'
 
 export function verifyAuthInProfile(
