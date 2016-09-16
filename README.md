@@ -1,26 +1,24 @@
-# Blockchain Auth JS
+# Blockstack Auth JS
 
 [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack-auth-js.svg)](https://circleci.com/gh/blockstack/blockstack-auth-js/tree/master)
-[![npm](https://img.shields.io/npm/l/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
-[![npm](https://img.shields.io/npm/v/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
-[![npm](https://img.shields.io/npm/dm/blockchain-auth.svg)](https://www.npmjs.com/package/blockchain-auth)
+[![npm](https://img.shields.io/npm/l/blockstack-auth.svg)](https://www.npmjs.com/package/blockstack-auth)
+[![npm](https://img.shields.io/npm/v/blockstack-auth.svg)](https://www.npmjs.com/package/blockstack-auth)
+[![npm](https://img.shields.io/npm/dm/blockstack-auth.svg)](https://www.npmjs.com/package/blockstack-auth)
 [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
 
-A Blockchain ID authentication library written in node.js that supports generating, decoding and verifying auth request and auth response tokens.
-
-[![Read the Wiki](https://raw.githubusercontent.com/blockstack/blockchain-id/master/images/read-the-wiki.png)](https://github.com/blockstack/blockchain-id/wiki/Blockchain-Auth)
+Blockstack Auth is a Blockstack ID authentication library written in node.js that supports generating, decoding and verifying auth request and auth response tokens.
 
 ## Installation
 
 ```
-$ npm install blockchain-auth
+$ npm install blockstack-auth
 ```
 
 ```js
-var AuthRequest = require('blockchain-auth').AuthRequest,
-    AuthResponse = require('blockchain-auth').AuthResponse,
-    verifyAuthMessage = require('blockchain-auth').verifyAuthMessage,
-    decodeToken = require('blockchain-auth').decodeToken
+var AuthRequest = require('blockstack-auth').AuthRequest,
+    AuthResponse = require('blockstack-auth').AuthResponse,
+    verifyAuthMessage = require('blockstack-auth').verifyAuthMessage,
+    decodeToken = require('blockstack-auth').decodeToken
 ```
 
 ## Auth Requests
@@ -54,7 +52,7 @@ var AuthRequest = require('blockchain-auth').AuthRequest,
 ### Verifying Requests
 
 ```js
-verifyAuthMessage(authRequestToken, blockchainIdResolver, function(verified) {
+verifyAuthMessage(authRequestToken, blockstackResolver, function(verified) {
     console.log(verified)
 }, function(err) {
     console.log(err)
@@ -96,7 +94,7 @@ verifyAuthMessage(authRequestToken, blockchainIdResolver, function(verified) {
 ### Verifying Responses
 
 ```js
-verifyAuthMessage(authResponseToken, blockchainIdResolver, function(verified) {
+verifyAuthMessage(authResponseToken, blockstackResolver, function(verified) {
     console.log(verified)
 }, function(err) {
     console.log(err)

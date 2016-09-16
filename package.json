@@ -1,14 +1,14 @@
 {
-  "name": "blockchain-auth",
-  "version": "1.4.0",
-  "description": "Blockchain ID Auth Library",
+  "name": "blockstack-auth",
+  "version": "0.1.0",
+  "description": "Blockstack Auth Library",
   "main": "index.js",
   "scripts": {
     "test": "node test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blockstack/blockchain-auth-js.git"
+    "url": "git+https://github.com/blockstack/blockstack-auth-js.git"
   },
   "keywords": [
     "blockchain",
@@ -30,18 +30,20 @@
     "sso",
     "crypto",
     "cryptography",
-    "token"
+    "token",
+    "blockstack",
+    "blockstack auth"
   ],
   "author": {
-    "name": "Halfmoon Labs, Inc.",
-    "email": "hello@onename.com",
-    "url": "https://onename.com"
+    "name": "Blockstack Inc.",
+    "email": "support@onename.com",
+    "url": "https://blockstack.com"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/blockstack/blockchain-auth-js/issues"
+    "url": "https://github.com/blockstack/blockstack-auth-js/issues"
   },
-  "homepage": "https://github.com/blockstack/blockchain-auth-js#readme",
+  "homepage": "https://github.com/blockstack/blockstack-auth-js#readme",
   "dependencies": {
     "base64url": "^1.0.4",
     "ecdsa-sig-formatter": "^1.0.2",

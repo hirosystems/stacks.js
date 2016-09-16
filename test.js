@@ -10,10 +10,10 @@ var test = require('tape'),
 
 var onenameResolver = new OnenameClient(process.env.ONENAME_APP_ID, process.env.ONENAME_APP_SECRET)
 
-function testBlockchainIDResolver(blockchainids, resolve, reject) {
-    if (blockchainids[0] === 'onename.id') {
+function testBlockstackResolver(blockstackIDs, resolve, reject) {
+    if (blockstackIDs[0] === 'todo.app') {
         resolve({
-            "onename.id": {
+            "todo.app": {
                 "profile": {
                     "auth": [
                         {
@@ -23,7 +23,7 @@ function testBlockchainIDResolver(blockchainids, resolve, reject) {
                 }
             }
         })
-    } else if (blockchainids[0] === 'ryan.id') {
+    } else if (blockstackIDs[0] === 'ryan.id') {
         resolve({
             "ryan.id": {
                 "profile": {
@@ -50,7 +50,7 @@ function testAuthRequest() {
     test('basicRequest', function(t) {
         t.plan(4)
 
-        var issuingBlockchainID = 'onename.id'
+        var issuingBlockchainID = 'todo.app'
 
         var authRequest = new AuthRequest(privateKey)
 
@@ -65,7 +65,7 @@ function testAuthRequest() {
         t.equal(typeof authRequestToken, 'string', 'token should be a string')
         t.equal(decodedAuthRequestToken.payload.issuer.username, issuingBlockchainID, 'token blockchain id should match the reference')
 
-        verifyAuthMessage(authRequestToken, testBlockchainIDResolver, function(verified) {
+        verifyAuthMessage(authRequestToken, testBlockstackResolver, function(verified) {
             t.equal(verified, true, 'token should be verified')
         }, function(err) {
             console.log(err)
@@ -75,14 +75,14 @@ function testAuthRequest() {
     test('advancedRequest', function(t) {
         t.plan(4)
 
-        var issuingBlockchainID = 'onename.id'
+        var issuingBlockchainID = 'todo.app'
 
         var authRequest = new AuthRequest(privateKey)
 
         authRequest.setIssuer({
             username: issuingBlockchainID,
-            appName: 'Onename',
-            appDomain: 'onename.com'
+            appName: 'Todo App',
+            appDomain: 'todo.app'
         })
         authRequest.setProvisions([
             { action: 'disclose', scope: 'username' },
@@ -99,7 +99,7 @@ function testAuthRequest() {
         t.equal(typeof authRequestToken, 'string', 'token should be a string')
         t.equal(decodedAuthRequestToken.payload.issuer.username, issuingBlockchainID, 'token blockchain id should match the reference')
 
-        verifyAuthMessage(authRequestToken, testBlockchainIDResolver, function(verified) {
+        verifyAuthMessage(authRequestToken, testBlockstackResolver, function(verified) {
             t.equal(verified, true, 'token should be verified')
         }, function(err) {
             console.log(err)
@@ -151,7 +151,7 @@ function testAuthResponse() {
         t.equal(decodedAuthResponseToken.payload.issuer.publicKey, publicKeyHex, 'token public key hex should match the reference value')
         t.equal(decodedAuthResponseToken.payload.provisions[0].signature, challengeSignature, 'challenge signature should match the reference value')
 
-        verifyAuthMessage(authResponseToken, testBlockchainIDResolver, function(verified) {
+        verifyAuthMessage(authResponseToken, testBlockstackResolver, function(verified) {
             t.equal(verified, true, 'token should be verified')
         }, function(err) {
             console.log(err)
@@ -161,7 +161,7 @@ function testAuthResponse() {
     test('partiallyIdentifiedResponse', function(t) {
         t.plan(1)
 
-        verifyAuthMessage(partiallyIdentifiedToken, testBlockchainIDResolver, function(verified) {
+        verifyAuthMessage(partiallyIdentifiedToken, testBlockstackResolver, function(verified) {
             t.equal(verified, false, 'token should be invalid')
         }, function(err) {
             console.log(err)
@@ -179,7 +179,7 @@ function testAuthResponse() {
         var authResponseToken = authResponse.sign()
         t.ok(authResponseToken, 'token should have been created')
 
-        verifyAuthMessage(authResponseToken, testBlockchainIDResolver, function(verified) {
+        verifyAuthMessage(authResponseToken, testBlockstackResolver, function(verified) {
             t.equal(verified, false, 'token should be invalid')
         }, function(err) {
             console.log(err)
@@ -200,7 +200,7 @@ function testAuthResponse() {
         t.equal(typeof authResponseToken, 'string', 'token should be a string')
         t.equal(decodedAuthResponseToken.payload.issuer.publicKey, publicKeyHex, 'token public key hex should match the reference value')
 
-        verifyAuthMessage(authResponseToken, testBlockchainIDResolver, function(verified) {
+        verifyAuthMessage(authResponseToken, testBlockstackResolver, function(verified) {
             t.equal(verified, true, 'token should be verified')
         }, function(err) {
             console.log(err)
