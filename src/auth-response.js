@@ -1,7 +1,7 @@
 'use strict'
 
 import KeyEncoder from 'key-encoder'
-import { TokenSigner, decodeToken } from 'jwt-js'
+import { TokenSigner, decodeToken } from 'blockstack-tokens'
 import { secp256k1 } from 'elliptic-curve'
 import uuid from 'node-uuid'
 
