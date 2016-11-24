@@ -1,11 +1,10 @@
 {
   "name": "blockstack-auth",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Blockstack Auth Library",
-  "main": "index.js",
+  "main": "lib/index",
   "scripts": {
     "compile": "babel --presets es2015 src -d lib",
-    "browserify": "npm run compile; browserify requires.js -o lib/bundle.js",
     "test": "npm run compile; node lib/unitTests.js",
     "prepublish": "npm run compile"
   },
@@ -39,7 +38,7 @@
   ],
   "author": {
     "name": "Blockstack Inc.",
-    "email": "support@onename.com",
+    "email": "admin@blockstack.com",
     "url": "https://blockstack.com"
   },
   "license": "MIT",
