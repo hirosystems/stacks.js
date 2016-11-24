@@ -1,6 +1,6 @@
 {
   "name": "blockstack-auth",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Blockstack Auth Library",
   "main": "lib/index",
   "scripts": {
@@ -49,7 +49,6 @@
   "dependencies": {
     "base64url": "^1.0.4",
     "blockstack-tokens": "^0.5.1",
-    "ecdsa-sig-formatter": "^1.0.2",
     "elliptic": "^5.1.0",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.3",
