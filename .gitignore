@@ -27,6 +27,6 @@ build/Release
 node_modules
 
 # Custom
-unused
 lib
+unused
 .DS_Store

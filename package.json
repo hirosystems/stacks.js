@@ -1,13 +1,13 @@
 {
   "name": "blockstack-auth",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Blockstack Auth Library",
   "main": "lib/index",
   "scripts": {
     "compile": "babel --presets es2015 src -d lib",
     "test": "npm run compile; node lib/test/unitTests.js",
     "prepublish": "npm run compile",
-    "test-browserify": "npm run compile; node lib/test/browserifyTests.js",
+    "browserify-test": "npm run compile; node lib/test/browserifyTests.js",
     "browserify-app": "npm run compile; browserify lib/test/browserifyApp.js -o lib/test/bundle.js"
   },
   "repository": {
@@ -53,7 +53,7 @@
     "elliptic": "^5.1.0",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.3",
-    "jsontokens": "^0.6.2",
+    "jsontokens": "^0.6.5",
     "key-encoder": "^1.1.3",
     "keychain-manager": "^1.1.2",
     "node-uuid": "^1.4.3",
