@@ -1,10 +1,14 @@
 {
   "name": "blockstack-auth",
-  "version": "0.1.0",
+  "version": "0.1.9",
   "description": "Blockstack Auth Library",
-  "main": "index.js",
+  "main": "lib/index",
   "scripts": {
-    "test": "node test.js"
+    "compile": "babel --presets es2015 src -d lib",
+    "test": "npm run compile; node lib/test/unitTests.js",
+    "prepublish": "npm run compile",
+    "browserify-test": "npm run compile; node lib/test/browserifyTests.js",
+    "browserify-app": "npm run compile; browserify lib/test/browserifyApp.js -o lib/test/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -36,7 +40,7 @@
   ],
   "author": {
     "name": "Blockstack Inc.",
-    "email": "support@onename.com",
+    "email": "admin@blockstack.com",
     "url": "https://blockstack.com"
   },
   "license": "MIT",
@@ -46,23 +50,22 @@
   "homepage": "https://github.com/blockstack/blockstack-auth-js#readme",
   "dependencies": {
     "base64url": "^1.0.4",
-    "ecdsa-sig-formatter": "^1.0.2",
     "elliptic": "^5.1.0",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.3",
-    "jwt-js": "^0.4.2",
+    "jsontokens": "^0.6.5",
     "key-encoder": "^1.1.3",
     "keychain-manager": "^1.1.2",
     "node-uuid": "^1.4.3",
     "promise": "^7.0.4"
   },
   "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "browserify": "^13.1.1",
     "onename-api": "^1.0.1",
-    "tape": "^4.2.0"
-  },
-  "files": [
-    "lib/",
-    "*.js",
-    "README.md"
-  ]
+    "phantomjs-prebuilt": "^2.1.13",
+    "tape": "^4.2.0",
+    "tape-run": "^2.1.4"
+  }
 }
