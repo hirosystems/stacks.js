@@ -1,6 +1,6 @@
 'use strict'
 
-import { TokenVerifier, decodeToken } from 'blockstack-tokens'
+import { TokenVerifier, decodeToken } from 'jsontokens'
 import { KeyEncoder } from 'key-encoder'
 import hasprop from 'hasprop'
 import Promise from 'promise'

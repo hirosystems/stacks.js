@@ -48,7 +48,7 @@
   "homepage": "https://github.com/blockstack/blockstack-auth-js#readme",
   "dependencies": {
     "base64url": "^1.0.4",
-    "blockstack-tokens": "^0.5.1",
+    "jsontokens": "^0.6.0",
     "elliptic": "^5.1.0",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.3",

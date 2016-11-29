@@ -3,4 +3,4 @@
 export { AuthRequest } from './auth-request'
 export { AuthResponse } from './auth-response'
 export { verifyAuthMessage } from './verification'
-export { decodeToken } from 'blockstack-tokens'
+export { decodeToken } from 'jsontokens'
