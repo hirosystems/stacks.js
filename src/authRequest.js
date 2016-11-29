@@ -1,9 +1,28 @@
 'use strict'
 
 import KeyEncoder from 'key-encoder'
-import { TokenSigner, decodeToken } from 'jsontokens'
+import { TokenSigner, decodeToken, createUnsignedToken } from 'jsontokens'
 import { secp256k1 } from 'elliptic-curve'
 import uuid from 'node-uuid'
+import base64url from 'base64url'
+
+export function createRequestPayload(issuer, provisions=null) {
+    let unsignedRequest = {
+        issuer: issuer,
+        issuedAt: new Date().getTime()
+    }
+    if (provisions) {
+        unsignedRequest.provisions = provisions
+    }
+    return unsignedRequest
+}
+
+export function createUnsignedRequest(issuer) {
+    const header = { typ: 'JWT' }
+    const payload = createRequestPayload(issuer)
+    const unsignedToken = createUnsignedToken(header, payload) + '.0'
+    return unsignedToken
+}
 
 export class AuthRequest {
     constructor(privateKey) {

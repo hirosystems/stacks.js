@@ -1,6 +1,6 @@
 'use strict'
 
-export { AuthRequest } from './auth-request'
-export { AuthResponse } from './auth-response'
+export { AuthRequest, createUnsignedRequest } from './authRequest'
+export { AuthResponse } from './authResponse'
 export { verifyAuthMessage } from './verification'
 export { decodeToken } from 'jsontokens'
