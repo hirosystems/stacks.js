@@ -14,13 +14,20 @@ const sampleProfiles = {
   navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
 }
 
+const sampleProofs = {
+  naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.proofs.json')),
+}
+
+
 function testProofs(profile, username) {
   test('Profiles', (t) => {
-    t.plan(1)
+    t.plan(3)
 
     let proofs = profileToProofs(profile, username)
+    t.ok(proofs, 'Proofs must have been created')
+    t.equal(proofs instanceof Array, true, "Proofs should be an Array")
+    t.equal(proofs.length, 3, "Should have a proof for each of the 3 claimed accounts")
     
-    t.ok(true)
   })
 
 }

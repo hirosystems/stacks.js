@@ -20,7 +20,6 @@ export function profileToProofs(profile, username) {
     return proofs
 
   accounts.forEach(function(account) {
-
     // skip if proof service is not supported
     if(account.hasOwnProperty("service") && !SITES.hasOwnProperty(account.service))
       return
@@ -37,7 +36,7 @@ export function profileToProofs(profile, username) {
       proofs.push(proof)
 
     }
-
-    return proofs
   })
+  
+  return proofs
 }
