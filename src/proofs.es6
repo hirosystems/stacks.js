@@ -1,16 +1,9 @@
 'use strict'
 
-import { SITES } from './sites'
-
-
-function isValidProof(service, identifier, username, proofUrl) {
-  // TODO: implement
-  return true
-}
+import { services } from './services/index'
 
 export function profileToProofs(profile, username) {
   let proofs = []
-
 
   let accounts = []
 
@@ -21,7 +14,7 @@ export function profileToProofs(profile, username) {
 
   accounts.forEach(function(account) {
     // skip if proof service is not supported
-    if(account.hasOwnProperty("service") && !SITES.hasOwnProperty(account.service))
+    if(account.hasOwnProperty("service") && !services.hasOwnProperty(account.service))
       return
 
     if(account.hasOwnProperty("proofType") && account.proofType == "http") {
@@ -30,13 +23,13 @@ export function profileToProofs(profile, username) {
                "identifier": account.identifier,
                "valid": false}
 
-      if(isValidProof(account.service, account.identifier, username, account.proofUrl))
+      if(services[account.service].isValidProof(account.identifier, username, account.proofUrl))
         proof.valid = true
 
       proofs.push(proof)
 
     }
   })
-  
+
   return proofs
 }

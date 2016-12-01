@@ -1,5 +1,3 @@
-'use strict'
-
 import test from 'tape'
 import fs from 'fs'
 import {
@@ -27,9 +25,11 @@ function testProofs(profile, username) {
     t.ok(proofs, 'Proofs must have been created')
     t.equal(proofs instanceof Array, true, "Proofs should be an Array")
     t.equal(proofs.length, 3, "Should have a proof for each of the 3 claimed accounts")
-    
+
   })
 
 }
 
-testProofs(sampleProfiles.naval, "naval")
+export function runProofsUnitTests() {
+  testProofs(sampleProfiles.naval, "naval")
+}

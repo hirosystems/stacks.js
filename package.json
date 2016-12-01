@@ -5,7 +5,7 @@
   "main": "lib/index",
   "scripts": {
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
-    "test": "npm run compile; node lib/testing/unitTests.js",
+    "test": "npm run compile; node lib/testing/index.js",
     "prepublish": "npm run compile"
   },
   "author": "Blockstack Inc.",
