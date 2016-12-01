@@ -1,7 +1,7 @@
-import test from 'tape'
+import test from 'blue-tape'
 import fs from 'fs'
 import {
-  profileToProofs
+  validateProofs
 } from '../index'
 
 
@@ -19,13 +19,11 @@ const sampleProofs = {
 
 function testProofs(profile, username) {
   test('Profiles', (t) => {
-    t.plan(3)
-
-    let proofs = profileToProofs(profile, username)
-    t.ok(proofs, 'Proofs must have been created')
-    t.equal(proofs instanceof Array, true, "Proofs should be an Array")
-    t.equal(proofs.length, 3, "Should have a proof for each of the 3 claimed accounts")
-
+    return validateProofs(profile, username).then((proofs) => {
+      t.ok(proofs, 'Proofs must have been created')
+      t.equal(proofs instanceof Array, true, "Proofs should be an Array")
+      t.equal(proofs.length, 3, "Should have a proof for each of the 3 claimed accounts")
+    })
   })
 
 }

@@ -12,10 +12,10 @@
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-es2015": "^6.3.13",
-    "tape": "^4.4.0"
+    "babel-preset-es2015": "^6.18.0",
+    "blue-tape": "^1.0.0",
+    "node-fetch": "^1.6.3",
+    "tape": "^4.6.3"
   },
-  "dependencies": {
-
-  }
+  "dependencies": {}
 }

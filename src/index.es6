@@ -1,9 +1,7 @@
 'use strict'
 
-
-import { profileToProofs } from './proofs'
-
+import { validateProofs } from './proofs'
 
 export {
-  profileToProofs
+  validateProofs
 }

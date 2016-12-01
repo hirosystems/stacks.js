@@ -24,7 +24,7 @@ $ npm install blockstack-proofs
 
 ```es6
 import {
-  profileToProofs
+  validateProofs
 } from 'blockstack-proofs'
 ```
 
@@ -38,8 +38,10 @@ var blockstackProofs = require('blockstack-proofs')
 
 ```es6
 let username = "naval"
-let proofs = profileToProofs(profile, username)
-console.log(proofs)
+validateProofs(profile, username).then((proofs) => {
+  console.log(proofs)
+})
+
 
 [
   { "identifier": "naval",

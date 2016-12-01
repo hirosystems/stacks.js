@@ -2,34 +2,42 @@
 
 import { services } from './services/index'
 
-export function profileToProofs(profile, username) {
-  let proofs = []
+const validationTimeout = 30000  // 30 seconds
 
-  let accounts = []
+export function validateProofs(profile, username) {
+  let promise = new Promise( (resolve, reject) => {
 
-  if(profile.hasOwnProperty("account"))
-    accounts = profile.account
-  else
-    return proofs
+    let proofs = []
 
-  accounts.forEach(function(account) {
-    // skip if proof service is not supported
-    if(account.hasOwnProperty("service") && !services.hasOwnProperty(account.service))
-      return
+    let accounts = []
 
-    if(account.hasOwnProperty("proofType") && account.proofType == "http") {
-      let proof = {"service": account.service,
-               "proof_url": account.proofUrl,
-               "identifier": account.identifier,
-               "valid": false}
+    if(profile.hasOwnProperty("account"))
+      accounts = profile.account
+    else
+      resolve(proofs)
 
-      if(services[account.service].isValidProof(account.identifier, username, account.proofUrl))
-        proof.valid = true
+    accounts.forEach(function(account) {
+      // skip if proof service is not supported
+      if(account.hasOwnProperty("service") && !services.hasOwnProperty(account.service))
+        return
 
-      proofs.push(proof)
+      if(account.hasOwnProperty("proofType") && account.proofType == "http") {
+        let proof = {"service": account.service,
+                 "proof_url": account.proofUrl,
+                 "identifier": account.identifier,
+                 "valid": false}
 
-    }
+        services[account.service].validateProof(proof).then((proof) => {
+          proofs.push(proof)
+
+          if(proofs.length >= accounts.length) {
+            resolve(proofs)
+          }
+
+        })
+      }
+    })
   })
 
-  return proofs
+  return promise
 }
