@@ -16,7 +16,6 @@ function testProofs(profile, username) {
       t.equal(proofs instanceof Array, true, "Proofs should be an Array")
       t.equal(proofs.length, 3, "Should have a proof for each of the 3 claimed accounts")
       FetchMock.restore()
-      t.end()
     })
   })
 

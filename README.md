@@ -1,5 +1,8 @@
 # Blockstack Proofs
 
+[![npm](https://img.shields.io/npm/l/blockstack-proofs.svg)](https://www.npmjs.com/package/blockstack-proofs)
+[![npm](https://img.shields.io/npm/v/blockstack-proofs.svg)](https://www.npmjs.com/package/blockstack-proofs)
+[![npm](https://img.shields.io/npm/dm/blockstack-proofs.svg)](https://www.npmjs.com/package/blockstack-proofs)
 [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
 
 ### Contents
@@ -64,3 +67,14 @@ validateProofs(profile, username).then((proofs) => {
 ]
 
 ```
+
+### Testing
+
+Run `npm run test` to run the test suite.
+
+#### Testing in a browser
+
+*This test will only work with your browser's Cross-Origin Restrictions disabled.*
+
+Run `npm run compile; npm run browserify` before opening the file `test.html`
+in your browser.

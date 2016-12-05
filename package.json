@@ -1,12 +1,13 @@
 {
   "name": "blockstack-proofs",
-  "version": "0.1.0",
-  "description": "A library for verifying proofs (twitter, github, domains etc) linked to a blockstack ID",
+  "version": "0.2.0",
+  "description": "A library for verifying proofs (twitter, github, domains etc) linked to a Blockstack ID",
   "main": "lib/index",
   "scripts": {
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
-    "test": "npm run compile; node lib/testing/index.js",
-    "prepublish": "npm run compile"
+    "test": "npm run compile; npm run browserify; node lib/testing/index.js",
+    "prepublish": "npm run compile",
+    "browserify": "./node_modules/.bin/browserify lib/index.js --standalone BlockstackProofs -o ./src/testing/browser/blockstack-proofs.js"
   },
   "author": "Blockstack Inc.",
   "license": "MIT",
@@ -14,6 +15,7 @@
     "babel-cli": "^6.4.5",
     "babel-preset-es2015": "^6.18.0",
     "blue-tape": "^1.0.0",
+    "browserify": "^13.1.1",
     "node-fetch": "^1.6.3",
     "tape": "^4.6.3"
   },
