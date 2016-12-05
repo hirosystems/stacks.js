@@ -1,11 +1,34 @@
 import { containsValidProofStatement } from "../utils"
+import "isomorphic-fetch"
 export class Service {
 
-  static validateProof(proof) {
+  static validateProof(proof, username) {
     return new Promise((resolve, reject) => {
-      console.error("The Service class should not be used directly.")
-      proof.valid = true
-      resolve(proof)
+      try {
+        let proofUrl = this.getProofUrl(proof)
+        fetch(proofUrl).then((res) => {
+          if(res.status == 200) {
+            res.text().then((text) => {
+                proof.valid = containsValidProofStatement(text, username)
+                resolve(proof)
+            })
+
+          } else {
+            console.error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
+              Unable to validate proof.` )
+            proof.valid = false
+            resolve(proof)
+          }
+        }).catch((err) => {
+          console.error(err)
+          proof.valid = false
+          resolve(proof)
+        })
+      } catch(e) {
+        console.error(e)
+        proof.valid = false
+        resolve(proof)
+      }
     })
   }
 
@@ -21,4 +44,5 @@ export class Service {
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
+
 }

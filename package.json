@@ -17,5 +17,7 @@
     "node-fetch": "^1.6.3",
     "tape": "^4.6.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1"
+  }
 }

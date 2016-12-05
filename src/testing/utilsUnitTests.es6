@@ -3,22 +3,24 @@ import fs from 'fs'
 import {
   containsValidProofStatement
 } from '../utils'
-
-const sampleVerifications = {
-
-  naval: {
-    github: fs.readFileSync('./docs/profiles/naval.verification.github.html','utf8')
-  }
-
-}
+import { sampleVerifications } from './samples'
 
 
 export function runUtilsUnitTests() {
   test('containsValidProofStatement', (t) => {
-    t.plan(2)
-    t.equal(containsValidProofStatement(sampleVerifications.naval.github, 'naval'),
-    true, "Should contain valid proof statement for +naval")
-    t.equal(containsValidProofStatement(sampleVerifications.naval.github, 'larry'),
-    false, "Should not contain valid proof statement for +larry")
+    t.plan(6)
+    t.equal(containsValidProofStatement(sampleVerifications.naval.facebook.body, 'naval'),
+    true, "Facebook post body should contain valid proof statement for +naval")
+    t.equal(containsValidProofStatement(sampleVerifications.naval.github.body, 'naval'),
+    true, "Github gist post body should contain valid proof statement for +naval")
+    t.equal(containsValidProofStatement(sampleVerifications.naval.twitter.body, 'naval'),
+    true, "Twitter post body should contain valid proof statement for +naval")
+
+    t.equal(containsValidProofStatement(sampleVerifications.naval.facebook.body, 'larry'),
+    false, "Github gist post body should not contain valid proof statement for +larry")
+    t.equal(containsValidProofStatement(sampleVerifications.naval.github.body, 'larry'),
+    false, "Github gist post body should not contain valid proof statement for +larry")
+    t.equal(containsValidProofStatement(sampleVerifications.naval.twitter.body, 'larry'),
+    false, "Github gist post body should not contain valid proof statement for +larry")
   })
 }

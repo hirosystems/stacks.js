@@ -2,7 +2,7 @@ import test from 'tape'
 import { services } from '../services/index'
 import { Service } from '../services/service'
 import { Facebook } from '../services/facebook'
-import { sampleProofs } from './sampleProofs'
+import { sampleProofs } from './samples'
 
 
 export function runServicesUnitTests() {

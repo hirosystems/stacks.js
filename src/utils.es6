@@ -4,7 +4,7 @@ export function containsValidProofStatement(searchText, username) {
   searchText = searchText.toLowerCase()
 
   const verificationStyles = [
-      `verifying myself: my bitcoin username is ${username}`,
+      `verifying myself: my bitcoin username is +${username}`,
       `verifying myself: my bitcoin username is ${username}`,
       `verifying myself: my openname is ${username}`,
       `verifying that +${username} is my bitcoin username`,
@@ -13,7 +13,7 @@ export function containsValidProofStatement(searchText, username) {
       `verifying that +${username} is my openname`,
       `verifying i am +${username} on my passcard`,
       `verifying that +${username} is my blockchain id`,
-      `verifying that \`${username}.id\` is my blockstack id`,
+      `verifying that "${username}.id" is my blockstack id`,
       `verifying that ${username}.id is my blockstack id`
   ]
 

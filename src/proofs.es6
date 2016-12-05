@@ -26,8 +26,7 @@ export function validateProofs(profile, username) {
                  "proof_url": account.proofUrl,
                  "identifier": account.identifier,
                  "valid": false}
-
-        services[account.service].validateProof(proof).then((proof) => {
+        services[account.service].validateProof(proof, username).then((proof) => {
           proofs.push(proof)
 
           if(proofs.length >= accounts.length) {
