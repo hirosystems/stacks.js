@@ -6,6 +6,17 @@ import { sampleProofs } from './sampleProofs'
 
 
 export function runServicesUnitTests() {
+
+  test('normalize Facebook URLs', (t) => {
+    t.plan(6)
+    t.equal(services.facebook.normalizeFacebookUrl("https://www.facebook.com/navalr/posts/10152190734077261"), "https://www.facebook.com/navalr/posts/10152190734077261")
+    t.equal(services.facebook.normalizeFacebookUrl("https://facebook.com/navalr/posts/10152190734077261"), "https://www.facebook.com/navalr/posts/10152190734077261")
+    t.equal(services.facebook.normalizeFacebookUrl("https://www.facebook.com/larrysalibra/posts/10100341028448093"), "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+    t.equal(services.facebook.normalizeFacebookUrl("https://www.facebook.com/larry.salibra/posts/10100341028448093"), "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+    t.equal(services.facebook.normalizeFacebookUrl("https://facebook.com/larry.salibra/posts/10100341028448093"), "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+    t.equal(services.facebook.normalizeFacebookUrl("https://facebook.com/larrysalibra/posts/10100341028448093"), "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+  })
+
   test('get proof url', (t) => {
     t.plan(3)
     t.equal(services.facebook.getProofUrl(sampleProofs.naval[1]), "https://www.facebook.com/navalr/posts/10152190734077261")

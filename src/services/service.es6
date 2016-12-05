@@ -9,9 +9,12 @@ export class Service {
     })
   }
 
+  static getBaseUrls() {
+    return []
+  }
 
-  static getProofUrl(proof, baseUrls) {
-
+  static getProofUrl(proof) {
+    let baseUrls = this.getBaseUrls()
     for(let i = 0; i < baseUrls.length; i++) {
       if(proof.proof_url.startsWith(baseUrls[i]))
         return proof.proof_url

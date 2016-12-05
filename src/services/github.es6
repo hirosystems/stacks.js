@@ -21,7 +21,7 @@ class Github extends Service {
   }
 
   static getProofUrl(proof) {
-    return super.getProofUrl(proof, this.getBaseUrls())
+    return super.getProofUrl(proof)
   }
 }
 
