@@ -14,7 +14,8 @@ export function containsValidProofStatement(searchText, username) {
       `verifying i am +${username} on my passcard`,
       `verifying that +${username} is my blockchain id`,
       `verifying that "${username}.id" is my blockstack id`,
-      `verifying that ${username}.id is my blockstack id`
+      `verifying that ${username}.id is my blockstack id`,
+      `verifying that &quot;${username}.id&quot; is my blockstack id`
   ]
 
   for(let i = 0; i < verificationStyles.length; i++) {

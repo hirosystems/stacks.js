@@ -8,7 +8,7 @@ import { sampleVerifications } from './samples'
 
 export function runUtilsUnitTests() {
   test('containsValidProofStatement', (t) => {
-    t.plan(6)
+    t.plan(7)
     t.equal(containsValidProofStatement(sampleVerifications.naval.facebook.body, 'naval'),
     true, "Facebook post body should contain valid proof statement for +naval")
     t.equal(containsValidProofStatement(sampleVerifications.naval.github.body, 'naval'),
@@ -22,5 +22,8 @@ export function runUtilsUnitTests() {
     false, "Github gist post body should not contain valid proof statement for +larry")
     t.equal(containsValidProofStatement(sampleVerifications.naval.twitter.body, 'larry'),
     false, "Github gist post body should not contain valid proof statement for +larry")
+
+    t.equal(containsValidProofStatement(sampleVerifications.larry.facebook.body, 'larry'),
+    true, "Facebook post body should contain valid proof statement for +larry")
   })
 }

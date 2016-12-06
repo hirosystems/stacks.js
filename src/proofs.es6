@@ -32,7 +32,8 @@ export function validateProofs(profile, username) {
         return
       }
 
-      if(!(account.hasOwnProperty("proofType") && account.proofType == "http")) {
+      if(!(account.hasOwnProperty("proofType") && account.proofType == "http" &&
+         account.hasOwnProperty("proofUrl"))) {
         accountsToValidate--
         return
       }

@@ -4,12 +4,14 @@ import fs from 'fs'
 const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
+  larry: JSON.parse(fs.readFileSync('./docs/profiles/larry.json')),
   google: JSON.parse(fs.readFileSync('./docs/profiles/google.json')),
   navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
 }
 
 const sampleProofs = {
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.proofs.json')),
+  larry: JSON.parse(fs.readFileSync('./docs/profiles/larry.proofs.json'))
 }
 
 
@@ -26,6 +28,12 @@ const sampleVerifications = {
     twitter: {
       url: "https://twitter.com/naval/status/486609266212499456",
       body: fs.readFileSync('./docs/profiles/naval.verification.twitter.html','utf8')
+    }
+  },
+  larry: {
+    facebook: {
+      url: "https://www.facebook.com/larrysalibra/posts/10100341028448093",
+      body: fs.readFileSync('./docs/profiles/larry.verification.facebook.html','utf8')
     }
   }
 }
