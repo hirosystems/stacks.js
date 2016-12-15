@@ -40,8 +40,8 @@ var blockstackProofs = require('blockstack-proofs')
 ### Usage
 
 ```es6
-let username = "naval"
-validateProofs(profile, username).then((proofs) => {
+let fqdn = "naval.id"
+validateProofs(profile, fqdn).then((proofs) => {
   console.log(proofs)
 })
 

@@ -1,6 +1,6 @@
 {
   "name": "blockstack-proofs",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A library for verifying proofs (twitter, github, domains etc) linked to a Blockstack ID",
   "main": "lib/index",
   "scripts": {
