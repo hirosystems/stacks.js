@@ -34,6 +34,6 @@ function mockRequests() {
 
 
 export function runProofsUnitTests() {
-  testProofs(sampleProfiles.naval, "naval", 3)
-  testProofs(sampleProfiles.larry, "larry", 1)
+  testProofs(sampleProfiles.naval, "naval.id", 3)
+  testProofs(sampleProfiles.larry, "larry.id", 1)
 }
