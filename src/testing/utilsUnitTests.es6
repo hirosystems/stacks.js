@@ -8,7 +8,7 @@ import { sampleVerifications } from './samples'
 
 export function runUtilsUnitTests() {
   test('containsValidProofStatement', (t) => {
-    t.plan(7)
+    t.plan(8)
     t.equal(containsValidProofStatement(sampleVerifications.naval.facebook.body, 'naval.id'),
     true, "Facebook post body should contain valid proof statement for naval.id")
     t.equal(containsValidProofStatement(sampleVerifications.naval.github.body, 'naval.id'),
@@ -25,5 +25,8 @@ export function runUtilsUnitTests() {
 
     t.equal(containsValidProofStatement(sampleVerifications.larry.facebook.body, 'larry.id'),
     true, "Facebook post body should contain valid proof statement for larry.id")
+
+    t.throws(() => { containsValidProofStatement(sampleVerifications.larry.facebook.body, 'larry') }, /Error/,
+    "Using non-fully qualified blockstack name should throw exception")
   })
 }
