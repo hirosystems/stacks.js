@@ -4,7 +4,7 @@ import { services } from './services/index'
 
 const validationTimeout = 30000  // 30 seconds
 
-export function validateProofs(profile, username) {
+export function validateProofs(profile, fqdn) {
   let promise = new Promise( (resolve, reject) => {
 
     let proofs = []
@@ -43,7 +43,7 @@ export function validateProofs(profile, username) {
                "identifier": account.identifier,
                "valid": false}
 
-      services[account.service].validateProof(proof, username).then((proof) => {
+      services[account.service].validateProof(proof, fqdn).then((proof) => {
         proofs.push(proof)
 
         if(proofs.length >= accountsToValidate) {

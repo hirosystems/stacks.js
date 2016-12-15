@@ -2,14 +2,14 @@ import { containsValidProofStatement } from "../utils"
 import "isomorphic-fetch"
 export class Service {
 
-  static validateProof(proof, username) {
+  static validateProof(proof, fqdn) {
     return new Promise((resolve, reject) => {
       try {
         let proofUrl = this.getProofUrl(proof)
         fetch(proofUrl).then((res) => {
           if(res.status == 200) {
             res.text().then((text) => {
-                proof.valid = containsValidProofStatement(text, username)
+                proof.valid = containsValidProofStatement(text, fqdn)
                 resolve(proof)
             })
 
