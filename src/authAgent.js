@@ -1,16 +1,19 @@
 'use strict'
 
-import queryString from 'queryString'
+import queryString from 'query-string'
 import base64url from 'base64url'
 import request from 'request'
 import { decodeToken } from 'jsontokens'
 
 export class AuthAgent {
-  constructor(identityProviderURL, blockstackResolverURL) {
-    this.identityProviderURL = identityProviderURL
-    this.blockstackResolverURL = blockstackResolverURL
+  constructor(identityProviderURL, nameResolverURL, currentHostURL) {
+    if (currentHostURL === null) {
+      currentHostURL = window.location.origin
+    }
     this.localStorageKeyName = 'blockstack'
-    this.currentHost = window.location.origin
+    this.identityProviderURL = identityProviderURL
+    this.nameResolverURL = nameResolverURL
+    this.currentHost = currentHostURL
   }
 
   static getUsernameFromToken(authResponseToken) {
@@ -37,9 +40,9 @@ export class AuthAgent {
     return queryDict.authResponse
   }
 
-  loadUser(authResponseToken, callbackFunction) {
+  loadUser(nameResolverURL, authResponseToken, callbackFunction) {
     const username = AuthAgent.getUsernameFromToken(authResponseToken)
-    const requestURL = this.blockstackResolverURL + username
+    const requestURL = this.nameResolverURL + username
     request(requestURL, function(error, response, body) {
       if (!error && response.statusCode == 200) {
         const profile = JSON.parse(body)[username].profile
