@@ -4,7 +4,7 @@ import test from 'tape'
 
 import {
     AuthMessage, AuthRequest, AuthResponse, createUnsignedRequest,
-    verifyAuthMessage, decodeToken
+    verifyAuthMessage, decodeToken, AuthAgent
 } from '../index'
 import { OnenameClient } from 'onename-api'
 
