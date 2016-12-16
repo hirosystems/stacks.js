@@ -6,10 +6,8 @@ import request from 'request'
 import { decodeToken } from 'jsontokens'
 
 export class AuthAgent {
-  constructor(identityProviderURL, nameResolverURL, currentHostURL) {
-    if (currentHostURL === null) {
-      currentHostURL = window.location.origin
-    }
+  constructor(identityProviderURL, nameResolverURL,
+              currentHostURL=window.location.origin) {
     this.localStorageKeyName = 'blockstack'
     this.identityProviderURL = identityProviderURL
     this.nameResolverURL = nameResolverURL
