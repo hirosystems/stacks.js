@@ -20,7 +20,7 @@ export class AuthAgent {
   }
 
   isUserLoggedIn() {
-    return window.localStorage.getItem(localStorageKeyName) ? true : false
+    return window.localStorage.getItem(this.localStorageKeyName) ? true : false
   }
 
   requestAuthentication() {
@@ -29,7 +29,7 @@ export class AuthAgent {
       issuedAt: new Date().getTime()
     }
     const authRequest = base64url.encode(JSON.stringify(payload))
-    window.location = identityHost + "?authRequest=" + authRequest
+    window.location = this.identityProviderURL + "?authRequest=" + authRequest
   }
 
   getAuthResponseToken() {
@@ -59,7 +59,7 @@ export class AuthAgent {
   }
 
   logout() {
-    window.localStorage.removeItem(localStorageKeyName)
+    window.localStorage.removeItem(this.localStorageKeyName)
     window.location = this.currentHost
   }
 }
