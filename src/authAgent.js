@@ -8,7 +8,7 @@ import { decodeToken } from 'jsontokens'
 export class AuthAgent {
   constructor(identityProviderURL, nameResolverURL,
               currentHostURL=window.location.origin) {
-    this.localStorageKeyName = 'blockstack'
+    this.storageLabel = 'blockstack'
     this.identityProviderURL = identityProviderURL
     this.nameResolverURL = nameResolverURL
     this.currentHost = currentHostURL
@@ -21,10 +21,10 @@ export class AuthAgent {
   }
 
   isUserLoggedIn() {
-    return window.localStorage.getItem(this.localStorageKeyName) ? true : false
+    return window.localStorage.getItem(this.storageLabel) ? true : false
   }
 
-  requestAuthentication() {
+  requestLogin() {
     const payload = {
       appURI: this.currentHost,
       issuedAt: new Date().getTime()
@@ -38,29 +38,35 @@ export class AuthAgent {
     return queryDict.authResponse
   }
 
-  loadUser(authResponseToken, callbackFunction) {
+  isLoginPending() {
+    return this.getAuthResponseToken() ? true : false
+  }
+
+  completeLogin(callbackFunction) {
+    const authResponseToken = this.getAuthResponseToken()
     const username = AuthAgent.getUsernameFromToken(authResponseToken)
     const requestURL = this.nameResolverURL + username
-    request(requestURL, function(error, response, body) {
+    request(requestURL, (error, response, body) => {
       if (!error && response.statusCode == 200) {
         const profile = JSON.parse(body)[username].profile
-        callbackFunction(username, profile)
+        const session = {
+          username: username,
+          profile: profile,
+          authResponseToken: authResponseToken
+        }
+        window.localStorage.setItem(this.storageLabel, JSON.stringify(session))
+        callbackFunction(session)
       }
     })
   }
 
-  recordSession(authResponseToken, username, profile) {
-    const blockstackData = {
-      profile: profile,
-      username: username,
-      authResponseToken: authResponseToken,
-    }
-    window.localStorage.setItem(
-      this.localStorageKeyName, JSON.stringify(blockstackData))
+  loadSession(callbackFunction) {
+    const session = JSON.parse(localStorage.getItem(authAgent.storageLabel))
+    callbackFunction(session)
   }
 
   logout() {
-    window.localStorage.removeItem(this.localStorageKeyName)
+    window.localStorage.removeItem(this.storageLabel)
     window.location = this.currentHost
   }
 }

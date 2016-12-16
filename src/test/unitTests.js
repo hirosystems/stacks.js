@@ -228,6 +228,5 @@ function testAuthResponse() {
     })
 }
 
-
 testAuthRequest()
 testAuthResponse()
