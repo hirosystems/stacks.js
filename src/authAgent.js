@@ -40,7 +40,7 @@ export class AuthAgent {
     return queryDict.authResponse
   }
 
-  loadUser(nameResolverURL, authResponseToken, callbackFunction) {
+  loadUser(authResponseToken, callbackFunction) {
     const username = AuthAgent.getUsernameFromToken(authResponseToken)
     const requestURL = this.nameResolverURL + username
     request(requestURL, function(error, response, body) {
@@ -49,7 +49,7 @@ export class AuthAgent {
         callbackFunction(username, profile)
       }
     })
-  }  
+  }
 
   recordSession(authResponseToken, username, profile) {
     const blockstackData = {
