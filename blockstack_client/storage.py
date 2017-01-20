@@ -382,7 +382,7 @@ def sign_raw_data(raw_data, privatekey):
 
     # force uncompressed
     if len(pk_hex) > 64:
-        pk = ECPrivateKey(privkey[:64])
+        pk = ECPrivateKey(privatekey[:64])
     
     priv = pk.to_hex()
     pub = pk.public_key().to_hex()
