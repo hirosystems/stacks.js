@@ -384,10 +384,14 @@ def sign_raw_data(raw_data, privatekey):
     if len(pk_hex) > 64:
         pk = ECPrivateKey(privatekey[:64])
     
-    priv = pk.to_hex()
+    priv = pk.to_hex()[:64]
     pub = pk.public_key().to_hex()
 
-    assert len(pub[2:].decode('hex')) == ecdsa.SECP256k1.verifying_key_length, "BUG: Invalid key decoding"
+    if keylib.key_formatting.get_pubkey_format(pub) == 'hex_compressed':
+        # required uncompressed
+        pub = keylib.key_formatting.decompress(pub)
+
+    assert len(pub[2:].decode('hex')) == ecdsa.SECP256k1.verifying_key_length, "BUG: Invalid key decoding {}".format(pub)
  
     sk = ecdsa.SigningKey.from_string(priv.decode('hex'), curve=ecdsa.SECP256k1)
     sig_bin = sk.sign_digest(data_hash.decode('hex'), sigencode=ecdsa.util.sigencode_der)
@@ -404,7 +408,8 @@ def sign_raw_data(raw_data, privatekey):
     vk = ecdsa.VerifyingKey.from_string(pub[2:].decode('hex'), curve=ecdsa.SECP256k1)
     assert vk.verify_digest(sig_bin, data_hash.decode('hex'), sigdecode=ecdsa.util.sigdecode_der), "Failed to verify signature ({}, {})".format(sig_r, sig_s)
 
-    return base64.b64encode( bitcoin.encode_sig( None, sig_r, sig_s ).decode('hex') )
+    # return base64.b64encode( bitcoin.encode_sig( None, sig_r, sig_s ).decode('hex') )
+    return base64.b64encode(ecdsa.util.sigencode_der(sig_r, sig_s, ecdsa.SECP256k1.order))
 
 
 def secp256k1_compressed_pubkey_to_uncompressed_pubkey( pubkey ):
@@ -449,8 +454,8 @@ def verify_raw_data(raw_data, pubkey, sigb64):
 
     data_hash = get_data_hash(raw_data)
     pubk = ECPublicKey(pubkey).to_hex()
-    if len(pubk) == 66:
-        pubk = secp256k1_compressed_pubkey_to_uncompressed_pubkey( pubkey )
+    if keylib.key_formatting.get_pubkey_format(pubk) == 'hex_compressed':
+        pubk = keylib.key_formatting.decompress(pubk)
 
     sig_bin = base64.b64decode(sigb64)
     vk = ecdsa.VerifyingKey.from_string( pubk[2:].decode('hex'), curve=ecdsa.SECP256k1 )
