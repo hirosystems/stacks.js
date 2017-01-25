@@ -1,6 +1,6 @@
 {
   "name": "blockstack-auth",
-  "version": "0.2.2",
+  "version": "0.2.1",
   "description": "Blockstack Auth Library",
   "main": "lib/index",
   "scripts": {
@@ -8,7 +8,8 @@
     "test": "npm run compile; node lib/test/unitTests.js",
     "prepublish": "npm run compile",
     "browserify-test": "npm run compile; node lib/test/browserifyTests.js",
-    "browserify-app": "npm run compile; browserify lib/test/browserifyApp.js -o lib/test/bundle.js"
+    "browserify-app": "npm run compile; browserify lib/test/browserifyApp.js -o lib/test/bundle.js",
+    "release": "npm version patch && npm publish"
   },
   "repository": {
     "type": "git",
