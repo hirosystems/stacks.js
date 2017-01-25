@@ -1,6 +1,6 @@
 {
   "name": "blockstack-auth",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Blockstack Auth Library",
   "main": "lib/index",
   "scripts": {
