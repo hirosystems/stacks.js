@@ -4,7 +4,7 @@ import test from 'tape'
 
 import {
     AuthMessage, AuthRequest, AuthResponse, createUnsignedRequest,
-    verifyAuthMessage, decodeToken
+    verifyAuthMessage, decodeToken, AuthAgent
 } from '../index'
 import { OnenameClient } from 'onename-api'
 
@@ -227,7 +227,6 @@ function testAuthResponse() {
         t.equal(JSON.stringify(decodedSampleToken.payload), JSON.stringify(sampleTokenPayload), 'token payload should match the reference payload')
     })
 }
-
 
 testAuthRequest()
 testAuthResponse()

@@ -1,6 +1,6 @@
 {
   "name": "blockstack-auth",
-  "version": "0.1.9",
+  "version": "0.2.1",
   "description": "Blockstack Auth Library",
   "main": "lib/index",
   "scripts": {
@@ -57,7 +57,9 @@
     "key-encoder": "^1.1.3",
     "keychain-manager": "^1.1.2",
     "node-uuid": "^1.4.3",
-    "promise": "^7.0.4"
+    "promise": "^7.0.4",
+    "query-string": "^4.2.3",
+    "request": "^2.79.0"
   },
   "devDependencies": {
     "babel-cli": "^6.14.0",
