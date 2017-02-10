@@ -66,7 +66,7 @@ export class AuthAgent {
   }
 
   loadSession(callbackFunction) {
-    const session = JSON.parse(localStorage.getItem(authAgent.storageLabel))
+    const session = JSON.parse(localStorage.getItem(this.storageLabel))
     callbackFunction(session)
   }
 
