@@ -30,7 +30,12 @@ export class AuthAgent {
       issuedAt: new Date().getTime()
     }
     const authRequest = base64url.encode(JSON.stringify(payload))
-    window.location = this.identityProviderURL + "?authRequest=" + authRequest
+    
+    setTimeout(function() {
+      window.location = this.identityProviderURL + "?authRequest=" + authRequest
+    }, 200)
+
+    window.location = "web+blockstack:" + authRequest
   }
 
   getAuthResponseToken() {
