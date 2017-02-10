@@ -10,7 +10,7 @@ Blockstack server and provides an interface for creating and managing names in d
 
 ## Getting Help
 
-If you ever need help with these instructions or want to learn more, please join the [Blockstack Slack](https://blockstack.slack.com) and drop us a line on the \#cli channel.
+If you ever need help with these instructions or want to learn more, check out the [CLI VIDEO TUTORIAL](https://www.youtube.com/playlist?list=PLXS8JJHIn4nGCU2uW85dHXpkQJ7QA5JkX) and please join the [Blockstack Slack](https://blockstack.slack.com) to drop us a line on the \#cli channel.
 
 ## Installation
 
@@ -61,6 +61,7 @@ $ sudo pip install blockstack
 ```
 
 ## Command Line Usage
+Visit the [CLI VIDEO TUTORIAL](https://www.youtube.com/playlist?list=PLXS8JJHIn4nGCU2uW85dHXpkQJ7QA5JkX) to learn more!
 
 ### Listing All Commands
 
