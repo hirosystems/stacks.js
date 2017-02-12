@@ -960,7 +960,7 @@ def cli_register( args, config_path=CONFIG_PATH, interactive=True, password=None
             input_prompt+= "You need to have Internet access during this time period, so\n"
             input_prompt+= "this program can send the right transactions at the right\n"
             input_prompt+= "times.\n\n"
-            input_prompt += "Continue? (Y/n): "
+            input_prompt += "Continue? (y/N): "
             user_input = raw_input(input_prompt)
             user_input = user_input.lower()
 
