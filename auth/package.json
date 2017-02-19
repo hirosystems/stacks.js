@@ -1,0 +1,74 @@
+{
+  "name": "blockstack-auth",
+  "version": "0.2.6",
+  "description": "Blockstack Auth Library",
+  "main": "lib/index",
+  "scripts": {
+    "compile": "babel --presets es2015 src -d lib",
+    "test": "npm run compile; node lib/test/unitTests.js",
+    "prepublish": "npm run compile",
+    "browserify-test": "npm run compile; node lib/test/browserifyTests.js",
+    "browserify-app": "npm run compile; browserify lib/test/browserifyApp.js -o lib/test/bundle.js",
+    "release": "npm version patch && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blockstack/blockstack-auth-js.git"
+  },
+  "keywords": [
+    "blockchain",
+    "id",
+    "auth",
+    "authentication",
+    "bitcoin",
+    "blockchain auth",
+    "blockchain authentication",
+    "blockchainid",
+    "blockchain id",
+    "bitcoin auth",
+    "bitcoin authentication",
+    "bitcoin login",
+    "blockchain login",
+    "authorization",
+    "login",
+    "signin",
+    "sso",
+    "crypto",
+    "cryptography",
+    "token",
+    "blockstack",
+    "blockstack auth"
+  ],
+  "author": {
+    "name": "Blockstack Inc.",
+    "email": "admin@blockstack.com",
+    "url": "https://blockstack.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/blockstack/blockstack-auth-js/issues"
+  },
+  "homepage": "https://github.com/blockstack/blockstack-auth-js#readme",
+  "dependencies": {
+    "base64url": "^1.0.4",
+    "elliptic": "^5.1.0",
+    "elliptic-curve": "^0.1.0",
+    "hasprop": "0.0.3",
+    "jsontokens": "^0.6.5",
+    "key-encoder": "^1.1.3",
+    "keychain-manager": "^1.1.2",
+    "node-uuid": "^1.4.3",
+    "promise": "^7.0.4",
+    "query-string": "^4.2.3",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-preset-es2015": "^6.14.0",
+    "browserify": "^13.1.1",
+    "onename-api": "^1.0.1",
+    "phantomjs-prebuilt": "^2.1.13",
+    "tape": "^4.2.0",
+    "tape-run": "^2.1.4"
+  }
+}
