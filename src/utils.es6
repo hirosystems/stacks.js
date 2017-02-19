@@ -1,4 +1,6 @@
-
+export function nextYear() {
+  return new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+}
 
 export function containsValidProofStatement(searchText, fqdn) {
   searchText = searchText.toLowerCase()

@@ -1,7 +1,7 @@
 'use strict'
 
 import { PrivateKeychain, PublicKeychain } from 'blockstack-keychains'
-import { decodeToken, TokenSigner, TokenVerifier } from 'jwt-js'
+import { decodeToken, TokenSigner, TokenVerifier } from 'jsontokens'
 
 import BigInteger from 'bigi'
 import ecurve from 'ecurve'

@@ -1,11 +1,8 @@
 import test from 'blue-tape'
 import fs from 'fs'
 import FetchMock from 'fetch-mock'
-import {
-  validateProofs
-} from '../index'
+import { validateProofs } from '../index'
 import { sampleProfiles, sampleProofs, sampleVerifications } from './samples'
-
 
 function testProofs(profile, username, totalProofs) {
   mockRequests()
@@ -18,20 +15,15 @@ function testProofs(profile, username, totalProofs) {
       FetchMock.restore()
     })
   })
-
 }
-
-
 
 function mockRequests() {
   FetchMock.get(sampleVerifications.naval.facebook.url, sampleVerifications.naval.facebook.body)
   FetchMock.get(sampleVerifications.naval.github.url, sampleVerifications.naval.github.body)
   FetchMock.get(sampleVerifications.naval.twitter.url, sampleVerifications.naval.twitter.body)
-
   FetchMock.get(sampleVerifications.larry.facebook.url, sampleVerifications.larry.facebook.body)
 
 }
-
 
 export function runProofsUnitTests() {
   testProofs(sampleProfiles.naval, "naval.id", 3)

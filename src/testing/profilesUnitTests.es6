@@ -180,9 +180,11 @@ function testSchemas() {
   })
 }
 
-testVerifyToken()
-testTokening('naval.json', sampleProfiles.naval)
-testTokening('google.json', sampleProfiles.google)
-testTokening('balloonDog.json', sampleProfiles.balloonDog)
-testZoneFile()
-testSchemas()
+export function runProfilesUnitTests() {
+  testVerifyToken()
+  testTokening('naval.json', sampleProfiles.naval)
+  testTokening('google.json', sampleProfiles.google)
+  testTokening('balloonDog.json', sampleProfiles.balloonDog)
+  testZoneFile()
+  testSchemas()
+}

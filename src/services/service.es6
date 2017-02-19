@@ -1,5 +1,6 @@
 import { containsValidProofStatement } from "../utils"
 import "isomorphic-fetch"
+
 export class Service {
 
   static validateProof(proof, fqdn) {
