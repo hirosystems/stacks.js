@@ -1,4 +1,4 @@
-# Blockstack Connect
+# Blockstack JS
 
 [![npm](https://img.shields.io/npm/l/blockstack.svg)](https://www.npmjs.com/package/blockstack)
 [![npm](https://img.shields.io/npm/v/blockstack.svg)](https://www.npmjs.com/package/blockstack)
@@ -7,30 +7,35 @@
 
 ## Contents
 
-* [About](#about)
 * [Installation](#installation)
+* [About](#about)
 * [Profiles](#profiles)
 * [Proofs](#proofs)
 * [Wiki](#wiki)
 * [Testing](#testing)
-
-## About
-
-A library for working with cryptographically-signed JSON profiles.
-
-This library can be used to:
-
-1. transform a JSON profile into signed tokens
-1. recover a JSON profile from signed tokens
-1. validate signed profile tokens
-
-*Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var").*
 
 ## Installation
 
 ```
 $ npm install blockstack
 ```
+
+## About
+
+Blockstack JS is a library for identity and authentication.
+
+The identity portion of this library can be used to:
+
+1. transform a JSON profile into cryptographically-signed signed tokens
+1. recover a JSON profile from signed tokens
+1. validate signed profile tokens
+
+The authentication portion of this library can be used to:
+
+1. create an authentication request
+1. create an authentication response
+
+*Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var").*
 
 ## Profiles
 
