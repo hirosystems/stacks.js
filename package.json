@@ -30,11 +30,11 @@
   },
   "dependencies": {
     "bigi": "^1.4.1",
-    "bitcoinjs-lib": "git+ssh://git@github.com/shea256/bitcoinjs-lib.git",
+    "bitcoinjs-lib": "^2.3.0",
     "blockstack-keychains": "0.0.4",
     "blockstack-zones": "0.0.1",
     "dateformat": "^1.0.12",
-    "ecurve": "git+ssh://git@github.com/shea256/ecurve.git",
+    "ecurve": "^1.0.5",
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.4",
     "isomorphic-fetch": "^2.2.1",
