@@ -7,6 +7,7 @@
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone BlockstackProofs -o ./src/testing/browser/blockstack-proofs.js",
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
     "prepublish": "npm run compile",
+    "release": "npm version patch && npm publish",
     "test": "npm run compile; npm run browserify; node lib/testing/index.js"
   },
   "repository": {
