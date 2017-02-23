@@ -11,11 +11,11 @@ const sampleProfiles = {
 const sampleTokenFiles = {
   ryan_apr20: {
     url: "https://blockstack.s3.amazonaws.com/ryan_apr20.id",
-    body: JSON.parse(fs.readFileSync('./docs/tokenfiles/ryan_apr20.json'))
+    body: JSON.parse(fs.readFileSync('./docs/token-files/ryan_apr20.json'))
   },
   ryan: {
     url: "https://blockstack.s3.amazonaws.com/ryan.id",
-    body: JSON.parse(fs.readFileSync('./docs/tokenfiles/ryan.json'), 'utf8')
+    body: JSON.parse(fs.readFileSync('./docs/token-files/ryan.json'), 'utf8')
   }
 }
 

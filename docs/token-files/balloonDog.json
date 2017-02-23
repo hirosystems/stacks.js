@@ -1,0 +1,37 @@
+[
+  {
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJqdGkiOiJhMmQ5MWI3Ny0yYzE1LTRiNDMtYTc2OC1iMGFjZGI4NmFjOWQiLCJpYXQiOiIyMDE3LTAyLTIzVDE5OjUzOjA2LjYyOVoiLCJleHAiOiIyMDE4LTAyLTIzVDE5OjUzOjA2LjYyOVoiLCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzODE4YjczN2U0NWNlNjFmYTYxODIxM2RiNDljYWRkYzI1NDJkNDhjMmZmZDE3MjQyMjdjMjc4ZWFhY2M4MWMzYyJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDM4MThiNzM3ZTQ1Y2U2MWZhNjE4MjEzZGI0OWNhZGRjMjU0MmQ0OGMyZmZkMTcyNDIyN2MyNzhlYWFjYzgxYzNjIn0sImNsYWltIjp7IkBjb250ZXh0IjoiaHR0cDovL3NjaGVtYS5vcmcvIiwiQHR5cGUiOiJDcmVhdGl2ZVdvcmsiLCJuYW1lIjoiQmFsbG9vbiBEb2ciLCJjcmVhdG9yIjpbeyJAdHlwZSI6IlBlcnNvbiIsIkBpZCI6InRoZXJlYWxqZWZma29vbnMuaWQiLCJuYW1lIjoiSmVmZiBLb29ucyJ9XSwiZGF0ZUNyZWF0ZWQiOiIxOTk0LTA1LTA5VDAwOjAwOjAwLTA0MDAiLCJkYXRlUHVibGlzaGVkIjoiMjAxNS0xMi0xMFQxNDo0NDoyNi0wNTAwIn19.pGVvuTQPGHxz-isqBngkX-V3LjWmx-UysVY3LCUu_ZUnM33xweO4yzzWuqpAqTnBcsS2N4dZUh91oWwxU3cW1A",
+    "decodedToken": {
+      "header": {
+        "typ": "JWT",
+        "alg": "ES256K"
+      },
+      "payload": {
+        "jti": "a2d91b77-2c15-4b43-a768-b0acdb86ac9d",
+        "iat": "2017-02-23T19:53:06.629Z",
+        "exp": "2018-02-23T19:53:06.629Z",
+        "subject": {
+          "publicKey": "03818b737e45ce61fa618213db49caddc2542d48c2ffd1724227c278eaacc81c3c"
+        },
+        "issuer": {
+          "publicKey": "03818b737e45ce61fa618213db49caddc2542d48c2ffd1724227c278eaacc81c3c"
+        },
+        "claim": {
+          "@context": "http://schema.org/",
+          "@type": "CreativeWork",
+          "name": "Balloon Dog",
+          "creator": [
+            {
+              "@type": "Person",
+              "@id": "therealjeffkoons.id",
+              "name": "Jeff Koons"
+            }
+          ],
+          "dateCreated": "1994-05-09T00:00:00-0400",
+          "datePublished": "2015-12-10T14:44:26-0500"
+        }
+      },
+      "signature": "pGVvuTQPGHxz-isqBngkX-V3LjWmx-UysVY3LCUu_ZUnM33xweO4yzzWuqpAqTnBcsS2N4dZUh91oWwxU3cW1A"
+    }
+  }
+]
