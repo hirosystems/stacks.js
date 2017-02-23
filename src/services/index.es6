@@ -3,13 +3,10 @@
 import { Facebook } from './facebook'
 import { Github } from './github'
 import { Twitter } from './twitter'
+export { containsValidProofStatement } from './serviceUtils'
 
-
-
-let services = {
-  "facebook": Facebook,
-  "github": Github,
-  "twitter": Twitter
+export const services = {
+  facebook: Facebook,
+  github: Github,
+  twitter: Twitter
 }
-
-export { services }

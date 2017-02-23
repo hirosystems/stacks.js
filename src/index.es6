@@ -1,34 +1,29 @@
 'use strict'
 
-/*
- * Profiles
- */
-import { signToken, wrapToken, signTokenRecords } from './tokenSigning'
-import { verifyToken, verifyTokenRecord, getProfileFromTokens } from './tokenVerifying'
-
-import { Profile } from './profile'
-import { Person, Organization, CreativeWork, getPersonFromLegacyFormat } from './identities'
-
-import { makeZoneFileForHostedProfile } from './zoneFiles'
-import { nextYear } from './utils'
-
-/*
- * Proofs
- */
-import { validateProofs } from './proofs'
+export {
+  Profile
+} from './profile'
 
 export {
-  signToken,
-  wrapToken,
-  signTokenRecords,
-  verifyToken,
-  verifyTokenRecord,
-  getProfileFromTokens,
-  makeZoneFileForHostedProfile,
-  Profile,
+  signProfileToken,
+  wrapProfileToken,
+  verifyProfileToken,
+  getProfileFromToken
+} from './profileTokens'
+
+export {
   Person,
   Organization,
-  CreativeWork,
-  nextYear,
-  validateProofs
-}
+  CreativeWork
+} from './profileSchemas'
+
+export {
+  validateProofs,
+  containsValidProofStatement
+} from './profileProofs'
+
+export {
+  getEntropy,
+  privateKeyToPublicKey,
+  makeZoneFileForHostedProfile
+} from './utils'

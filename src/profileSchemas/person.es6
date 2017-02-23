@@ -1,5 +1,8 @@
-import { getProfileFromTokens } from '../tokenVerifying'
+'use strict'
+
 import inspector from 'schema-inspector'
+
+import { signProfileToken, getProfileFromToken } from '../profileTokens'
 import { Profile } from '../profile'
 import { getPersonFromLegacyFormat } from './personLegacy'
 import {
@@ -8,7 +11,7 @@ import {
   getConnections, getOrganizations
 } from './personUtils'
 
-let schemaDefinition = {
+const schemaDefinition = {
   type: 'object',
   strict: false,
   properties: {
@@ -104,18 +107,18 @@ export class Person extends Profile {
     }, this._profile)
   }
 
-  static validateSchema(profile, strict = false) {
+  static validateSchema(profile, strict=false) {
     schemaDefinition['strict'] = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromTokens(tokenRecords, publicKeychain) {
-    let profile = getProfileFromTokens(tokenRecords, publicKeychain)
+  static fromToken(token, publicKeyOrAddress=null) {
+    const profile = getProfileFromToken(token, publicKeyOrAddress)
     return new Person(profile)
   }
 
   static fromLegacyFormat(legacyProfile) {
-    let profile = getPersonFromLegacyFormat(legacyProfile)
+    const profile = getPersonFromLegacyFormat(legacyProfile)
     return new Person(profile)
   }
 

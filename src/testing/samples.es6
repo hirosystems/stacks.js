@@ -1,6 +1,5 @@
 import fs from 'fs'
 
-
 const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
@@ -13,7 +12,6 @@ const sampleProofs = {
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.proofs.json')),
   larry: JSON.parse(fs.readFileSync('./docs/profiles/larry.proofs.json'))
 }
-
 
 const sampleVerifications = {
   naval: {

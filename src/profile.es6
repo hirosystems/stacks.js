@@ -1,8 +1,14 @@
-import { signTokenRecords } from './tokenSigning'
-import { getProfileFromTokens } from './tokenVerifying'
+'use strict'
+
 import inspector from 'schema-inspector'
 
-let schemaDefinition = {
+import {
+  signProfileToken, verifyProfileToken, getProfileFromToken
+} from './profileTokens'
+import { validateProofs } from './profileProofs'
+import { makeZoneFileForHostedProfile } from './utils'
+
+const schemaDefinition = {
   type: 'object',
   properties: {
     '@context': { type: 'string', optional: true },
@@ -21,31 +27,25 @@ export class Profile {
     return Object.assign({}, this._profile)
   }
 
-  toSignedTokens(privateKeychain, standaloneProperties = []) {
-    let profileComponents = [],
-        profile = this.toJSON()
-    standaloneProperties.map((property) => {
-      if (profile.hasOwnProperty(property)) {
-        let subprofile = {
-          [property]: profile[property]
-        }
-        profileComponents.push(subprofile)
-        delete profile[property]
-      }
-    })
-    profileComponents = [
-      profile,
-      ...profileComponents
-    ]
-    return signTokenRecords(profileComponents, privateKeychain)
+  toToken(privateKey) {
+    return signProfileToken(this.toJSON(), privateKey)
   }
 
-  static validateSchema(profile) {
+  static validateSchema(profile, strict=false) {
+    schemaDefinition['strict'] = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromTokens(tokenRecords, publicKeychain) {
-    let profile = getProfileFromTokens(tokenRecords, publicKeychain)
+  static fromToken(token, publicKeyOrAddress=null) {
+    const profile = getProfileFromToken(token, publicKeyOrAddress)
     return new Profile(profile)
+  }
+
+  static makeZoneFile(domainName, tokenFileURL) {
+    return makeZoneFileForHostedProfile(domainName, tokenFileURL)
+  }
+
+  static validateProofs(domainName) {
+    return validateProofs(this.toJSON(), domainName)
   }
 }

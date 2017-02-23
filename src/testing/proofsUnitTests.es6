@@ -18,11 +18,13 @@ function testProofs(profile, username, totalProofs) {
 }
 
 function mockRequests() {
-  FetchMock.get(sampleVerifications.naval.facebook.url, sampleVerifications.naval.facebook.body)
-  FetchMock.get(sampleVerifications.naval.github.url, sampleVerifications.naval.github.body)
-  FetchMock.get(sampleVerifications.naval.twitter.url, sampleVerifications.naval.twitter.body)
-  FetchMock.get(sampleVerifications.larry.facebook.url, sampleVerifications.larry.facebook.body)
+  const naval = sampleVerifications.naval
+  const larry = sampleVerifications.larry
 
+  FetchMock.get(naval.facebook.url, naval.facebook.body)
+  FetchMock.get(naval.github.url, naval.github.body)
+  FetchMock.get(naval.twitter.url, naval.twitter.body)
+  FetchMock.get(larry.facebook.url, larry.facebook.body)
 }
 
 export function runProofsUnitTests() {

@@ -1,22 +1,20 @@
 'use strict'
 
-import { services } from './services/index'
+import { services } from './services'
 
 const validationTimeout = 30000  // 30 seconds
 
 export function validateProofs(profile, fqdn) {
-  let promise = new Promise( (resolve, reject) => {
+  let promise = new Promise((resolve, reject) => {
 
     let proofs = []
-
     let accounts = []
 
-
-
-    if(profile.hasOwnProperty("account"))
+    if (profile.hasOwnProperty("account")) {
       accounts = profile.account
-    else
+    } else {
       resolve(proofs)
+    }
 
     let accountsToValidate = accounts.length
 
@@ -27,30 +25,32 @@ export function validateProofs(profile, fqdn) {
 
     accounts.forEach(function(account) {
       // skip if proof service is not supported
-      if(account.hasOwnProperty("service") && !services.hasOwnProperty(account.service)) {
+      if (account.hasOwnProperty("service") &&
+          !services.hasOwnProperty(account.service)) {
         accountsToValidate--
         return
       }
 
-      if(!(account.hasOwnProperty("proofType") && account.proofType == "http" &&
-         account.hasOwnProperty("proofUrl"))) {
+      if (!(account.hasOwnProperty("proofType") &&
+          account.proofType == "http" &&
+          account.hasOwnProperty("proofUrl"))) {
         accountsToValidate--
         return
       }
 
-      let proof = {"service": account.service,
-               "proof_url": account.proofUrl,
-               "identifier": account.identifier,
-               "valid": false}
+      let proof = {
+        "service": account.service,
+        "proof_url": account.proofUrl,
+        "identifier": account.identifier,
+        "valid": false
+      }
 
       services[account.service].validateProof(proof, fqdn).then((proof) => {
         proofs.push(proof)
-
-        if(proofs.length >= accountsToValidate) {
+        if (proofs.length >= accountsToValidate) {
           clearTimeout(timeoutTimer)
           resolve(proofs)
         }
-
       })
 
     })

@@ -1,5 +1,7 @@
-import { containsValidProofStatement } from "../utils"
+'use strict'
+
 import "isomorphic-fetch"
+import { containsValidProofStatement } from "./serviceUtils"
 
 export class Service {
 

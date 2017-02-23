@@ -1,15 +1,15 @@
 import test from 'tape'
 import fs from 'fs'
-import { PrivateKeychain, PublicKeychain } from 'blockstack-keychains'
-import {
-  signToken, wrapToken, signTokenRecords,
-  verifyToken, verifyTokenRecord, getProfileFromTokens,
-  Profile, Person, Organization, CreativeWork,
-  makeZoneFileForHostedProfile
-} from '../index'
+import { ECPair } from 'bitcoinjs-lib'
 
-let privateKeychain = new PrivateKeychain(),
-    publicKeychain = privateKeychain.publicKeychain()
+import {
+  signProfileToken,
+  wrapProfileToken,
+  verifyProfileToken,
+  getProfileFromToken,
+  Profile, Person, Organization, CreativeWork,
+  getEntropy
+} from '../index'
 
 const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
@@ -22,42 +22,44 @@ const sampleTokenFiles = {
 }
 
 function testTokening(filename, profile) {
+  const keyPair = new ECPair.makeRandom({ rng: getEntropy })
+  const privateKey = keyPair.d.toBuffer(32).toString('hex')
+  const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+
   let tokenRecords = []
 
   test('profileToToken', (t) => {
     t.plan(3)
 
-    let privateKey = privateKeychain.privateKey('hex'),
-        publicKey = publicKeychain.publicKey('hex')
-
-    let token = signToken(profile, privateKey, {publicKey: publicKey})
+    let token = signProfileToken(profile, privateKey)
     t.ok(token, 'Token must have been created')
-    let tokenRecord = wrapToken(token)
+    
+    let tokenRecord = wrapProfileToken(token)
     t.ok(tokenRecord, 'Token record must have been created')
 
-    let decodedToken = verifyTokenRecord(tokenRecord, publicKey)
+    let decodedToken = verifyProfileToken(tokenRecord.token, publicKey)
     t.ok(decodedToken, 'Token record must have been verified')
   })
 
   test('profileToTokens', (t) => {
     t.plan(2)
 
-    tokenRecords = signTokenRecords([profile], privateKeychain)
+    tokenRecords = [wrapProfileToken(signProfileToken(profile, privateKey))]
     t.ok(tokenRecords, 'Tokens should have been created')
     //console.log(JSON.stringify(tokenRecords, null, 2))
     fs.writeFileSync('./docs/tokenfiles/' + filename, JSON.stringify(tokenRecords, null, 2))
 
     let tokensVerified = true
     tokenRecords.map((tokenRecord) => {
-      let decodedToken = verifyTokenRecord(tokenRecord, publicKeychain)
+      let decodedToken = verifyProfileToken(tokenRecord.token, publicKey)
     })
     t.equal(tokensVerified, true, 'All tokens should be valid')
   })
 
-  test('tokensToProfile', (t) => {
+  test('tokenToProfile', (t) => {
     t.plan(2)
 
-    let recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
+    let recoveredProfile = getProfileFromToken(tokenRecords[0].token, publicKey)
     //console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile), JSON.stringify(profile), 'Profile should equal the reference')
@@ -75,13 +77,13 @@ function testVerifyToken() {
   test('verifyToken', (t) => {
     t.plan(3)
 
-    let decodedToken1 = verifyToken(token, publicKey)
+    let decodedToken1 = verifyProfileToken(token, publicKey)
     t.ok(decodedToken1, 'Token should have been verified against a public key')
 
-    let decodedToken2 = verifyToken(token, compressedAddress)
+    let decodedToken2 = verifyProfileToken(token, compressedAddress)
     t.ok(decodedToken2, 'Token should have been verified against a compressed address')
 
-    let decodedToken3 = verifyToken(token, uncompressedAddress)
+    let decodedToken3 = verifyProfileToken(token, uncompressedAddress)
     t.ok(decodedToken3, 'Token should have been verified against an uncompressed address')
   })
 }
@@ -91,13 +93,17 @@ function testZoneFile() {
     t.plan(1)
     
     let fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
-    let zoneFile = makeZoneFileForHostedProfile('naval.id', fileUrl)
+    let zoneFile = Profile.makeZoneFile('naval.id', fileUrl)
     //console.log(zoneFile)
     t.ok(zoneFile, 'Zone file should have been created for hosted profile')
   })
 }
 
 function testSchemas() {
+  const keyPair = new ECPair.makeRandom({ rng: getEntropy })
+  const privateKey = keyPair.d.toBuffer(32).toString('hex')
+  const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+
   test('Profile', (t) => {
     t.plan(5)
 
@@ -110,10 +116,10 @@ function testSchemas() {
     let profileJson = profileObject.toJSON()
     t.ok(profileJson, 'Profile JSON should have been created')  
 
-    let tokenRecords = profileObject.toSignedTokens(privateKeychain)
+    let tokenRecords = profileObject.toToken(privateKey)
     t.ok(tokenRecords, 'Profile tokens should have been created')
     
-    let profileObject2 = Profile.fromTokens(tokenRecords, publicKeychain)
+    let profileObject2 = Profile.fromToken(tokenRecords, publicKey)
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
@@ -126,12 +132,12 @@ function testSchemas() {
     let validationResults = Person.validateSchema(sampleProfiles.naval, true)
     t.ok(validationResults.valid, 'Person profile should be valid')
 
-    let standaloneProperties = ['taxID', 'birthDate', 'address']
-    let tokenRecords = personObject.toSignedTokens(privateKeychain, standaloneProperties)
+    let token = personObject.toToken(privateKey)
+    let tokenRecords = [wrapProfileToken(token)]
     t.ok(tokenRecords, 'Person profile tokens should have been created')
     fs.writeFileSync('./docs/tokenfiles/naval-4-tokens.json', JSON.stringify(tokenRecords, null, 2))
 
-    let profileObject2 = Person.fromTokens(tokenRecords, publicKeychain)
+    let profileObject2 = Person.fromToken(tokenRecords[0].token, publicKey)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
 
     let name = personObject.name()

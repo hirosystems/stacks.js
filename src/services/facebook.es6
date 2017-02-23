@@ -1,7 +1,6 @@
 import { Service } from "./service"
 
 class Facebook extends Service {
-
   static getBaseUrls() {
     const baseUrls = ["https://facebook.com/", "https://www.facebook.com"]
     return baseUrls
@@ -10,7 +9,6 @@ class Facebook extends Service {
   static getProofUrl(proof) {
     let proofUrl = super.getProofUrl(proof)
     return this.normalizeFacebookUrl(proofUrl)
-
   }
 
   /* Facebook url proofs should start with www. */
@@ -26,6 +24,5 @@ class Facebook extends Service {
     return proofUrl
   }
 }
-
 
 export { Facebook }

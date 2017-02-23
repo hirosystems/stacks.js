@@ -48,141 +48,45 @@ Follow these steps to create and register a profile for a Blockchain ID:
 #### Create a profile
 
 ```es6
-let balloonDog = {
+const profileOfNaval = {
   "@context": "http://schema.org/",
-  "@type": "CreativeWork",
-  "name": "Balloon Dog",
-  "creator": [
-    {
-      "@type": "Person",
-      "@id": "therealjeffkoons.id",
-      "name": "Jeff Koons"
-    }
-  ],
-  "dateCreated": "1994-05-09T00:00:00-0400",
-  "datePublished": "2015-12-10T14:44:26-0500"
+  "@type": "Person",
+  "name": "Naval Ravikant",
+  "description": "Co-founder of AngelList"
 }
 ```
 
 #### Sign a profile as a single token
 
 ```es6
-import { PrivateKeychain, PublicKeychain } from 'blockstack-keychain'
-import { signToken, wrapToken } from 'blockstack'
+import { ECPair } from 'bitcoinjs-lib'
+import { signProfileToken, wrapProfileToken, Person } from 'blockstack'
 
-let privateKeychain = new PrivateKeychain(),
-    privateKey = privateKeychain.privateKey('hex'),
-    publicKey = privateKeychain.publicKeychain.publicKey('hex')
-let token = signToken(balloonDog, privateKey, {publicKey: publicKey})
-let tokenRecord = wrapToken(token)
-console.log(token)
-eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzMTc1MTFlOWVhY2Y0MmZlOGY3MTdmNzU3ODc2YzU1YmQ1ZDRjODgxOGViYWMxNzdiMzUwZmEyZDMzMzAwMTA2NiJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDMxNzUxMWU5ZWFjZjQyZmU4ZjcxN2Y3NTc4NzZjNTViZDVkNGM4ODE4ZWJhYzE3N2IzNTBmYTJkMzMzMDAxMDY2In0sImlzc3VlZEF0IjoiMjAxNi0wNC0xOFQyMzo0NTo1Mi40MTFaIiwiZXhwaXJlc0F0IjoiMjAxNy0wNC0xOFQyMzo0NTo1Mi40MTFaIn0.4M-XodG4PaNm1NovKKo3gZVUMwG6aN7W9sVESqdZ4I9UaTB30jEuvqKWyD4aPcckw6SEEbZ1cBwgW9qXNXipzg
-console.log(tokenRecord)
-{
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzMTc1MTFlOWVhY2Y0MmZlOGY3MTdmNzU3ODc2YzU1YmQ1ZDRjODgxOGViYWMxNzdiMzUwZmEyZDMzMzAwMTA2NiJ9LCJpc3N1ZXIiOnsicHVibGljS2V5IjoiMDMxNzUxMWU5ZWFjZjQyZmU4ZjcxN2Y3NTc4NzZjNTViZDVkNGM4ODE4ZWJhYzE3N2IzNTBmYTJkMzMzMDAxMDY2In0sImlzc3VlZEF0IjoiMjAxNi0wNC0xOFQyMzo0NTo1Mi40MTFaIiwiZXhwaXJlc0F0IjoiMjAxNy0wNC0xOFQyMzo0NTo1Mi40MTFaIn0.4M-XodG4PaNm1NovKKo3gZVUMwG6aN7W9sVESqdZ4I9UaTB30jEuvqKWyD4aPcckw6SEEbZ1cBwgW9qXNXipzg",
-  "data": {
-    "header": {
-      "typ": "JWT",
-      "alg": "ES256K"
-    },
-    "payload": {
-      "claim": {
-        "@context": "http://schema.org/",
-        "@type": "CreativeWork",
-        "name": "Balloon Dog",
-        "creator": [
-          {
-            "@type": "Person",
-            "@id": "therealjeffkoons.id",
-            "name": "Jeff Koons"
-          }
-        ],
-        "dateCreated": "1994-05-09T00:00:00-0400",
-        "datePublished": "2015-12-10T14:44:26-0500"
-      },
-      "subject": {
-        "publicKey": "0317511e9eacf42fe8f717f757876c55bd5d4c8818ebac177b350fa2d333001066"
-      },
-      "issuer": {
-        "publicKey": "0317511e9eacf42fe8f717f757876c55bd5d4c8818ebac177b350fa2d333001066"
-      },
-      "issuedAt": "2016-04-18T23:45:52.411Z",
-      "expiresAt": "2017-04-18T23:45:52.411Z"
-    },
-    "signature": "4M-XodG4PaNm1NovKKo3gZVUMwG6aN7W9sVESqdZ4I9UaTB30jEuvqKWyD4aPcckw6SEEbZ1cBwgW9qXNXipzg"
-  },
-  "encrypted": false,
-  "parentPublicKey": "02b511f1267a77f5814b2c07f03f1f112438d4be6f553dd4b877b2832874b4e706",
-  "derivationEntropy": "1f8eaa7a916f05218cfc6904a3dab1a1ccd3ab69fbdd9d96a24db8c7445d118c"
-}
+const keyPair = new ECPair.makeRandom({ rng: getEntropy })
+const privateKey = keyPair.d.toBuffer(32).toString('hex')
+const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+
+const person = new Person(profileOfNaval)
+const token = person.toToken(privateKey)
+const tokenFile = [wrapProfileToken(token)]
 ```
 
 #### Verify an individual token
 
 ```js
-import { verifyTokenRecord } from 'blockstack'
+import { verifyProfileToken } from 'blockstack'
 
 try {
-  let decodedToken = verifyTokenRecord(tokenRecords[0], publicKeychain)
+  const decodedToken = verifyProfileToken(tokenFile[0].token, publicKey)
 } catch(e) {
   console.log(e)
 }
 ```
 
-#### Transform a profile to multiple signed tokens
-
-```es6
-import { signTokenRecords } from 'blockstack'
-
-let privateKeychain = new PrivateKeychain()
-let tokenRecords = signTokenRecords([balloonDog], privateKeychain)
-console.log(tokenRecords)
-[
-  {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJjbGFpbSI6eyJAY29udGV4dCI6Imh0dHA6Ly9zY2hlbWEub3JnLyIsIkB0eXBlIjoiQ3JlYXRpdmVXb3JrIiwibmFtZSI6IkJhbGxvb24gRG9nIiwiY3JlYXRvciI6W3siQHR5cGUiOiJQZXJzb24iLCJAaWQiOiJ0aGVyZWFsamVmZmtvb25zLmlkIiwibmFtZSI6IkplZmYgS29vbnMifV0sImRhdGVDcmVhdGVkIjoiMTk5NC0wNS0wOVQwMDowMDowMC0wNDAwIiwiZGF0ZVB1Ymxpc2hlZCI6IjIwMTUtMTItMTBUMTQ6NDQ6MjYtMDUwMCJ9LCJzdWJqZWN0Ijp7InB1YmxpY0tleSI6IjAzYTU5ZGJmZDk2MTJlNDA4ODgxOGM5MGUxOWFmY2Y4ZDE3OTNiMzhhNWMwNDBjMzhkN2QwN2JiN2QzOWQ4NmQ3MiJ9LCJpc3N1ZWRBdCI6IjIwMTYtMDMtMTBUMTc6MDE6MzIuODc5WiIsImV4cGlyZXNBdCI6IjIwMTctMDMtMTBUMTc6MDE6MzIuODc5WiJ9.vEUJzl713FApgDNYzbUue5SDOdeElxEaAnMbmT-A6ihfrnzhOd5WvzlGJwTiz1LbeTruhQgbh_XyCJ6aLxfu6A",
-    "data": {
-      "header": {
-        "typ": "JWT",
-        "alg": "ES256K"
-      },
-      "payload": {
-        "claim": {
-          "@context": "http://schema.org/",
-          "@type": "CreativeWork",
-          "name": "Balloon Dog",
-          "creator": [
-            {
-              "@type": "Person",
-              "@id": "therealjeffkoons.id",
-              "name": "Jeff Koons"
-            }
-          ],
-          "dateCreated": "1994-05-09T00:00:00-0400",
-          "datePublished": "2015-12-10T14:44:26-0500"
-        },
-        "subject": {
-          "publicKey": "03a59dbfd9612e4088818c90e19afcf8d1793b38a5c040c38d7d07bb7d39d86d72"
-        },
-        "issuedAt": "2016-03-10T17:01:32.879Z",
-        "expiresAt": "2017-03-10T17:01:32.879Z"
-      },
-      "signature": "vEUJzl713FApgDNYzbUue5SDOdeElxEaAnMbmT-A6ihfrnzhOd5WvzlGJwTiz1LbeTruhQgbh_XyCJ6aLxfu6A"
-    },
-    "publicKey": "03a59dbfd9612e4088818c90e19afcf8d1793b38a5c040c38d7d07bb7d39d86d72",
-    "encrypted": false,
-    "parentPublicKey": "03be573c8dbdd74bbc457f530c4f5898f7147f105af57c1aee20127f981697b884",
-    "derivationEntropy": "35d0d4e73780d7e47b404a961c9005f415db76ae88c1bcd4bdcd742d68670f26"
-  }
-]
-```
-
-#### Recover a profile from tokens
+#### Recover a profile from a token file
 
 ```js
-import { getProfileFromTokens } from 'blockstack'
-
-let publicKeychain = privateKeychain.publicKeychain()
-let recoveredProfile = getProfileFromTokens(tokenRecords, publicKeychain)
+const recoveredProfile = Person.fromToken(tokenFile, publicKey)
 console.log(recoveredProfile)
 { '@context': 'http://schema.org/',
   '@type': 'CreativeWork',
@@ -198,49 +102,18 @@ console.log(recoveredProfile)
 #### Validate profile schema
 
 ```js
-import { Person } from 'blockstack'
-let validationResults = Person.validateSchema(recoveredProfile)
-console.log(validationResults.valid)
-true
+const validationResults = Person.validateSchema(recoveredProfile)
 ```
 
-## Proofs
-
-#### Node
+#### Validate a proof
 
 ```es6
 import { validateProofs } from 'blockstack'
-```
 
-#### Usage
-
-```es6
-let fullyQualifiedDomainName = "naval.id"
+const fullyQualifiedDomainName = "naval.id"
 validateProofs(profile, fullyQualifiedDomainName).then((proofs) => {
   console.log(proofs)
 })
-
-
-[
-  { "identifier": "naval",
-    "proof_url": "https://twitter.com/naval/status/486609266212499456",
-    "service": "twitter",
-    "valid": true
-  },
-  {
-      "identifier": "navalr",
-      "proof_url": "https://facebook.com/navalr/posts/10152190734077261",
-      "service": "facebook",
-      "valid": true
-  },
-  {
-    "identifier": "navalr",
-    "proof_url": "https://gist.github.com/navalr/f31a74054f859ec0ac6a",
-    "service": "github",
-    "valid": true
-  }
-]
-
 ```
 
 ## Testing
