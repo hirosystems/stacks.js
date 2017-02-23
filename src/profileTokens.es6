@@ -131,9 +131,7 @@ export function getProfileFromToken(token, publicKeyOrAddress=null) {
   } else {
     decodedToken = decodedToken(token)
   }
-
-  console.log(decodedToken)
-
+  
   let profile = {}
   if (decodedToken.hasOwnProperty('payload')) {
     const payload = decodedToken.payload

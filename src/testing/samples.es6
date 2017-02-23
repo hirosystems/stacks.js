@@ -8,6 +8,17 @@ const sampleProfiles = {
   navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
 }
 
+const sampleTokenFiles = {
+  ryan_apr20: {
+    url: "https://blockstack.s3.amazonaws.com/ryan_apr20.id",
+    body: JSON.parse(fs.readFileSync('./docs/testTokenFiles/ryan_apr20.json'))
+  },
+  ryan: {
+    url: "https://blockstack.s3.amazonaws.com/ryan.id",
+    body: JSON.parse(fs.readFileSync('./docs/tokenFiles/ryan.id.json'), 'utf8')
+  }
+}
+
 const sampleProofs = {
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.proofs.json')),
   larry: JSON.parse(fs.readFileSync('./docs/profiles/larry.proofs.json'))
@@ -36,4 +47,4 @@ const sampleVerifications = {
   }
 }
 
-export { sampleProfiles, sampleProofs, sampleVerifications }
+export { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles }

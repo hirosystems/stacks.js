@@ -6,7 +6,7 @@ import {
   signProfileToken, verifyProfileToken, getProfileFromToken
 } from './profileTokens'
 import { validateProofs } from './profileProofs'
-import { makeZoneFileForHostedProfile } from './utils'
+import { makeZoneFileForHostedProfile } from './zoneFiles'
 
 const schemaDefinition = {
   type: 'object',

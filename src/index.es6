@@ -14,7 +14,8 @@ export {
 export {
   Person,
   Organization,
-  CreativeWork
+  CreativeWork,
+  resolveZoneFileToPerson
 } from './profileSchemas'
 
 export {
@@ -24,6 +25,10 @@ export {
 
 export {
   getEntropy,
-  privateKeyToPublicKey,
-  makeZoneFileForHostedProfile
+  privateKeyToPublicKey
 } from './utils'
+
+export {
+  makeZoneFileForHostedProfile,
+  getTokenFileUrlFromZoneFile
+} from './zoneFiles'

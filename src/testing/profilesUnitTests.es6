@@ -1,25 +1,23 @@
 import test from 'tape'
 import fs from 'fs'
 import { ECPair } from 'bitcoinjs-lib'
+import FetchMock from 'fetch-mock'
 
 import {
   signProfileToken,
   wrapProfileToken,
   verifyProfileToken,
   getProfileFromToken,
-  Profile, Person, Organization, CreativeWork,
-  getEntropy
+  Profile,
+  Person,
+  Organization,
+  CreativeWork,
+  getEntropy,
+  makeZoneFileForHostedProfile,
+  resolveZoneFileToPerson
 } from '../index'
 
-const sampleProfiles = {
-  balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
-  naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
-  google: JSON.parse(fs.readFileSync('./docs/profiles/google.json')),
-  navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
-}
-const sampleTokenFiles = {
-  ryan_apr20: JSON.parse(fs.readFileSync('./docs/testTokenFiles/ryan_apr20.json'))
-}
+import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './samples'
 
 function testTokening(filename, profile) {
   const keyPair = new ECPair.makeRandom({ rng: getEntropy })
@@ -67,7 +65,7 @@ function testTokening(filename, profile) {
 }
 
 function testVerifyToken() {
-  const tokenFile = sampleTokenFiles.ryan_apr20,
+  const tokenFile = sampleTokenFiles.ryan_apr20.body,
         token = tokenFile[0].token
 
   const publicKey = "02413d7c51118104cfe1b41e540b6c2acaaf91f1e2e22316df7448fb6070d582ec",
@@ -183,6 +181,19 @@ function testSchemas() {
 
     let validationResults = Person.validateSchema(profileObject.toJSON(), true)
     t.ok(validationResults, 'Profile should be in a valid format')
+  })
+
+  test('resolveZoneFileToPerson', (t) => {
+    t.plan(2)
+
+    let zoneFile = "$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 \"https://blockstack.s3.amazonaws.com/ryan.id\"\n"
+    let ownerAddress = "19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk"
+    FetchMock.get(sampleTokenFiles.ryan.url, sampleTokenFiles.ryan.body)
+
+    resolveZoneFileToPerson(zoneFile, ownerAddress, (profile) => {
+      t.ok(profile, 'Profile was extracted')
+      t.equal(profile.name, "Ryan Shea", 'The profile was recovered with the expected value of the name field')
+    })
   })
 }
 

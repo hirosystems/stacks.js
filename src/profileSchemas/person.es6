@@ -3,7 +3,7 @@
 import inspector from 'schema-inspector'
 
 import { signProfileToken, getProfileFromToken } from '../profileTokens'
-import { Profile } from '../profile'
+import { Profile } from '../index'
 import { getPersonFromLegacyFormat } from './personLegacy'
 import {
   getName, getFamilyName, getGivenName, getAvatarUrl, getDescription,
@@ -113,12 +113,12 @@ export class Person extends Profile {
   }
 
   static fromToken(token, publicKeyOrAddress=null) {
-    const profile = getProfileFromToken(token, publicKeyOrAddress)
+    let profile = getProfileFromToken(token, publicKeyOrAddress)
     return new Person(profile)
   }
 
   static fromLegacyFormat(legacyProfile) {
-    const profile = getPersonFromLegacyFormat(legacyProfile)
+    let profile = getPersonFromLegacyFormat(legacyProfile)
     return new Person(profile)
   }
 
