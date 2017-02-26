@@ -10,7 +10,7 @@
 * [Installation](#installation)
 * [About](#about)
 * [Profiles](#profiles)
-* [Proofs](#proofs)
+* [Auth](#auth)
 * [Wiki](#wiki)
 * [Testing](#testing)
 
@@ -104,6 +104,53 @@ const fullyQualifiedDomainName = "naval.id"
 validateProofs(profile, fullyQualifiedDomainName).then((proofs) => {
   console.log(proofs)
 })
+```
+
+## Auth
+
+#### Ask a user to login
+
+```es6
+import { BlockstackAuth } from 'blockstack'
+
+$('#login-button').click(function() {
+    BlockstackAuth.requestLogin("http://localhost:8888")
+})
+```
+
+#### Create a keypair
+
+```es6
+import { ECPair } from 'bitcoinjs-lib'
+const keyPair = new ECPair.makeRandom({ rng: getEntropy })
+const privateKey = keyPair.d.toBuffer(32).toString('hex')
+```
+
+#### Create an auth response
+
+```es6
+import { AuthResponse } from 'blockstack'
+
+const keyPair = new ECPair.makeRandom({ rng: getEntropy })
+const privateKey = keyPair.d.toBuffer(32).toString('hex')
+const authData = {
+    profile: { name: 'Naval Ravikant' },
+    domainName: "naval.id",
+    api: {
+        getName: "https://api.blockstack.api/v1/users"
+    }
+}
+const authResponse = new AuthResponse(privateKey, authData)
+const authResponseToken = authResponse.sign()
+```
+
+#### Create an auth request
+
+```es6
+import { AuthRequest } from 'blockstack'
+
+const authRequest = new AuthRequest(privateKey)
+const authRequestToken = authRequest.sign()
 ```
 
 ## Testing

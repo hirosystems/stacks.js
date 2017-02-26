@@ -228,5 +228,7 @@ function testAuthResponse() {
     })
 }
 
-testAuthRequest()
-testAuthResponse()
+export function runAuthTests() {
+    testAuthRequest()
+    testAuthResponse()
+}

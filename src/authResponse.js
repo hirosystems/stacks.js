@@ -3,7 +3,6 @@
 import KeyEncoder from 'key-encoder'
 import { TokenSigner, decodeToken } from 'jsontokens'
 import { secp256k1 } from 'elliptic-curve'
-import uuid from 'node-uuid'
 
 export class AuthResponse {
     constructor(privateKey) {

@@ -3,8 +3,8 @@
 import KeyEncoder from 'key-encoder'
 import { TokenSigner, decodeToken, createUnsignedToken } from 'jsontokens'
 import { secp256k1 } from 'elliptic-curve'
-import uuid from 'node-uuid'
 import base64url from 'base64url'
+import { generateUUID4 } from './utils'
 
 export function createRequestPayload(issuer, provisions=null) {
     let unsignedRequest = {
@@ -32,7 +32,7 @@ export class AuthRequest {
         this.tokenSigner = new TokenSigner('ES256k', privateKey)
         this.issuer = { publicKey: this.publicKey }
         this.provisions = [
-            { action: 'sign', data: uuid.v4() },
+            { action: 'sign', data: generateUUID4() },
             { action: 'disclose', scope: 'username' }
         ]
     }

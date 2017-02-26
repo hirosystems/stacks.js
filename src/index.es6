@@ -32,3 +32,13 @@ export {
   makeZoneFileForHostedProfile,
   getTokenFileUrlFromZoneFile
 } from './zoneFiles'
+
+export {
+  AuthAgent
+} from './authAgent'
+export {
+  AuthRequest
+} from './authRequest'
+export {
+  AuthResponse
+} from './authResponse'
