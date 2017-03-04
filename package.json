@@ -75,7 +75,7 @@
     "elliptic-curve": "^0.1.0",
     "hasprop": "0.0.4",
     "isomorphic-fetch": "^2.2.1",
-    "jsontokens": "^0.6.2",
+    "jsontokens": "^0.7.3",
     "key-encoder": "^1.1.6",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",

@@ -32,6 +32,6 @@ unused
 
 # Folder to ignore for development with es6
 lib
-docs/tokenfiles/*.json
+docs/token-files/*.json
 
 src/testing/browser/blockstack-proofs.js

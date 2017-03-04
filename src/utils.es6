@@ -5,7 +5,27 @@
  */
 
 export function nextYear() {
-  return new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+  return new Date(
+    new Date().setFullYear(
+      new Date().getFullYear() + 1
+    )
+  )
+}
+
+export function nextMonth() {
+  return new Date(
+    new Date().setMonth(
+      new Date().getMonth() + 1
+    )
+  )
+}
+
+export function nextHour() {
+  return new Date(
+    new Date().setHours(
+      new Date().getHours() + 1
+    )
+  )
 }
 
 /**
@@ -22,32 +42,17 @@ export function getEntropy(numberOfBytes) {
 }
 
 /**
- * Elliptic Curve Keys
- */
-
-import BigInteger from 'bigi'
-import { ECPair as ECKeyPair } from 'bitcoinjs-lib'
-
-export function privateKeyToPublicKey(privateKey) {
-  const privateKeyBuffer = new Buffer(privateKey, 'hex')
-  const privateKeyBigInteger = BigInteger.fromBuffer(privateKeyBuffer)
-  const keyPair = new ECKeyPair(privateKeyBigInteger, null, {})
-  const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
-  return publicKey
-}
-
-/**
  * UUIDs
  */
 
-export function generateUUID4 () {
-    let d = new Date().getTime();
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-        d += performance.now(); //use high-precision timer if available
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
+export function makeUUID4() {
+  let d = new Date().getTime()
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    d += performance.now(); //use high-precision timer if available
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = (d + Math.random() * 16) % 16 | 0
+    d = Math.floor(d / 16)
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+  })
 }

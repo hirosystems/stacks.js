@@ -1,8 +1,36 @@
 'use strict'
 
 export {
+  makeAuthRequest,
+  makeAuthResponse,
+  Authenticator
+} from './auth'
+
+export {
+  makeDIDFromPublicKey,
+  makeDIDFromAddress,
+  getPublicKeyOrAddressFromDID
+} from './decentralizedIDs'
+
+export {
+  privateKeyToPublicKey
+} from './keyUtils'
+
+export {
   Profile
 } from './profile'
+
+export {
+  validateProofs
+} from './profileProofs'
+
+export {
+  Person,
+  Organization,
+  CreativeWork,
+  getPersonFromLegacyFormat,
+  resolveZoneFileToPerson
+} from './profileSchemas'
 
 export {
   signProfileToken,
@@ -12,20 +40,16 @@ export {
 } from './profileTokens'
 
 export {
-  Person,
-  Organization,
-  CreativeWork,
-  resolveZoneFileToPerson
-} from './profileSchemas'
-
-export {
-  validateProofs,
+  services,
   containsValidProofStatement
-} from './profileProofs'
+} from './services'
 
 export {
+  nextYear,
+  nextMonth,
+  nextHour,
   getEntropy,
-  privateKeyToPublicKey
+  makeUUID4
 } from './utils'
 
 export {
@@ -33,12 +57,3 @@ export {
   getTokenFileUrlFromZoneFile
 } from './zoneFiles'
 
-export {
-  AuthAgent
-} from './authAgent'
-export {
-  AuthRequest
-} from './authRequest'
-export {
-  AuthResponse
-} from './authResponse'

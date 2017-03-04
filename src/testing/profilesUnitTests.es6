@@ -17,7 +17,7 @@ import {
   resolveZoneFileToPerson
 } from '../index'
 
-import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './samples'
+import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
 
 function testTokening(filename, profile) {
   const keyPair = new ECPair.makeRandom({ rng: getEntropy })

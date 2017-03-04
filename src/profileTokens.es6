@@ -4,7 +4,8 @@ import ecurve from 'ecurve'
 import { ECPair as ECKeyPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jsontokens'
 import BigInteger from 'bigi'
-import { nextYear, privateKeyToPublicKey, generateUUID4 } from './utils'
+import { nextYear, makeUUID4 } from './utils'
+import { privateKeyToPublicKey } from './keyUtils'
 
 const secp256k1 = ecurve.getCurveByName('secp256k1')
 
@@ -38,7 +39,7 @@ export function signProfileToken(profile, privateKey, subject=null, issuer=null,
   const tokenSigner = new TokenSigner(signingAlgorithm, privateKey)
 
   const payload = {
-    jti: generateUUID4(),
+    jti: makeUUID4(),
     iat: issuedAt.toISOString(),
     exp: expiresAt.toISOString(),
     subject: subject,
@@ -70,18 +71,25 @@ export function verifyProfileToken(token, publicKeyOrAddress) {
   const decodedToken = decodeToken(token)
   const payload = decodedToken.payload
 
-  if (!payload.hasOwnProperty('subject')) {
+  // Inspect and verify the subject
+  if (payload.hasOwnProperty('subject')) {
+    if (!payload.subject.hasOwnProperty('publicKey')) {
+      throw new Error("Token doesn't have a subject public key")
+    }
+  } else {
     throw new Error("Token doesn't have a subject")
   }
-  if (!payload.subject.hasOwnProperty('publicKey')) {
-    throw new Error("Token doesn't have a subject public key")
-  }
-  if (!payload.hasOwnProperty('issuer')) {
+
+  // Inspect and verify the issuer
+  if (payload.hasOwnProperty('issuer')) {
+    if (!payload.issuer.hasOwnProperty('publicKey')) {
+      throw new Error("Token doesn't have an issuer public key")    
+    }
+  } else {
     throw new Error("Token doesn't have an issuer")
   }
-  if (!payload.issuer.hasOwnProperty('publicKey')) {
-    throw new Error("Token doesn't have an issuer public key")    
-  }
+
+  // Inspect and verify the claim
   if (!payload.hasOwnProperty('claim')) {
     throw new Error("Token doesn't have a claim")
   }

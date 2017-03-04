@@ -1,7 +1,7 @@
 import test from 'tape'
 import fs from 'fs'
 import { containsValidProofStatement } from '../services'
-import { sampleVerifications } from './samples'
+import { sampleVerifications } from './sampleData'
 
 export function runUtilsUnitTests() {
   test('containsValidProofStatement', (t) => {

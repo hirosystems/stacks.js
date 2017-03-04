@@ -2,7 +2,7 @@ import test from 'blue-tape'
 import fs from 'fs'
 import FetchMock from 'fetch-mock'
 import { validateProofs } from '../index'
-import { sampleProfiles, sampleProofs, sampleVerifications } from './samples'
+import { sampleProfiles, sampleProofs, sampleVerifications } from './sampleData'
 
 function testProofs(profile, username, totalProofs) {
   mockRequests()
