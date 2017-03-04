@@ -19,8 +19,13 @@ const secp256k1 = ecurve.getCurveByName('secp256k1')
   * @param {Date} issuedAt - the time of issuance of the token
   * @param {Date} expiresAt - the time of expiration of the token
   */
-export function signProfileToken(profile, privateKey, subject=null, issuer=null,
-  signingAlgorithm='ES256K', issuedAt=new Date(), expiresAt=nextYear()) {
+export function signProfileToken(profile,
+                                 privateKey,
+                                 subject=null,
+                                 issuer=null,
+                                 signingAlgorithm='ES256K',
+                                 issuedAt=new Date(),
+                                 expiresAt=nextYear()) {
 
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')

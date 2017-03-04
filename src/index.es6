@@ -13,7 +13,9 @@ export {
 } from './decentralizedIDs'
 
 export {
-  privateKeyToPublicKey
+  getEntropy,
+  makeECPrivateKey,
+  ecPrivateKeyToPublicKey
 } from './keyUtils'
 
 export {
@@ -48,7 +50,6 @@ export {
   nextYear,
   nextMonth,
   nextHour,
-  getEntropy,
   makeUUID4
 } from './utils'
 
