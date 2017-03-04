@@ -45,7 +45,7 @@ function testTokening(filename, profile) {
     tokenRecords = [wrapProfileToken(signProfileToken(profile, privateKey))]
     t.ok(tokenRecords, 'Tokens should have been created')
     //console.log(JSON.stringify(tokenRecords, null, 2))
-    fs.writeFileSync('./docs/token-files/' + filename, JSON.stringify(tokenRecords, null, 2))
+    //fs.writeFileSync('./docs/token-files/' + filename, JSON.stringify(tokenRecords, null, 2))
 
     let tokensVerified = true
     tokenRecords.map((tokenRecord) => {
@@ -133,7 +133,7 @@ function testSchemas() {
     let token = personObject.toToken(privateKey)
     let tokenRecords = [wrapProfileToken(token)]
     t.ok(tokenRecords, 'Person profile tokens should have been created')
-    fs.writeFileSync('./docs/token-files/naval-4-tokens.json', JSON.stringify(tokenRecords, null, 2))
+    //fs.writeFileSync('./docs/token-files/naval-4-tokens.json', JSON.stringify(tokenRecords, null, 2))
 
     let profileObject2 = Person.fromToken(tokenRecords[0].token, publicKey)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
