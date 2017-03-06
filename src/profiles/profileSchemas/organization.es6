@@ -1,7 +1,8 @@
 'use strict'
 
-import { signProfileToken, getProfileFromToken } from '../profileTokens'
 import inspector from 'schema-inspector'
+
+import { extractProfile } from '../profileTokens'
 import { Profile } from '../profile'
 
 const schemaDefinition = {
@@ -13,11 +14,11 @@ const schemaDefinition = {
   }
 }
 
-export class CreativeWork extends Profile {
+export class Organization extends Profile {
   constructor(profile = {}) {
     super(profile)
     this._profile = Object.assign({}, {
-      '@type': 'CreativeWork'
+      '@type': 'Organization'
     }, this._profile)
   }
 
@@ -27,7 +28,7 @@ export class CreativeWork extends Profile {
   }
 
   static fromToken(token, publicKeyOrAddress=null) {
-    const profile = getProfileFromToken(token, publicKeyOrAddress)
-    return new CreativeWork(profile)
+    const profile = extractProfile(token, publicKeyOrAddress)
+    return new Organization(profile)
   }
 }

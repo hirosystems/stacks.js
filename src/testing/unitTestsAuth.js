@@ -3,9 +3,7 @@
 import test from 'tape'
 import { decodeToken } from 'jsontokens'
 
-import {
-  makeAuthRequest, makeAuthResponse, makeDIDFromPublicKey
-} from '../index'
+import { makeAuthRequest, makeAuthResponse, publicKeyToAddress, makeDIDFromAddress } from '../index'
 
 export function runAuthTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -20,7 +18,7 @@ export function runAuthTests() {
     icons: [
       {
         src: "https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png",
-        sizes: "192x19x",
+        sizes: "192x192",
         type: "image/png"
       }
     ]
@@ -43,7 +41,8 @@ export function runAuthTests() {
     const decodedToken = decodeToken(authRequest)
     t.ok(decodedToken, 'auth request token should have been decoded')
 
-    const referenceDID = makeDIDFromPublicKey(publicKey)
+    const address = publicKeyToAddress(publicKey)
+    const referenceDID = makeDIDFromAddress(address)
     t.equal(decodedToken.payload.iss, referenceDID, 'auth request issuer should include the public key')
 
     t.equal(JSON.stringify(decodedToken.payload.scopes), "[]", 'auth request scopes should be an empty list')
@@ -58,7 +57,8 @@ export function runAuthTests() {
     const decodedToken = decodeToken(authResponse)
     t.ok(decodedToken, 'auth response should have been decoded')
 
-    const referenceDID = makeDIDFromPublicKey(publicKey)
+    const address = publicKeyToAddress(publicKey)
+    const referenceDID = makeDIDFromAddress(address)
     t.equal(decodedToken.payload.iss, referenceDID, 'auth response issuer should include the public key')
 
     t.equal(JSON.stringify(decodedToken.payload.profile), JSON.stringify(profile), 'auth response profile should equal the reference value')

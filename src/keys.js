@@ -16,9 +16,17 @@ export function makeECPrivateKey() {
   return keyPair.d.toBuffer(32).toString('hex')
 }
 
+export function publicKeyToAddress(publicKey) {
+  const publicKeyBuffer = new Buffer(publicKey, 'hex')
+  const keyPair = ECPair.fromPublicKeyBuffer(publicKeyBuffer)
+  return keyPair.getAddress()
+}
+
+/*
 export function privateKeyToPublicKey(privateKey) {
   const privateKeyBuffer = new Buffer(privateKey, 'hex')
   const privateKeyBigInteger = BigInteger.fromBuffer(privateKeyBuffer)
   const keyPair = new ECPair(privateKeyBigInteger, null, {})
   return keyPair.getPublicKeyBuffer().toString('hex')
 }
+*/

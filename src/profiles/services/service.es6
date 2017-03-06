@@ -4,7 +4,6 @@ import "isomorphic-fetch"
 import { containsValidProofStatement } from "./serviceUtils"
 
 export class Service {
-
   static validateProof(proof, fqdn) {
     return new Promise((resolve, reject) => {
       try {

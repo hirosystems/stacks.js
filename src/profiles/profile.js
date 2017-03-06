@@ -2,11 +2,9 @@
 
 import inspector from 'schema-inspector'
 
-import {
-  signProfileToken, verifyProfileToken, getProfileFromToken
-} from './profileTokens'
+import { signProfileToken, verifyProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'
-import { makeZoneFileForHostedProfile } from './zoneFiles'
+import { makeProfileZoneFile } from './profileZoneFiles'
 
 const schemaDefinition = {
   type: 'object',
@@ -37,12 +35,12 @@ export class Profile {
   }
 
   static fromToken(token, publicKeyOrAddress=null) {
-    const profile = getProfileFromToken(token, publicKeyOrAddress)
+    const profile = extractProfile(token, publicKeyOrAddress)
     return new Profile(profile)
   }
 
   static makeZoneFile(domainName, tokenFileURL) {
-    return makeZoneFileForHostedProfile(domainName, tokenFileURL)
+    return makeProfileZoneFile(domainName, tokenFileURL)
   }
 
   static validateProofs(domainName) {

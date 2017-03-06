@@ -3,10 +3,11 @@
 import { Facebook } from './facebook'
 import { Github } from './github'
 import { Twitter } from './twitter'
-export { containsValidProofStatement } from './serviceUtils'
 
-export const services = {
+export const profileServices = {
   facebook: Facebook,
   github: Github,
   twitter: Twitter
 }
+
+export { containsValidProofStatement } from './serviceUtils'

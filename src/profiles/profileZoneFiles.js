@@ -3,7 +3,7 @@
 import { makeZoneFile, parseZoneFile } from 'zone-file'
 import { getProfileFromToken } from './profileTokens'
 
-export function makeZoneFileForHostedProfile(origin, tokenFileUrl) {
+export function makeProfileZoneFile(origin, tokenFileUrl) {
   if (tokenFileUrl.indexOf('://') < 0) {
     throw new Error('Invalid token file url')
   }
@@ -33,7 +33,7 @@ export function makeZoneFileForHostedProfile(origin, tokenFileUrl) {
   return makeZoneFile(zoneFile, zoneFileTemplate)
 }
 
-export function getTokenFileUrlFromZoneFile(zoneFileJson) {
+export function getTokenFileUrl(zoneFileJson) {
   if (!zoneFileJson.hasOwnProperty('uri')) {
     return null
   }

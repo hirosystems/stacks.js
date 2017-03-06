@@ -1,10 +1,14 @@
 'use strict'
 
-import { services } from './services'
+import { profileServices } from './services'
 
 const validationTimeout = 30000  // 30 seconds
 
 export function validateProofs(profile, fqdn) {
+  if (!profile) {
+    throw new Error("Profile must not be null")
+  }
+
   let promise = new Promise((resolve, reject) => {
 
     let proofs = []
@@ -26,7 +30,7 @@ export function validateProofs(profile, fqdn) {
     accounts.forEach(function(account) {
       // skip if proof service is not supported
       if (account.hasOwnProperty("service") &&
-          !services.hasOwnProperty(account.service)) {
+          !profileServices.hasOwnProperty(account.service)) {
         accountsToValidate--
         return
       }
@@ -45,7 +49,7 @@ export function validateProofs(profile, fqdn) {
         "valid": false
       }
 
-      services[account.service].validateProof(proof, fqdn).then((proof) => {
+      profileServices[account.service].validateProof(proof, fqdn).then((proof) => {
         proofs.push(proof)
         if (proofs.length >= accountsToValidate) {
           clearTimeout(timeoutTimer)
