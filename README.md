@@ -45,8 +45,19 @@ The profiles/identity portion of this library can be used to:
 ```es6
 import { requestSignIn } from 'blockstack'
 
+var appManifest = {
+  name: "Hello, Blockstack",
+  start_url: "https://helloblockstack.com",
+  description: "A simple demo of blockstack auth",
+  icons: [{
+    "src": "https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
+}
+
 $('#login-button').click(function() {
-    requestSignIn() // The user will be redirected to their identity provider
+    requestSignIn(null, appManifest) // The user will be redirected to their identity provider
 })
 ```
 

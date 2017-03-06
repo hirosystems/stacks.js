@@ -7,15 +7,15 @@ app.get('/', (request, response) => {
 })
 
 app.get('/proofs', (request, response) => {  
-  response.sendFile(__dirname + '/lib/testing/browser/proofsTest.html')
+  response.sendFile(__dirname + '/src/testing/browser/proofsTest.html')
 })
 
 app.get('/auth', (request, response) => {  
-  response.sendFile(__dirname + '/lib/testing/browser/authTest.html')
+  response.sendFile(__dirname + '/src/testing/browser/authTest.html')
 })
 
 app.get('/blockstack-bundle.js', (request, response) => {  
-  response.sendFile(__dirname + '/lib/testing/browser/blockstack-bundle.js')
+  response.sendFile(__dirname + '/lib/blockstack-bundle.js')
 })
 
 app.listen(port, (err) => {  
