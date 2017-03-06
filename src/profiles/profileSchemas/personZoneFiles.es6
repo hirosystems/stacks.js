@@ -1,9 +1,10 @@
 'use strict'
 
 import { makeZoneFile, parseZoneFile } from 'zone-file'
-import { Person} from './person'
-import { getTokenFileUrlFromZoneFile } from '../zoneFiles'
-import { getProfileFromToken } from '../profileTokens'
+
+import { Person } from './person'
+import { getTokenFileUrl } from '../profileZoneFiles'
+import { extractProfile } from '../profileTokens'
 
 export function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
   let zoneFileJson = null
@@ -18,7 +19,7 @@ export function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) 
 
   let tokenFileUrl = null
   if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
-    tokenFileUrl = getTokenFileUrlFromZoneFile(zoneFileJson)
+    tokenFileUrl = getTokenFileUrl(zoneFileJson)
   } else {
     let profile = null
     try {
@@ -40,7 +41,7 @@ export function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) 
 
         let tokenRecords = responseJson
         let token = tokenRecords[0].token
-        let profile = getProfileFromToken(token, publicKeyOrAddress)
+        let profile = extractProfile(token, publicKeyOrAddress)
 
         callback(profile)
         return

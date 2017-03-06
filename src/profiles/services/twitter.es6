@@ -1,3 +1,5 @@
+'use strict'
+
 import { Service } from "./service"
 
 class Twitter extends Service {

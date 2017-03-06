@@ -29,19 +29,6 @@ export function nextHour() {
 }
 
 /**
- * Entropy
- */
-
-import { randomBytes } from 'crypto'
-
-export function getEntropy(numberOfBytes) {
-  if (!numberOfBytes) {
-    numberOfBytes = 32
-  }
-  return randomBytes(numberOfBytes)
-}
-
-/**
  * UUIDs
  */
 

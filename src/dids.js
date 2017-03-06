@@ -1,15 +1,30 @@
 'use strict'
 
-export function makeDIDFromPublicKey(publicKey) {
-  return `did:ecdsa-pub:${publicKey}`
-}
-
 export function makeDIDFromAddress(address) {
   return `did:btc-addr:${address}`
 }
 
-export function getPublicKeyOrAddressFromDID(did) {
-  const didParts = did.split(':')
+export function makeDIDFromPublicKey(publicKey) {
+  return `did:ecdsa-pub:${publicKey}`
+}
+
+export function getDIDType(decentralizedID) {
+  const didParts = decentralizedID.split(':')
+
+  if (didParts.length !== 3) {
+    throw new InvalidDIDError('Decentralized IDs must have 3 parts')
+  }
+
+  if (didParts[0].toLowerCase() !== 'did') {
+    throw new InvalidDIDError('Decentralized IDs must start with "did"')
+  }
+
+  return didParts[1].toLowerCase()
+}
+
+/*
+export function getPublicKeyOrAddressFromDID(decentralizedID) {
+  const didParts = decentralizedID.split(':')
 
   if (didParts.length !== 3) {
     throw new InvalidDIDError('Decentralized IDs must have 3 parts')
@@ -27,3 +42,4 @@ export function getPublicKeyOrAddressFromDID(did) {
     throw new InvalidDIDError('Decentralized ID format not supported')
   }
 }
+*/

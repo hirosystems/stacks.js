@@ -7,7 +7,7 @@ import {
   signProfileToken,
   wrapProfileToken,
   verifyProfileToken,
-  getProfileFromToken,
+  extractProfile,
   Profile,
   Person,
   Organization,
@@ -20,9 +20,8 @@ import {
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
 
 function testTokening(filename, profile) {
-  const keyPair = new ECPair.makeRandom({ rng: getEntropy })
-  const privateKey = keyPair.d.toBuffer(32).toString('hex')
-  const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+  const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+  const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
   let tokenRecords = []
 
@@ -57,7 +56,7 @@ function testTokening(filename, profile) {
   test('tokenToProfile', (t) => {
     t.plan(2)
 
-    let recoveredProfile = getProfileFromToken(tokenRecords[0].token, publicKey)
+    let recoveredProfile = extractProfile(tokenRecords[0].token, publicKey)
     //console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile), JSON.stringify(profile), 'Profile should equal the reference')

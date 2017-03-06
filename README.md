@@ -10,8 +10,8 @@
 
 * [Installation](#installation)
 * [About](#about)
-* [Profiles](#profiles)
 * [Auth](#auth)
+* [Profiles](#profiles)
 * [Wiki](#wiki)
 * [Testing](#testing)
 
@@ -23,20 +23,64 @@ $ npm install blockstack
 
 ## About
 
-Blockstack JS is a library for identity and authentication.
-
-The identity portion of this library can be used to:
-
-1. transform a JSON profile into cryptographically-signed signed tokens
-1. recover a JSON profile from signed tokens
-1. validate signed profile tokens
+Blockstack JS is a library for profiles/identity and authentication.
 
 The authentication portion of this library can be used to:
 
 1. create an authentication request
 1. create an authentication response
 
+The profiles/identity portion of this library can be used to:
+
+1. transform a JSON profile into cryptographically-signed signed tokens
+1. recover a JSON profile from signed tokens
+1. validate signed profile tokens
+
 *Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var").*
+
+## Auth
+
+#### Ask a user to authenticate
+
+```es6
+import { requestSignIn } from 'blockstack'
+
+$('#login-button').click(function() {
+    requestSignIn() // The user will be redirected to their identity provider
+})
+```
+
+#### Complete a user's login
+
+```es6
+import { signUserIn } from 'blockstack'
+
+signUserIn((session) => {
+    // Redirect the user to the home page
+})
+
+```
+
+#### Create a raw auth request
+
+```es6
+import { makeAuthRequest, makeECPrivateKey } from 'blockstack'
+
+const privateKey = makeECPrivateKey()
+
+const appManifest = { name: "Hello, Blockstack", start_url: "https://helloblockstack.com" }
+const authRequest = makeAuthRequest(privateKey, appManifest)
+```
+
+#### Create an auth response
+
+```es6
+import { makeAuthResponse, makeECPrivateKey } from 'blockstack'
+const privateKey = makeECPrivateKey()
+
+const authData = { profile: { name: 'Naval Ravikant' }, username: 'naval.id' }
+const authResponse = makeAuthResponse(privateKey, authData)
+```
 
 ## Profiles
 
@@ -60,12 +104,9 @@ const profileOfNaval = {
 #### Sign a profile as a single token
 
 ```es6
-import { ECPair } from 'bitcoinjs-lib'
-import { signProfileToken, wrapProfileToken, Person } from 'blockstack'
+import { makeECPrivateKey, wrapProfileToken, Person } from 'blockstack'
 
-const keyPair = new ECPair.makeRandom({ rng: getEntropy })
-const privateKey = keyPair.d.toBuffer(32).toString('hex')
-const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+const privateKey = makeECPrivateKey()
 
 const person = new Person(profileOfNaval)
 const token = person.toToken(privateKey)
@@ -101,57 +142,10 @@ const validationResults = Person.validateSchema(recoveredProfile)
 ```es6
 import { validateProofs } from 'blockstack'
 
-const fullyQualifiedDomainName = "naval.id"
-validateProofs(profile, fullyQualifiedDomainName).then((proofs) => {
+const domainName = "naval.id"
+validateProofs(profile, domainName).then((proofs) => {
   console.log(proofs)
 })
-```
-
-## Auth
-
-#### Ask a user to login
-
-```es6
-import { BlockstackAuth } from 'blockstack'
-
-$('#login-button').click(function() {
-    BlockstackAuth.requestLogin("http://localhost:8888")
-})
-```
-
-#### Create a keypair
-
-```es6
-import { ECPair } from 'bitcoinjs-lib'
-const keyPair = new ECPair.makeRandom({ rng: getEntropy })
-const privateKey = keyPair.d.toBuffer(32).toString('hex')
-```
-
-#### Create an auth response
-
-```es6
-import { AuthResponse } from 'blockstack'
-
-const keyPair = new ECPair.makeRandom({ rng: getEntropy })
-const privateKey = keyPair.d.toBuffer(32).toString('hex')
-const authData = {
-    profile: { name: 'Naval Ravikant' },
-    domainName: "naval.id",
-    api: {
-        getName: "https://api.blockstack.api/v1/users"
-    }
-}
-const authResponse = new AuthResponse(privateKey, authData)
-const authResponseToken = authResponse.sign()
-```
-
-#### Create an auth request
-
-```es6
-import { AuthRequest } from 'blockstack'
-
-const authRequest = new AuthRequest(privateKey)
-const authRequestToken = authRequest.sign()
 ```
 
 ## Testing

@@ -1,14 +1,33 @@
 import fs from 'fs'
 
-const sampleProfiles = {
+export const sampleManifests = {
+  helloBlockstack: {
+    name: "Hello, Blockstack",
+    short_name: "Hello, Blockstack",
+    start_url: "https://helloblockstack.com",
+    display: "standalone",
+    background_color: "#fff",
+    description: "A simple app demonstrating how to log in with Blockstack.",
+    icons: [
+      {
+        src: "https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png",
+        sizes: "192x192",
+        type: "image/png"
+      }
+    ]
+  }
+}
+
+export const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync('./docs/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.json')),
+  ryan: JSON.parse(fs.readFileSync('./docs/profiles/ryan.json')),
   larry: JSON.parse(fs.readFileSync('./docs/profiles/larry.json')),
   google: JSON.parse(fs.readFileSync('./docs/profiles/google.json')),
   navalLegacy: JSON.parse(fs.readFileSync('./docs/profiles/naval-legacy.json'))
 }
 
-const sampleTokenFiles = {
+export const sampleTokenFiles = {
   ryan_apr20: {
     url: "https://blockstack.s3.amazonaws.com/ryan_apr20.id",
     body: JSON.parse(fs.readFileSync('./docs/token-files/ryan_apr20.json'))
@@ -19,12 +38,12 @@ const sampleTokenFiles = {
   }
 }
 
-const sampleProofs = {
+export const sampleProofs = {
   naval: JSON.parse(fs.readFileSync('./docs/profiles/naval.proofs.json')),
   larry: JSON.parse(fs.readFileSync('./docs/profiles/larry.proofs.json'))
 }
 
-const sampleVerifications = {
+export const sampleVerifications = {
   naval: {
     facebook: {
       url: "https://www.facebook.com/navalr/posts/10152190734077261",
@@ -46,5 +65,3 @@ const sampleVerifications = {
     }
   }
 }
-
-export { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles }

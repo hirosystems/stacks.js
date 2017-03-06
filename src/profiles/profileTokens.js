@@ -1,11 +1,12 @@
 'use strict'
 
 import ecurve from 'ecurve'
-import { ECPair as ECKeyPair } from 'bitcoinjs-lib'
+import { ECPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jsontokens'
+import { SECP256K1Client } from 'jsontokens'
 import BigInteger from 'bigi'
-import { nextYear, makeUUID4 } from './utils'
-import { privateKeyToPublicKey } from './keyUtils'
+
+import { nextYear, makeUUID4 } from '../utils'
 
 const secp256k1 = ecurve.getCurveByName('secp256k1')
 
@@ -19,14 +20,19 @@ const secp256k1 = ecurve.getCurveByName('secp256k1')
   * @param {Date} issuedAt - the time of issuance of the token
   * @param {Date} expiresAt - the time of expiration of the token
   */
-export function signProfileToken(profile, privateKey, subject=null, issuer=null,
-  signingAlgorithm='ES256K', issuedAt=new Date(), expiresAt=nextYear()) {
+export function signProfileToken(profile,
+                          privateKey,
+                          subject=null,
+                          issuer=null,
+                          signingAlgorithm='ES256K',
+                          issuedAt=new Date(),
+                          expiresAt=nextYear()) {
 
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
 
-  const publicKey = privateKeyToPublicKey(privateKey)
+  const publicKey = SECP256K1Client.derivePublicKey(privateKey)
 
   if (subject === null) {
     subject = {publicKey: publicKey}
@@ -98,9 +104,9 @@ export function verifyProfileToken(token, publicKeyOrAddress) {
   const publicKeyBuffer = new Buffer(issuerPublicKey, 'hex')
 
   const Q = ecurve.Point.decodeFrom(secp256k1, publicKeyBuffer)
-  const compressedKeyPair = new ECKeyPair(null, Q, { compressed: true })
+  const compressedKeyPair = new ECPair(null, Q, { compressed: true })
   const compressedAddress = compressedKeyPair.getAddress()
-  const uncompressedKeyPair = new ECKeyPair(null, Q, { compressed: false })
+  const uncompressedKeyPair = new ECPair(null, Q, { compressed: false })
   const uncompressedAddress = uncompressedKeyPair.getAddress()
 
   if (publicKeyOrAddress === issuerPublicKey) {
@@ -132,7 +138,7 @@ export function verifyProfileToken(token, publicKeyOrAddress) {
   * @param {String} publicKeyOrAddress - the public key or address of the
   *   keypair that is thought to have signed the token
   */
-export function getProfileFromToken(token, publicKeyOrAddress=null) {
+export function extractProfile(token, publicKeyOrAddress=null) {
   let decodedToken
   if (publicKeyOrAddress) {
     decodedToken = verifyProfileToken(token, publicKeyOrAddress)

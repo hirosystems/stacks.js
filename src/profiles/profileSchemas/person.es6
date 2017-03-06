@@ -2,8 +2,8 @@
 
 import inspector from 'schema-inspector'
 
-import { signProfileToken, getProfileFromToken } from '../profileTokens'
-import { Profile } from '../index'
+import { Profile } from '../profile'
+import { extractProfile } from '../profileTokens'
 import { getPersonFromLegacyFormat } from './personLegacy'
 import {
   getName, getFamilyName, getGivenName, getAvatarUrl, getDescription,
@@ -113,7 +113,7 @@ export class Person extends Profile {
   }
 
   static fromToken(token, publicKeyOrAddress=null) {
-    let profile = getProfileFromToken(token, publicKeyOrAddress)
+    let profile = extractProfile(token, publicKeyOrAddress)
     return new Person(profile)
   }
 
