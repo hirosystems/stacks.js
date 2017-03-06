@@ -1,6 +1,5 @@
 'use strict'
 
-import queryString from 'query-string'
 import base64url from 'base64url'
 import request from 'request'
 import {

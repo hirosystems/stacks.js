@@ -1,5 +1,9 @@
 'use strict'
 
+import queryString from 'query-string'
+import { decodeToken } from 'jsontokens'
+import { makeAuthRequest } from './authMessages'
+
 const BLOCKSTACK_HANDLER = "web+blockstack"
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"
 

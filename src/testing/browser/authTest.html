@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Browserify Test</title>
-  <script src="lib/test/bundle.js"></script>
+  <title>Auth Test</title>
+  <script src="blockstack-bundle.js"></script>
+  <script>
+    var appManifest = blockstack.createSimpleAppManifest(
+        "Hello, Blockstack", 'https://helloblockstack.com', "A simple demo of blockstack auth")
+    appManifest.icons = [{
+        "src": "https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png",
+        "sizes": "192x192",
+        "type": "image/png"
+    }]
+    blockstack.requestSignIn(null, appManifest, "http://localhost:3000/auth")
+  </script>
 </head>
 <body>
 </body>
