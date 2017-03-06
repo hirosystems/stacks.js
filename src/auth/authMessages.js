@@ -3,12 +3,14 @@
 import queryString from 'query-string'
 import base64url from 'base64url'
 import request from 'request'
-import { TokenSigner, decodeToken, createUnsecuredToken } from 'jsontokens'
-import { SECP256K1Client } from 'jsontokens'
+import {
+  TokenSigner, TokenVerifier, decodeToken, createUnsecuredToken,
+  SECP256K1Client
+  } from 'jsontokens'
 
-import { makeUUID4, nextMonth, nextHour } from '../utils'
-import { makeDIDFromAddress, utils } from '../index'
-import { publicKeyToAddress } from '../keys'
+import {
+  makeDIDFromAddress, makeUUID4, nextMonth, nextHour, publicKeyToAddress
+} from '../index'
 
 export function makeAuthRequest(privateKey,
                             appManifest,
@@ -22,8 +24,8 @@ export function makeAuthRequest(privateKey,
     iat: new Date().getTime(),
     exp: nextHour(),
     iss: null,
-    publicKey: [],
-    manifest: appManifest,
+    publicKeys: [],
+    appManifest: appManifest,
     scopes: scopes
   }
 
@@ -33,7 +35,7 @@ export function makeAuthRequest(privateKey,
   } else {
     /* Convert the private key to a public key to an issuer */
     const publicKey = SECP256K1Client.derivePublicKey(privateKey)
-    payload.publicKey = [publicKey]
+    payload.publicKeys = [publicKey]
     const address = publicKeyToAddress(publicKey)
     payload.iss = makeDIDFromAddress(address)
     /* Sign and return the token */
@@ -57,7 +59,7 @@ export function makeAuthResponse(privateKey,
     iat: new Date().getTime(),
     exp: nextMonth(),
     iss: makeDIDFromAddress(address),
-    publicKey: [publicKey],
+    publicKeys: [publicKey],
     profile: profile,
     username: username
   }
@@ -68,13 +70,15 @@ export function makeAuthResponse(privateKey,
 
 function verifyAuthMessage(token) {
   const payload = decodeToken(token).payload
-  if (publicKey.length === 1) {
-    const publicKey = payload.publicKey[0]
-    const tokenVerifier = new TokenVerifier('ES256k', publicKey)
-    const signatureVerified = tokenVerifier.verify(token)  
-    if (!signatureVerified) {
-      return false
-    }
+  const publicKeys = payload.publicKeys
+  if (publicKeys.length === 1) {
+    publicKeys.map((publicKey) => {
+      const tokenVerifier = new TokenVerifier('ES256k', publicKey)
+      const signatureVerified = tokenVerifier.verify(token)
+      if (!signatureVerified) {
+        return false
+      }
+    })
   } else {
     throw new Error('Invalid public key array')
   }
