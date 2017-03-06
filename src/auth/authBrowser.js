@@ -61,7 +61,7 @@ export function loadSession(callbackFunction) {
   callbackFunction(session)
 }
 
-export function signUserOut() {
+export function signUserOut(redirectURL) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
-  window.location = this.currentHost
+  window.location = redirectURL
 }
