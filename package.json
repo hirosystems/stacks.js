@@ -46,7 +46,10 @@
     "cryptography",
     "token",
     "blockstack",
-    "blockstack auth"
+    "blockstack auth",
+    "profile",
+    "identity",
+    "ethereum"
   ],
   "homepage": "https://blockstack.org",
   "contributors": [
@@ -68,18 +71,11 @@
     "tape": "^4.6.3"
   },
   "dependencies": {
-    "base64url": "^2.0.0",
-    "bigi": "^1.4.1",
     "bitcoinjs-lib": "^2.3.0",
-    "blockstack-keychains": "0.0.4",
-    "dateformat": "^1.0.12",
     "ecurve": "^1.0.5",
     "elliptic": "^6.4.0",
-    "elliptic-curve": "^0.1.0",
-    "hasprop": "0.0.4",
     "isomorphic-fetch": "^2.2.1",
     "jsontokens": "^0.7.4",
-    "key-encoder": "^1.1.6",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
     "request": "^2.79.0",
