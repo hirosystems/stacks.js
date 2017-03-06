@@ -8,7 +8,6 @@
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
-    "quick-test": "npm run compile; node lib/testing/index.js",
     "test": "npm run compile; npm run browserify; node lib/testing/index.js"
   },
   "repository": {
