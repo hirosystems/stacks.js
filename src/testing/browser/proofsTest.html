@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="blockstack-proofs.js"></script>
+  <title>Proofs Test</title>
+  <script src="blockstack-bundle.js"></script>
   <script>
     var naval = {
       "@context": "http://schema.org/",
@@ -148,25 +149,16 @@
             }
         ]
     }
-
-</script>
-<script>
-  // BlockstackProofs.validateProofs(naval,"naval").then(function(proofs) {
-  //   console.log(proofs)
-  //   var newDiv= document.createElement("div");
-  //   newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
-  //   var targetDiv = document.getElementById("results")
-  //   document.body.insertBefore(newDiv, targetDiv)
-  // })
-
-  BlockstackProofs.validateProofs(larry,"larry").then(function(proofs) {
-    console.log(proofs)
-    var newDiv= document.createElement("div");
-    newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
-    var targetDiv = document.getElementById("results")
-    document.body.insertBefore(newDiv, targetDiv)
-  })
-</script>
+  </script>
+  <script>
+    blockstack.validateProofs(larry, "larry").then(function(proofs) {
+      console.log(proofs)
+      var newDiv = document.createElement("div");
+      newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
+      var targetDiv = document.getElementById("results")
+      document.body.insertBefore(newDiv, targetDiv)
+    })
+  </script>
 </head>
 <body>
   <div id="results"></div>

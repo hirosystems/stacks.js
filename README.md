@@ -40,17 +40,28 @@ The profiles/identity portion of this library can be used to:
 
 ## Auth
 
-#### Ask a user to authenticate
+### Request a user to sign in
 
 ```es6
 import { requestSignIn } from 'blockstack'
 
+var appManifest = {
+  name: "Hello, Blockstack",
+  start_url: "https://helloblockstack.com",
+  description: "A simple demo of blockstack auth",
+  icons: [{
+    "src": "https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
+}
+
 $('#login-button').click(function() {
-    requestSignIn() // The user will be redirected to their identity provider
+    requestSignIn(null, appManifest) // The user will be redirected to their identity provider
 })
 ```
 
-#### Complete a user's login
+### Sign a user in
 
 ```es6
 import { signUserIn } from 'blockstack'
@@ -61,7 +72,7 @@ signUserIn((session) => {
 
 ```
 
-#### Create a raw auth request
+### Create a raw auth request
 
 ```es6
 import { makeAuthRequest, makeECPrivateKey } from 'blockstack'
@@ -72,7 +83,15 @@ const appManifest = { name: "Hello, Blockstack", start_url: "https://helloblocks
 const authRequest = makeAuthRequest(privateKey, appManifest)
 ```
 
-#### Create an auth response
+### Verify an auth request
+
+```es6
+import { verifyAuthRequest } from 'blockstack'
+
+const verified = verifyAuthRequest(authRequest)
+```
+
+### Create an auth response
 
 ```es6
 import { makeAuthResponse, makeECPrivateKey } from 'blockstack'
@@ -80,6 +99,14 @@ const privateKey = makeECPrivateKey()
 
 const authData = { profile: { name: 'Naval Ravikant' }, username: 'naval.id' }
 const authResponse = makeAuthResponse(privateKey, authData)
+```
+
+### Verify an auth response
+
+```
+import { verifyAuthResponse } from 'blockstack'
+
+const verified = verifyAuthResponse(authResponse)
 ```
 
 ## Profiles
@@ -90,7 +117,7 @@ Follow these steps to create and register a profile for a Blockchain ID:
 2. Split up the profile into tokens, sign the tokens, and put them in a token file
 3. Create a zone file that points to the web location of the profile token file
 
-#### Create a profile
+### Create a profile
 
 ```es6
 const profileOfNaval = {
@@ -101,7 +128,7 @@ const profileOfNaval = {
 }
 ```
 
-#### Sign a profile as a single token
+### Sign a profile as a single token
 
 ```es6
 import { makeECPrivateKey, wrapProfileToken, Person } from 'blockstack'
@@ -113,7 +140,7 @@ const token = person.toToken(privateKey)
 const tokenFile = [wrapProfileToken(token)]
 ```
 
-#### Verify an individual token
+### Verify an individual token
 
 ```js
 import { verifyProfileToken } from 'blockstack'
@@ -125,19 +152,19 @@ try {
 }
 ```
 
-#### Recover a profile from a token file
+### Recover a profile from a token file
 
 ```js
 const recoveredProfile = Person.fromToken(tokenFile, publicKey)
 ```
 
-#### Validate profile schema
+### Validate profile schema
 
 ```js
 const validationResults = Person.validateSchema(recoveredProfile)
 ```
 
-#### Validate a proof
+### Validate a proof
 
 ```es6
 import { validateProofs } from 'blockstack'
@@ -154,39 +181,9 @@ validateProofs(profile, domainName).then((proofs) => {
 $ npm run test
 ```
 
-#### Testing in a browser
+### Testing in a browser
 
 *This test will only work with your browser's Cross-Origin Restrictions disabled.*
 
 Run `npm run compile; npm run browserify` before opening the file `test.html`
 in your browser.
-
-## Wiki
-
-#### Names
-
-A blockchain ID = a name + a profile, registered on a blockchain.
-
-Let's say you register the name 'alice' within the 'id' namespace, the default namespace for identities for people. In this case, your "fully qualified name" name would be expressed as `alice.id`.
-
-#### Profiles
-
-Profile schemas are taken from schema.org. The schema for a person record can be found at http://schema.org/Person. There are some fields that have yet to be included, like the "account", "key", "policy", "id", and "publicKey" fields. An updated schema definition will be published to a different location that superclasses the schema.org Person definition and adds these fields.
-
-#### Profile Storage
-
-Blockchain ID profiles are stored in two files: a token file and a zone file:
-
-+ **token file** - contains signed tokens with profile data
-+ **zone file** - describes where to find the token file
-
-#### Lookups
-
-An identity lookup is performed as follows:
-
-1. lookup the name in Blockstack's name records and get back the data hash associated with the name
-2. lookup the data hash in the Blockstack Atlas network and get back the zone file
-3. scan the zone file for "zone origin" records and get the token file URL
-4. issue a request to the token file URL and get back the token file
-5. parse through the token file for tokens and verify that all the tokens have valid signatures and that they can be tied back to the public key associated with the user's name
-6. grab all of the claims in the tokens and merge them into a single JSON object, which is the user's profile

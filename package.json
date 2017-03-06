@@ -1,14 +1,15 @@
 {
   "name": "blockstack",
-  "version": "0.2.4",
+  "version": "0.2.9",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
-    "browserify": "mkdir ./lib/testing/browser; ./node_modules/.bin/browserify lib/index.js --standalone BlockstackProofs -o ./lib/testing/browser/blockstack-proofs.js",
+    "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./lib/blockstack-bundle.js",
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
-    "test": "npm run compile; npm run browserify; node lib/testing/index.js"
+    "test": "npm run compile; npm run browserify; node lib/testing/index.js",
+    "browser-test": "npm run compile; npm run browserify; node server.js"
   },
   "repository": {
     "type": "git",
@@ -61,6 +62,7 @@
     "babel-preset-es2015": "^6.3.13",
     "blue-tape": "^1.0.0",
     "browserify": "^13.1.1",
+    "express": "^4.15.0",
     "fetch-mock": "^5.5.0",
     "node-fetch": "^1.6.3",
     "tape": "^4.6.3"
