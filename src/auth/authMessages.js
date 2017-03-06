@@ -1,20 +1,19 @@
 'use strict'
 
-import base64url from 'base64url'
 import request from 'request'
 import {
   TokenSigner, TokenVerifier, decodeToken, createUnsecuredToken,
   SECP256K1Client
-  } from 'jsontokens'
+} from 'jsontokens'
 
 import {
   makeDIDFromAddress, makeUUID4, nextMonth, nextHour, publicKeyToAddress
 } from '../index'
 
 export function makeAuthRequest(privateKey,
-                            appManifest,
-                            scopes=[],
-                            expiresAt=nextHour()) {
+                                appManifest,
+                                scopes=[],
+                                expiresAt=nextHour()) {
   let token = null
 
   /* Create the payload */
@@ -46,9 +45,9 @@ export function makeAuthRequest(privateKey,
 }
 
 export function makeAuthResponse(privateKey,
-                             profile={},
-                             username=null,
-                             expiresAt=nextMonth()) {
+                                 profile={},
+                                 username=null,
+                                 expiresAt=nextMonth()) {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)

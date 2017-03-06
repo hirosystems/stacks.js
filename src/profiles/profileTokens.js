@@ -4,7 +4,6 @@ import ecurve from 'ecurve'
 import { ECPair } from 'bitcoinjs-lib'
 import { decodeToken, TokenSigner, TokenVerifier } from 'jsontokens'
 import { SECP256K1Client } from 'jsontokens'
-import BigInteger from 'bigi'
 
 import { nextYear, makeUUID4 } from '../utils'
 

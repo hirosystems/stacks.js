@@ -5,4 +5,4 @@ export * from './profiles'
 
 export { makeDIDFromAddress, makeDIDFromPublicKey, getDIDType } from './dids'
 export { getEntropy, makeECPrivateKey, publicKeyToAddress } from './keys'
-export { nextYear, nextMonth, nextHour, makeUUID4 } from './utils'
+export { nextYear, nextMonth, nextHour, makeUUID4, hasprop } from './utils'

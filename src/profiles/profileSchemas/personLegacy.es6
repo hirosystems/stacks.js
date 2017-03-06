@@ -1,6 +1,6 @@
 'use strict'
 
-import hasprop from 'hasprop'
+import { hasprop } from '../../index'
 
 function formatAccount(serviceName, data) {
     let proofUrl
