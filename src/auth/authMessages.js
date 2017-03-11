@@ -66,7 +66,7 @@ export function makeAuthResponse(privateKey,
   return tokenSigner.sign(payload)
 }
 
-function verifyAuthMessage(token) {
+function doPublicKeysMatchSignatures(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
   if (publicKeys.length === 1) {
@@ -82,6 +82,10 @@ function verifyAuthMessage(token) {
   }
 
   return true
+}
+
+function verifyAuthMessage(token) {
+  return doPublicKeysMatchSignatures(token)
 }
 
 export function verifyAuthRequest(token) {
