@@ -5,7 +5,10 @@ import test from 'tape'
 import fs from 'fs'
 import FetchMock from 'fetch-mock'
 
-import { validateProofs, containsValidProofStatement, profileServices } from '../index'
+import {
+  validateProofs, containsValidProofStatement, profileServices
+} from '../index'
+
 import { sampleProfiles, sampleProofs, sampleVerifications } from './sampleData'
 
 function mockRequests() {

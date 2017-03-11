@@ -2,32 +2,21 @@
 
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { makeAuthRequest } from './authMessages'
+import { makeAuthRequest, verifyAuthResponse } from './authMessages'
 
 const BLOCKSTACK_HANDLER = "web+blockstack"
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"
-
-export function createSimpleAppManifest(appName, appStartURL, appDescription) {
-  return {
-    name: appName,
-    short_name: appName,
-    start_url: appStartURL,
-    display: "standalone",
-    background_color: "#fff",
-    description: appDescription
-  }
-}
+const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
 
 export function isUserSignedIn() {
   return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false
 }
 
-export function requestSignIn(signingKey, appManifest, identityProviderURL="http://localhost:8888/auth") {
-  const authRequest = makeAuthRequest(signingKey, appManifest)
-
+export function redirectUserToSignIn(authRequest,
+                                     blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
   setTimeout(function() {
-    window.location = identityProviderURL + "?authRequest=" + authRequest
-  }, 200)
+    window.location = blockstackIDHost + "?authRequest=" + authRequest
+  }, 500)
 
   window.location = BLOCKSTACK_HANDLER + ":" + authRequest
 }
@@ -43,22 +32,25 @@ export function isSignInPending() {
 
 export function signUserIn(callbackFunction) {
   const authResponseToken = getAuthResponseToken()
-  const decodedToken = decodeToken(authResponseToken)
-  const username = decodedToken.payload.username
-  const profile = decodedToken.payload.profile
-  
-  const session = {
-    username: username,
-    profile: profile,
-    authResponseToken: authResponseToken
+
+  if (verifyAuthResponse(authResponseToken)) {
+    const tokenPayload = decodeToken(authResponseToken).payload
+    const userData = {
+      username: tokenPayload.username,
+      profile: tokenPayload.profile,
+      authResponseToken: authResponseToken
+    }
+    window.localStorage.setItem(
+      BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+    callbackFunction(true)
+  } else {
+    callbackFunction(false)
   }
-  window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(session))
-  callbackFunction(session)
 }
 
-export function loadSession(callbackFunction) {
-  const session = JSON.parse(localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
-  callbackFunction(session)
+export function loadUserData(callbackFunction) {
+  const userData = JSON.parse(localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
+  callbackFunction(userData)
 }
 
 export function signUserOut(redirectURL) {
