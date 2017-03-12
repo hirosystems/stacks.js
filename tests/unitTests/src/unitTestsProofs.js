@@ -7,7 +7,7 @@ import FetchMock from 'fetch-mock'
 
 import {
   validateProofs, containsValidProofStatement, profileServices
-} from '../index'
+} from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications } from './sampleData'
 

@@ -10,7 +10,7 @@ import {
   verifyAuthResponse,
   publicKeyToAddress,
   makeDIDFromAddress
-} from '../index'
+} from '../../../lib'
 
 import { sampleManifests, sampleProfiles } from './sampleData'
 
