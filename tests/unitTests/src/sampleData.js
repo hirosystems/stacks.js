@@ -20,6 +20,10 @@ export const sampleManifests = {
   }
 }
 
+export const sampleNameRecords = {
+  ryan: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/name-records/ryan.json')),
+}
+
 export const sampleProfiles = {
   balloonDog: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/balloonDog.json')),
   naval: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/naval.json')),

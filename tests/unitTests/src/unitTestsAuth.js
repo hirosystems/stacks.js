@@ -1,7 +1,9 @@
 'use strict'
 
-import test from 'tape'
+//import test from 'tape'
+import test from 'tape-promise/tape'
 import { decodeToken } from 'jsontokens'
+import FetchMock from 'fetch-mock'
 
 import {
   makeAuthRequest,
@@ -18,21 +20,23 @@ import {
 } from '../../../lib'
 import blockstack from '../../../lib'
 
-import { sampleManifests, sampleProfiles } from './sampleData'
+import { sampleManifests, sampleProfiles, sampleNameRecords } from './sampleData'
 
 export function runAuthTests() {
-  const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-  const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
+  const privateKey = "a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229"
+  const publicKey = "027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69"
+  const nameLookupURL = "https://explorer-api.appartisan.com/get_name_blockchain_record/"
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(9)
 
     const authRequest = makeAuthRequest(privateKey, sampleManifests.helloBlockstack)
     t.ok(authRequest, 'auth request should have been created')
+    //console.log(authRequest)
 
     const decodedToken = decodeToken(authRequest)
     t.ok(decodedToken, 'auth request token should have been decoded')
-    console.log(JSON.stringify(decodedToken, null, 2))
+    //console.log(JSON.stringify(decodedToken, null, 2))
 
     const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
@@ -40,13 +44,35 @@ export function runAuthTests() {
 
     t.equal(JSON.stringify(decodedToken.payload.scopes), "[]", 'auth request scopes should be an empty list')
 
-    const verified = verifyAuthRequest(authRequest)
-    t.equal(verified, true, 'auth request should be verified')
+    verifyAuthRequest(authRequest)
+      .then((verified) => {
+        t.true(verified, 'auth request should be verified')
+      })
 
-    t.equal(isExpirationDateValid(authRequest), true, 'Expiration date should be valid')
-    t.equal(isIssuanceDateValid(authRequest), true, 'Issuance date should be valid')
-    t.equal(doSignaturesMatchPublicKeys(authRequest), true, 'Signatures should match the public keys')
-    t.equal(doPublicKeysMatchIssuer(authRequest), true, 'Public keys should match the issuer')
+    t.true(isExpirationDateValid(authRequest), 'Expiration date should be valid')
+    t.true(isIssuanceDateValid(authRequest), 'Issuance date should be valid')
+    t.true(doSignaturesMatchPublicKeys(authRequest), 'Signatures should match the public keys')
+    t.true(doPublicKeysMatchIssuer(authRequest), 'Public keys should match the issuer')
+  })
+
+  test('invalid auth request', (t) => {
+    t.plan(2)
+
+    const authRequest = makeAuthRequest(privateKey, sampleManifests.helloBlockstack)
+    const invalidAuthRequest = authRequest.substring(0, authRequest.length-1)
+
+    t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false, 'Signatures should not match the public keys')
+
+    verifyAuthRequest(invalidAuthRequest)
+      .then((verified) => {
+        t.equal(verified, false, 'auth request should be unverified')
+      })
+
+    //console.log(`auth request: ${authRequest}`)
+    //console.log(`invalid auth request: ${invalidAuthRequest}`)
+
+    //console.log('==============================')
+    //console.log(verified)
   })
 
   test('makeAuthResponse && verifyAuthResponse', (t) => {
@@ -57,7 +83,7 @@ export function runAuthTests() {
 
     const decodedToken = decodeToken(authResponse)
     t.ok(decodedToken, 'auth response should have been decoded')
-    console.log(JSON.stringify(decodedToken, null, 2))
+    //console.log(JSON.stringify(decodedToken, null, 2))
 
     const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
@@ -67,14 +93,40 @@ export function runAuthTests() {
 
     t.equal(decodedToken.payload.username, null, 'auth response username should be null')
 
-    const verified = verifyAuthResponse(authResponse)
-    t.equal(verified, true, 'auth request should be verified')
+    //const verified = verifyAuthResponse(authResponse)
+    //t.equal(verified, true, 'auth response should be verified')
 
-    t.equal(isExpirationDateValid(authResponse), true, 'Expiration date should be valid')
-    t.equal(isIssuanceDateValid(authResponse), true, 'Issuance date should be valid')
-    t.equal(doSignaturesMatchPublicKeys(authResponse), true, 'Signatures should match the public keys')
-    t.equal(doPublicKeysMatchIssuer(authResponse), true, 'Public keys should match the issuer')
-    t.equal(doPublicKeysMatchUsername(authResponse), true, 'Public keys should match the username')
+    verifyAuthResponse(authResponse, nameLookupURL)
+      .then((verified) => {
+        t.true(verified, 'auth response should be verified')
+      })
+
+    t.true(isExpirationDateValid(authResponse), 'Expiration date should be valid')
+    t.true(isIssuanceDateValid(authResponse), 'Issuance date should be valid')
+    t.true(doSignaturesMatchPublicKeys(authResponse), 'Signatures should match the public keys')
+    t.true(doPublicKeysMatchIssuer(authResponse), 'Public keys should match the issuer')
+    
+    doPublicKeysMatchUsername(authResponse, nameLookupURL)
+      .then(verified => {
+        t.true(verified, 'Public keys should match the username')
+      })
+  })
+
+  test('auth response with username', (t) => {
+    t.plan(1)
+
+    const url = nameLookupURL + "ryan.id"
+    //console.log(`URL: ${url}`)
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, "ryan.id")
+    //console.log(decodeToken(authResponse))
+
+    doPublicKeysMatchUsername(authResponse, nameLookupURL)
+      .then(verified => {
+        t.true(verified, 'Public keys should match the username')
+      })
   })
 }
 

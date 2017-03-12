@@ -1,13 +1,15 @@
 'use strict'
 
-import request from 'request'
+require('es6-promise').polyfill()
+require('isomorphic-fetch')
+
 import {
   TokenSigner, TokenVerifier, decodeToken, createUnsecuredToken,
   SECP256K1Client
 } from 'jsontokens'
 
 import {
-  makeDIDFromAddress, getDIDType,
+  makeDIDFromAddress, getDIDType, getAddressFromDID,
   makeUUID4,
   nextMonth, nextHour,
   publicKeyToAddress
@@ -73,28 +75,28 @@ export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
   
-  if (publicKeys.length !== 1) {
-    throw new Error('Multiple public keys are not supported')
-  }
-
-  publicKeys.map((publicKey) => {
-    const tokenVerifier = new TokenVerifier('ES256k', publicKey)
-    const signatureVerified = tokenVerifier.verify(token)
-    if (!signatureVerified) {
+  if (publicKeys.length === 1) {
+    const publicKey = publicKeys[0]
+    try {
+      const tokenVerifier = new TokenVerifier('ES256k', publicKey)
+      const signatureVerified = tokenVerifier.verify(token)
+      if (signatureVerified) {
+        return true
+      } else {
+        return false
+      }
+    } catch(e) {
       return false
     }
-  })
-
-  return true
+  } else {
+    throw new Error('Multiple public keys are not supported')
+  }
 }
 
 export function doPublicKeysMatchIssuer(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
-  const issuer = payload.iss
-  const issuerType = getDIDType(issuer)
-  const addressFromIssuer = (issuerType === 'btc-addr') ?
-    issuer.split(':')[2] : null
+  const addressFromIssuer = getAddressFromDID(payload.iss)
 
   if (publicKeys.length === 1) {
     const addressFromPublicKeys = publicKeyToAddress(publicKeys[0])
@@ -108,18 +110,53 @@ export function doPublicKeysMatchIssuer(token) {
   return false
 }
 
-export function doPublicKeysMatchUsername(token) {
-  const payload = decodeToken(token).payload
+export function doPublicKeysMatchUsername(token, nameLookupURL) {
+  return new Promise((resolve, reject) => {
+    const payload = decodeToken(token).payload
 
-  if (!payload.username) {
-    return true
-  }
+    if (!payload.username) {
+      resolve(true)
+      return
+    }
 
-  if (payload.username === null) {
-    return true
-  }
+    if (payload.username === null) {
+      resolve(true)
+      return
+    }
 
-  return false
+    if (nameLookupURL === null) {
+      resolve(false)
+      return
+    }
+
+    const username = payload.username
+    const url = nameLookupURL.replace(/\/$/, "") + '/' + username
+
+    try {
+      fetch(url)
+        .then(response => response.text())
+        .then(responseText => JSON.parse(responseText))
+        .then(responseJSON => {
+          if (responseJSON.hasOwnProperty('address')) {
+            const nameOwningAddress = responseJSON.address
+            const addressFromIssuer = getAddressFromDID(payload.iss)
+            if (nameOwningAddress === addressFromIssuer) {
+              resolve(true)
+            } else {
+              resolve(false)
+            }
+          } else {
+            resolve(false)
+          }
+        })
+        .catch((e) => {
+          resolve(false)
+        })
+    } catch(e) {
+      resolve(false)
+    }
+
+  })
 }
 
 export function isIssuanceDateValid(token) {
@@ -157,31 +194,39 @@ export function isExpirationDateValid(token) {
 }
 
 export function verifyAuthRequest(token) {
-  if (decodeToken(token).header.alg === 'none') {
-    // Token is unsecured
-    return (isExpirationDateValid(token))
-  } else {
-    // Token is signed
-    return (isExpirationDateValid(token)
-            && isIssuanceDateValid(token)
-            && doSignaturesMatchPublicKeys(token)
-            && doPublicKeysMatchIssuer(token))
-  }
-}
+  return new Promise((resolve, reject) => {
+    if (decodeToken(token).header.alg === 'none') {
+      reject("Token must be signed in order to be verified")
+    }
 
-export function verifyAuthResponse(token) {
-  return (isExpirationDateValid(token)
-          && isIssuanceDateValid(token)
-          && doSignaturesMatchPublicKeys(token)
-          && doPublicKeysMatchIssuer(token)
-          && doPublicKeysMatchUsername(token))
-}
-
-/*
-    request(requestURL, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
-        const profile = JSON.parse(body)[username].profile
-        
+    Promise.all([
+      isExpirationDateValid(token),
+      isIssuanceDateValid(token),
+      doSignaturesMatchPublicKeys(token),
+      doPublicKeysMatchIssuer(token)
+    ]).then(values => {
+      if (values.every(Boolean)) {
+        resolve(true)
+      } else {
+        resolve(false)
       }
     })
-*/
+  })
+}
+
+export function verifyAuthResponse(token, nameLookupURL) {
+  return new Promise((resolve, reject) => {
+    Promise.all([
+      isExpirationDateValid(token),
+      isIssuanceDateValid(token),
+      doSignaturesMatchPublicKeys(token),
+      doPublicKeysMatchIssuer(token)
+    ]).then(values => {
+      if (values.every(Boolean)) {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    })
+  })
+}

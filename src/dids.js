@@ -22,6 +22,15 @@ export function getDIDType(decentralizedID) {
   return didParts[1].toLowerCase()
 }
 
+export function getAddressFromDID(decentralizedID) {
+  const didType = getDIDType(decentralizedID)
+  if (didType === 'btc-addr') {
+    return decentralizedID.split(':')[2]
+  } else {
+    return null
+  }
+}
+
 /*
 export function getPublicKeyOrAddressFromDID(decentralizedID) {
   const didParts = decentralizedID.split(':')

@@ -69,12 +69,14 @@
     "express": "^4.15.0",
     "fetch-mock": "^5.5.0",
     "node-fetch": "^1.6.3",
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "tape-promise": "^2.0.1"
   },
   "dependencies": {
     "bitcoinjs-lib": "^2.3.0",
     "ecurve": "^1.0.5",
     "elliptic": "^6.4.0",
+    "es6-promise": "^4.1.0",
     "isomorphic-fetch": "^2.2.1",
     "jsontokens": "^0.7.4",
     "promise": "^7.1.1",
