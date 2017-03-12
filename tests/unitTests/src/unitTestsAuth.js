@@ -9,8 +9,14 @@ import {
   verifyAuthRequest,
   verifyAuthResponse,
   publicKeyToAddress,
-  makeDIDFromAddress
+  makeDIDFromAddress,
+  isExpirationDateValid,
+  isIssuanceDateValid,
+  doSignaturesMatchPublicKeys,
+  doPublicKeysMatchIssuer,
+  doPublicKeysMatchUsername
 } from '../../../lib'
+import blockstack from '../../../lib'
 
 import { sampleManifests, sampleProfiles } from './sampleData'
 
@@ -19,7 +25,7 @@ export function runAuthTests() {
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
-    t.plan(5)
+    t.plan(9)
 
     const authRequest = makeAuthRequest(privateKey, sampleManifests.helloBlockstack)
     t.ok(authRequest, 'auth request should have been created')
@@ -36,10 +42,15 @@ export function runAuthTests() {
 
     const verified = verifyAuthRequest(authRequest)
     t.equal(verified, true, 'auth request should be verified')
+
+    t.equal(isExpirationDateValid(authRequest), true, 'Expiration date should be valid')
+    t.equal(isIssuanceDateValid(authRequest), true, 'Issuance date should be valid')
+    t.equal(doSignaturesMatchPublicKeys(authRequest), true, 'Signatures should match the public keys')
+    t.equal(doPublicKeysMatchIssuer(authRequest), true, 'Public keys should match the issuer')
   })
 
   test('makeAuthResponse && verifyAuthResponse', (t) => {
-    t.plan(6)
+    t.plan(11)
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan)
     t.ok(authResponse, 'auth response should have been created')
@@ -58,6 +69,12 @@ export function runAuthTests() {
 
     const verified = verifyAuthResponse(authResponse)
     t.equal(verified, true, 'auth request should be verified')
+
+    t.equal(isExpirationDateValid(authResponse), true, 'Expiration date should be valid')
+    t.equal(isIssuanceDateValid(authResponse), true, 'Issuance date should be valid')
+    t.equal(doSignaturesMatchPublicKeys(authResponse), true, 'Signatures should match the public keys')
+    t.equal(doPublicKeysMatchIssuer(authResponse), true, 'Public keys should match the issuer')
+    t.equal(doPublicKeysMatchUsername(authResponse), true, 'Public keys should match the username')
   })
 }
 

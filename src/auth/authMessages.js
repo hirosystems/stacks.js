@@ -23,7 +23,7 @@ export function makeAuthRequest(privateKey,
   let payload = {
     jti: makeUUID4(),
     iat: new Date().getTime(),
-    exp: nextHour(),
+    exp: nextHour().getTime(),
     iss: null,
     publicKeys: [],
     appManifest: appManifest,
@@ -58,7 +58,7 @@ export function makeAuthResponse(privateKey,
   const payload = {
     jti: makeUUID4(),
     iat: new Date().getTime(),
-    exp: nextMonth(),
+    exp: nextMonth().getTime(),
     iss: makeDIDFromAddress(address),
     publicKeys: [publicKey],
     profile: profile,
@@ -69,7 +69,7 @@ export function makeAuthResponse(privateKey,
   return tokenSigner.sign(payload)
 }
 
-function doSignaturesMatchPublicKeys(token) {
+export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
   
@@ -88,7 +88,7 @@ function doSignaturesMatchPublicKeys(token) {
   return true
 }
 
-function doPublicKeysMatchIssuer(token) {
+export function doPublicKeysMatchIssuer(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
   const issuer = payload.iss
@@ -108,41 +108,73 @@ function doPublicKeysMatchIssuer(token) {
   return false
 }
 
-function doPublicKeysMatchUsername(token) {
-  // Fill in
-  return true
+export function doPublicKeysMatchUsername(token) {
+  const payload = decodeToken(token).payload
+
+  if (!payload.username) {
+    return true
+  }
+
+  if (payload.username === null) {
+    return true
+  }
+
+  return false
 }
 
-function isExpirationDateInTheFuture(token) {
-  // Fill in
-  return true
+export function isIssuanceDateValid(token) {
+  const payload = decodeToken(token).payload
+  if (payload.iat) {
+    if (typeof payload.iat !== "number") {
+      return false
+    }
+    const issuedAt = new Date(payload.iat)
+    if (new Date().getTime() < issuedAt.getTime()) {
+      return false
+    } else {
+      return true
+    }
+  } else {
+    return true
+  }
+}
+
+export function isExpirationDateValid(token) {
+  const payload = decodeToken(token).payload
+  if (payload.exp) {
+    if (typeof payload.exp !== "number") {
+      return false
+    }
+    const expiresAt = new Date(payload.exp)
+    if (new Date().getTime() > expiresAt.getTime()) {
+      return false
+    } else {
+      return true
+    }
+  } else {
+    return true
+  }
 }
 
 export function verifyAuthRequest(token) {
-  const expirationDateIsInTheFuture = isExpirationDateInTheFuture(token)
-
   if (decodeToken(token).header.alg === 'none') {
     // Token is unsecured
-    return (expirationDateIsInTheFuture)
+    return (isExpirationDateValid(token))
   } else {
     // Token is signed
-    const signaturesMatchPublicKeys = doSignaturesMatchPublicKeys(token)
-    const publicKeysMatchIssuer = doPublicKeysMatchIssuer(token)
-    return (expirationDateIsInTheFuture
-            && signaturesMatchPublicKeys
-            && publicKeysMatchIssuer)
+    return (isExpirationDateValid(token)
+            && isIssuanceDateValid(token)
+            && doSignaturesMatchPublicKeys(token)
+            && doPublicKeysMatchIssuer(token))
   }
 }
 
 export function verifyAuthResponse(token) {
-  const expirationDateIsInTheFuture = isExpirationDateInTheFuture(token)
-  const signaturesMatchPublicKeys = doSignaturesMatchPublicKeys(token)
-  const publicKeysMatchIssuer = doPublicKeysMatchIssuer(token)
-  const publicKeysMatchUsername = doPublicKeysMatchUsername(token)
-
-  return (signaturesMatchPublicKeys
-          && publicKeysMatchIssuer
-          && publicKeysMatchUsername)
+  return (isExpirationDateValid(token)
+          && isIssuanceDateValid(token)
+          && doSignaturesMatchPublicKeys(token)
+          && doPublicKeysMatchIssuer(token)
+          && doPublicKeysMatchUsername(token))
 }
 
 /*

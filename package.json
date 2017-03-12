@@ -9,7 +9,7 @@
     "compile-tests": "rm -rf tests/unitTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
-    "test-server": "npm run compile; npm run browserify; node ./tests/browserTests/server.js",
+    "dev": "npm run compile; npm run browserify; node ./tests/browserTests/server.js",
     "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js"
   },
   "repository": {
