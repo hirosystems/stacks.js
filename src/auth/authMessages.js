@@ -7,7 +7,10 @@ import {
 } from 'jsontokens'
 
 import {
-  makeDIDFromAddress, makeUUID4, nextMonth, nextHour, publicKeyToAddress
+  makeDIDFromAddress, getDIDType,
+  makeUUID4,
+  nextMonth, nextHour,
+  publicKeyToAddress
 } from '../index'
 
 export function makeAuthRequest(privateKey,
@@ -66,34 +69,80 @@ export function makeAuthResponse(privateKey,
   return tokenSigner.sign(payload)
 }
 
-function doPublicKeysMatchSignatures(token) {
+function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
-  if (publicKeys.length === 1) {
-    publicKeys.map((publicKey) => {
-      const tokenVerifier = new TokenVerifier('ES256k', publicKey)
-      const signatureVerified = tokenVerifier.verify(token)
-      if (!signatureVerified) {
-        return false
-      }
-    })
-  } else {
-    throw new Error('Invalid public key array')
+  
+  if (publicKeys.length !== 1) {
+    throw new Error('Multiple public keys are not supported')
   }
+
+  publicKeys.map((publicKey) => {
+    const tokenVerifier = new TokenVerifier('ES256k', publicKey)
+    const signatureVerified = tokenVerifier.verify(token)
+    if (!signatureVerified) {
+      return false
+    }
+  })
 
   return true
 }
 
-function verifyAuthMessage(token) {
-  return doPublicKeysMatchSignatures(token)
+function doPublicKeysMatchIssuer(token) {
+  const payload = decodeToken(token).payload
+  const publicKeys = payload.publicKeys
+  const issuer = payload.iss
+  const issuerType = getDIDType(issuer)
+  const addressFromIssuer = (issuerType === 'btc-addr') ?
+    issuer.split(':')[2] : null
+
+  if (publicKeys.length === 1) {
+    const addressFromPublicKeys = publicKeyToAddress(publicKeys[0])
+    if (addressFromPublicKeys === addressFromIssuer) {
+      return true
+    }
+  } else {
+    throw new Error('Multiple public keys are not supported')
+  }
+
+  return false
+}
+
+function doPublicKeysMatchUsername(token) {
+  // Fill in
+  return true
+}
+
+function isExpirationDateInTheFuture(token) {
+  // Fill in
+  return true
 }
 
 export function verifyAuthRequest(token) {
-  return verifyAuthMessage(token)
+  const expirationDateIsInTheFuture = isExpirationDateInTheFuture(token)
+
+  if (decodeToken(token).header.alg === 'none') {
+    // Token is unsecured
+    return (expirationDateIsInTheFuture)
+  } else {
+    // Token is signed
+    const signaturesMatchPublicKeys = doSignaturesMatchPublicKeys(token)
+    const publicKeysMatchIssuer = doPublicKeysMatchIssuer(token)
+    return (expirationDateIsInTheFuture
+            && signaturesMatchPublicKeys
+            && publicKeysMatchIssuer)
+  }
 }
 
 export function verifyAuthResponse(token) {
-  return verifyAuthMessage(token)
+  const expirationDateIsInTheFuture = isExpirationDateInTheFuture(token)
+  const signaturesMatchPublicKeys = doSignaturesMatchPublicKeys(token)
+  const publicKeysMatchIssuer = doPublicKeysMatchIssuer(token)
+  const publicKeysMatchUsername = doPublicKeysMatchUsername(token)
+
+  return (signaturesMatchPublicKeys
+          && publicKeysMatchIssuer
+          && publicKeysMatchUsername)
 }
 
 /*
