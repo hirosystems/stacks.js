@@ -25,7 +25,7 @@ export function makeAuthRequest(privateKey,
   let payload = {
     jti: makeUUID4(),
     iat: new Date().getTime(),
-    exp: nextHour().getTime(),
+    exp: expiresAt.getTime(),
     iss: null,
     publicKeys: [],
     appManifest: appManifest,
@@ -60,7 +60,7 @@ export function makeAuthResponse(privateKey,
   const payload = {
     jti: makeUUID4(),
     iat: new Date().getTime(),
-    exp: nextMonth().getTime(),
+    exp: expiresAt.getTime(),
     iss: makeDIDFromAddress(address),
     publicKeys: [publicKey],
     profile: profile,
@@ -74,7 +74,7 @@ export function makeAuthResponse(privateKey,
 export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.publicKeys
-  
+
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]
     try {
