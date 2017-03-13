@@ -34,7 +34,7 @@ $(document).ready(function() {
     })
   } else if (blockstack.isSignInPending()) {
     blockstack.signUserIn(function(userData) {
-      window.location = currentHost
+      //window.location = currentHost
     })
   } else {
     // do nothing

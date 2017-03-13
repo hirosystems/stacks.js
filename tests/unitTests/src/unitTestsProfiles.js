@@ -15,7 +15,7 @@ import {
   getEntropy,
   makeZoneFileForHostedProfile,
   resolveZoneFileToPerson
-} from '../index'
+} from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
 

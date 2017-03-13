@@ -7,7 +7,7 @@ import FetchMock from 'fetch-mock'
 
 import {
   validateProofs, containsValidProofStatement, profileServices
-} from '../index'
+} from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications } from './sampleData'
 
@@ -69,34 +69,44 @@ export function runProofServicesUnitTests() {
     t.plan(6)
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       "https://www.facebook.com/navalr/posts/10152190734077261"),
-      "https://www.facebook.com/navalr/posts/10152190734077261")
+      "https://www.facebook.com/navalr/posts/10152190734077261",
+      "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       "https://facebook.com/navalr/posts/10152190734077261"),
-      "https://www.facebook.com/navalr/posts/10152190734077261")
+      "https://www.facebook.com/navalr/posts/10152190734077261",
+      "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       "https://www.facebook.com/larrysalibra/posts/10100341028448093"),
-      "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+      "https://www.facebook.com/larrysalibra/posts/10100341028448093",
+      "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       "https://www.facebook.com/larry.salibra/posts/10100341028448093"),
-      "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+      "https://www.facebook.com/larrysalibra/posts/10100341028448093",
+      "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       "https://facebook.com/larry.salibra/posts/10100341028448093"),
-      "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+      "https://www.facebook.com/larrysalibra/posts/10100341028448093",
+      "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       "https://facebook.com/larrysalibra/posts/10100341028448093"),
-      "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+      "https://www.facebook.com/larrysalibra/posts/10100341028448093",
+      "Facebook URL should be normalized")
   })
 
   test('get proof url', (t) => {
     t.plan(4)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
-      "https://www.facebook.com/navalr/posts/10152190734077261")
+      "https://www.facebook.com/navalr/posts/10152190734077261",
+      "Facebook proof URL should match reference")
     t.equal(profileServices.github.getProofUrl(sampleProofs.naval[2]),
-      "https://gist.github.com/navalr/f31a74054f859ec0ac6a")
+      "https://gist.github.com/navalr/f31a74054f859ec0ac6a",
+      "Facebook proof URL should match reference")
     t.equal(profileServices.twitter.getProofUrl(sampleProofs.naval[0]),
-      "https://twitter.com/naval/status/486609266212499456")
+      "https://twitter.com/naval/status/486609266212499456",
+      "Facebook proof URL should match reference")
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.larry[0]),
-      "https://www.facebook.com/larrysalibra/posts/10100341028448093")
+      "https://www.facebook.com/larrysalibra/posts/10100341028448093",
+      "Facebook proof URL should match reference")
   })
 }
 
