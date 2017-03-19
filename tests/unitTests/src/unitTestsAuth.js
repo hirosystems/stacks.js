@@ -30,7 +30,7 @@ export function runAuthTests() {
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(9)
 
-    const authRequest = makeAuthRequest(privateKey, sampleManifests.helloBlockstack)
+    const authRequest = makeAuthRequest(privateKey, 'localhost:3000')
     t.ok(authRequest, 'auth request should have been created')
     //console.log(authRequest)
 
@@ -58,7 +58,7 @@ export function runAuthTests() {
   test('invalid auth request', (t) => {
     t.plan(2)
 
-    const authRequest = makeAuthRequest(privateKey, sampleManifests.helloBlockstack)
+    const authRequest = makeAuthRequest(privateKey, 'localhost:3000')
     const invalidAuthRequest = authRequest.substring(0, authRequest.length-1)
 
     t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false, 'Signatures should not match the public keys')

@@ -1,6 +1,5 @@
 'use strict'
 
-require('es6-promise').polyfill()
 require('isomorphic-fetch')
 
 import {
@@ -16,19 +15,30 @@ import {
 } from '../index'
 
 export function makeAuthRequest(privateKey,
-                                appManifest,
+                                domain_name,
+                                manifestURI=null,
+                                redirectURI=null,
                                 scopes=[],
-                                expiresAt=nextHour()) {
+                                expiresAt=nextHour().getTime()) {
   let token = null
+
+  if (manifestURI === null) {
+    manifestURI = domain_name + '/manifest.json'
+  }
+  if (redirectURI === null) {
+    redirectURI = domain_name
+  }
 
   /* Create the payload */
   let payload = {
     jti: makeUUID4(),
     iat: new Date().getTime(),
-    exp: nextHour().getTime(),
+    exp: expiresAt,
     iss: null,
-    publicKeys: [],
-    appManifest: appManifest,
+    public_keys: [],
+    domain_name: domain_name,
+    manifest_uri: manifestURI,
+    redirect_uri: redirectURI,
     scopes: scopes
   }
 
@@ -38,7 +48,7 @@ export function makeAuthRequest(privateKey,
   } else {
     /* Convert the private key to a public key to an issuer */
     const publicKey = SECP256K1Client.derivePublicKey(privateKey)
-    payload.publicKeys = [publicKey]
+    payload.public_keys = [publicKey]
     const address = publicKeyToAddress(publicKey)
     payload.iss = makeDIDFromAddress(address)
     /* Sign and return the token */
@@ -52,7 +62,7 @@ export function makeAuthRequest(privateKey,
 export function makeAuthResponse(privateKey,
                                  profile={},
                                  username=null,
-                                 expiresAt=nextMonth()) {
+                                 expiresAt=nextMonth().getTime()) {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -60,9 +70,9 @@ export function makeAuthResponse(privateKey,
   const payload = {
     jti: makeUUID4(),
     iat: new Date().getTime(),
-    exp: nextMonth().getTime(),
+    exp: expiresAt,
     iss: makeDIDFromAddress(address),
-    publicKeys: [publicKey],
+    public_keys: [publicKey],
     profile: profile,
     username: username
   }
@@ -73,7 +83,7 @@ export function makeAuthResponse(privateKey,
 
 export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
-  const publicKeys = payload.publicKeys
+  const publicKeys = payload.public_keys
   
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]
@@ -95,7 +105,7 @@ export function doSignaturesMatchPublicKeys(token) {
 
 export function doPublicKeysMatchIssuer(token) {
   const payload = decodeToken(token).payload
-  const publicKeys = payload.publicKeys
+  const publicKeys = payload.public_keys
   const addressFromIssuer = getAddressFromDID(payload.iss)
 
   if (publicKeys.length === 1) {

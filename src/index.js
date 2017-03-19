@@ -3,6 +3,12 @@
 export * from './auth'
 export * from './profiles'
 
-export { makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID } from './dids'
-export { getEntropy, makeECPrivateKey, publicKeyToAddress } from './keys'
-export { nextYear, nextMonth, nextHour, makeUUID4, hasprop } from './utils'
+export {
+  makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID
+} from './dids'
+export {
+  getEntropy, makeECPrivateKey, publicKeyToAddress
+} from './keys'
+export {
+  nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter
+} from './utils'
