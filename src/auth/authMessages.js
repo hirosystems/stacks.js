@@ -32,8 +32,8 @@ export function makeAuthRequest(privateKey,
   /* Create the payload */
   let payload = {
     jti: makeUUID4(),
-    iat: new Date().getTime(),
-    exp: expiresAt,
+    iat: Math.floor(new Date().getTime()/1000), // JWT times are in seconds
+    exp: Math.floor(expiresAt/1000), // JWT times are in seconds
     iss: null,
     public_keys: [],
     domain_name: domain_name,
@@ -69,8 +69,8 @@ export function makeAuthResponse(privateKey,
   /* Create the payload */
   const payload = {
     jti: makeUUID4(),
-    iat: new Date().getTime(),
-    exp: expiresAt,
+    iat: Math.floor(new Date().getTime()/1000), // JWT times are in seconds
+    exp: Math.floor(expiresAt/1000), // JWT times are in seconds
     iss: makeDIDFromAddress(address),
     public_keys: [publicKey],
     profile: profile,
@@ -84,7 +84,6 @@ export function makeAuthResponse(privateKey,
 export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.public_keys
-  
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]
     try {
@@ -175,7 +174,7 @@ export function isIssuanceDateValid(token) {
     if (typeof payload.iat !== "number") {
       return false
     }
-    const issuedAt = new Date(payload.iat)
+    const issuedAt = new Date(payload.iat * 1000) // JWT times are in seconds
     if (new Date().getTime() < issuedAt.getTime()) {
       return false
     } else {
@@ -192,7 +191,7 @@ export function isExpirationDateValid(token) {
     if (typeof payload.exp !== "number") {
       return false
     }
-    const expiresAt = new Date(payload.exp)
+    const expiresAt = new Date(payload.exp * 1000) // JWT times are in seconds
     if (new Date().getTime() > expiresAt.getTime()) {
       return false
     } else {
