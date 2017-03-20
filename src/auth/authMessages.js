@@ -22,6 +22,9 @@ export function makeAuthRequest(privateKey,
                                 expiresAt=nextHour().getTime()) {
   let token = null
 
+  if (domain_name === null) {
+    throw new Error("Invalid app domain name")
+  }
   if (manifestURI === null) {
     manifestURI = domain_name + '/manifest.json'
   }

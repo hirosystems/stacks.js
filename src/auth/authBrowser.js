@@ -3,8 +3,9 @@
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { makeAuthRequest, verifyAuthResponse } from './authMessages'
+import { updateQueryStringParameter } from '../index'
 
-const BLOCKSTACK_HANDLER = "blockstack"
+const BLOCKSTACK_HANDLER = "web+blockstack"
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"
 const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
 
@@ -53,7 +54,7 @@ export function signUserIn(callbackFunction) {
 }
 
 export function loadUserData(callbackFunction) {
-  const userData = JSON.parse(localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
+  const userData = JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
   callbackFunction(userData)
 }
 
@@ -66,38 +67,49 @@ export function signUserOut(redirectURL) {
  * For identity providers
  */
 
-export function getAuthRequestToken() {
+export function getAuthRequestFromURL() {
   const queryDict = queryString.parse(location.search)
-  if (queryDict.authRequest) {
+  if (queryDict.authRequest !== null) {
     return queryDict.authRequest.split(BLOCKSTACK_HANDLER + ':').join('')
   } else {
     return null
   }
 }
 
-export function getAppManifest(authRequest) {
+export function fetchAppManifest(authRequest) {
   return new Promise((resolve, reject) => {
-    const payload = decodeToken(authRequest).payload
-    const manifestURI = payload.manifestURI
-    try {
-      fetch(manifestURI)
-        .then(response => response.text())
-        .then(responseText => JSON.parse(responseText))
-        .then(responseJSON => {
-          resolve(responseJSON)
-        })
-        .catch((e) => {
-          reject("URI request couldn't be completed")
-        })
-    } catch(e) {
-      reject("URI request couldn't be completed")
+    if (!authRequest) {
+      reject("Invalid auth request")
+    } else {
+      const payload = decodeToken(authRequest).payload
+      const manifestURI = payload.manifest_uri
+      console.log(manifestURI)
+      try {
+        fetch(manifestURI)
+          .then(response => response.text())
+          .then(responseText => JSON.parse(responseText))
+          .then(responseJSON => {
+            resolve(responseJSON)
+          })
+          .catch((e) => {
+            console.log(e.stack)
+            reject("URI request couldn't be completed")
+          })
+      } catch(e) {
+        console.log(e.stack)
+        reject("URI request couldn't be completed")
+      }
     }
   })
 }
 
 export function redirectUserToApp(authRequest, authResponse) {
   const payload = decodeToken(authRequest).payload
-  let redirectURI = payload.redirectURI
-  redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
+  let redirectURI = payload.redirect_uri
+  if (redirectURI) {
+    redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
+  } else {
+    throw new Error("Invalid redirect URI")
+  }
   window.location = redirectURI
 }
