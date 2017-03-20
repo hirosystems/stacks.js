@@ -1,0 +1,10 @@
+{
+  "name": "Hello, Blockstack",
+  "start_url": "localhost:5000",
+  "description": "A simple demo of Blockstack Auth",
+  "icons": [{
+    "src": "https://raw.githubusercontent.com/blockstack/blockstack-portal/master/app/images/app-hello-blockstack.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
+}

@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.2.12",
+  "version": "0.2.14",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
@@ -9,7 +9,8 @@
     "compile-tests": "rm -rf tests/unitTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
-    "dev": "npm run compile; npm run browserify; node ./tests/browserTests/server.js",
+    "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
+    "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
     "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js"
   },
   "repository": {
