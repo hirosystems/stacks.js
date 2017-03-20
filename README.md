@@ -1,7 +1,5 @@
 # blockstack.js [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack.js/master.svg)](https://circleci.com/gh/blockstack/blockstack.js/tree/master) [![npm](https://img.shields.io/npm/v/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![npm](https://img.shields.io/npm/dm/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![npm](https://img.shields.io/npm/l/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
 
-## Contents
-
 * [Installation](#installation)
 * [About](#about)
 * [Auth](#auth)
