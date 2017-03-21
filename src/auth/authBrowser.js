@@ -83,7 +83,6 @@ export function fetchAppManifest(authRequest) {
     } else {
       const payload = decodeToken(authRequest).payload
       const manifestURI = payload.manifest_uri
-      console.log(manifestURI)
       try {
         fetch(manifestURI)
           .then(response => response.text())
