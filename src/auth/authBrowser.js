@@ -69,7 +69,7 @@ export function signUserOut(redirectURL) {
 
 export function getAuthRequestFromURL() {
   const queryDict = queryString.parse(location.search)
-  if (queryDict.authRequest !== null) {
+  if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
     return queryDict.authRequest.split(BLOCKSTACK_HANDLER + ':').join('')
   } else {
     return null
