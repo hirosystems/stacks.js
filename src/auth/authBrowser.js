@@ -21,7 +21,7 @@ export function redirectUserToSignIn(authRequest,
                                      blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
   setTimeout(function() {
     window.location = blockstackIDHost + "?authRequest=" + authRequest
-  }, 500)
+  }, 5000)
 
   window.location = BLOCKSTACK_HANDLER + ":" + authRequest
 }
