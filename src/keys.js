@@ -1,7 +1,7 @@
 'use strict'
 
 import { randomBytes } from 'crypto'
-import { ECPair } from 'bitcoinjs-lib'
+import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
 
 export function getEntropy(numberOfBytes) {
   if (!numberOfBytes) {
@@ -17,6 +17,7 @@ export function makeECPrivateKey() {
 
 export function publicKeyToAddress(publicKey) {
   const publicKeyBuffer = new Buffer(publicKey, 'hex')
-  const keyPair = ECPair.fromPublicKeyBuffer(publicKeyBuffer)
-  return keyPair.getAddress()
+  const publicKeyHash160 = bcrypto.hash160(publicKeyBuffer)
+  const address = baddress.toBase58Check(publicKeyHash160, 0x00)
+  return address
 }

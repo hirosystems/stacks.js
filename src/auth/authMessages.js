@@ -232,7 +232,8 @@ export function verifyAuthResponse(token, nameLookupURL) {
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
-      doPublicKeysMatchIssuer(token)
+      doPublicKeysMatchIssuer(token),
+      doPublicKeysMatchUsername(token)
     ]).then(values => {
       if (values.every(Boolean)) {
         resolve(true)
