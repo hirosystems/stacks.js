@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
@@ -70,11 +70,13 @@
     "express": "^4.15.0",
     "fetch-mock": "^5.5.0",
     "node-fetch": "^1.6.3",
+    "opn": "^4.0.2",
     "tape": "^4.6.3",
     "tape-promise": "^2.0.1"
   },
   "dependencies": {
     "bitcoinjs-lib": "^2.3.0",
+    "custom-protocol-detection": "^1.0.0",
     "ecurve": "^1.0.5",
     "elliptic": "^6.4.0",
     "es6-promise": "^4.1.0",
