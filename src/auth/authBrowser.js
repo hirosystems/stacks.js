@@ -4,6 +4,7 @@ import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { makeAuthRequest, verifyAuthResponse } from './authMessages'
 import { updateQueryStringParameter } from '../index'
+import protocolCheck from 'custom-protocol-detection'
 
 const BLOCKSTACK_HANDLER = "blockstack"
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"
@@ -19,11 +20,15 @@ export function isUserSignedIn() {
 
 export function redirectUserToSignIn(authRequest,
                                      blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
-  setTimeout(function() {
-    window.location = blockstackIDHost + "?authRequest=" + authRequest
-  }, 500)
+  const protocolURI = BLOCKSTACK_HANDLER + ":" + authRequest
+  const httpsURI = blockstackIDHost + "?authRequest=" + authRequest
 
-  window.location = BLOCKSTACK_HANDLER + ":" + authRequest
+  protocolCheck(protocolURI, () => {
+    console.log('protocol handler not detected')
+    window.location = httpsURI
+  }, () => {
+    console.log('protocol handler detected')
+  })
 }
 
 export function getAuthResponseToken() {

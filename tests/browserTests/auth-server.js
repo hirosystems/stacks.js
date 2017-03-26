@@ -1,4 +1,5 @@
-const express = require('express')  
+const express = require('express')
+const opn = require('opn')
 const app = express()  
 const port = 5000
 
@@ -19,4 +20,5 @@ app.listen(port, (err) => {
     return console.log('something bad happened', err)
   }
   console.log(`server is listening on ${port}`)
+  opn('http://localhost:5000')
 })
