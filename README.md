@@ -33,11 +33,11 @@ The profiles/identity portion of this library can be used to:
 
 ## Auth
 
-[![Documentation](/docs-button.png)](/src/auth/README.md)
+[![Documentation](/docs-button.png)](/src/auth)
 
 ## Profiles
 
-[![Documentation](/docs-button.png)](/src/profiles/README.md)
+[![Documentation](/docs-button.png)](/src/profiles)
 
 ## Testing
 
