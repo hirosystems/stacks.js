@@ -6,7 +6,7 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
-    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/coreTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/coreTests/src -d tests/coreTests/lib;",
+    "compile-tests": "rm -rf tests/unitTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
@@ -82,7 +82,7 @@
     "elliptic": "^6.4.0",
     "es6-promise": "^4.1.0",
     "isomorphic-fetch": "^2.2.1",
-    "jsontokens": "^0.7.5",
+    "jsontokens": "^0.7.6",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
     "request": "^2.79.0",
