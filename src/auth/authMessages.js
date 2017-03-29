@@ -65,10 +65,13 @@ export function makeAuthRequest(privateKey,
 export function makeAuthResponse(privateKey,
                                  profile={},
                                  username=null,
+                                 coreToken=null,
                                  expiresAt=nextMonth().getTime()) {
+
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
+
   /* Create the payload */
   const payload = {
     jti: makeUUID4(),
@@ -77,8 +80,10 @@ export function makeAuthResponse(privateKey,
     iss: makeDIDFromAddress(address),
     public_keys: [publicKey],
     profile: profile,
-    username: username
+    username: username,
+    core_token: coreToken
   }
+
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', privateKey)
   return tokenSigner.sign(payload)

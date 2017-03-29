@@ -6,12 +6,13 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
-    "compile-tests": "rm -rf tests/unitTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib",
+    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/coreTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/coreTests/src -d tests/coreTests/lib;",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
-    "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js"
+    "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js",
+    "core-test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/coreTests/lib/index.js"
   },
   "repository": {
     "type": "git",
