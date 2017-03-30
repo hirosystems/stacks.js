@@ -8,8 +8,8 @@ pip install --upgrade cryptography
 
 # install Blockstack and integration tests
 git clone https://github.com/blockstack/blockstack-core /tmp/blockstack-core
-cd /tmp/blockstack-core && ./setup.py && ./setup.py install 
-cd /tmp/blockstack-core/integration_tests && ./setup.py && ./setup.py install
+cd /tmp/blockstack-core && ./setup.py build && ./setup.py install 
+cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py install
 npm install -g babel
 npm install -g browserify
 
