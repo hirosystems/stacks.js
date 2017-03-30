@@ -87,7 +87,7 @@
     "elliptic": "^6.4.0",
     "es6-promise": "^4.1.0",
     "isomorphic-fetch": "^2.2.1",
-    "jsontokens": "^0.7.5",
+    "jsontokens": "^0.7.6",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
     "request": "^2.79.0",
