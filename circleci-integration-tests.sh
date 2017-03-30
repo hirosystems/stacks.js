@@ -13,6 +13,9 @@ cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py inst
 npm install -g babel
 npm install -g browserify
 
+# get bitcoind 
+apt-get install bitcoind || exit 1
+
 # run the relevant integration tests
 blockstack-test-scenario blockstack_integration_tests.scenarios.name_preorder_register_update_portal_auth || exit 1
 blockstack-test-scenario blockstack_integration_tests.scenarios.name_preorder_register_update_portal_datastore || exit 1
