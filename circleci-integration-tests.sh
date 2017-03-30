@@ -2,9 +2,11 @@
 
 BLOCKSTACK_BRANCH="rc-0.14.2"
 
+test -d /home/ubuntu/blockstack.js || exit 1
+
 sudo mkdir -p /usr/share/node_modules
 test -d /usr/share/node_modules/blockstack && rm -rf /usr/share/node_modules/blockstack
-sudo cp -a blockstack.js /usr/share/node-modules/blockstack
+sudo cp -a /home/ubuntu/blockstack.js /usr/share/node-modules/blockstack
 
 # get bitcoind
 sudo add-apt-repository -y ppa:bitcoin/bitcoin || exit 1
