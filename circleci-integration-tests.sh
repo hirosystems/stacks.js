@@ -8,6 +8,7 @@ pip install --upgrade six
 pip install --upgrade setuptools
 pip install --upgrade cryptography
 pip install --upgrade scrypt
+pip install --upgrade fastecdsa
 
 # install Blockstack and integration tests
 git clone https://github.com/blockstack/blockstack-core /tmp/blockstack-core
