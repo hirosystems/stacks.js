@@ -2,6 +2,11 @@
 
 BLOCKSTACK_BRANCH="rc-0.14.2"
 
+# get bitcoind
+sudo add-apt-repository ppa:bitcoin/bitcoin || exit 1
+sudo apt-get update || exit 1
+sudo apt-get install bitcoin || exit 1
+
 # needed on CircleCI's VMs
 pip install --upgrade pip
 pip install --upgrade six
@@ -19,9 +24,6 @@ cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py inst
 
 npm install -g babel
 npm install -g browserify
-
-# get bitcoind 
-sudo apt-get install bitcoind || exit 1
 
 # run the relevant integration tests
 blockstack-test-scenario blockstack_integration_tests.scenarios.name_preorder_register_portal_auth || exit 1
