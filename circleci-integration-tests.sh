@@ -16,6 +16,11 @@ pip install --upgrade cryptography
 pip install --upgrade scrypt
 pip install --upgrade fastecdsa
 
+# fetch and install virtualchain 
+git clone https://github.com/blockstack/virtualchain /tmp/virtualchain
+cd /tmp/virtualchain && git checkout "$BLOCKSTACK_BRANCH"
+cd /tmp/virtualchain && ./setup.py build && ./setup.py install
+
 # fetch blockstack core and integration tests
 git clone https://github.com/blockstack/blockstack-core /tmp/blockstack-core
 cd /tmp/blockstack-core && git checkout "$BLOCKSTACK_BRANCH"
