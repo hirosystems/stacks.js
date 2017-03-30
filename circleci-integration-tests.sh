@@ -3,9 +3,9 @@
 BLOCKSTACK_BRANCH="rc-0.14.2"
 
 # get bitcoind
-sudo add-apt-repository ppa:bitcoin/bitcoin || exit 1
-sudo apt-get update || exit 1
-sudo apt-get install bitcoin || exit 1
+sudo add-apt-repository -y ppa:bitcoin/bitcoin || exit 1
+sudo apt-get -y update || exit 1
+sudo apt-get -y install bitcoin || exit 1
 
 # needed on CircleCI's VMs
 pip install --upgrade pip
