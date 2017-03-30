@@ -1,8 +1,7 @@
 #!/bin/sh
 
 BLOCKSTACK_BRANCH="rc-0.14.2"
-
-test -d /home/ubuntu/blockstack.js || exit 1
+BLOCKSTACK_JS_BRANCH="v0.6-core-auth"
 
 # get bitcoind
 sudo add-apt-repository -y ppa:bitcoin/bitcoin || exit 1
@@ -35,12 +34,12 @@ cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py inst
 npm install -g babel
 npm install -g browserify
 
-ls -al /usr/share/node_modules/
-ls -al /usr/share/node_modules/blockstack
-
-sudo mkdir -p /usr/share/node_modules
-test -d /usr/share/node_modules/blockstack && rm -rf /usr/share/node_modules/blockstack
-sudo cp -a /home/ubuntu/blockstack.js /usr/share/node_modules/blockstack
+# get blockstack.js 
+git clone https://github.com/blockstack/blockstack.js /tmp/blockstack.js
+cd /tmp/blockstack.js && git checkout "$BLOCKSTACK_JS_BRANCH" && npm install
+sudo mkdir -p /usr/lib/node_modules
+sudo rm -rf /usr/lib/node_modules/blockstack
+sudo cp -a /tmp/blockstack.js /usr/lib/node_modules/blockstack
 
 # run the relevant integration tests
 blockstack-test-scenario blockstack_integration_tests.scenarios.name_preorder_register_portal_auth || exit 1
