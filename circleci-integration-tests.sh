@@ -4,6 +4,7 @@ BLOCKSTACK_BRANCH="rc-0.14.2"
 
 # get bitcoind
 sudo add-apt-repository -y ppa:bitcoin/bitcoin || exit 1
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys F76221572C52609D
 sudo apt-get -y update || exit 1
 sudo apt-get -y install bitcoin || exit 1
 
