@@ -29,7 +29,7 @@ cd /tmp/blockstack-core && git checkout "$BLOCKSTACK_BRANCH"
 cd /tmp/blockstack-core && ./setup.py build && ./setup.py install 
 cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py install
 
-# set up node 
+# set up node
 npm install -g babel
 npm install -g browserify
 
