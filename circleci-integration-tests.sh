@@ -4,15 +4,6 @@ BLOCKSTACK_BRANCH="rc-0.14.2"
 
 test -d /home/ubuntu/blockstack.js || exit 1
 
-ls -al .
-ls -al /home/ubuntu
-ls -al /home/ubuntu/blockstack.js
-
-sudo mkdir -p /usr/share/node_modules
-test -d /usr/share/node_modules/blockstack && rm -rf /usr/share/node_modules/blockstack
-sudo cp -a /home/ubuntu/blockstack.js /usr/share/node_modules/blockstack
-ls -al /usr/share/node_modules/blockstack
-
 # get bitcoind
 sudo add-apt-repository -y ppa:bitcoin/bitcoin || exit 1
 sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys F76221572C52609D
@@ -43,6 +34,13 @@ cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py inst
 # set up node
 npm install -g babel
 npm install -g browserify
+
+ls -al /usr/share/node_modules/
+ls -al /usr/share/node_modules/blockstack
+
+sudo mkdir -p /usr/share/node_modules
+test -d /usr/share/node_modules/blockstack && rm -rf /usr/share/node_modules/blockstack
+sudo cp -a /home/ubuntu/blockstack.js /usr/share/node_modules/blockstack
 
 # run the relevant integration tests
 blockstack-test-scenario blockstack_integration_tests.scenarios.name_preorder_register_portal_auth || exit 1
