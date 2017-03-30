@@ -16,13 +16,15 @@ pip install --upgrade cryptography
 pip install --upgrade scrypt
 pip install --upgrade fastecdsa
 
-# install Blockstack and integration tests
+# fetch blockstack core and integration tests
 git clone https://github.com/blockstack/blockstack-core /tmp/blockstack-core
 cd /tmp/blockstack-core && git checkout "$BLOCKSTACK_BRANCH"
 
+# install blockstack core and integration tests
 cd /tmp/blockstack-core && ./setup.py build && ./setup.py install 
 cd /tmp/blockstack-core/integration_tests && ./setup.py build && ./setup.py install
 
+# set up node
 npm install -g babel
 npm install -g browserify
 
