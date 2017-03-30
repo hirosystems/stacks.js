@@ -1,7 +1,7 @@
 #!/bin/sh
 
 BLOCKSTACK_BRANCH="rc-0.14.2"
-BLOCKSTACK_JS_BRANCH="v0.6-core-auth"
+BLOCKSTACK_JS_BRANCH="develop-core-auth"
 
 # get bitcoind
 sudo add-apt-repository -y ppa:bitcoin/bitcoin || exit 1
