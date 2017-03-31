@@ -1,6 +1,9 @@
 {
   "extends": "airbnb",
   "rules": {
-    "semi": [2, "never"]
+    "semi": [2, "never"],
+    "no-param-reassign": 0,
+    "no-else-return": 0,
+    "object-shorthand": [2, "consistent"]
   },
 }
