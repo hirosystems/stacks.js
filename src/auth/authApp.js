@@ -1,38 +1,33 @@
-'use strict'
-
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { verifyAuthResponse } from './authMessages'
 import protocolCheck from 'custom-protocol-detection'
-
-const BLOCKSTACK_HANDLER = "blockstack"
-const BLOCKSTACK_STORAGE_LABEL = "blockstack"
-const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
+import { BLOCKSTACK_HANDLER, BLOCKSTACK_STORAGE_LABEL, DEFAULT_BLOCKSTACK_HOST } from './authConstants'
+import { verifyAuthResponse } from './authMessages'
 
 export function isUserSignedIn() {
-  return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false
+  return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) !== null
 }
 
 export function redirectUserToSignIn(authRequest,
-                                     blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
-  const protocolURI = BLOCKSTACK_HANDLER + ":" + authRequest
-  const httpsURI = blockstackIDHost + "?authRequest=" + authRequest
+  blockstackIDHost = DEFAULT_BLOCKSTACK_HOST) {
+  const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
+  const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
   protocolCheck(protocolURI, () => {
-    console.log('protocol handler not detected')
+    // console.log('protocol handler not detected')
     window.location = httpsURI
   }, () => {
-    console.log('protocol handler detected')
+    // console.log('protocol handler detected')
   })
 }
 
 export function getAuthResponseToken() {
-  const queryDict = queryString.parse(location.search)
+  const queryDict = queryString.parse(window.location.search)
   return queryDict.authResponse ? queryDict.authResponse : null
 }
 
 export function isSignInPending() {
-  return getAuthResponseToken() ? true : false
+  return getAuthResponseToken() !== null
 }
 
 export function signUserIn(callbackFunction) {
@@ -43,7 +38,7 @@ export function signUserIn(callbackFunction) {
     const userData = {
       username: tokenPayload.username,
       profile: tokenPayload.profile,
-      authResponseToken: authResponseToken
+      authResponseToken: authResponseToken,
     }
     window.localStorage.setItem(
       BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))

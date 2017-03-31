@@ -1,20 +1,29 @@
-'use strict'
-
 export {
-  isUserSignedIn, redirectUserToSignIn, getAuthResponseToken, isSignInPending,
-  signUserIn, loadUserData, signUserOut
+  isUserSignedIn,
+  redirectUserToSignIn,
+  getAuthResponseToken,
+  isSignInPending,
+  signUserIn,
+  loadUserData,
+  signUserOut,
 } from './authApp'
+export { makeAuthRequest, makeAuthResponse } from './authMessages'
 export {
-  makeAuthRequest, makeAuthResponse
-} from './authMessages'
-export {
-  getAuthRequestFromURL, fetchAppManifest, redirectUserToApp
+  getAuthRequestFromURL,
+  fetchAppManifest,
+  redirectUserToApp,
 } from './authProvider'
 export {
-  makeCoreSessionRequest, sendCoreSessionRequest, getCoreSession
+  makeCoreSessionRequest,
+  sendCoreSessionRequest,
+  getCoreSession,
 } from './authSession'
 export {
-  verifyAuthRequest, verifyAuthResponse,
-  isExpirationDateValid, isIssuanceDateValid, doPublicKeysMatchUsername,
-  doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys
+  verifyAuthRequest,
+  verifyAuthResponse,
+  isExpirationDateValid,
+  isIssuanceDateValid,
+  doPublicKeysMatchUsername,
+  doPublicKeysMatchIssuer,
+  doSignaturesMatchPublicKeys,
 } from './authVerification'
