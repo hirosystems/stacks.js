@@ -1,5 +1,7 @@
 # Blockstack Auth
 
+SSO and authentication without 3rd parties or remote servers
+
 * [Quickstart](#quickstart)
 * [Operations](#operations)
 * [Examples](#examples)
