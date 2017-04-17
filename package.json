@@ -6,14 +6,13 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
-    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; rm -rf tests/storageTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib; babel --presets es2015 tests/storageTests/src -d tests/storageTests/lib",
+    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
     "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js",
-    "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
-    "integration-test-storage": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/storageTests/lib/index.js"
+    "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js"
   },
   "repository": {
     "type": "git",
