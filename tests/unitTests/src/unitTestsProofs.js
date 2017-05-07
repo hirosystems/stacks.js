@@ -69,6 +69,7 @@ export function runProofServicesUnitTests() {
     t.plan(6)
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       {
+        service: 'facebook',
         proof_url: "https://www.facebook.com/navalr/posts/10152190734077261",
         identifier: "navalr"
       }),
@@ -76,6 +77,7 @@ export function runProofServicesUnitTests() {
       "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       {
+        service: 'facebook',
         proof_url: "https://facebook.com/navalr/posts/10152190734077261",
         identifier: "navalr"
       }),
@@ -83,6 +85,7 @@ export function runProofServicesUnitTests() {
       "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       {
+        service: 'facebook',
         proof_url: "https://www.facebook.com/larrysalibra/posts/10100341028448093",
         identifier: "larrysalibra"
       }),
@@ -90,6 +93,7 @@ export function runProofServicesUnitTests() {
       "Facebook URL should be normalized")
     t.notEqual(profileServices.facebook.normalizeFacebookUrl(
       {
+        service: 'facebook',
         proof_url: "https://www.facebook.com/larry.salibra/posts/10100341028448093",
         identifier: "larry.salibra"
       }),
@@ -97,6 +101,7 @@ export function runProofServicesUnitTests() {
       "Facebook URL should be normalized")
     t.notEqual(profileServices.facebook.normalizeFacebookUrl(
       {
+        service: 'facebook',
         proof_url: "https://facebook.com/larry.salibra/posts/10100341028448093",
         identifier: "larry.salibra"
       }),
@@ -104,6 +109,7 @@ export function runProofServicesUnitTests() {
       "Facebook URL should be normalized")
     t.equal(profileServices.facebook.normalizeFacebookUrl(
       {
+        service: 'facebook',
         proof_url: "https://facebook.com/larrysalibra/posts/10100341028448093",
         identifier: "larrysalibra"
       }),
@@ -112,7 +118,7 @@ export function runProofServicesUnitTests() {
   })
 
   test('get proof url', (t) => {
-    t.plan(4)
+    t.plan(7)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       "https://www.facebook.com/navalr/posts/10152190734077261",
       "Facebook proof URL should match reference")
@@ -125,6 +131,30 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.larry[0]),
       "https://www.facebook.com/larry.salibra/posts/10100341028448093",
       "Facebook proof URL should match reference")
+
+    t.throws(() => {
+      const notLarry = Object.assign({},
+        sampleProofs.larry[0], {
+          proof_url: 'https://www.facebook.com/not.larry/posts/10100341028448093'
+        })
+      profileServices.facebook.getProofUrl(notLarry)
+    }, /Error/, 'Not having claimed account identifier in Facebook proof URL should throw exception')
+
+    t.throws(() => {
+      const notNavalTwitter = Object.assign({},
+        sampleProofs.naval[0], {
+          proof_url: 'https://twitter.com/not_naval/status/486609266212499456'
+        })
+      profileServices.twitter.getProofUrl(notNavalTwitter)
+    }, /Error/, 'Not having claimed account identifier in Twitter proof URL should throw exception')
+
+    t.throws(() => {
+      const notNavalGithub = Object.assign({},
+        sampleProofs.naval[2], {
+          proof_url: 'https://gist.github.com/not_naval/f31a74054f859ec0ac6a'
+        })
+      profileServices.github.getProofUrl(notNavalGithub)
+    }, /Error/, 'Not having claimed account identifier in Github proof URL should throw exception')
   })
 }
 

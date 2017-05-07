@@ -4,7 +4,7 @@ import { Service } from "./service"
 
 class Facebook extends Service {
   static getBaseUrls() {
-    const baseUrls = ["https://facebook.com/", "https://www.facebook.com"]
+    const baseUrls = ["https://facebook.com/", "https://www.facebook.com/"]
     return baseUrls
   }
 
