@@ -20,7 +20,6 @@ class Facebook extends Service {
       proofUrl = "https://www.facebook.com" + tokens[1]
     }
     let tokens = proofUrl.split("https://www.facebook.com/")[1].split("/posts/")
-    let username = tokens[0].replace(".", "")
     let postId = tokens[1]
     proofUrl = "https://www.facebook.com/" + username + "/posts/" + postId
     return proofUrl
