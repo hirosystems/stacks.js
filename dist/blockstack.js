@@ -257,11 +257,9 @@ var _url = require('url');
 
 var _url2 = _interopRequireDefault(_url);
 
-var _schemaInspector = require('schema-inspector');
-
-var _schemaInspector2 = _interopRequireDefault(_schemaInspector);
-
 var _jsontokens = require('jsontokens');
+
+var _authProvider = require('./authProvider');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -269,29 +267,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Create an authentication token to be sent to the Core API server
  * in order to generate a Core session JWT.
  *
- * @param app_domain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
- * @param app_methods (Array) The list of API methods this application will need.
- * @param app_privkey (String) The application-specific private key
- * @param blockchain_ids (Array) Optional; if given, this is the list of blockchain IDs for which this session identifies.
+ * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
+ * @param appMethods (Array) The list of API methods this application will need.
+ * @param appPrivateKey (String) The application-specific private key
+ * @param blockchainIds (Array) Optional; if given, this is the list of blockchain
+ *        IDs for which this session identifies.
  *
  * Returns a JWT signed by the app's private key
  */
-function makeCoreSessionRequest(app_domain, app_methods, app_privkey) {
-  var blockchain_ids = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
+  var blockchainIds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-  var app_public_key = _jsontokens.SECP256K1Client.derivePublicKey(app_privkey);
+  var appPublicKey = _jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey);
   var authBody = {
-    'app_domain': app_domain,
-    'methods': app_methods,
-    'app_public_key': app_public_key
+    app_domain: appDomain,
+    methods: appMethods,
+    app_public_key: appPublicKey
   };
 
-  if (blockchain_ids) {
-    authBody['blockchain_ids'] = blockchain_ids;
+  if (blockchainIds) {
+    authBody.blockchain_ids = blockchainIds;
   }
 
   // make token
-  var tokenSigner = new _jsontokens.TokenSigner('ES256k', app_privkey);
+  var tokenSigner = new _jsontokens.TokenSigner('ES256k', appDomain);
   var token = tokenSigner.sign(authBody);
 
   return token;
@@ -300,54 +299,54 @@ function makeCoreSessionRequest(app_domain, app_methods, app_privkey) {
 /*
  * Send Core a request for a session token.
  *
- * @param core_auth_request (String) a signed JWT encoding the authentication request
- * @param api_password (String) the API password for Core
+ * @param coreAuthRequest (String) a signed JWT encoding the authentication request
+ * @param apiPassword (String) the API password for Core
  *
  * Returns a JWT signed with the Core API server's private key that authorizes the bearer
  * to carry out the requested operations.
  */
-function sendCoreSessionRequest(core_host, core_port, core_auth_request, api_password) {
+function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
   return new Promise(function (resolve, reject) {
-    if (!api_password) {
-      reject("Missing API password");
+    if (!apiPassword) {
+      reject('Missing API password');
       return null;
     }
 
     var options = {
-      'method': 'GET',
-      'host': core_host,
-      'port': core_port,
-      'path': '/v1/auth?authRequest=' + core_auth_request,
-      'headers': {
-        'Authorization': 'bearer ' + api_password
+      method: 'GET',
+      host: coreHost,
+      port: corePort,
+      path: '/v1/auth?authRequest=' + coreAuthRequest,
+      headers: {
+        Authorization: 'bearer ' + apiPassword
       }
     };
 
     var req = _http2.default.request(options, function (response) {
-      var strbuf = [];
+      var stringBuffer = [];
       response.on('data', function (chunk) {
-        strbuf.push(chunk);
+        stringBuffer.push(chunk);
       });
 
       response.on('end', function () {
-        if (response.statusCode != 200) {
+        if (response.statusCode !== 200) {
           reject('HTTP status ' + response.statusCode);
           return null;
         }
 
-        var str = Buffer.concat(strbuf).toString();
+        var str = Buffer.concat(stringBuffer).toString();
         var resp = null;
         try {
           resp = JSON.parse(str);
         } catch (e) {
           console.log(e.stack);
-          reject("Invalid Core response: not JSON");
+          reject('Invalid Core response: not JSON');
           return null;
         }
 
         var token = resp.token;
         if (!token) {
-          reject("Failed to get Core session token");
+          reject('Failed to get Core session token');
           return null;
         }
 
@@ -360,64 +359,56 @@ function sendCoreSessionRequest(core_host, core_port, core_auth_request, api_pas
 }
 
 /*
- * Get a core session token.  Generate an auth request, sign it, send it to Core, and get back a session token.
+ * Get a core session token.  Generate an auth request, sign it, send it to Core,
+ * and get back a session token.
  *
- * @param core_host (String) Core API server's hostname
- * @param core_port (Integer) Core API server's port number
- * @param app_privkey (String) Application's private key
- * @param user_blockchain_id (String) Optional; blockchain ID of the user signing in.
+ * @param coreHost (String) Core API server's hostname
+ * @param corePort (Integer) Core API server's port number
+ * @param appPrivateKey (String) Application's private key
+ * @param userBlockchainId (String) Optional; blockchain ID of the user signing in.
  *
  * Returns a Promise that resolves to a Core session token.
  */
-function getCoreSession(core_host, core_port, api_password, app_privkey) {
-  var user_blockchain_id = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-  var auth_request = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
+  var userBlockchainId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
-
-  if (!auth_request) {
+  if (!authRequest) {
     // try from url?
-    auth_request = getAuthRequestFromURL();
+    authRequest = (0, _authProvider.getAuthRequestFromURL)();
   }
 
-  if (!auth_request) {
-    return new Promise(function (resolve, reject) {
-      reject("No authRequest in URL query string");
-    });
+  if (!authRequest) {
+    return Promise.reject('No authRequest in URL query string');
   }
 
   var payload = null;
   try {
-    var auth_request_obj = (0, _jsontokens.decodeToken)(auth_request);
-    if (!auth_request_obj) {
-      return new Promise(function (resolve, reject) {
-        reject("Invalid authRequest in URL query string");
-      });
+    var authRequestObject = (0, _jsontokens.decodeToken)(authRequest);
+    if (!authRequestObject) {
+      return Promise.reject('Invalid authRequest in URL query string');
     }
-    if (!auth_request_obj.payload) {
-      return new Promise(function (resolve, reject) {
-        reject("Invalid authRequest in URL query string");
-      });
+    if (!authRequestObject.payload) {
+      return Promise.reject('Invalid authRequest in URL query string');
     }
-    payload = auth_request_obj.payload;
+    payload = authRequestObject.payload;
   } catch (e) {
-    console.log(e.stack);
-    return new Promise(function (resolve, reject) {
-      reject("Failed to parse authRequest in URL");
-    });
+    console.error(e.stack);
+    return Promise.reject('Failed to parse authRequest in URL');
   }
 
-  var app_domain = _url2.default.parse(payload.domain_name).host;
-  var app_methods = payload.scopes;
-  var blockchain_ids = null;
-  if (user_blockchain_id) {
-    blockchain_ids = [user_blockchain_id];
+  var appDomain = _url2.default.parse(payload.domain_name).host;
+  var appMethods = payload.scopes;
+  var blockchainIds = null;
+  if (userBlockchainId) {
+    blockchainIds = [userBlockchainId];
   }
 
-  var core_auth_request = makeCoreSessionRequest(app_domain, app_methods, app_privkey, blockchain_ids);
-  return sendCoreSessionRequest(core_host, core_port, core_auth_request, api_password);
+  var coreAuthRequest = makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainIds);
+  return sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword);
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":108,"http":257,"jsontokens":170,"schema-inspector":246,"url":268}],5:[function(require,module,exports){
+},{"./authProvider":3,"buffer":108,"http":257,"jsontokens":170,"url":268}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
