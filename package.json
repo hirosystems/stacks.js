@@ -1,18 +1,19 @@
 {
   "name": "blockstack",
-  "version": "0.2.22",
+  "version": "0.3.0",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
     "compile": "rm -rf lib; babel --presets es2015 src -d lib",
-    "compile-tests": "rm -rf tests/unitTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib",
+    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run compile",
     "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
-    "test": "npm run compile; npm run compile-tests; npm run browserify-tests; node ./tests/unitTests/lib/index.js",
+    "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js",
+    "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
     "build": "npm run compile; npm run browserify"
   },
   "repository": {
@@ -62,6 +63,9 @@
     },
     {
       "name": "Larry Salibra"
+    },
+    {
+      "name": "Jude Nelson"
     }
   ],
   "devDependencies": {
@@ -83,17 +87,20 @@
     "tape-promise": "^2.0.1"
   },
   "dependencies": {
+    "ajv": "^4.11.5",
     "bitcoinjs-lib": "^2.3.0",
     "custom-protocol-detection": "^1.0.0",
     "ecurve": "^1.0.5",
     "elliptic": "^6.4.0",
     "es6-promise": "^4.1.0",
     "isomorphic-fetch": "^2.2.1",
-    "jsontokens": "^0.7.5",
+    "jsontokens": "^0.7.6",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
     "request": "^2.79.0",
+    "sprintf-js": "^1.0.3",
     "schema-inspector": "^1.6.4",
+    "uuid": "^3.0.1",
     "validator": "^7.0.0",
     "zone-file": "^0.2.2"
   }
