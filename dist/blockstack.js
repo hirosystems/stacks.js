@@ -465,7 +465,7 @@ function doPublicKeysMatchIssuer(token) {
 }
 
 function doPublicKeysMatchUsername(token, nameLookupURL) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     var payload = (0, _jsontokens.decodeToken)(token).payload;
 
     if (!payload.username) {
@@ -484,7 +484,7 @@ function doPublicKeysMatchUsername(token, nameLookupURL) {
     }
 
     var username = payload.username;
-    var url = nameLookupURL.replace(/\/$/, "") + '/' + username;
+    var url = nameLookupURL.replace(/\/$/, '') + '/' + username;
 
     try {
       fetch(url).then(function (response) {
@@ -503,7 +503,7 @@ function doPublicKeysMatchUsername(token, nameLookupURL) {
         } else {
           resolve(false);
         }
-      }).catch(function (e) {
+      }).catch(function () {
         resolve(false);
       });
     } catch (e) {
@@ -515,7 +515,7 @@ function doPublicKeysMatchUsername(token, nameLookupURL) {
 function isIssuanceDateValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   if (payload.iat) {
-    if (typeof payload.iat !== "number") {
+    if (typeof payload.iat !== 'number') {
       return false;
     }
     var issuedAt = new Date(payload.iat * 1000); // JWT times are in seconds
@@ -532,7 +532,7 @@ function isIssuanceDateValid(token) {
 function isExpirationDateValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   if (payload.exp) {
-    if (typeof payload.exp !== "number") {
+    if (typeof payload.exp !== 'number') {
       return false;
     }
     var expiresAt = new Date(payload.exp * 1000); // JWT times are in seconds
@@ -549,7 +549,7 @@ function isExpirationDateValid(token) {
 function verifyAuthRequest(token) {
   return new Promise(function (resolve, reject) {
     if ((0, _jsontokens.decodeToken)(token).header.alg === 'none') {
-      reject("Token must be signed in order to be verified");
+      reject('Token must be signed in order to be verified');
     }
 
     Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token)]).then(function (values) {
@@ -564,7 +564,8 @@ function verifyAuthRequest(token) {
 
 function verifyAuthResponse(token, nameLookupURL) {
   return new Promise(function (resolve, reject) {
-    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token)]).then(function (values) {
+    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
+      console.log(values);
       if (values.every(Boolean)) {
         resolve(true);
       } else {

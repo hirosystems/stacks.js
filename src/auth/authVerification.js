@@ -1,5 +1,3 @@
-'use strict'
-
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import { getAddressFromDID, publicKeyToAddress } from '../index'
 
@@ -16,7 +14,7 @@ export function doSignaturesMatchPublicKeys(token) {
       } else {
         return false
       }
-    } catch(e) {
+    } catch (e) {
       return false
     }
   } else {
@@ -42,7 +40,7 @@ export function doPublicKeysMatchIssuer(token) {
 }
 
 export function doPublicKeysMatchUsername(token, nameLookupURL) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const payload = decodeToken(token).payload
 
     if (!payload.username) {
@@ -61,7 +59,7 @@ export function doPublicKeysMatchUsername(token, nameLookupURL) {
     }
 
     const username = payload.username
-    const url = nameLookupURL.replace(/\/$/, "") + '/' + username
+    const url = `${nameLookupURL.replace(/\/$/, '')}/${username}`
 
     try {
       fetch(url)
@@ -80,20 +78,19 @@ export function doPublicKeysMatchUsername(token, nameLookupURL) {
             resolve(false)
           }
         })
-        .catch((e) => {
+        .catch(() => {
           resolve(false)
         })
-    } catch(e) {
+    } catch (e) {
       resolve(false)
     }
-
   })
 }
 
 export function isIssuanceDateValid(token) {
   const payload = decodeToken(token).payload
   if (payload.iat) {
-    if (typeof payload.iat !== "number") {
+    if (typeof payload.iat !== 'number') {
       return false
     }
     const issuedAt = new Date(payload.iat * 1000) // JWT times are in seconds
@@ -110,7 +107,7 @@ export function isIssuanceDateValid(token) {
 export function isExpirationDateValid(token) {
   const payload = decodeToken(token).payload
   if (payload.exp) {
-    if (typeof payload.exp !== "number") {
+    if (typeof payload.exp !== 'number') {
       return false
     }
     const expiresAt = new Date(payload.exp * 1000) // JWT times are in seconds
@@ -127,7 +124,7 @@ export function isExpirationDateValid(token) {
 export function verifyAuthRequest(token) {
   return new Promise((resolve, reject) => {
     if (decodeToken(token).header.alg === 'none') {
-      reject("Token must be signed in order to be verified")
+      reject('Token must be signed in order to be verified')
     }
 
     Promise.all([
@@ -146,14 +143,15 @@ export function verifyAuthRequest(token) {
 }
 
 export function verifyAuthResponse(token, nameLookupURL) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     Promise.all([
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
       doPublicKeysMatchIssuer(token),
-      doPublicKeysMatchUsername(token)
+      doPublicKeysMatchUsername(token, nameLookupURL)
     ]).then(values => {
+      console.log(values)
       if (values.every(Boolean)) {
         resolve(true)
       } else {
