@@ -17,7 +17,7 @@ const authRequest = makeAuthRequest(clientPrivateKey, 'https://www.foo.com',
 'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
 ['store_read', 'store_write', 'store_admin'])
 
-getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', authRequest)
+getCoreSession('localhost', 16268, apiPassword, appPrivateKey, authRequest, 'judecn.id')
 .then((session) => {
   console.log('success!')
   console.log(session)

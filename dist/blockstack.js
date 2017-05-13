@@ -356,17 +356,11 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
  *
  * Returns a Promise that resolves to a Core session token.
  */
-function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
-  var userBlockchainId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-  var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, authRequest) {
+  var userBlockchainId = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
   if (!authRequest) {
-    // try from url?
-    authRequest = (0, _authProvider.getAuthRequestFromURL)();
-  }
-
-  if (!authRequest) {
-    return Promise.reject('No authRequest in URL query string');
+    return Promise.reject('No authRequest provided');
   }
 
   var payload = null;

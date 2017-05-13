@@ -97,15 +97,10 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
  *
  * Returns a Promise that resolves to a Core session token.
  */
-export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
-                               userBlockchainId = null, authRequest = null) {
+export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, authRequest,
+                               userBlockchainId = null) {
   if (!authRequest) {
-       // try from url?
-    authRequest = getAuthRequestFromURL()
-  }
-
-  if (!authRequest) {
-    return Promise.reject('No authRequest in URL query string')
+    return Promise.reject('No authRequest provided')
   }
 
   let payload = null
