@@ -1,5 +1,5 @@
 'use strict'
-
+export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
  * Time
  */

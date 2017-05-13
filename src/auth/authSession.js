@@ -1,8 +1,7 @@
-import http from 'http'
 import urlparse from 'url'
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
 import { getAuthRequestFromURL } from './authProvider'
-
+import fetch from 'isomorphic-fetch'
 /*
  * Create an authentication token to be sent to the Core API server
  * in order to generate a Core session JWT.
@@ -29,7 +28,7 @@ export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey,
   }
 
    // make token
-  const tokenSigner = new TokenSigner('ES256k', appDomain)
+  const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
   const token = tokenSigner.sign(authBody)
 
   return token
@@ -54,48 +53,35 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
     }
 
     const options = {
-      method: 'GET',
-      host: coreHost,
-      port: corePort,
-      path: `/v1/auth?authRequest=${coreAuthRequest}`,
       headers: {
         Authorization: `bearer ${apiPassword}`
       }
     }
 
-    const req = http.request(options,  (response) => {
-      const stringBuffer = []
-      response.on('data', (chunk) => {
-        stringBuffer.push(chunk)
-      })
+    const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
 
-      response.on('end', () => {
-        if (response.statusCode !== 200) {
-          reject(`HTTP status ${response.statusCode}`)
-          return null
-        }
-
-        const str = Buffer.concat(stringBuffer).toString()
-        let resp = null
-        try {
-          resp = JSON.parse(str)
-        } catch (e) {
-          console.log(e.stack)
-          reject('Invalid Core response: not JSON')
-          return null
-        }
-
-        const token = resp.token
-        if (!token) {
-          reject('Failed to get Core session token')
-          return null
-        }
-        
-        resolve(token)
-      })
+    return fetch(url, options)
+    .then(response => {
+      if (!response.ok) {
+        reject('HTTP status not OK')
+        return null
+      }
+      return response.text()
     })
-
-    req.end()
+    .then(responseText => JSON.parse(responseText))
+    .then(responseJson => {
+      const token = responseJson.token
+      if (!token) {
+        reject('Failed to get Core session token')
+        return null
+      }
+      resolve(token)
+      return token
+    })
+    .catch(error => {
+      console.error(error)
+      reject('Invalid Core response: not JSON')
+    })
   })
 }
 
@@ -123,8 +109,9 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
   }
 
   let payload = null
+  let authRequestObject = null
   try {
-    const authRequestObject = decodeToken(authRequest)
+    authRequestObject = decodeToken(authRequest)
     if (!authRequestObject) {
       return Promise.reject('Invalid authRequest in URL query string')
     }
@@ -137,7 +124,10 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
     return Promise.reject('Failed to parse authRequest in URL')
   }
 
-  const appDomain = urlparse.parse(payload.domain_name).host
+  const appDomain = payload.domain_name
+  if (!appDomain) {
+    return Promise.reject('No domain_name in authRequest')
+  }
   const appMethods = payload.scopes
   let blockchainIds = null
   if (userBlockchainId) {

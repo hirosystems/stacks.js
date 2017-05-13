@@ -4,8 +4,8 @@ import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authMessages'
 import protocolCheck from 'custom-protocol-detection'
+import { BLOCKSTACK_HANDLER } from '../utils'
 
-const BLOCKSTACK_HANDLER = "blockstack"
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"
 const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
 

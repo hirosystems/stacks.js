@@ -3,11 +3,12 @@
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { updateQueryStringParameter } from '../index'
+import { BLOCKSTACK_HANDLER } from '../utils'
 
 export function getAuthRequestFromURL() {
   const queryDict = queryString.parse(location.search)
   if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
-    return queryDict.authRequest.split(BLOCKSTACK_HANDLER + ':').join('')
+    return queryDict.authRequest.split(`${BLOCKSTACK_HANDLER}:`).join('')
   } else {
     return null
   }
