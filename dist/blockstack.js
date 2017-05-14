@@ -40,13 +40,23 @@ function redirectUserToSignIn(authRequest) {
 
   var protocolURI = _utils.BLOCKSTACK_HANDLER + ":" + authRequest;
   var httpsURI = blockstackIDHost + "?authRequest=" + authRequest;
+  function successCallback() {
+    console.log('protocol handler detected');
+    // protocolCheck should open the link for us
+  }
 
-  (0, _customProtocolDetection2.default)(protocolURI, function () {
+  function failCallback() {
     console.log('protocol handler not detected');
     window.location = httpsURI;
-  }, function () {
-    console.log('protocol handler detected');
-  });
+  }
+
+  function unsupportedBrowserCallback() {
+    // Safari is unsupported by protocolCheck
+    console.log('can not detect custom protocols on this browser');
+    window.location = protocolURI;
+  }
+
+  (0, _customProtocolDetection2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
 }
 
 function getAuthResponseToken() {
@@ -19480,7 +19490,7 @@ function openUriWithHiddenFrame(uri, failCb, successCb) {
 }
 
 function openUriWithTimeoutHack(uri, failCb, successCb) {
-    
+
     var timeout = setTimeout(function () {
         failCb();
         handler.remove();
@@ -19575,10 +19585,19 @@ function openUriWithMsLaunchUri(uri, failCb, successCb) {
 
 function checkBrowser() {
     var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+
+    function isSafari() {
+      var ua = navigator.userAgent.toLowerCase();
+      var re = new RegExp("safari");
+      var re2 = new RegExp("chrome");
+
+      return re.exec(ua) && !re2.exec(ua)
+    }
+
     return {
         isOpera   : isOpera,
         isFirefox : typeof InstallTrigger !== 'undefined',
-        isSafari  : Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0,
+        isSafari  : isSafari(),
         isChrome  : !!window.chrome && !isOpera,
         isIE      : /*@cc_on!@*/false || !!document.documentMode // At least IE6
     }
@@ -19602,7 +19621,7 @@ function getInternetExplorerVersion() {
     return rv;
 }
 
-module.exports = function(uri, failCb, successCb) {
+module.exports = function(uri, failCb, successCb, unsupportedCb) {
     function failCallback() {
         failCb && failCb();
     }
@@ -19611,20 +19630,31 @@ module.exports = function(uri, failCb, successCb) {
         successCb && successCb();
     }
 
+    function unsupportedCallback() {
+        if (unsupportedCb)
+          unsupportedCb();
+        else
+          failCallback();
+    }
+
     if (navigator.msLaunchUri) { //for IE and Edge in Win 8 and Win 10
+        console.log('openUriWithMsLaunchUri')
         openUriWithMsLaunchUri(uri, failCb, successCb);
     } else {
         var browser = checkBrowser();
 
         if (browser.isFirefox) {
+            console.log('openUriUsingFirefox')
             openUriUsingFirefox(uri, failCallback, successCallback);
         } else if (browser.isChrome) {
+            console.log('openUriWithTimeoutHack')
             openUriWithTimeoutHack(uri, failCallback, successCallback);
         } else if (browser.isIE) {
+            console.log('openUriUsingIEInOlderWindows')
             openUriUsingIEInOlderWindows(uri, failCallback, successCallback);
         } else {
-            //not supported, implement please
-            failCallback();
+            console.log('unsupported browser')
+            unsupportedCallback()
         }
     }
 }

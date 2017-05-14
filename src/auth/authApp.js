@@ -32,7 +32,7 @@ export function redirectUserToSignIn(authRequest,
     window.location = protocolURI
   }
 
-  protocolCheck(protocolURI, successCallback, failCallback, unsupportedBrowserCallback)
+  protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
 }
 
 export function getAuthResponseToken() {
