@@ -17,13 +17,22 @@ export function redirectUserToSignIn(authRequest,
                                      blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
   const protocolURI = BLOCKSTACK_HANDLER + ":" + authRequest
   const httpsURI = blockstackIDHost + "?authRequest=" + authRequest
+  function successCallback() {
+    console.log('protocol handler detected')
+    // protocolCheck should open the link for us
+  }
 
-  protocolCheck(protocolURI, () => {
+  function failCallback() {
     console.log('protocol handler not detected')
     window.location = httpsURI
-  }, () => {
-    console.log('protocol handler detected')
-  })
+  }
+
+  function unsupportedBrowserCallback() { // Safari is unsupported by protocolCheck
+    console.log('can not detect custom protocols on this browser')
+    window.location = protocolURI
+  }
+
+  protocolCheck(protocolURI, successCallback, failCallback, unsupportedBrowserCallback)
 }
 
 export function getAuthResponseToken() {
