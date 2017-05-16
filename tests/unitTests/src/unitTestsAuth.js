@@ -28,9 +28,16 @@ export function runAuthTests() {
   const nameLookupURL = 'https://explorer-api.appartisan.com/get_name_blockchain_record/'
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
-    t.plan(9)
+    t.plan(11)
 
-    const authRequest = makeAuthRequest(privateKey, 'localhost:3000')
+    global.window = {
+      location: {
+        origin: 'http://localhost:3000',
+        hostname: 'localhost',
+        host: 'localhost'
+      }
+    }
+    const authRequest = makeAuthRequest(privateKey, 'localhost')
     t.ok(authRequest, 'auth request should have been created')
     // console.log(authRequest)
 
@@ -40,7 +47,11 @@ export function runAuthTests() {
 
     const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
+    const domainName = 'localhost'
+    const origin = 'http://localhost:3000'
     t.equal(decodedToken.payload.iss, referenceDID, 'auth request issuer should include the public key')
+    t.equal(decodedToken.payload.domain_name, domainName, 'auth request should include domain name ')
+    t.notEqual(decodedToken.payload.domain_name, origin, 'auth request domain_name should not be origin')
 
     t.equal(JSON.stringify(decodedToken.payload.scopes), '[]', 'auth request scopes should be an empty list')
 

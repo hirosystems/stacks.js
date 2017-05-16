@@ -13,7 +13,7 @@ const clientPrivateKey = '8b13483d65e55eb2184ff7c9978379eff2fae7ad40da09ae4e3e5c
 const appPrivateKey = '99c01d085f7914e4725ffa3160df583c37cc27e1e7fd48f2d6e17d4a9a4ba55e'
 const apiPassword = 'blockstack_integration_test_api_password'
 
-const authRequest = makeAuthRequest(clientPrivateKey, 'https://www.foo.com',
+const authRequest = makeAuthRequest(clientPrivateKey, 'www.foo.com',
 'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
 ['store_read', 'store_write', 'store_admin'])
 

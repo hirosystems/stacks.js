@@ -21,10 +21,10 @@ export function makeAuthRequest(privateKey, domain_name, manifestURI=null,
     throw new Error("Invalid app domain name")
   }
   if (manifestURI === null) {
-    manifestURI = domain_name + '/manifest.json'
+    manifestURI = `${window.location.origin}/manifest.json`
   }
   if (redirectURI === null) {
-    redirectURI = domain_name
+    redirectURI = window.location
   }
 
   /* Create the payload */

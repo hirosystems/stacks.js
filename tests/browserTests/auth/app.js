@@ -1,6 +1,6 @@
-document.addEventListener("DOMContentLoaded", function(event) { 
+document.addEventListener("DOMContentLoaded", function(event) {
   document.getElementById('signin-button').addEventListener('click', function() {
-    var authRequest = blockstack.makeAuthRequest(null, window.location.origin)
+    var authRequest = blockstack.makeAuthRequest(null, window.location.hostname)
     blockstack.redirectUserToSignIn(authRequest)
   })
   document.getElementById('signout-button').addEventListener('click', function() {
