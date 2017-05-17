@@ -124,7 +124,7 @@ function makeAuthRequest(privateKey, domain_name) {
     manifestURI = window.location.origin + '/manifest.json';
   }
   if (redirectURI === null) {
-    redirectURI = window.location;
+    redirectURI = window.location.href;
   }
 
   /* Create the payload */
@@ -244,6 +244,7 @@ function fetchAppManifest(authRequest) {
 function redirectUserToApp(authRequest, authResponse) {
   var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
   var redirectURI = payload.redirect_uri;
+  console.log(redirectURI);
   if (redirectURI) {
     redirectURI = (0, _index.updateQueryStringParameter)(redirectURI, 'authResponse', authResponse);
   } else {

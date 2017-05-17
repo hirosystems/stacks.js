@@ -43,6 +43,7 @@ export function fetchAppManifest(authRequest) {
 export function redirectUserToApp(authRequest, authResponse) {
   const payload = decodeToken(authRequest).payload
   let redirectURI = payload.redirect_uri
+  console.log(redirectURI)
   if (redirectURI) {
     redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
   } else {

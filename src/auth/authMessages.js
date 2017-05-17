@@ -24,7 +24,7 @@ export function makeAuthRequest(privateKey, domain_name, manifestURI=null,
     manifestURI = `${window.location.origin}/manifest.json`
   }
   if (redirectURI === null) {
-    redirectURI = window.location
+    redirectURI = window.location.href
   }
 
   /* Create the payload */
