@@ -2,7 +2,7 @@
 
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { verifyAuthResponse } from './authMessages'
+import { verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection'
 import { BLOCKSTACK_HANDLER } from '../utils'
 
