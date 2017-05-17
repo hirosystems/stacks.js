@@ -18,7 +18,7 @@ var _queryString2 = _interopRequireDefault(_queryString);
 
 var _jsontokens = require('jsontokens');
 
-var _authMessages = require('./authMessages');
+var _index = require('./index');
 
 var _customProtocolDetection = require('custom-protocol-detection');
 
@@ -71,7 +71,7 @@ function isSignInPending() {
 function signUserIn(callbackFunction) {
   var authResponseToken = getAuthResponseToken();
 
-  if ((0, _authMessages.verifyAuthResponse)(authResponseToken)) {
+  if ((0, _index.verifyAuthResponse)(authResponseToken)) {
     var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
     var userData = {
       username: tokenPayload.username,
@@ -94,7 +94,7 @@ function signUserOut(redirectURL) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL);
   window.location = redirectURL;
 }
-},{"../utils":28,"./authMessages":2,"custom-protocol-detection":117,"jsontokens":169,"query-string":227}],2:[function(require,module,exports){
+},{"../utils":28,"./index":6,"custom-protocol-detection":117,"jsontokens":169,"query-string":227}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -459,7 +459,9 @@ function doPublicKeysMatchIssuer(token) {
   return false;
 }
 
-function doPublicKeysMatchUsername(token, nameLookupURL) {
+function doPublicKeysMatchUsername(token) {
+  var nameLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/{name}';
+
   return new Promise(function (resolve) {
     var payload = (0, _jsontokens.decodeToken)(token).payload;
 

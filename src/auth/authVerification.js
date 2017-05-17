@@ -39,7 +39,8 @@ export function doPublicKeysMatchIssuer(token) {
   return false
 }
 
-export function doPublicKeysMatchUsername(token, nameLookupURL) {
+export function doPublicKeysMatchUsername(token,
+  nameLookupURL = 'https://core.blockstack.org/v1/names/{name}') {
   return new Promise((resolve) => {
     const payload = decodeToken(token).payload
 
