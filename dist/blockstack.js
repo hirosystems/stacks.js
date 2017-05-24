@@ -460,7 +460,7 @@ function doPublicKeysMatchIssuer(token) {
 }
 
 function doPublicKeysMatchUsername(token) {
-  var nameLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/{name}';
+  var nameLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
 
   return new Promise(function (resolve) {
     var payload = (0, _jsontokens.decodeToken)(token).payload;
