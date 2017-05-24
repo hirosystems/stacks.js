@@ -2,17 +2,12 @@
 
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { makeAuthRequest, verifyAuthResponse } from './authMessages'
-import { updateQueryStringParameter } from '../index'
+import { verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection'
+import { BLOCKSTACK_HANDLER } from '../utils'
 
-const BLOCKSTACK_HANDLER = "blockstack"
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"
 const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
-
-/**
- * For applications
- */
 
 export function isUserSignedIn() {
   return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false
@@ -22,13 +17,22 @@ export function redirectUserToSignIn(authRequest,
                                      blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
   const protocolURI = BLOCKSTACK_HANDLER + ":" + authRequest
   const httpsURI = blockstackIDHost + "?authRequest=" + authRequest
+  function successCallback() {
+    console.log('protocol handler detected')
+    // protocolCheck should open the link for us
+  }
 
-  protocolCheck(protocolURI, () => {
+  function failCallback() {
     console.log('protocol handler not detected')
     window.location = httpsURI
-  }, () => {
-    console.log('protocol handler detected')
-  })
+  }
+
+  function unsupportedBrowserCallback() { // Safari is unsupported by protocolCheck
+    console.log('can not detect custom protocols on this browser')
+    window.location = protocolURI
+  }
+
+  protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
 }
 
 export function getAuthResponseToken() {
@@ -66,54 +70,4 @@ export function loadUserData(callbackFunction) {
 export function signUserOut(redirectURL) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
   window.location = redirectURL
-}
-
-/**
- * For identity providers
- */
-
-export function getAuthRequestFromURL() {
-  const queryDict = queryString.parse(location.search)
-  if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
-    return queryDict.authRequest.split(BLOCKSTACK_HANDLER + ':').join('')
-  } else {
-    return null
-  }
-}
-
-export function fetchAppManifest(authRequest) {
-  return new Promise((resolve, reject) => {
-    if (!authRequest) {
-      reject("Invalid auth request")
-    } else {
-      const payload = decodeToken(authRequest).payload
-      const manifestURI = payload.manifest_uri
-      try {
-        fetch(manifestURI)
-          .then(response => response.text())
-          .then(responseText => JSON.parse(responseText))
-          .then(responseJSON => {
-            resolve(responseJSON)
-          })
-          .catch((e) => {
-            console.log(e.stack)
-            reject("URI request couldn't be completed")
-          })
-      } catch(e) {
-        console.log(e.stack)
-        reject("URI request couldn't be completed")
-      }
-    }
-  })
-}
-
-export function redirectUserToApp(authRequest, authResponse) {
-  const payload = decodeToken(authRequest).payload
-  let redirectURI = payload.redirect_uri
-  if (redirectURI) {
-    redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
-  } else {
-    throw new Error("Invalid redirect URI")
-  }
-  window.location = redirectURI
 }

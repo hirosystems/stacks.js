@@ -41,8 +41,9 @@ export class Service {
   static getProofUrl(proof) {
     let baseUrls = this.getBaseUrls()
     for(let i = 0; i < baseUrls.length; i++) {
-      if(proof.proof_url.startsWith(baseUrls[i]))
+      if(proof.proof_url.startsWith(`${baseUrls[i]}${proof.identifier}`)) {
         return proof.proof_url
+      }
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }

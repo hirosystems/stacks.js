@@ -1,5 +1,3 @@
-'use strict'
-
 export * from './auth'
 export * from './profiles'
 
@@ -12,5 +10,4 @@ export {
 export {
   nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter
 } from './utils'
-
 export { decodeToken } from 'jsontokens'
