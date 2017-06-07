@@ -8,6 +8,7 @@ export function makeProfileZoneFile(origin, tokenFileUrl) {
     throw new Error('Invalid token file url')
   }
 
+  const urlScheme = tokenFileUrl.split('://')[0]
   const urlParts = tokenFileUrl.split('://')[1].split('/')
   const domain = urlParts[0]
   const pathname = '/' + urlParts.slice(1).join('/')
@@ -20,7 +21,7 @@ export function makeProfileZoneFile(origin, tokenFileUrl) {
         "name": "_http._tcp",
         "priority": 10,
         "weight": 1,
-        "target": `${domain}${pathname}`
+        "target": `${urlScheme}://${domain}${pathname}`
       }
     ]
   }
