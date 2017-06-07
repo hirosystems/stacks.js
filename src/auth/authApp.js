@@ -3,7 +3,7 @@
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './index'
-import protocolCheck from 'custom-protocol-detection'
+import protocolCheck from 'custom-protocol-detection-blockstack'
 import { BLOCKSTACK_HANDLER } from '../utils'
 
 const BLOCKSTACK_STORAGE_LABEL = "blockstack"

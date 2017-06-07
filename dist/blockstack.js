@@ -20,9 +20,9 @@ var _jsontokens = require('jsontokens');
 
 var _index = require('./index');
 
-var _customProtocolDetection = require('custom-protocol-detection');
+var _customProtocolDetectionBlockstack = require('custom-protocol-detection-blockstack');
 
-var _customProtocolDetection2 = _interopRequireDefault(_customProtocolDetection);
+var _customProtocolDetectionBlockstack2 = _interopRequireDefault(_customProtocolDetectionBlockstack);
 
 var _utils = require('../utils');
 
@@ -56,7 +56,7 @@ function redirectUserToSignIn(authRequest) {
     window.location = protocolURI;
   }
 
-  (0, _customProtocolDetection2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
+  (0, _customProtocolDetectionBlockstack2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
 }
 
 function getAuthResponseToken() {
@@ -94,7 +94,7 @@ function signUserOut(redirectURL) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL);
   window.location = redirectURL;
 }
-},{"../utils":28,"./index":6,"custom-protocol-detection":117,"jsontokens":169,"query-string":227}],2:[function(require,module,exports){
+},{"../utils":28,"./index":6,"custom-protocol-detection-blockstack":117,"jsontokens":169,"query-string":227}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
