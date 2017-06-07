@@ -30,7 +30,7 @@ function testTokening(filename, profile) {
 
     let token = signProfileToken(profile, privateKey)
     t.ok(token, 'Token must have been created')
-    
+
     let tokenRecord = wrapProfileToken(token)
     t.ok(tokenRecord, 'Token record must have been created')
 
@@ -87,15 +87,18 @@ function testVerifyToken() {
 
 function testZoneFile() {
   test('makeZoneFileForHostedProfile', (t) => {
-    t.plan(1)
-    
-    let fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
-    let zoneFile = Profile.makeZoneFile('naval.id', fileUrl)
-    //console.log(zoneFile)
+    t.plan(3)
+
+    const fileUrl = 'https://mq9.s3.amazonaws.com/naval.id/profile.json'
+    const incorrectFileUrl = 'mq9.s3.amazonaws.com/naval.id/profile.json'
+    const zoneFile = Profile.makeZoneFile('naval.id', fileUrl)
     t.ok(zoneFile, 'Zone file should have been created for hosted profile')
+    t.ok(zoneFile.includes(`"${fileUrl}"`), 'Zone file should include quoted entire profile url')
+    t.notOk(zoneFile.includes(`"${incorrectFileUrl}"`),
+    'Zone file should not include quoted profile url without protocol')
+
   })
 }
-
 function testSchemas() {
   const keyPair = new ECPair.makeRandom({ rng: getEntropy })
   const privateKey = keyPair.d.toBuffer(32).toString('hex')
@@ -111,11 +114,11 @@ function testSchemas() {
     t.ok(validationResults.valid, 'Profile should be valid')
 
     let profileJson = profileObject.toJSON()
-    t.ok(profileJson, 'Profile JSON should have been created')  
+    t.ok(profileJson, 'Profile JSON should have been created')
 
     let tokenRecords = profileObject.toToken(privateKey)
     t.ok(tokenRecords, 'Profile tokens should have been created')
-    
+
     let profileObject2 = Profile.fromToken(tokenRecords, publicKey)
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
@@ -151,7 +154,7 @@ function testSchemas() {
 
     let description = personObject.description()
     t.ok(description, 'Avatar URL should have been returned')
-    
+
     let avatarUrl = personObject.avatarUrl()
     t.ok(avatarUrl, 'Avatar URL should have been returned')
 

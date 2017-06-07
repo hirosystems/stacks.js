@@ -2183,6 +2183,7 @@ function makeProfileZoneFile(origin, tokenFileUrl) {
     throw new Error('Invalid token file url');
   }
 
+  var urlScheme = tokenFileUrl.split('://')[0];
   var urlParts = tokenFileUrl.split('://')[1].split('/');
   var domain = urlParts[0];
   var pathname = '/' + urlParts.slice(1).join('/');
@@ -2194,7 +2195,7 @@ function makeProfileZoneFile(origin, tokenFileUrl) {
       "name": "_http._tcp",
       "priority": 10,
       "weight": 1,
-      "target": '' + domain + pathname
+      "target": urlScheme + '://' + domain + pathname
     }]
   };
 
