@@ -9,25 +9,22 @@ import fetch from 'isomorphic-fetch'
  * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
  * @param appMethods (Array) The list of API methods this application will need.
  * @param appPrivateKey (String) The application-specific private key
- * @param blockchainIds (Array) Optional; if given, this is the list of blockchain
- *        IDs for which this session identifies.
+ * @param blockchainId (String) This is the blockchain ID of the requester
  *
  * Returns a JWT signed by the app's private key
  */
-export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey,
-                                       blockchainIds = null) {
+export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID) {
+
   const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
   const authBody = {
+    version: 1,
     app_domain: appDomain,
     methods: appMethods,
-    app_public_key: appPublicKey
+    app_public_key: appPublicKey,
+    blockchain_id: blockchainID
   }
 
-  if (blockchainIds) {
-    authBody.blockchain_ids = blockchainIds
-  }
-
-   // make token
+  // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
   const token = tokenSigner.sign(authBody)
 
@@ -93,12 +90,12 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
  * @param coreHost (String) Core API server's hostname
  * @param corePort (Integer) Core API server's port number
  * @param appPrivateKey (String) Application's private key
- * @param userBlockchainId (String) Optional; blockchain ID of the user signing in.
+ * @param blockchainId (String) blockchain ID of the user signing in.
  *
  * Returns a Promise that resolves to a Core session token.
  */
-export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, authRequest,
-                               userBlockchainId = null) {
+export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
+                               blockchainId, authRequest = null) {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }
@@ -124,13 +121,10 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, a
     return Promise.reject('No domain_name in authRequest')
   }
   const appMethods = payload.scopes
-  let blockchainIds = null
-  if (userBlockchainId) {
-    blockchainIds = [userBlockchainId]
-  }
 
   const coreAuthRequest = makeCoreSessionRequest(
-      appDomain, appMethods, appPrivateKey, blockchainIds)
+      appDomain, appMethods, appPrivateKey, blockchainId)
+
   return sendCoreSessionRequest(
       coreHost, corePort, coreAuthRequest, apiPassword)
 }
