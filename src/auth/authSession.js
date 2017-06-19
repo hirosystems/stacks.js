@@ -13,16 +13,28 @@ import fetch from 'isomorphic-fetch'
  *
  * Returns a JWT signed by the app's private key
  */
-export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID) {
+export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID, thisDevice=null ) {
 
-  const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
+  if (thisDevice === null) {
+     thisDevice = '.default';
+  }
+
+  // TODO: multi-device
+  const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey);
+  const appPublicKeys = [{
+     'public_key': appPublicKey,
+     'device_id': thisDevice,
+  }];
+
   const authBody = {
     version: 1,
+    blockchain_id: blockchainID,
+    app_private_key: appPrivateKey,
     app_domain: appDomain,
     methods: appMethods,
-    app_public_key: appPublicKey,
-    blockchain_id: blockchainID
-  }
+    app_public_keys: appPublicKeys,
+    device_id: thisDevice,
+  };
 
   // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
@@ -41,8 +53,7 @@ export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blo
  * Returns a JWT signed with the Core API server's private key that authorizes the bearer
  * to carry out the requested operations.
  */
-export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
-                                       apiPassword) {
+export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
   return new Promise((resolve, reject) => {
     if (!apiPassword) {
       reject('Missing API password')
@@ -95,7 +106,7 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
  * Returns a Promise that resolves to a Core session token.
  */
 export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
-                               blockchainId, authRequest = null) {
+                               blockchainId, authRequest = null, this_device_id = null) {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }
@@ -123,7 +134,7 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
   const appMethods = payload.scopes
 
   const coreAuthRequest = makeCoreSessionRequest(
-      appDomain, appMethods, appPrivateKey, blockchainId)
+      appDomain, appMethods, appPrivateKey, blockchainId, this_device_id)
 
   return sendCoreSessionRequest(
       coreHost, corePort, coreAuthRequest, apiPassword)
