@@ -52,6 +52,8 @@ export function signUserIn(callbackFunction) {
     const userData = {
       username: tokenPayload.username,
       profile: tokenPayload.profile,
+      appPrivateKey: tokenPayload.private_key,
+      coreSessionToken: tokenPayload.core_token,
       authResponseToken: authResponseToken
     }
     window.localStorage.setItem(
