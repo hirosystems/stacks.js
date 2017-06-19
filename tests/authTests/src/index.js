@@ -17,7 +17,7 @@ const authRequest = makeAuthRequest(clientPrivateKey, 'www.foo.com',
 'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
 ['store_read', 'store_write', 'store_admin'])
 
-getCoreSession('localhost', 16268, apiPassword, appPrivateKey, authRequest, 'judecn.id')
+getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', authRequest)
 .then((session) => {
   console.log('success!')
   console.log(session)
@@ -25,6 +25,8 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, authRequest, 'jud
    // inspect session
   const token = jsontokens.decodeToken(session)
   const payload = token.payload
+ 
+  console.log(JSON.stringify(payload));
 
   assert(payload.app_domain === 'www.foo.com')
 
@@ -33,9 +35,10 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, authRequest, 'jud
   assert(payload.methods[2] === 'store_admin')
   assert(payload.methods.length === 3)
 
-  assert(payload.app_public_key === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
+  assert(payload.app_public_keys.length == 1)
+  assert(payload.app_public_keys[0]['public_key'] === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
 
-  assert(payload.blockchain_ids[0] === 'judecn.id')
+  assert(payload.blockchain_id === 'judecn.id')
   return true
 }, (error) => {
   console.error('failure!')
