@@ -58,7 +58,7 @@ export function makeAuthRequest(privateKey, domain_name, manifestURI=null,
 }
 
 export function makeAuthResponse(privateKey, profile={}, username=null,
-                                 coreToken=null,
+                                 coreToken=null, appPrivateKey=null,
                                  expiresAt=nextMonth().getTime()) {
 
   /* Convert the private key to a public key to an issuer */
@@ -71,7 +71,7 @@ export function makeAuthResponse(privateKey, profile={}, username=null,
     iat: Math.floor(new Date().getTime()/1000), // JWT times are in seconds
     exp: Math.floor(expiresAt/1000), // JWT times are in seconds
     iss: makeDIDFromAddress(address),
-    public_keys: [publicKey],
+    private_key: appPrivateKey,
     profile: profile,
     username: username,
     core_token: coreToken
