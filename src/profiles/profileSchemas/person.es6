@@ -122,6 +122,22 @@ export class Person extends Profile {
     return new Person(profile)
   }
 
+  toJSON() {
+    return {
+      profile: this.profile(),
+      name: this.name(),
+      givenName: this.givenName(),
+      familyName: this.familyName(),
+      description: this.description(),
+      avatarUrl: this.avatarUrl(),
+      verifiedAccounts: this.verifiedAccounts(),
+      address: this.address(),
+      birthDate: this.birthDate(),
+      connections: this.connections(),
+      organizations: this.organizations()
+    }
+  }
+
   profile() {
     return Object.assign({}, this._profile)
   }
