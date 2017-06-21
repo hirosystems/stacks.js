@@ -1,22 +1,19 @@
-'use strict'
-
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection'
 import { BLOCKSTACK_HANDLER } from '../utils'
 
-const BLOCKSTACK_STORAGE_LABEL = "blockstack"
-const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
+const BLOCKSTACK_STORAGE_LABEL = 'blockstack'
+const DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth'
 
 export function isUserSignedIn() {
-  return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false
+  return !!window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
 }
 
-export function redirectUserToSignIn(authRequest,
-                                     blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
-  const protocolURI = BLOCKSTACK_HANDLER + ":" + authRequest
-  const httpsURI = blockstackIDHost + "?authRequest=" + authRequest
+export function redirectUserToSignIn(authRequest, blockstackIDHost = DEFAULT_BLOCKSTACK_HOST) {
+  const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
+  const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
   function successCallback() {
     console.log('protocol handler detected')
     // protocolCheck should open the link for us
@@ -41,30 +38,29 @@ export function getAuthResponseToken() {
 }
 
 export function isSignInPending() {
-  return getAuthResponseToken() ? true : false
+  return !!getAuthResponseToken()
 }
 
-export function signUserIn(callbackFunction) {
+export function signUserIn() {
   const authResponseToken = getAuthResponseToken()
-
-  if (verifyAuthResponse(authResponseToken)) {
-    const tokenPayload = decodeToken(authResponseToken).payload
-    const userData = {
-      username: tokenPayload.username,
-      profile: tokenPayload.profile,
-      authResponseToken: authResponseToken
-    }
-    window.localStorage.setItem(
-      BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-    callbackFunction(true)
-  } else {
-    callbackFunction(false)
-  }
+  
+  return verifyAuthResponse(authResponseToken)
+    .then(isValid => {
+      if (isValid) {
+        const tokenPayload = decodeToken(authResponseToken).payload
+        const userData = {
+          username: tokenPayload.username,
+          profile: tokenPayload.profile,
+          authResponseToken
+        }
+        window.localStorage.setItem(
+          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+      }
+    })
 }
 
-export function loadUserData(callbackFunction) {
-  const userData = JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
-  callbackFunction(userData)
+export function loadUserData() {
+  return JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))  
 }
 
 export function signUserOut(redirectURL) {
