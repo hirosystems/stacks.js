@@ -1528,6 +1528,23 @@ var Person = exports.Person = function (_Profile) {
   }
 
   _createClass(Person, [{
+    key: 'toJSON',
+    value: function toJSON() {
+      return {
+        profile: this.profile(),
+        name: this.name(),
+        givenName: this.givenName(),
+        familyName: this.familyName(),
+        description: this.description(),
+        avatarUrl: this.avatarUrl(),
+        verifiedAccounts: this.verifiedAccounts(),
+        address: this.address(),
+        birthDate: this.birthDate(),
+        connections: this.connections(),
+        organizations: this.organizations()
+      };
+    }
+  }, {
     key: 'profile',
     value: function profile() {
       return Object.assign({}, this._profile);
