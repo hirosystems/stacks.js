@@ -52,7 +52,9 @@ export function signUserIn(callbackFunction) {
     const userData = {
       username: tokenPayload.username,
       profile: tokenPayload.profile,
-      authResponseToken: authResponseToken
+      appPrivateKey: tokenPayload.private_key,
+      coreSessionToken: tokenPayload.core_token,
+      authResponseToken
     }
     window.localStorage.setItem(
       BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))

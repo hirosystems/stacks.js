@@ -76,6 +76,8 @@ function signUserIn(callbackFunction) {
     var userData = {
       username: tokenPayload.username,
       profile: tokenPayload.profile,
+      appPrivateKey: tokenPayload.private_key,
+      coreSessionToken: tokenPayload.core_token,
       authResponseToken: authResponseToken
     };
     window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
@@ -161,7 +163,8 @@ function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var username = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
   var coreToken = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-  var expiresAt = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : (0, _index.nextMonth)().getTime();
+  var appPrivateKey = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _index.nextMonth)().getTime();
 
 
   /* Convert the private key to a public key to an issuer */
@@ -174,7 +177,7 @@ function makeAuthResponse(privateKey) {
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: (0, _index.makeDIDFromAddress)(address),
-    public_keys: [publicKey],
+    private_key: appPrivateKey,
     profile: profile,
     username: username,
     core_token: coreToken
@@ -283,24 +286,34 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
  * @param appMethods (Array) The list of API methods this application will need.
  * @param appPrivateKey (String) The application-specific private key
- * @param blockchainIds (Array) Optional; if given, this is the list of blockchain
- *        IDs for which this session identifies.
+ * @param blockchainId (String) This is the blockchain ID of the requester
  *
  * Returns a JWT signed by the app's private key
  */
-function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
-  var blockchainIds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID) {
+  var thisDevice = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
+
+  if (thisDevice === null) {
+    thisDevice = '.default';
+  }
+
+  // TODO: multi-device
   var appPublicKey = _jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey);
+  var appPublicKeys = [{
+    'public_key': appPublicKey,
+    'device_id': thisDevice
+  }];
+
   var authBody = {
+    version: 1,
+    blockchain_id: blockchainID,
+    app_private_key: appPrivateKey,
     app_domain: appDomain,
     methods: appMethods,
-    app_public_key: appPublicKey
+    app_public_keys: appPublicKeys,
+    device_id: thisDevice
   };
-
-  if (blockchainIds) {
-    authBody.blockchain_ids = blockchainIds;
-  }
 
   // make token
   var tokenSigner = new _jsontokens.TokenSigner('ES256k', appPrivateKey);
@@ -363,15 +376,20 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
  * @param coreHost (String) Core API server's hostname
  * @param corePort (Integer) Core API server's port number
  * @param appPrivateKey (String) Application's private key
- * @param userBlockchainId (String) Optional; blockchain ID of the user signing in.
+ * @param blockchainId (String) blockchain ID of the user signing in.
  *
  * Returns a Promise that resolves to a Core session token.
  */
-function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, authRequest) {
-  var userBlockchainId = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, blockchainId) {
+  var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var this_device_id = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
   if (!authRequest) {
     return Promise.reject('No authRequest provided');
+  }
+
+  if (!blockchainId) {
+    return Promise.reject('No blockchain ID given');
   }
 
   var payload = null;
@@ -395,12 +413,9 @@ function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, authRequ
     return Promise.reject('No domain_name in authRequest');
   }
   var appMethods = payload.scopes;
-  var blockchainIds = null;
-  if (userBlockchainId) {
-    blockchainIds = [userBlockchainId];
-  }
 
-  var coreAuthRequest = makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainIds);
+  var coreAuthRequest = makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainId, this_device_id);
+
   return sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword);
 }
 },{"./authProvider":3,"isomorphic-fetch":163,"jsontokens":169,"url":262}],5:[function(require,module,exports){
