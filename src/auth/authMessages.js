@@ -72,6 +72,7 @@ export function makeAuthResponse(privateKey, profile={}, username=null,
     exp: Math.floor(expiresAt/1000), // JWT times are in seconds
     iss: makeDIDFromAddress(address),
     private_key: appPrivateKey,
+    public_keys: [publicKey],
     profile: profile,
     username: username,
     core_token: coreToken
