@@ -178,6 +178,7 @@ function makeAuthResponse(privateKey) {
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: (0, _index.makeDIDFromAddress)(address),
     private_key: appPrivateKey,
+    public_keys: [publicKey],
     profile: profile,
     username: username,
     core_token: coreToken
