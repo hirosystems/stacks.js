@@ -1,3 +1,4 @@
+
 export * from './auth'
 export * from './profiles'
 
@@ -11,3 +12,7 @@ export {
   nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter
 } from './utils'
 export { decodeToken } from 'jsontokens'
+
+export {
+  getFile, putFile
+} from 'blockstack-storage'
