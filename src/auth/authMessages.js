@@ -1,58 +1,43 @@
-'use strict'
-
 require('isomorphic-fetch')
 
 import {
-  TokenSigner, TokenVerifier, decodeToken, createUnsecuredToken,
+  TokenSigner,
   SECP256K1Client
 } from 'jsontokens'
 
 import {
-  makeDIDFromAddress, getDIDType, getAddressFromDID, makeUUID4,
+  makeDIDFromAddress, generateAndStoreAppKey, makeUUID4,
   nextMonth, nextHour, publicKeyToAddress
 } from '../index'
 
-export function makeAuthRequest(privateKey, domain_name, manifestURI=null,
-                                redirectURI=null, scopes=[],
-                                expiresAt=nextHour().getTime()) {
-  let token = null
-
-  if (domain_name === null) {
-    throw new Error("Invalid app domain name")
-  }
-  if (manifestURI === null) {
-    manifestURI = `${window.location.origin}/manifest.json`
-  }
-  if (redirectURI === null) {
-    redirectURI = window.location.href
-  }
-
+export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
+                                appDomain = window.location.origin,
+                                redirectURI = `${window.location.origin}/`,
+                                manifestURI = `${window.location.origin}/manifest.json`,
+                                scopes = ['scope_write'],
+                                expiresAt = nextHour().getTime()) {
   /* Create the payload */
-  let payload = {
+  const payload = {
     jti: makeUUID4(),
-    iat: Math.floor(new Date().getTime()/1000), // JWT times are in seconds
-    exp: Math.floor(expiresAt/1000), // JWT times are in seconds
+    iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
+    exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: null,
     public_keys: [],
-    domain_name: domain_name,
+    domain_name: appDomain,
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
-    scopes: scopes
+    scopes
   }
 
-  if (privateKey === null) {
-    /* Create an unsecured token and return it */
-    token = createUnsecuredToken(payload)
-  } else {
-    /* Convert the private key to a public key to an issuer */
-    const publicKey = SECP256K1Client.derivePublicKey(privateKey)
-    payload.public_keys = [publicKey]
-    const address = publicKeyToAddress(publicKey)
-    payload.iss = makeDIDFromAddress(address)
-    /* Sign and return the token */
-    const tokenSigner = new TokenSigner('ES256k', privateKey)
-    token = tokenSigner.sign(payload)
-  }
+  /* Convert the private key to a public key to an issuer */
+  const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
+  payload.public_keys = [publicKey]
+  const address = publicKeyToAddress(publicKey)
+  payload.iss = makeDIDFromAddress(address)
+
+  /* Sign and return the token */
+  const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
+  const token = tokenSigner.sign(payload)
 
   return token
 }

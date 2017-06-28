@@ -24,8 +24,7 @@ import blockstack from 'blockstack'
 
 ```js
 document.getElementById('signin-button').addEventListener('click', function() {
-  var authRequest = blockstack.makeAuthRequest(null, window.location.origin)
-  blockstack.redirectUserToSignIn(authRequest)
+  blockstack.redirectUserToSignIn()
 })
 ```
 

@@ -1,22 +1,28 @@
-'use strict'
-
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { verifyAuthResponse } from './index'
+import { makeAuthRequest, verifyAuthResponse, makeECPrivateKey } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
 import { BLOCKSTACK_HANDLER } from '../utils'
 
-const BLOCKSTACK_STORAGE_LABEL = "blockstack"
-const DEFAULT_BLOCKSTACK_HOST = "https://blockstack.org/auth"
+const BLOCKSTACK_STORAGE_LABEL = 'blockstack'
+const BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key'
+
+const DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth'
+
+export function generateAndStoreAppKey() {
+  const transitKey = makeECPrivateKey()
+  localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
+  return transitKey
+}
 
 export function isUserSignedIn() {
   return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false
 }
 
-export function redirectUserToSignIn(authRequest,
-                                     blockstackIDHost=DEFAULT_BLOCKSTACK_HOST) {
-  const protocolURI = BLOCKSTACK_HANDLER + ":" + authRequest
-  const httpsURI = blockstackIDHost + "?authRequest=" + authRequest
+export function redirectUserToSignInWithAuthRequest(authRequest = makeAuthRequest(),
+                                     blockstackIDHost = DEFAULT_BLOCKSTACK_HOST) {
+  const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
+  const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
   function successCallback() {
     console.log('protocol handler detected')
     // protocolCheck should open the link for us
@@ -33,6 +39,13 @@ export function redirectUserToSignIn(authRequest,
   }
 
   protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
+}
+
+export function redirectUserToSignIn(redirectURI = `${window.location.origin}/`,
+                                     manifestURI = `${window.location.origin}/manifest.json`,
+                                     scopes = ['scope_write']) {
+  const authRequest = makeAuthRequest(generateAndStoreAppKey(), redirectURI, manifestURI, scopes)
+  redirectUserToSignInWithAuthRequest(authRequest)
 }
 
 export function getAuthResponseToken() {
