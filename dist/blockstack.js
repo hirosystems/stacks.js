@@ -382,7 +382,7 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
  */
 function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, blockchainId) {
   var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-  var this_device_id = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+  var this_device_id = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '0';
 
   if (!authRequest) {
     return Promise.reject('No authRequest provided');
@@ -438,6 +438,7 @@ var _index = require('../index');
 
 function doSignaturesMatchPublicKeys(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
+  console.log(payload);
   var publicKeys = payload.public_keys;
   if (publicKeys.length === 1) {
     var publicKey = publicKeys[0];

@@ -3,6 +3,7 @@ import { getAddressFromDID, publicKeyToAddress } from '../index'
 
 export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
+  console.log(payload)
   const publicKeys = payload.public_keys
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]

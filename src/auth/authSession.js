@@ -106,11 +106,11 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiP
  * Returns a Promise that resolves to a Core session token.
  */
 export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
-                               blockchainId, authRequest = null, this_device_id = null) {
+                               blockchainId, authRequest = null, this_device_id = '0') {
   if (!authRequest) {
     return Promise.reject('No authRequest provided');
   }
- 
+
   if (!blockchainId) {
     return Promise.reject('No blockchain ID given');
   }
