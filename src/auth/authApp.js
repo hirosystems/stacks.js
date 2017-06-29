@@ -18,7 +18,7 @@ export function generateAndStoreAppKey() {
 }
 
 export function isUserSignedIn() {
-  return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false
+  return !!window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
 }
 
 export function redirectToSignInWithAuthRequest(authRequest = makeAuthRequest(),
@@ -56,36 +56,29 @@ export function getAuthResponseToken() {
 }
 
 export function isSignInPending() {
-  return getAuthResponseToken() ? true : false
+  return !!getAuthResponseToken()
 }
 
 export function handlePendingSignIn() {
-  return new Promise((resolve, reject) => {
-    const authResponseToken = getAuthResponseToken()
+  const authResponseToken = getAuthResponseToken()
 
-    if (verifyAuthResponse(authResponseToken)) {
-      const tokenPayload = decodeToken(authResponseToken).payload
-      const userData = {
-        username: tokenPayload.username,
-        profile: tokenPayload.profile,
-        appPrivateKey: tokenPayload.private_key,
-        coreSessionToken: tokenPayload.core_token,
-        authResponseToken
+  return verifyAuthResponse(authResponseToken)
+    .then(isValid => {
+      if (isValid) {
+        const tokenPayload = decodeToken(authResponseToken).payload
+        const userData = {
+          username: tokenPayload.username,
+          profile: tokenPayload.profile,
+          authResponseToken
+        }
+        window.localStorage.setItem(
+          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
       }
-      window.localStorage.setItem(
-        BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-      resolve(userData)
-    } else {
-      reject(false)
-    }
-  })
+    })
 }
 
 export function loadUserData() {
-  return new Promise((resolve) => {
-    const userData = JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
-    resolve(userData)
-  })
+  return JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
 }
 
 export function signUserOut(redirectURL) {

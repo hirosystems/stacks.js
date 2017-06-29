@@ -46,7 +46,7 @@ function generateAndStoreAppKey() {
 }
 
 function isUserSignedIn() {
-  return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false;
+  return !!window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL);
 }
 
 function redirectToSignInWithAuthRequest() {
@@ -89,35 +89,27 @@ function getAuthResponseToken() {
 }
 
 function isSignInPending() {
-  return getAuthResponseToken() ? true : false;
+  return !!getAuthResponseToken();
 }
 
 function handlePendingSignIn() {
-  return new Promise(function (resolve, reject) {
-    var authResponseToken = getAuthResponseToken();
+  var authResponseToken = getAuthResponseToken();
 
-    if ((0, _index.verifyAuthResponse)(authResponseToken)) {
+  return (0, _index.verifyAuthResponse)(authResponseToken).then(function (isValid) {
+    if (isValid) {
       var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
       var userData = {
         username: tokenPayload.username,
         profile: tokenPayload.profile,
-        appPrivateKey: tokenPayload.private_key,
-        coreSessionToken: tokenPayload.core_token,
         authResponseToken: authResponseToken
       };
       window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-      resolve(userData);
-    } else {
-      reject(false);
     }
   });
 }
 
 function loadUserData() {
-  return new Promise(function (resolve) {
-    var userData = JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL));
-    resolve(userData);
-  });
+  return JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL));
 }
 
 function signUserOut(redirectURL) {
@@ -1593,6 +1585,23 @@ var Person = exports.Person = function (_Profile) {
   }
 
   _createClass(Person, [{
+    key: 'toJSON',
+    value: function toJSON() {
+      return {
+        profile: this.profile(),
+        name: this.name(),
+        givenName: this.givenName(),
+        familyName: this.familyName(),
+        description: this.description(),
+        avatarUrl: this.avatarUrl(),
+        verifiedAccounts: this.verifiedAccounts(),
+        address: this.address(),
+        birthDate: this.birthDate(),
+        connections: this.connections(),
+        organizations: this.organizations()
+      };
+    }
+  }, {
     key: 'profile',
     value: function profile() {
       return Object.assign({}, this._profile);
