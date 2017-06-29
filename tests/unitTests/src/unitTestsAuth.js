@@ -54,7 +54,7 @@ export function runAuthTests() {
     t.equal(decodedToken.payload.redirect_uri, 'http://localhost:3000/', 'auth request redirects to correct uri')
     t.equal(decodedToken.payload.manifest_uri, 'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
 
-    t.equal(JSON.stringify(decodedToken.payload.scopes), '["scope_write"]', 'auth request scopes should be store_write')
+    t.equal(JSON.stringify(decodedToken.payload.scopes), '["store_write"]', 'auth request scopes should be store_write')
 
     verifyAuthRequest(authRequest)
       .then((verified) => {

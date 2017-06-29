@@ -95,19 +95,25 @@ function isSignInPending() {
 function handlePendingSignIn() {
   var authResponseToken = getAuthResponseToken();
 
-  return (0, _index.verifyAuthResponse)(authResponseToken).then(function (isValid) {
-    if (isValid) {
-      var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
-      var userData = {
-        username: tokenPayload.username,
-        profile: tokenPayload.profile,
-        authResponseToken: authResponseToken
-      };
-      window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-    }
+  return new Promise(function (resolve, reject) {
+    (0, _index.verifyAuthResponse)(authResponseToken).then(function (isValid) {
+      if (isValid) {
+        var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
+        var userData = {
+          username: tokenPayload.username,
+          profile: tokenPayload.profile,
+          appPrivateKey: tokenPayload.private_key,
+          coreSessionToken: tokenPayload.core_token,
+          authResponseToken: authResponseToken
+        };
+        window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+        resolve(userData);
+      } else {
+        reject();
+      }
+    });
   });
 }
-
 function loadUserData() {
   return JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL));
 }
@@ -588,7 +594,9 @@ function verifyAuthRequest(token) {
 
 function verifyAuthResponse(token, nameLookupURL) {
   return new Promise(function (resolve) {
-    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
+    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token) //,
+    // doPublicKeysMatchUsername(token, nameLookupURL)
+    ]).then(function (values) {
       console.log(values);
       if (values.every(Boolean)) {
         resolve(true);
