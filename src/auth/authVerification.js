@@ -150,8 +150,8 @@ export function verifyAuthResponse(token, nameLookupURL) {
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
-      doPublicKeysMatchIssuer(token),
-      doPublicKeysMatchUsername(token, nameLookupURL)
+      doPublicKeysMatchIssuer(token)//,
+      // doPublicKeysMatchUsername(token, nameLookupURL)
     ]).then(values => {
       console.log(values)
       if (values.every(Boolean)) {
