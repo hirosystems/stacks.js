@@ -37,7 +37,7 @@ var BLOCKSTACK_STORAGE_LABEL = 'blockstack';
 var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
 
 var DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth';
-var DEFAULT_SCOPE = exports.DEFAULT_SCOPE = ['scope_write'];
+var DEFAULT_SCOPE = exports.DEFAULT_SCOPE = ['store_write'];
 
 function generateAndStoreAppKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
