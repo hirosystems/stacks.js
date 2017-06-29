@@ -62,21 +62,27 @@ export function isSignInPending() {
 export function handlePendingSignIn() {
   const authResponseToken = getAuthResponseToken()
 
-  return verifyAuthResponse(authResponseToken)
+  return new Promise((resolve, reject) => {
+    verifyAuthResponse(authResponseToken)
     .then(isValid => {
       if (isValid) {
         const tokenPayload = decodeToken(authResponseToken).payload
         const userData = {
           username: tokenPayload.username,
           profile: tokenPayload.profile,
+          appPrivateKey: tokenPayload.private_key,
+          coreSessionToken: tokenPayload.core_token,
           authResponseToken
         }
         window.localStorage.setItem(
           BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+        resolve(userData)
+      } else {
+        reject()
       }
     })
+  })
 }
-
 export function loadUserData() {
   return JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
 }
