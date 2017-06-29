@@ -25,7 +25,7 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
    // inspect session
   const token = jsontokens.decodeToken(session)
   const payload = token.payload
- 
+
   console.log(JSON.stringify(payload));
 
   assert(payload.app_domain === 'www.foo.com')

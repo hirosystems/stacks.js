@@ -28,7 +28,7 @@ export function runAuthTests() {
   const nameLookupURL = 'https://explorer-api.appartisan.com/get_name_blockchain_record/'
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
-    t.plan(11)
+    t.plan(12)
 
     global.window = {
       location: {
@@ -52,6 +52,7 @@ export function runAuthTests() {
     t.equal(decodedToken.payload.iss, referenceDID, 'auth request issuer should include the public key')
     t.equal(decodedToken.payload.domain_name, origin, 'auth request domain_name should be origin')
     t.equal(decodedToken.payload.redirect_uri, 'http://localhost:3000/', 'auth request redirects to correct uri')
+    t.equal(decodedToken.payload.manifest_uri, 'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
 
     t.equal(JSON.stringify(decodedToken.payload.scopes), '["scope_write"]', 'auth request scopes should be store_write')
 
