@@ -24,7 +24,7 @@ import blockstack from 'blockstack'
 
 ```js
 document.getElementById('signin-button').addEventListener('click', function() {
-  blockstack.redirectUserToSignIn()
+  blockstack.redirectToSignIn()
 })
 ```
 
@@ -52,7 +52,7 @@ if (blockstack.isUserSignedIn()) {
     showProfile(userData.profile)
   })
 } else if (blockstack.isSignInPending()) {
-  blockstack.signUserIn(function(userData) {
+  blockstack.handlePendingSignIn(function(userData) {
     window.location = window.location.origin
   })
 }

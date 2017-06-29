@@ -29,6 +29,8 @@ export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
     scopes
   }
 
+  console.log(payload)
+
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
   payload.public_keys = [publicKey]

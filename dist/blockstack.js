@@ -6,11 +6,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.generateAndStoreAppKey = generateAndStoreAppKey;
 exports.isUserSignedIn = isUserSignedIn;
-exports.redirectUserToSignInWithAuthRequest = redirectUserToSignInWithAuthRequest;
-exports.redirectUserToSignIn = redirectUserToSignIn;
+exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
+exports.redirectToSignIn = redirectToSignIn;
 exports.getAuthResponseToken = getAuthResponseToken;
 exports.isSignInPending = isSignInPending;
-exports.signUserIn = signUserIn;
+exports.handlePendingSignIn = handlePendingSignIn;
 exports.loadUserData = loadUserData;
 exports.signUserOut = signUserOut;
 
@@ -28,15 +28,18 @@ var _customProtocolDetectionBlockstack2 = _interopRequireDefault(_customProtocol
 
 var _utils = require('../utils');
 
+var _index2 = require('../index');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_STORAGE_LABEL = 'blockstack';
 var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
 
 var DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth';
+var DEFAULT_SCOPE = ['scope_write'];
 
 function generateAndStoreAppKey() {
-  var transitKey = (0, _index.makeECPrivateKey)();
+  var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
 }
@@ -45,7 +48,7 @@ function isUserSignedIn() {
   return window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL) ? true : false;
 }
 
-function redirectUserToSignInWithAuthRequest() {
+function redirectToSignInWithAuthRequest() {
   var authRequest = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : (0, _index.makeAuthRequest)();
   var blockstackIDHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DEFAULT_BLOCKSTACK_HOST;
 
@@ -70,13 +73,13 @@ function redirectUserToSignInWithAuthRequest() {
   (0, _customProtocolDetectionBlockstack2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
 }
 
-function redirectUserToSignIn() {
+function redirectToSignIn() {
   var redirectURI = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.location.origin + '/';
   var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin + '/manifest.json';
-  var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ['scope_write'];
+  var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : DEFAULT_SCOPE;
 
   var authRequest = (0, _index.makeAuthRequest)(generateAndStoreAppKey(), redirectURI, manifestURI, scopes);
-  redirectUserToSignInWithAuthRequest(authRequest);
+  redirectToSignInWithAuthRequest(authRequest);
 }
 
 function getAuthResponseToken() {
@@ -88,35 +91,39 @@ function isSignInPending() {
   return getAuthResponseToken() ? true : false;
 }
 
-function signUserIn(callbackFunction) {
-  var authResponseToken = getAuthResponseToken();
+function handlePendingSignIn() {
+  return new Promise(function (resolve, reject) {
+    var authResponseToken = getAuthResponseToken();
 
-  if ((0, _index.verifyAuthResponse)(authResponseToken)) {
-    var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
-    var userData = {
-      username: tokenPayload.username,
-      profile: tokenPayload.profile,
-      appPrivateKey: tokenPayload.private_key,
-      coreSessionToken: tokenPayload.core_token,
-      authResponseToken: authResponseToken
-    };
-    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-    callbackFunction(true);
-  } else {
-    callbackFunction(false);
-  }
+    if ((0, _index.verifyAuthResponse)(authResponseToken)) {
+      var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
+      var userData = {
+        username: tokenPayload.username,
+        profile: tokenPayload.profile,
+        appPrivateKey: tokenPayload.private_key,
+        coreSessionToken: tokenPayload.core_token,
+        authResponseToken: authResponseToken
+      };
+      window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+      resolve(userData);
+    } else {
+      reject(false);
+    }
+  });
 }
 
-function loadUserData(callbackFunction) {
-  var userData = JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL));
-  callbackFunction(userData);
+function loadUserData() {
+  return new Promise(function (resolve) {
+    var userData = JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL));
+    resolve(userData);
+  });
 }
 
 function signUserOut(redirectURL) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL);
   window.location = redirectURL;
 }
-},{"../utils":28,"./index":6,"custom-protocol-detection-blockstack":169,"jsontokens":225,"query-string":291}],2:[function(require,module,exports){
+},{"../index":8,"../utils":28,"./index":6,"custom-protocol-detection-blockstack":169,"jsontokens":225,"query-string":291}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -151,6 +158,8 @@ function makeAuthRequest() {
     redirect_uri: redirectURI,
     scopes: scopes
   };
+
+  console.log(payload);
 
   /* Convert the private key to a public key to an issuer */
   var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(transitPrivateKey);
@@ -609,16 +618,16 @@ Object.defineProperty(exports, 'isUserSignedIn', {
     return _authApp.isUserSignedIn;
   }
 });
-Object.defineProperty(exports, 'redirectUserToSignIn', {
+Object.defineProperty(exports, 'redirectToSignIn', {
   enumerable: true,
   get: function get() {
-    return _authApp.redirectUserToSignIn;
+    return _authApp.redirectToSignIn;
   }
 });
-Object.defineProperty(exports, 'redirectUserToSignInWithAuthRequest', {
+Object.defineProperty(exports, 'redirectToSignInWithAuthRequest', {
   enumerable: true,
   get: function get() {
-    return _authApp.redirectUserToSignInWithAuthRequest;
+    return _authApp.redirectToSignInWithAuthRequest;
   }
 });
 Object.defineProperty(exports, 'getAuthResponseToken', {
@@ -633,10 +642,10 @@ Object.defineProperty(exports, 'isSignInPending', {
     return _authApp.isSignInPending;
   }
 });
-Object.defineProperty(exports, 'signUserIn', {
+Object.defineProperty(exports, 'handlePendingSignIn', {
   enumerable: true,
   get: function get() {
-    return _authApp.signUserIn;
+    return _authApp.handlePendingSignIn;
   }
 });
 Object.defineProperty(exports, 'loadUserData', {
