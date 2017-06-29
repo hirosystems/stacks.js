@@ -10,11 +10,15 @@ import {
   nextMonth, nextHour, publicKeyToAddress
 } from '../index'
 
+import {
+  DEFAULT_SCOPE
+} from './authApp'
+
 export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
-                                appDomain = window.location.origin,
                                 redirectURI = `${window.location.origin}/`,
                                 manifestURI = `${window.location.origin}/manifest.json`,
-                                scopes = ['scope_write'],
+                                scopes = DEFAULT_SCOPE,
+                                appDomain = window.location.origin,
                                 expiresAt = nextHour().getTime()) {
   /* Create the payload */
   const payload = {

@@ -4,6 +4,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.DEFAULT_SCOPE = undefined;
 exports.generateAndStoreAppKey = generateAndStoreAppKey;
 exports.isUserSignedIn = isUserSignedIn;
 exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
@@ -36,7 +37,7 @@ var BLOCKSTACK_STORAGE_LABEL = 'blockstack';
 var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
 
 var DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth';
-var DEFAULT_SCOPE = ['scope_write'];
+var DEFAULT_SCOPE = exports.DEFAULT_SCOPE = ['scope_write'];
 
 function generateAndStoreAppKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
@@ -136,14 +137,16 @@ var _jsontokens = require('jsontokens');
 
 var _index = require('../index');
 
+var _authApp = require('./authApp');
+
 require('isomorphic-fetch');
 
 function makeAuthRequest() {
   var transitPrivateKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : (0, _index.generateAndStoreAppKey)();
-  var appDomain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin;
-  var redirectURI = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window.location.origin + '/';
-  var manifestURI = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : window.location.origin + '/manifest.json';
-  var scopes = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : ['scope_write'];
+  var redirectURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin + '/';
+  var manifestURI = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window.location.origin + '/manifest.json';
+  var scopes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _authApp.DEFAULT_SCOPE;
+  var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
   var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _index.nextHour)().getTime();
 
   /* Create the payload */
@@ -203,7 +206,7 @@ function makeAuthResponse(privateKey) {
   var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
   return tokenSigner.sign(payload);
 }
-},{"../index":8,"isomorphic-fetch":215,"jsontokens":225}],3:[function(require,module,exports){
+},{"../index":8,"./authApp":1,"isomorphic-fetch":215,"jsontokens":225}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

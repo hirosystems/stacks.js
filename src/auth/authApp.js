@@ -9,7 +9,7 @@ const BLOCKSTACK_STORAGE_LABEL = 'blockstack'
 const BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key'
 
 const DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth'
-const DEFAULT_SCOPE = ['scope_write']
+export const DEFAULT_SCOPE = ['scope_write']
 
 export function generateAndStoreAppKey() {
   const transitKey = makeECPrivateKey()
