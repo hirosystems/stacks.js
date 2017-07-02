@@ -12,7 +12,7 @@ import {
 
 import {
   DEFAULT_SCOPE
-} from './authApp'
+} from './authConstants'
 
 export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
                                 redirectURI = `${window.location.origin}/`,

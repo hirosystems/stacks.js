@@ -4,12 +4,11 @@ import { makeAuthRequest, verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
 import { BLOCKSTACK_HANDLER } from '../utils'
 import { makeECPrivateKey } from '../index'
+import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
+         BLOCKSTACK_STORAGE_LABEL,
+         DEFAULT_BLOCKSTACK_HOST,
+         DEFAULT_SCOPE } from './authConstants'
 
-const BLOCKSTACK_STORAGE_LABEL = 'blockstack'
-const BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key'
-
-const DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth'
-export const DEFAULT_SCOPE = ['store_write']
 
 export function generateAndStoreAppKey() {
   const transitKey = makeECPrivateKey()
