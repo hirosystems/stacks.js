@@ -1,4 +1,4 @@
-'use strict'
+import { InvalidDIDError } from './errors'
 
 export function makeDIDFromAddress(address) {
   return `did:btc-addr:${address}`

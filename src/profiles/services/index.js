@@ -1,5 +1,3 @@
-'use strict'
-
 import { Facebook } from './facebook'
 import { Github } from './github'
 import { Twitter } from './twitter'

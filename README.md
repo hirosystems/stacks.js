@@ -6,6 +6,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 * [About](#about)
 * [Auth](#auth)
 * [Profiles](#profiles)
+* [Storage](#storage)
 * [Testing](#testing)
 
 ## Installation
@@ -38,6 +39,10 @@ The profiles/identity portion of this library can be used to:
 ## Profiles
 
 [![Documentation](/docs-button.png)](/src/profiles)
+
+## Storage
+
+[![Documentation](/docs-button.png)](/src/storage)
 
 ## Testing
 

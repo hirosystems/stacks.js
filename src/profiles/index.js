@@ -1,5 +1,3 @@
-'use strict'
-
 export {
   Profile
 } from './profile'

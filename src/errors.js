@@ -1,5 +1,3 @@
-'use strict'
-
 export class MissingParametersError extends Error {
   constructor(message) {
     super()

@@ -1,5 +1,7 @@
 # Blockstack Auth
 
+SSO and authentication without 3rd parties or remote servers
+
 * [Quickstart](#quickstart)
 * [Operations](#operations)
 * [Examples](#examples)
@@ -22,8 +24,7 @@ import blockstack from 'blockstack'
 
 ```js
 document.getElementById('signin-button').addEventListener('click', function() {
-  var authRequest = blockstack.makeAuthRequest(null, window.location.origin)
-  blockstack.redirectUserToSignIn(authRequest)
+  blockstack.redirectToSignIn()
 })
 ```
 
@@ -51,7 +52,7 @@ if (blockstack.isUserSignedIn()) {
     showProfile(userData.profile)
   })
 } else if (blockstack.isSignInPending()) {
-  blockstack.signUserIn(function(userData) {
+  blockstack.handlePendingSignIn(function(userData) {
     window.location = window.location.origin
   })
 }

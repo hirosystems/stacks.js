@@ -35,3 +35,6 @@ lib
 bundle.js
 
 src/testing/browser/blockstack-proofs.js
+
+*.swp
+*.swo
