@@ -15,6 +15,7 @@ const secp256k1 = ecurve.getCurveByName('secp256k1')
   * @param {String} signingAlgorithm - the signing algorithm to use
   * @param {Date} issuedAt - the time of issuance of the token
   * @param {Date} expiresAt - the time of expiration of the token
+  * @returns {Object} - the signed profile token
   */
 export function signProfileToken(profile,
                           privateKey,
@@ -54,6 +55,7 @@ export function signProfileToken(profile,
 /**
   * Wraps a token for a profile token file
   * @param {String} token - the token to be wrapped
+  * @returns {Object} - including `token` and `decodedToken` 
   */
 export function wrapProfileToken(token) {
   return {
@@ -67,6 +69,8 @@ export function wrapProfileToken(token) {
   * @param {String} token - the token to be verified
   * @param {String} publicKeyOrAddress - the public key or address of the
   *   keypair that is thought to have signed the token
+  * @returns {Object} - the verified, decoded profile token
+  * @throws {Error} - throws an error if token verification fails
   */
 export function verifyProfileToken(token, publicKeyOrAddress) {
   const decodedToken = decodeToken(token)
@@ -128,10 +132,13 @@ export function verifyProfileToken(token, publicKeyOrAddress) {
 }
 
 /**
-  * Extracts a profile from an encoded token
+  * Extracts a profile from an encoded token and optionally verifies it,
+  * if `publicKeyOrAddress` is provided.
   * @param {String} token - the token to be extracted
   * @param {String} publicKeyOrAddress - the public key or address of the
   *   keypair that is thought to have signed the token
+  * @returns {Object} - the profile extracted from the encoded token
+  * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
   */
 export function extractProfile(token, publicKeyOrAddress = null) {
   let decodedToken
