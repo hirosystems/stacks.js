@@ -6,15 +6,16 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib; babel --presets es2015 src -d lib",
+    "compile": "rm -rf lib; babel src -d lib",
     "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run build",
     "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
-    "test": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/unitTests/lib/index.js",
+    "test": "npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
-    "build": "npm run compile; npm run browserify"
+    "build": "npm run compile; npm run browserify",
+    "flow": "flow"
   },
   "repository": {
     "type": "git",
@@ -69,9 +70,10 @@
     }
   ],
   "devDependencies": {
-    "babel-cli": "^6.4.5",
+    "babel-cli": "^6.24.1",
     "babel-eslint": "^6.0.4",
     "babel-preset-es2015": "^6.3.13",
+    "babel-preset-flow": "^6.23.0",
     "blue-tape": "^1.0.0",
     "browserify": "^13.1.1",
     "eslint": "^2.10.2",
@@ -81,6 +83,7 @@
     "eslint-plugin-react": "^5.1.1",
     "express": "^4.15.0",
     "fetch-mock": "^5.5.0",
+    "flow-bin": "^0.49.1",
     "node-fetch": "^1.6.3",
     "opn": "^4.0.2",
     "tape": "^4.6.3",
