@@ -144,13 +144,13 @@ export function verifyAuthRequest(token) {
   })
 }
 
-export function verifyAuthResponse(token, nameLookupURL) {
+export function verifyAuthResponse(token) {
   return new Promise((resolve) => {
     Promise.all([
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
-      doPublicKeysMatchIssuer(token)//,
+      doPublicKeysMatchIssuer(token)// ,
       // doPublicKeysMatchUsername(token, nameLookupURL)
     ]).then(values => {
       console.log(values)

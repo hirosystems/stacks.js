@@ -1,5 +1,3 @@
-'use strict'
-
 import { extractToken } from '../profileTokens'
 import inspector from 'schema-inspector'
 import { Profile } from '../profile'
@@ -21,12 +19,12 @@ export class CreativeWork extends Profile {
     }, this._profile)
   }
 
-  static validateSchema(profile, strict=false) {
-    schemaDefinition['strict'] = strict
+  static validateSchema(profile, strict = false) {
+    schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token, publicKeyOrAddress=null) {
+  static fromToken(token, publicKeyOrAddress = null) {
     const profile = extractToken(token, publicKeyOrAddress)
     return new CreativeWork(profile)
   }

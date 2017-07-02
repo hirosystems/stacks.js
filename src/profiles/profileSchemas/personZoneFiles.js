@@ -1,6 +1,4 @@
-'use strict'
-
-import { makeZoneFile, parseZoneFile } from 'zone-file'
+import { parseZoneFile } from 'zone-file'
 
 import { Person } from './person'
 import { getTokenFileUrl } from '../profileZoneFiles'
@@ -12,9 +10,10 @@ export function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) 
     zoneFileJson = parseZoneFile(zoneFile)
     if (!zoneFileJson.hasOwnProperty('$origin')) {
       zoneFileJson = null
-      throw('zone file is missing an origin')
+      throw new Error('zone file is missing an origin')
     }
-  } catch(e) {
+  } catch (e) {
+    console.error(e)
   }
 
   let tokenFileUrl = null
@@ -38,10 +37,9 @@ export function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) 
       .then((response) => response.text())
       .then((responseText) => JSON.parse(responseText))
       .then((responseJson) => {
-
-        let tokenRecords = responseJson
-        let token = tokenRecords[0].token
-        let profile = extractProfile(token, publicKeyOrAddress)
+        const tokenRecords = responseJson
+        const token = tokenRecords[0].token
+        const profile = extractProfile(token, publicKeyOrAddress)
 
         callback(profile)
         return

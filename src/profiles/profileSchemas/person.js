@@ -1,5 +1,3 @@
-'use strict'
-
 import inspector from 'schema-inspector'
 
 import { Profile } from '../profile'
@@ -29,8 +27,8 @@ const schemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
-          'name': { type: 'string', optional: true },
-          'contentUrl': { type: 'string', optional: true }
+          name: { type: 'string', optional: true },
+          contentUrl: { type: 'string', optional: true }
         }
       }
     },
@@ -41,7 +39,7 @@ const schemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
-          'url': { type: 'string', optional: true }
+          url: { type: 'string', optional: true }
         }
       }
     },
@@ -52,12 +50,12 @@ const schemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
-          'service': { type: 'string', optional: true },
-          'identifier': { type: 'string', optional: true },
-          'proofType': { type: 'string', optional: true },
-          'proofUrl': { type: 'string', optional: true },
-          'proofMessage': { type: 'string', optional: true },
-          'proofSignature': { type: 'string', optional: true }
+          service: { type: 'string', optional: true },
+          identifier: { type: 'string', optional: true },
+          proofType: { type: 'string', optional: true },
+          proofUrl: { type: 'string', optional: true },
+          proofMessage: { type: 'string', optional: true },
+          proofSignature: { type: 'string', optional: true }
         }
       }
     },
@@ -88,10 +86,10 @@ const schemaDefinition = {
       optional: true,
       properties: {
         '@type': { type: 'string' },
-        'streetAddress': { type: 'string', optional: true },
-        'addressLocality': { type: 'string', optional: true },
-        'postalCode': { type: 'string', optional: true },
-        'addressCountry': { type: 'string', optional: true }
+        streetAddress: { type: 'string', optional: true },
+        addressLocality: { type: 'string', optional: true },
+        postalCode: { type: 'string', optional: true },
+        addressCountry: { type: 'string', optional: true }
       }
     },
     birthDate: { type: 'string', optional: true },
@@ -107,18 +105,18 @@ export class Person extends Profile {
     }, this._profile)
   }
 
-  static validateSchema(profile, strict=false) {
-    schemaDefinition['strict'] = strict
+  static validateSchema(profile, strict = false) {
+    schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token, publicKeyOrAddress=null) {
-    let profile = extractProfile(token, publicKeyOrAddress)
+  static fromToken(token, publicKeyOrAddress = null) {
+    const profile = extractProfile(token, publicKeyOrAddress)
     return new Person(profile)
   }
 
   static fromLegacyFormat(legacyProfile) {
-    let profile = getPersonFromLegacyFormat(legacyProfile)
+    const profile = getPersonFromLegacyFormat(legacyProfile)
     return new Person(profile)
   }
 

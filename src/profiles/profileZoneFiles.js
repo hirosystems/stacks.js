@@ -1,7 +1,4 @@
-'use strict'
-
-import { makeZoneFile, parseZoneFile } from 'zone-file'
-import { getProfileFromToken } from './profileTokens'
+import { makeZoneFile } from 'zone-file'
 
 export function makeProfileZoneFile(origin, tokenFileUrl) {
   if (tokenFileUrl.indexOf('://') < 0) {
@@ -11,25 +8,25 @@ export function makeProfileZoneFile(origin, tokenFileUrl) {
   const urlScheme = tokenFileUrl.split('://')[0]
   const urlParts = tokenFileUrl.split('://')[1].split('/')
   const domain = urlParts[0]
-  const pathname = '/' + urlParts.slice(1).join('/')
+  const pathname = `/${urlParts.slice(1).join('/')}`
 
   const zoneFile = {
-    "$origin": origin,
-    "$ttl": 3600,
-    "uri": [
+    $origin: origin,
+    $ttl: 3600,
+    uri: [
       {
-        "name": "_http._tcp",
-        "priority": 10,
-        "weight": 1,
-        "target": `${urlScheme}://${domain}${pathname}`
+        name: '_http._tcp',
+        priority: 10,
+        weight: 1,
+        target: `${urlScheme}://${domain}${pathname}`
       }
     ]
   }
 
-  const zoneFileTemplate = '{$origin}\n\
-{$ttl}\n\
-{uri}\n\
-'
+  const zoneFileTemplate = '{$origin}\n\\' +
+'{$ttl}\n\\' +
+'{uri}\n\\'
+
 
   return makeZoneFile(zoneFile, zoneFileTemplate)
 }
@@ -44,7 +41,7 @@ export function getTokenFileUrl(zoneFileJson) {
   if (zoneFileJson.uri.length < 1) {
     return null
   }
-  let firstUriRecord = zoneFileJson.uri[0]
+  const firstUriRecord = zoneFileJson.uri[0]
 
   if (!firstUriRecord.hasOwnProperty('target')) {
     return null
@@ -56,7 +53,7 @@ export function getTokenFileUrl(zoneFileJson) {
   } else if (tokenFileUrl.startsWith('http')) {
     // pass
   } else {
-    tokenFileUrl = 'https://' + tokenFileUrl
+    tokenFileUrl = `https://${tokenFileUrl}`
   }
 
   return tokenFileUrl

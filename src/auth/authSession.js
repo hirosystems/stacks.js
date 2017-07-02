@@ -1,6 +1,4 @@
-import urlparse from 'url'
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
-import { getAuthRequestFromURL } from './authProvider'
 import fetch from 'isomorphic-fetch'
 /*
  * Create an authentication token to be sent to the Core API server
@@ -13,18 +11,18 @@ import fetch from 'isomorphic-fetch'
  *
  * Returns a JWT signed by the app's private key
  */
-export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID, thisDevice=null ) {
-
+export function makeCoreSessionRequest(appDomain, appMethods,
+  appPrivateKey, blockchainID, thisDevice = null) {
   if (thisDevice === null) {
-     thisDevice = '.default';
+    thisDevice = '.default'
   }
 
   // TODO: multi-device
-  const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey);
+  const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
   const appPublicKeys = [{
-     'public_key': appPublicKey,
-     'device_id': thisDevice,
-  }];
+    public_key: appPublicKey,
+    device_id: thisDevice
+  }]
 
   const authBody = {
     version: 1,
@@ -33,8 +31,8 @@ export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blo
     app_domain: appDomain,
     methods: appMethods,
     app_public_keys: appPublicKeys,
-    device_id: thisDevice,
-  };
+    device_id: thisDevice
+  }
 
   // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
@@ -106,13 +104,13 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiP
  * Returns a Promise that resolves to a Core session token.
  */
 export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
-                               blockchainId, authRequest = null, this_device_id = '0') {
+                               blockchainId, authRequest = null, deviceId = '0') {
   if (!authRequest) {
-    return Promise.reject('No authRequest provided');
+    return Promise.reject('No authRequest provided')
   }
 
   if (!blockchainId) {
-    return Promise.reject('No blockchain ID given');
+    return Promise.reject('No blockchain ID given')
   }
 
   let payload = null
@@ -138,7 +136,7 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
   const appMethods = payload.scopes
 
   const coreAuthRequest = makeCoreSessionRequest(
-      appDomain, appMethods, appPrivateKey, blockchainId, this_device_id)
+      appDomain, appMethods, appPrivateKey, blockchainId, deviceId)
 
   return sendCoreSessionRequest(
       coreHost, corePort, coreAuthRequest, apiPassword)

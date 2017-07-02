@@ -1,5 +1,3 @@
-'use strict'
-
 import inspector from 'schema-inspector'
 
 import { extractProfile } from '../profileTokens'
@@ -22,12 +20,12 @@ export class Organization extends Profile {
     }, this._profile)
   }
 
-  static validateSchema(profile, strict=false) {
-    schemaDefinition['strict'] = strict
+  static validateSchema(profile, strict = false) {
+    schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token, publicKeyOrAddress=null) {
+  static fromToken(token, publicKeyOrAddress = null) {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new Organization(profile)
   }

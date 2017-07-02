@@ -1,8 +1,6 @@
-'use strict'
-
 import inspector from 'schema-inspector'
 
-import { signProfileToken, verifyProfileToken, extractProfile } from './profileTokens'
+import { signProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'
 import { makeProfileZoneFile } from './profileZoneFiles'
 
@@ -29,12 +27,12 @@ export class Profile {
     return signProfileToken(this.toJSON(), privateKey)
   }
 
-  static validateSchema(profile, strict=false) {
-    schemaDefinition['strict'] = strict
+  static validateSchema(profile, strict = false) {
+    schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token, publicKeyOrAddress=null) {
+  static fromToken(token, publicKeyOrAddress = null) {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new Profile(profile)
   }

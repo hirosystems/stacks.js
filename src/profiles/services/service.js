@@ -1,23 +1,20 @@
-'use strict'
-
-import "isomorphic-fetch"
-import { containsValidProofStatement } from "./serviceUtils"
+import 'isomorphic-fetch'
+import { containsValidProofStatement } from './serviceUtils'
 
 export class Service {
   static validateProof(proof, fqdn) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       try {
-        let proofUrl = this.getProofUrl(proof)
+        const proofUrl = this.getProofUrl(proof)
         fetch(proofUrl).then((res) => {
-          if(res.status == 200) {
+          if (res.status === 200) {
             res.text().then((text) => {
-                proof.valid = containsValidProofStatement(text, fqdn)
-                resolve(proof)
+              proof.valid = containsValidProofStatement(text, fqdn)
+              resolve(proof)
             })
-
           } else {
             console.error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
-              Unable to validate proof.` )
+              Unable to validate proof.`)
             proof.valid = false
             resolve(proof)
           }
@@ -26,7 +23,7 @@ export class Service {
           proof.valid = false
           resolve(proof)
         })
-      } catch(e) {
+      } catch (e) {
         console.error(e)
         proof.valid = false
         resolve(proof)
@@ -39,9 +36,9 @@ export class Service {
   }
 
   static getProofUrl(proof) {
-    let baseUrls = this.getBaseUrls()
-    for(let i = 0; i < baseUrls.length; i++) {
-      if(proof.proof_url.startsWith(`${baseUrls[i]}${proof.identifier}`)) {
+    const baseUrls = this.getBaseUrls()
+    for (let i = 0; i < baseUrls.length; i++) {
+      if (proof.proof_url.startsWith(`${baseUrls[i]}${proof.identifier}`)) {
         return proof.proof_url
       }
     }

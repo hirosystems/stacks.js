@@ -1,5 +1,3 @@
-'use strict'
-
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { updateQueryStringParameter } from '../index'
@@ -17,7 +15,7 @@ export function getAuthRequestFromURL() {
 export function fetchAppManifest(authRequest) {
   return new Promise((resolve, reject) => {
     if (!authRequest) {
-      reject("Invalid auth request")
+      reject('Invalid auth request')
     } else {
       const payload = decodeToken(authRequest).payload
       const manifestURI = payload.manifest_uri
@@ -30,11 +28,11 @@ export function fetchAppManifest(authRequest) {
           })
           .catch((e) => {
             console.log(e.stack)
-            reject("URI request couldn't be completed")
+            reject('URI request couldn\'t be completed')
           })
-      } catch(e) {
+      } catch (e) {
         console.log(e.stack)
-        reject("URI request couldn't be completed")
+        reject('URI request couldn\'t be completed')
       }
     }
   })
@@ -47,7 +45,7 @@ export function redirectUserToApp(authRequest, authResponse) {
   if (redirectURI) {
     redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
   } else {
-    throw new Error("Invalid redirect URI")
+    throw new Error('Invalid redirect URI')
   }
   window.location = redirectURI
 }

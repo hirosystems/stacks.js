@@ -1,5 +1,3 @@
-'use strict'
-
 export function getName(profile) {
   if (!profile) {
     return null
@@ -12,7 +10,7 @@ export function getName(profile) {
       name = profile.givenName
     }
     if (profile.familyName) {
-      name += ' ' + profile.familyName
+      name += ` ${profile.familyName}`
     }
   } else if (profile.name) {
     name = profile.name
@@ -29,7 +27,7 @@ export function getGivenName(profile) {
   if (profile.givenName) {
     givenName = profile.givenName
   } else if (profile.name) {
-    let nameParts = profile.name.split(' ')
+    const nameParts = profile.name.split(' ')
     givenName = nameParts.slice(0, -1).join(' ')
   }
   return givenName
@@ -44,7 +42,7 @@ export function getFamilyName(profile) {
   if (profile.familyName) {
     familyName = profile.familyName
   } else if (profile.name) {
-    let nameParts = profile.name.split(' ')
+    const nameParts = profile.name.split(' ')
     familyName = nameParts.pop()
   }
   return familyName
@@ -69,10 +67,12 @@ export function getAvatarUrl(profile) {
 
   let avatarContentUrl = null
   if (profile.image) {
-    profile.image.map(function(image) {
+    profile.image.map((image) => {
       if (image.name === 'avatar') {
         avatarContentUrl = image.contentUrl
-        return
+        return avatarContentUrl
+      } else {
+        return null
       }
     })
   }
@@ -84,13 +84,13 @@ export function getVerifiedAccounts(profile, verifications) {
     return null
   }
 
-  let filteredAccounts = []
+  const filteredAccounts = []
   if (profile.hasOwnProperty('account') && verifications) {
-    profile.account.map(function(account) {
+    profile.account.map((account) => {
       let accountIsValid = false
       let proofUrl = null
 
-      verifications.map(function(verification) {
+      verifications.map((verification) => {
         if (verification.hasOwnProperty('proof_url')) {
           verification.proofUrl = verification.proof_url
         }
@@ -100,12 +100,18 @@ export function getVerifiedAccounts(profile, verifications) {
             && verification.proofUrl) {
           accountIsValid = true
           proofUrl = verification.proofUrl
+          return true
+        } else {
+          return false
         }
       })
-      
+
       if (accountIsValid) {
         account.proofUrl = proofUrl
         filteredAccounts.push(account)
+        return account
+      } else {
+        return null
       }
     })
   }
@@ -117,7 +123,7 @@ export function getOrganizations(profile) {
     return null
   }
 
-  let organizations = []
+  const organizations = []
 
   if (profile.hasOwnProperty('worksFor')) {
     return profile.worksFor
@@ -148,7 +154,7 @@ export function getAddress(profile) {
   let addressString = null
 
   if (profile.hasOwnProperty('address')) {
-    let addressParts = []
+    const addressParts = []
 
     if (profile.address.hasOwnProperty('streetAddress')) {
       addressParts.push(profile.address.streetAddress)
@@ -176,15 +182,15 @@ export function getBirthDate(profile) {
     return null
   }
 
-  let monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ]
 
   let birthDateString = null
-  
+
   if (profile.hasOwnProperty('birthDate')) {
-    let date = new Date(profile.birthDate)
+    const date = new Date(profile.birthDate)
     birthDateString = `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
   }
 

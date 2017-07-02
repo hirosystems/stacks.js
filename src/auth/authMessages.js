@@ -48,10 +48,9 @@ export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
   return token
 }
 
-export function makeAuthResponse(privateKey, profile={}, username=null,
-                                 coreToken=null, appPrivateKey=null,
-                                 expiresAt=nextMonth().getTime()) {
-
+export function makeAuthResponse(privateKey, profile = {}, username = null,
+                                 coreToken = null, appPrivateKey = null,
+                                 expiresAt = nextMonth().getTime()) {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -59,13 +58,13 @@ export function makeAuthResponse(privateKey, profile={}, username=null,
   /* Create the payload */
   const payload = {
     jti: makeUUID4(),
-    iat: Math.floor(new Date().getTime()/1000), // JWT times are in seconds
-    exp: Math.floor(expiresAt/1000), // JWT times are in seconds
+    iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
+    exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: makeDIDFromAddress(address),
     private_key: appPrivateKey,
     public_keys: [publicKey],
-    profile: profile,
-    username: username,
+    profile,
+    username,
     core_token: coreToken
   }
 

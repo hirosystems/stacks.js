@@ -12,10 +12,11 @@
     "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
-    "test": "npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
+    "test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
     "build": "npm run compile; npm run browserify",
-    "flow": "flow"
+    "flow": "flow",
+    "lint": "eslint src"
   },
   "repository": {
     "type": "git",
@@ -97,6 +98,7 @@
     "ecurve": "^1.0.5",
     "elliptic": "^6.4.0",
     "es6-promise": "^4.1.0",
+    "hasprop": "0.0.4",
     "isomorphic-fetch": "^2.2.1",
     "jsontokens": "^0.7.6",
     "promise": "^7.1.1",
