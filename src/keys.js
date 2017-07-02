@@ -2,7 +2,7 @@
 import { randomBytes } from 'crypto'
 import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
 
-export function getEntropy(numberOfBytes: string) {
+export function getEntropy(numberOfBytes: number) {
   if (!numberOfBytes) {
     numberOfBytes = 32
   }
