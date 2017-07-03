@@ -8,7 +8,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 -   [Profiles](#profiles)
 -   [Storage](#storage)
 -   [Testing](#testing)
--   [Documentation])(#documentation)
+-   [Documentation](#documentation)
 
 ## Installation
 
@@ -87,7 +87,7 @@ and `redirectToSignInWithAuthRequest` to build your own sign in process.
     this app's data store.
     An array of strings indicating which permissions this app is requesting. (optional, default `DEFAULT_SCOPE`)
 
-Returns **void** 
+Returns **void**
 
 ### getAuthResponseToken
 
@@ -123,7 +123,7 @@ Sign the user out and re
 
 -   `redirectURL` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Location to redirect user to after sign out. (optional, default `'/'`)
 
-Returns **void** 
+Returns **void**
 
 ### signProfileToken
 
@@ -192,9 +192,9 @@ Query Strings
 
 **Parameters**
 
--   `uri` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `value` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `uri` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
+-   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
+-   `value` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 ### makeUUID4
 
