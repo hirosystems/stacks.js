@@ -34,11 +34,22 @@ var _authConstants = require('./authConstants');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Generates a ECDSA keypair and stores the hex value of the private key in
+ * local storage.
+ * @return {[type]} [description]
+ * @private
+ */
 function generateAndStoreAppKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
 }
+
+/**
+ * Check if a user is currently signed in.
+ * @return {Boolean} `true` if the user is signed in, `false` if not.
+ */
 
 function isUserSignedIn() {
   return !!window.localStorage.getItem(_authConstants.BLOCKSTACK_STORAGE_LABEL);
@@ -69,6 +80,29 @@ function redirectToSignInWithAuthRequest() {
   (0, _customProtocolDetectionBlockstack2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
 }
 
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
+ * Most applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `generateAndStoreAppKey`, `makeAuthRequest`,
+ * and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ *
+ * @param  {String} [redirectURI=`${window.location.origin}/`]
+ * The location to which the identity provider will redirect the user after
+ * the user approves sign in.
+ * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * Location of the manifest file.
+ * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * this app's data store.
+ * An array of strings indicating which permissions this app is requesting.
+ * @return {void}
+ */
 function redirectToSignIn() {
   var redirectURI = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.location.origin + '/';
   var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin + '/manifest.json';
@@ -78,15 +112,30 @@ function redirectToSignIn() {
   redirectToSignInWithAuthRequest(authRequest);
 }
 
+/**
+ * Retrieve the authentication token from the
+ * @return {String} [description]
+ */
 function getAuthResponseToken() {
   var queryDict = _queryString2.default.parse(location.search);
   return queryDict.authResponse ? queryDict.authResponse : null;
 }
 
+/**
+ * Check if there is a authentication request that hasn't been handled.
+ * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
+ */
 function isSignInPending() {
   return !!getAuthResponseToken();
 }
 
+/**
+ * Try to process any pending sign in request by returning a `Promise` that resolves
+ * to the user data object if the sign in succeeds.
+ *
+ * @return {Promise} that resolves to the user data object if successful and rejects
+ * if handling the sign in request fails or there was no pending sign in request.
+ */
 function handlePendingSignIn() {
   var authResponseToken = getAuthResponseToken();
 
@@ -109,11 +158,23 @@ function handlePendingSignIn() {
     });
   });
 }
+
+/**
+ * Retrieves the user data object. The user's profile is stored in the key `profile`.
+ * @return {Object} User data object.
+ */
 function loadUserData() {
   return JSON.parse(window.localStorage.getItem(_authConstants.BLOCKSTACK_STORAGE_LABEL));
 }
 
-function signUserOut(redirectURL) {
+/**
+ * Sign the user out and re
+ * @param  {String} [redirectURL='/'] Location to redirect user to after sign out.
+ * @return {void}
+ */
+function signUserOut() {
+  var redirectURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+
   window.localStorage.removeItem(_authConstants.BLOCKSTACK_STORAGE_LABEL);
   window.location = redirectURL;
 }
@@ -304,7 +365,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param appPrivateKey (String) The application-specific private key
  * @param blockchainId (String) This is the blockchain ID of the requester
  *
- * Returns a JWT signed by the app's private key
+ * @returns a JWT signed by the app's private key
+ * @private
  */
 function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID) {
   var thisDevice = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
@@ -345,6 +407,7 @@ function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchain
  *
  * Returns a JWT signed with the Core API server's private key that authorizes the bearer
  * to carry out the requested operations.
+ * @private
  */
 function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
   return new Promise(function (resolve, reject) {
@@ -394,6 +457,7 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
  * @param blockchainId (String) blockchain ID of the user signing in.
  *
  * Returns a Promise that resolves to a Core session token.
+ * @private
  */
 function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, blockchainId) {
   var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
