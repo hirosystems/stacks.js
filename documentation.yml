@@ -1,0 +1,25 @@
+toc:
+  - name: Authentication
+    description: |
+      Authentication methods.
+  - redirectToSignIn
+  - isSignInPending
+  - handlePendingSignIn
+  - loadUserData
+  - isUserSignedIn
+  - signUserOut
+  - makeAuthRequest
+  - redirectToSignInWithAuthRequest
+  - getAuthResponseToken
+  - name: Profiles
+    description: |
+      Profile methods.
+  - extractProfile
+  - wrapProfileToken
+  - signProfileToken
+  - verifyProfileToken
+  - name: storage
+    description: |
+      Storage methods.
+  - getFile
+  - putFile
