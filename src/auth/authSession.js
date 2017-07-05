@@ -1,6 +1,4 @@
-import urlparse from 'url'
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
-import { getAuthRequestFromURL } from './authProvider'
 import fetch from 'isomorphic-fetch'
 /*
  * Create an authentication token to be sent to the Core API server
@@ -9,25 +7,35 @@ import fetch from 'isomorphic-fetch'
  * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
  * @param appMethods (Array) The list of API methods this application will need.
  * @param appPrivateKey (String) The application-specific private key
- * @param blockchainIds (Array) Optional; if given, this is the list of blockchain
- *        IDs for which this session identifies.
+ * @param blockchainId (String) This is the blockchain ID of the requester
  *
- * Returns a JWT signed by the app's private key
+ * @returns a JWT signed by the app's private key
+ * @private
  */
-export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey,
-                                       blockchainIds = null) {
+export function makeCoreSessionRequest(appDomain, appMethods,
+  appPrivateKey, blockchainID, thisDevice = null) {
+  if (thisDevice === null) {
+    thisDevice = '.default'
+  }
+
+  // TODO: multi-device
   const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
+  const appPublicKeys = [{
+    public_key: appPublicKey,
+    device_id: thisDevice
+  }]
+
   const authBody = {
+    version: 1,
+    blockchain_id: blockchainID,
+    app_private_key: appPrivateKey,
     app_domain: appDomain,
     methods: appMethods,
-    app_public_key: appPublicKey
+    app_public_keys: appPublicKeys,
+    device_id: thisDevice
   }
 
-  if (blockchainIds) {
-    authBody.blockchain_ids = blockchainIds
-  }
-
-   // make token
+  // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
   const token = tokenSigner.sign(authBody)
 
@@ -43,9 +51,9 @@ export function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey,
  *
  * Returns a JWT signed with the Core API server's private key that authorizes the bearer
  * to carry out the requested operations.
+ * @private
  */
-export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
-                                       apiPassword) {
+export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
   return new Promise((resolve, reject) => {
     if (!apiPassword) {
       reject('Missing API password')
@@ -93,14 +101,19 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest,
  * @param coreHost (String) Core API server's hostname
  * @param corePort (Integer) Core API server's port number
  * @param appPrivateKey (String) Application's private key
- * @param userBlockchainId (String) Optional; blockchain ID of the user signing in.
+ * @param blockchainId (String) blockchain ID of the user signing in.
  *
  * Returns a Promise that resolves to a Core session token.
+ * @private
  */
-export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, authRequest,
-                               userBlockchainId = null) {
+export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
+                               blockchainId, authRequest = null, deviceId = '0') {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
+  }
+
+  if (!blockchainId) {
+    return Promise.reject('No blockchain ID given')
   }
 
   let payload = null
@@ -124,13 +137,10 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, a
     return Promise.reject('No domain_name in authRequest')
   }
   const appMethods = payload.scopes
-  let blockchainIds = null
-  if (userBlockchainId) {
-    blockchainIds = [userBlockchainId]
-  }
 
   const coreAuthRequest = makeCoreSessionRequest(
-      appDomain, appMethods, appPrivateKey, blockchainIds)
+      appDomain, appMethods, appPrivateKey, blockchainId, deviceId)
+
   return sendCoreSessionRequest(
       coreHost, corePort, coreAuthRequest, apiPassword)
 }

@@ -1,8 +1,7 @@
-'use strict'
-
 export {
-  isUserSignedIn, redirectUserToSignIn, getAuthResponseToken, isSignInPending,
-  signUserIn, loadUserData, signUserOut
+  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
+  getAuthResponseToken, isSignInPending,
+  handlePendingSignIn, loadUserData, signUserOut, generateAndStoreAppKey
 } from './authApp'
 export {
   makeAuthRequest, makeAuthResponse

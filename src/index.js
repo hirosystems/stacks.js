@@ -1,5 +1,7 @@
+
 export * from './auth'
 export * from './profiles'
+export * from './storage'
 
 export {
   makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID

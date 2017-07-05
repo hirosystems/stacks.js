@@ -3,6 +3,7 @@ import { getAddressFromDID, publicKeyToAddress } from '../index'
 
 export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
+  console.log(payload)
   const publicKeys = payload.public_keys
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]
@@ -143,14 +144,14 @@ export function verifyAuthRequest(token) {
   })
 }
 
-export function verifyAuthResponse(token, nameLookupURL) {
+export function verifyAuthResponse(token) {
   return new Promise((resolve) => {
     Promise.all([
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
-      doPublicKeysMatchIssuer(token),
-      doPublicKeysMatchUsername(token, nameLookupURL)
+      doPublicKeysMatchIssuer(token)// ,
+      // doPublicKeysMatchUsername(token, nameLookupURL)
     ]).then(values => {
       console.log(values)
       if (values.every(Boolean)) {

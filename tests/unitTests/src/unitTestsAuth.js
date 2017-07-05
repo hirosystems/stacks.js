@@ -35,27 +35,26 @@ export function runAuthTests() {
         origin: 'http://localhost:3000',
         hostname: 'localhost',
         host: 'localhost:3000',
-        href: 'http://localhost:3000/landing'
+        href: 'http://localhost:3000/signin'
       }
     }
-    const authRequest = makeAuthRequest(privateKey, 'localhost')
+    const authRequest = makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
-    // console.log(authRequest)
+    console.log(authRequest)
 
     const decodedToken = decodeToken(authRequest)
     t.ok(decodedToken, 'auth request token should have been decoded')
-    // console.log(JSON.stringify(decodedToken, null, 2))
+    console.log(JSON.stringify(decodedToken, null, 2))
 
     const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
-    const domainName = 'localhost'
     const origin = 'http://localhost:3000'
     t.equal(decodedToken.payload.iss, referenceDID, 'auth request issuer should include the public key')
-    t.equal(decodedToken.payload.domain_name, domainName, 'auth request should include domain name ')
-    t.notEqual(decodedToken.payload.domain_name, origin, 'auth request domain_name should not be origin')
-    t.equal(decodedToken.payload.redirect_uri, 'http://localhost:3000/landing', 'auth request redirects to correct uri')
+    t.equal(decodedToken.payload.domain_name, origin, 'auth request domain_name should be origin')
+    t.equal(decodedToken.payload.redirect_uri, 'http://localhost:3000/', 'auth request redirects to correct uri')
+    t.equal(decodedToken.payload.manifest_uri, 'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
 
-    t.equal(JSON.stringify(decodedToken.payload.scopes), '[]', 'auth request scopes should be an empty list')
+    t.equal(JSON.stringify(decodedToken.payload.scopes), '["store_write"]', 'auth request scopes should be store_write')
 
     verifyAuthRequest(authRequest)
       .then((verified) => {
