@@ -14,7 +14,8 @@ import {
   CreativeWork,
   getEntropy,
   makeZoneFileForHostedProfile,
-  resolveZoneFileToPerson
+  resolveZoneFileToPerson,
+  makeProfileZoneFile
 } from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
@@ -60,6 +61,16 @@ function testTokening(filename, profile) {
     //console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile), JSON.stringify(profile), 'Profile should equal the reference')
+  })
+
+  test('makeProfileZoneFile', (t) => {
+    t.plan(1)
+
+    const origin = 'satoshi.id'
+    const tokenFileUrl = 'https://example.com/satoshi.json'
+    const expectedZoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const actualZoneFile = makeProfileZoneFile(origin, tokenFileUrl)
+    t.equal(actualZoneFile, expectedZoneFile)
   })
 }
 

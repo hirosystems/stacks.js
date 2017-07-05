@@ -23,9 +23,7 @@ export function makeProfileZoneFile(origin, tokenFileUrl) {
     ]
   }
 
-  const zoneFileTemplate = '{$origin}\n\\' +
-'{$ttl}\n\\' +
-'{uri}\n\\'
+  const zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n'
 
 
   return makeZoneFile(zoneFile, zoneFileTemplate)
