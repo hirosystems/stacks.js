@@ -1,5 +1,6 @@
 /* @flow */
-import blockstackStorage from 'blockstack-storage'
+import { getFile as storageGetFile,
+  putFile as storagePutFile } from 'blockstack-storage'
 
 /**
  * Retrieves the specified file from the app's data store.
@@ -8,7 +9,7 @@ import blockstackStorage from 'blockstack-storage'
  * or rejects with an error
  */
 export function getFile(path: string) {
-  return blockstackStorage.getFile(path)
+  return storageGetFile(path)
 }
 
 /**
@@ -19,5 +20,5 @@ export function getFile(path: string) {
  * if it failed
  */
 export function putFile(path: string, content: string | Buffer) {
-  return blockstackStorage.putFile(path, content)
+  return storagePutFile(path, content)
 }
