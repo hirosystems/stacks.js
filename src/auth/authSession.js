@@ -9,7 +9,8 @@ import fetch from 'isomorphic-fetch'
  * @param appPrivateKey (String) The application-specific private key
  * @param blockchainId (String) This is the blockchain ID of the requester
  *
- * Returns a JWT signed by the app's private key
+ * @returns a JWT signed by the app's private key
+ * @private
  */
 export function makeCoreSessionRequest(appDomain, appMethods,
   appPrivateKey, blockchainID, thisDevice = null) {
@@ -50,6 +51,7 @@ export function makeCoreSessionRequest(appDomain, appMethods,
  *
  * Returns a JWT signed with the Core API server's private key that authorizes the bearer
  * to carry out the requested operations.
+ * @private
  */
 export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
   return new Promise((resolve, reject) => {
@@ -102,6 +104,7 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiP
  * @param blockchainId (String) blockchain ID of the user signing in.
  *
  * Returns a Promise that resolves to a Core session token.
+ * @private
  */
 export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
                                blockchainId, authRequest = null, deviceId = '0') {

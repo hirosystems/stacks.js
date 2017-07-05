@@ -1,3 +1,4 @@
+/* @flow */
 require('isomorphic-fetch')
 
 import {
@@ -14,12 +15,23 @@ import {
   DEFAULT_SCOPE
 } from './authConstants'
 
-export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
-                                redirectURI = `${window.location.origin}/`,
-                                manifestURI = `${window.location.origin}/manifest.json`,
-                                scopes = DEFAULT_SCOPE,
-                                appDomain = window.location.origin,
-                                expiresAt = nextHour().getTime()) {
+/**
+ * Generates an authentication request that can be sent to the Blockstack
+ * browser for the user to approve sign in.
+ * @param  {String} [transitPrivateKey=generateAndStoreAppKey()] - hex encoded app private key
+ * @param {String} redirectURI - location to redirect user to after sign in approval
+ * @param {String} manifestURI - location of this app's manifest file
+ * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {String} appDomain - the origin of this app
+ * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @return {String} the authentication request
+ */
+export function makeAuthRequest(transitPrivateKey: string = generateAndStoreAppKey(),
+                                redirectURI: string = `${window.location.origin}/`,
+                                manifestURI: string = `${window.location.origin}/manifest.json`,
+                                scopes: Array<String> = DEFAULT_SCOPE,
+                                appDomain: string = window.location.origin,
+                                expiresAt: number = nextHour().getTime()): string {
   /* Create the payload */
   const payload = {
     jti: makeUUID4(),
@@ -48,9 +60,12 @@ export function makeAuthRequest(transitPrivateKey = generateAndStoreAppKey(),
   return token
 }
 
-export function makeAuthResponse(privateKey, profile = {}, username = null,
-                                 coreToken = null, appPrivateKey = null,
-                                 expiresAt = nextMonth().getTime()) {
+export function makeAuthResponse(privateKey: string,
+                                 profile: {} = {},
+                                 username: ?string = null,
+                                 coreToken: ?string = null,
+                                 appPrivateKey: ?string = null,
+                                 expiresAt: number = nextMonth().getTime()): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)

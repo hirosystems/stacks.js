@@ -2,6 +2,7 @@
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
  * Time
+ * @private
  */
 
 export function nextYear() {
@@ -30,6 +31,7 @@ export function nextHour() {
 
 /**
  * Query Strings
+ * @private
  */
 
 export function updateQueryStringParameter(uri: string, key: string, value: string) {
@@ -44,6 +46,7 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
 
 /**
  * UUIDs
+ * @private
  */
 
 export function makeUUID4() {

@@ -1,0 +1,24 @@
+toc:
+  - name: Authentication
+    file: /src/auth/README.md 
+  - redirectToSignIn
+  - isSignInPending
+  - handlePendingSignIn
+  - loadUserData
+  - isUserSignedIn
+  - signUserOut
+  - makeAuthRequest
+  - redirectToSignInWithAuthRequest
+  - getAuthResponseToken
+  - name: Profiles
+    description: |
+      Profile methods.
+  - extractProfile
+  - wrapProfileToken
+  - signProfileToken
+  - verifyProfileToken
+  - name: storage
+    description: |
+      Storage methods.
+  - getFile
+  - putFile
