@@ -2740,21 +2740,36 @@ exports.Twitter = Twitter;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getFile = getFile;
+exports.putFile = putFile;
 
 var _blockstackStorage = require('blockstack-storage');
 
-Object.defineProperty(exports, 'getFile', {
-  enumerable: true,
-  get: function get() {
-    return _blockstackStorage.getFile;
-  }
-});
-Object.defineProperty(exports, 'putFile', {
-  enumerable: true,
-  get: function get() {
-    return _blockstackStorage.putFile;
-  }
-});
+var _blockstackStorage2 = _interopRequireDefault(_blockstackStorage);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Retrieves the specified file from the app's data store.
+ * @param {String} path - the path to the file to read
+ * @returns {Promise} that resolves to the raw data in the file
+ * or rejects with an error
+ */
+function getFile(path) {
+  return _blockstackStorage2.default.getFile(path);
+}
+
+/**
+ * Stores the data provided in the app's data store to to the file specified.
+ * @param {String} path - the path to store the data in
+ * @param {String|Buffer} content - the data to store in the file
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
+
+function putFile(path, content) {
+  return _blockstackStorage2.default.putFile(path, content);
+}
 },{"blockstack-storage":120}],31:[function(require,module,exports){
 'use strict';
 
