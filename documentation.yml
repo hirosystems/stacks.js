@@ -1,6 +1,9 @@
 toc:
   - name: Authentication
-    file: /src/auth/README.md 
+    description: |
+      Signal sign on and authentication without third parties or remote servers.
+
+      [Read more about authentication](https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md)
   - redirectToSignIn
   - isSignInPending
   - handlePendingSignIn
@@ -12,13 +15,17 @@ toc:
   - getAuthResponseToken
   - name: Profiles
     description: |
-      Profile methods.
+      Identity you own and control.
+
+      [Read more about profiles](https://github.com/blockstack/blockstack.js/blob/master/src/profiles/README.md)
   - extractProfile
   - wrapProfileToken
   - signProfileToken
   - verifyProfileToken
-  - name: storage
+  - name: Storage
     description: |
-      Storage methods.
+      Store your app's data without servers in storage your user controls.
+
+      [Read more about storage](https://github.com/blockstack/blockstack.js/src/storage/README.md)
   - getFile
   - putFile

@@ -16,7 +16,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
 ## About
 
-Blockstack JS is a library for profiles/identity and authentication.
+Blockstack JS is a library for profiles/identity, authentication, and storage.
 
 The authentication portion of this library can be used to:
 
@@ -29,11 +29,15 @@ The profiles/identity portion of this library can be used to:
 2.  recover a JSON profile from signed tokens
 3.  validate signed profile tokens
 
+The storage portion of this library can be used to:
+
+1. store and retrieve your app's data in storage that is controlled by the user 
+
 _Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var")._
 
 ## Documentation
 
-[![Documentation](/docs-button.png)](/docs)
+[![Documentation](/docs-button.png)](http://blockstack.github.io/blockstack.js/index.html)
 
 ## Testing
 
