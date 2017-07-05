@@ -2423,7 +2423,7 @@ function makeProfileZoneFile(origin, tokenFileUrl) {
     }]
   };
 
-  var zoneFileTemplate = '{$origin}\n\\' + '{$ttl}\n\\' + '{uri}\n\\';
+  var zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n';
 
   return (0, _zoneFile.makeZoneFile)(zoneFile, zoneFileTemplate);
 }
@@ -2745,10 +2745,6 @@ exports.putFile = putFile;
 
 var _blockstackStorage = require('blockstack-storage');
 
-var _blockstackStorage2 = _interopRequireDefault(_blockstackStorage);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
@@ -2756,7 +2752,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * or rejects with an error
  */
 function getFile(path) {
-  return _blockstackStorage2.default.getFile(path);
+  return (0, _blockstackStorage.getFile)(path);
 }
 
 /**
@@ -2768,7 +2764,7 @@ function getFile(path) {
  */
 
 function putFile(path, content) {
-  return _blockstackStorage2.default.putFile(path, content);
+  return (0, _blockstackStorage.putFile)(path, content);
 }
 },{"blockstack-storage":120}],31:[function(require,module,exports){
 'use strict';
