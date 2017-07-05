@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 0.7.0 | Documentation</title>
+  <title>blockstack 0.8.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>0.7.0</code></div>
+          <div class='mb1'><code>0.8.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -177,7 +177,7 @@
                 <li><a
                   href='#storage'
                   class="h5 bold black caps">
-                  storage
+                  Storage
                   
                 </a>
                 
@@ -220,93 +220,8 @@
   </h2>
 
   
-    <h1>Blockstack Auth</h1>
-<p>SSO and authentication without 3rd parties or remote servers</p>
-<ul>
-<li><a href="#quickstart">Quickstart</a></li>
-<li><a href="#operations">Operations</a></li>
-<li><a href="#examples">Examples</a></li>
-</ul>
-<h2>Quickstart</h2>
-<p>1) Install <code>blockstack.js</code>:</p>
-<pre class='hljs'>npm install blockstack --save</pre>
-<p>2) Import Blockstack into your project</p>
-<pre class='hljs'><span class="hljs-keyword">import</span> blockstack <span class="hljs-keyword">from</span> <span class="hljs-string">'blockstack'</span></pre>
-<p>3) Wire up a sign in button</p>
-<pre class='hljs'><span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'signin-button'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  blockstack.redirectToSignIn()
-})</pre>
-<p>4) Wire up a sign out button</p>
-<pre class='hljs'><span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'signout-button'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  blockstack.signUserOut(<span class="hljs-built_in">window</span>.location.origin)
-})</pre>
-<p>5) Include the logic to (a) load user data (b) handle the auth response</p>
-<pre class='hljs'><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showProfile</span>(<span class="hljs-params">profile</span>) </span>{
-  <span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> blockstack.Person(profile)
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'heading-name'</span>).innerHTML = person.name()
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'avatar-image'</span>).setAttribute(<span class="hljs-string">'src'</span>, person.avatarUrl())
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'section-1'</span>).style.display = <span class="hljs-string">'none'</span>
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'section-2'</span>).style.display = <span class="hljs-string">'block'</span>
-}
-
-<span class="hljs-keyword">if</span> (blockstack.isUserSignedIn()) {
-  blockstack.loadUserData(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">userData</span>) </span>{
-    showProfile(userData.profile)
-  })
-} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (blockstack.isSignInPending()) {
-  blockstack.handlePendingSignIn(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">userData</span>) </span>{
-    <span class="hljs-built_in">window</span>.location = <span class="hljs-built_in">window</span>.location.origin
-  })
-}</pre>
-<p>6) Create a manifest.json file</p>
-<pre class='hljs'>{
-  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"Hello, Blockstack"</span>,
-  <span class="hljs-attr">"start_url"</span>: <span class="hljs-string">"localhost:5000"</span>,
-  <span class="hljs-attr">"description"</span>: <span class="hljs-string">"A simple demo of Blockstack Auth"</span>,
-  <span class="hljs-attr">"icons"</span>: [{
-    <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://helloblockstack.com/icon-192x192.png"</span>,
-    <span class="hljs-attr">"sizes"</span>: <span class="hljs-string">"192x192"</span>,
-    <span class="hljs-attr">"type"</span>: <span class="hljs-string">"image/png"</span>
-  }]
-}</pre>
-<p>7) Serve your application</p>
-<h2>Operations</h2>
-<h3>Request a user to sign in</h3>
-<pre class='hljs'>import { requestSignIn } from 'blockstack'
-
-const authRequest = blockstack.makeAuthRequest(null, window.location.origin)
-blockstack.redirectUserToSignIn(authRequest)</pre>
-<h3>Sign a user in</h3>
-<pre class='hljs'>import { signUserIn } from 'blockstack'
-
-signUserIn((userData) =&gt; {
-    // Redirect the user to the home page
-})</pre>
-<h3>Create a raw auth request</h3>
-<pre class='hljs'>import { makeAuthRequest, makeECPrivateKey } from 'blockstack'
-
-const privateKey = makeECPrivateKey()
-const authRequest = makeAuthRequest(privateKey)</pre>
-<h3>Verify an auth request</h3>
-<pre class='hljs'>import { verifyAuthRequest } from 'blockstack'
-
-const verified = verifyAuthRequest(authRequest)</pre>
-<h3>Create an auth response</h3>
-<pre class='hljs'>import { makeAuthResponse, makeECPrivateKey } from 'blockstack'
-
-const privateKey = makeECPrivateKey()
-const profile = { "name": "Naval Ravikant" }
-const username = "naval.id"
-const authResponse = makeAuthResponse(privateKey, profile, username)</pre>
-<h3>Verify an auth response</h3>
-<pre><code>import { verifyAuthResponse } from 'blockstack'
-
-const verified = verifyAuthResponse(authResponse)
-</code></pre>
-<h2>Examples</h2>
-<ul>
-<li><a href="https://github.com/blockstack/blockstack.js/blob/master/tests/browserTests/auth/app.js#L18">Hello, Blockstack</a></li>
-</ul>
+    <p>Signal sign on and authentication without third parties or remote servers.</p>
+<p><a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md">Read more about authentication</a></p>
 
   
 </section>
@@ -982,7 +897,8 @@ protocol handler is not detected
   </h2>
 
   
-    <p>Profile methods.</p>
+    <p>Identity you own and control.</p>
+<p><a href="https://github.com/blockstack/blockstack.js/blob/master/src/profiles/README.md">Read more about profiles</a></p>
 
   
 </section>
@@ -1370,11 +1286,12 @@ keypair that is thought to have signed the token
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='storage' class='mt0'>
-    storage
+    Storage
   </h2>
 
   
-    <p>Storage methods.</p>
+    <p>Store your app's data without servers in storage your user controls.</p>
+<p><a href="https://github.com/blockstack/blockstack.js/src/storage/README.md">Read more about storage</a></p>
 
   
 </section>
