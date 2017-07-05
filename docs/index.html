@@ -2,7 +2,11 @@
 <html>
 <head>
   <meta charset='utf-8' />
+<<<<<<< HEAD
   <title>blockstack 0.8.2 | Documentation</title>
+=======
+  <title>blockstack 0.8.1 | Documentation</title>
+>>>>>>> fe6ef840ea8d218fc247a548c757ad8b9b02c3e4
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -22,187 +26,187 @@
             type='text' />
           <div id='toc'>
             <ul class='list-reset h5 py1-ul'>
-              
-                
+
+
                 <li><a
                   href='#authentication'
                   class="h5 bold black caps">
                   Authentication
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#redirecttosignin'
                   class="">
                   redirectToSignIn
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#issigninpending'
                   class="">
                   isSignInPending
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#handlependingsignin'
                   class="">
                   handlePendingSignIn
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#loaduserdata'
                   class="">
                   loadUserData
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#isusersignedin'
                   class="">
                   isUserSignedIn
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#signuserout'
                   class="">
                   signUserOut
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#makeauthrequest'
                   class="">
                   makeAuthRequest
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#redirecttosigninwithauthrequest'
                   class="">
                   redirectToSignInWithAuthRequest
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#getauthresponsetoken'
                   class="">
                   getAuthResponseToken
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#profiles'
                   class="h5 bold black caps">
                   Profiles
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#extractprofile'
                   class="">
                   extractProfile
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#wrapprofiletoken'
                   class="">
                   wrapProfileToken
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#signprofiletoken'
                   class="">
                   signProfileToken
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#verifyprofiletoken'
                   class="">
                   verifyProfileToken
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#storage'
                   class="h5 bold black caps">
                   Storage
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#getfile'
                   class="">
                   getFile
-                  
+
                 </a>
-                
+
                 </li>
-              
-                
+
+
                 <li><a
                   href='#putfile'
                   class="">
                   putFile
-                  
+
                 </a>
-                
+
                 </li>
-              
+
             </ul>
           </div>
           <div class='mt1 h6 quiet'>
@@ -211,36 +215,36 @@
         </div>
       </div>
       <div class='fix-margin-3'>
-        
-          
+
+
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='authentication' class='mt0'>
     Authentication
   </h2>
 
-  
+
     <p>Signal sign on and authentication without third parties or remote servers.</p>
 <p><a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md">Read more about authentication</a></p>
 
-  
+
 </section>
 </div>
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='redirecttosignin'>
       redirectToSignIn
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Generates an authentication request and redirects the user to the Blockstack
 browser to approve the sign in request.</p>
@@ -254,20 +258,20 @@ and <code>redirectToSignInWithAuthRequest</code> to build your own sign in proce
 
 
   <div class='pre p1 fill-light mt0'>redirectToSignIn(redirectURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>): void</div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -276,9 +280,9 @@ and <code>redirectToSignInWithAuthRequest</code> to build your own sign in proce
 the user approves sign in.
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -286,9 +290,9 @@ the user approves sign in.
 	    Location of the manifest file.
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>
@@ -298,296 +302,296 @@ this app's data store.
 An array of strings indicating which permissions this app is requesting.
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code>void</code>:
-        
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='issigninpending'>
       isSignInPending
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Check if there is a authentication request that hasn't been handled.</p>
 
 
   <div class='pre p1 fill-light mt0'>isSignInPending(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
 
-  
 
-  
-    
+
+
+
+
+
+
+
+
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         <code>true</code>
- if there is a pending sign in, otherwise 
+ if there is a pending sign in, otherwise
 <code>false</code>
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='handlependingsignin'>
       handlePendingSignIn
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Try to process any pending sign in request by returning a <code>Promise</code> that resolves
 to the user data object if the sign in succeeds.</p>
 
 
   <div class='pre p1 fill-light mt0'>handlePendingSignIn(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
 
-  
 
-  
-    
+
+
+
+
+
+
+
+
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the user data object if successful and rejects
 if handling the sign in request fails or there was no pending sign in request.
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='loaduserdata'>
       loadUserData
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Retrieves the user data object. The user's profile is stored in the key <code>profile</code>.</p>
 
 
   <div class='pre p1 fill-light mt0'>loadUserData(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
 
-  
 
-  
-    
+
+
+
+
+
+
+
+
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         User data object.
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='isusersignedin'>
       isUserSignedIn
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Check if a user is currently signed in.</p>
 
 
   <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
 
-  
 
-  
-    
+
+
+
+
+
+
+
+
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         <code>true</code>
- if the user is signed in, 
+ if the user is signed in,
 <code>false</code>
  if not.
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='signuserout'>
       signUserOut
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Sign the user out and redirect to given location.</p>
 
 
   <div class='pre p1 fill-light mt0'>signUserOut(redirectURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>redirectURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -595,70 +599,70 @@ if handling the sign in request fails or there was no pending sign in request.
 	    Location to redirect user to after sign out.
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code>void</code>:
-        
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='makeauthrequest'>
       makeAuthRequest
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Generates an authentication request that can be sent to the Blockstack
 browser for the user to approve sign in.</p>
 
 
   <div class='pre p1 fill-light mt0'>makeAuthRequest(transitPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, redirectURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>, appDomain: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, expiresAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>transitPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -666,9 +670,9 @@ browser for the user to approve sign in.</p>
 	    hex encoded app private key
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -676,9 +680,9 @@ browser for the user to approve sign in.</p>
 	    location to redirect user to after sign in approval
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -686,9 +690,9 @@ browser for the user to approve sign in.</p>
 	    location of this app's manifest file
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>
@@ -696,9 +700,9 @@ browser for the user to approve sign in.</p>
 	    the permissions this app is requesting
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>appDomain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -706,9 +710,9 @@ browser for the user to approve sign in.</p>
 	    the origin of this app
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
@@ -716,50 +720,50 @@ browser for the user to approve sign in.</p>
 	    the time at which this request is no longer valid
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
         the authentication request
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='redirecttosigninwithauthrequest'>
       redirectToSignInWithAuthRequest
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Redirects the user to the Blockstack browser to approve the sign in request
 given.</p>
@@ -769,31 +773,31 @@ does not work on all browsers.</p>
 
 
   <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, blockstackIDHost: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>authRequest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>makeAuthRequest()</code>)</code>
-	    the authentication request generated by 
+	    the authentication request generated by
 <code>makeAuthRequest</code>
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>blockstackIDHost</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -802,151 +806,151 @@ does not work on all browsers.</p>
 protocol handler is not detected
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code>void</code>:
-        
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='getauthresponsetoken'>
       getAuthResponseToken
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Retrieve the authentication token from the URL query</p>
 
 
   <div class='pre p1 fill-light mt0'>getAuthResponseToken(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
 
-  
 
-  
-    
+
+
+
+
+
+
+
+
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
-        the authentication token if it exists otherwise 
+        the authentication token if it exists otherwise
 <code>null</code>
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='profiles' class='mt0'>
     Profiles
   </h2>
 
-  
+
     <p>Identity you own and control.</p>
 <p><a href="https://github.com/blockstack/blockstack.js/blob/master/src/profiles/README.md">Read more about profiles</a></p>
 
-  
+
 </section>
 </div>
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='extractprofile'>
       extractProfile
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Extracts a profile from an encoded token and optionally verifies it,
 if <code>publicKeyOrAddress</code> is provided.</p>
 
 
   <div class='pre p1 fill-light mt0'>extractProfile(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the token to be extracted
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>publicKeyOrAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -955,168 +959,168 @@ if <code>publicKeyOrAddress</code> is provided.</p>
 keypair that is thought to have signed the token
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         the profile extracted from the encoded token
 
-      
-    
-  
 
-  
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Throws</div>
     <ul>
-      
-        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: if the token isn't signed by the provided 
+
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: if the token isn't signed by the provided
 <code>publicKeyOrAddress</code>
 </li>
-      
+
     </ul>
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='wrapprofiletoken'>
       wrapProfileToken
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Wraps a token for a profile token file</p>
 
 
   <div class='pre p1 fill-light mt0'>wrapProfileToken(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the token to be wrapped
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-        including 
+        including
 <code>token</code>
- and 
+ and
 <code>decodedToken</code>
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='signprofiletoken'>
       signProfileToken
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Signs a profile token</p>
 
 
   <div class='pre p1 fill-light mt0'>signProfileToken(profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, subject: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, issuer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, signingAlgorithm: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, issuedAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>, expiresAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    the JSON of the profile to be signed
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the signing private key
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>subject</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
@@ -1124,9 +1128,9 @@ keypair that is thought to have signed the token
 	    the entity that the information is about
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>issuer</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
@@ -1134,9 +1138,9 @@ keypair that is thought to have signed the token
 	    the entity that is issuing the token
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>signingAlgorithm</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
@@ -1144,9 +1148,9 @@ keypair that is thought to have signed the token
 	    the signing algorithm to use
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>issuedAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>
@@ -1154,9 +1158,9 @@ keypair that is thought to have signed the token
 	    the time of issuance of the token
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>
@@ -1164,78 +1168,78 @@ keypair that is thought to have signed the token
 	    the time of expiration of the token
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         the signed profile token
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='verifyprofiletoken'>
       verifyProfileToken
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Verifies a profile token</p>
 
 
   <div class='pre p1 fill-light mt0'>verifyProfileToken(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the token to be verified
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>publicKeyOrAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
@@ -1243,210 +1247,210 @@ keypair that is thought to have signed the token
 keypair that is thought to have signed the token
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         the verified, decoded profile token
 
-      
-    
-  
 
-  
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Throws</div>
     <ul>
-      
+
         <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: throws an error if token verification fails
 </li>
-      
+
     </ul>
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='storage' class='mt0'>
     Storage
   </h2>
 
-  
+
     <p>Store your app's data without servers in storage your user controls.</p>
 <p><a href="https://github.com/blockstack/blockstack.js/src/storage/README.md">Read more about storage</a></p>
 
-  
+
 </section>
 </div>
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='getfile'>
       getFile
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Retrieves the specified file from the app's data store.</p>
 
 
   <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the path to the file to read
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the raw data in the file
 or rejects with an error
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
-          
+
+
+
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
-  
+
   <div class='clearfix'>
-    
+
     <h3 class='fl m0' id='putfile'>
       putFile
     </h3>
-    
-    
+
+
   </div>
-  
+
 
   <p>Stores the data provided in the app's data store to to the file specified.</p>
 
 
   <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
 
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the path to store the data in
 
           </div>
-          
+
         </div>
-      
+
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
 	    the data to store in the file
 
           </div>
-          
+
         </div>
-      
+
     </div>
-  
 
-  
 
-  
-    
+
+
+
+
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves if the operation succeed and rejects
 if it failed
 
-      
-    
-  
 
-  
 
-  
 
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
 </section>
 
-          
-        
+
+
       </div>
     </div>
   </div>
