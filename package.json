@@ -18,7 +18,7 @@
     "flow": "flow",
     "lint": "eslint src",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/documentation/bin/documentation.js --config ./documentation.yml readme --section=Documentation src/index.js"
+    "build-documentation": "./node_modules/documentation/bin/documentation.js build src --config ./documentation.yml --format html --output docs"
   },
   "repository": {
     "type": "git",

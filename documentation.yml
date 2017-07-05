@@ -1,7 +1,6 @@
 toc:
   - name: Authentication
-    description: |
-      Authentication methods.
+    file: /src/auth/README.md 
   - redirectToSignIn
   - isSignInPending
   - handlePendingSignIn
