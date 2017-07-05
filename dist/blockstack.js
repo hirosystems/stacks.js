@@ -2423,7 +2423,7 @@ function makeProfileZoneFile(origin, tokenFileUrl) {
     }]
   };
 
-  var zoneFileTemplate = '{$origin}\n\\' + '{$ttl}\n\\' + '{uri}\n\\';
+  var zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n';
 
   return (0, _zoneFile.makeZoneFile)(zoneFile, zoneFileTemplate);
 }
