@@ -18,7 +18,6 @@ export function makeCoreSessionRequest(appDomain, appMethods,
     thisDevice = '.default'
   }
 
-  // TODO: multi-device
   const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
   const appPublicKeys = [{
     public_key: appPublicKey,
@@ -113,7 +112,7 @@ export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
   }
 
   if (!blockchainId) {
-    return Promise.reject('No blockchain ID given')
+    blockchainId = null;
   }
 
   let payload = null
