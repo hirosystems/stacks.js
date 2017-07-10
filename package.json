@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
@@ -112,5 +112,9 @@
     "uuid": "^3.0.1",
     "validator": "^7.0.0",
     "zone-file": "^0.2.2"
+  },
+  "engines": {
+    "node": ">=6",
+    "npm": ">=5"
   }
 }

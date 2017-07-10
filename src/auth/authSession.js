@@ -1,3 +1,4 @@
+/* @flow */
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
 import fetch from 'isomorphic-fetch'
 /*
@@ -7,13 +8,16 @@ import fetch from 'isomorphic-fetch'
  * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
  * @param appMethods (Array) The list of API methods this application will need.
  * @param appPrivateKey (String) The application-specific private key
- * @param blockchainId (String) This is the blockchain ID of the requester
+ * @param blockchainId (String|null) This is the blockchain ID of the requester,
  *
  * @returns a JWT signed by the app's private key
  * @private
  */
-export function makeCoreSessionRequest(appDomain, appMethods,
-  appPrivateKey, blockchainID, thisDevice = null) {
+export function makeCoreSessionRequest(appDomain: string,
+                                       appMethods: Array<string>,
+                                       appPrivateKey: string,
+                                       blockchainID: ?string = null,
+                                       thisDevice: ?string = null) {
   if (thisDevice === null) {
     thisDevice = '.default'
   }
@@ -53,7 +57,10 @@ export function makeCoreSessionRequest(appDomain, appMethods,
  * to carry out the requested operations.
  * @private
  */
-export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
+export function sendCoreSessionRequest(coreHost: string,
+                                       corePort: number,
+                                       coreAuthRequest: string,
+                                       apiPassword: string) {
   return new Promise((resolve, reject) => {
     if (!apiPassword) {
       reject('Missing API password')
@@ -101,19 +108,21 @@ export function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiP
  * @param coreHost (String) Core API server's hostname
  * @param corePort (Integer) Core API server's port number
  * @param appPrivateKey (String) Application's private key
- * @param blockchainId (String) blockchain ID of the user signing in.
+ * @param blockchainId (String|null) blockchain ID of the user signing in.
+ * `null` if user has no blockchain ID
  *
  * Returns a Promise that resolves to a Core session token.
  * @private
  */
-export function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey,
-                               blockchainId, authRequest = null, deviceId = '0') {
+export function getCoreSession(coreHost: string,
+                               corePort: number,
+                               apiPassword: string,
+                               appPrivateKey: string,
+                               blockchainId: ?string = null,
+                               authRequest: ?string = null,
+                               deviceId: string = '0') {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
-  }
-
-  if (!blockchainId) {
-    return Promise.reject('No blockchain ID given')
   }
 
   let payload = null
