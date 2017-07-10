@@ -386,12 +386,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
  * @param appMethods (Array) The list of API methods this application will need.
  * @param appPrivateKey (String) The application-specific private key
- * @param blockchainId (String) This is the blockchain ID of the requester
+ * @param blockchainId (String|null) This is the blockchain ID of the requester,
  *
  * @returns a JWT signed by the app's private key
  * @private
  */
-function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID) {
+function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
+  var blockchainID = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
   var thisDevice = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
   if (thisDevice === null) {
@@ -477,21 +478,19 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
  * @param coreHost (String) Core API server's hostname
  * @param corePort (Integer) Core API server's port number
  * @param appPrivateKey (String) Application's private key
- * @param blockchainId (String) blockchain ID of the user signing in.
+ * @param blockchainId (String|null) blockchain ID of the user signing in.
+ * `null` if user has no blockchain ID
  *
  * Returns a Promise that resolves to a Core session token.
  * @private
  */
-function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, blockchainId) {
+function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
+  var blockchainId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
   var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
   var deviceId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '0';
 
   if (!authRequest) {
     return Promise.reject('No authRequest provided');
-  }
-
-  if (!blockchainId) {
-    return Promise.reject('No blockchain ID given');
   }
 
   var payload = null;
