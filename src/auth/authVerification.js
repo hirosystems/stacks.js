@@ -41,7 +41,7 @@ export function doPublicKeysMatchIssuer(token) {
 }
 
 export function doPublicKeysMatchUsername(token,
-  nameLookupURL = 'https://core.blockstack.org/v1/names/') {
+  nameLookupURL) {
   return new Promise((resolve) => {
     const payload = decodeToken(token).payload
 
@@ -144,14 +144,14 @@ export function verifyAuthRequest(token) {
   })
 }
 
-export function verifyAuthResponse(token) {
+export function verifyAuthResponse(token, nameLookupURL) {
   return new Promise((resolve) => {
     Promise.all([
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
-      doPublicKeysMatchIssuer(token)// ,
-      // doPublicKeysMatchUsername(token, nameLookupURL)
+      doPublicKeysMatchIssuer(token),
+      doPublicKeysMatchUsername(token, nameLookupURL)
     ]).then(values => {
       console.log(values)
       if (values.every(Boolean)) {

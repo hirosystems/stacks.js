@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 0.8.3 | Documentation</title>
+  <title>blockstack 0.9.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>0.8.3</code></div>
+          <div class='mb1'><code>0.9.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -404,7 +404,7 @@ An array of strings indicating which permissions this app is requesting.
 to the user data object if the sign in succeeds.</p>
 
 
-  <div class='pre p1 fill-light mt0'>handlePendingSignIn(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -415,6 +415,22 @@ to the user data object if the sign in succeeds.</p>
   
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>nameLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>&#39;https://core.blockstack.org/v1/names/&#39;</code>)</code>
+	    the endpoint against which to verify public
+keys match claimed username
+
+          </div>
+          
+        </div>
+      
+    </div>
   
 
   
