@@ -1,7 +1,7 @@
 toc:
   - name: Authentication
     description: |
-      Signal sign on and authentication without third parties or remote servers.
+      Single sign on and authentication without third parties or remote servers.
 
       [Read more about authentication](https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md)
   - redirectToSignIn
