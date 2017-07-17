@@ -145,14 +145,19 @@ function isSignInPending() {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
+ * @param {String} nameLookupURL - the endpoint against which to verify public
+ * keys match claimed username
+ *
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
 function handlePendingSignIn() {
+  var nameLookupURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://core.blockstack.org/v1/names/';
+
   var authResponseToken = getAuthResponseToken();
 
   return new Promise(function (resolve, reject) {
-    (0, _index.verifyAuthResponse)(authResponseToken).then(function (isValid) {
+    (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
       if (isValid) {
         var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
         var userData = {
@@ -386,12 +391,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
  * @param appMethods (Array) The list of API methods this application will need.
  * @param appPrivateKey (String) The application-specific private key
- * @param blockchainId (String) This is the blockchain ID of the requester
+ * @param blockchainId (String|null) This is the blockchain ID of the requester,
  *
  * @returns a JWT signed by the app's private key
  * @private
  */
-function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainID) {
+function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
+  var blockchainID = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
   var thisDevice = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
   if (thisDevice === null) {
@@ -477,21 +483,19 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
  * @param coreHost (String) Core API server's hostname
  * @param corePort (Integer) Core API server's port number
  * @param appPrivateKey (String) Application's private key
- * @param blockchainId (String) blockchain ID of the user signing in.
+ * @param blockchainId (String|null) blockchain ID of the user signing in.
+ * `null` if user has no blockchain ID
  *
  * Returns a Promise that resolves to a Core session token.
  * @private
  */
-function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey, blockchainId) {
+function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
+  var blockchainId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
   var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
   var deviceId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '0';
 
   if (!authRequest) {
     return Promise.reject('No authRequest provided');
-  }
-
-  if (!blockchainId) {
-    return Promise.reject('No blockchain ID given');
   }
 
   var payload = null;
@@ -577,9 +581,7 @@ function doPublicKeysMatchIssuer(token) {
   return false;
 }
 
-function doPublicKeysMatchUsername(token) {
-  var nameLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
-
+function doPublicKeysMatchUsername(token, nameLookupURL) {
   return new Promise(function (resolve) {
     var payload = (0, _jsontokens.decodeToken)(token).payload;
 
@@ -677,11 +679,9 @@ function verifyAuthRequest(token) {
   });
 }
 
-function verifyAuthResponse(token) {
+function verifyAuthResponse(token, nameLookupURL) {
   return new Promise(function (resolve) {
-    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token) // ,
-    // doPublicKeysMatchUsername(token, nameLookupURL)
-    ]).then(function (values) {
+    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
       console.log(values);
       if (values.every(Boolean)) {
         resolve(true);
