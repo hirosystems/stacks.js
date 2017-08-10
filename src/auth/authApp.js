@@ -160,10 +160,10 @@ export function loadUserData() {
  * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
  * @return {void}
  */
-export function signUserOut(redirectURL: string = null) {
+export function signUserOut(redirectURL: string = '') {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
 
-  if (redirectURL !== null) {
+  if (redirectURL !== '') {
     window.location = redirectURL
   }
 }
