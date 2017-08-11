@@ -4,9 +4,9 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
 -   [Installation](#installation)
 -   [About](#about)
--   [Auth](#auth)
--   [Profiles](#profiles)
--   [Storage](#storage)
+-   [Auth](https://blockstack.github.io/blockstack.js/index.html#authentication)
+-   [Profiles](https://blockstack.github.io/blockstack.js/index.html#profiles)
+-   [Storage](https://blockstack.github.io/blockstack.js/index.html#storage)
 -   [Testing](#testing)
 -   [Documentation](#documentation)
 
