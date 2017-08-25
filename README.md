@@ -1,12 +1,12 @@
-# blockstack.js [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack.js/master.svg)](https://circleci.com/gh/blockstack/blockstack.js/tree/master) [![npm](https://img.shields.io/npm/v/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![npm](https://img.shields.io/npm/dm/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![npm](https://img.shields.io/npm/l/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![Slack](http://slack.blockstack.org/badge.svg)](http://slack.blockstack.org/)
+# blockstack.js [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack.js/master.svg)](https://circleci.com/gh/blockstack/blockstack.js/tree/master) [![npm](https://img.shields.io/npm/v/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![npm](https://img.shields.io/npm/dm/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![npm](https://img.shields.io/npm/l/blockstack.svg)](https://www.npmjs.com/package/blockstack) [![Slack](https://img.shields.io/badge/join-slack-e32072.svg?style=flat)](http://slack.blockstack.org/)
 
 Note: If you're looking for the Blockstack CLI repo it was merged with [Blockstack Core](https://github.com/blockstack/blockstack-core).
 
 -   [Installation](#installation)
 -   [About](#about)
--   [Auth](#auth)
--   [Profiles](#profiles)
--   [Storage](#storage)
+-   [Auth](https://blockstack.github.io/blockstack.js/index.html#authentication)
+-   [Profiles](https://blockstack.github.io/blockstack.js/index.html#profiles)
+-   [Storage](https://blockstack.github.io/blockstack.js/index.html#storage)
 -   [Testing](#testing)
 -   [Documentation](#documentation)
 
