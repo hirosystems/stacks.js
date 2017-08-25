@@ -380,7 +380,9 @@ function datastoreCreate(blockstack_hostport, blockstack_session_token, datastor
       'path': '/v1/stores'
    };
 
-   options['headers'] = { 'Authorization': 'bearer ' + blockstack_session_token };
+   if (blockstack_session_token) {
+      options['headers'] = { 'Authorization': 'bearer ' + blockstack_session_token };
+   }
 
    var body = JSON.stringify(payload);
    options['headers']['Content-Type'] = 'application/json';
@@ -470,7 +472,9 @@ function datastoreDelete() {
       'path': '/v1/stores?device_ids=' + device_list
    };
 
-   options['headers'] = { 'Authorization': 'bearer ' + getSessionToken() };
+   if (ds.session_token) {
+      options['headers'] = { 'Authorization': 'bearer ' + ds.session_token };
+   }
 
    var body = JSON.stringify(payload);
    options['headers']['Content-Type'] = 'application/json';
@@ -507,55 +511,43 @@ function datastoreDelete() {
 function datastoreMount(opts) {
 
    var data_privkey_hex = opts.appPrivateKey;
-   var no_cache = opts.noCachedMounts;
-
    var sessionToken = opts.sessionToken;
-   var blockchain_id = opts.blockchainID;
-   var session_blockchain_id = getSessionBlockchainID(sessionToken);
+
+   // TODO: only support single-user datastore access
+   assert(data_privkey_hex);
+
    var datastore_id = null;
    var device_id = null;
+   var blockchain_id = null;
    var api_endpoint = null;
    var app_public_keys = null;
 
-   // maybe cached?
-   if (blockchain_id && !no_cache) {
-      var ds = getCachedMountContext(blockchain_id);
-      if (ds) {
-         return new Promise(function (resolve, reject) {
-            resolve(ds);
-         });
-      }
+   if (!sessionToken) {
+      // load from user data
+      var userData = getUserData();
+
+      sessionToken = userData.coreSessionToken;
+      assert(sessionToken);
    }
 
-   if (!blockchain_id || blockchain_id === session_blockchain_id) {
+   var session = jsontokens.decodeToken(sessionToken).payload;
 
-      // assume the one in this session
-      if (!sessionToken) {
-         // load from localStorage
-         var userData = getUserData();
-
-         sessionToken = userData.coreSessionToken;
-         assert(sessionToken);
-      }
+   if (data_privkey_hex) {
+      datastore_id = datastoreGetId(getPubkeyHex(data_privkey_hex));
+   } else {
+      blockchain_id = opts.blockchainID;
+      var app_name = opts.appName;
 
       if (!blockchain_id) {
-         blockchain_id = getSessionBlockchainID(sessionToken);
+         blockchain_id = getSessionBlockchainID();
       }
 
       assert(blockchain_id);
+      assert(app_name);
 
-      var _session = jsontokens.decodeToken(sessionToken).payload;
-
-      device_id = _session.device_id;
-      api_endpoint = _session.api_endpoint;
-      app_public_keys = _session.app_public_keys;
-      datastore_id = datastoreGetId(getPubkeyHex(data_privkey_hex));
-      blockchain_id = session_blockchain_id;
-   } else {
       // TODO: look up the datastore information via Core
       // TODO: blocked by Core's lack of support for token files
       // TODO: set device_id, blockchain_id, app_public_keys
-      throw new Error("Multiplayer storage is not supported yet");
    }
 
    if (!device_id) {
@@ -586,7 +578,9 @@ function datastoreMount(opts) {
       'blockchain_id': blockchain_id,
       'device_id': device_id,
       'datastore_id': datastore_id,
+      'session_token': sessionToken,
       'app_public_keys': app_public_keys,
+      'session': session,
       'datastore': null
    };
 
@@ -626,9 +620,6 @@ function datastoreMount(opts) {
             setUserData(_userData);
          }
 
-         // save
-         setCachedMountContext(blockchain_id, ctx);
-
          return ctx;
       }
    });
@@ -640,7 +631,7 @@ function datastoreMount(opts) {
  */
 function getUserData() {
    var userData = localStorage.getItem(LOCAL_STORAGE_ID);
-   if (userData === null || typeof userData === 'undefined') {
+   if (userData === null) {
       userData = '{}';
    }
 
@@ -652,6 +643,19 @@ function getUserData() {
  * Save local storage
  */
 function setUserData(userData) {
+
+   var u = getUserData();
+   if (u.coreSessionToken && userData.coreSessionToken) {
+      // only store the newer one 
+      var coreSessionToken = null;
+      if (u.coreSessionToken.timestamp < userData.coreSessionToken.timestamp) {
+         coreSessionToken = userData.coreSessionToken;
+      } else {
+         coreSessionToken = u.coreSessionToken;
+      }
+      userData.coreSessionToken = coreSessionToken;
+   }
+
    localStorage.setItem(LOCAL_STORAGE_ID, JSON.stringify(userData));
 }
 
@@ -663,8 +667,6 @@ function setUserData(userData) {
 function getCachedMountContext(blockchain_id) {
 
    var userData = getUserData();
-   assert(userData);
-
    if (!userData.datastore_contexts) {
       console.log("No datastore contexts defined");
       return null;
@@ -690,8 +692,6 @@ function getCachedMountContext(blockchain_id) {
 function setCachedMountContext(blockchain_id, datastore_context) {
 
    var userData = getUserData();
-   assert(userData);
-
    if (!userData.datastore_contexts) {
       userData.datastore_contexts = {};
    }
@@ -709,30 +709,16 @@ function getBlockchainIDFromSessionOrDefault(session) {
 }
 
 /*
- * Get the session token from localstorage
- */
-function getSessionToken() {
-   var userData = getUserData();
-   assert(userData);
-   assert(userData.coreSessionToken);
-
-   var sessionToken = userData.coreSessionToken;
-   return sessionToken;
-}
-
-/*
  * Get the current session's blockchain ID
  * Throw if not defined or not present.
  */
 function getSessionBlockchainID() {
-   var sessionToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
+   var userData = getUserData();
+   assert(userData);
+   assert(userData.coreSessionToken);
 
-   if (!sessionToken) {
-      sessionToken = getSessionToken();
-   }
-
-   var session = jsontokens.decodeToken(sessionToken).payload;
+   var session = jsontokens.decodeToken(userData.coreSessionToken).payload;
 
    return getBlockchainIDFromSessionOrDefault(session);
 }
@@ -1141,13 +1127,13 @@ function lookup(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 
-   var blockchain_id = opts.blockchainID;
+   var blockchain_id = opts.blockchain_id;
 
-   if (!blockchain_id) {
+   if (!opts.blockchain_id) {
       blockchain_id = getSessionBlockchainID();
    }
 
-   return datastoreMount({ 'blockchainID': blockchain_id }).then(function (ds) {
+   return datastoreMountOrCreate().then(function (ds) {
       assert(ds);
 
       var datastore_id = ds.datastore_id;
@@ -1157,7 +1143,7 @@ function lookup(path) {
          'method': 'GET',
          'host': ds.host,
          'port': ds.port,
-         'path': '/v1/stores/' + datastore_id + '/inodes?path=' + escape(sanitizePath(path)) + '&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + blockchain_id
+         'path': '/v1/stores/' + datastore_id + '/inodes?path=' + escape(sanitizePath(path)) + '&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + ds.blockchain_id
       };
 
       if (!opts) {
@@ -1208,13 +1194,13 @@ function listdir(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 
-   var blockchain_id = opts.blockchainID;
+   var blockchain_id = opts.blockchain_id;
 
-   if (!blockchain_id) {
+   if (!opts.blockchain_id) {
       blockchain_id = getSessionBlockchainID();
    }
 
-   return datastoreMount({ 'blockchainID': blockchain_id }).then(function (ds) {
+   return datastoreMountOrCreate().then(function (ds) {
 
       assert(ds);
 
@@ -1225,7 +1211,7 @@ function listdir(path) {
          'method': 'GET',
          'host': ds.host,
          'port': ds.port,
-         'path': '/v1/stores/' + datastore_id + '/directories?path=' + escape(sanitizePath(path)) + '&idata=1&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + blockchain_id
+         'path': '/v1/stores/' + datastore_id + '/directories?path=' + escape(sanitizePath(path)) + '&idata=1&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + ds.blockchain_id
       };
 
       var schema = _schemas.MUTABLE_DATUM_DIR_IDATA_SCHEMA;
@@ -1236,11 +1222,15 @@ function listdir(path) {
 
       if (opts.extended) {
          options['path'] += '&extended=1';
-         schema = _schemas.MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
+         schema = MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
       }
 
       if (opts.force) {
          optsion['path'] += '&force=1';
+      }
+
+      if (ds.session_token) {
+         options['headers'] = { 'Authorization': 'bearer ' + ds.session_token };
       }
 
       return httpRequest(options, schema).then(function (response) {
@@ -1273,13 +1263,13 @@ function stat(path) {
 
 
    var ds = opts.ds;
-   var blockchain_id = opts.blockchainID;
+   var blockchain_id = opts.blockchain_id;
 
-   if (!blockchain_id) {
+   if (!opts.blockchain_id) {
       blockchain_id = getSessionBlockchainID();
    }
 
-   return datastoreMount({ 'blockchainID': blockchain_id }).then(function (ds) {
+   return datastoreMountOrCreate().then(function (ds) {
 
       assert(ds);
 
@@ -1290,7 +1280,7 @@ function stat(path) {
          'method': 'GET',
          'host': ds.host,
          'port': ds.port,
-         'path': '/v1/stores/' + datastore_id + '/inodes?path=' + escape(sanitizePath(path)) + '&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + blockchain_id
+         'path': '/v1/stores/' + datastore_id + '/inodes?path=' + escape(sanitizePath(path)) + '&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + ds.blockchain_id
       };
 
       var schema = _schemas.MUTABLE_DATUM_INODE_SCHEMA;
@@ -1301,11 +1291,15 @@ function stat(path) {
 
       if (opts.extended) {
          options['path'] += '&extended=1';
-         schema = _schemas.MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
+         schema = MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
       }
 
       if (opts.force) {
          optsion['path'] += '&force=1';
+      }
+
+      if (ds.session_token) {
+         options['headers'] = { 'Authorization': 'bearer ' + ds.session_token };
       }
 
       return httpRequest(options, schema).then(function (response) {
@@ -1335,16 +1329,16 @@ function stat(path) {
  * Asynchronous; returns a Promise that resolves to an inode and its data, or an extended mutable datum response (if opts.extended is set)
  */
 function getInode(path) {
-   var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+   var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
 
-   var blockchain_id = opts.blockchainID;
+   var blockchain_id = opts.blockchain_id;
 
-   if (!blockchain_id) {
+   if (!opts.blockchain_id) {
       blockchain_id = getSessionBlockchainID();
    }
 
-   return datastoreMount({ 'blockchainID': blockchain_id }).then(function (ds) {
+   return datastoreMountOrCreate().then(function (ds) {
 
       assert(ds);
 
@@ -1355,10 +1349,10 @@ function getInode(path) {
          'method': 'GET',
          'host': ds.host,
          'port': ds.port,
-         'path': '/v1/stores/' + datastore_id + '/inodes?path=' + escape(sanitizePath(path)) + '&idata=1&extended=1&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + blockchain_id
+         'path': '/v1/stores/' + datastore_id + '/inodes?path=' + escape(sanitizePath(path)) + '&idata=1&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + ds.blockchain_id
       };
 
-      var schema = _schemas.MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
+      var schema = _schemas.MUTABLE_DATUM_INODE_SCHEMA;
 
       if (!opts) {
          opts = {};
@@ -1366,11 +1360,15 @@ function getInode(path) {
 
       if (opts.extended) {
          options['path'] += '&extended=1';
-         schema = _schemas.MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
+         schema = MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
       }
 
       if (opts.force) {
          options['path'] += '&force=1';
+      }
+
+      if (ds.session_token) {
+         options['headers'] = { 'Authorization': 'bearer ' + ds.session_token };
       }
 
       return httpRequest(options, schema).then(function (response) {
@@ -1379,43 +1377,6 @@ function getInode(path) {
             var errorNo = response.errno || 'UNKNOWN';
             throw new Error('Failed to getInode ' + path + ' (errno: ' + errorNo + '): ' + errorMsg);
          } else {
-
-            // act on hints
-            // * if this is a directory, and there are "absent children"
-            // (i.e. children that we tried but only partially succeeded to create),
-            // then erase them.
-            var inode = response.inode_info.inode;
-            if (inode.type === _schemas.MUTABLE_DATUM_DIR_TYPE && response.hints && response.hints.children_absent) {
-               var _iteratorNormalCompletion11 = true;
-               var _didIteratorError11 = false;
-               var _iteratorError11 = undefined;
-
-               try {
-                  for (var _iterator11 = response.hints.children_absent[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-                     var child_name = _step11.value;
-
-                     if (Object.keys(inode.idata.children).includes(child_name)) {
-                        // mask this 
-                        console.log('child inode ' + child_name + ' is only partially-created; masking...');
-                        delete response.inode_info.inode.idata.children[child_name];
-                     }
-                  }
-               } catch (err) {
-                  _didIteratorError11 = true;
-                  _iteratorError11 = err;
-               } finally {
-                  try {
-                     if (!_iteratorNormalCompletion11 && _iterator11.return) {
-                        _iterator11.return();
-                     }
-                  } finally {
-                     if (_didIteratorError11) {
-                        throw _iteratorError11;
-                     }
-                  }
-               }
-            }
-
             return response;
          }
       });
@@ -1440,13 +1401,13 @@ function getFile(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 
-   var blockchain_id = opts.blockchainID;
+   var blockchain_id = opts.blockchain_id;
 
-   if (!blockchain_id) {
+   if (!opts.blockchain_id) {
       blockchain_id = getSessionBlockchainID();
    }
 
-   return datastoreMount({ 'blockchainID': blockchain_id }).then(function (ds) {
+   return datastoreMountOrCreate().then(function (ds) {
       assert(ds);
 
       var datastore_id = ds.datastore_id;
@@ -1456,7 +1417,7 @@ function getFile(path) {
          'method': 'GET',
          'host': ds.host,
          'port': ds.port,
-         'path': '/v1/stores/' + datastore_id + '/files?path=' + escape(sanitizePath(path)) + '&idata=1&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + blockchain_id
+         'path': '/v1/stores/' + datastore_id + '/files?path=' + escape(sanitizePath(path)) + '&idata=1&device_ids=' + device_list + '&device_pubkeys=' + device_pubkeys + '&blockchain_id=' + ds.blockchain_id
       };
 
       var schema = 'bytes';
@@ -1467,11 +1428,15 @@ function getFile(path) {
 
       if (opts.extended) {
          options['path'] += '&extended=1';
-         schema = _schemas.MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
+         schema = MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA;
       }
 
       if (opts.force) {
          options['path'] += '&force=1';
+      }
+
+      if (ds.session_token) {
+         options['headers'] = { 'Authorization': 'bearer ' + ds.session_token };
       }
 
       return httpRequest(options, schema).then(function (response) {
@@ -1551,7 +1516,9 @@ function datastoreOperation(ds, operation, path, inodes, payloads, signatures, t
       'path': request_path
    };
 
-   options['headers'] = { 'Authorization': 'bearer ' + getSessionToken() };
+   if (ds.session_token) {
+      options['headers'] = { 'Authorization': 'bearer ' + ds.session_token };
+   }
 
    var datastore_str = JSON.stringify(ds.datastore);
    var datastore_sig = (0, _inode.signRawData)(datastore_str, datastore_privkey);
@@ -1592,26 +1559,22 @@ function datastoreOperation(ds, operation, path, inodes, payloads, signatures, t
  *      .blockchain_id (string) this is the blockchain ID of the datastore owner (if different from the session)
  *      .ds (datastore context) this is the mount context for the datastore, if different from one that we have cached
  *
- * Asynchronous; returns a Promise that resolves to the inode
+ * Asynchronous; returns a Promise
  */
 function getParent(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
    var dirpath = dirname(path);
-   return getInode(dirpath, opts).then(function (response) {
-      if (!response) {
+   return getInode(dirpath, opts).then(function (inode) {
+      if (!inode) {
          return { 'error': 'Failed to get parent', 'errno': EREMOTEIO };
       }
-
-      var inode = response.inode_info.inode;
-
       if (inode.type !== _schemas.MUTABLE_DATUM_DIR_TYPE) {
          return { 'error': 'Not a directory', 'errno': ENOTDIR };
       } else {
          return inode;
       }
    }, function (error_resp) {
-      console.log(error_resp);
       return { 'error': 'Failed to get inode', 'errno': EREMOTEIO };
    });
 }
@@ -1634,9 +1597,9 @@ function putFile(path, file_buffer) {
    var opts = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
 
-   var blockchain_id = opts.blockchainID;
+   var blockchain_id = opts.blockchain_id;
 
-   if (!blockchain_id) {
+   if (!opts.blockchain_id) {
       blockchain_id = getSessionBlockchainID();
    }
 
@@ -1656,7 +1619,7 @@ function putFile(path, file_buffer) {
       // get parent dir
       return getParent(path, opts).then(function (parent_dir) {
          if (parent_dir.error) {
-            throw new Error('Failed to look up ' + dirname(path) + ': ' + parent_dir.error);
+            return parent_dir;
          }
 
          // make the file inode information
@@ -1721,6 +1684,12 @@ function mkdir(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 
+   var blockchain_id = opts.blockchain_id;
+
+   if (!opts.blockchain_id) {
+      blockchain_id = getSessionBlockchainID();
+   }
+
    return datastoreMountOrCreate().then(function (ds) {
 
       assert(ds);
@@ -1734,7 +1703,7 @@ function mkdir(path) {
 
       return getParent(path, opts).then(function (parent_dir) {
          if (parent_dir.error) {
-            throw new Error('Failed to look up ' + dirname(path) + ': ' + parent_dir.error);
+            return parent_dir;
          }
 
          // must not exist
@@ -1773,6 +1742,12 @@ function deleteFile(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 
+   var blockchain_id = opts.blockchain_id;
+
+   if (!opts.blockchain_id) {
+      blockchain_id = getSessionBlockchainID();
+   }
+
    return datastoreMountOrCreate().then(function (ds) {
 
       assert(ds);
@@ -1787,7 +1762,7 @@ function deleteFile(path) {
 
       return getParent(path, opts).then(function (parent_dir) {
          if (parent_dir.error) {
-            throw new Error('Failed to look up ' + dirname(path) + ': ' + parent_dir.error);
+            return parent_dir;
          }
 
          // no longer exists?
@@ -1827,6 +1802,12 @@ function rmdir(path) {
    var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
 
+   var blockchain_id = opts.blockchain_id;
+
+   if (!opts.blockchain_id) {
+      blockchain_id = getSessionBlockchainID();
+   }
+
    return datastoreMountOrCreate().then(function (ds) {
 
       assert(ds);
@@ -1841,7 +1822,7 @@ function rmdir(path) {
 
       return getParent(path, opts).then(function (parent_dir) {
          if (parent_dir.error) {
-            throw new Error('Failed to look up ' + dirname(path) + ': ' + parent_dir.error);
+            return parent_dir;
          }
 
          // no longer exists?
@@ -2665,6 +2646,9 @@ var MUTABLE_DATUM_RESPONSE_SCHEMA = exports.MUTABLE_DATUM_RESPONSE_SCHEMA = {
     required: ['status']
 };
 
+var MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA = exports.MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA = Object.assign({}, MUTABLE_DATUM_RESPONSE_SCHEMA);
+MUTABLE_DATUM_EXTENDED_RESPONSE_SCHEMA['path_info'] = MUTABLE_DATUM_PATH_INFO_SCHEMA;
+
 var DATASTORE_SCHEMA = exports.DATASTORE_SCHEMA = {
     type: 'object',
     properties: {
@@ -2760,6 +2744,7 @@ var DATASTORE_LOOKUP_RESPONSE_SCHEMA = exports.DATASTORE_LOOKUP_RESPONSE_SCHEMA 
             type: 'boolean'
         }
     },
+    additionalProperties: false,
     required: ['inode', 'status']
 };
 
@@ -2770,13 +2755,15 @@ var DATASTORE_LOOKUP_EXTENDED_RESPONSE_SCHEMA = exports.DATASTORE_LOOKUP_EXTENDE
             type: 'object',
             patternProperties: {
                 OP_URLENCODED_OR_EMPTY_PATTERN: DATASTORE_LOOKUP_INODE_SCHEMA
-            }
+            },
+            additionalProperties: false
         },
         inode_info: DATASTORE_LOOKUP_INODE_SCHEMA,
         status: {
             type: 'boolean'
         }
     },
+    additionalProperties: false,
     required: ['path_info', 'inode_info', 'status']
 };
 
