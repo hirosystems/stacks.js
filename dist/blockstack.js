@@ -1345,8 +1345,6 @@ exports.validateProofs = validateProofs;
 
 var _services = require('./services');
 
-var validationTimeout = 30000; // 30 seconds
-
 function validateProofs(profile, identifier) {
   var useBitcoinAddress = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -1354,53 +1352,40 @@ function validateProofs(profile, identifier) {
     throw new Error('Profile must not be null');
   }
 
-  var promise = new Promise(function (resolve) {
-    var proofs = [];
-    var accounts = [];
+  var accounts = [];
+  var proofsToValidate = [];
 
-    if (profile.hasOwnProperty('account')) {
-      accounts = profile.account;
-    } else {
-      resolve(proofs);
+  if (profile.hasOwnProperty('account')) {
+    accounts = profile.account;
+  } else {
+    return new Promise(function (resolve) {
+      resolve([]);
+    });
+  }
+
+  accounts.forEach(function (account) {
+    // skip if proof service is not supported
+    if (account.hasOwnProperty('service') && !_services.profileServices.hasOwnProperty(account.service)) {
+      return;
     }
 
-    var accountsToValidate = accounts.length;
+    if (!(account.hasOwnProperty('proofType') && account.proofType === 'http' && account.hasOwnProperty('proofUrl'))) {
+      return;
+    }
 
-    var timeoutTimer = setTimeout(function () {
-      console.error('Blockstack proof validation timed out.');
-      resolve(proofs);
-    }, validationTimeout);
+    var proof = {
+      service: account.service,
+      proof_url: account.proofUrl,
+      identifier: account.identifier,
+      valid: false
+    };
 
-    accounts.forEach(function (account) {
-      // skip if proof service is not supported
-      if (account.hasOwnProperty('service') && !_services.profileServices.hasOwnProperty(account.service)) {
-        accountsToValidate--;
-        return;
-      }
-
-      if (!(account.hasOwnProperty('proofType') && account.proofType === 'http' && account.hasOwnProperty('proofUrl'))) {
-        accountsToValidate--;
-        return;
-      }
-
-      var proof = {
-        service: account.service,
-        proof_url: account.proofUrl,
-        identifier: account.identifier,
-        valid: false
-      };
-
-      _services.profileServices[account.service].validateProof(proof, identifier, useBitcoinAddress).then(function (validatedProof) {
-        proofs.push(validatedProof);
-        if (proofs.length >= accountsToValidate) {
-          clearTimeout(timeoutTimer);
-          resolve(proofs);
-        }
-      });
-    });
+    proofsToValidate.push(new Promise(function (resolve) {
+      resolve(_services.profileServices[account.service].validateProof(proof, identifier, useBitcoinAddress));
+    }));
   });
 
-  return promise;
+  return Promise.all(proofsToValidate);
 }
 },{"./services":26}],15:[function(require,module,exports){
 'use strict';
