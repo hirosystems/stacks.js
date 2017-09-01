@@ -71,3 +71,22 @@ export const sampleVerifications = {
     }
   }
 }
+
+export const sampleAddressBasedVerifications = {
+  larry: {
+    facebook: {
+      url: "https://www.facebook.com/larrysalibra/posts/10100341028448094",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.verification.address.facebook.html','utf8')
+    }
+  },
+  ken: {
+    github: {
+      url: "https://gist.github.com/yknl/37c763ab7bc6cf89b919212ef3f10676",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.github.html','utf8')
+    },
+    twitter: {
+      url: "https://twitter.com/YukanL/status/903285763240022017",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.twitter.html','utf8')
+    }
+  }
+}

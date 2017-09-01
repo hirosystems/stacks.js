@@ -8,4 +8,4 @@ export const profileServices = {
   twitter: Twitter
 }
 
-export { containsValidProofStatement } from './serviceUtils'
+export { containsValidProofStatement, containsValidBitcoinProofStatement } from './serviceUtils'

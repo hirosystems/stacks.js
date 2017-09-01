@@ -1,4 +1,5 @@
 import { Service } from './service'
+import cheerio from 'cheerio'
 
 class Facebook extends Service {
   static getBaseUrls() {
@@ -21,6 +22,11 @@ class Facebook extends Service {
     const postId = tokens[1]
     proofUrl = `https://www.facebook.com/${proof.identifier}/posts/${postId}`
     return proofUrl
+  }
+
+  static getProofStatement(searchText) {
+    const $ = cheerio.load(searchText)
+    return $('meta[name="description"]').attr('content').trim()
   }
 }
 

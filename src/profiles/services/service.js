@@ -1,15 +1,18 @@
 import 'isomorphic-fetch'
-import { containsValidProofStatement } from './serviceUtils'
+import { containsValidProofStatement, containsValidBitcoinProofStatement } from './serviceUtils'
 
 export class Service {
-  static validateProof(proof, fqdn) {
+  static validateProof(proof, identifier, useBitcoinAddress) {
     return new Promise((resolve) => {
       try {
         const proofUrl = this.getProofUrl(proof)
         fetch(proofUrl).then((res) => {
           if (res.status === 200) {
             res.text().then((text) => {
-              proof.valid = containsValidProofStatement(text, fqdn)
+              const proofText = this.getProofStatement(text)
+              proof.valid = useBitcoinAddress ? 
+              containsValidBitcoinProofStatement(proofText, identifier) 
+              : containsValidProofStatement(proofText, identifier)
               resolve(proof)
             })
           } else {

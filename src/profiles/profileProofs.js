@@ -2,7 +2,7 @@ import { profileServices } from './services'
 
 const validationTimeout = 30000  // 30 seconds
 
-export function validateProofs(profile, fqdn) {
+export function validateProofs(profile, identifier, useBitcoinAddress = false) {
   if (!profile) {
     throw new Error('Profile must not be null')
   }
@@ -47,7 +47,7 @@ export function validateProofs(profile, fqdn) {
       }
 
       profileServices[account.service]
-      .validateProof(proof, fqdn)
+      .validateProof(proof, identifier, useBitcoinAddress)
       .then((validatedProof) => {
         proofs.push(validatedProof)
         if (proofs.length >= accountsToValidate) {
