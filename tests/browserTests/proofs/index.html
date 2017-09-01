@@ -149,10 +149,50 @@
             }
         ]
     }
+
+    var ken = {
+      "@type": "Person", 
+      "account": [
+        {
+          "@type": "Account", 
+          "identifier": "yukanl", 
+          "proofType": "http", 
+          "proofUrl": "https://twitter.com/YukanL/status/903285763240022017", 
+          "service": "twitter"
+        }, 
+        {
+          "@type": "Account", 
+          "identifier": "yknl", 
+          "proofType": "http", 
+          "proofUrl": "https://gist.github.com/yknl/37c763ab7bc6cf89b919212ef3f10676", 
+          "service": "github"
+        }
+      ], 
+      "address": {
+        "@type": "PostalAddress"
+      }, 
+      "familyName": "Liao", 
+      "givenName": "Ken", 
+      "image": [
+        {
+          "@type": "ImageObject", 
+          "contentUrl": "https://www.dropbox.com/s/f7ofcbimzq2c287/avatar-1?dl=1", 
+          "name": "avatar"
+        }
+      ]
+    }
+
   </script>
   <script>
-    blockstack.validateProofs(larry, "larry").then(function(proofs) {
-      console.log(proofs)
+    blockstack.validateProofs(larry, "larry.id").then(function(proofs) {
+      var newDiv = document.createElement("div");
+      newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
+      var targetDiv = document.getElementById("results")
+      document.body.insertBefore(newDiv, targetDiv)
+    })
+
+    blockstack.validateProofs(ken, "1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5", true)
+    .then(function(proofs) {
       var newDiv = document.createElement("div");
       newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
       var targetDiv = document.getElementById("results")

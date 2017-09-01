@@ -41,7 +41,7 @@ export class Service {
   static getProofUrl(proof) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
-      if (proof.proof_url.startsWith(`${baseUrls[i]}${proof.identifier}`)) {
+      if (proof.proof_url.toLowerCase().startsWith(`${baseUrls[i]}${proof.identifier}`)) {
         return proof.proof_url
       }
     }

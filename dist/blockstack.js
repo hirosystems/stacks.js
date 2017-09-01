@@ -2689,7 +2689,7 @@ var Service = exports.Service = function () {
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url.startsWith('' + baseUrls[i] + proof.identifier)) {
+        if (proof.proof_url.toLowerCase().startsWith('' + baseUrls[i] + proof.identifier)) {
           return proof.proof_url;
         }
       }
