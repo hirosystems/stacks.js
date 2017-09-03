@@ -26,7 +26,8 @@ class Facebook extends Service {
 
   static getProofStatement(searchText) {
     const $ = cheerio.load(searchText)
-    return $('meta[name="description"]').attr('content').trim()
+    const statement = $('meta[name="description"]').attr('content')
+    return (statement !== undefined) ? statement.trim() : ''
   }
 }
 

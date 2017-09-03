@@ -21,9 +21,6 @@ function mockRequests() {
   FetchMock.get(naval.github.url, naval.github.body)
   FetchMock.get(naval.twitter.url, naval.twitter.body)
   FetchMock.get(larry.facebook.url, larry.facebook.body)
-
-  // FetchMock.get(addressBasedLarry.facebook.url, addressBasedLarry.facebook.body)
-  // FetchMock.get(test.instagram.url, test.instagram.body)
 }
 
 function testProofs(profile, username, totalProofs) {
@@ -41,7 +38,7 @@ function testProofs(profile, username, totalProofs) {
 
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
-    t.plan(5)
+    t.plan(6)
 
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
@@ -52,7 +49,7 @@ export function runProofStatementUnitTests() {
       'Should extract proof statement from Facebook page meta tags')
 
     t.equal(profileServices.twitter.getProofStatement(naval.twitter.body), 
-      '“Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin”', 
+      'Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin', 
       'Should extract proof statement from Twitter page meta tags')
 
     t.equal(profileServices.github.getProofStatement(naval.github.body), 
@@ -60,18 +57,22 @@ export function runProofStatementUnitTests() {
       'Should extract proof statement from Github page body')
 
     t.equal(profileServices.twitter.getProofStatement(ken.twitter.body), 
-      '“Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5”', 
+      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Twitter page meta tags')
 
     t.equal(profileServices.github.getProofStatement(ken.github.body), 
       'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Github page body')
+
+    t.equal(profileServices.instagram.getProofStatement(ken.instagram.body), 
+      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Should extract address-based proof statement from Instagram meta tags')
   })
 }
 
 export function runBitcoinAddressBasedProofsUnitTests() {
   test('containsValidBitcoinProofStatement', (t) => {
-    t.plan(6)
+    t.plan(8)
 
     const larry = sampleAddressBasedVerifications.larry
     const ken = sampleAddressBasedVerifications.ken
@@ -79,6 +80,7 @@ export function runBitcoinAddressBasedProofsUnitTests() {
     const facebookProofStatement = profileServices.facebook.getProofStatement(larry.facebook.body)
     const twitterProofStatement = profileServices.twitter.getProofStatement(ken.twitter.body)
     const githubProofStatement = profileServices.github.getProofStatement(ken.github.body)
+    const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body)
 
     t.equals(containsValidBitcoinProofStatement(facebookProofStatement, '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
       true, "Facebook post meta tags should contain valid bitcoin address proof statement")
@@ -98,6 +100,11 @@ export function runBitcoinAddressBasedProofsUnitTests() {
     t.equals(containsValidBitcoinProofStatement(githubProofStatement, 'differentBitcoinAddress', true),
       false, "Github gist body should not contain valid bitcoin address proof statement")
 
+    t.equals(containsValidBitcoinProofStatement(instagramProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Instagram body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidBitcoinProofStatement(instagramProofStatement, 'differentBitcoinAddress', true),
+      false, "Instagram body should not contain valid bitcoin address proof statement")
   })
 }
 

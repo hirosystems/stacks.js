@@ -9,11 +9,17 @@ export class Service {
         fetch(proofUrl).then((res) => {
           if (res.status === 200) {
             res.text().then((text) => {
+              // Validate identity in provided proof body/tags if required
+              if (this.shouldValidateIdentityInBody() 
+                && proof.identifier !== this.getProofIdentity(text)) {
+                return resolve(proof)
+              }
+
               const proofText = this.getProofStatement(text)
               proof.valid = useBitcoinAddress ? 
               containsValidBitcoinProofStatement(proofText, identifier) 
               : containsValidProofStatement(proofText, identifier)
-              resolve(proof)
+              return resolve(proof)
             })
           } else {
             console.error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
@@ -36,6 +42,10 @@ export class Service {
 
   static getBaseUrls() {
     return []
+  }
+
+  static shouldValidateIdentityInBody() {
+    return false
   }
 
   static getProofUrl(proof) {

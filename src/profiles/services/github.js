@@ -9,14 +9,11 @@ class Github extends Service {
 
   static getProofStatement(searchText) {
     const $ = cheerio.load(searchText)
-
     const text = $('.gist-content')
-            .find('.file')
-            .find('table')
-            .text()
-            .trim()
-
-    return text
+      .find('.file')
+      .find('table')
+      .text()
+    return (text !== undefined) ? text.trim() : ''
   }
 }
 

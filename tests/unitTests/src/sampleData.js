@@ -87,6 +87,10 @@ export const sampleAddressBasedVerifications = {
     twitter: {
       url: "https://twitter.com/YukanL/status/903285763240022017",
       body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.twitter.html','utf8')
+    },
+    instagram: {
+      url: "https://www.instagram.com/p/BYj6UDwgaX7/",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.instagram.html','utf8')
     }
   }
 }

@@ -9,7 +9,12 @@ class Twitter extends Service {
 
   static getProofStatement(searchText) {
     const $ = cheerio.load(searchText)
-    return $('meta[property="og:description"]').attr('content').trim()
+    const statement = $('meta[property="og:description"]').attr('content')
+    if (statement !== undefined) {
+      return statement.trim().replace('“', '').replace('”', '')
+    } else {
+      return ''
+    }
   }
 }
 
