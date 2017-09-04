@@ -38,7 +38,7 @@ function testProofs(profile, username, totalProofs) {
 
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
-    t.plan(6)
+    t.plan(7)
 
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
@@ -67,12 +67,16 @@ export function runProofStatementUnitTests() {
     t.equal(profileServices.instagram.getProofStatement(ken.instagram.body), 
       'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Instagram meta tags')
+
+    t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body), 
+      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Should extract address-based proof statement from Hacker News profile')
   })
 }
 
 export function runBitcoinAddressBasedProofsUnitTests() {
   test('containsValidBitcoinProofStatement', (t) => {
-    t.plan(8)
+    t.plan(10)
 
     const larry = sampleAddressBasedVerifications.larry
     const ken = sampleAddressBasedVerifications.ken
@@ -81,6 +85,7 @@ export function runBitcoinAddressBasedProofsUnitTests() {
     const twitterProofStatement = profileServices.twitter.getProofStatement(ken.twitter.body)
     const githubProofStatement = profileServices.github.getProofStatement(ken.github.body)
     const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body)
+    const hackerNewsProofStatement = profileServices.hackerNews.getProofStatement(ken.hackerNews.body)
 
     t.equals(containsValidBitcoinProofStatement(facebookProofStatement, '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
       true, "Facebook post meta tags should contain valid bitcoin address proof statement")
@@ -105,6 +110,12 @@ export function runBitcoinAddressBasedProofsUnitTests() {
 
     t.equals(containsValidBitcoinProofStatement(instagramProofStatement, 'differentBitcoinAddress', true),
       false, "Instagram body should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidBitcoinProofStatement(hackerNewsProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Hacker News body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidBitcoinProofStatement(hackerNewsProofStatement, 'differentBitcoinAddress', true),
+      false, "Hacker News body should not contain valid bitcoin address proof statement")
   })
 }
 
@@ -192,19 +203,22 @@ export function runProofServicesUnitTests() {
   })
 
   test('get proof url', (t) => {
-    t.plan(7)
+    t.plan(9)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       "https://www.facebook.com/navalr/posts/10152190734077261",
       "Facebook proof URL should match reference")
     t.equal(profileServices.github.getProofUrl(sampleProofs.naval[2]),
       "https://gist.github.com/navalr/f31a74054f859ec0ac6a",
-      "Facebook proof URL should match reference")
+      "Github proof URL should match reference")
     t.equal(profileServices.twitter.getProofUrl(sampleProofs.naval[0]),
       "https://twitter.com/naval/status/486609266212499456",
-      "Facebook proof URL should match reference")
+      "Twitter proof URL should match reference")
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.larry[0]),
       "https://www.facebook.com/larry.salibra/posts/10100341028448093",
       "Facebook proof URL should match reference")
+    t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.ken[0]),
+      "https://news.ycombinator.com/user?id=yukanl",
+      "Hacker News proof URL should match reference")
 
     t.throws(() => {
       const notLarry = Object.assign({},
@@ -229,6 +243,14 @@ export function runProofServicesUnitTests() {
         })
       profileServices.github.getProofUrl(notNavalGithub)
     }, /Error/, 'Not having claimed account identifier in Github proof URL should throw exception')
+
+    t.throws(() => {
+      const notKenHackerNews = Object.assign({},
+        sampleProofs.ken[0], {
+          proof_url: 'https://news.ycombinator.com/user?id=notken'
+        })
+      profileServices.github.getProofUrl(notKenHackerNews)
+    }, /Error/, 'Not having claimed account identifier in Hacker News proof URL should throw exception')
   })
 }
 

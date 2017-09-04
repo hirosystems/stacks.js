@@ -46,7 +46,8 @@ export const sampleTokenFiles = {
 
 export const sampleProofs = {
   naval: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/naval.proofs.json')),
-  larry: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.proofs.json'))
+  larry: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.proofs.json')),
+  ken: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.proofs.json'))
 }
 
 export const sampleVerifications = {
@@ -91,6 +92,10 @@ export const sampleAddressBasedVerifications = {
     instagram: {
       url: "https://www.instagram.com/p/BYj6UDwgaX7/",
       body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.instagram.html','utf8')
+    },
+    hackerNews: {
+      url: "https://news.ycombinator.com/user?id=yukanl",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.hackernews.html','utf8')
     }
   }
 }
