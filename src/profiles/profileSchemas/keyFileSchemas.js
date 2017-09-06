@@ -4,7 +4,7 @@ export const OP_SUBDOMAIN_NAME_PATTERN = `^(${OP_NAME_CLASS})\\.(${OP_NAME_CLASS
 export const OP_NAME_OR_SUBDOMAIN_FRAGMENT = `(${OP_NAME_PATTERN})|(${OP_SUBDOMAIN_NAME_PATTERN})`;
 export const OP_NAME_OR_SUBDOMAIN_PATTERN = `^${OP_NAME_OR_SUBDOMAIN_FRAGMENT}$`;
 export const OP_DNS_NAME_PATTERN = '([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])(\\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9]))*';
-export const OP_APP_NAME_PATTERN = `^(^(${OP_DNS_NAME_PATTERN})\\.1(:[0-9]+){{0,1}}$)|(${OP_NAME_OR_SUBDOMAIN_FRAGMENT}\\.x$)$`;
+export const OP_APP_NAME_PATTERN = `^(^(${OP_DNS_NAME_PATTERN})\\.1(:[0-9]+){{0,1}}$)|(^(${OP_NAME_OR_SUBDOMAIN_FRAGMENT})\\.x$)$`;
 
 export const OP_HEX_PATTERN = '^([0-9a-fA-F]+)$';
 export const OP_PUBKEY_PATTERN = OP_HEX_PATTERN;
