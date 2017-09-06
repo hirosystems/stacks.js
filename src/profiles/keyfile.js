@@ -1,6 +1,5 @@
 import {
-  getIdentityPrivateKeychain,
-  getIdentityOwnerAddressNode,
+  IdentityAddressOwnerNode,
 } from '../wallet';
 
 import {
@@ -11,13 +10,13 @@ import {
 } from './profileSchemas';
 
 import {
-   signProfileToken
+   signProfileToken,
 } from './profileTokens';
 
 import {
    getPubkeyHex,
    publicKeyToAddress,
-   decompressPublicKey
+   decompressPublicKey,
 } from '../keys';
 
 const Ajv = require('ajv');
@@ -26,19 +25,18 @@ const assert = require('assert');
 
 /*
  * Make a delegation entry's private keys.
- * @master_keychain (object) This is the decrypted master keychain.
+ * @identityKeypair (object) This is the bundle of name-owner information
  * @key_index (int) this is the identity index
  *
  * Returns private keys object, keyed with 'app', 'enc', 'sign', and 'owner'
  */
-export function keyFileMakeDelegationPrivateKeys(master_keychain, key_index) {
-   // derive keys
-   const identity_master_keychain = getIdentityPrivateKeychain(master_keychain);
-   const identity_owner_node = getIdentityOwnerAddressNode(identity_master_keychain, key_index);
+export function keyFileMakeDelegationPrivateKeys(identityKeypair, key_index = 0) {
+   assert(identityKeypair.node, `BUG: missing .node in identityKeypair ${key_index}`);
 
-   const apps_key_node = identity_owner_node.getAppsNode();
+   const identity_owner_node = new IdentityAddressOwnerNode(identityKeypair.node, identityKeypair.salt); 
    const signing_key_node = identity_owner_node.getSigningNode();
    const encryption_key_node = identity_owner_node.getEncryptionNode();
+   const apps_key_node = identity_owner_node.getAppsNode();
 
    // tricky...
    const apps_privkey_hex = apps_key_node.getNode().keyPair.d.toHex();
@@ -65,14 +63,14 @@ export function keyFileMakeDelegationPrivateKeys(master_keychain, key_index) {
 
 /*
  * Make a delegation entry.
- * @master_keychain (object) This is the decrypted master keychain.
+ * @identityKeypair (object) This is a bundle of key information for the name owner
  * @key_index (int) this is the identity index
  *
  * Returns the delegation object
  */
-export function keyFileMakeDelegationEntry(master_keychain, key_index) {
+export function keyFileMakeDelegationEntry(identityKeypair, key_index) {
    // derive keys
-   const privkeys = keyFileMakeDelegationPrivateKeys(master_keychain, key_index);
+   const privkeys = keyFileMakeDelegationPrivateKeys(identityKeypair, key_index);
    const delg = {
       'app': getPubkeyHex(privkeys['app']),
       'enc': getPubkeyHex(privkeys['enc']),
@@ -88,7 +86,7 @@ export function keyFileMakeDelegationEntry(master_keychain, key_index) {
  * Sign a keyfile
  * 
  * @key_file (object) the key file to sign
- * @master_keychain (object) the decrypted master keychain 
+ * @signing_privkey (string) the signing key 
  *
  * Returns the serialized JWT
  */
@@ -113,14 +111,14 @@ export function keyFileProfileSerialize(profile, signing_privkey) {
  * Create a key file, optionally from an existing profile or existing key file state.
  * 
  * @name (string) this is the blockchain ID
- * @master_keychain (object) this is the decrypted master keychain
+ * @identityKeypair (object) this is the identity keypair bundle
  * @opts (object) the set of optional keyword arguments:
  * * @key_order (array) this is the list of device IDs that determine the verification order of the keys derived from the master keychain
  * * @profile (object) this is the profile of the name, if it exists already
  * * @apps (object) this is the existing application bundle
  * * @index (object) index of this name in the identity keychain
  */
-export function keyFileCreate(name, master_keychain, device_id, opts) {
+export function keyFileCreate(name, identityKeypair, device_id, opts) {
    if (!opts) {
       opts = {};
    }
@@ -149,7 +147,7 @@ export function keyFileCreate(name, master_keychain, device_id, opts) {
       'timestamp': now,
    };
 
-   delegations['devices'][device_id] = keyFileMakeDelegationEntry(master_keychain, key_index);
+   delegations['devices'][device_id] = keyFileMakeDelegationEntry(identityKeypair, key_index);
 
    assert(delegations['name'] === name, `Invalid delegations: name ${delegations['name']} does not match ${name}`);
 
@@ -177,7 +175,7 @@ export function keyFileCreate(name, master_keychain, device_id, opts) {
 
    // derive signing keys
    // TODO: flesh out for multisig
-   const privkeys = keyFileMakeDelegationPrivateKeys(master_keychain, key_index);
+   const privkeys = keyFileMakeDelegationPrivateKeys(identityKeypair, key_index);
    const owner_privkeys = {};
    const signing_privkeys = {};
 
