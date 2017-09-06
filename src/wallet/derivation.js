@@ -85,7 +85,7 @@ export class AppsNode {
  * Hardened private key derivation node in the user's wallet,
  * meant for deriving keys to own names.
  */
-class IdentityAddressOwnerNode {
+export class IdentityAddressOwnerNode {
   constructor(ownerHdNode, salt) {
     this.hdNode = ownerHdNode
     this.salt = salt
@@ -196,6 +196,7 @@ export function deriveIdentityKeyPair(identityOwnerAddressNode) {
   const identityKeyID = identityOwnerAddressNode.getIdentityKeyID()
   const appsNode = identityOwnerAddressNode.getAppsNode()
   const keyPair = {
+    node: identityOwnerAddressNode.getNode(),
     key: identityKey,
     keyID: identityKeyID,
     address,
