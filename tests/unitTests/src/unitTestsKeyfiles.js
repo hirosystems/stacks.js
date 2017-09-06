@@ -29,7 +29,10 @@ import {
   keyFileGetDelegatedDevicePubkeys,
   keyFileGetSigningPublicKeys,
   keyFileGetAppListing,
-  decodePrivateKey
+  decodePrivateKey,
+  deriveIdentityKeyPair,
+  getIdentityPrivateKeychain,
+  getIdentityOwnerAddressNode,
 } from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
@@ -167,19 +170,22 @@ function testKeyFileCreate(profile, apps) {
   const app_pubkey = '03eb05a2f40e045c4dfa106ca9fa0b96daa189a508748b8b015a7883cbbf798bbc';
   const app_datastore_id = '1Jw7yUHbwUDLBKcRk8kcajYf3CqT1vJqj1';
 
-  const master_privkey_info = keyFileMakeDelegationPrivateKeys(masterKeychain, 0);
+  const identity_master_keychain = getIdentityPrivateKeychain(masterKeychain);
+  const identity_owner_node = getIdentityOwnerAddressNode(identity_master_keychain, 0);
+  const identity_keypair = deriveIdentityKeyPair(identity_owner_node);
+  const master_privkey_info = keyFileMakeDelegationPrivateKeys(identity_keypair, 0);
   const address = publicKeyToAddress(getPubkeyHex(master_privkey_info['owner']))
 
   test('keyFileCreate', (t) => {
 
-     let keyfile = keyFileCreate("hello.id", masterKeychain, device_id, {'profile': profile, 'apps': apps});
+     let keyfile = keyFileCreate("hello.id", identity_keypair, device_id, {'profile': profile, 'apps': apps});
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
      t.ok(parsed_keyfile, 'Key file must have been parsed');
 
      // check that the profile, delegations, signing keys, and apps bundles are all preserved
-     let key_info = keyFileMakeDelegationEntry(masterKeychain, 0);
+     let key_info = keyFileMakeDelegationEntry(identity_keypair, 0);
 
      // if no profile is given, then a default one is used.
      if (!profile) {
@@ -227,13 +233,13 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileUpdateProfile', (t) => {
 
-     let keyfile = keyFileCreate('hello.id', masterKeychain, device_id);
+     let keyfile = keyFileCreate('hello.id', identity_keypair, device_id);
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
      t.ok(parsed_keyfile, 'Key file must have been parsed');
 
-     let privkey_info = keyFileMakeDelegationPrivateKeys(masterKeychain, 0);
+     let privkey_info = keyFileMakeDelegationPrivateKeys(identity_keypair, 0);
 
      if (!profile) {
         profile = {'@type': 'Person', 'accounts': [], 'updated': 'yup'};
@@ -251,7 +257,7 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileUpdateDelegation', (t) => {
 
-     let keyfile = keyFileCreate('hello.id', masterKeychain, device_id);
+     let keyfile = keyFileCreate('hello.id', identity_keypair, device_id);
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
@@ -259,10 +265,10 @@ function testKeyFileCreate(profile, apps) {
 
      profile = parsed_keyfile.profile;
 
-     let privkey_info = keyFileMakeDelegationPrivateKeys(masterKeychain, 1);
+     let privkey_info = keyFileMakeDelegationPrivateKeys(identity_keypair, 1);
 
      // check that the profile, delegations, signing keys, and apps bundles are all preserved
-     let new_key_info = keyFileMakeDelegationEntry(masterKeychain, 1);
+     let new_key_info = keyFileMakeDelegationEntry(identity_keypair, 1);
 
      let delegation = {};
      delegation[device_id] = {'app': new_key_info['app'], 'enc': new_key_info['enc'], 'sign': new_key_info['sign'], 'index': 1};
@@ -298,7 +304,7 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileUpdateApps', (t) => {
 
-     let keyfile = keyFileCreate('hello.id', masterKeychain, device_id);
+     let keyfile = keyFileCreate('hello.id', identity_keypair, device_id);
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
@@ -306,7 +312,7 @@ function testKeyFileCreate(profile, apps) {
      
      profile = parsed_keyfile.profile;
 
-     let privkey_info = keyFileMakeDelegationPrivateKeys(masterKeychain, 0);
+     let privkey_info = keyFileMakeDelegationPrivateKeys(identity_keypair, 0);
 
      // insert an app 
      let new_keyfile = keyFileUpdateApps(parsed_keyfile, device_id, app_name, app_pubkey, device_id, app_datastore_id, ['http://example.com/app.datastore'], ['http://example.com/app.root'], privkey_info['sign']);
