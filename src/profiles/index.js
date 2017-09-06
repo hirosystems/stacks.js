@@ -29,3 +29,16 @@ export {
   makeProfileZoneFile,
   getTokenFileUrl
 } from './profileZoneFiles'
+
+export {
+  keyFileCreate,
+  keyFileParse,
+  keyFileUpdateProfile,
+  keyFileUpdateDelegation,
+  keyFileUpdateApps,
+  keyFileMakeDelegationPrivateKeys,
+  keyFileMakeDelegationEntry,
+  keyFileGetDelegatedDevicePubkeys,
+  keyFileGetSigningPublicKeys,
+  keyFileGetAppListing,
+} from './keyfile'

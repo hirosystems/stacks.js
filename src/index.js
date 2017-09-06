@@ -7,7 +7,8 @@ export {
   makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID
 } from './dids'
 export {
-  getEntropy, makeECPrivateKey, publicKeyToAddress
+  getEntropy, makeECPrivateKey, publicKeyToAddress, decodePrivateKey,
+  decompressPublicKey, getPubkeyHex
 } from './keys'
 export {
   nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter
