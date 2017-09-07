@@ -38,7 +38,7 @@ function testProofs(profile, username, totalProofs) {
 
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
-    t.plan(7)
+    t.plan(8)
 
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
@@ -71,12 +71,16 @@ export function runProofStatementUnitTests() {
     t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body), 
       'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Hacker News profile')
+
+    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body), 
+      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Should extract address-based proof statement from Hacker News profile')
   })
 }
 
 export function runBitcoinAddressBasedProofsUnitTests() {
   test('containsValidBitcoinProofStatement', (t) => {
-    t.plan(10)
+    t.plan(12)
 
     const larry = sampleAddressBasedVerifications.larry
     const ken = sampleAddressBasedVerifications.ken
@@ -86,6 +90,7 @@ export function runBitcoinAddressBasedProofsUnitTests() {
     const githubProofStatement = profileServices.github.getProofStatement(ken.github.body)
     const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body)
     const hackerNewsProofStatement = profileServices.hackerNews.getProofStatement(ken.hackerNews.body)
+    const linkedInProofStatement = profileServices.linkedIn.getProofStatement(ken.linkedIn.body)
 
     t.equals(containsValidBitcoinProofStatement(facebookProofStatement, '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
       true, "Facebook post meta tags should contain valid bitcoin address proof statement")
@@ -116,6 +121,27 @@ export function runBitcoinAddressBasedProofsUnitTests() {
 
     t.equals(containsValidBitcoinProofStatement(hackerNewsProofStatement, 'differentBitcoinAddress', true),
       false, "Hacker News body should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidBitcoinProofStatement(linkedInProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Hacker News body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidBitcoinProofStatement(linkedInProofStatement, 'differentBitcoinAddress', true),
+      false, "Hacker News body should not contain valid bitcoin address proof statement")
+  })
+}
+
+export function runInBodyIdentityVerificationTests() {
+  test('getProofIdentity', (t) => {
+    t.plan(2)
+    const ken = sampleAddressBasedVerifications.ken
+
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body), 
+      'blckstcktest', 
+      'Should extract social proof identity from Instagram proof page body')
+
+    t.equal(profileServices.linkedIn.getProofIdentity(ken.linkedIn.body),
+      'blck-stck', 
+      'Should extract social proof identity from LinkedIn proof page body')
   })
 }
 
@@ -203,7 +229,7 @@ export function runProofServicesUnitTests() {
   })
 
   test('get proof url', (t) => {
-    t.plan(9)
+    t.plan(11)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       "https://www.facebook.com/navalr/posts/10152190734077261",
       "Facebook proof URL should match reference")
@@ -216,9 +242,15 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.larry[0]),
       "https://www.facebook.com/larry.salibra/posts/10100341028448093",
       "Facebook proof URL should match reference")
-    t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.ken[0]),
+    t.equal(profileServices.instagram.getProofUrl(sampleProofs.ken[0]),
+      "https://www.instagram.com/p/BYj6UDwgaX7/",
+      "Instagram proof URL should match reference")
+    t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.ken[1]),
       "https://news.ycombinator.com/user?id=yukanl",
       "Hacker News proof URL should match reference")
+    t.equal(profileServices.linkedIn.getProofUrl(sampleProofs.ken[2]),
+      "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
+      "LinkedIn proof URL should match reference")
 
     t.throws(() => {
       const notLarry = Object.assign({},
@@ -261,6 +293,8 @@ export function runProofsUnitTests() {
   runProofStatementUnitTests()
   // Proof address based
   runBitcoinAddressBasedProofsUnitTests()
+  // Proof identity extract from response body
+  runInBodyIdentityVerificationTests()
   // Proof services
   runProofServicesUnitTests()
   // Proof HTML

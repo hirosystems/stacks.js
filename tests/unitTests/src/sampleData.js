@@ -96,6 +96,10 @@ export const sampleAddressBasedVerifications = {
     hackerNews: {
       url: "https://news.ycombinator.com/user?id=yukanl",
       body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.hackernews.html','utf8')
+    },
+    linkedIn: {
+      url: "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.linkedin.html','utf8')
     }
   }
 }
