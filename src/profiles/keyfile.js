@@ -550,7 +550,7 @@ export function keyFileUpdateApps(parsed_key_file, device_id, app_name, app_pubk
       cur_apps[device_id] = { 'version': '1.0', 'apps': {} };
    }
    
-   const fq_datastore_id = makeFullyQualifiedDataId(this_device_id, datastore_id);
+   const fq_datastore_id = makeFullyQualifiedDataId(this_device_id, `${datastore_id}.datastore`);
 
    cur_apps[device_id]['apps'][app_name] = {
       'public_key': decompressPublicKey(app_pubkey),

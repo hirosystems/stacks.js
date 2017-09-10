@@ -352,7 +352,7 @@ function testKeyFileCreate(profile, apps) {
         'public_key': app_pubkey_uncompressed,
         'root_urls': ['http://example.com/app.root'],
         'datastore_urls': ['http://example.com/app.datastore'],
-        'fq_datastore_id': makeFullyQualifiedDataId(device_id, app_datastore_id),
+        'fq_datastore_id': makeFullyQualifiedDataId(device_id, `${app_datastore_id}.datastore`),
      };
      
      t.ok(deepCompare(app_info, expected_app_listing), 'App listing must match key file')
@@ -379,7 +379,7 @@ function testKeyFileCreate(profile, apps) {
         'public_key': app_pubkey_uncompressed,
         'root_urls': ['http://example.com/app.root'],
         'datastore_urls': ['http://example.com/app.datastore'],
-        'fq_datastore_id': makeFullyQualifiedDataId(device_id, app_datastore_id),
+        'fq_datastore_id': makeFullyQualifiedDataId(device_id, `${app_datastore_id}.datastore`),
      };
 
      t.ok(deepCompare(app_info, expected_app_listing), 'App listing must match key file, after adding 2')
@@ -389,7 +389,7 @@ function testKeyFileCreate(profile, apps) {
         'public_key': app_pubkey_uncompressed_2,
         'root_urls': ['http://example.com/app2.root'],
         'datastore_urls': ['http://example.com/app2.datastore'],
-        'fq_datastore_id': makeFullyQualifiedDataId(device_id, app_datastore_id_2),
+        'fq_datastore_id': makeFullyQualifiedDataId(device_id, `${app_datastore_id_2}.datastore`),
      };
 
      t.ok(deepCompare(app_info_2, expected_app_listing_2), 'App listing 2 must match key file');
@@ -437,7 +437,7 @@ export function runKeyfilesUnitTests() {
                'public_key': '04806ab413ff168f76915725e75fda571ff8069d41d6193fa580866400807f8f5bffdb72356523a0f0f274b241139434b8871788d6f0c3211989217e2095704c2d',
                'root_urls': ['http://www.naval.com/naval.root'],
                'datastore_urls': ['http://www.naval.com/naval.datastore'],
-               'fq_datastore_id': makeFullyQualifiedDataId('naval_phone', '1Jw7yUHbwUDLBKcRk8kcajYf3CqT1vJqj1'),
+               'fq_datastore_id': makeFullyQualifiedDataId('naval_phone', '1Jw7yUHbwUDLBKcRk8kcajYf3CqT1vJqj1.datastore'),
             },
          },
      },
