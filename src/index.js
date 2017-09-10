@@ -9,7 +9,7 @@ export {
 } from './dids'
 export {
   getEntropy, makeECPrivateKey, publicKeyToAddress, decodePrivateKey,
-  decompressPublicKey, getPubkeyHex
+  compressPublicKey, decompressPublicKey, getPubkeyHex
 } from './keys'
 export {
   nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter

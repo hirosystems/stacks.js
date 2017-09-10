@@ -41,4 +41,6 @@ export {
   keyFileGetDelegatedDevicePubkeys,
   keyFileGetSigningPublicKeys,
   keyFileGetAppListing,
+  keyFileProfileSerialize,
+  keyFileICANNToAppName
 } from './keyfile'
