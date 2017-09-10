@@ -68,7 +68,8 @@ export function sendCoreSessionRequest(coreHost: string,
 
     const options = {
       headers: {
-        Authorization: `bearer ${apiPassword}`
+        Authorization: `bearer ${apiPassword}`,
+        Origin: 'http://localhost:8888',
       }
     }
 
