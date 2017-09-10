@@ -29,16 +29,20 @@ import {
   keyFileGetDelegatedDevicePubkeys,
   keyFileGetSigningPublicKeys,
   keyFileGetAppListing,
+  keyFileICANNToAppName,
+  keyFileProfileSerialize,
   decodePrivateKey,
   deriveIdentityKeyPair,
   getIdentityPrivateKeychain,
   getIdentityOwnerAddressNode,
+  makeFullyQualifiedDataId
 } from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
 
 const bitcoinjs = require('bitcoinjs-lib');
 const BigInteger = require('bigi');
+const jsontokens = require('jsontokens');
 
 // Go home javascript, you're drunk.
 // https://stackoverflow.com/questions/1068834/object-comparison-in-javascript
@@ -165,10 +169,15 @@ function testKeyFileCreate(profile, apps) {
   const device_id = 'mydevice';
 
   const app_name = 'foo.com.1';
+  const app_name_2 = 'bar.com.1';
   const app_privkey = 'b4f48cc184dbdf4e7ce62b161a3f566a708cb5de4803bbbc4a5681c9d2bf5da3';
+  const app_privkey_2 = 'bf59ba5cc5964bb9adaaec555dc00842a261bfa10ec215c11a40cb01b4524e82';
   const app_pubkey_uncompressed = '04eb05a2f40e045c4dfa106ca9fa0b96daa189a508748b8b015a7883cbbf798bbc9ba64e1568685924331f6697eb080bd7f381bb009984f2560ef2bf06a2c7f26f';
+  const app_pubkey_uncompressed_2 = '041382f57dd729a3a6b5a510d5619c80f665b6b89f4b95df5a403bee45cb7b5bf029d44f9ad7b1516828a3bb2b4156a4df16e5ded78352fbf5ea9c749d7e3f38ce';
   const app_pubkey = '03eb05a2f40e045c4dfa106ca9fa0b96daa189a508748b8b015a7883cbbf798bbc';
+  const app_pubkey_2 = '021382f57dd729a3a6b5a510d5619c80f665b6b89f4b95df5a403bee45cb7b5bf0';
   const app_datastore_id = '1Jw7yUHbwUDLBKcRk8kcajYf3CqT1vJqj1';
+  const app_datastore_id_2 = '1KxAUXd9xfXS9a9K6qhYgu5N7ZjjWvWaLn';
 
   const identity_master_keychain = getIdentityPrivateKeychain(masterKeychain);
   const identity_owner_node = getIdentityOwnerAddressNode(identity_master_keychain, 0);
@@ -196,6 +205,10 @@ function testKeyFileCreate(profile, apps) {
      delegation['devices'][device_id] = {'app': key_info['app'], 'enc': key_info['enc'], 'sign': key_info['sign'], 'index': 0};
 
      profile['keyfile'] = parsed_keyfile.profile.keyfile;
+
+     if (!profile.timestamp) {
+        delete parsed_keyfile.profile.timestamp;
+     }
 
      let equal = deepCompare(parsed_keyfile.profile, profile);
      t.ok(equal, 'Profile was must have been preserved');
@@ -252,6 +265,15 @@ function testKeyFileCreate(profile, apps) {
      t.ok(parsed_keyfile, 'New key file must have been parsed');
 
      t.ok(deepCompare(parsed_keyfile.profile, profile), 'profiles match');
+
+     // make sure we can decode, reserialize, and reparse the profile 
+     let decoded_profile = jsontokens.decodeToken(keyfile).payload.claim;
+     t.ok(decoded_profile, 'Key file decodes to a profile')
+
+     let profile_token = keyFileProfileSerialize(profile, privkey_info['sign'])
+     parsed_keyfile = keyFileParse(profile_token, address);
+     t.ok(parsed_keyfile, 'Key file must have been parsed after decoding and resigning')
+
      t.end();
   });
 
@@ -330,16 +352,77 @@ function testKeyFileCreate(profile, apps) {
         'public_key': app_pubkey_uncompressed,
         'root_urls': ['http://example.com/app.root'],
         'datastore_urls': ['http://example.com/app.datastore'],
-        'fq_datastore_id': escape(`${device_id}:${app_datastore_id}`.replace('/', '\\x2f')),
+        'fq_datastore_id': makeFullyQualifiedDataId(device_id, app_datastore_id),
      };
      
      t.ok(deepCompare(app_info, expected_app_listing), 'App listing must match key file')
      t.ok(deepCompare(parsed_keyfile.profile, profile), 'profiles still match');
+
+     // insert another app 
+     new_keyfile = keyFileUpdateApps(parsed_keyfile, device_id, app_name_2, app_pubkey_2, device_id, app_datastore_id_2, ['http://example.com/app2.datastore'], ['http://example.com/app2.root'], privkey_info['sign']);
+     t.ok(new_keyfile, 'Key file must have been updated again');
+
+     // make sure it's there 
+     parsed_keyfile = keyFileParse(new_keyfile, address);
+     t.ok(parsed_keyfile, 'New key file must have been parsed');
+
+     profile = parsed_keyfile.profile;
+
+     app_info = keyFileGetAppListing(parsed_keyfile, app_name);
+     t.ok(app_info, 'App listing must be present');
+     
+     let app_info_2 = keyFileGetAppListing(parsed_keyfile, app_name_2);
+     t.ok(app_info_2, 'App listing 2 must be present');
+
+     expected_app_listing = {};
+     expected_app_listing[device_id] = {
+        'public_key': app_pubkey_uncompressed,
+        'root_urls': ['http://example.com/app.root'],
+        'datastore_urls': ['http://example.com/app.datastore'],
+        'fq_datastore_id': makeFullyQualifiedDataId(device_id, app_datastore_id),
+     };
+
+     t.ok(deepCompare(app_info, expected_app_listing), 'App listing must match key file, after adding 2')
+
+     let expected_app_listing_2 = {};
+     expected_app_listing_2[device_id] = {
+        'public_key': app_pubkey_uncompressed_2,
+        'root_urls': ['http://example.com/app2.root'],
+        'datastore_urls': ['http://example.com/app2.datastore'],
+        'fq_datastore_id': makeFullyQualifiedDataId(device_id, app_datastore_id_2),
+     };
+
+     t.ok(deepCompare(app_info_2, expected_app_listing_2), 'App listing 2 must match key file');
+     t.ok(deepCompare(parsed_keyfile.profile, profile), 'profiles still match, after adding 2');
      t.end();
   });
 }
 
+function testKeyFileMisc() {
+
+  const icann_names = ['foo.com', 'foo.com:8080', 'localhost:8888']
+  const expected_app_names = ['foo.com.1', 'foo.com.1:8080', 'localhost.1:8888']
+
+  test('keyFileICANNToAppName', (t) => {
+    
+     for (let i = 0; i < icann_names.length; i++) {
+        const name = icann_names[i];
+        const scheme_name = `http://${name}`;
+
+        const expected_name = expected_app_names[i];
+
+        t.ok(keyFileICANNToAppName(name) === expected_name, `scheme-less ICANN name to app name: ${name} === ${keyFileICANNToAppName(name)} === ${expected_name}`);
+        t.ok(keyFileICANNToAppName(scheme_name) === expected_name, `schemed ICANN name to app name: ${scheme_name} === ${keyFileICANNToAppName(scheme_name)} === ${expected_name}`);
+        t.ok(keyFileICANNToAppName(expected_name) === expected_name, 'conversion is idempotent');
+     }
+
+     t.end();
+  });
+}
+
+
 export function runKeyfilesUnitTests() {
+  testKeyFileMisc();
   testKeyFileCreate(null, null);
 
   testKeyFileCreate(sampleProfiles.naval, null);
@@ -354,7 +437,7 @@ export function runKeyfilesUnitTests() {
                'public_key': '04806ab413ff168f76915725e75fda571ff8069d41d6193fa580866400807f8f5bffdb72356523a0f0f274b241139434b8871788d6f0c3211989217e2095704c2d',
                'root_urls': ['http://www.naval.com/naval.root'],
                'datastore_urls': ['http://www.naval.com/naval.datastore'],
-               'fq_datastore_id': escape('naval_phone:1Jw7yUHbwUDLBKcRk8kcajYf3CqT1vJqj1'.replace('/', '\\x2f')),
+               'fq_datastore_id': makeFullyQualifiedDataId('naval_phone', '1Jw7yUHbwUDLBKcRk8kcajYf3CqT1vJqj1'),
             },
          },
      },
