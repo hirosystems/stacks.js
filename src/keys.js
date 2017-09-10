@@ -73,6 +73,21 @@ export function decompressPublicKey(pubkey_hex: string) {
 
 
 /*
+ * Convert a public key to its compressed format
+ *
+ * @param pubkey (string) the public key as a hex string
+ *
+ * Returns a string that encodes the uncompressed public key
+ */
+export function compressPublicKey(pubkey_hex: string) {
+   const pubk = ECPair.fromPublicKeyBuffer(Buffer.from(pubkey_hex, 'hex'));
+   pubk.compressed = true;
+   
+   const public_key_str = pubk.getPublicKeyBuffer().toString('hex');
+   return public_key_str;
+}
+
+/*
  * Get a *uncompressed* public key (hex) from private key
  */
 export function getPubkeyHex(privkey_hex: string) {
