@@ -7,6 +7,7 @@ import {
    KEY_DELEGATION_SCHEMA, 
    BLOCKSTACK_KEY_FILE_SCHEMA,
    MINIMAL_PROFILE_SCHEMA,
+   OP_APP_NAME_PATTERN
 } from './profileSchemas';
 
 import {
@@ -16,12 +17,19 @@ import {
 import {
    getPubkeyHex,
    publicKeyToAddress,
+   compressPublicKey,
    decompressPublicKey,
 } from '../keys';
+
+import {
+   makeFullyQualifiedDataId
+} from '../storage';
 
 const Ajv = require('ajv');
 const jsontokens = require('jsontokens');
 const assert = require('assert');
+const bitcoinjs = require('bitcoinjs-lib');
+const URL = require('url');
 
 /*
  * Make a delegation entry's private keys.
@@ -31,9 +39,9 @@ const assert = require('assert');
  * Returns private keys object, keyed with 'app', 'enc', 'sign', and 'owner'
  */
 export function keyFileMakeDelegationPrivateKeys(identityKeypair, key_index = 0) {
-   assert(identityKeypair.node, `BUG: missing .node in identityKeypair ${key_index}`);
+   assert(identityKeypair.nodeKey, `BUG: missing .nodeKey in identityKeypair ${key_index}`);
 
-   const identity_owner_node = new IdentityAddressOwnerNode(identityKeypair.node, identityKeypair.salt); 
+   const identity_owner_node = new IdentityAddressOwnerNode(bitcoinjs.HDNode.fromBase58(identityKeypair.nodeKey), identityKeypair.salt); 
    const signing_key_node = identity_owner_node.getSigningNode();
    const encryption_key_node = identity_owner_node.getEncryptionNode();
    const apps_key_node = identity_owner_node.getAppsNode();
@@ -117,6 +125,8 @@ export function keyFileProfileSerialize(profile, signing_privkey) {
  * * @profile (object) this is the profile of the name, if it exists already
  * * @apps (object) this is the existing application bundle
  * * @index (object) index of this name in the identity keychain
+ *
+ * Returns the new profile with the keyfile
  */
 export function keyFileCreate(name, identityKeypair, device_id, opts) {
    if (!opts) {
@@ -140,6 +150,12 @@ export function keyFileCreate(name, identityKeypair, device_id, opts) {
       profile = { '@type': 'Person', 'accounts': [] };
    }
 
+   if (Object.keys(profile).includes('keyfile')) {
+      delete profile['keyfile'];
+   }
+
+   profile['timestamp'] = now;
+
    const delegations = {
       'version': '1.0',
       'name': name,
@@ -148,8 +164,6 @@ export function keyFileCreate(name, identityKeypair, device_id, opts) {
    };
 
    delegations['devices'][device_id] = keyFileMakeDelegationEntry(identityKeypair, key_index);
-
-   assert(delegations['name'] === name, `Invalid delegations: name ${delegations['name']} does not match ${name}`);
 
    const ajv = new Ajv();
 
@@ -296,7 +310,7 @@ export function keyFileParse(profile_txt, name_address) {
    assert(valid, 'Invalid profile: does not conform to minimal profile schema');
 
    // must have a keyfile
-   assert(unverified_profile['keyfile'], 'Legacy profile: no key file entry');
+   assert(unverified_profile['keyfile'], `Legacy profile: no key file entry in ${unverified_profile}`);
 
    key_txt = unverified_profile['keyfile'];
    unverified_key_file = jsontokens.decodeToken(key_txt)['payload'];
@@ -325,9 +339,12 @@ export function keyFileParse(profile_txt, name_address) {
    // TODO: only single-sig for now 
    assert(name_owner_pubkeys.length === 1, 'Multisig is not supported yet');
 
-   // make sure they match the address 
+   // make sure they match the address.
+   // try both compressed and uncompressed.
    // TODO: multisig support 
-   assert(publicKeyToAddress(name_owner_pubkeys[0]) === name_address, `Invalid key file: name public key ${name_owner_pubkeys[0]} does not match address ${name_address}`);
+   assert(publicKeyToAddress(compressPublicKey(name_owner_pubkeys[0])) === name_address || 
+          publicKeyToAddress(decompressPublicKey(name_owner_pubkeys[0])) === name_address,
+          `Invalid key file: name public key ${name_owner_pubkeys[0]} does not match address ${name_address}`);
 
    // authenticate the delegation file 
    // TODO: multisig
@@ -343,7 +360,7 @@ export function keyFileParse(profile_txt, name_address) {
       signing_public_keys[dev_id] = delegation_file['devices'][dev_id]['sign'];
    }
 
-   // verify key file and profile, using any of the signign keys 
+   // verify key file and profile, using any of the signing keys 
    for (const dev_id of Object.keys(signing_public_keys)) {
       const signing_public_key = signing_public_keys[dev_id];
       try {
@@ -354,7 +371,7 @@ export function keyFileParse(profile_txt, name_address) {
          profile = unverified_profile;
       }
       catch (e) {
-         continue;
+         ;
       }
 
       try {
@@ -365,7 +382,7 @@ export function keyFileParse(profile_txt, name_address) {
          key_file = unverified_key_file;
       }
       catch (e) {
-         continue;
+         ;
       }
 
       if (key_file && profile) {
@@ -373,8 +390,8 @@ export function keyFileParse(profile_txt, name_address) {
       }
    }
 
-   assert(profile, 'Invalid key file: Failed to verify profile with name address');
-   assert(key_file, 'Invalid key file: Failed to verify key file with name address');
+   assert(profile, `Invalid key file: Failed to verify profile with available signing keys (${profile_txt})`);
+   assert(key_file, `Invalid key file: Failed to verify key file with available signing keys (${key_txt})`);
 
    // device IDs in the delegation file must include all of the device IDs in the app key bundles 
    for (const dev_id of Object.keys(key_file['keys']['apps'])) {
@@ -466,6 +483,32 @@ export function keyFileUpdateProfile(parsed_key_file, new_profile, signing_priva
 
 
 /*
+ * Convert a host:port or a scheme://host:port to an ICANN name in Blockstack
+ */
+export function keyFileICANNToAppName(icann_name) {
+   if (!icann_name.startsWith('http')) {
+      icann_name = `http://${icann_name}`;
+   }
+
+   const url_info = URL.parse(icann_name);
+
+   // is this already valid?
+   const name_regex = new RegExp(OP_APP_NAME_PATTERN);
+   if (name_regex.test(url_info.host)) {
+      return url_info.host;
+   }
+
+   const hostname = url_info.hostname;
+   if (url_info.port) {
+      return `${hostname}.1:${url_info.port}`;
+   }
+   else {
+      return `${hostname}.1`;
+   }
+}
+
+
+/*
  * Update the device-specific application set in a keyfile.
  *
  * @parsed_key_file (object) the return value of keyFileParse()
@@ -497,7 +540,8 @@ export function keyFileUpdateApps(parsed_key_file, device_id, app_name, app_pubk
    const apps_jwts = key_jwts['apps'];
    assert(apps_jwts, 'Invalid key file: no apps JWTs');
 
-   // TODO: well-formed app name?
+   const name_regex = new RegExp(OP_APP_NAME_PATTERN);
+   assert(name_regex.test(app_name), `Invalid app name ${app_name}`);
 
    assert(Object.keys(parsed_key_file['keys']['delegation']['devices']).includes(device_id), `Device ${device_id} not present in delegation file`);
 
@@ -506,8 +550,7 @@ export function keyFileUpdateApps(parsed_key_file, device_id, app_name, app_pubk
       cur_apps[device_id] = { 'version': '1.0', 'apps': {} };
    }
    
-   // TODO: duplicates work with blockstack-storage.js
-   const fq_datastore_id = escape(`${this_device_id}:${datastore_id}`.replace('/', '\\x2f'));
+   const fq_datastore_id = makeFullyQualifiedDataId(this_device_id, datastore_id);
 
    cur_apps[device_id]['apps'][app_name] = {
       'public_key': decompressPublicKey(app_pubkey),
@@ -715,11 +758,14 @@ export function keyFileGetAppListing(parsed_key_file, full_application_name) {
       }
 
       const dev_app_info = dev_app_pubkey_info['apps'];
+      assert(dev_app_info, `Invalid keyfile: no device-specific info for device ${dev_id}`);
+
       if (!Object.keys(dev_app_info).includes(full_application_name)) {
          continue;
       }
 
-      app_info[dev_id] = dev_app_info[full_application_name];
+      app_info[dev_id] = {};
+      Object.assign(app_info[dev_id], dev_app_info[full_application_name]);
    }
 
    return app_info;
