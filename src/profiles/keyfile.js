@@ -118,17 +118,16 @@ export function keyFileProfileSerialize(profile, signing_privkey) {
 /*
  * Create a key file, optionally from an existing profile or existing key file state.
  * 
- * @name (string) this is the blockchain ID
  * @identityKeypair (object) this is the identity keypair bundle
  * @opts (object) the set of optional keyword arguments:
  * * @key_order (array) this is the list of device IDs that determine the verification order of the keys derived from the master keychain
- * * @profile (object) this is the profile of the name, if it exists already
+ * * @profile (object) this is the profile, if it exists already
  * * @apps (object) this is the existing application bundle
- * * @index (object) index of this name in the identity keychain
+ * * @index (object) index of this identity keychain's address
  *
  * Returns the new profile with the keyfile
  */
-export function keyFileCreate(name, identityKeypair, device_id, opts) {
+export function keyFileCreate(identityKeypair, device_id, opts) {
    if (!opts) {
       opts = {};
    }
@@ -158,7 +157,6 @@ export function keyFileCreate(name, identityKeypair, device_id, opts) {
 
    const delegations = {
       'version': '1.0',
-      'name': name,
       'devices': {},
       'timestamp': now,
    };

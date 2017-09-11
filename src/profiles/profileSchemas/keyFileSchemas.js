@@ -28,10 +28,6 @@ export const KEY_DELEGATION_SCHEMA = {
             type: 'string',
             pattern: '^1\\.0$',
         },
-        name: {
-            type: 'string',
-            pattern: OP_NAME_OR_SUBDOMAIN_PATTERN,
-        },
         devices: {
             type: 'object',
             patternProperties: {
@@ -73,7 +69,6 @@ export const KEY_DELEGATION_SCHEMA = {
     },
     required: [
         'version',
-        'name',
         'devices',
         'timestamp'
     ],
