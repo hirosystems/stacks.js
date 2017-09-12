@@ -1,3 +1,4 @@
+/* @flow */
 import { Service } from './service'
 import cheerio from 'cheerio'
 
@@ -7,7 +8,7 @@ class HackerNews extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof) {
+  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
       if (proof.proof_url === `${baseUrls[i]}${proof.identifier}`) {
@@ -17,7 +18,7 @@ class HackerNews extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static getProofStatement(searchText) {
+  static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const tables = $('#hnmain').children().find('table')
     let statement = ''

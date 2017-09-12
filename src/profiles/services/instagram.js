@@ -1,3 +1,4 @@
+/* @flow */
 import { Service } from './service'
 import cheerio from 'cheerio'
 
@@ -7,7 +8,7 @@ class Instagram extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof) {
+  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
       if (proof.proof_url.startsWith(`${baseUrls[i]}`)) {
@@ -21,7 +22,7 @@ class Instagram extends Service {
     return true
   }
 
-  static getProofIdentity(searchText) {
+  static getProofIdentity(searchText: string) {
     const $ = cheerio.load(searchText)
     const username = $('meta[property="og:description"]').attr('content')
     if (username !== undefined && username.split(':').length > 1) {
@@ -31,7 +32,7 @@ class Instagram extends Service {
     }
   }
 
-  static getProofStatement(searchText) {
+  static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[property="og:description"]')
                         .attr('content')

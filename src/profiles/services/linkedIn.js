@@ -1,3 +1,4 @@
+/* @flow */
 import { Service } from './service'
 import cheerio from 'cheerio'
 
@@ -7,7 +8,7 @@ class LinkedIn extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof) {
+  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
       if (proof.proof_url.startsWith(`${baseUrls[i]}`)) {
@@ -21,7 +22,7 @@ class LinkedIn extends Service {
     return true
   }
 
-  static getProofIdentity(searchText) {
+  static getProofIdentity(searchText: string) {
     const $ = cheerio.load(searchText)
     const profileLink = $('article').find('.post-meta__profile-link')
 
@@ -32,7 +33,7 @@ class LinkedIn extends Service {
     }
   }
 
-  static getProofStatement(searchText) {
+  static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const postContent = $('article').find('.commentary')
     let statement = ''

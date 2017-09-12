@@ -2934,6 +2934,16 @@ var Service = exports.Service = function () {
       return [];
     }
   }, {
+    key: 'getProofIdentity',
+    value: function getProofIdentity(searchText) {
+      return searchText;
+    }
+  }, {
+    key: 'getProofStatement',
+    value: function getProofStatement(searchText) {
+      return searchText;
+    }
+  }, {
     key: 'shouldValidateIdentityInBody',
     value: function shouldValidateIdentityInBody() {
       return false;

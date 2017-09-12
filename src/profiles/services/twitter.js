@@ -1,3 +1,4 @@
+/* @flow */
 import { Service } from './service'
 import cheerio from 'cheerio'
 
@@ -7,7 +8,7 @@ class Twitter extends Service {
     return baseUrls
   }
 
-  static getProofStatement(searchText) {
+  static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[property="og:description"]').attr('content')
     if (statement !== undefined) {

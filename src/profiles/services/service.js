@@ -1,8 +1,16 @@
+/* @flow */
 import 'isomorphic-fetch'
 import { containsValidProofStatement, containsValidBitcoinProofStatement } from './serviceUtils'
 
 export class Service {
-  static validateProof(proof, identifier, useBitcoinAddress) {
+  static validateProof(proof: { 
+                          proof_url: string, 
+                          valid: boolean, 
+                          service: string, 
+                          identifier: string 
+                        }, 
+                        identifier: string, 
+                        useBitcoinAddress: boolean) {
     return new Promise((resolve) => {
       try {
         const proofUrl = this.getProofUrl(proof)
@@ -44,11 +52,19 @@ export class Service {
     return []
   }
 
+  static getProofIdentity(searchText: string) {
+    return searchText
+  }
+
+  static getProofStatement(searchText: string) {
+    return searchText
+  }
+
   static shouldValidateIdentityInBody() {
     return false
   }
 
-  static getProofUrl(proof) {
+  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
       if (proof.proof_url.toLowerCase().startsWith(`${baseUrls[i]}${proof.identifier}`)) {

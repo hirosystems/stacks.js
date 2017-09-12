@@ -1,11 +1,14 @@
+/* @flow */
 import { profileServices } from './services'
 
-export function validateProofs(profile, identifier, useBitcoinAddress = false) {
+export function validateProofs(profile: { account: Array<any> }, 
+                                identifier: string, 
+                                useBitcoinAddress: boolean = false) {
   if (!profile) {
     throw new Error('Profile must not be null')
   }
 
-  let accounts = []
+  let accounts: Array<any> = []
   const proofsToValidate = []
 
   if (profile.hasOwnProperty('account')) {

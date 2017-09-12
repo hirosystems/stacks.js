@@ -1,4 +1,5 @@
-export function containsValidProofStatement(searchText, identifier) {
+/* @flow */
+export function containsValidProofStatement(searchText: string, identifier: string) {
   searchText = searchText.toLowerCase()
 
   if (identifier.split('.').length !== 2) {
@@ -47,7 +48,7 @@ export function containsValidProofStatement(searchText, identifier) {
   return false
 }
 
-export function containsValidBitcoinProofStatement(proofStatement, identifier) {
+export function containsValidBitcoinProofStatement(proofStatement: string, identifier: string) {
   proofStatement = proofStatement.split(identifier)[0].toLowerCase() + identifier
 
   const verificationStyles = [
