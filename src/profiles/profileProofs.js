@@ -1,7 +1,17 @@
 /* @flow */
 import { profileServices } from './services'
 
-export function validateProofs(profile: { account: Array<any> }, 
+/**
+ * Validates the social proofs in a user's profile. Currently supports validation of 
+ * Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.
+ *
+ * @param {Object} profile The JSON of the profile to be validated
+ * @param {string} identifier The bitcoin address or Blockstack name to be validated
+ * @param {boolean} [useBitcoinAddress=false] Whether the identifier is a bitcoin address 
+ * or Blockstack name
+ * @returns {Promise} that resolves to an array of validated proof objects
+ */
+export function validateProofs(profile: Object, 
                                 identifier: string, 
                                 useBitcoinAddress: boolean = false) {
   if (!profile) {

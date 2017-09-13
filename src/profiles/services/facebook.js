@@ -8,12 +8,12 @@ class Facebook extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
+  static getProofUrl(proof: Object) {
     return this.normalizeFacebookUrl(proof)
   }
 
   /* Facebook url proofs should start with www. */
-  static normalizeFacebookUrl(proof: { proof_url: string, identifier: string, service: string }) {
+  static normalizeFacebookUrl(proof: Object) {
     let proofUrl = super.getProofUrl(proof)
     if (proofUrl.startsWith('https://facebook.com')) {
       const tokens = proofUrl.split('https://facebook.com')

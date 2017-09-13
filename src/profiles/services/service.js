@@ -3,12 +3,7 @@ import 'isomorphic-fetch'
 import { containsValidProofStatement, containsValidBitcoinProofStatement } from './serviceUtils'
 
 export class Service {
-  static validateProof(proof: { 
-                          proof_url: string, 
-                          valid: boolean, 
-                          service: string, 
-                          identifier: string 
-                        }, 
+  static validateProof(proof: Object, 
                         identifier: string, 
                         useBitcoinAddress: boolean) {
     return new Promise((resolve) => {
@@ -64,7 +59,7 @@ export class Service {
     return false
   }
 
-  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
+  static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
       if (proof.proof_url.toLowerCase().startsWith(`${baseUrls[i]}${proof.identifier}`)) {

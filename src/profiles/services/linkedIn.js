@@ -8,7 +8,7 @@ class LinkedIn extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof: { proof_url: string, identifier: string, service: string }) {
+  static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
       if (proof.proof_url.startsWith(`${baseUrls[i]}`)) {

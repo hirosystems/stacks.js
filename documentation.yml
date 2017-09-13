@@ -22,6 +22,7 @@ toc:
   - wrapProfileToken
   - signProfileToken
   - verifyProfileToken
+  - validateProofs
   - name: Storage
     description: |
       Store your app's data without servers in storage your user controls.
