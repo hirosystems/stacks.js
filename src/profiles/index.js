@@ -23,7 +23,7 @@ export {
 export {
   profileServices,
   containsValidProofStatement,
-  containsValidBitcoinProofStatement
+  containsValidAddressProofStatement
 } from './services'
 
 export {

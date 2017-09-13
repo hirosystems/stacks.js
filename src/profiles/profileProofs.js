@@ -6,14 +6,13 @@ import { profileServices } from './services'
  * Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.
  *
  * @param {Object} profile The JSON of the profile to be validated
- * @param {string} identifier The bitcoin address or Blockstack name to be validated
- * @param {boolean} [useBitcoinAddress=false] Whether the identifier is a bitcoin address 
- * or Blockstack name
+ * @param {string} ownerAddress The owner bitcoin address to be validated
+ * @param {boolean} [name=null] The Blockstack name to be validated 
  * @returns {Promise} that resolves to an array of validated proof objects
  */
 export function validateProofs(profile: Object, 
-                                identifier: string, 
-                                useBitcoinAddress: boolean = false) {
+                                ownerAddress: string, 
+                                name: ?string = null) {
   if (!profile) {
     throw new Error('Profile must not be null')
   }
@@ -51,7 +50,7 @@ export function validateProofs(profile: Object,
 
     proofsToValidate.push(new Promise((resolve) => {
       resolve(profileServices[account.service]
-        .validateProof(proof, identifier, useBitcoinAddress))
+        .validateProof(proof, ownerAddress, name))
     }))
   })
 

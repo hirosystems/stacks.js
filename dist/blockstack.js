@@ -1231,10 +1231,10 @@ Object.defineProperty(exports, 'containsValidProofStatement', {
     return _services.containsValidProofStatement;
   }
 });
-Object.defineProperty(exports, 'containsValidBitcoinProofStatement', {
+Object.defineProperty(exports, 'containsValidAddressProofStatement', {
   enumerable: true,
   get: function get() {
-    return _services.containsValidBitcoinProofStatement;
+    return _services.containsValidAddressProofStatement;
   }
 });
 
@@ -1350,13 +1350,12 @@ var _services = require('./services');
  * Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.
  *
  * @param {Object} profile The JSON of the profile to be validated
- * @param {string} identifier The bitcoin address or Blockstack name to be validated
- * @param {boolean} [useBitcoinAddress=false] Whether the identifier is a bitcoin address 
- * or Blockstack name
+ * @param {string} ownerAddress The owner bitcoin address to be validated
+ * @param {boolean} [name=null] The Blockstack name to be validated 
  * @returns {Promise} that resolves to an array of validated proof objects
  */
-function validateProofs(profile, identifier) {
-  var useBitcoinAddress = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+function validateProofs(profile, ownerAddress) {
+  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
   if (!profile) {
     throw new Error('Profile must not be null');
@@ -1391,7 +1390,7 @@ function validateProofs(profile, identifier) {
     };
 
     proofsToValidate.push(new Promise(function (resolve) {
-      resolve(_services.profileServices[account.service].validateProof(proof, identifier, useBitcoinAddress));
+      resolve(_services.profileServices[account.service].validateProof(proof, ownerAddress, name));
     }));
   });
 
@@ -2673,7 +2672,7 @@ exports.HackerNews = HackerNews;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.containsValidBitcoinProofStatement = exports.containsValidProofStatement = exports.profileServices = undefined;
+exports.containsValidAddressProofStatement = exports.containsValidProofStatement = exports.profileServices = undefined;
 
 var _serviceUtils = require('./serviceUtils');
 
@@ -2683,10 +2682,10 @@ Object.defineProperty(exports, 'containsValidProofStatement', {
     return _serviceUtils.containsValidProofStatement;
   }
 });
-Object.defineProperty(exports, 'containsValidBitcoinProofStatement', {
+Object.defineProperty(exports, 'containsValidAddressProofStatement', {
   enumerable: true,
   get: function get() {
-    return _serviceUtils.containsValidBitcoinProofStatement;
+    return _serviceUtils.containsValidAddressProofStatement;
   }
 });
 
@@ -2903,8 +2902,10 @@ var Service = exports.Service = function () {
 
   _createClass(Service, null, [{
     key: 'validateProof',
-    value: function validateProof(proof, identifier, useBitcoinAddress) {
+    value: function validateProof(proof, ownerAddress) {
       var _this = this;
+
+      var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
       return new Promise(function (resolve) {
         try {
@@ -2916,9 +2917,8 @@ var Service = exports.Service = function () {
                 if (_this.shouldValidateIdentityInBody() && proof.identifier !== _this.getProofIdentity(text)) {
                   return resolve(proof);
                 }
-
                 var proofText = _this.getProofStatement(text);
-                proof.valid = useBitcoinAddress ? (0, _serviceUtils.containsValidBitcoinProofStatement)(proofText, identifier) : (0, _serviceUtils.containsValidProofStatement)(proofText, identifier);
+                proof.valid = (0, _serviceUtils.containsValidProofStatement)(proofText, name) || (0, _serviceUtils.containsValidAddressProofStatement)(proofText, ownerAddress);
                 return resolve(proof);
               });
             } else {
@@ -2980,25 +2980,31 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.containsValidProofStatement = containsValidProofStatement;
-exports.containsValidBitcoinProofStatement = containsValidBitcoinProofStatement;
-function containsValidProofStatement(searchText, identifier) {
+exports.containsValidAddressProofStatement = containsValidAddressProofStatement;
+function containsValidProofStatement(searchText) {
+  var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (!name) {
+    return false;
+  }
+
   searchText = searchText.toLowerCase();
 
-  if (identifier.split('.').length !== 2) {
+  if (name.split('.').length !== 2) {
     throw new Error('Please provide the fully qualified Blockstack name.');
   }
 
   var username = null;
 
   // support legacy Blockstack ID proofs
-  if (identifier.endsWith('.id')) {
-    username = identifier.split('.id')[0];
+  if (name.endsWith('.id')) {
+    username = name.split('.id')[0];
   }
 
-  var verificationStyles = username != null ? ['verifying myself: my bitcoin username is +' + username, 'verifying myself: my bitcoin username is ' + username, 'verifying myself: my openname is ' + username, 'verifying that +' + username + ' is my bitcoin username', 'verifying that ' + username + ' is my bitcoin username', 'verifying that ' + username + ' is my openname', 'verifying that +' + username + ' is my openname', 'verifying i am +' + username + ' on my passcard', 'verifying that +' + username + ' is my blockchain id', 'verifying that "' + identifier + '" is my blockstack id', // id
-  'verifying that ' + identifier + ' is my blockstack id', 'verifying that &quot;' + identifier + '&quot; is my blockstack id'] : [// only these formats are valid for non-.id tlds
-  'verifying that "' + identifier + '" is my blockstack id', // id
-  'verifying that ' + identifier + ' is my blockstack id', 'verifying that &quot;' + identifier + '&quot; is my blockstack id'];
+  var verificationStyles = username != null ? ['verifying myself: my bitcoin username is +' + username, 'verifying myself: my bitcoin username is ' + username, 'verifying myself: my openname is ' + username, 'verifying that +' + username + ' is my bitcoin username', 'verifying that ' + username + ' is my bitcoin username', 'verifying that ' + username + ' is my openname', 'verifying that +' + username + ' is my openname', 'verifying i am +' + username + ' on my passcard', 'verifying that +' + username + ' is my blockchain id', 'verifying that "' + name + '" is my blockstack id', // id
+  'verifying that ' + name + ' is my blockstack id', 'verifying that &quot;' + name + '&quot; is my blockstack id'] : [// only these formats are valid for non-.id tlds
+  'verifying that "' + name + '" is my blockstack id', // id
+  'verifying that ' + name + ' is my blockstack id', 'verifying that &quot;' + name + '&quot; is my blockstack id'];
 
   for (var i = 0; i < verificationStyles.length; i++) {
     var verificationStyle = verificationStyles[i];
@@ -3014,10 +3020,10 @@ function containsValidProofStatement(searchText, identifier) {
   return false;
 }
 
-function containsValidBitcoinProofStatement(proofStatement, identifier) {
-  proofStatement = proofStatement.split(identifier)[0].toLowerCase() + identifier;
+function containsValidAddressProofStatement(proofStatement, address) {
+  proofStatement = proofStatement.split(address)[0].toLowerCase() + address;
 
-  var verificationStyles = ['verifying my avatar on blockstack is owned by the address ' + identifier];
+  var verificationStyles = ['verifying my avatar on blockstack is owned by the address ' + address];
 
   for (var i = 0; i < verificationStyles.length; i++) {
     var verificationStyle = verificationStyles[i];

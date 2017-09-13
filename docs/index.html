@@ -1326,7 +1326,7 @@ keypair that is thought to have signed the token
 Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
 
 
-  <div class='pre p1 fill-light mt0'>validateProofs(profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, identifier: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, useBitcoinAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>validateProofs(profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1352,8 +1352,8 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>identifier</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    The bitcoin address or Blockstack name to be validated
+            <span class='code bold'>ownerAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The owner bitcoin address to be validated
 
           </div>
           
@@ -1361,10 +1361,9 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>useBitcoinAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
-            = <code>false</code>)</code>
-	    Whether the identifier is a bitcoin address
-or Blockstack name
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
+            = <code>null</code>)</code>
+	    The Blockstack name to be validated
 
           </div>
           

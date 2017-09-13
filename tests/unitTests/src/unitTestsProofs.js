@@ -6,7 +6,7 @@ import fs from 'fs'
 import FetchMock from 'fetch-mock'
 
 import {
-  validateProofs, containsValidProofStatement, containsValidBitcoinProofStatement, profileServices
+  validateProofs, containsValidProofStatement, containsValidAddressProofStatement, profileServices
 } from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleAddressBasedVerifications } from './sampleData'
@@ -78,8 +78,8 @@ export function runProofStatementUnitTests() {
   })
 }
 
-export function runBitcoinAddressBasedProofsUnitTests() {
-  test('containsValidBitcoinProofStatement', (t) => {
+export function runOwnerAddressBasedProofsUnitTests() {
+  test('containsValidAddressProofStatement', (t) => {
     t.plan(12)
 
     const larry = sampleAddressBasedVerifications.larry
@@ -92,40 +92,40 @@ export function runBitcoinAddressBasedProofsUnitTests() {
     const hackerNewsProofStatement = profileServices.hackerNews.getProofStatement(ken.hackerNews.body)
     const linkedInProofStatement = profileServices.linkedIn.getProofStatement(ken.linkedIn.body)
 
-    t.equals(containsValidBitcoinProofStatement(facebookProofStatement, '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
+    t.equals(containsValidAddressProofStatement(facebookProofStatement, '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
       true, "Facebook post meta tags should contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(facebookProofStatement, 'differentBitcoinAddress', true),
+    t.equals(containsValidAddressProofStatement(facebookProofStatement, 'differentBitcoinAddress', true),
       false, "Facebook post meta tags should not contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(twitterProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+    t.equals(containsValidAddressProofStatement(twitterProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
       true, "Twitter status meta tags should contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(twitterProofStatement, 'differentBitcoinAddress', true),
+    t.equals(containsValidAddressProofStatement(twitterProofStatement, 'differentBitcoinAddress', true),
       false, "Twitter status meta tags should not contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(githubProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+    t.equals(containsValidAddressProofStatement(githubProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
       true, "Github gist body should contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(githubProofStatement, 'differentBitcoinAddress', true),
+    t.equals(containsValidAddressProofStatement(githubProofStatement, 'differentBitcoinAddress', true),
       false, "Github gist body should not contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(instagramProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+    t.equals(containsValidAddressProofStatement(instagramProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
       true, "Instagram body should contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(instagramProofStatement, 'differentBitcoinAddress', true),
+    t.equals(containsValidAddressProofStatement(instagramProofStatement, 'differentBitcoinAddress', true),
       false, "Instagram body should not contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(hackerNewsProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+    t.equals(containsValidAddressProofStatement(hackerNewsProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
       true, "Hacker News body should contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(hackerNewsProofStatement, 'differentBitcoinAddress', true),
+    t.equals(containsValidAddressProofStatement(hackerNewsProofStatement, 'differentBitcoinAddress', true),
       false, "Hacker News body should not contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(linkedInProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+    t.equals(containsValidAddressProofStatement(linkedInProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
       true, "Hacker News body should contain valid bitcoin address proof statement")
 
-    t.equals(containsValidBitcoinProofStatement(linkedInProofStatement, 'differentBitcoinAddress', true),
+    t.equals(containsValidAddressProofStatement(linkedInProofStatement, 'differentBitcoinAddress', true),
       false, "Hacker News body should not contain valid bitcoin address proof statement")
   })
 }
@@ -292,7 +292,7 @@ export function runProofsUnitTests() {
   // Proof statements
   runProofStatementUnitTests()
   // Proof address based
-  runBitcoinAddressBasedProofsUnitTests()
+  runOwnerAddressBasedProofsUnitTests()
   // Proof identity extract from response body
   runInBodyIdentityVerificationTests()
   // Proof services

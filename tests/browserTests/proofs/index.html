@@ -205,14 +205,14 @@
 
   </script>
   <script>
-    blockstack.validateProofs(larry, "larry.id").then(function(proofs) {
+    blockstack.validateProofs(larry, "", "larry.id").then(function(proofs) {
       var newDiv = document.createElement("div");
       newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
       var targetDiv = document.getElementById("results")
       document.body.insertBefore(newDiv, targetDiv)
     })
 
-    blockstack.validateProofs(ken, "1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5", true)
+    blockstack.validateProofs(ken, "1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5")
     .then(function(proofs) {
       var newDiv = document.createElement("div");
       newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
