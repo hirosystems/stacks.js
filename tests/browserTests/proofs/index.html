@@ -122,6 +122,13 @@
                 "proofType": "http",
                 "proofUrl": "https://www.facebook.com/larry.salibra/posts/10100341028448093",
                 "service": "facebook"
+            },
+            {
+                "@type": "Account", 
+                "identifier": "blck-stck",
+                "proofType": "http", 
+                "proofUrl": "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/", 
+                "service": "linkedIn"
             }
         ],
         "address": {
@@ -205,7 +212,7 @@
 
   </script>
   <script>
-    blockstack.validateProofs(larry, "", "larry.id").then(function(proofs) {
+    blockstack.validateProofs(larry, "1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5", "larry.id").then(function(proofs) {
       var newDiv = document.createElement("div");
       newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
       var targetDiv = document.getElementById("results")
