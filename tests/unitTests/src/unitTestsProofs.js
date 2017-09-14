@@ -57,23 +57,23 @@ export function runProofStatementUnitTests() {
       'Should extract proof statement from Github page body')
 
     t.equal(profileServices.twitter.getProofStatement(ken.twitter.body), 
-      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Twitter page meta tags')
 
     t.equal(profileServices.github.getProofStatement(ken.github.body), 
-      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Github page body')
 
     t.equal(profileServices.instagram.getProofStatement(ken.instagram.body), 
-      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Instagram meta tags')
 
     t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body), 
-      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Hacker News profile')
 
     t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body), 
-      'Verifying my avatar on Blockstack is owned by the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+      'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Hacker News profile')
   })
 }

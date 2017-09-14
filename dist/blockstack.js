@@ -3023,7 +3023,7 @@ function containsValidProofStatement(searchText) {
 function containsValidAddressProofStatement(proofStatement, address) {
   proofStatement = proofStatement.split(address)[0].toLowerCase() + address;
 
-  var verificationStyles = ['verifying my avatar on blockstack is owned by the address ' + address];
+  var verificationStyles = ['verifying my blockchain id is secured with the address ' + address];
 
   for (var i = 0; i < verificationStyles.length; i++) {
     var verificationStyle = verificationStyles[i];
