@@ -18,7 +18,7 @@ function mockRequests() {
   const addressBasedLarry = sampleAddressBasedVerifications.larry
 
   FetchMock.get(naval.facebook.url, naval.facebook.body)
-  FetchMock.get(naval.github.url, naval.github.body)
+  FetchMock.get(`${naval.github.url}/raw`, naval.github.body)
   FetchMock.get(naval.twitter.url, naval.twitter.body)
   FetchMock.get(larry.facebook.url, larry.facebook.body)
 }
@@ -38,7 +38,7 @@ function testProofs(profile, username, totalProofs) {
 
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
-    t.plan(8)
+    t.plan(6)
 
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
@@ -52,17 +52,9 @@ export function runProofStatementUnitTests() {
       'Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin', 
       'Should extract proof statement from Twitter page meta tags')
 
-    t.equal(profileServices.github.getProofStatement(naval.github.body), 
-      'Verifying that +naval is my Bitcoin username. You can send me #bitcoin here: https://onename.io/naval', 
-      'Should extract proof statement from Github page body')
-
     t.equal(profileServices.twitter.getProofStatement(ken.twitter.body), 
       'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Twitter page meta tags')
-
-    t.equal(profileServices.github.getProofStatement(ken.github.body), 
-      'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
-      'Should extract address-based proof statement from Github page body')
 
     t.equal(profileServices.instagram.getProofStatement(ken.instagram.body), 
       'Verifying my blockchain ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
@@ -234,7 +226,7 @@ export function runProofServicesUnitTests() {
       "https://www.facebook.com/navalr/posts/10152190734077261",
       "Facebook proof URL should match reference")
     t.equal(profileServices.github.getProofUrl(sampleProofs.naval[2]),
-      "https://gist.github.com/navalr/f31a74054f859ec0ac6a",
+      "https://gist.github.com/navalr/f31a74054f859ec0ac6a/raw",
       "Github proof URL should match reference")
     t.equal(profileServices.twitter.getProofUrl(sampleProofs.naval[0]),
       "https://twitter.com/naval/status/486609266212499456",

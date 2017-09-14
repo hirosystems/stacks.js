@@ -1,6 +1,5 @@
 /* @flow */
 import { Service } from './service'
-import cheerio from 'cheerio'
 
 class Github extends Service {
   static getBaseUrls() {
@@ -8,13 +7,15 @@ class Github extends Service {
     return baseUrls
   }
 
-  static getProofStatement(searchText: string) {
-    const $ = cheerio.load(searchText)
-    const text = $('.gist-content')
-      .find('.file')
-      .find('table')
-      .text()
-    return (text !== undefined) ? text.trim() : ''
+  static getProofUrl(proof: Object) {
+    const baseUrls = this.getBaseUrls()
+    for (let i = 0; i < baseUrls.length; i++) {
+      if (proof.proof_url.toLowerCase().startsWith(`${baseUrls[i]}${proof.identifier}`)) {
+        const raw = proof.proof_url.endsWith('/') ? 'raw' : '/raw'
+        return `${proof.proof_url}${raw}`
+      }
+    }
+    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 }
 

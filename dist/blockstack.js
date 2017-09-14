@@ -2545,12 +2545,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _service = require('./service');
 
-var _cheerio = require('cheerio');
-
-var _cheerio2 = _interopRequireDefault(_cheerio);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -2573,11 +2567,16 @@ var Github = function (_Service) {
       return baseUrls;
     }
   }, {
-    key: 'getProofStatement',
-    value: function getProofStatement(searchText) {
-      var $ = _cheerio2.default.load(searchText);
-      var text = $('.gist-content').find('.file').find('table').text();
-      return text !== undefined ? text.trim() : '';
+    key: 'getProofUrl',
+    value: function getProofUrl(proof) {
+      var baseUrls = this.getBaseUrls();
+      for (var i = 0; i < baseUrls.length; i++) {
+        if (proof.proof_url.toLowerCase().startsWith('' + baseUrls[i] + proof.identifier)) {
+          var raw = proof.proof_url.endsWith('/') ? 'raw' : '/raw';
+          return '' + proof.proof_url + raw;
+        }
+      }
+      throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
     }
   }]);
 
@@ -2585,7 +2584,7 @@ var Github = function (_Service) {
 }(_service.Service);
 
 exports.Github = Github;
-},{"./service":30,"cheerio":166}],26:[function(require,module,exports){
+},{"./service":30}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
