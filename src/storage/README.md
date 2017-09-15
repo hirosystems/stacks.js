@@ -1,5 +1,10 @@
 # Blockstack Storage
 
+_Note: Blockstack Gaia Storage APIs and on-disk format will change in
+upcoming pre-releases breaking backward compatibility. Certain storage features
+such as file encryption and collections are not implemented in the current
+version. These features will be rolled out in future updates._
+
 ## Creating a file
 
 ```JavaScript
