@@ -7,9 +7,11 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 -   [Auth](https://blockstack.github.io/blockstack.js/index.html#authentication)
 -   [Profiles](https://blockstack.github.io/blockstack.js/index.html#profiles)
 -   [Storage](https://blockstack.github.io/blockstack.js/index.html#storage)
--   [Testing](#testing)
 -   [Documentation](#documentation)
 -   [Contributing](#contributing)
+-   [Maintainer](#maintainer)
+-   [Testing](#testing)
+-   [Releasing](#releasing)
 
 ## Installation
 
@@ -71,3 +73,9 @@ _This test will only work with your browser's Cross-Origin Restrictions disabled
 
 Run `npm run compile; npm run browserify` before opening the file `test.html`
 in your browser.
+
+## Releasing
+
+- `git flow start release <version>`
+- Increment version in `package.json` and commit
+- `npm publish`
