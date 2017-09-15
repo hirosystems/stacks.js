@@ -1,4 +1,6 @@
+/* @flow */
 import { Service } from './service'
+import cheerio from 'cheerio'
 
 class Facebook extends Service {
   static getBaseUrls() {
@@ -6,12 +8,12 @@ class Facebook extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof) {
+  static getProofUrl(proof: Object) {
     return this.normalizeFacebookUrl(proof)
   }
 
   /* Facebook url proofs should start with www. */
-  static normalizeFacebookUrl(proof) {
+  static normalizeFacebookUrl(proof: Object) {
     let proofUrl = super.getProofUrl(proof)
     if (proofUrl.startsWith('https://facebook.com')) {
       const tokens = proofUrl.split('https://facebook.com')
@@ -21,6 +23,12 @@ class Facebook extends Service {
     const postId = tokens[1]
     proofUrl = `https://www.facebook.com/${proof.identifier}/posts/${postId}`
     return proofUrl
+  }
+
+  static getProofStatement(searchText: string) {
+    const $ = cheerio.load(searchText)
+    const statement = $('meta[name="description"]').attr('content')
+    return (statement !== undefined) ? statement.trim() : ''
   }
 }
 
