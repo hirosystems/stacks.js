@@ -76,6 +76,8 @@ in your browser.
 
 ## Releasing
 
-- `git flow start release <version>`
+- `git flow release start <version>`
 - Increment version in `package.json` and commit
 - `npm publish`
+- Commit built documentation and distribution
+- `git flow release finish`
