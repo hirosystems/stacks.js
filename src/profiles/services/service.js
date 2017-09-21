@@ -60,7 +60,8 @@ export class Service {
   static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
-      if (proof.proof_url.toLowerCase().startsWith(`${baseUrls[i]}${proof.identifier}`)) {
+      const requiredPrefix = `${baseUrls[i]}${proof.identifier}`.toLowerCase()
+      if (proof.proof_url.toLowerCase().startsWith(requiredPrefix)) {
         return proof.proof_url
       }
     }
