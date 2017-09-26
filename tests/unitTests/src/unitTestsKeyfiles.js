@@ -187,7 +187,7 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileCreate', (t) => {
 
-     let keyfile = keyFileCreate("hello.id", identity_keypair, device_id, {'profile': profile, 'apps': apps});
+     let keyfile = keyFileCreate(identity_keypair, device_id, {'profile': profile, 'apps': apps});
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
@@ -246,7 +246,7 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileUpdateProfile', (t) => {
 
-     let keyfile = keyFileCreate('hello.id', identity_keypair, device_id);
+     let keyfile = keyFileCreate(identity_keypair, device_id);
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
@@ -279,7 +279,7 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileUpdateDelegation', (t) => {
 
-     let keyfile = keyFileCreate('hello.id', identity_keypair, device_id);
+     let keyfile = keyFileCreate(identity_keypair, device_id);
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
@@ -326,7 +326,7 @@ function testKeyFileCreate(profile, apps) {
 
   test('keyFileUpdateApps', (t) => {
 
-     let keyfile = keyFileCreate('hello.id', identity_keypair, device_id);
+     let keyfile = keyFileCreate(identity_keypair, device_id);
      t.ok(keyfile, 'Key file must have been created');
 
      let parsed_keyfile = keyFileParse(keyfile, address);
