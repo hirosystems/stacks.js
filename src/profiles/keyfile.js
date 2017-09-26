@@ -251,7 +251,14 @@ export function keyFileParseProfile(profile_txt) {
          unverified_profile = unverified_profile[0];
       }
 
-      unverified_profile = unverified_profile['claim'];
+      claim_profile = unverified_profile['claim'];
+      if (!claim_profile) {
+         // possibly a token within a JSON struct
+         token_profile = unverified_profile['token'];
+         if (token_profile) {
+            claim_profile = jsontokens.decodeToken(token_profile)['payload']['claim'];
+         }
+      }
       assert(unverified_profile);
    }
    catch (e) {
