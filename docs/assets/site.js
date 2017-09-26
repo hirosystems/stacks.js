@@ -1,3 +1,5 @@
+'use strict';
+
 /* global anchors */
 
 // add anchor links to headers
@@ -7,7 +9,7 @@ anchors.add('h3');
 // Filter UI
 var tocElements = document.getElementById('toc').getElementsByTagName('li');
 
-document.getElementById('filter-input').addEventListener('keyup', function(e) {
+document.getElementById('filter-input').addEventListener('keyup', function (e) {
   var i, element, children;
 
   // enter key
@@ -22,15 +24,16 @@ document.getElementById('filter-input').addEventListener('keyup', function(e) {
     }
   }
 
-  var match = function() {
+  var match = function () {
     return true;
   };
 
   var value = this.value.toLowerCase();
 
   if (!value.match(/^\s*$/)) {
-    match = function(element) {
-      return element.firstChild.innerHTML.toLowerCase().indexOf(value) !== -1;
+    match = function (element) {
+      var html = element.firstChild.innerHTML;
+      return html && html.toLowerCase().indexOf(value) !== -1;
     };
   }
 
@@ -51,9 +54,7 @@ for (var i = 0; i < toggles.length; i++) {
 }
 
 function toggleStepSibling() {
-  var stepSibling = this.parentNode.parentNode.parentNode.getElementsByClassName(
-    'toggle-target'
-  )[0];
+  var stepSibling = this.parentNode.parentNode.parentNode.getElementsByClassName('toggle-target')[0];
   var klass = 'display-none';
   if (stepSibling.classList.contains(klass)) {
     stepSibling.classList.remove(klass);
@@ -83,18 +84,16 @@ function toggleSibling() {
 }
 
 function showHashTarget(targetId) {
-  var hashTarget = document.getElementById(targetId);
-  // new target is hidden
-  if (
-    hashTarget &&
-    hashTarget.offsetHeight === 0 &&
-    hashTarget.parentNode.parentNode.classList.contains('display-none')
-  ) {
-    hashTarget.parentNode.parentNode.classList.remove('display-none');
+  if (targetId) {
+    var hashTarget = document.getElementById(targetId);
+    // new target is hidden
+    if (hashTarget && hashTarget.offsetHeight === 0 && hashTarget.parentNode.parentNode.classList.contains('display-none')) {
+      hashTarget.parentNode.parentNode.classList.remove('display-none');
+    }
   }
 }
 
-window.addEventListener('hashchange', function() {
+window.addEventListener('hashchange', function () {
   showHashTarget(location.hash.substring(1));
 });
 

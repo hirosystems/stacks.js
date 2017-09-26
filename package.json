@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.9.1",
+  "version": "0.9.6",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
@@ -9,7 +9,6 @@
     "compile": "rm -rf lib; babel src -d lib",
     "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run build",
-    "release": "npm version patch && npm publish",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
     "test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
@@ -97,6 +96,7 @@
     "ajv": "^4.11.5",
     "bitcoinjs-lib": "^2.3.0",
     "blockstack-storage": "^0.3.0",
+    "cheerio": "^0.22.0",
     "custom-protocol-detection-blockstack": "1.1.3",
     "ecurve": "^1.0.5",
     "elliptic": "^6.4.0",
