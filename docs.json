@@ -1,0 +1,6196 @@
+[
+  {
+    "name": "Authentication",
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Single sign on and authentication without third parties or remote servers.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 75,
+                  "offset": 74
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 75,
+              "offset": 74
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "title": null,
+              "url": "https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Read more about authentication",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 2,
+                      "offset": 77
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 32,
+                      "offset": 107
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 76
+                },
+                "end": {
+                  "line": 3,
+                  "column": 109,
+                  "offset": 184
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 76
+            },
+            "end": {
+              "line": 3,
+              "column": 109,
+              "offset": 184
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 1,
+          "offset": 185
+        }
+      }
+    },
+    "kind": "note",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "Authentication",
+        "kind": "note"
+      }
+    ],
+    "namespace": "Authentication"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Generates an authentication request and redirects the user to the Blockstack\nbrowser to approve the sign in request.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 40,
+                  "offset": 116
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 40,
+              "offset": 116
+            },
+            "indent": [
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Please note that this requires that the web browser properly handles the\n",
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 118
+                },
+                "end": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 191
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "blockstack:",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 191
+                },
+                "end": {
+                  "line": 5,
+                  "column": 14,
+                  "offset": 204
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " URL protocol handler.",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 14,
+                  "offset": 204
+                },
+                "end": {
+                  "line": 5,
+                  "column": 36,
+                  "offset": 226
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 4,
+              "column": 1,
+              "offset": 118
+            },
+            "end": {
+              "line": 5,
+              "column": 36,
+              "offset": 226
+            },
+            "indent": [
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Most applications should use this\nmethod for sign in unless they require more fine grained control over how the\nauthentication request is generated. If your app falls into this category,\nuse ",
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 1,
+                  "offset": 228
+                },
+                "end": {
+                  "line": 10,
+                  "column": 5,
+                  "offset": 419
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "generateAndStoreAppKey",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 5,
+                  "offset": 419
+                },
+                "end": {
+                  "line": 10,
+                  "column": 29,
+                  "offset": 443
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": ", ",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 29,
+                  "offset": 443
+                },
+                "end": {
+                  "line": 10,
+                  "column": 31,
+                  "offset": 445
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "makeAuthRequest",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 31,
+                  "offset": 445
+                },
+                "end": {
+                  "line": 10,
+                  "column": 48,
+                  "offset": 462
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": ",\nand ",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 48,
+                  "offset": 462
+                },
+                "end": {
+                  "line": 11,
+                  "column": 5,
+                  "offset": 468
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "redirectToSignInWithAuthRequest",
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 5,
+                  "offset": 468
+                },
+                "end": {
+                  "line": 11,
+                  "column": 38,
+                  "offset": 501
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " to build your own sign in process.",
+              "position": {
+                "start": {
+                  "line": 11,
+                  "column": 38,
+                  "offset": 501
+                },
+                "end": {
+                  "line": 11,
+                  "column": 73,
+                  "offset": 536
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 228
+            },
+            "end": {
+              "line": 11,
+              "column": 73,
+              "offset": 536
+            },
+            "indent": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 11,
+          "column": 73,
+          "offset": 536
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "The location to which the identity provider will redirect the user after\nthe user approves sign in.",
+        "lineNumber": 13,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "String"
+          }
+        },
+        "name": "redirectURI",
+        "default": "`${window.location.origin}/`"
+      },
+      {
+        "title": "param",
+        "description": "Location of the manifest file.",
+        "lineNumber": 16,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "String"
+          }
+        },
+        "name": "manifestURI",
+        "default": "`${window.location.origin}/manifest.json`"
+      },
+      {
+        "title": "param",
+        "description": "Defaults to requesting write access to\nthis app's data store.\nAn array of strings indicating which permissions this app is requesting.",
+        "lineNumber": 18,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          }
+        },
+        "name": "scopes",
+        "default": "DEFAULT_SCOPE"
+      },
+      {
+        "title": "return",
+        "description": null,
+        "lineNumber": 21,
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 67,
+        "column": 0
+      },
+      "end": {
+        "line": 89,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 90,
+          "column": 0
+        },
+        "end": {
+          "line": 95,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "redirectURI",
+        "lineNumber": 13,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The location to which the identity provider will redirect the user after\nthe user approves sign in.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 27,
+                      "offset": 99
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 27,
+                  "offset": 99
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 27,
+              "offset": 99
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "`${window.location.origin}/`"
+      },
+      {
+        "title": "param",
+        "name": "manifestURI",
+        "lineNumber": 16,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Location of the manifest file.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 31,
+                      "offset": 30
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 31,
+              "offset": 30
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "`${window.location.origin}/manifest.json`"
+      },
+      {
+        "title": "param",
+        "name": "scopes",
+        "lineNumber": 18,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Defaults to requesting write access to\nthis app's data store.\nAn array of strings indicating which permissions this app is requesting.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 73,
+                      "offset": 134
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 73,
+                  "offset": 134
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 73,
+              "offset": 134
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Array"
+        },
+        "default": "DEFAULT_SCOPE"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "redirectToSignIn",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "redirectToSignIn",
+        "kind": "function"
+      }
+    ],
+    "namespace": "redirectToSignIn"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Check if there is a authentication request that hasn't been handled.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 69,
+                  "offset": 68
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 69,
+              "offset": 68
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 69,
+          "offset": 68
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "return",
+        "description": "`true` if there is a pending sign in, otherwise `false`",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 106,
+        "column": 0
+      },
+      "end": {
+        "line": 109,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 110,
+          "column": 0
+        },
+        "end": {
+          "line": 112,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "true",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " if there is a pending sign in, otherwise ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "false",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 56,
+                      "offset": 55
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 56,
+                  "offset": 55
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 56,
+              "offset": 55
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "isSignInPending",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "isSignInPending",
+        "kind": "function"
+      }
+    ],
+    "namespace": "isSignInPending"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Try to process any pending sign in request by returning a ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 59,
+                  "offset": 58
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "Promise",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 59,
+                  "offset": 58
+                },
+                "end": {
+                  "line": 1,
+                  "column": 68,
+                  "offset": 67
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " that resolves\nto the user data object if the sign in succeeds.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 68,
+                  "offset": 67
+                },
+                "end": {
+                  "line": 2,
+                  "column": 49,
+                  "offset": 130
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 49,
+              "offset": 130
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 49,
+          "offset": 130
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the endpoint against which to verify public\nkeys match claimed username",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "nameLookupURL"
+      },
+      {
+        "title": "return",
+        "description": "that resolves to the user data object if successful and rejects\nif handling the sign in request fails or there was no pending sign in request.",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 115,
+        "column": 0
+      },
+      "end": {
+        "line": 124,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 125,
+          "column": 0
+        },
+        "end": {
+          "line": 148,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "nameLookupURL",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the endpoint against which to verify public\nkeys match claimed username",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 28,
+                      "offset": 71
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 28,
+                  "offset": 71
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 28,
+              "offset": 71
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "'https://core.blockstack.org/v1/names/'"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves to the user data object if successful and rejects\nif handling the sign in request fails or there was no pending sign in request.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 79,
+                      "offset": 142
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 79,
+                  "offset": 142
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 79,
+              "offset": 142
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "handlePendingSignIn",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "handlePendingSignIn",
+        "kind": "function"
+      }
+    ],
+    "namespace": "handlePendingSignIn"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Retrieves the user data object. The user's profile is stored in the key ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 73,
+                  "offset": 72
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "profile",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 73,
+                  "offset": 72
+                },
+                "end": {
+                  "line": 1,
+                  "column": 82,
+                  "offset": 81
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": ".",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 82,
+                  "offset": 81
+                },
+                "end": {
+                  "line": 1,
+                  "column": 83,
+                  "offset": 82
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 83,
+              "offset": 82
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 83,
+          "offset": 82
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "return",
+        "description": "User data object.",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 150,
+        "column": 0
+      },
+      "end": {
+        "line": 153,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 154,
+          "column": 0
+        },
+        "end": {
+          "line": 156,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "User data object.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 18,
+                      "offset": 17
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 18,
+                  "offset": 17
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 18,
+              "offset": 17
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "loadUserData",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "loadUserData",
+        "kind": "function"
+      }
+    ],
+    "namespace": "loadUserData"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Check if a user is currently signed in.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 40,
+              "offset": 39
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 40,
+          "offset": 39
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "return",
+        "description": "`true` if the user is signed in, `false` if not.",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 25,
+        "column": 0
+      },
+      "end": {
+        "line": 28,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 29,
+          "column": 0
+        },
+        "end": {
+          "line": 31,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "true",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " if the user is signed in, ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "false",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " if not.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 49,
+                  "offset": 48
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 49,
+              "offset": 48
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "isUserSignedIn",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "isUserSignedIn",
+        "kind": "function"
+      }
+    ],
+    "namespace": "isUserSignedIn"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Sign the user out and optionally redirect to given location.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 61,
+                  "offset": 60
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 61,
+              "offset": 60
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 61,
+          "offset": 60
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "Location to redirect user to after sign out.",
+        "lineNumber": 2,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "String"
+          }
+        },
+        "name": "redirectURL",
+        "default": "null"
+      },
+      {
+        "title": "return",
+        "description": null,
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 158,
+        "column": 0
+      },
+      "end": {
+        "line": 162,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 163,
+          "column": 0
+        },
+        "end": {
+          "line": 169,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "redirectURL",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Location to redirect user to after sign out.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 45,
+              "offset": 44
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signUserOut",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signUserOut",
+        "kind": "function"
+      }
+    ],
+    "namespace": "signUserOut"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Generates an authentication request that can be sent to the Blockstack\nbrowser for the user to approve sign in.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 41,
+                  "offset": 111
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 41,
+              "offset": 111
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 41,
+          "offset": 111
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "hex encoded app private key",
+        "lineNumber": 3,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "String"
+          }
+        },
+        "name": "transitPrivateKey",
+        "default": "generateAndStoreAppKey()"
+      },
+      {
+        "title": "param",
+        "description": "location to redirect user to after sign in approval",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "redirectURI"
+      },
+      {
+        "title": "param",
+        "description": "location of this app's manifest file",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "manifestURI"
+      },
+      {
+        "title": "param",
+        "description": "the permissions this app is requesting",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            }
+          ]
+        },
+        "name": "scopes"
+      },
+      {
+        "title": "param",
+        "description": "the origin of this app",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "appDomain"
+      },
+      {
+        "title": "param",
+        "description": "the time at which this request is no longer valid",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "name": "expiresAt"
+      },
+      {
+        "title": "return",
+        "description": "the authentication request",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 18,
+        "column": 0
+      },
+      "end": {
+        "line": 28,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 29,
+          "column": 0
+        },
+        "end": {
+          "line": 61,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "transitPrivateKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "hex encoded app private key",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 28,
+                      "offset": 27
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 28,
+                  "offset": 27
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 28,
+              "offset": 27
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "generateAndStoreAppKey()"
+      },
+      {
+        "title": "param",
+        "name": "redirectURI",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "location to redirect user to after sign in approval",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 52,
+                      "offset": 51
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 52,
+                  "offset": 51
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 52,
+              "offset": 51
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "`${window.location.origin}/`"
+      },
+      {
+        "title": "param",
+        "name": "manifestURI",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "location of this app's manifest file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "`${window.location.origin}/manifest.json`"
+      },
+      {
+        "title": "param",
+        "name": "scopes",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the permissions this app is requesting",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 39,
+                      "offset": 38
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 39,
+                  "offset": 38
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 39,
+              "offset": 38
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            }
+          ]
+        },
+        "default": "DEFAULT_SCOPE"
+      },
+      {
+        "title": "param",
+        "name": "appDomain",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the origin of this app",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 23,
+                      "offset": 22
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 23,
+                  "offset": 22
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 23,
+              "offset": 22
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "window.location.origin"
+      },
+      {
+        "title": "param",
+        "name": "expiresAt",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the time at which this request is no longer valid",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 50,
+                      "offset": 49
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 50,
+                  "offset": 49
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 50,
+              "offset": 49
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "default": "nextHour().getTime()"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the authentication request",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 27,
+                      "offset": 26
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "makeAuthRequest",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "makeAuthRequest",
+        "kind": "function"
+      }
+    ],
+    "namespace": "makeAuthRequest"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Redirects the user to the Blockstack browser to approve the sign in request\ngiven.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 7,
+                  "offset": 82
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 7,
+              "offset": 82
+            },
+            "indent": [
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "The user is redirected to the ",
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 84
+                },
+                "end": {
+                  "line": 4,
+                  "column": 31,
+                  "offset": 114
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "blockstackIDHost",
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 31,
+                  "offset": 114
+                },
+                "end": {
+                  "line": 4,
+                  "column": 49,
+                  "offset": 132
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " if the ",
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 49,
+                  "offset": 132
+                },
+                "end": {
+                  "line": 4,
+                  "column": 57,
+                  "offset": 140
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "blockstack:",
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 57,
+                  "offset": 140
+                },
+                "end": {
+                  "line": 4,
+                  "column": 70,
+                  "offset": 153
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": "\nprotocol handler is not detected. Please note that the protocol handler detection\ndoes not work on all browsers.",
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 70,
+                  "offset": 153
+                },
+                "end": {
+                  "line": 6,
+                  "column": 31,
+                  "offset": 266
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 4,
+              "column": 1,
+              "offset": 84
+            },
+            "end": {
+              "line": 6,
+              "column": 31,
+              "offset": 266
+            },
+            "indent": [
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 6,
+          "column": 31,
+          "offset": 266
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the authentication request generated by `makeAuthRequest`",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "authRequest"
+      },
+      {
+        "title": "param",
+        "description": "the URL to redirect the user to if the blockstack\n                                    protocol handler is not detected",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "blockstackIDHost"
+      },
+      {
+        "title": "return",
+        "description": null,
+        "lineNumber": 10,
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 33,
+        "column": 0
+      },
+      "end": {
+        "line": 44,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 45,
+          "column": 0
+        },
+        "end": {
+          "line": 65,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "authRequest",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the authentication request generated by ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "makeAuthRequest",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 58,
+                      "offset": 57
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 58,
+                  "offset": 57
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 58,
+              "offset": 57
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "makeAuthRequest()"
+      },
+      {
+        "title": "param",
+        "name": "blockstackIDHost",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the URL to redirect the user to if the blockstack\n                                    protocol handler is not detected",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 69,
+                      "offset": 118
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 69,
+                  "offset": 118
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 69,
+              "offset": 118
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "DEFAULT_BLOCKSTACK_HOST"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "redirectToSignInWithAuthRequest",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "redirectToSignInWithAuthRequest",
+        "kind": "function"
+      }
+    ],
+    "namespace": "redirectToSignInWithAuthRequest"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Retrieve the authentication token from the URL query",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 53,
+          "offset": 52
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "return",
+        "description": "the authentication token if it exists otherwise `null`",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 97,
+        "column": 0
+      },
+      "end": {
+        "line": 100,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 101,
+          "column": 0
+        },
+        "end": {
+          "line": 104,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the authentication token if it exists otherwise ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "null",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 55,
+                      "offset": 54
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 55,
+                  "offset": 54
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 55,
+              "offset": 54
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAuthResponseToken",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAuthResponseToken",
+        "kind": "function"
+      }
+    ],
+    "namespace": "getAuthResponseToken"
+  },
+  {
+    "name": "Profiles",
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Identity you own and control.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "title": null,
+              "url": "https://github.com/blockstack/blockstack.js/blob/master/src/profiles/README.md",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Read more about profiles",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 2,
+                      "offset": 32
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 26,
+                      "offset": 56
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 31
+                },
+                "end": {
+                  "line": 3,
+                  "column": 107,
+                  "offset": 137
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 31
+            },
+            "end": {
+              "line": 3,
+              "column": 107,
+              "offset": 137
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 1,
+          "offset": 138
+        }
+      }
+    },
+    "kind": "note",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "Profiles",
+        "kind": "note"
+      }
+    ],
+    "namespace": "Profiles"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Extracts a profile from an encoded token and optionally verifies it,\nif ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 4,
+                  "offset": 72
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "publicKeyOrAddress",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 4,
+                  "offset": 72
+                },
+                "end": {
+                  "line": 2,
+                  "column": 24,
+                  "offset": 92
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " is provided.",
+              "position": {
+                "start": {
+                  "line": 2,
+                  "column": 24,
+                  "offset": 92
+                },
+                "end": {
+                  "line": 2,
+                  "column": 37,
+                  "offset": 105
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 37,
+              "offset": 105
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 37,
+          "offset": 105
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the token to be extracted",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "param",
+        "description": "the public key or address of the\n  keypair that is thought to have signed the token",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "publicKeyOrAddress"
+      },
+      {
+        "title": "returns",
+        "description": "the profile extracted from the encoded token",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      },
+      {
+        "title": "throws",
+        "description": "if the token isn't signed by the provided `publicKeyOrAddress`",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Error"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 134,
+        "column": 0
+      },
+      "end": {
+        "line": 142,
+        "column": 4
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 143,
+          "column": 0
+        },
+        "end": {
+          "line": 160,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the token to be extracted",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "publicKeyOrAddress",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the public key or address of the\n  keypair that is thought to have signed the token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 51,
+                      "offset": 83
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 51,
+                  "offset": 83
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 51,
+              "offset": 83
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the profile extracted from the encoded token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 45,
+              "offset": 44
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "if the token isn't signed by the provided ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 43,
+                      "offset": 42
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "publicKeyOrAddress",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 43,
+                      "offset": 42
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 63,
+                      "offset": 62
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 63,
+              "offset": 62
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Error"
+        }
+      }
+    ],
+    "todos": [],
+    "name": "extractProfile",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "extractProfile",
+        "kind": "function"
+      }
+    ],
+    "namespace": "extractProfile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Wraps a token for a profile token file",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 39,
+                  "offset": 38
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 39,
+              "offset": 38
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 39,
+          "offset": 38
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the token to be wrapped",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "returns",
+        "description": "including `token` and `decodedToken`",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 55,
+        "column": 0
+      },
+      "end": {
+        "line": 59,
+        "column": 4
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 60,
+          "column": 0
+        },
+        "end": {
+          "line": 65,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the token to be wrapped",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "including ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 11,
+                      "offset": 10
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 11,
+                      "offset": 10
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 18,
+                      "offset": 17
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " and ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 18,
+                      "offset": 17
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 23,
+                      "offset": 22
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "decodedToken",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 23,
+                      "offset": 22
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "wrapProfileToken",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "wrapProfileToken",
+        "kind": "function"
+      }
+    ],
+    "namespace": "wrapProfileToken"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Signs a profile token",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 22,
+                  "offset": 21
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 22,
+              "offset": 21
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 22,
+          "offset": 21
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the JSON of the profile to be signed",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "profile"
+      },
+      {
+        "title": "param",
+        "description": "the signing private key",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "privateKey"
+      },
+      {
+        "title": "param",
+        "description": "the entity that the information is about",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "subject"
+      },
+      {
+        "title": "param",
+        "description": "the entity that is issuing the token",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "issuer"
+      },
+      {
+        "title": "param",
+        "description": "the signing algorithm to use",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "signingAlgorithm"
+      },
+      {
+        "title": "param",
+        "description": "the time of issuance of the token",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Date"
+        },
+        "name": "issuedAt"
+      },
+      {
+        "title": "param",
+        "description": "the time of expiration of the token",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "Date"
+        },
+        "name": "expiresAt"
+      },
+      {
+        "title": "returns",
+        "description": "the signed profile token",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 9,
+        "column": 0
+      },
+      "end": {
+        "line": 19,
+        "column": 4
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 0
+        },
+        "end": {
+          "line": 53,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "profile",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the JSON of the profile to be signed",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      },
+      {
+        "title": "param",
+        "name": "privateKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the signing private key",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "subject",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the entity that the information is about",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "issuer",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the entity that is issuing the token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "signingAlgorithm",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the signing algorithm to use",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 29,
+                  "offset": 28
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 29,
+              "offset": 28
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "'ES256K'"
+      },
+      {
+        "title": "param",
+        "name": "issuedAt",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the time of issuance of the token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 34,
+                  "offset": 33
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 34,
+              "offset": 33
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Date"
+        },
+        "default": "new Date()"
+      },
+      {
+        "title": "param",
+        "name": "expiresAt",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the time of expiration of the token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 36,
+                  "offset": 35
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 36,
+              "offset": 35
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Date"
+        },
+        "default": "nextYear()"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the signed profile token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 25,
+                      "offset": 24
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signProfileToken",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signProfileToken",
+        "kind": "function"
+      }
+    ],
+    "namespace": "signProfileToken"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Verifies a profile token",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 25,
+          "offset": 24
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the token to be verified",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "param",
+        "description": "the public key or address of the\n  keypair that is thought to have signed the token",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "publicKeyOrAddress"
+      },
+      {
+        "title": "returns",
+        "description": "the verified, decoded profile token",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      },
+      {
+        "title": "throws",
+        "description": "throws an error if token verification fails",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Error"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 67,
+        "column": 0
+      },
+      "end": {
+        "line": 74,
+        "column": 4
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 75,
+          "column": 0
+        },
+        "end": {
+          "line": 132,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the token to be verified",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 25,
+                      "offset": 24
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "publicKeyOrAddress",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the public key or address of the\n  keypair that is thought to have signed the token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 51,
+                      "offset": 83
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 51,
+                  "offset": 83
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 51,
+              "offset": 83
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the verified, decoded profile token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 36,
+                  "offset": 35
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 36,
+              "offset": 35
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "throws an error if token verification fails",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 44,
+                      "offset": 43
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 44,
+                  "offset": 43
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 44,
+              "offset": 43
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Error"
+        }
+      }
+    ],
+    "todos": [],
+    "name": "verifyProfileToken",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "verifyProfileToken",
+        "kind": "function"
+      }
+    ],
+    "namespace": "verifyProfileToken"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Validates the social proofs in a user's profile. Currently supports validation of \nFacebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 72,
+                  "offset": 154
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 72,
+              "offset": 154
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 72,
+          "offset": 154
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "The JSON of the profile to be validated",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "profile"
+      },
+      {
+        "title": "param",
+        "description": "The owner bitcoin address to be validated",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "ownerAddress"
+      },
+      {
+        "title": "param",
+        "description": "The Blockstack name to be validated",
+        "lineNumber": 6,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
+        },
+        "name": "name",
+        "default": "null"
+      },
+      {
+        "title": "returns",
+        "description": "that resolves to an array of validated proof objects",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 4,
+        "column": 0
+      },
+      "end": {
+        "line": 12,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 13,
+          "column": 0
+        },
+        "end": {
+          "line": 58,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "profile",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The JSON of the profile to be validated",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 40,
+                      "offset": 39
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 40,
+              "offset": 39
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      },
+      {
+        "title": "param",
+        "name": "ownerAddress",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The owner bitcoin address to be validated",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 42,
+                  "offset": 41
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 42,
+              "offset": 41
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "param",
+        "name": "name",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The Blockstack name to be validated",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 36,
+                      "offset": 35
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 36,
+                  "offset": 35
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 36,
+              "offset": 35
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "null"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves to an array of validated proof objects",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "validateProofs",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "validateProofs",
+        "kind": "function"
+      }
+    ],
+    "namespace": "validateProofs"
+  },
+  {
+    "name": "Storage",
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Store your app's data without servers in storage your user controls.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 69,
+                  "offset": 68
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 69,
+              "offset": 68
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Note: Blockstack Gaia Storage APIs and on-disk format will change in\nupcoming pre-releases breaking backward compatibility. Certain storage features\nsuch as file encryption and collections are not implemented in the current\nversion. These features will be rolled out in future updates.",
+                  "position": {
+                    "start": {
+                      "line": 3,
+                      "column": 2,
+                      "offset": 71
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 62,
+                      "offset": 356
+                    },
+                    "indent": [
+                      1,
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 70
+                },
+                "end": {
+                  "line": 6,
+                  "column": 63,
+                  "offset": 357
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 70
+            },
+            "end": {
+              "line": 6,
+              "column": 63,
+              "offset": 357
+            },
+            "indent": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "link",
+              "title": null,
+              "url": "https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Read more about storage",
+                  "position": {
+                    "start": {
+                      "line": 8,
+                      "column": 2,
+                      "offset": 360
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 25,
+                      "offset": 383
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 1,
+                  "offset": 359
+                },
+                "end": {
+                  "line": 8,
+                  "column": 105,
+                  "offset": 463
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 8,
+              "column": 1,
+              "offset": 359
+            },
+            "end": {
+              "line": 8,
+              "column": 105,
+              "offset": 463
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 9,
+          "column": 1,
+          "offset": 464
+        }
+      }
+    },
+    "kind": "note",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "Storage",
+        "kind": "note"
+      }
+    ],
+    "namespace": "Storage"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Retrieves the specified file from the app's data store.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 56,
+                  "offset": 55
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 56,
+              "offset": 55
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 56,
+          "offset": 55
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the path to the file to read",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "path"
+      },
+      {
+        "title": "returns",
+        "description": "that resolves to the raw data in the file\nor rejects with an error",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 5,
+        "column": 0
+      },
+      "end": {
+        "line": 10,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 11,
+          "column": 0
+        },
+        "end": {
+          "line": 13,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "path",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the path to the file to read",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 29,
+                  "offset": 28
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 29,
+              "offset": 28
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves to the raw data in the file\nor rejects with an error",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 66
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 25,
+                  "offset": 66
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 25,
+              "offset": 66
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getFile",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getFile",
+        "kind": "function"
+      }
+    ],
+    "namespace": "getFile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Stores the data provided in the app's data store to to the file specified.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 75,
+                  "offset": 74
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 75,
+              "offset": 74
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 75,
+          "offset": 74
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the path to store the data in",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "path"
+      },
+      {
+        "title": "param",
+        "description": "the data to store in the file",
+        "lineNumber": 3,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        },
+        "name": "content"
+      },
+      {
+        "title": "return",
+        "description": "that resolves if the operation succeed and rejects\nif it failed",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 15,
+        "column": 0
+      },
+      "end": {
+        "line": 21,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 22,
+          "column": 0
+        },
+        "end": {
+          "line": 24,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "path",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the path to store the data in",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 30,
+                      "offset": 29
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the data to store in the file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 30,
+                      "offset": 29
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            }
+          }
+        },
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves if the operation succeed and rejects\nif it failed",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 13,
+                      "offset": 63
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 13,
+                  "offset": 63
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 13,
+              "offset": 63
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "putFile",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "putFile",
+        "kind": "function"
+      }
+    ],
+    "namespace": "putFile"
+  }
+]
