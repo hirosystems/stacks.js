@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.9.6",
+  "version": "0.10.0",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
@@ -21,16 +21,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blockstack/blockstack-js.git"
+    "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "author": {
-    "name": "Blockstack Inc.",
+    "name": "Blockstack PBC",
     "email": "admin@blockstack.com",
     "url": "https://blockstack.com"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/blockstack/blockstack-js/issues"
+    "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "keywords": [
     "blockchain",
