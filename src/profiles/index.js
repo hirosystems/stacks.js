@@ -22,7 +22,8 @@ export {
 
 export {
   profileServices,
-  containsValidProofStatement
+  containsValidProofStatement,
+  containsValidAddressProofStatement
 } from './services'
 
 export {

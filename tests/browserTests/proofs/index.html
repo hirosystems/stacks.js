@@ -122,6 +122,13 @@
                 "proofType": "http",
                 "proofUrl": "https://www.facebook.com/larry.salibra/posts/10100341028448093",
                 "service": "facebook"
+            },
+            {
+                "@type": "Account", 
+                "identifier": "blck-stck",
+                "proofType": "http", 
+                "proofUrl": "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/", 
+                "service": "linkedIn"
             }
         ],
         "address": {
@@ -149,10 +156,71 @@
             }
         ]
     }
+
+    var ken = {
+      "@type": "Person", 
+      "account": [
+        {
+          "@type": "Account", 
+          "identifier": "blckstcktest", 
+          "proofType": "http", 
+          "proofUrl": "https://twitter.com/blckstcktest/status/908420883177525249", 
+          "service": "twitter"
+        }, 
+        {
+          "@type": "Account", 
+          "identifier": "yknl", 
+          "proofType": "http", 
+          "proofUrl": "https://gist.github.com/yknl/37c763ab7bc6cf89b919212ef3f10676", 
+          "service": "github"
+        },
+        {
+          "@type": "Account", 
+          "identifier": "blckstcktest", 
+          "proofType": "http", 
+          "proofUrl": "https://www.instagram.com/p/BZCMqkUgJM5/", 
+          "service": "instagram"
+        },
+        {
+          "@type": "Account", 
+          "identifier": "blckstcktest", 
+          "proofType": "http", 
+          "proofUrl": "https://news.ycombinator.com/user?id=blckstcktest", 
+          "service": "hackerNews"
+        },
+        {
+          "@type": "Account", 
+          "identifier": "blck-stck",
+          "proofType": "http", 
+          "proofUrl": "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/", 
+          "service": "linkedIn"
+        }
+      ], 
+      "address": {
+        "@type": "PostalAddress"
+      }, 
+      "familyName": "Liao", 
+      "givenName": "Ken", 
+      "image": [
+        {
+          "@type": "ImageObject", 
+          "contentUrl": "https://www.dropbox.com/s/f7ofcbimzq2c287/avatar-1?dl=1", 
+          "name": "avatar"
+        }
+      ]
+    }
+
   </script>
   <script>
-    blockstack.validateProofs(larry, "larry").then(function(proofs) {
-      console.log(proofs)
+    blockstack.validateProofs(larry, "1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5", "larry.id").then(function(proofs) {
+      var newDiv = document.createElement("div");
+      newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
+      var targetDiv = document.getElementById("results")
+      document.body.insertBefore(newDiv, targetDiv)
+    })
+
+    blockstack.validateProofs(ken, "1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5")
+    .then(function(proofs) {
       var newDiv = document.createElement("div");
       newDiv.appendChild(document.createTextNode(JSON.stringify(proofs)))
       var targetDiv = document.getElementById("results")

@@ -46,7 +46,8 @@ export const sampleTokenFiles = {
 
 export const sampleProofs = {
   naval: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/naval.proofs.json')),
-  larry: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.proofs.json'))
+  larry: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.proofs.json')),
+  ken: JSON.parse(fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.proofs.json'))
 }
 
 export const sampleVerifications = {
@@ -68,6 +69,37 @@ export const sampleVerifications = {
     facebook: {
       url: "https://www.facebook.com/larrysalibra/posts/10100341028448093",
       body: fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.verification.facebook.html','utf8')
+    }
+  }
+}
+
+export const sampleAddressBasedVerifications = {
+  larry: {
+    facebook: {
+      url: "https://www.facebook.com/larrysalibra/posts/10100341028448094",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/larry.verification.address.facebook.html','utf8')
+    }
+  },
+  ken: {
+    github: {
+      url: "https://gist.github.com/yknl/37c763ab7bc6cf89b919212ef3f10676",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.github.html','utf8')
+    },
+    twitter: {
+      url: "https://twitter.com/YukanL/status/903285763240022017",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.twitter.html','utf8')
+    },
+    instagram: {
+      url: "https://www.instagram.com/p/BYj6UDwgaX7/",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.instagram.html','utf8')
+    },
+    hackerNews: {
+      url: "https://news.ycombinator.com/user?id=yukanl",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.hackernews.html','utf8')
+    },
+    linkedIn: {
+      url: "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.linkedin.html','utf8')
     }
   }
 }
