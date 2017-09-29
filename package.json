@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
@@ -17,7 +17,7 @@
     "flow": "flow",
     "lint": "eslint src",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/documentation/bin/documentation.js build src --config ./documentation.yml --format html --output docs"
+    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
   },
   "repository": {
     "type": "git",

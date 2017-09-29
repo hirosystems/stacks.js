@@ -2962,7 +2962,8 @@ var Service = exports.Service = function () {
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url.toLowerCase().startsWith('' + baseUrls[i] + proof.identifier)) {
+        var requiredPrefix = ('' + baseUrls[i] + proof.identifier).toLowerCase();
+        if (proof.proof_url.toLowerCase().startsWith(requiredPrefix)) {
           return proof.proof_url;
         }
       }
