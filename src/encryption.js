@@ -3,17 +3,49 @@ import crypto from 'crypto'
 
 const ecurve = new EllipticCurve('secp256k1')
 
+function aes256CbcEncrypt(iv : Buffer, key : Buffer, plaintext : Buffer) {
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
+  return Buffer.concat([cipher.update(plaintext), cipher.final()])
+}
+
+function aes256CbcDecrypt(iv : Buffer, key : Buffer, ciphertext : Buffer) {
+  const cipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
+  return Buffer.concat([cipher.update(ciphertext), cipher.final()])
+}
+
+function hmacSha256(key : Buffer, content : Buffer) {
+  return crypto.createHmac('sha256', key).update(content).digest()
+}
+
+function equalConstTime(b1 : Buffer, b2 : Buffer) {
+  if (b1.length !== b2.length) {
+    return false
+  }
+  let res = 0
+  for (let i = 0; i < b1.length; i++) {
+    res |= b1[i] ^ b2[i]  // jshint ignore:line
+  }
+  return res === 0
+}
+
+function sharedSecretToKeys(sharedSecret : Buffer) {
+  // generate mac and encryption key from shared secret
+  const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
+  return { encryptionKey: hashedSecret.slice(0, 32),
+           hmacKey: hashedSecret.slice(32) }
+}
+
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @param {String} secp256k1 public key hex string
- * @param {String | Buffer} content to encrypt
+ * @param {String} publicKey - secp256k1 public key hex string
+ * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  */
 export function encryptECIES(publicKey: string, content: string | Buffer) {
-  const isString = (typeof(content) == 'string')
+  const isString = (typeof(content) === 'string')
   const plainText = isString ? new Buffer(content) : content
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
@@ -33,23 +65,23 @@ export function encryptECIES(publicKey: string, content: string | Buffer) {
                                  cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
-  return { iv : initializationVector.toString('hex'),
-           ephemeralPK : ephemeralPK.encodeCompressed('hex'),
-           cipherText : cipherText.toString('hex'),
-           mac : mac.toString('hex'),
-           wasString : isString }
+  return { iv: initializationVector.toString('hex'),
+           ephemeralPK: ephemeralPK.encodeCompressed('hex'),
+           cipherText: cipherText.toString('hex'),
+           mac: mac.toString('hex'),
+           wasString: isString }
 }
 
 /**
  * Decrypt content encrypted using ECIES
- * @param {String} secp256k1 private key hex string
- * @param {Object} encrypted cipherObject to decrypt, should contain:
+ * @param {String} privateKey - secp256k1 private key hex string
+ * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeralPublicKey
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext, or false if error
  */
-export function decryptECIES(privateKey: string, cipherObject: string ) {
+export function decryptECIES(privateKey: string, cipherObject: string) {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
   const ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic()
   const sharedSecret = ecSK.derive(ephemeralPK)
@@ -63,8 +95,9 @@ export function decryptECIES(privateKey: string, cipherObject: string ) {
                                  new Buffer(ephemeralPK.encodeCompressed()),
                                  cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
-  if (! equalConstTime(new Buffer(cipherObject.mac, 'hex'), actualMac)){
-    throw 'Decryption failed: failure in MAC check'
+  const expectedMac = new Buffer(cipherObject.mac, 'hex')
+  if (! equalConstTime(expectedMac, actualMac)) {
+    throw new Error('Decryption failed: failure in MAC check')
   }
   const plainText = aes256CbcDecrypt(
     ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer)
@@ -74,44 +107,4 @@ export function decryptECIES(privateKey: string, cipherObject: string ) {
   } else {
     return plainText
   }
-}
-
-function aes256CbcEncrypt(iv : Buffer, key : Buffer, plaintext : Buffer) {
-  var cipher = crypto.createCipheriv("aes-256-cbc", key, iv)
-  var firstChunk = cipher.update(plaintext)
-  var secondChunk = cipher.final()
-  return Buffer.concat([firstChunk, secondChunk])
-}
-
-function aes256CbcDecrypt(iv : Buffer, key : Buffer, ciphertext : Buffer) {
-  var cipher = crypto.createDecipheriv("aes-256-cbc", key, iv)
-  var firstChunk = cipher.update(ciphertext)
-  var secondChunk = cipher.final()
-  return Buffer.concat([firstChunk, secondChunk])
-}
-
-function hmacSha256(key : Buffer, content : Buffer) {
-  return crypto.createHmac("sha256", key).update(content).digest()
-}
-
-function sha512(content : Buffer) {
-  return crypto.createHash('sha512').update(content).digest()
-}
-
-function equalConstTime(b1 : Buffer, b2 : Buffer) {
-  if (b1.length !== b2.length) {
-    return false;
-  }
-  var res = 0;
-  for (var i = 0; i < b1.length; i++) {
-    res |= b1[i] ^ b2[i];  // jshint ignore:line
-  }
-  return res === 0;
-}
-
-function sharedSecretToKeys(sharedSecret : Buffer) {
-  // generate mac and encryption key from shared secret
-  const hashedSecret = sha512(sharedSecret)
-  return { encryptionKey : hashedSecret.slice(0, 32),
-           hmacKey : hashedSecret.slice(32) }
 }

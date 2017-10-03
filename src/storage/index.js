@@ -9,17 +9,18 @@ import { getPublicKeyFromPrivate } from '../keys'
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
+ * @param {Boolean} decrypt - try to decrypt the data with the app private key
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
 export function getFile(path: string, decrypt: boolean = false) {
   return storageGetFile(path)
-    .then( (storedContents) => {
+    .then((storedContents) => {
       if (decrypt) {
         const privateKey = loadUserData().appPrivateKey
         const cipherObject = JSON.parse(storedContents)
         return decryptECIES(privateKey, cipherObject)
-      }else{
+      } else {
         return storedContents
       }
     })
@@ -34,7 +35,7 @@ export function getFile(path: string, decrypt: boolean = false) {
  * if it failed
  */
 export function putFile(path: string, content: string | Buffer, encrypt: boolean = false) {
-  if (encrypt){
+  if (encrypt) {
     const privateKey = loadUserData().appPrivateKey
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const cipherObject = encryptECIES(publicKey, content)

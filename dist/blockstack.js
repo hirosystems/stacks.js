@@ -943,25 +943,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var ecurve = new _elliptic.ec('secp256k1');
 
 function aes256CbcEncrypt(iv, key, plaintext) {
-  var cipher = _crypto2.default.createCipheriv("aes-256-cbc", key, iv);
-  var firstChunk = cipher.update(plaintext);
-  var secondChunk = cipher.final();
-  return Buffer.concat([firstChunk, secondChunk]);
+  var cipher = _crypto2.default.createCipheriv('aes-256-cbc', key, iv);
+  return Buffer.concat([cipher.update(plaintext), cipher.final()]);
 }
 
 function aes256CbcDecrypt(iv, key, ciphertext) {
-  var cipher = _crypto2.default.createDecipheriv("aes-256-cbc", key, iv);
-  var firstChunk = cipher.update(ciphertext);
-  var secondChunk = cipher.final();
-  return Buffer.concat([firstChunk, secondChunk]);
+  var cipher = _crypto2.default.createDecipheriv('aes-256-cbc', key, iv);
+  return Buffer.concat([cipher.update(ciphertext), cipher.final()]);
 }
 
 function hmacSha256(key, content) {
-  return _crypto2.default.createHmac("sha256", key).update(content).digest();
-}
-
-function sha512(content) {
-  return _crypto2.default.createHash('sha512').update(content).digest();
+  return _crypto2.default.createHmac('sha256', key).update(content).digest();
 }
 
 function equalConstTime(b1, b2) {
@@ -977,27 +969,29 @@ function equalConstTime(b1, b2) {
 
 function sharedSecretToKeys(sharedSecret) {
   // generate mac and encryption key from shared secret
-  var hashedSecret = sha512(sharedSecret);
+  var hashedSecret = _crypto2.default.createHash('sha512').update(sharedSecret).digest();
   return { encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32) };
 }
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @param {String} secp256k1 public key hex string
- * @param {String | Buffer} content to encrypt
+ * @param {String} publicKey - secp256k1 public key hex string
+ * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
+ *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  */
 function encryptECIES(publicKey, content) {
-  var plainText = typeof content == 'string' ? new Buffer(content) : content;
+  var isString = typeof content === 'string';
+  var plainText = isString ? new Buffer(content) : content;
   var ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
   var ephemeralSK = ecurve.genKeyPair();
   var ephemeralPK = ephemeralSK.getPublic();
 
   var sharedSecret = ephemeralSK.derive(ecPK);
-  var sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer());
+  var sharedKeys = sharedSecretToKeys(new Buffer(sharedSecret.toString('hex'), 'hex'));
 
   var initializationVector = _crypto2.default.randomBytes(16);
 
@@ -1009,32 +1003,41 @@ function encryptECIES(publicKey, content) {
   return { iv: initializationVector.toString('hex'),
     ephemeralPK: ephemeralPK.encodeCompressed('hex'),
     cipherText: cipherText.toString('hex'),
-    mac: mac.toString('hex') };
+    mac: mac.toString('hex'),
+    wasString: isString };
 }
 
 /**
  * Decrypt content encrypted using ECIES
- * @param {String} secp256k1 private key hex string
- * @param {Object} encrypted cipherObject to decrypt, should contain:
+ * @param {String} privateKey - secp256k1 private key hex string
+ * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeralPublicKey
+ *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext, or false if error
  */
 function decryptECIES(privateKey, cipherObject) {
   var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
   var ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
   var sharedSecret = ecSK.derive(ephemeralPK);
-  var sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer());
+  var sharedKeys = sharedSecretToKeys(new Buffer(sharedSecret.toString('hex'), 'hex'));
 
   var ivBuffer = new Buffer(cipherObject.iv, 'hex');
   var cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex');
 
   var macData = Buffer.concat([ivBuffer, new Buffer(ephemeralPK.encodeCompressed()), cipherTextBuffer]);
   var actualMac = hmacSha256(sharedKeys.hmacKey, macData);
-  if (!equalConstTime(new Buffer(cipherObject.mac, 'hex'), actualMac)) {
-    throw 'Decryption failed: failure in MAC check';
+  var expectedMac = new Buffer(cipherObject.mac, 'hex');
+  if (!equalConstTime(expectedMac, actualMac)) {
+    throw new Error('Decryption failed: failure in MAC check');
   }
-  return aes256CbcDecrypt(ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer);
+  var plainText = aes256CbcDecrypt(ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer);
+
+  if (cipherObject.wasString) {
+    return plainText.toString();
+  } else {
+    return plainText;
+  }
 }
 }).call(this,require("buffer").Buffer)
 },{"buffer":166,"crypto":188,"elliptic":226}],10:[function(require,module,exports){
@@ -1251,7 +1254,7 @@ function getEntropy(numberOfBytes) {
   if (!numberOfBytes) {
     numberOfBytes = 32;
   }
-  return crypto.randomBytes(numberOfBytes);
+  return (0, _crypto.randomBytes)(numberOfBytes);
 }
 function makeECPrivateKey() {
   var keyPair = new _bitcoinjsLib.ECPair.makeRandom({ rng: getEntropy });
@@ -1266,7 +1269,7 @@ function publicKeyToAddress(publicKey) {
 }
 
 function getPublicKeyFromPrivate(privateKey) {
-  var keyPair = new _bitcoinjsLib.ECPair(_bigi2.default.fromHex(sk));
+  var keyPair = new _bitcoinjsLib.ECPair(_bigi2.default.fromHex(privateKey));
   return keyPair.getPublicKeyBuffer().toString('hex');
 }
 }).call(this,require("buffer").Buffer)
@@ -3242,11 +3245,12 @@ var _keys = require('../keys');
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
+ * @param {Boolean} decrypt - try to decrypt the data with the app private key
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-function getFile(path, content) {
-  var decrypt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+function getFile(path) {
+  var decrypt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
   return (0, _blockstackStorage.getFile)(path).then(function (storedContents) {
     if (decrypt) {
