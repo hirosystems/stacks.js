@@ -1,12 +1,13 @@
 /* @flow */
 import { randomBytes } from 'crypto'
 import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
+import bigi from 'bigi'
 
 export function getEntropy(numberOfBytes: number) {
   if (!numberOfBytes) {
     numberOfBytes = 32
   }
-  return randomBytes(numberOfBytes)
+  return crypto.randomBytes(numberOfBytes)
 }
 
 export function makeECPrivateKey() {
@@ -20,3 +21,9 @@ export function publicKeyToAddress(publicKey: string) {
   const address = baddress.toBase58Check(publicKeyHash160, 0x00)
   return address
 }
+
+export function getPublicKeyFromPrivate(privateKey: string) {
+  const keyPair = new ECPair(bigi.fromHex(sk))
+  return keyPair.getPublicKeyBuffer().toString('hex')
+}
+
