@@ -12,7 +12,7 @@ import { getPublicKeyFromPrivate } from '../keys'
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(path: string, content: string | Buffer, decrypt: boolean = false) {
+export function getFile(path: string, decrypt: boolean = false) {
   return storageGetFile(path)
     .then( (storedContents) => {
       if (decrypt) {
