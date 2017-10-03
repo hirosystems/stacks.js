@@ -7,7 +7,7 @@ export function getEntropy(numberOfBytes: number) {
   if (!numberOfBytes) {
     numberOfBytes = 32
   }
-  return crypto.randomBytes(numberOfBytes)
+  return randomBytes(numberOfBytes)
 }
 
 export function makeECPrivateKey() {
