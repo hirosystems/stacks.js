@@ -46,7 +46,7 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
  */
 export function encryptECIES(publicKey: string, content: string | Buffer) {
   const isString = (typeof(content) === 'string')
-  const plainText = isString ? new Buffer(content) : content
+  const plainText = new Buffer(content) // always copy to buffer
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
   const ephemeralPK = ephemeralSK.getPublic()
