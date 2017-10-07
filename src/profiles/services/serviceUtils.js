@@ -56,7 +56,7 @@ export function containsValidAddressProofStatement(proofStatement: string, addre
   proofStatement = proofStatement.split(address)[0].toLowerCase() + address
 
   const verificationStyles = [
-    `verifying my blockchain id is secured with the address ${address}`
+    `verifying my blockstack id is secured with the address ${address}`
   ]
 
   for (let i = 0; i < verificationStyles.length; i++) {

@@ -2744,7 +2744,7 @@ var Instagram = function (_Service) {
   _createClass(Instagram, null, [{
     key: 'getBaseUrls',
     value: function getBaseUrls() {
-      var baseUrls = ['https://www.instagram.com/'];
+      var baseUrls = ['https://www.instagram.com/', 'https://instagram.com/'];
       return baseUrls;
     }
   }, {
@@ -3023,7 +3023,7 @@ function containsValidProofStatement(searchText) {
 function containsValidAddressProofStatement(proofStatement, address) {
   proofStatement = proofStatement.split(address)[0].toLowerCase() + address;
 
-  var verificationStyles = ['verifying my blockchain id is secured with the address ' + address];
+  var verificationStyles = ['verifying my blockstack id is secured with the address ' + address];
 
   for (var i = 0; i < verificationStyles.length; i++) {
     var verificationStyle = verificationStyles[i];
