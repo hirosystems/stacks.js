@@ -22,7 +22,6 @@ export function makeCoreSessionRequest(appDomain: string,
     thisDevice = '.default'
   }
 
-  // TODO: multi-device
   const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
   const appPublicKeys = [{
     public_key: appPublicKey,
@@ -69,7 +68,8 @@ export function sendCoreSessionRequest(coreHost: string,
 
     const options = {
       headers: {
-        Authorization: `bearer ${apiPassword}`
+        Authorization: `bearer ${apiPassword}`,
+        Origin: 'http://localhost:8888',
       }
     }
 

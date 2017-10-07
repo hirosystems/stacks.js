@@ -13,10 +13,11 @@ const clientPrivateKey = '8b13483d65e55eb2184ff7c9978379eff2fae7ad40da09ae4e3e5c
 const appPrivateKey = '99c01d085f7914e4725ffa3160df583c37cc27e1e7fd48f2d6e17d4a9a4ba55e'
 const apiPassword = 'blockstack_integration_test_api_password'
 
-const authRequest = makeAuthRequest(clientPrivateKey, 'www.foo.com',
+const authRequest = makeAuthRequest(clientPrivateKey,
 'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
-['store_read', 'store_write', 'store_admin'])
+['store_read', 'store_write', 'store_admin'], "www.foo.com")
 
+console.log("Log in with a blockchain ID")
 getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', authRequest)
 .then((session) => {
   console.log('success!')
@@ -42,9 +43,50 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
   return true
 }, (error) => {
   console.error('failure!')
-  console.error(error)
+  console.error(error.stack)
   return false
-}).then(() => {
+})
+.then((res) => {
+   if (!res) {
+      throw new Error("Failed to log in with blockchain ID");
+   }
+
+   console.log("Log in without a blockchain ID");
+   // try with no blockchain ID
+   return getCoreSession('localhost', 16268, apiPassword, appPrivateKey, null, authRequest)
+}, (error) => {
+    console.log("failure!")
+    cosnole.log(e.stack)
+})
+.then((session) => {
+   console.log('success!')
+   console.log(session)
+
+   // inspect session
+   const token = jsontokens.decodeToken(session)
+   const payload = token.payload
+
+   console.log(JSON.stringify(payload));
+
+   assert(payload.app_domain === 'www.foo.com')
+
+   assert(payload.methods[0] === 'store_read')
+   assert(payload.methods[1] === 'store_write')
+   assert(payload.methods[2] === 'store_admin')
+   assert(payload.methods.length === 3)
+
+   assert(payload.app_public_keys.length == 1)
+   assert(payload.app_public_keys[0]['public_key'] === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
+
+   assert(payload.blockchain_id === null)
+   return true
+}, (e) => {
+   console.log("failure!")
+   console.log(e)
+   console.log(e.stack)
+   return false
+})
+.then(() => {
   process.exit(0)
 }, (e) => {
   console.log(e.stack)
