@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
   "scripts": {
