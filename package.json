@@ -94,6 +94,7 @@
   },
   "dependencies": {
     "ajv": "^4.11.5",
+    "bigi": "^1.4.2",
     "bitcoinjs-lib": "^2.3.0",
     "blockstack-storage": "0.2.11",
     "cheerio": "^0.22.0",
