@@ -3,8 +3,6 @@ export function getName(profile) {
     return null
   }
 
-  console.log('############# using new getName')
-
   let name = null
   if (profile.name) {
     name = profile.name
