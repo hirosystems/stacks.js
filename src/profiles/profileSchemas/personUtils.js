@@ -3,8 +3,12 @@ export function getName(profile) {
     return null
   }
 
+  console.log('############# using new getName')
+
   let name = null
-  if (profile.givenName || profile.familyName) {
+  if (profile.name) {
+    name = profile.name
+  } else if (profile.givenName || profile.familyName) {
     name = ''
     if (profile.givenName) {
       name = profile.givenName
@@ -12,8 +16,6 @@ export function getName(profile) {
     if (profile.familyName) {
       name += ` ${profile.familyName}`
     }
-  } else if (profile.name) {
-    name = profile.name
   }
   return name
 }
