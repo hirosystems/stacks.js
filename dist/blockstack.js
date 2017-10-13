@@ -2097,7 +2097,9 @@ function getName(profile) {
   }
 
   var name = null;
-  if (profile.givenName || profile.familyName) {
+  if (profile.name) {
+    name = profile.name;
+  } else if (profile.givenName || profile.familyName) {
     name = '';
     if (profile.givenName) {
       name = profile.givenName;
@@ -2105,8 +2107,6 @@ function getName(profile) {
     if (profile.familyName) {
       name += ' ' + profile.familyName;
     }
-  } else if (profile.name) {
-    name = profile.name;
   }
   return name;
 }
