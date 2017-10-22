@@ -135,6 +135,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           profile: tokenPayload.profile,
           appPrivateKey: tokenPayload.private_key,
           coreSessionToken: tokenPayload.core_token,
+          identityAddress: tokenPayload.iss,
           authResponseToken
         }
         window.localStorage.setItem(
