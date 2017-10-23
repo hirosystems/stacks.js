@@ -27,6 +27,19 @@ export function getFile(path: string, decrypt: boolean = false) {
 }
 
 /**
+ * Encrypt the data provided in the app's data store to to the Object passed.
+ * @param {String|Buffer} content - the data to store in the file
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
+export function encryptContent(content: string | Buffer) {
+    const privateKey = loadUserData().appPrivateKey
+    const publicKey = getPublicKeyFromPrivate(privateKey)
+    const cipherObject = encryptECIES(publicKey, content)
+    return JSON.stringify(cipherObject)
+}
+
+/**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
@@ -36,10 +49,7 @@ export function getFile(path: string, decrypt: boolean = false) {
  */
 export function putFile(path: string, content: string | Buffer, encrypt: boolean = false) {
   if (encrypt) {
-    const privateKey = loadUserData().appPrivateKey
-    const publicKey = getPublicKeyFromPrivate(privateKey)
-    const cipherObject = encryptECIES(publicKey, content)
-    content = JSON.stringify(cipherObject)
+    content = encryptContent(content)
   }
   return storagePutFile(path, content)
 }
