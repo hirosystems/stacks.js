@@ -27,7 +27,7 @@ export function getFile(path: string, decrypt: boolean = false) {
 }
 
 /**
- * Encrypt the data provided in the app's data store to to the Object passed.
+ * Encrypts the data provided.
  * @param {String|Buffer} content - the data to store in the file
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
