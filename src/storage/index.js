@@ -33,10 +33,10 @@ export function getFile(path: string, decrypt: boolean = false) {
  * if it failed
  */
 export function encryptContent(content: string | Buffer) {
-    const privateKey = loadUserData().appPrivateKey
-    const publicKey = getPublicKeyFromPrivate(privateKey)
-    const cipherObject = encryptECIES(publicKey, content)
-    return JSON.stringify(cipherObject)
+  const privateKey = loadUserData().appPrivateKey
+  const publicKey = getPublicKeyFromPrivate(privateKey)
+  const cipherObject = encryptECIES(publicKey, content)
+  return JSON.stringify(cipherObject)
 }
 
 /**
