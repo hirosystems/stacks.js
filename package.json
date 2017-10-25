@@ -17,7 +17,9 @@
     "flow": "flow",
     "lint": "eslint src",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs && ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
+    "build-documentation": "npm run build-documentation-html && npm run build-documentation-json",
+    "build-documentation-html": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs",
+    "build-documentation-json": "./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
   },
   "repository": {
     "type": "git",
