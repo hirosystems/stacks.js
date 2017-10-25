@@ -143,11 +143,16 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
         const tokenPayload = decodeToken(authResponseToken).payload
         // TODO: real version handling
         let appPrivateKey = tokenPayload.private_key
+        let coreSessionToken = tokenPayload.core_token
         if (tokenPayload.version === '1.1.0') {
           const transitKey = getTransitKey()
-          if (appPrivateKey !== undefined && appPrivateKey !== null &&
-              transitKey !== undefined && transitKey != null) {
-            appPrivateKey = decryptPrivateKey(transitKey, tokenPayload.private_key)
+          if (transitKey !== undefined && transitKey != null) {
+            if (appPrivateKey !== undefined && appPrivateKey !== null) {
+              appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
+            }
+            if (coreSessionToken !== undefined && coreSessionToken !== null) {
+              coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+            }
           }
         }
 
@@ -155,7 +160,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           username: tokenPayload.username,
           profile: tokenPayload.profile,
           appPrivateKey,
-          coreSessionToken: tokenPayload.core_token,
+          coreSessionToken,
           authResponseToken
         }
         window.localStorage.setItem(

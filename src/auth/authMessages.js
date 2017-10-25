@@ -91,10 +91,13 @@ export function makeAuthResponse(privateKey: string,
 
   /* See if we should encrypt with the transit key */
   let privateKeyPayload = appPrivateKey
+  let coreTokenPayload = coreToken
   let additionalProperties = {}
   if (transitPublicKey !== undefined && transitPublicKey !== null &&
-      appPrivateKey !== undefined && appPrivateKey !== null) {
+      appPrivateKey !== undefined && appPrivateKey !== null &&
+      coreToken !== undefined && coreToken !== null) {
     privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+    coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
     additionalProperties = { version: '1.1.0' }
   }
 
@@ -108,7 +111,7 @@ export function makeAuthResponse(privateKey: string,
     public_keys: [publicKey],
     profile,
     username,
-    core_token: coreToken
+    core_token: coreTokenPayload
   }, additionalProperties)
 
   /* Sign and return the token */
