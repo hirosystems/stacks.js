@@ -6,18 +6,20 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib; babel src -d lib",
-    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
+    "compile": "rimraf lib && babel src -d lib",
+    "compile-tests": "rimraf tests/unitTests/lib && rimraf tests/authTests/lib && babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib && babel --presets es2015 tests/authTests/src -d tests/authTests/lib",
     "prepublish": "npm run build",
-    "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
-    "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
+    "dev-auth": "npm run compile && npm run browserify && node ./tests/browserTests/auth-server.js",
+    "dev-proofs": "npm run compile && npm run browserify && node ./tests/browserTests/proofs-server.js",
     "test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
-    "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
+    "integration-test-auth": "npm run compile && npm run compile-tests && npm run browserify && node ./tests/authTests/lib/index.js",
     "build": "npm run build-documentation && npm run compile && npm run browserify",
     "flow": "flow",
     "lint": "eslint src",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
+    "build-documentation": "npm run build-documentation-html && npm run build-documentation-json",
+    "build-documentation-html": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs",
+    "build-documentation-json": "./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
   },
   "repository": {
     "type": "git",
@@ -89,6 +91,7 @@
     "flow-bin": "^0.49.1",
     "node-fetch": "^1.6.3",
     "opn": "^4.0.2",
+    "rimraf": "^2.6.2",
     "tape": "^4.6.3",
     "tape-promise": "^2.0.1"
   },
