@@ -39,10 +39,15 @@ export function fetchAppManifest(authRequest) {
 }
 
 export function redirectUserToApp(authRequest, authResponse) {
-  const payload = decodeToken(authRequest).payload
+  const decodedRequest = decodeToken(authRequest)
+  const payload = decodedRequest.payload
+  const domainName = decodedRequest.domain_name
   let redirectURI = payload.redirect_uri
   console.log(redirectURI)
   if (redirectURI) {
+    if (! redirectURI.startsWith(domainName)) {
+      throw new Error(`Redirect URI ${redirectURI} does not match domain name ${domainName}`)
+    }
     redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
   } else {
     throw new Error('Invalid redirect URI')
