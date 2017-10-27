@@ -360,7 +360,7 @@ function fetchAppManifest(authRequest) {
 function redirectUserToApp(authRequest, authResponse) {
   var decodedRequest = (0, _jsontokens.decodeToken)(authRequest);
   var payload = decodedRequest.payload;
-  var domainName = decodedRequest.domain_name;
+  var domainName = payload.domain_name;
   var redirectURI = payload.redirect_uri;
   console.log(redirectURI);
   if (redirectURI) {

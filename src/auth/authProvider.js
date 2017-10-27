@@ -41,7 +41,7 @@ export function fetchAppManifest(authRequest) {
 export function redirectUserToApp(authRequest, authResponse) {
   const decodedRequest = decodeToken(authRequest)
   const payload = decodedRequest.payload
-  const domainName = decodedRequest.domain_name
+  const domainName = payload.domain_name
   let redirectURI = payload.redirect_uri
   console.log(redirectURI)
   if (redirectURI) {
