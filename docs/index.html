@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 0.12.0 | Documentation</title>
+  <title>blockstack 0.12.1 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>0.12.0</code></div>
+          <div class='mb1'><code>0.12.1</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -279,7 +279,7 @@ browser to approve the sign in request.</p>
 <p>Most applications should use this
 method for sign in unless they require more fine grained control over how the
 authentication request is generated. If your app falls into this category,
-use <code>generateAndStoreAppKey</code>, <code>makeAuthRequest</code>,
+use <code>generateAndStoreTransitKey</code>, <code>makeAuthRequest</code>,
 and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
 
 
@@ -708,8 +708,9 @@ browser for the user to approve sign in.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>transitPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
-            = <code>generateAndStoreAppKey()</code>)</code>
-	    hex encoded app private key
+            = <code>generateAndStoreTransitKey()</code>)</code>
+	    hex encoded transit
+private key
 
           </div>
           
