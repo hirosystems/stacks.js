@@ -17,6 +17,8 @@ import {
 
 import { encryptECIES, decryptECIES } from '../encryption'
 
+const VERSION = '1.1.0'
+
 /**
  * Generates an authentication request that can be sent to the Blockstack
  * browser for the user to approve sign in.
@@ -45,11 +47,11 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     domain_name: appDomain,
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
-    version: '1.1.0',
+    version: VERSION,
     scopes
   }
-
-  console.log(payload)
+  
+  console.log(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
@@ -96,9 +98,12 @@ export function makeAuthResponse(privateKey: string,
   if (transitPublicKey !== undefined && transitPublicKey !== null &&
       appPrivateKey !== undefined && appPrivateKey !== null &&
       coreToken !== undefined && coreToken !== null) {
+    console.log(`blockstack.js: generating v${VERSION} auth response`)
     privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
     coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
-    additionalProperties = { version: '1.1.0' }
+    additionalProperties = { version: VERSION }
+  } else {
+    console.log('blockstack.js: generating legacy auth response')
   }
 
   /* Create the payload */
