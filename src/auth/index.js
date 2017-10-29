@@ -1,7 +1,8 @@
 export {
   isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
   getAuthResponseToken, isSignInPending,
-  handlePendingSignIn, loadUserData, signUserOut, generateAndStoreAppKey
+  handlePendingSignIn, loadUserData, signUserOut,
+  generateAndStoreTransitKey, getTransitKey
 } from './authApp'
 export {
   makeAuthRequest, makeAuthResponse

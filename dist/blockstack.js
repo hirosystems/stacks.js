@@ -4,7 +4,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateAndStoreAppKey = generateAndStoreAppKey;
+exports.generateAndStoreTransitKey = generateAndStoreTransitKey;
+exports.getTransitKey = getTransitKey;
 exports.isUserSignedIn = isUserSignedIn;
 exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
 exports.redirectToSignIn = redirectToSignIn;
@@ -30,6 +31,8 @@ var _utils = require('../utils');
 
 var _index2 = require('../index');
 
+var _authMessages = require('./authMessages');
+
 var _authConstants = require('./authConstants');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -40,17 +43,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @return {String} the hex encoded private key
  * @private
  */
-function generateAndStoreAppKey() {
+function generateAndStoreTransitKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
 }
 
 /**
+ * Fetches the hex value of the transit private key from local storage.
+ * @return {String} the hex encoded private key
+ * @private
+ */
+function getTransitKey() {
+  return localStorage.getItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL);
+}
+
+/**
  * Check if a user is currently signed in.
  * @return {Boolean} `true` if the user is signed in, `false` if not.
  */
-
 function isUserSignedIn() {
   return !!window.localStorage.getItem(_authConstants.BLOCKSTACK_STORAGE_LABEL);
 }
@@ -102,7 +113,7 @@ function redirectToSignInWithAuthRequest() {
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `generateAndStoreAppKey`, `makeAuthRequest`,
+ * use `generateAndStoreTransitKey`, `makeAuthRequest`,
  * and `redirectToSignInWithAuthRequest` to build your own sign in process.
  *
  * @param {String} [redirectURI=`${window.location.origin}/`]
@@ -120,7 +131,7 @@ function redirectToSignIn() {
   var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin + '/manifest.json';
   var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_SCOPE;
 
-  var authRequest = (0, _index.makeAuthRequest)(generateAndStoreAppKey(), redirectURI, manifestURI, scopes);
+  var authRequest = (0, _index.makeAuthRequest)(generateAndStoreTransitKey(), redirectURI, manifestURI, scopes);
   redirectToSignInWithAuthRequest(authRequest);
 }
 
@@ -160,11 +171,26 @@ function handlePendingSignIn() {
     (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
       if (isValid) {
         var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
+        // TODO: real version handling
+        var appPrivateKey = tokenPayload.private_key;
+        var coreSessionToken = tokenPayload.core_token;
+        if (tokenPayload.version === '1.1.0') {
+          var transitKey = getTransitKey();
+          if (transitKey !== undefined && transitKey != null) {
+            if (appPrivateKey !== undefined && appPrivateKey !== null) {
+              appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, appPrivateKey);
+            }
+            if (coreSessionToken !== undefined && coreSessionToken !== null) {
+              coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
+            }
+          }
+        }
+
         var userData = {
           username: tokenPayload.username,
           profile: tokenPayload.profile,
-          appPrivateKey: tokenPayload.private_key,
-          coreSessionToken: tokenPayload.core_token,
+          appPrivateKey: appPrivateKey,
+          coreSessionToken: coreSessionToken,
           authResponseToken: authResponseToken
         };
         window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
@@ -198,7 +224,7 @@ function signUserOut() {
     window.location = redirectURL;
   }
 }
-},{"../index":11,"../utils":35,"./authConstants":2,"./index":7,"custom-protocol-detection-blockstack":298,"jsontokens":381,"query-string":478}],2:[function(require,module,exports){
+},{"../index":11,"../utils":35,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":298,"jsontokens":381,"query-string":478}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -210,12 +236,15 @@ var DEFAULT_BLOCKSTACK_HOST = exports.DEFAULT_BLOCKSTACK_HOST = 'https://blockst
 var DEFAULT_SCOPE = exports.DEFAULT_SCOPE = ['store_write'];
 var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
 },{}],3:[function(require,module,exports){
+(function (Buffer){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.makeAuthRequest = makeAuthRequest;
+exports.encryptPrivateKey = encryptPrivateKey;
+exports.decryptPrivateKey = decryptPrivateKey;
 exports.makeAuthResponse = makeAuthResponse;
 
 var _jsontokens = require('jsontokens');
@@ -224,12 +253,17 @@ var _index = require('../index');
 
 var _authConstants = require('./authConstants');
 
+var _encryption = require('../encryption');
+
 require('isomorphic-fetch');
+
+var VERSION = '1.1.0';
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
  * browser for the user to approve sign in.
- * @param  {String} [transitPrivateKey=generateAndStoreAppKey()] - hex encoded app private key
+ * @param  {String} [transitPrivateKey=generateAndStoreTransitKey()] - hex encoded transit
+ *   private key
  * @param {String} redirectURI - location to redirect user to after sign in approval
  * @param {String} manifestURI - location of this app's manifest file
  * @param {Array<String>} scopes - the permissions this app is requesting
@@ -238,7 +272,7 @@ require('isomorphic-fetch');
  * @return {String} the authentication request
  */
 function makeAuthRequest() {
-  var transitPrivateKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : (0, _index.generateAndStoreAppKey)();
+  var transitPrivateKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : (0, _index.generateAndStoreTransitKey)();
   var redirectURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin + '/';
   var manifestURI = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : window.location.origin + '/manifest.json';
   var scopes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _authConstants.DEFAULT_SCOPE;
@@ -255,10 +289,11 @@ function makeAuthRequest() {
     domain_name: appDomain,
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
+    version: VERSION,
     scopes: scopes
   };
 
-  console.log(payload);
+  console.log('blockstack.js: generating v' + VERSION + ' auth request');
 
   /* Convert the private key to a public key to an issuer */
   var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(transitPrivateKey);
@@ -273,34 +308,67 @@ function makeAuthRequest() {
   return token;
 }
 
+function encryptPrivateKey(publicKey, privateKey) {
+  var encryptedObj = (0, _encryption.encryptECIES)(publicKey, privateKey);
+  var encryptedJSON = JSON.stringify(encryptedObj);
+  return new Buffer(encryptedJSON).toString('hex');
+}
+
+function decryptPrivateKey(privateKey, hexedEncrypted) {
+  var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
+  var encryptedObj = JSON.parse(unhexedString);
+  return (0, _encryption.decryptECIES)(privateKey, encryptedObj);
+}
+
 function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var username = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-  var coreToken = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-  var appPrivateKey = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-  var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _index.nextMonth)().getTime();
+  var metadata = arguments[3];
+  var coreToken = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var appPrivateKey = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var expiresAt = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (0, _index.nextMonth)().getTime();
+  var transitPublicKey = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
 
   /* Convert the private key to a public key to an issuer */
   var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(privateKey);
   var address = (0, _index.publicKeyToAddress)(publicKey);
 
+  /* See if we should encrypt with the transit key */
+  var privateKeyPayload = appPrivateKey;
+  var coreTokenPayload = coreToken;
+  var additionalProperties = {};
+  if (transitPublicKey !== undefined && transitPublicKey !== null && appPrivateKey !== undefined && appPrivateKey !== null && coreToken !== undefined && coreToken !== null) {
+    console.log('blockstack.js: generating v' + VERSION + ' auth response');
+    privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
+    coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
+    additionalProperties = {
+      email: metadata.email ? metadata.email : null,
+      profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      version: VERSION
+    };
+  } else {
+    console.log('blockstack.js: generating legacy auth response');
+  }
+
   /* Create the payload */
-  var payload = {
+  var payload = Object.assign({}, {
     jti: (0, _index.makeUUID4)(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: (0, _index.makeDIDFromAddress)(address),
-    private_key: appPrivateKey,
+    private_key: privateKeyPayload,
     public_keys: [publicKey],
     profile: profile,
     username: username,
-    core_token: coreToken
+    core_token: coreTokenPayload
+  }, additionalProperties);
 
-    /* Sign and return the token */
-  };var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
+  /* Sign and return the token */
+  var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
   return tokenSigner.sign(payload);
 }
-},{"../index":11,"./authConstants":2,"isomorphic-fetch":371,"jsontokens":381}],4:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"../encryption":9,"../index":11,"./authConstants":2,"buffer":188,"isomorphic-fetch":371,"jsontokens":381}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -749,10 +817,16 @@ Object.defineProperty(exports, 'signUserOut', {
     return _authApp.signUserOut;
   }
 });
-Object.defineProperty(exports, 'generateAndStoreAppKey', {
+Object.defineProperty(exports, 'generateAndStoreTransitKey', {
   enumerable: true,
   get: function get() {
-    return _authApp.generateAndStoreAppKey;
+    return _authApp.generateAndStoreTransitKey;
+  }
+});
+Object.defineProperty(exports, 'getTransitKey', {
+  enumerable: true,
+  get: function get() {
+    return _authApp.getTransitKey;
   }
 });
 
