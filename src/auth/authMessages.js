@@ -19,6 +19,11 @@ import { encryptECIES, decryptECIES } from '../encryption'
 
 const VERSION = '1.1.0'
 
+type AuthMetadata = {
+  email: ?string,
+  profileUrl: ?string
+}
+
 /**
  * Generates an authentication request that can be sent to the Blockstack
  * browser for the user to approve sign in.
@@ -50,7 +55,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     version: VERSION,
     scopes
   }
-  
+
   console.log(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
@@ -83,6 +88,7 @@ export function decryptPrivateKey(privateKey: string,
 export function makeAuthResponse(privateKey: string,
                                  profile: {} = {},
                                  username: ?string = null,
+                                 metadata: AuthMetadata,
                                  coreToken: ?string = null,
                                  appPrivateKey: ?string = null,
                                  expiresAt: number = nextMonth().getTime(),
@@ -101,7 +107,11 @@ export function makeAuthResponse(privateKey: string,
     console.log(`blockstack.js: generating v${VERSION} auth response`)
     privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
     coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
-    additionalProperties = { version: VERSION }
+    additionalProperties = {
+      email: metadata.email ? metadata.email : null,
+      profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      version: VERSION
+    }
   } else {
     console.log('blockstack.js: generating legacy auth response')
   }
