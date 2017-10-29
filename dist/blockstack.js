@@ -323,10 +323,11 @@ function decryptPrivateKey(privateKey, hexedEncrypted) {
 function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var username = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-  var coreToken = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-  var appPrivateKey = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-  var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _index.nextMonth)().getTime();
-  var transitPublicKey = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+  var metadata = arguments[3];
+  var coreToken = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var appPrivateKey = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var expiresAt = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (0, _index.nextMonth)().getTime();
+  var transitPublicKey = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
 
   /* Convert the private key to a public key to an issuer */
   var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(privateKey);
@@ -340,7 +341,11 @@ function makeAuthResponse(privateKey) {
     console.log('blockstack.js: generating v' + VERSION + ' auth response');
     privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
     coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
-    additionalProperties = { version: VERSION };
+    additionalProperties = {
+      email: metadata.email ? metadata.email : null,
+      profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      version: VERSION
+    };
   } else {
     console.log('blockstack.js: generating legacy auth response');
   }
