@@ -2706,7 +2706,8 @@ var Github = function (_Service) {
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url.toLowerCase().startsWith('' + baseUrls[i] + proof.identifier)) {
+        var requiredPrefix = ('' + baseUrls[i] + proof.identifier).toLowerCase();
+        if (proof.proof_url.toLowerCase().startsWith(requiredPrefix)) {
           var raw = proof.proof_url.endsWith('/') ? 'raw' : '/raw';
           return '' + proof.proof_url + raw;
         }
