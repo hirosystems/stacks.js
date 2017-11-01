@@ -11,6 +11,8 @@ import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
          DEFAULT_BLOCKSTACK_HOST,
          DEFAULT_SCOPE } from './authConstants'
 
+import { extractProfile } from '../profiles'
+
 /**
  * Generates a ECDSA keypair and stores the hex value of the private key in
  * local storage.
@@ -163,9 +165,26 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           coreSessionToken,
           authResponseToken
         }
-        window.localStorage.setItem(
-          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-        resolve(userData)
+        const profileURL = tokenPayload.profile_url
+        if ((userData.profile === null ||
+             userData.profile === undefined) &&
+            profileURL !== undefined && profileURL !== null) {
+          fetch(profileURL)
+            .then(response => response.text())
+            .then(response => JSON.parse(response))
+            .then(wrappedProfile => extractProfile(wrappedProfile[0].token))
+            .then(profile => {
+              userData.profile = profile
+              window.localStorage.setItem(
+                BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+              resolve(userData)
+            })
+        } else {
+          userData.profile = tokenPayload.profile
+          window.localStorage.setItem(
+            BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+          resolve(userData)
+        }
       } else {
         reject()
       }
