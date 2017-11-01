@@ -191,13 +191,13 @@ function handlePendingSignIn() {
 
         var userData = {
           username: tokenPayload.username,
-          profile: null,
+          profile: tokenPayload.profile,
           appPrivateKey: appPrivateKey,
           coreSessionToken: coreSessionToken,
           authResponseToken: authResponseToken
         };
         var profileURL = tokenPayload.profile_url;
-        if (profileURL !== undefined && profileURL !== null) {
+        if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
           fetch(profileURL).then(function (response) {
             return response.text();
           }).then(function (response) {

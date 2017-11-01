@@ -160,13 +160,15 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
 
         const userData = {
           username: tokenPayload.username,
-          profile: null,
+          profile: tokenPayload.profile,
           appPrivateKey,
           coreSessionToken,
           authResponseToken
         }
         const profileURL = tokenPayload.profile_url
-        if (profileURL !== undefined && profileURL !== null) {
+        if ((userData.profile === null ||
+             userData.profile === undefined) &&
+            profileURL !== undefined && profileURL !== null) {
           fetch(profileURL)
             .then(response => response.text())
             .then(response => JSON.parse(response))
