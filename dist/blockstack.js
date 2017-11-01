@@ -11907,7 +11907,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/home/aaron/devel/blockstack.js"
+      "/Users/larry/git/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -11933,7 +11933,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_where": "/Users/larry/git/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -40860,34 +40860,29 @@ exports.isHtml = function(str) {
 
 },{"./parse":286,"dom-serializer":299}],289:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "cheerio@0.22.0",
-      "/home/aaron/devel/blockstack.js"
-    ]
-  ],
-  "_from": "cheerio@0.22.0",
+  "_from": "cheerio@^0.22.0",
   "_id": "cheerio@0.22.0",
   "_inBundle": false,
   "_integrity": "sha1-qbqoYKP5tZWmuBsahocxIe06Jp4=",
   "_location": "/cheerio",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "cheerio@0.22.0",
+    "raw": "cheerio@^0.22.0",
     "name": "cheerio",
     "escapedName": "cheerio",
-    "rawSpec": "0.22.0",
+    "rawSpec": "^0.22.0",
     "saveSpec": null,
-    "fetchSpec": "0.22.0"
+    "fetchSpec": "^0.22.0"
   },
   "_requiredBy": [
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
-  "_spec": "0.22.0",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
+  "_spec": "cheerio@^0.22.0",
+  "_where": "/Users/larry/git/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -40896,6 +40891,7 @@ module.exports={
   "bugs": {
     "url": "https://github.com/cheeriojs/cheerio/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "css-select": "~1.2.0",
     "dom-serializer": "~0.1.0",
@@ -40914,6 +40910,7 @@ module.exports={
     "lodash.reject": "^4.4.0",
     "lodash.some": "^4.4.0"
   },
+  "deprecated": false,
   "description": "Tiny, fast, and elegant implementation of core jQuery designed specifically for the server",
   "devDependencies": {
     "benchmark": "^2.1.0",
@@ -49112,27 +49109,21 @@ utils.encode = function encode(arr, enc) {
 
 },{}],350:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "elliptic@6.4.0",
-      "/home/aaron/devel/blockstack.js"
-    ]
-  ],
-  "_from": "elliptic@6.4.0",
+  "_from": "elliptic@^6.4.0",
   "_id": "elliptic@6.4.0",
   "_inBundle": false,
   "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "elliptic@6.4.0",
+    "raw": "elliptic@^6.4.0",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "6.4.0",
+    "rawSpec": "^6.4.0",
     "saveSpec": null,
-    "fetchSpec": "6.4.0"
+    "fetchSpec": "^6.4.0"
   },
   "_requiredBy": [
     "/",
@@ -49142,8 +49133,9 @@ module.exports={
     "/jsontokens"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_spec": "6.4.0",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+  "_spec": "elliptic@^6.4.0",
+  "_where": "/Users/larry/git/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -49151,6 +49143,7 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -49160,6 +49153,7 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
+  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -61702,34 +61696,29 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":433}],450:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "elliptic@5.2.1",
-      "/home/aaron/devel/blockstack.js"
-    ]
-  ],
-  "_from": "elliptic@5.2.1",
+  "_from": "elliptic@^5.1.0",
   "_id": "elliptic@5.2.1",
   "_inBundle": false,
   "_integrity": "sha1-+ilLZWPG3bybo9yFlGh66ECFjxA=",
   "_location": "/jsontokens/key-encoder/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "elliptic@5.2.1",
+    "raw": "elliptic@^5.1.0",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "5.2.1",
+    "rawSpec": "^5.1.0",
     "saveSpec": null,
-    "fetchSpec": "5.2.1"
+    "fetchSpec": "^5.1.0"
   },
   "_requiredBy": [
     "/jsontokens/key-encoder"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
-  "_spec": "5.2.1",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_shasum": "fa294b6563c6ddbc9ba3dc8594687ae840858f10",
+  "_spec": "elliptic@^5.1.0",
+  "_where": "/Users/larry/git/blockstack.js/node_modules/jsontokens/node_modules/key-encoder",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -61737,12 +61726,14 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^3.1.1",
     "brorand": "^1.0.1",
     "hash.js": "^1.0.0",
     "inherits": "^2.0.1"
   },
+  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "browserify": "^3.44.2",
