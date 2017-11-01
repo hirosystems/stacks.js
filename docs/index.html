@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 0.9.1 | Documentation</title>
+  <title>blockstack 0.13.0 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>0.9.1</code></div>
+          <div class='mb1'><code>0.13.0</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -175,6 +175,16 @@
               
                 
                 <li><a
+                  href='#validateproofs'
+                  class="">
+                  validateProofs
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#storage'
                   class="h5 bold black caps">
                   Storage
@@ -198,6 +208,26 @@
                   href='#putfile'
                   class="">
                   putFile
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#encryptecies'
+                  class="">
+                  encryptECIES
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#decryptecies'
+                  class="">
+                  decryptECIES
                   
                 </a>
                 
@@ -249,7 +279,7 @@ browser to approve the sign in request.</p>
 <p>Most applications should use this
 method for sign in unless they require more fine grained control over how the
 authentication request is generated. If your app falls into this category,
-use <code>generateAndStoreAppKey</code>, <code>makeAuthRequest</code>,
+use <code>generateAndStoreTransitKey</code>, <code>makeAuthRequest</code>,
 and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
 
 
@@ -586,7 +616,7 @@ if handling the sign in request fails or there was no pending sign in request.
   </div>
   
 
-  <p>Sign the user out and redirect to given location.</p>
+  <p>Sign the user out and optionally redirect to given location.</p>
 
 
   <div class='pre p1 fill-light mt0'>signUserOut(redirectURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
@@ -607,7 +637,7 @@ if handling the sign in request fails or there was no pending sign in request.
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>redirectURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
-            = <code>&#39;/&#39;</code>)</code>
+            = <code>null</code>)</code>
 	    Location to redirect user to after sign out.
 
           </div>
@@ -678,8 +708,9 @@ browser for the user to approve sign in.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>transitPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
-            = <code>generateAndStoreAppKey()</code>)</code>
-	    hex encoded app private key
+            = <code>generateAndStoreTransitKey()</code>)</code>
+	    hex encoded transit
+private key
 
           </div>
           
@@ -1299,6 +1330,95 @@ keypair that is thought to have signed the token
           
         
           
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='validateproofs'>
+      validateProofs
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Validates the social proofs in a user's profile. Currently supports validation of
+Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
+
+
+  <div class='pre p1 fill-light mt0'>validateProofs(profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    The JSON of the profile to be validated
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ownerAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The owner bitcoin address to be validated
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>null</code>)</code>
+	    The Blockstack name to be validated
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        that resolves to an array of validated proof objects
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
 
   <h2 id='storage' class='mt0'>
@@ -1307,7 +1427,12 @@ keypair that is thought to have signed the token
 
   
     <p>Store your app's data without servers in storage your user controls.</p>
-<p><a href="https://github.com/blockstack/blockstack.js/src/storage/README.md">Read more about storage</a></p>
+<p><em>Note: Blockstack Gaia Storage APIs and on-disk format will change in
+upcoming pre-releases breaking backward compatibility. File encryption is currently
+opt-in on a file by file basis.</em></p>
+<p><em>Certain storage features such as and collections are not implemented in the current
+version. These features will be rolled out in future updates.</em></p>
+<p><a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md">Read more about storage</a></p>
 
   
 </section>
@@ -1331,7 +1456,7 @@ keypair that is thought to have signed the token
   <p>Retrieves the specified file from the app's data store.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, decrypt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1350,6 +1475,16 @@ keypair that is thought to have signed the token
           <div>
             <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the path to the file to read
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>decrypt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>
+            = <code>false</code>)</code>
+	    try to decrypt the data with the app private key
 
           </div>
           
@@ -1401,7 +1536,7 @@ or rejects with an error
   <p>Stores the data provided in the app's data store to to the file specified.</p>
 
 
-  <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), encrypt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1434,6 +1569,16 @@ or rejects with an error
           
         </div>
       
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>encrypt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>
+            = <code>false</code>)</code>
+	    encrypt the data with the app private key
+
+          </div>
+          
+        </div>
+      
     </div>
   
 
@@ -1445,6 +1590,168 @@ or rejects with an error
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves if the operation succeed and rejects
 if it failed
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='encryptecies'>
+      encryptECIES
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Encrypt content to elliptic curve publicKey using ECIES</p>
+
+
+  <div class='pre p1 fill-light mt0'>encryptECIES(publicKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>publicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    secp256k1 public key hex string
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+	    content to encrypt
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        Object containing (hex encoded):
+iv (initialization vector), cipherText (cipher text),
+mac (message authentication code), ephemeral public key
+wasString (boolean indicating with or not to return a buffer or string on decrypt)
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decryptecies'>
+      decryptECIES
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Decrypt content encrypted using ECIES</p>
+
+
+  <div class='pre p1 fill-light mt0'>decryptECIES(privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, cipherObject: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://nodejs.org/api/buffer.html">Buffer</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    secp256k1 private key hex string
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>cipherObject</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    object to decrypt, should contain:
+iv (initialization vector), cipherText (cipher text),
+mac (message authentication code), ephemeralPublicKey
+wasString (boolean indicating with or not to return a buffer or string on decrypt)
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://nodejs.org/api/buffer.html">Buffer</a></code>:
+        plaintext, or false if error
 
       
     

@@ -5,6 +5,7 @@ import { makeAuthRequest, verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
 import { BLOCKSTACK_HANDLER } from '../utils'
 import { makeECPrivateKey } from '../index'
+import { decryptPrivateKey } from './authMessages'
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
          BLOCKSTACK_STORAGE_LABEL,
          DEFAULT_BLOCKSTACK_HOST,
@@ -16,10 +17,19 @@ import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
  * @return {String} the hex encoded private key
  * @private
  */
-export function generateAndStoreAppKey() {
+export function generateAndStoreTransitKey() {
   const transitKey = makeECPrivateKey()
   localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
   return transitKey
+}
+
+/**
+ * Fetches the hex value of the transit private key from local storage.
+ * @return {String} the hex encoded private key
+ * @private
+ */
+export function getTransitKey() {
+  return localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
 }
 
 /**
@@ -74,7 +84,7 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `generateAndStoreAppKey`, `makeAuthRequest`,
+ * use `generateAndStoreTransitKey`, `makeAuthRequest`,
  * and `redirectToSignInWithAuthRequest` to build your own sign in process.
  *
  * @param {String} [redirectURI=`${window.location.origin}/`]
@@ -90,7 +100,8 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
 export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`,
                                  manifestURI: string = `${window.location.origin}/manifest.json`,
                                  scopes: Array<string> = DEFAULT_SCOPE) {
-  const authRequest = makeAuthRequest(generateAndStoreAppKey(), redirectURI, manifestURI, scopes)
+  const authRequest = makeAuthRequest(
+    generateAndStoreTransitKey(), redirectURI, manifestURI, scopes)
   redirectToSignInWithAuthRequest(authRequest)
 }
 
@@ -130,11 +141,26 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
     .then(isValid => {
       if (isValid) {
         const tokenPayload = decodeToken(authResponseToken).payload
+        // TODO: real version handling
+        let appPrivateKey = tokenPayload.private_key
+        let coreSessionToken = tokenPayload.core_token
+        if (tokenPayload.version === '1.1.0') {
+          const transitKey = getTransitKey()
+          if (transitKey !== undefined && transitKey != null) {
+            if (appPrivateKey !== undefined && appPrivateKey !== null) {
+              appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
+            }
+            if (coreSessionToken !== undefined && coreSessionToken !== null) {
+              coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+            }
+          }
+        }
+
         const userData = {
           username: tokenPayload.username,
           profile: tokenPayload.profile,
-          appPrivateKey: tokenPayload.private_key,
-          coreSessionToken: tokenPayload.core_token,
+          appPrivateKey,
+          coreSessionToken,
           authResponseToken
         }
         window.localStorage.setItem(
@@ -156,11 +182,14 @@ export function loadUserData() {
 }
 
 /**
- * Sign the user out and redirect to given location.
- * @param  {String} [redirectURL='/'] Location to redirect user to after sign out.
+ * Sign the user out and optionally redirect to given location.
+ * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
  * @return {void}
  */
-export function signUserOut(redirectURL: string = '/') {
+export function signUserOut(redirectURL: ?string = null) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
-  window.location = redirectURL
+
+  if (redirectURL !== null) {
+    window.location = redirectURL
+  }
 }
