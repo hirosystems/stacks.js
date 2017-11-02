@@ -2996,24 +2996,28 @@ var Instagram = function (_Service) {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+      var normalizedProofUrl = this.normalizeInstagramUrl(proof);
+
       for (var i = 0; i < baseUrls.length; i++) {
-        console.error(proof.proof_url);
-        if (proof.proof_url.startsWith('' + baseUrls[i])) {
-          return proof.proof_url;
+        if (normalizedProofUrl.startsWith('' + baseUrls[i])) {
+          return normalizedProofUrl;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
     }
-
-    /* Instagram url proofs should start with www. */
-
   }, {
     key: 'normalizeInstagramUrl',
     value: function normalizeInstagramUrl(proof) {
-      var proofUrl = Instagram.getProofUrl(proof);
+      var proofUrl = proof.proof_url;
+
+      if (proofUrl.startsWith('http://')) {
+        var tokens = proofUrl.split('http://');
+        proofUrl = 'https://' + tokens[1];
+      }
+
       if (proofUrl.startsWith('https://instagram.com')) {
-        var tokens = proofUrl.split('https://instagram.com');
-        proofUrl = 'https://www.instagram.com' + tokens[1];
+        var _tokens = proofUrl.split('https://instagram.com');
+        proofUrl = 'https://www.instagram.com' + _tokens[1];
       }
       return proofUrl;
     }
@@ -3113,6 +3117,9 @@ var LinkedIn = function (_Service) {
       var profileLink = $('article').find('.post-meta__profile-link');
 
       if (profileLink !== undefined) {
+        if (profileLink.attr('href') === undefined) {
+          return '';
+        }
         return profileLink.attr('href').split('/').pop();
       } else {
         return '';
