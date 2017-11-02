@@ -35,14 +35,21 @@ var _authMessages = require('./authMessages');
 
 var _authConstants = require('./authConstants');
 
+var _profiles = require('../profiles');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Generates a ECDSA keypair and stores the hex value of the private key in
- * local storage.
- * @return {String} the hex encoded private key
- * @private
- */
+var DEFAULT_PROFILE = {
+  '@type': 'Person',
+  '@context': 'http://schema.org'
+
+  /**
+   * Generates a ECDSA keypair and stores the hex value of the private key in
+   * local storage.
+   * @return {String} the hex encoded private key
+   * @private
+   */
+};
 function generateAndStoreTransitKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
@@ -193,8 +200,31 @@ function handlePendingSignIn() {
           coreSessionToken: coreSessionToken,
           authResponseToken: authResponseToken
         };
-        window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-        resolve(userData);
+        var profileURL = tokenPayload.profile_url;
+        if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
+          fetch(profileURL).then(function (response) {
+            if (!response.ok) {
+              // return blank profile if we fail to fetch
+              userData.profile = Object.assign({}, DEFAULT_PROFILE);
+              window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+              resolve(userData);
+            } else {
+              response.text().then(function (responseText) {
+                return JSON.parse(responseText);
+              }).then(function (wrappedProfile) {
+                return (0, _profiles.extractProfile)(wrappedProfile[0].token);
+              }).then(function (profile) {
+                userData.profile = profile;
+                window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+                resolve(userData);
+              });
+            }
+          });
+        } else {
+          userData.profile = tokenPayload.profile;
+          window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+          resolve(userData);
+        }
       } else {
         reject();
       }
@@ -224,7 +254,7 @@ function signUserOut() {
     window.location = redirectURL;
   }
 }
-},{"../index":11,"../utils":35,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":298,"jsontokens":381,"query-string":478}],2:[function(require,module,exports){
+},{"../index":11,"../profiles":13,"../utils":35,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":298,"jsontokens":381,"query-string":478}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -290,6 +320,7 @@ function makeAuthRequest() {
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
     version: VERSION,
+    do_not_include_profile: true,
     scopes: scopes
   };
 
@@ -337,10 +368,14 @@ function makeAuthResponse(privateKey) {
   var privateKeyPayload = appPrivateKey;
   var coreTokenPayload = coreToken;
   var additionalProperties = {};
-  if (transitPublicKey !== undefined && transitPublicKey !== null && appPrivateKey !== undefined && appPrivateKey !== null && coreToken !== undefined && coreToken !== null) {
+  if (appPrivateKey !== undefined && appPrivateKey !== null) {
     console.log('blockstack.js: generating v' + VERSION + ' auth response');
-    privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
-    coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
+    if (transitPublicKey !== undefined && transitPublicKey !== null) {
+      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
+      if (coreToken !== undefined && coreToken !== null) {
+        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
+      }
+    }
     additionalProperties = {
       email: metadata.email ? metadata.email : null,
       profile_url: metadata.profileUrl ? metadata.profileUrl : null,
@@ -2589,7 +2624,7 @@ function extractProfile(token) {
   if (publicKeyOrAddress) {
     decodedToken = verifyProfileToken(token, publicKeyOrAddress);
   } else {
-    decodedToken = decodedToken(token);
+    decodedToken = (0, _jsontokens.decodeToken)(token);
   }
 
   var profile = {};
@@ -2961,12 +2996,30 @@ var Instagram = function (_Service) {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+      var normalizedProofUrl = this.normalizeInstagramUrl(proof);
+
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url.startsWith('' + baseUrls[i])) {
-          return proof.proof_url;
+        if (normalizedProofUrl.startsWith('' + baseUrls[i])) {
+          return normalizedProofUrl;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
+    }
+  }, {
+    key: 'normalizeInstagramUrl',
+    value: function normalizeInstagramUrl(proof) {
+      var proofUrl = proof.proof_url;
+
+      if (proofUrl.startsWith('http://')) {
+        var tokens = proofUrl.split('http://');
+        proofUrl = 'https://' + tokens[1];
+      }
+
+      if (proofUrl.startsWith('https://instagram.com')) {
+        var _tokens = proofUrl.split('https://instagram.com');
+        proofUrl = 'https://www.instagram.com' + _tokens[1];
+      }
+      return proofUrl;
     }
   }, {
     key: 'shouldValidateIdentityInBody',
@@ -3064,6 +3117,9 @@ var LinkedIn = function (_Service) {
       var profileLink = $('article').find('.post-meta__profile-link');
 
       if (profileLink !== undefined) {
+        if (profileLink.attr('href') === undefined) {
+          return '';
+        }
         return profileLink.attr('href').split('/').pop();
       } else {
         return '';
@@ -3363,11 +3419,15 @@ function putFile(path, content) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.BLOCKSTACK_HANDLER = undefined;
 exports.nextYear = nextYear;
 exports.nextMonth = nextMonth;
 exports.nextHour = nextHour;
 exports.updateQueryStringParameter = updateQueryStringParameter;
 exports.makeUUID4 = makeUUID4;
+
+var _crypto = require('crypto');
+
 var BLOCKSTACK_HANDLER = exports.BLOCKSTACK_HANDLER = 'blockstack';
 /**
  * Time
@@ -3412,12 +3472,12 @@ function makeUUID4() {
     d += performance.now(); // use high-precision timer if available
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (d + Math.random() * 16) % 16 | 0;
+    var r = (d + (0, _crypto.randomBytes)(1).readUInt8() % 16) % 16;
     d = Math.floor(d / 16);
     return (c === 'x' ? r : r & 0x3 | 0x8).toString(16);
   });
 }
-},{}],36:[function(require,module,exports){
+},{"crypto":198}],36:[function(require,module,exports){
 'use strict';
 
 var compileSchema = require('./compile')
