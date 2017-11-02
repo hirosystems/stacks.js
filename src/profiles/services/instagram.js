@@ -32,7 +32,6 @@ class Instagram extends Service {
       const tokens = proofUrl.split('https://instagram.com')
       proofUrl = `https://www.instagram.com${tokens[1]}`
     }
-
     return proofUrl
   }
 
