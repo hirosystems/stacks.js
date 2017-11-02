@@ -38,7 +38,7 @@ function testProofs(profile, username, totalProofs) {
 
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
-    t.plan(6)
+    t.plan(7)
 
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
@@ -67,6 +67,10 @@ export function runProofStatementUnitTests() {
     t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body), 
       'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
       'Should extract address-based proof statement from Hacker News profile')
+
+    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedInBroken.body), 
+      '', 
+      'Should not crash on broken LinkedIn proof link')
   })
 }
 
@@ -115,10 +119,10 @@ export function runOwnerAddressBasedProofsUnitTests() {
       false, "Hacker News body should not contain valid bitcoin address proof statement")
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
-      true, "Hacker News body should contain valid bitcoin address proof statement")
+      true, "LinkedIn body should contain valid bitcoin address proof statement")
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement, 'differentBitcoinAddress', true),
-      false, "Hacker News body should not contain valid bitcoin address proof statement")
+      false, "LinkedIn body should not contain valid bitcoin address proof statement")
   })
 }
 
@@ -218,6 +222,42 @@ export function runProofServicesUnitTests() {
       }),
       "https://www.facebook.com/larrysalibra/posts/10100341028448093",
       "Facebook URL should be normalized")
+  })
+
+  test('normalize Instagarm URLs', (t) => {
+    t.plan(4)
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "https://instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "http://www.instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "http://instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
   })
 
   test('get proof url', (t) => {
