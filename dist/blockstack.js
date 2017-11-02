@@ -39,12 +39,17 @@ var _profiles = require('../profiles');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Generates a ECDSA keypair and stores the hex value of the private key in
- * local storage.
- * @return {String} the hex encoded private key
- * @private
- */
+var DEFAULT_PROFILE = {
+  '@type': 'Person',
+  '@context': 'http://schema.org'
+
+  /**
+   * Generates a ECDSA keypair and stores the hex value of the private key in
+   * local storage.
+   * @return {String} the hex encoded private key
+   * @private
+   */
+};
 function generateAndStoreTransitKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
@@ -56,7 +61,6 @@ function generateAndStoreTransitKey() {
  * @return {String} the hex encoded private key
  * @private
  */
-
 function getTransitKey() {
   return localStorage.getItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL);
 }
@@ -199,15 +203,22 @@ function handlePendingSignIn() {
         var profileURL = tokenPayload.profile_url;
         if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
           fetch(profileURL).then(function (response) {
-            return response.text();
-          }).then(function (response) {
-            return JSON.parse(response);
-          }).then(function (wrappedProfile) {
-            return (0, _profiles.extractProfile)(wrappedProfile[0].token);
-          }).then(function (profile) {
-            userData.profile = profile;
-            window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-            resolve(userData);
+            if (!response.ok) {
+              // return blank profile if we fail to fetch
+              userData.profile = Object.assign({}, DEFAULT_PROFILE);
+              window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+              resolve(userData);
+            } else {
+              response.text().then(function (responseText) {
+                return JSON.parse(responseText);
+              }).then(function (wrappedProfile) {
+                return (0, _profiles.extractProfile)(wrappedProfile[0].token);
+              }).then(function (profile) {
+                userData.profile = profile;
+                window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+                resolve(userData);
+              });
+            }
           });
         } else {
           userData.profile = tokenPayload.profile;
