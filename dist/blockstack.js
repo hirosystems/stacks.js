@@ -2997,11 +2997,25 @@ var Instagram = function (_Service) {
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
       for (var i = 0; i < baseUrls.length; i++) {
+        console.error(proof.proof_url);
         if (proof.proof_url.startsWith('' + baseUrls[i])) {
           return proof.proof_url;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
+    }
+
+    /* Instagram url proofs should start with www. */
+
+  }, {
+    key: 'normalizeInstagramUrl',
+    value: function normalizeInstagramUrl(proof) {
+      var proofUrl = Instagram.getProofUrl(proof);
+      if (proofUrl.startsWith('https://instagram.com')) {
+        var tokens = proofUrl.split('https://instagram.com');
+        proofUrl = 'https://www.instagram.com' + tokens[1];
+      }
+      return proofUrl;
     }
   }, {
     key: 'shouldValidateIdentityInBody',

@@ -44,28 +44,28 @@ export function runProofStatementUnitTests() {
     const naval = sampleVerifications.naval
     const ken = sampleAddressBasedVerifications.ken
 
-    t.equal(profileServices.facebook.getProofStatement(larry.facebook.body), 
-      'Verifying that "larry.id" is my Blockstack ID.', 
+    t.equal(profileServices.facebook.getProofStatement(larry.facebook.body),
+      'Verifying that "larry.id" is my Blockstack ID.',
       'Should extract proof statement from Facebook page meta tags')
 
-    t.equal(profileServices.twitter.getProofStatement(naval.twitter.body), 
-      'Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin', 
+    t.equal(profileServices.twitter.getProofStatement(naval.twitter.body),
+      'Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin',
       'Should extract proof statement from Twitter page meta tags')
 
-    t.equal(profileServices.twitter.getProofStatement(ken.twitter.body), 
-      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+    t.equal(profileServices.twitter.getProofStatement(ken.twitter.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
       'Should extract address-based proof statement from Twitter page meta tags')
 
-    t.equal(profileServices.instagram.getProofStatement(ken.instagram.body), 
-      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+    t.equal(profileServices.instagram.getProofStatement(ken.instagram.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
       'Should extract address-based proof statement from Instagram meta tags')
 
-    t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body), 
-      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+    t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
       'Should extract address-based proof statement from Hacker News profile')
 
-    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body), 
-      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', 
+    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
       'Should extract address-based proof statement from Hacker News profile')
   })
 }
@@ -127,12 +127,12 @@ export function runInBodyIdentityVerificationTests() {
     t.plan(2)
     const ken = sampleAddressBasedVerifications.ken
 
-    t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body), 
-      'blckstcktest', 
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body),
+      'blckstcktest',
       'Should extract social proof identity from Instagram proof page body')
 
     t.equal(profileServices.linkedIn.getProofIdentity(ken.linkedIn.body),
-      'blck-stck', 
+      'blck-stck',
       'Should extract social proof identity from LinkedIn proof page body')
   })
 }
@@ -218,6 +218,26 @@ export function runProofServicesUnitTests() {
       }),
       "https://www.facebook.com/larrysalibra/posts/10100341028448093",
       "Facebook URL should be normalized")
+  })
+
+  test('normalize Instagram URLs', (t) => {
+    t.plan(2)
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        "service": "instagram",
+        "proof_url": "https://www.instagram.com/p/BYj6UDwgaX7/",
+        "identifier": "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BYj6UDwgaX7/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        "service": "instagram",
+        "proof_url": "https://instagram.com/p/BYj6UDwgaX7/",
+        "identifier": "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BYj6UDwgaX7/",
+      "Instagram URL should be normalized")
   })
 
   test('get proof url', (t) => {

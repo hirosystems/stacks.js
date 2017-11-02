@@ -11,11 +11,22 @@ class Instagram extends Service {
   static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
     for (let i = 0; i < baseUrls.length; i++) {
+      console.error(proof.proof_url)
       if (proof.proof_url.startsWith(`${baseUrls[i]}`)) {
         return proof.proof_url
       }
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+  }
+
+  /* Instagram url proofs should start with www. */
+  static normalizeInstagramUrl(proof: Object) {
+    let proofUrl = Instagram.getProofUrl(proof)
+    if (proofUrl.startsWith('https://instagram.com')) {
+      const tokens = proofUrl.split('https://instagram.com')
+      proofUrl = `https://www.instagram.com${tokens[1]}`
+    }
+    return proofUrl
   }
 
   static shouldValidateIdentityInBody() {
