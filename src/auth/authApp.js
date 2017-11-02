@@ -143,46 +143,45 @@ export function isSignInPending() {
 export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/') {
   const authResponseToken = getAuthResponseToken()
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     verifyAuthResponse(authResponseToken, nameLookupURL)
-    .then(isValid => {
-      if (isValid) {
-        const tokenPayload = decodeToken(authResponseToken).payload
-        // TODO: real version handling
-        let appPrivateKey = tokenPayload.private_key
-        let coreSessionToken = tokenPayload.core_token
-        if (tokenPayload.version === '1.1.0') {
-          const transitKey = getTransitKey()
-          if (transitKey !== undefined && transitKey != null) {
-            if (appPrivateKey !== undefined && appPrivateKey !== null) {
-              appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
-            }
-            if (coreSessionToken !== undefined && coreSessionToken !== null) {
-              coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
-            }
+    .then(() => {
+      const tokenPayload = decodeToken(authResponseToken).payload
+      // TODO: real version handling
+      let appPrivateKey = tokenPayload.private_key
+      let coreSessionToken = tokenPayload.core_token
+      if (tokenPayload.version === '1.1.0') {
+        const transitKey = getTransitKey()
+        if (transitKey !== undefined && transitKey != null) {
+          if (appPrivateKey !== undefined && appPrivateKey !== null) {
+            appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
+          }
+          if (coreSessionToken !== undefined && coreSessionToken !== null) {
+            coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
           }
         }
+      }
 
-        const userData = {
-          username: tokenPayload.username,
-          profile: tokenPayload.profile,
-          appPrivateKey,
-          coreSessionToken,
-          authResponseToken
-        }
-        const profileURL = tokenPayload.profile_url
-        if ((userData.profile === null ||
-             userData.profile === undefined) &&
-            profileURL !== undefined && profileURL !== null) {
-          fetch(profileURL)
-            .then(response => {
-              if (!response.ok) { // return blank profile if we fail to fetch
-                userData.profile = Object.assign({}, DEFAULT_PROFILE)
-                window.localStorage.setItem(
-                  BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-                resolve(userData)
-              } else {
-                response.text()
+      const userData = {
+        username: tokenPayload.username,
+        profile: tokenPayload.profile,
+        appPrivateKey,
+        coreSessionToken,
+        authResponseToken
+      }
+      const profileURL = tokenPayload.profile_url
+      if ((userData.profile === null ||
+           userData.profile === undefined) &&
+          profileURL !== undefined && profileURL !== null) {
+        fetch(profileURL)
+          .then(response => {
+            if (!response.ok) { // return blank profile if we fail to fetch
+              userData.profile = Object.assign({}, DEFAULT_PROFILE)
+              window.localStorage.setItem(
+                BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+              resolve(userData)
+            } else {
+              response.text()
                 .then(responseText => JSON.parse(responseText))
                 .then(wrappedProfile => extractProfile(wrappedProfile[0].token))
                 .then(profile => {
@@ -191,16 +190,13 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
                     BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
                   resolve(userData)
                 })
-              }
-            })
-        } else {
-          userData.profile = tokenPayload.profile
-          window.localStorage.setItem(
-            BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-          resolve(userData)
-        }
+            }
+          })
       } else {
-        reject()
+        userData.profile = tokenPayload.profile
+        window.localStorage.setItem(
+          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+        resolve(userData)
       }
     })
   })

@@ -126,7 +126,7 @@ export function runAuthTests() {
   })
 
   test('auth response with username', (t) => {
-    t.plan(2)
+    t.plan(3)
 
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
@@ -144,6 +144,20 @@ export function runAuthTests() {
     verifyAuthResponse(authResponse, nameLookupURL)
       .then(verifiedResult => {
         t.true(verifiedResult, 'auth response should be verified')
+      })
+
+    const authResponseInvalid = makeAuthResponse(privateKey, sampleProfiles.ryan, 'aaron.id')
+    const urlAaron = `${nameLookupURL}aaron.id`
+    FetchMock.get(urlAaron, {
+      "address": "19s2U1SAYiC3KPA4pWrAXC5SDSArietDMr"
+    })
+
+    verifyAuthResponse(authResponseInvalid, nameLookupURL)
+      .then(verifiedResult => {
+        t.fail('auth response should throw error')
+      })
+      .catch(reason => {
+        t.pass('auth response should throw error')
       })
   })
 }

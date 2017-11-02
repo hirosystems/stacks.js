@@ -145,7 +145,14 @@ export function verifyAuthRequest(token) {
 }
 
 export function verifyAuthResponse(token, nameLookupURL) {
-  return new Promise((resolve) => {
+  const reasons = [
+    'Expiration date invalid',
+    'Issuance date invalid',
+    'Response signature invalid',
+    'Public key does not match JWT issuer',
+    'Public key does not match username']
+
+  return new Promise((resolve, reject) => {
     Promise.all([
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
@@ -153,11 +160,11 @@ export function verifyAuthResponse(token, nameLookupURL) {
       doPublicKeysMatchIssuer(token),
       doPublicKeysMatchUsername(token, nameLookupURL)
     ]).then(values => {
-      console.log(values)
       if (values.every(Boolean)) {
         resolve(true)
       } else {
-        resolve(false)
+        const reason = reasons[values.indexOf(false)]
+        reject(new Error(`Response Validation Error: ${reason}`))
       }
     })
   })
