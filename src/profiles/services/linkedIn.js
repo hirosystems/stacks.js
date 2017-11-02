@@ -27,6 +27,9 @@ class LinkedIn extends Service {
     const profileLink = $('article').find('.post-meta__profile-link')
 
     if (profileLink !== undefined) {
+      if(profileLink.attr('href') === undefined) {
+        return ''
+      }
       return profileLink.attr('href').split('/').pop()
     } else {
       return ''
