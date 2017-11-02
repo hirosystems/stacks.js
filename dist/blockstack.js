@@ -3419,11 +3419,15 @@ function putFile(path, content) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.BLOCKSTACK_HANDLER = undefined;
 exports.nextYear = nextYear;
 exports.nextMonth = nextMonth;
 exports.nextHour = nextHour;
 exports.updateQueryStringParameter = updateQueryStringParameter;
 exports.makeUUID4 = makeUUID4;
+
+var _crypto = require('crypto');
+
 var BLOCKSTACK_HANDLER = exports.BLOCKSTACK_HANDLER = 'blockstack';
 /**
  * Time
@@ -3468,12 +3472,12 @@ function makeUUID4() {
     d += performance.now(); // use high-precision timer if available
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (d + Math.random() * 16) % 16 | 0;
+    var r = (d + (0, _crypto.randomBytes)(1).readUInt8() % 16) % 16;
     d = Math.floor(d / 16);
     return (c === 'x' ? r : r & 0x3 | 0x8).toString(16);
   });
 }
-},{}],36:[function(require,module,exports){
+},{"crypto":198}],36:[function(require,module,exports){
 'use strict';
 
 var compileSchema = require('./compile')
