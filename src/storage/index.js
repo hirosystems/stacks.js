@@ -1,6 +1,7 @@
 /* @flow */
 import { getFile as storageGetFile,
-  putFile as storagePutFile } from 'blockstack-storage'
+  putFile as storagePutFile,
+  deleteFile as storageDeleteFile } from 'blockstack-storage'
 
 import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
@@ -42,4 +43,14 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
     content = JSON.stringify(cipherObject)
   }
   return storagePutFile(path, content)
+}
+
+/**
+ * Deletes the specified file from the app's data store.
+ * @param {String} path - the path to the file to delete
+ * @returns {Promise} that resolves when the file has been removed
+ * or rejects with an error
+ */
+export function deleteFile(path: string) {
+  return storageDeleteFile(path)
 }
