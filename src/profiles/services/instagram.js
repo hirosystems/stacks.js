@@ -22,11 +22,7 @@ class Instagram extends Service {
 
   static normalizeInstagramUrl(proof: Object) {
     let proofUrl = proof.proof_url
-
-    if (proofUrl.startsWith('http://')) {
-      const tokens = proofUrl.split('http://')
-      proofUrl = `https://${tokens[1]}`
-    }
+    proofUrl = super.prefixScheme(proofUrl)
 
     if (proofUrl.startsWith('https://instagram.com')) {
       const tokens = proofUrl.split('https://instagram.com')

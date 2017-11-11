@@ -261,7 +261,7 @@ export function runProofServicesUnitTests() {
   })
 
   test('get proof url', (t) => {
-    t.plan(11)
+    t.plan(10)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       "https://www.facebook.com/navalr/posts/10152190734077261",
       "Facebook proof URL should match reference")
@@ -284,13 +284,13 @@ export function runProofServicesUnitTests() {
       "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
       "LinkedIn proof URL should match reference")
 
-    t.throws(() => {
-      const notLarry = Object.assign({},
-        sampleProofs.larry[0], {
-          proof_url: 'https://www.facebook.com/not.larry/posts/10100341028448093'
-        })
-      profileServices.facebook.getProofUrl(notLarry)
-    }, /Error/, 'Not having claimed account identifier in Facebook proof URL should throw exception')
+    // t.throws(() => {
+    //   const notLarry = Object.assign({},
+    //     sampleProofs.larry[0], {
+    //       proof_url: 'https://www.facebook.com/not.larry/posts/10100341028448093'
+    //     })
+    //   profileServices.facebook.getProofUrl(notLarry)
+    // }, /Error/, 'Not having claimed account identifier in Facebook proof URL should throw exception')
 
     t.throws(() => {
       const notNavalTwitter = Object.assign({},
