@@ -35,14 +35,21 @@ var _authMessages = require('./authMessages');
 
 var _authConstants = require('./authConstants');
 
+var _profiles = require('../profiles');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Generates a ECDSA keypair and stores the hex value of the private key in
- * local storage.
- * @return {String} the hex encoded private key
- * @private
- */
+var DEFAULT_PROFILE = {
+  '@type': 'Person',
+  '@context': 'http://schema.org'
+
+  /**
+   * Generates a ECDSA keypair and stores the hex value of the private key in
+   * local storage.
+   * @return {String} the hex encoded private key
+   * @private
+   */
+};
 function generateAndStoreTransitKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
@@ -193,8 +200,31 @@ function handlePendingSignIn() {
           coreSessionToken: coreSessionToken,
           authResponseToken: authResponseToken
         };
-        window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-        resolve(userData);
+        var profileURL = tokenPayload.profile_url;
+        if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
+          fetch(profileURL).then(function (response) {
+            if (!response.ok) {
+              // return blank profile if we fail to fetch
+              userData.profile = Object.assign({}, DEFAULT_PROFILE);
+              window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+              resolve(userData);
+            } else {
+              response.text().then(function (responseText) {
+                return JSON.parse(responseText);
+              }).then(function (wrappedProfile) {
+                return (0, _profiles.extractProfile)(wrappedProfile[0].token);
+              }).then(function (profile) {
+                userData.profile = profile;
+                window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+                resolve(userData);
+              });
+            }
+          });
+        } else {
+          userData.profile = tokenPayload.profile;
+          window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+          resolve(userData);
+        }
       } else {
         reject();
       }
@@ -224,7 +254,7 @@ function signUserOut() {
     window.location = redirectURL;
   }
 }
-},{"../index":11,"../utils":35,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":298,"jsontokens":381,"query-string":478}],2:[function(require,module,exports){
+},{"../index":11,"../profiles":13,"../utils":35,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":298,"jsontokens":381,"query-string":478}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -290,6 +320,7 @@ function makeAuthRequest() {
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
     version: VERSION,
+    do_not_include_profile: true,
     scopes: scopes
   };
 
@@ -337,10 +368,14 @@ function makeAuthResponse(privateKey) {
   var privateKeyPayload = appPrivateKey;
   var coreTokenPayload = coreToken;
   var additionalProperties = {};
-  if (transitPublicKey !== undefined && transitPublicKey !== null && appPrivateKey !== undefined && appPrivateKey !== null && coreToken !== undefined && coreToken !== null) {
+  if (appPrivateKey !== undefined && appPrivateKey !== null) {
     console.log('blockstack.js: generating v' + VERSION + ' auth response');
-    privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
-    coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
+    if (transitPublicKey !== undefined && transitPublicKey !== null) {
+      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
+      if (coreToken !== undefined && coreToken !== null) {
+        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
+      }
+    }
     additionalProperties = {
       email: metadata.email ? metadata.email : null,
       profile_url: metadata.profileUrl ? metadata.profileUrl : null,
@@ -2589,7 +2624,7 @@ function extractProfile(token) {
   if (publicKeyOrAddress) {
     decodedToken = verifyProfileToken(token, publicKeyOrAddress);
   } else {
-    decodedToken = decodedToken(token);
+    decodedToken = (0, _jsontokens.decodeToken)(token);
   }
 
   var profile = {};
@@ -2703,30 +2738,32 @@ var Facebook = function (_Service) {
   }
 
   _createClass(Facebook, null, [{
-    key: 'getBaseUrls',
-    value: function getBaseUrls() {
-      var baseUrls = ['https://facebook.com/', 'https://www.facebook.com/'];
-      return baseUrls;
-    }
-  }, {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       return this.normalizeFacebookUrl(proof);
     }
-
-    /* Facebook url proofs should start with www. */
-
   }, {
     key: 'normalizeFacebookUrl',
     value: function normalizeFacebookUrl(proof) {
-      var proofUrl = _get(Facebook.__proto__ || Object.getPrototypeOf(Facebook), 'getProofUrl', this).call(this, proof);
+      var proofUrl = proof.proof_url.toLowerCase();
+      var urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9\-]+\.)+facebook\.com/;
+
+      proofUrl = _get(Facebook.__proto__ || Object.getPrototypeOf(Facebook), 'prefixScheme', this).call(this, proofUrl);
+
       if (proofUrl.startsWith('https://facebook.com')) {
-        var _tokens = proofUrl.split('https://facebook.com');
-        proofUrl = 'https://www.facebook.com' + _tokens[1];
+        var tokens = proofUrl.split('https://facebook.com');
+        proofUrl = 'https://www.facebook.com' + tokens[1];
+        tokens = proofUrl.split('https://www.facebook.com/')[1].split('/posts/');
+        var postId = tokens[1];
+        proofUrl = 'https://www.facebook.com/' + proof.identifier + '/posts/' + postId;
+      } else if (proofUrl.match(urlRegex)) {
+        var _tokens = proofUrl.split('facebook.com/')[1].split('/posts/');
+        var _postId = _tokens[1];
+        proofUrl = 'https://www.facebook.com/' + proof.identifier + '/posts/' + _postId;
+      } else {
+        throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
       }
-      var tokens = proofUrl.split('https://www.facebook.com/')[1].split('/posts/');
-      var postId = tokens[1];
-      proofUrl = 'https://www.facebook.com/' + proof.identifier + '/posts/' + postId;
+
       return proofUrl;
     }
   }, {
@@ -2752,6 +2789,8 @@ exports.Github = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _service = require('./service');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2772,18 +2811,22 @@ var Github = function (_Service) {
   _createClass(Github, null, [{
     key: 'getBaseUrls',
     value: function getBaseUrls() {
-      var baseUrls = ['https://gist.github.com/'];
+      var baseUrls = ['https://gist.github.com/', 'http://gist.github.com', 'gist.github.com'];
       return baseUrls;
     }
   }, {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+      var proofUrl = proof.proof_url.toLowerCase();
+
+      proofUrl = _get(Github.__proto__ || Object.getPrototypeOf(Github), 'prefixScheme', this).call(this, proofUrl);
+
       for (var i = 0; i < baseUrls.length; i++) {
         var requiredPrefix = ('' + baseUrls[i] + proof.identifier).toLowerCase();
-        if (proof.proof_url.toLowerCase().startsWith(requiredPrefix)) {
-          var raw = proof.proof_url.endsWith('/') ? 'raw' : '/raw';
-          return '' + proof.proof_url + raw;
+        if (proofUrl.startsWith(requiredPrefix)) {
+          var raw = proofUrl.endsWith('/') ? 'raw' : '/raw';
+          return '' + proofUrl + raw;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
@@ -2803,6 +2846,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.HackerNews = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _service = require('./service');
 
@@ -2830,16 +2875,20 @@ var HackerNews = function (_Service) {
   _createClass(HackerNews, null, [{
     key: 'getBaseUrls',
     value: function getBaseUrls() {
-      var baseUrls = ['https://news.ycombinator.com/user?id='];
+      var baseUrls = ['https://news.ycombinator.com/user?id=', 'http://news.ycombinator.com/user?id=', 'news.ycombinator.com/user?id='];
       return baseUrls;
     }
   }, {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+
+      var proofUrl = proof.proof_url.toLowerCase();
+      proofUrl = _get(HackerNews.__proto__ || Object.getPrototypeOf(HackerNews), 'prefixScheme', this).call(this, proofUrl);
+
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url === '' + baseUrls[i] + proof.identifier) {
-          return proof.proof_url;
+        if (proofUrl === '' + baseUrls[i] + proof.identifier) {
+          return proofUrl;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
@@ -2928,6 +2977,8 @@ exports.Instagram = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _service = require('./service');
 
 var _cheerio = require('cheerio');
@@ -2961,12 +3012,26 @@ var Instagram = function (_Service) {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+      var normalizedProofUrl = this.normalizeInstagramUrl(proof);
+
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url.startsWith('' + baseUrls[i])) {
-          return proof.proof_url;
+        if (normalizedProofUrl.startsWith('' + baseUrls[i])) {
+          return normalizedProofUrl;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
+    }
+  }, {
+    key: 'normalizeInstagramUrl',
+    value: function normalizeInstagramUrl(proof) {
+      var proofUrl = proof.proof_url;
+      proofUrl = _get(Instagram.__proto__ || Object.getPrototypeOf(Instagram), 'prefixScheme', this).call(this, proofUrl);
+
+      if (proofUrl.startsWith('https://instagram.com')) {
+        var tokens = proofUrl.split('https://instagram.com');
+        proofUrl = 'https://www.instagram.com' + tokens[1];
+      }
+      return proofUrl;
     }
   }, {
     key: 'shouldValidateIdentityInBody',
@@ -3012,6 +3077,8 @@ exports.LinkedIn = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _service = require('./service');
 
 var _cheerio = require('cheerio');
@@ -3038,16 +3105,20 @@ var LinkedIn = function (_Service) {
   _createClass(LinkedIn, null, [{
     key: 'getBaseUrls',
     value: function getBaseUrls() {
-      var baseUrls = ['https://www.linkedin.com/feed/update/'];
+      var baseUrls = ['https://www.linkedin.com/feed/update/', 'http://www.linkedin.com/feed/update/', 'www.linkedin.com/feed/update/'];
       return baseUrls;
     }
   }, {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+
+      var proofUrl = proof.proof_url.toLowerCase();
+      proofUrl = _get(LinkedIn.__proto__ || Object.getPrototypeOf(LinkedIn), 'prefixScheme', this).call(this, proofUrl);
+
       for (var i = 0; i < baseUrls.length; i++) {
-        if (proof.proof_url.startsWith('' + baseUrls[i])) {
-          return proof.proof_url;
+        if (proofUrl.startsWith('' + baseUrls[i])) {
+          return proofUrl;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
@@ -3064,6 +3135,9 @@ var LinkedIn = function (_Service) {
       var profileLink = $('article').find('.post-meta__profile-link');
 
       if (profileLink !== undefined) {
+        if (profileLink.attr('href') === undefined) {
+          return '';
+        }
         return profileLink.attr('href').split('/').pop();
       } else {
         return '';
@@ -3168,13 +3242,28 @@ var Service = exports.Service = function () {
       return false;
     }
   }, {
+    key: 'prefixScheme',
+    value: function prefixScheme(proofUrl) {
+      if (!proofUrl.startsWith('https://') && !proofUrl.startsWith('http://')) {
+        return 'https://' + proofUrl;
+      } else if (proofUrl.startsWith('http://')) {
+        return proofUrl.replace('http://', 'https://');
+      } else {
+        return proofUrl;
+      }
+    }
+  }, {
     key: 'getProofUrl',
     value: function getProofUrl(proof) {
       var baseUrls = this.getBaseUrls();
+
+      var proofUrl = proof.proof_url.toLowerCase();
+      proofUrl = this.prefixScheme(proofUrl);
+
       for (var i = 0; i < baseUrls.length; i++) {
         var requiredPrefix = ('' + baseUrls[i] + proof.identifier).toLowerCase();
-        if (proof.proof_url.toLowerCase().startsWith(requiredPrefix)) {
-          return proof.proof_url;
+        if (proofUrl.startsWith(requiredPrefix)) {
+          return proofUrl;
         }
       }
       throw new Error('Proof url ' + proof.proof_url + ' is not valid for service ' + proof.service);
@@ -3280,7 +3369,7 @@ var Twitter = function (_Service) {
   _createClass(Twitter, null, [{
     key: 'getBaseUrls',
     value: function getBaseUrls() {
-      var baseUrls = ['https://twitter.com/'];
+      var baseUrls = ['https://twitter.com/', 'http://twitter.com/', 'twitter.com/'];
       return baseUrls;
     }
   }, {

@@ -4,15 +4,23 @@ import cheerio from 'cheerio'
 
 class HackerNews extends Service {
   static getBaseUrls() {
-    const baseUrls = ['https://news.ycombinator.com/user?id=']
+    const baseUrls = [
+      'https://news.ycombinator.com/user?id=', 
+      'http://news.ycombinator.com/user?id=',
+      'news.ycombinator.com/user?id='
+    ]
     return baseUrls
   }
 
   static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
+
+    let proofUrl = proof.proof_url.toLowerCase()
+    proofUrl = super.prefixScheme(proofUrl)
+
     for (let i = 0; i < baseUrls.length; i++) {
-      if (proof.proof_url === `${baseUrls[i]}${proof.identifier}`) {
-        return proof.proof_url
+      if (proofUrl === `${baseUrls[i]}${proof.identifier}`) {
+        return proofUrl
       }
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)

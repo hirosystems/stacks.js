@@ -57,12 +57,26 @@ export class Service {
     return false
   }
 
+  static prefixScheme(proofUrl: string) {
+    if (!proofUrl.startsWith('https://') && !proofUrl.startsWith('http://')) {
+      return `https://${proofUrl}`
+    } else if (proofUrl.startsWith('http://')) {
+      return proofUrl.replace('http://', 'https://')
+    } else {
+      return proofUrl
+    }
+  }
+
   static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
+
+    let proofUrl = proof.proof_url.toLowerCase()
+    proofUrl = this.prefixScheme(proofUrl)
+
     for (let i = 0; i < baseUrls.length; i++) {
       const requiredPrefix = `${baseUrls[i]}${proof.identifier}`.toLowerCase()
-      if (proof.proof_url.toLowerCase().startsWith(requiredPrefix)) {
-        return proof.proof_url
+      if (proofUrl.startsWith(requiredPrefix)) {
+        return proofUrl
       }
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
