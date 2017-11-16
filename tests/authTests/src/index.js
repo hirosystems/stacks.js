@@ -17,8 +17,69 @@ const authRequest = makeAuthRequest(clientPrivateKey,
 'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
 ['store_read', 'store_write', 'store_admin'], "www.foo.com")
 
+
+/*
+ * Send Core a request for a session token.
+ * This duplicates the functionality of sendCoreSessionRequest(), but in a way
+ * that is compatible with the integration test framework.  In particular,
+ * it sets the Origin: header.
+ *
+ * @param coreAuthRequest (String) a signed JWT encoding the authentication request
+ * @param apiPassword (String) the API password for Core
+ *
+ * Returns a JWT signed with the Core API server's private key that authorizes the bearer
+ * to carry out the requested operations.
+ * @private
+ */
+function sendCoreSessionRequestTEST(coreHost: string,
+                                    corePort: number,
+                                    coreAuthRequest: string,
+                                    apiPassword: string) {
+
+  return new Promise((resolve, reject) => {
+    if (!apiPassword) {
+      reject('Missing API password')
+      return null
+    }
+
+    const options = {
+      headers: {
+        Authorization: `bearer ${apiPassword}`,
+        Origin: `http://localhost:${corePort}`
+      }
+    }
+
+    const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
+    console.log(`sendCoreSesionRequestTEST: Fetch ${url}`);
+
+    return fetch(url, options)
+    .then(response => {
+      if (!response.ok) {
+        reject('HTTP status not OK')
+        return null
+      }
+      return response.text()
+    })
+    .then(responseText => JSON.parse(responseText))
+    .then(responseJson => {
+      const token = responseJson.token
+      if (!token) {
+        reject('Failed to get Core session token')
+        return null
+      }
+      resolve(token)
+      return token
+    })
+    .catch(error => {
+      console.error(error)
+      reject('Invalid Core response: not JSON')
+    })
+  })
+}
+
+
 console.log("Log in with a blockchain ID")
-getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', authRequest)
+getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', authRequest, '0', sendCoreSessionRequestTEST)
 .then((session) => {
   console.log('success!')
   console.log(session)
@@ -43,8 +104,9 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
   return true
 }, (error) => {
   console.error('failure!')
+  console.log(error)
   console.error(error.stack)
-  return false
+  process.exit(1)
 })
 .then((res) => {
    if (!res) {
@@ -53,10 +115,12 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
 
    console.log("Log in without a blockchain ID");
    // try with no blockchain ID
-   return getCoreSession('localhost', 16268, apiPassword, appPrivateKey, null, authRequest)
+   return getCoreSession('localhost', 16268, apiPassword, appPrivateKey, null, authRequest, '0', sendCoreSessionRequestTEST)
 }, (error) => {
     console.log("failure!")
-    cosnole.log(e.stack)
+    console.log(error)
+    cosnole.log(error.stack)
+    process.exit(1)
 })
 .then((session) => {
    console.log('success!')
@@ -84,7 +148,7 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
    console.log("failure!")
    console.log(e)
    console.log(e.stack)
-   return false
+   process.exit(1)
 })
 .then(() => {
   process.exit(0)

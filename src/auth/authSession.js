@@ -119,7 +119,11 @@ export function getCoreSession(coreHost: string,
                                appPrivateKey: string,
                                blockchainId: ?string = null,
                                authRequest: ?string = null,
-                               deviceId: string = '0') {
+                               deviceId: string = '0',
+                               sendRequestFunc: ?(host: string,
+                                                  port: number,
+                                                  authReq: string,
+                                                  pass: string) => mixed) {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }
@@ -147,8 +151,12 @@ export function getCoreSession(coreHost: string,
   const appMethods = payload.scopes
 
   const coreAuthRequest = makeCoreSessionRequest(
-      appDomain, appMethods, appPrivateKey, blockchainId, deviceId)
+     appDomain, appMethods, appPrivateKey, blockchainId, deviceId)
+  
+  if (!sendRequestFunc) {
+    sendRequestFunc = sendCoreSessionRequest
+  }
 
-  return sendCoreSessionRequest(
+  return sendRequestFunc(
       coreHost, corePort, coreAuthRequest, apiPassword)
 }
