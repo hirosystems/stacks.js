@@ -7,7 +7,7 @@ import {
 } from 'jsontokens'
 
 import {
-  makeDIDFromAddress, generateAndStoreAppKey, makeUUID4,
+  makeDIDFromAddress, generateAndStoreTransitKey, makeUUID4,
   nextMonth, nextHour, publicKeyToAddress
 } from '../index'
 
@@ -15,10 +15,20 @@ import {
   DEFAULT_SCOPE
 } from './authConstants'
 
+import { encryptECIES, decryptECIES } from '../encryption'
+
+const VERSION = '1.1.0'
+
+type AuthMetadata = {
+  email: ?string,
+  profileUrl: ?string
+}
+
 /**
  * Generates an authentication request that can be sent to the Blockstack
  * browser for the user to approve sign in.
- * @param  {String} [transitPrivateKey=generateAndStoreAppKey()] - hex encoded app private key
+ * @param  {String} [transitPrivateKey=generateAndStoreTransitKey()] - hex encoded transit
+ *   private key
  * @param {String} redirectURI - location to redirect user to after sign in approval
  * @param {String} manifestURI - location of this app's manifest file
  * @param {Array<String>} scopes - the permissions this app is requesting
@@ -26,7 +36,7 @@ import {
  * @param {Number} expiresAt - the time at which this request is no longer valid
  * @return {String} the authentication request
  */
-export function makeAuthRequest(transitPrivateKey: string = generateAndStoreAppKey(),
+export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTransitKey(),
                                 redirectURI: string = `${window.location.origin}/`,
                                 manifestURI: string = `${window.location.origin}/manifest.json`,
                                 scopes: Array<String> = DEFAULT_SCOPE,
@@ -42,10 +52,12 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreAppK
     domain_name: appDomain,
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
+    version: VERSION,
+    do_not_include_profile: true,
     scopes
   }
 
-  console.log(payload)
+  console.log(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
@@ -60,28 +72,65 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreAppK
   return token
 }
 
+export function encryptPrivateKey(publicKey: string,
+                                  privateKey: string): string | null {
+  const encryptedObj = encryptECIES(publicKey, privateKey)
+  const encryptedJSON = JSON.stringify(encryptedObj)
+  return (new Buffer(encryptedJSON)).toString('hex')
+}
+
+export function decryptPrivateKey(privateKey: string,
+                                  hexedEncrypted: string): string | null {
+  const unhexedString = new Buffer(hexedEncrypted, 'hex').toString()
+  const encryptedObj = JSON.parse(unhexedString)
+  return decryptECIES(privateKey, encryptedObj)
+}
+
 export function makeAuthResponse(privateKey: string,
                                  profile: {} = {},
                                  username: ?string = null,
+                                 metadata: AuthMetadata,
                                  coreToken: ?string = null,
                                  appPrivateKey: ?string = null,
-                                 expiresAt: number = nextMonth().getTime()): string {
+                                 expiresAt: number = nextMonth().getTime(),
+                                 transitPublicKey: ?string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
 
+  /* See if we should encrypt with the transit key */
+  let privateKeyPayload = appPrivateKey
+  let coreTokenPayload = coreToken
+  let additionalProperties = {}
+  if (appPrivateKey !== undefined && appPrivateKey !== null) {
+    console.log(`blockstack.js: generating v${VERSION} auth response`)
+    if (transitPublicKey !== undefined && transitPublicKey !== null) {
+      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+      if (coreToken !== undefined && coreToken !== null) {
+        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
+      }
+    }
+    additionalProperties = {
+      email: metadata.email ? metadata.email : null,
+      profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      version: VERSION
+    }
+  } else {
+    console.log('blockstack.js: generating legacy auth response')
+  }
+
   /* Create the payload */
-  const payload = {
+  const payload = Object.assign({}, {
     jti: makeUUID4(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: makeDIDFromAddress(address),
-    private_key: appPrivateKey,
+    private_key: privateKeyPayload,
     public_keys: [publicKey],
     profile,
     username,
-    core_token: coreToken
-  }
+    core_token: coreTokenPayload
+  }, additionalProperties)
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', privateKey)

@@ -6,17 +6,19 @@ import fs from 'fs'
 import FetchMock from 'fetch-mock'
 
 import {
-  validateProofs, containsValidProofStatement, profileServices
+  validateProofs, containsValidProofStatement, containsValidAddressProofStatement, profileServices
 } from '../../../lib'
 
-import { sampleProfiles, sampleProofs, sampleVerifications } from './sampleData'
+import { sampleProfiles, sampleProofs, sampleVerifications, sampleAddressBasedVerifications } from './sampleData'
 
 function mockRequests() {
   const naval = sampleVerifications.naval
   const larry = sampleVerifications.larry
 
+  const addressBasedLarry = sampleAddressBasedVerifications.larry
+
   FetchMock.get(naval.facebook.url, naval.facebook.body)
-  FetchMock.get(naval.github.url, naval.github.body)
+  FetchMock.get(`${naval.github.url}/raw`, naval.github.body)
   FetchMock.get(naval.twitter.url, naval.twitter.body)
   FetchMock.get(larry.facebook.url, larry.facebook.body)
 }
@@ -31,6 +33,111 @@ function testProofs(profile, username, totalProofs) {
       t.equal(proofs.length, totalProofs, "Should have a proof for each of the 3 claimed accounts")
       FetchMock.restore()
     })
+  })
+}
+
+export function runProofStatementUnitTests() {
+  test('getProofStatement', (t) => {
+    t.plan(7)
+
+    const larry = sampleVerifications.larry
+    const naval = sampleVerifications.naval
+    const ken = sampleAddressBasedVerifications.ken
+
+    t.equal(profileServices.facebook.getProofStatement(larry.facebook.body),
+      'Verifying that "larry.id" is my Blockstack ID.',
+      'Should extract proof statement from Facebook page meta tags')
+
+    t.equal(profileServices.twitter.getProofStatement(naval.twitter.body),
+      'Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin',
+      'Should extract proof statement from Twitter page meta tags')
+
+    t.equal(profileServices.twitter.getProofStatement(ken.twitter.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
+      'Should extract address-based proof statement from Twitter page meta tags')
+
+    t.equal(profileServices.instagram.getProofStatement(ken.instagram.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
+      'Should extract address-based proof statement from Instagram meta tags')
+
+    t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
+      'Should extract address-based proof statement from Hacker News profile')
+
+    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body),
+      'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
+      'Should extract address-based proof statement from Hacker News profile')
+
+    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedInBroken.body),
+      '',
+      'Should not crash on broken LinkedIn proof link')
+  })
+}
+
+export function runOwnerAddressBasedProofsUnitTests() {
+  test('containsValidAddressProofStatement', (t) => {
+    t.plan(12)
+
+    const larry = sampleAddressBasedVerifications.larry
+    const ken = sampleAddressBasedVerifications.ken
+
+    const facebookProofStatement = profileServices.facebook.getProofStatement(larry.facebook.body)
+    const twitterProofStatement = profileServices.twitter.getProofStatement(ken.twitter.body)
+    const githubProofStatement = profileServices.github.getProofStatement(ken.github.body)
+    const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body)
+    const hackerNewsProofStatement = profileServices.hackerNews.getProofStatement(ken.hackerNews.body)
+    const linkedInProofStatement = profileServices.linkedIn.getProofStatement(ken.linkedIn.body)
+
+    t.equals(containsValidAddressProofStatement(facebookProofStatement, '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
+      true, "Facebook post meta tags should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(facebookProofStatement, 'differentBitcoinAddress', true),
+      false, "Facebook post meta tags should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(twitterProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Twitter status meta tags should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(twitterProofStatement, 'differentBitcoinAddress', true),
+      false, "Twitter status meta tags should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(githubProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Github gist body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(githubProofStatement, 'differentBitcoinAddress', true),
+      false, "Github gist body should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(instagramProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Instagram body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(instagramProofStatement, 'differentBitcoinAddress', true),
+      false, "Instagram body should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(hackerNewsProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "Hacker News body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(hackerNewsProofStatement, 'differentBitcoinAddress', true),
+      false, "Hacker News body should not contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(linkedInProofStatement, '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+      true, "LinkedIn body should contain valid bitcoin address proof statement")
+
+    t.equals(containsValidAddressProofStatement(linkedInProofStatement, 'differentBitcoinAddress', true),
+      false, "LinkedIn body should not contain valid bitcoin address proof statement")
+  })
+}
+
+export function runInBodyIdentityVerificationTests() {
+  test('getProofIdentity', (t) => {
+    t.plan(2)
+    const ken = sampleAddressBasedVerifications.ken
+
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body),
+      'blckstcktest',
+      'Should extract social proof identity from Instagram proof page body')
+
+    t.equal(profileServices.linkedIn.getProofIdentity(ken.linkedIn.body),
+      'blck-stck',
+      'Should extract social proof identity from LinkedIn proof page body')
   })
 }
 
@@ -117,28 +224,73 @@ export function runProofServicesUnitTests() {
       "Facebook URL should be normalized")
   })
 
+  test('normalize Instagarm URLs', (t) => {
+    t.plan(4)
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "https://instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "http://www.instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+    t.equal(profileServices.instagram.normalizeInstagramUrl(
+      {
+        service: 'instagram',
+        proof_url: "http://instagram.com/p/BZ7KMM0A-Qc/",
+        identifier: "blckstcktest"
+      }),
+      "https://www.instagram.com/p/BZ7KMM0A-Qc/",
+      "Instagram URL should be normalized")
+  })
+
   test('get proof url', (t) => {
-    t.plan(7)
+    t.plan(10)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       "https://www.facebook.com/navalr/posts/10152190734077261",
       "Facebook proof URL should match reference")
     t.equal(profileServices.github.getProofUrl(sampleProofs.naval[2]),
-      "https://gist.github.com/navalr/f31a74054f859ec0ac6a",
-      "Facebook proof URL should match reference")
+      "https://gist.github.com/navalr/f31a74054f859ec0ac6a/raw",
+      "Github proof URL should match reference")
     t.equal(profileServices.twitter.getProofUrl(sampleProofs.naval[0]),
       "https://twitter.com/naval/status/486609266212499456",
-      "Facebook proof URL should match reference")
+      "Twitter proof URL should match reference")
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.larry[0]),
       "https://www.facebook.com/larry.salibra/posts/10100341028448093",
       "Facebook proof URL should match reference")
+    t.equal(profileServices.instagram.getProofUrl(sampleProofs.ken[0]),
+      "https://www.instagram.com/p/BYj6UDwgaX7/",
+      "Instagram proof URL should match reference")
+    t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.ken[1]),
+      "https://news.ycombinator.com/user?id=yukanl",
+      "Hacker News proof URL should match reference")
+    t.equal(profileServices.linkedIn.getProofUrl(sampleProofs.ken[2]),
+      "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
+      "LinkedIn proof URL should match reference")
 
-    t.throws(() => {
-      const notLarry = Object.assign({},
-        sampleProofs.larry[0], {
-          proof_url: 'https://www.facebook.com/not.larry/posts/10100341028448093'
-        })
-      profileServices.facebook.getProofUrl(notLarry)
-    }, /Error/, 'Not having claimed account identifier in Facebook proof URL should throw exception')
+    // t.throws(() => {
+    //   const notLarry = Object.assign({},
+    //     sampleProofs.larry[0], {
+    //       proof_url: 'https://www.facebook.com/not.larry/posts/10100341028448093'
+    //     })
+    //   profileServices.facebook.getProofUrl(notLarry)
+    // }, /Error/, 'Not having claimed account identifier in Facebook proof URL should throw exception')
 
     t.throws(() => {
       const notNavalTwitter = Object.assign({},
@@ -155,12 +307,26 @@ export function runProofServicesUnitTests() {
         })
       profileServices.github.getProofUrl(notNavalGithub)
     }, /Error/, 'Not having claimed account identifier in Github proof URL should throw exception')
+
+    t.throws(() => {
+      const notKenHackerNews = Object.assign({},
+        sampleProofs.ken[0], {
+          proof_url: 'https://news.ycombinator.com/user?id=notken'
+        })
+      profileServices.github.getProofUrl(notKenHackerNews)
+    }, /Error/, 'Not having claimed account identifier in Hacker News proof URL should throw exception')
   })
 }
 
 export function runProofsUnitTests() {
   // Proof utils
   runProofUtilsUnitTests()
+  // Proof statements
+  runProofStatementUnitTests()
+  // Proof address based
+  runOwnerAddressBasedProofsUnitTests()
+  // Proof identity extract from response body
+  runInBodyIdentityVerificationTests()
   // Proof services
   runProofServicesUnitTests()
   // Proof HTML

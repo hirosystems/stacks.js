@@ -73,6 +73,10 @@ if (blockstack.isUserSignedIn()) {
 }
 ```
 
+Make sure your manifest.json file has appropriate CORS headers so that it can
+be fetched via an http `GET` from any origin.
+
+
 7) Serve your application
 
 ## Operations
