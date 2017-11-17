@@ -398,8 +398,8 @@ function makeAuthResponse(privateKey) {
     core_token: coreTokenPayload
   }, additionalProperties);
 
-    /* Sign and return the token */
-  };var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
+  /* Sign and return the token */
+  var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
   return tokenSigner.sign(payload);
 }
 }).call(this,require("buffer").Buffer)
@@ -11975,34 +11975,52 @@ module.exports = BigInteger
 module.exports={
   "_args": [
     [
-      "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      {
+        "raw": "bigi@^1.4.0",
+        "scope": null,
+        "escapedName": "bigi",
+        "name": "bigi",
+        "rawSpec": "^1.4.0",
+        "spec": ">=1.4.0 <2.0.0",
+        "type": "range"
+      },
+      "/Users/keenanjohnson/open-source/blockstack.js/node_modules/bitcoinjs-lib"
     ]
   ],
-  "_from": "bigi@1.4.2",
+  "_from": "bigi@>=1.4.0 <2.0.0",
   "_id": "bigi@1.4.2",
-  "_inBundle": false,
-  "_integrity": "sha1-nGZalfiLiwj8Bc/XMfVhhZ1yWCU=",
+  "_inCache": true,
+  "_installable": true,
   "_location": "/bigi",
+  "_nodeVersion": "6.1.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/bigi-1.4.2.tgz_1469584192413_0.6801238611806184"
+  },
+  "_npmUser": {
+    "name": "jprichardson",
+    "email": "jprichardson@gmail.com"
+  },
+  "_npmVersion": "3.8.6",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "bigi@1.4.2",
-    "name": "bigi",
+    "raw": "bigi@^1.4.0",
+    "scope": null,
     "escapedName": "bigi",
-    "rawSpec": "1.4.2",
-    "saveSpec": null,
-    "fetchSpec": "1.4.2"
+    "name": "bigi",
+    "rawSpec": "^1.4.0",
+    "spec": ">=1.4.0 <2.0.0",
+    "type": "range"
   },
   "_requiredBy": [
-    "/",
     "/bitcoinjs-lib",
     "/ecurve"
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
-  "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+  "_shrinkwrap": null,
+  "_spec": "bigi@^1.4.0",
+  "_where": "/Users/keenanjohnson/open-source/blockstack.js/node_modules/bitcoinjs-lib",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -12015,6 +12033,12 @@ module.exports={
     "mocha": "^2.1.0",
     "mochify": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+    "tarball": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz"
+  },
+  "gitHead": "c25308081c896ff84702303722bf5ecd8b3f78e3",
   "homepage": "https://github.com/cryptocoinjs/bigi#readme",
   "keywords": [
     "cryptography",
@@ -12034,7 +12058,27 @@ module.exports={
     "float"
   ],
   "main": "./lib/index.js",
+  "maintainers": [
+    {
+      "name": "midnightlightning",
+      "email": "boydb@midnightdesign.ws"
+    },
+    {
+      "name": "sidazhang",
+      "email": "sidazhang89@gmail.com"
+    },
+    {
+      "name": "nadav",
+      "email": "npm@shesek.info"
+    },
+    {
+      "name": "jprichardson",
+      "email": "jprichardson@gmail.com"
+    }
+  ],
   "name": "bigi",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "url": "git+https://github.com/cryptocoinjs/bigi.git",
     "type": "git"
@@ -23540,43 +23584,12 @@ function fromByteArray (uint8) {
     // Handle the residue
     if (bitsLeft > 0) {
       this.words[i] = ~this.words[i] & (0x3ffffff >> (26 - bitsLeft));
-}).call(this,require("buffer").Buffer)
-},{"./aes":128,"buffer":160,"cipher-base":162,"inherits":223}],143:[function(require,module,exports){
-var ebtk = require('evp_bytestokey')
-var aes = require('browserify-aes/browser')
-var desModes = require('browserify-des/modes')
-var aesModes = require('browserify-aes/modes')
-function createCipher (suite, password) {
-  var keyLen, ivLen
-  suite = suite.toLowerCase()
-  if (aesModes[suite]) {
-    keyLen = aesModes[suite].key
-    ivLen = aesModes[suite].iv
-  } else if (desModes[suite]) {
-    keyLen = desModes[suite].key * 8
-    ivLen = desModes[suite].iv
-  } else {
-    throw new TypeError('invalid suite type')
-  }
-  var keys = ebtk(password, false, keyLen, ivLen)
-  return createCipheriv(suite, keys.key, keys.iv)
-}
-function createDecipher (suite, password) {
-  var keyLen, ivLen
-  suite = suite.toLowerCase()
-  if (aesModes[suite]) {
-    keyLen = aesModes[suite].key
-    ivLen = aesModes[suite].iv
-  } else if (desModes[suite]) {
-    keyLen = desModes[suite].key * 8
-    ivLen = desModes[suite].iv
-  } else {
-    throw new TypeError('invalid suite type')
-  }
-  var keys = ebtk(password, false, keyLen, ivLen)
-  return createDecipheriv(suite, keys.key, keys.iv)
-}
-=======
+    }
+
+    // And remove leading zeroes
+    return this.strip();
+  };
+
   BN.prototype.notn = function notn (width) {
     return this.clone().inotn(width);
   };
@@ -24524,15 +24537,14 @@ function createDecipher (suite, password) {
   };
 
   FFTM.prototype.conjugate = function conjugate (rws, iws, N) {
+    if (N <= 1) return;
+
+    for (var i = 0; i < N / 2; i++) {
+      var t = rws[i];
+
+      rws[i] = rws[N - i - 1];
       rws[N - i - 1] = t;
 
-}).call(this,require("buffer").Buffer)
-},{"buffer":160}],159:[function(require,module,exports){
-(function (Buffer){
-module.exports = function xor (a, b) {
-  var length = Math.min(a.length, b.length)
-  var buffer = new Buffer(length)
-=======
       t = iws[i];
 
       iws[i] = -iws[N - i - 1];
@@ -26248,8 +26260,6 @@ if (typeof self === 'object') {
     };
   } catch (e) {
   }
-
-  done(err)
 }
 
 },{"crypto":160}],160:[function(require,module,exports){
@@ -26995,7 +27005,6 @@ function encryptByte (self, byteParam, decrypt) {
   }
   return out
 }
-module.exports = Hmac
 
 function shiftIn (buffer, value) {
   var len = buffer.length
@@ -40964,29 +40973,34 @@ exports.isHtml = function(str) {
 
 },{"./parse":286,"dom-serializer":299}],289:[function(require,module,exports){
 module.exports={
-  "_from": "cheerio@^0.22.0",
+  "_args": [
+    [
+      "cheerio@0.22.0",
+      "/Users/keenanjohnson/open-source/blockstack.js"
+    ]
+  ],
+  "_from": "cheerio@0.22.0",
   "_id": "cheerio@0.22.0",
   "_inBundle": false,
   "_integrity": "sha1-qbqoYKP5tZWmuBsahocxIe06Jp4=",
   "_location": "/cheerio",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "cheerio@^0.22.0",
+    "raw": "cheerio@0.22.0",
     "name": "cheerio",
     "escapedName": "cheerio",
-    "rawSpec": "^0.22.0",
+    "rawSpec": "0.22.0",
     "saveSpec": null,
-    "fetchSpec": "^0.22.0"
+    "fetchSpec": "0.22.0"
   },
   "_requiredBy": [
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
-  "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
-  "_spec": "cheerio@^0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_spec": "0.22.0",
+  "_where": "/Users/keenanjohnson/open-source/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -40995,7 +41009,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/cheeriojs/cheerio/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "css-select": "~1.2.0",
     "dom-serializer": "~0.1.0",
@@ -41014,7 +41027,6 @@ module.exports={
     "lodash.reject": "^4.4.0",
     "lodash.some": "^4.4.0"
   },
-  "deprecated": false,
   "description": "Tiny, fast, and elegant implementation of core jQuery designed specifically for the server",
   "devDependencies": {
     "benchmark": "^2.1.0",
@@ -49213,31 +49225,55 @@ utils.encode = function encode(arr, enc) {
 
 },{}],350:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.4.0",
+  "_args": [
+    [
+      {
+        "raw": "elliptic@^6.4.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.4.0",
+        "spec": ">=6.4.0 <7.0.0",
+        "type": "range"
+      },
+      "/Users/keenanjohnson/open-source/blockstack.js"
+    ]
+  ],
+  "_from": "elliptic@>=6.4.0 <7.0.0",
   "_id": "elliptic@6.4.0",
-  "_inBundle": false,
-  "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
+  "_inCache": true,
+  "_installable": true,
   "_location": "/elliptic",
+  "_nodeVersion": "7.0.0",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/elliptic-6.4.0.tgz_1487798866428_0.30510620190761983"
+  },
+  "_npmUser": {
+    "name": "indutny",
+    "email": "fedor@indutny.com"
+  },
+  "_npmVersion": "3.10.8",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
-    "registry": true,
     "raw": "elliptic@^6.4.0",
-    "name": "elliptic",
+    "scope": null,
     "escapedName": "elliptic",
+    "name": "elliptic",
     "rawSpec": "^6.4.0",
-    "saveSpec": null,
-    "fetchSpec": "^6.4.0"
+    "spec": ">=6.4.0 <7.0.0",
+    "type": "range"
   },
   "_requiredBy": [
     "/",
     "/blockstack-storage",
-    "/browserify/browserify-sign",
-    "/browserify/create-ecdh",
+    "/browserify-sign",
+    "/create-ecdh",
     "/jsontokens"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+  "_shrinkwrap": null,
   "_spec": "elliptic@^6.4.0",
   "_where": "/Users/keenanjohnson/open-source/blockstack.js",
   "author": {
@@ -49247,7 +49283,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -49257,7 +49292,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -49275,9 +49309,15 @@ module.exports={
     "jshint": "^2.6.0",
     "mocha": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz"
+  },
   "files": [
     "lib"
   ],
+  "gitHead": "6b0d2b76caae91471649c8e21f0b1d3ba0f96090",
   "homepage": "https://github.com/indutny/elliptic",
   "keywords": [
     "EC",
@@ -49287,7 +49327,15 @@ module.exports={
   ],
   "license": "MIT",
   "main": "lib/elliptic.js",
+  "maintainers": [
+    {
+      "name": "indutny",
+      "email": "fedor@indutny.com"
+    }
+  ],
   "name": "elliptic",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/indutny/elliptic.git"
@@ -52069,21 +52117,13 @@ var MissingParametersError = exports.MissingParametersError = function (_Error) 
 
   function MissingParametersError(message) {
     _classCallCheck(this, MissingParametersError);
-// on the global object (window or self)
-//
-require('whatwg-fetch');
-module.exports = self.fetch.bind(self);
 
-},{"whatwg-fetch":424}],227:[function(require,module,exports){
-var json = typeof JSON !== 'undefined' ? JSON : require('jsonify');
-=======
     var _this = _possibleConstructorReturn(this, (MissingParametersError.__proto__ || Object.getPrototypeOf(MissingParametersError)).call(this));
 
     _this.name = 'MissingParametersError';
     _this.message = message || '';
     return _this;
   }
->>>>>>> develop
 
   return MissingParametersError;
 }(Error);
@@ -61808,29 +61848,34 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":433}],450:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^5.1.0",
+  "_args": [
+    [
+      "elliptic@5.2.1",
+      "/Users/keenanjohnson/open-source/blockstack.js"
+    ]
+  ],
+  "_from": "elliptic@5.2.1",
   "_id": "elliptic@5.2.1",
   "_inBundle": false,
   "_integrity": "sha1-+ilLZWPG3bybo9yFlGh66ECFjxA=",
   "_location": "/jsontokens/key-encoder/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^5.1.0",
+    "raw": "elliptic@5.2.1",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^5.1.0",
+    "rawSpec": "5.2.1",
     "saveSpec": null,
-    "fetchSpec": "^5.1.0"
+    "fetchSpec": "5.2.1"
   },
   "_requiredBy": [
     "/jsontokens/key-encoder"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
-  "_shasum": "fa294b6563c6ddbc9ba3dc8594687ae840858f10",
-  "_spec": "elliptic@^5.1.0",
-  "_where": "/Users/larry/git/blockstack.js/node_modules/jsontokens/node_modules/key-encoder",
+  "_spec": "5.2.1",
+  "_where": "/Users/keenanjohnson/open-source/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -61838,14 +61883,12 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^3.1.1",
     "brorand": "^1.0.1",
     "hash.js": "^1.0.0",
     "inherits": "^2.0.1"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "browserify": "^3.44.2",
@@ -66775,7 +66818,6 @@ function keys(object) {
 function identity(value) {
   return value;
 }
-module.exports = defaultEncoding
 
 /**
  * Creates a function that returns the value at `path` of a given object.
