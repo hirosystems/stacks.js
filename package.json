@@ -3,6 +3,7 @@
   "version": "0.13.5",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
