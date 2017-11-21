@@ -1,14 +1,7 @@
-const DUST_MINIMUM = 5500
 import bitcoin from 'bitcoinjs-lib'
-import RIPEMD160 from 'ripemd160'
+import { hash160, hash128, DUST_MINIMUM } from './util'
 
 // todo : add name length / character verification
-
-function hash160(buff: Buffer){
-    const sha256 = bitcoin.crypto.sha256(buff);
-    const ret =  (new RIPEMD160()).update(sha256).digest();
-    return ret;
-}
 
 
 function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string,
@@ -29,7 +22,7 @@ function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
   const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress)
 
-  const dataBuffers = [ nameBuff, scriptPublicKey ]
+  const dataBuffers = [nameBuff, scriptPublicKey]
 
   if (registerAddress) {
     const registerBuff = Buffer.from(registerAddress, 'ascii')
@@ -57,7 +50,7 @@ function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string
 }
 
 function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress: string,
-                              ownerAddress: string, valueHash: string=null) {
+                              ownerAddress: string, valueHash: string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -70,20 +63,20 @@ function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress: strin
   let payload
 
   if (valueHash) {
-    if (valueHash.length != 40) {
-      throw new Exception('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
+    if (valueHash.length !== 40) {
+      throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
     }
-    payload = Buffer.alloc(57, fill=0)
+    payload = Buffer.alloc(57, 0)
     payload.write(fullyQualifiedName, 0, 37, 'ascii')
     payload.write(valueHash, 37, 20, 'hex')
   } else {
     payload = Buffer.from(fullyQualifiedName, 'ascii')
   }
 
-  const opReturnBuffer = Buffer.concat([ Buffer.from('id:', 'ascii'), payload ])
+  const opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload])
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
 
-  const tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(registerAddress, DUST_MINIMUM)
@@ -100,24 +93,24 @@ function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: string,
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
-  const op_ret = Buffer.alloc(36)
+  const opRet = Buffer.alloc(36)
   let keepChar = '~'
-  if(keepZonefile){
+  if (keepZonefile) {
     keepChar = '>'
   }
 
-  op_ret.write('id>', 0, 3, 'ascii')
-  op_ret.write(keepChar, 3, 1, 'ascii')
+  opRet.write('id>', 0, 3, 'ascii')
+  opRet.write(keepChar, 3, 1, 'ascii')
 
-  const hashed = utils.hash128(Buffer.from(fullyQualifiedName, 'ascii'))
-  hashed.copy(op_ret, 4)
-  op_ret.write(consensusHash, 20, 16, 'hex')
+  const hashed = hash128(Buffer.from(fullyQualifiedName, 'ascii'))
+  hashed.copy(opRet, 4)
+  opRet.write(consensusHash, 20, 16, 'hex')
 
-  const op_ret_payload = bitcoin.script.nullDataOutput(op_ret)
+  const opRetPayload = bitcoin.script.nullDataOutput(opRet)
 
-  const tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder()
 
-  tx.addOutput(op_ret_payload, 0)
+  tx.addOutput(opRetPayload, 0)
   tx.addOutput(newOwner, DUST_MINIMUM)
 
   return tx.buildIncomplete()
@@ -132,27 +125,29 @@ function makeUpdateSkeleton(fullyQualifiedName : string, consensusHash : string,
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
-  const op_ret = Buffer.alloc(39)
+  const opRet = Buffer.alloc(39)
 
-  const nameBuff = Buffer.from(fqa, 'ascii')
+  const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
   const consensusBuff = Buffer.from(consensusHash, 'ascii')
 
-  const hashedName = utils.hash128(Buffer.concat(
+  const hashedName = hash128(Buffer.concat(
     [nameBuff, consensusBuff]))
 
-  const hashedZonefile = utils.hash160(zonefile)
+  const hashedZonefile = hash160(zonefile)
 
-  op_ret.write('id+', 0, 3, 'ascii')
-  hashedName.copy(op_ret, 3)
-  hashedZonefile.copy(op_ret, 19)
+  opRet.write('id+', 0, 3, 'ascii')
+  hashedName.copy(opRet, 3)
+  hashedZonefile.copy(opRet, 19)
 
-  const op_ret_payload = bitcoin.script.nullDataOutput(op_ret)
+  const opRetPayload = bitcoin.script.nullDataOutput(opRet)
 
-  var tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder()
 
-  tx.addOutput(op_ret_payload, 0)
+  tx.addOutput(opRetPayload, 0)
 
   return tx.buildIncomplete()
 }
 
-exports.makePreorderSkeleton = makePreorderSkeleton
+exports = {
+  makePreorderSkeleton, makeUpdateSkeleton, makeRegisterSkeleton,
+  makeTransferSkeleton }

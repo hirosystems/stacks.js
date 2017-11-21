@@ -1,31 +1,30 @@
 import bitcoinjs from 'bitcoinjs-lib'
-import coinSelectUtils from 'coinselect/utils'
 
+import { addUTXOsToFund, getConsensusHash, getUTXOs,
+         estimateTXBytes, getFeeRate, getNamePrice } from './util'
 import { makePreorderSkeleton } from './skeletons'
 
 function addOwnerInput(utxos: Object,
                        txIn: bitcoinjs.Transaction) {
-  let txBuilder = TransactionBuilder.fromTransaction(txIn)
-  utxos.sort( (a, b) => a.value - b.value )
+  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn)
+  utxos.sort((a, b) => a.value - b.value)
   const selected = utxos[0]
-  txBuilder.addInput(selected.tx_hash, selected.tx_output_n)
-  return txBuilder.buildIncomplete()
+  txB.addInput(selected.tx_hash, selected.tx_output_n)
+  return txB.buildIncomplete()
 }
 
 function makeEphemeralKey() {
   return bitcoinjs.ECPair.makeRandom()
 }
 
-const DUST_MINIMUM = 5500
-
 function performPreorder(fullyQualifiedName: string,
                          destinationAddress: string,
-                         paymentKey: ECPair) {
+                         paymentKey: bitcoinjs.ECPair) {
   const burnAddress = '1111111111111111111114oLvT2'
   const registerAddress = destinationAddress
   const preorderAddress = paymentKey.getAddress()
 
-  const preorderPromise = Promise.all([getConsensusHash(), getNamePrice(fullyQualifiedName) ])
+  const preorderPromise = Promise.all([getConsensusHash(), getNamePrice(fullyQualifiedName)])
         .then(inputs => {
           const consensusHash = inputs[0]
           const namePrice = inputs[1]
@@ -40,7 +39,7 @@ function performPreorder(fullyQualifiedName: string,
       const feeRate = inputs[1]
       const preorderSkeleton = inputs[2]
       const txFee = estimateTXBytes(preorderSkeleton, 1, 0) * feeRate
-      const outAmounts = preorderSkeleton.outs.reduce( (agg, x) => agg + x.value )
+      const outAmounts = preorderSkeleton.outs.reduce((agg, x) => agg + x.value)
 
       return addUTXOsToFund(
         preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate)
@@ -54,6 +53,5 @@ function performPreorder(fullyQualifiedName: string,
     })
 }
 
-exports.makeEphemeralKey = makeEphemeralKey
-exports.performPreorder = performPreorder
+exports = { makeEphemeralKey, performPreorder, addOwnerInput }
 
