@@ -53,6 +53,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     manifest_uri: manifestURI,
     redirect_uri: redirectURI,
     version: VERSION,
+    do_not_include_profile: true,
     scopes
   }
 
@@ -101,12 +102,14 @@ export function makeAuthResponse(privateKey: string,
   let privateKeyPayload = appPrivateKey
   let coreTokenPayload = coreToken
   let additionalProperties = {}
-  if (transitPublicKey !== undefined && transitPublicKey !== null &&
-      appPrivateKey !== undefined && appPrivateKey !== null &&
-      coreToken !== undefined && coreToken !== null) {
+  if (appPrivateKey !== undefined && appPrivateKey !== null) {
     console.log(`blockstack.js: generating v${VERSION} auth response`)
-    privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
-    coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
+    if (transitPublicKey !== undefined && transitPublicKey !== null) {
+      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+      if (coreToken !== undefined && coreToken !== null) {
+        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
+      }
+    }
     additionalProperties = {
       email: metadata.email ? metadata.email : null,
       profile_url: metadata.profileUrl ? metadata.profileUrl : null,
