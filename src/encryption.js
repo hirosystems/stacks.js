@@ -52,8 +52,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer) {
   const ephemeralPK = ephemeralSK.getPublic()
 
   const sharedSecret = ephemeralSK.derive(ecPK)
-  const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecret.toString('hex'), 'hex'))
+  const sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer())
 
   const initializationVector = crypto.randomBytes(16)
 
@@ -85,8 +84,7 @@ export function decryptECIES(privateKey: string, cipherObject: string) {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
   const ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic()
   const sharedSecret = ecSK.derive(ephemeralPK)
-  const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecret.toString('hex'), 'hex'))
+  const sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer())
 
   const ivBuffer = new Buffer(cipherObject.iv, 'hex')
   const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')
