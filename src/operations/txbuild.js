@@ -5,7 +5,8 @@ import { addUTXOsToFund, getConsensusHash, getUTXOs,
 import { makePreorderSkeleton } from './skeletons'
 
 function addOwnerInput(utxos: Object,
-                       txIn: bitcoinjs.Transaction) {
+                       txIn: bitcoinjs.Transaction,
+                       network: Object) {
   const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn)
   utxos.sort((a, b) => a.value - b.value)
   const selected = utxos[0]
@@ -19,7 +20,8 @@ function makeEphemeralKey() {
 
 function performPreorder(fullyQualifiedName: string,
                          destinationAddress: string,
-                         paymentKey: bitcoinjs.ECPair) {
+                         paymentKey: bitcoinjs.ECPair,
+                         network: Object = bitcoinjs.network.mainnet) {
   const burnAddress = '1111111111111111111114oLvT2'
   const registerAddress = destinationAddress
   const preorderAddress = paymentKey.getAddress()
@@ -30,7 +32,7 @@ function performPreorder(fullyQualifiedName: string,
           const namePrice = inputs[1]
           return makePreorderSkeleton(
             fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
-            namePrice, registerAddress)
+            namePrice, registerAddress, network)
         })
 
   return Promise.all([getUTXOs(preorderAddress), getFeeRate(), preorderPromise])
@@ -42,10 +44,10 @@ function performPreorder(fullyQualifiedName: string,
       const outAmounts = preorderSkeleton.outs.reduce((agg, x) => agg + x.value)
 
       return addUTXOsToFund(
-        preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate)
+        preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate, network)
     })
     .then(unsignedTx => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx)
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network)
       for (let i = 0; i < txB.ins.length; i++) {
         txB.sign(i, paymentKey)
       }

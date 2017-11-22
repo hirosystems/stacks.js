@@ -7,6 +7,11 @@ const blockstackAPIUrl = 'https://core.blockstack.org'
 const DUST_MINIMUM = 5500
 
 function getUTXOs(address: string) {
+  // sigh. for regtest, this is going to be weird.
+  //   either, we write a driver kit for plugging into
+  //   different backends (I do not like.) or we assume
+  //   an API for the UTXO provider, and stand-up a simple
+  //   wrapper daemon for regtest / local bitcoind comms.
   return fetch(`${utxoProviderUrl}${address}`)
     .then(resp => resp.json())
 }
@@ -25,8 +30,8 @@ function hash128(buff: Buffer) {
   return Buffer.from(bitcoinjs.crypto.sha256(buff).slice(0, 16))
 }
 
-function estimateTXBytes(txIn : bitcoinjs.Transaction,
-                         additionalInputs : number, additionalOutputs : number) {
+function estimateTXBytes(txIn : bitcoinjs.Transaction, additionalInputs : number,
+                         additionalOutputs : number) {
   const inputs = [].concat(txIn.ins, new Array(additionalInputs))
   const outputs = [].concat(txIn.outs, new Array(additionalOutputs))
   return coinSelectUtils.transactionBytes(inputs, outputs)
@@ -36,12 +41,9 @@ function countDustOutputs() {
 
 }
 
-function addUTXOsToFund(txIn: bitcoinjs.Transaction,
-                        funderAddress: string,
-                        utxos: Object,
-                        amountToFund: number,
-                        feeRate: number) {
-  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn)
+function addUTXOsToFund(txIn: bitcoinjs.Transaction, funderAddress: string, utxos: Object,
+                        amountToFund: number, feeRate: number, network: Object) {
+  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn, network)
 
   if (utxos.length === 0) {
     throw new Error('Not enough UTXOs to fund')
@@ -69,7 +71,7 @@ function addUTXOsToFund(txIn: bitcoinjs.Transaction,
 
     return addUTXOsToFund(txB.buildIncomplete(),
                           funderAddress, utxos.slice(1),
-                          remainToFund, feeRate)
+                          remainToFund, feeRate, network)
   }
 }
 
