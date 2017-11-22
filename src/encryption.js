@@ -35,6 +35,20 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
            hmacKey: hashedSecret.slice(32) }
 }
 
+function getEncryptionKeys(publicKey: string) {
+  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
+  const ephemeralSK = ecurve.genKeyPair()
+  const ephemeralPK = ephemeralSK.getPublic()
+  const sharedSecret = ephemeralSK.derive(ecPK)
+  const sharedSecretHex = sharedSecret.toString('hex')
+
+  if (sharedSecretHex.length === 64) {
+    return { sharedSecret, ephemeralPK }
+  }
+
+  return getEncryptionKeys(publicKey)
+}
+
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
  * @param {String} publicKey - secp256k1 public key hex string
@@ -47,11 +61,8 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
 export function encryptECIES(publicKey: string, content: string | Buffer) {
   const isString = (typeof(content) === 'string')
   const plainText = new Buffer(content) // always copy to buffer
-  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
-  const ephemeralSK = ecurve.genKeyPair()
-  const ephemeralPK = ephemeralSK.getPublic()
+  const { sharedSecret, ephemeralPK } = getEncryptionKeys(publicKey)
 
-  const sharedSecret = ephemeralSK.derive(ecPK)
   const sharedKeys = sharedSecretToKeys(
     new Buffer(sharedSecret.toString('hex'), 'hex'))
 
