@@ -1109,6 +1109,7 @@ function getEncryptionKeys(publicKey) {
 function encryptECIES(publicKey, content) {
   var isString = typeof content === 'string';
   var plainText = new Buffer(content); // always copy to buffer
+
   var _getEncryptionKeys = getEncryptionKeys(publicKey),
       sharedSecret = _getEncryptionKeys.sharedSecret,
       ephemeralPK = _getEncryptionKeys.ephemeralPK;
