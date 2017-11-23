@@ -35,18 +35,14 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
            hmacKey: hashedSecret.slice(32) }
 }
 
-function getEncryptionKeys(publicKey: string) {
-  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
-  const ephemeralSK = ecurve.genKeyPair()
-  const ephemeralPK = ephemeralSK.getPublic()
-  const sharedSecret = ephemeralSK.derive(ecPK)
-  const sharedSecretHex = sharedSecret.toString('hex')
+function getHexFromBN(bnInput: Object) {
+  const hexOut = bnInput.toString('hex')
 
-  if (sharedSecretHex.length === 64) {
-    return { sharedSecret, ephemeralPK }
+  if (hexOut.length === 64) {
+    return hexOut
+  } else {
+    return `0${hexOut}`
   }
-
-  return getEncryptionKeys(publicKey)
 }
 
 /**
@@ -61,10 +57,16 @@ function getEncryptionKeys(publicKey: string) {
 export function encryptECIES(publicKey: string, content: string | Buffer) {
   const isString = (typeof(content) === 'string')
   const plainText = new Buffer(content) // always copy to buffer
-  const { sharedSecret, ephemeralPK } = getEncryptionKeys(publicKey)
+
+  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
+  const ephemeralSK = ecurve.genKeyPair()
+  const ephemeralPK = ephemeralSK.getPublic()
+  const sharedSecret = ephemeralSK.derive(ecPK)
+
+  const sharedSecretHex = getHexFromBN(sharedSecret)
 
   const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecret.toString('hex'), 'hex'))
+    new Buffer(sharedSecretHex, 'hex'))
 
   const initializationVector = crypto.randomBytes(16)
 
@@ -96,7 +98,9 @@ export function decryptECIES(privateKey: string, cipherObject: string) {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
   const ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic()
   const sharedSecret = ecSK.derive(ephemeralPK)
-  const sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer())
+  const sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex')
+
+  const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
   const ivBuffer = new Buffer(cipherObject.iv, 'hex')
   const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')
