@@ -11225,7 +11225,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/home/aaron/devel/blockstack.js"
+      "/Users/brandonparee/work/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -11251,7 +11251,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_where": "/Users/brandonparee/work/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -40181,7 +40181,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/home/aaron/devel/blockstack.js"
+      "/Users/brandonparee/work/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -40205,7 +40205,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_where": "/Users/brandonparee/work/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -48672,7 +48672,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/home/aaron/devel/blockstack.js"
+      "/Users/brandonparee/work/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -48700,7 +48700,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_where": "/Users/brandonparee/work/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -61777,7 +61777,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/home/aaron/devel/blockstack.js"
+      "/Users/brandonparee/work/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -61801,7 +61801,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_where": "/Users/brandonparee/work/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
