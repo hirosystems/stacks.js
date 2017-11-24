@@ -1083,6 +1083,16 @@ function sharedSecretToKeys(sharedSecret) {
     hmacKey: hashedSecret.slice(32) };
 }
 
+function getHexFromBN(bnInput) {
+  var hexOut = bnInput.toString('hex');
+
+  if (hexOut.length === 64) {
+    return hexOut;
+  } else {
+    return '0' + hexOut;
+  }
+}
+
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
  * @param {String} publicKey - secp256k1 public key hex string
@@ -1095,12 +1105,15 @@ function sharedSecretToKeys(sharedSecret) {
 function encryptECIES(publicKey, content) {
   var isString = typeof content === 'string';
   var plainText = new Buffer(content); // always copy to buffer
+
   var ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
   var ephemeralSK = ecurve.genKeyPair();
   var ephemeralPK = ephemeralSK.getPublic();
-
   var sharedSecret = ephemeralSK.derive(ecPK);
-  var sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer());
+
+  var sharedSecretHex = getHexFromBN(sharedSecret);
+
+  var sharedKeys = sharedSecretToKeys(new Buffer(sharedSecretHex, 'hex'));
 
   var initializationVector = _crypto2.default.randomBytes(16);
 
@@ -1129,7 +1142,9 @@ function decryptECIES(privateKey, cipherObject) {
   var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
   var ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
   var sharedSecret = ecSK.derive(ephemeralPK);
-  var sharedKeys = sharedSecretToKeys(sharedSecret.toBuffer());
+  var sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex');
+
+  var sharedKeys = sharedSecretToKeys(sharedSecretBuffer);
 
   var ivBuffer = new Buffer(cipherObject.iv, 'hex');
   var cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex');
