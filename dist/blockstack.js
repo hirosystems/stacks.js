@@ -3412,6 +3412,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getFile = getFile;
 exports.putFile = putFile;
+exports.deleteFile = deleteFile;
 
 var _blockstackStorage = require('blockstack-storage');
 
@@ -3460,6 +3461,16 @@ function putFile(path, content) {
     content = JSON.stringify(cipherObject);
   }
   return (0, _blockstackStorage.putFile)(path, content);
+}
+
+/**
+ * Deletes the specified file from the app's data store.
+ * @param {String} path - the path to the file to delete
+ * @returns {Promise} that resolves when the file has been removed
+ * or rejects with an error
+ */
+function deleteFile(path) {
+  return (0, _blockstackStorage.deleteFile)(path);
 }
 },{"../auth":7,"../encryption":9,"../keys":12,"blockstack-storage":136}],35:[function(require,module,exports){
 'use strict';
