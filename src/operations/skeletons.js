@@ -1,10 +1,10 @@
 import bitcoin from 'bitcoinjs-lib'
-import { hash160, hash128, DUST_MINIMUM } from './util'
+import { decodeB40, hash160, hash128, DUST_MINIMUM } from './util'
 
 // todo : add name length / character verification
 
 
-function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string,
+export function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string,
                               preorderAddress: string, burnAddress : string,
                               burnAmount: number,
                               network: Object,
@@ -20,8 +20,8 @@ function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string
 
   // Returns an unsigned serialized transaction.
 
-  const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
-  const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress)
+  const nameBuff = Buffer.from(decodeB40(fullyQualifiedName), 'hex') // base40
+  const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network)
 
   const dataBuffers = [nameBuff, scriptPublicKey]
 
@@ -50,7 +50,7 @@ function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string
   return tx.buildIncomplete()
 }
 
-function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress: string,
+export function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress: string,
                               ownerAddress: string, network: Object, valueHash: string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
@@ -85,7 +85,7 @@ function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress: strin
   return tx.buildIncomplete()
 }
 
-function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: string,
+export function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: string,
                               newOwner: string, network: Object, keepZonefile: boolean = false) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
@@ -118,7 +118,7 @@ function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: string,
 }
 
 
-function makeUpdateSkeleton(fullyQualifiedName: string, consensusHash: string,
+export function makeUpdateSkeleton(fullyQualifiedName: string, consensusHash: string,
                             zonefile: Buffer, network: Object) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
@@ -148,7 +148,3 @@ function makeUpdateSkeleton(fullyQualifiedName: string, consensusHash: string,
 
   return tx.buildIncomplete()
 }
-
-exports = {
-  makePreorderSkeleton, makeUpdateSkeleton, makeRegisterSkeleton,
-  makeTransferSkeleton }

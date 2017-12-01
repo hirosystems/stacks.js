@@ -3,5 +3,8 @@ export {
 } from './skeletons'
 
 export {
-  performPreorder, makeEphemeralKey
+  performPreorder, performRegister
 } from './txbuild'
+
+export * from './util'
+

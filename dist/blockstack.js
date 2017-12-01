@@ -1296,23 +1296,14 @@ Object.defineProperty(exports, 'updateQueryStringParameter', {
 
 var _operations = require('./operations');
 
-Object.defineProperty(exports, 'makePreorderSkeleton', {
-  enumerable: true,
-  get: function get() {
-    return _operations.makePreorderSkeleton;
-  }
-});
-Object.defineProperty(exports, 'performPreorder', {
-  enumerable: true,
-  get: function get() {
-    return _operations.performPreorder;
-  }
-});
-Object.defineProperty(exports, 'makeEphemeralKey', {
-  enumerable: true,
-  get: function get() {
-    return _operations.makeEphemeralKey;
-  }
+Object.keys(_operations).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _operations[key];
+    }
+  });
 });
 
 var _jsontokens = require('jsontokens');
@@ -1392,15 +1383,35 @@ Object.defineProperty(exports, 'performPreorder', {
     return _txbuild.performPreorder;
   }
 });
-Object.defineProperty(exports, 'makeEphemeralKey', {
+Object.defineProperty(exports, 'performRegister', {
   enumerable: true,
   get: function get() {
-    return _txbuild.makeEphemeralKey;
+    return _txbuild.performRegister;
   }
 });
-},{"./skeletons":14,"./txbuild":15}],14:[function(require,module,exports){
+
+var _util = require('./util');
+
+Object.keys(_util).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _util[key];
+    }
+  });
+});
+},{"./skeletons":14,"./txbuild":15,"./util":16}],14:[function(require,module,exports){
 (function (Buffer){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.makePreorderSkeleton = makePreorderSkeleton;
+exports.makeRegisterSkeleton = makeRegisterSkeleton;
+exports.makeTransferSkeleton = makeTransferSkeleton;
+exports.makeUpdateSkeleton = makeUpdateSkeleton;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -1413,8 +1424,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // todo : add name length / character verification
 
 
-function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burnAmount) {
-  var registerAddress = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burnAmount, network) {
+  var registerAddress = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
@@ -1427,8 +1438,8 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   // Returns an unsigned serialized transaction.
 
-  var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
-  var scriptPublicKey = _bitcoinjsLib2.default.address.toOutputScript(preorderAddress);
+  var nameBuff = Buffer.from((0, _util.decodeB40)(fullyQualifiedName), 'hex'); // base40
+  var scriptPublicKey = _bitcoinjsLib2.default.address.toOutputScript(preorderAddress, network);
 
   var dataBuffers = [nameBuff, scriptPublicKey];
 
@@ -1448,7 +1459,7 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   var nullOutput = _bitcoinjsLib2.default.script.nullDataOutput(opReturnBuffer);
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(_bitcoinjsLib2.default.networks.bitcoin);
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network);
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(preorderAddress, _util.DUST_MINIMUM);
@@ -1457,8 +1468,8 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
   return tx.buildIncomplete();
 }
 
-function makeRegisterSkeleton(fullyQualifiedName, registerAddress, ownerAddress) {
-  var valueHash = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+function makeRegisterSkeleton(fullyQualifiedName, registerAddress, ownerAddress, network) {
+  var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
@@ -1485,7 +1496,7 @@ function makeRegisterSkeleton(fullyQualifiedName, registerAddress, ownerAddress)
   var opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload]);
   var nullOutput = _bitcoinjsLib2.default.script.nullDataOutput(opReturnBuffer);
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder();
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network);
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(registerAddress, _util.DUST_MINIMUM);
@@ -1493,8 +1504,8 @@ function makeRegisterSkeleton(fullyQualifiedName, registerAddress, ownerAddress)
   return tx.buildIncomplete();
 }
 
-function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
-  var keepZonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner, network) {
+  var keepZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
@@ -1518,7 +1529,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
 
   var opRetPayload = _bitcoinjsLib2.default.script.nullDataOutput(opRet);
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder();
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network);
 
   tx.addOutput(opRetPayload, 0);
   tx.addOutput(newOwner, _util.DUST_MINIMUM);
@@ -1526,7 +1537,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
   return tx.buildIncomplete();
 }
 
-function makeUpdateSkeleton(fullyQualifiedName, consensusHash, zonefile) {
+function makeUpdateSkeleton(fullyQualifiedName, consensusHash, zonefile, network) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -1548,19 +1559,22 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, zonefile) {
 
   var opRetPayload = _bitcoinjsLib2.default.script.nullDataOutput(opRet);
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder();
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network);
 
   tx.addOutput(opRetPayload, 0);
 
   return tx.buildIncomplete();
 }
-
-exports = {
-  makePreorderSkeleton: makePreorderSkeleton, makeUpdateSkeleton: makeUpdateSkeleton, makeRegisterSkeleton: makeRegisterSkeleton,
-  makeTransferSkeleton: makeTransferSkeleton };
 }).call(this,require("buffer").Buffer)
 },{"./util":16,"bitcoinjs-lib":129,"buffer":192}],15:[function(require,module,exports){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addOwnerInput = addOwnerInput;
+exports.performPreorder = performPreorder;
+exports.performRegister = performRegister;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -1572,8 +1586,8 @@ var _skeletons = require('./skeletons');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function addOwnerInput(utxos, txIn) {
-  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(txIn);
+function addOwnerInput(utxos, txIn, network) {
+  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(txIn, network);
   utxos.sort(function (a, b) {
     return a.value - b.value;
   });
@@ -1582,19 +1596,17 @@ function addOwnerInput(utxos, txIn) {
   return txB.buildIncomplete();
 }
 
-function makeEphemeralKey() {
-  return _bitcoinjsLib2.default.ECPair.makeRandom();
-}
-
 function performPreorder(fullyQualifiedName, destinationAddress, paymentKey) {
-  var burnAddress = '1111111111111111111114oLvT2';
+  var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.network.mainnet;
+
+  var burnAddress = (0, _util.coerceAddress)('1111111111111111111114oLvT2', network);
   var registerAddress = destinationAddress;
   var preorderAddress = paymentKey.getAddress();
 
   var preorderPromise = Promise.all([(0, _util.getConsensusHash)(), (0, _util.getNamePrice)(fullyQualifiedName)]).then(function (inputs) {
     var consensusHash = inputs[0];
     var namePrice = inputs[1];
-    return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, registerAddress);
+    return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, network, registerAddress);
   });
 
   return Promise.all([(0, _util.getUTXOs)(preorderAddress), (0, _util.getFeeRate)(), preorderPromise]).then(function (inputs) {
@@ -1604,22 +1616,67 @@ function performPreorder(fullyQualifiedName, destinationAddress, paymentKey) {
     var txFee = (0, _util.estimateTXBytes)(preorderSkeleton, 1, 0) * feeRate;
     var outAmounts = preorderSkeleton.outs.reduce(function (agg, x) {
       return agg + x.value;
-    });
+    }, 0);
 
-    return (0, _util.addUTXOsToFund)(preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate);
+    return (0, _util.addUTXOsToFund)(preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate, network);
   }).then(function (unsignedTx) {
-    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(unsignedTx);
-    for (var i = 0; i < txB.ins.length; i++) {
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(unsignedTx, network);
+    for (var i = 0; i < txB.tx.ins.length; i++) {
       txB.sign(i, paymentKey);
     }
     return txB.build();
   });
 }
 
-exports = { makeEphemeralKey: makeEphemeralKey, performPreorder: performPreorder, addOwnerInput: addOwnerInput };
+function performRegister(fullyQualifiedName, registerAddress, paymentKey) {
+  var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.network.mainnet;
+
+  var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, registerAddress, network);
+
+  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerSkeleton, network);
+  var paymentAddress = paymentKey.getAddress();
+  txB.addOutput(paymentAddress, _util.DUST_MINIMUM); // change.
+
+  var withChange = txB.buildIncomplete();
+
+  return Promise.all([(0, _util.getUTXOs)(paymentAddress), (0, _util.getFeeRate)()]).then(function (inputs) {
+    var utxos = inputs[0];
+    var feeRate = inputs[1];
+    var txFee = (0, _util.estimateTXBytes)(withChange, 1, 0) * feeRate;
+    var outAmounts = withChange.outs.reduce(function (agg, x) {
+      return agg + x.value;
+    }, 0);
+
+    return (0, _util.addUTXOsToFund)(withChange, paymentAddress, utxos, txFee + outAmounts, feeRate, network);
+  }).then(function (unsignedTx) {
+    var signingTxB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(unsignedTx, network);
+    for (var i = 0; i < txB.tx.ins.length; i++) {
+      signingTxB.sign(i, paymentKey);
+    }
+    return signingTxB.build();
+  });
+}
 },{"./skeletons":14,"./util":16,"bitcoinjs-lib":129}],16:[function(require,module,exports){
 (function (Buffer){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SATOSHIS_PER_BTC = exports.DUST_MINIMUM = undefined;
+exports.getUTXOsMain = getUTXOsMain;
+exports.getUTXOs = getUTXOs;
+exports.coerceAddress = coerceAddress;
+exports.getNamePrice = getNamePrice;
+exports.getFeeRateMainnet = getFeeRateMainnet;
+exports.getFeeRate = getFeeRate;
+exports.getConsensusHash = getConsensusHash;
+exports.hash160 = hash160;
+exports.hash128 = hash128;
+exports.estimateTXBytes = estimateTXBytes;
+exports.countDustOutputs = countDustOutputs;
+exports.decodeB40 = decodeB40;
+exports.addUTXOsToFund = addUTXOsToFund;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -1633,21 +1690,78 @@ var _ripemd = require('ripemd160');
 
 var _ripemd2 = _interopRequireDefault(_ripemd);
 
+var _bigi = require('bigi');
+
+var _bigi2 = _interopRequireDefault(_bigi);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var utxoProviderUrl = 'https://blockchain.info/unspent?format=json&active=';
-var blockstackAPIUrl = 'https://core.blockstack.org';
-var DUST_MINIMUM = 5500;
+// const blockstackAPIUrl = 'https://core.blockstack.org'
+var blockstackAPIUrl = 'http://localhost:16268';
+var DUST_MINIMUM = exports.DUST_MINIMUM = 5500;
+var SATOSHIS_PER_BTC = exports.SATOSHIS_PER_BTC = 1e8;
 
-function getUTXOs(address) {
+function getUTXOsMain(address) {
+  // sigh. for regtest, this is going to be weird.
+  //   either, we write a driver kit for plugging into
+  //   different backends (I do not like.) or we assume
+  //   an API for the UTXO provider, and stand-up a simple
+  //   wrapper daemon for regtest / local bitcoind comms.
   return fetch('' + utxoProviderUrl + address).then(function (resp) {
     return resp.json();
   });
 }
 
+function getUTXOs(address) {
+  var jsonRPCImport = { jsonrpc: '1.0',
+    method: 'importaddress',
+    params: [address] };
+  var jsonRPCUnspent = { jsonrpc: '1.0',
+    method: 'listunspent',
+    params: [1, 9999999, [address]] };
+  var fetchURL = 'http://blockstack:blockstacksystem@127.0.0.1:18332/';
+
+  return fetch(fetchURL, { method: 'POST', body: JSON.stringify(jsonRPCImport) }).then(function () {
+    return fetch(fetchURL, { method: 'POST', body: JSON.stringify(jsonRPCUnspent) });
+  }).then(function (resp) {
+    return resp.json();
+  }).then(function (x) {
+    return x.result;
+  }).then(function (utxos) {
+    return utxos.map(function (x) {
+      return Object({ value: x.amount * SATOSHIS_PER_BTC,
+        confirmations: x.confirmations,
+        tx_hash: x.txid,
+        tx_output_n: x.vout });
+    });
+  });
+}
+
+function coerceAddress(address, network) {
+  var addressHash = _bitcoinjsLib2.default.address.fromBase58Check(address).hash;
+  return _bitcoinjsLib2.default.address.toBase58Check(addressHash, network.pubKeyHash);
+}
+
+function getNamePrice(fullyQualifiedName) {
+  return fetch(blockstackAPIUrl + '/v1/prices/names/' + fullyQualifiedName).then(function (resp) {
+    return resp.json();
+  }).then(function (x) {
+    return x.name_price.satoshis;
+  });
+}
+
+function getFeeRateMainnet() {}
+
+function getFeeRate() {
+  return 0.00001000 * SATOSHIS_PER_BTC;
+}
+
 function getConsensusHash() {
   return fetch(blockstackAPIUrl + '/v1/blockchains/bitcoin/consensus').then(function (resp) {
-    return resp.json().consensus_hash;
+    return resp.json();
+  }).then(function (x) {
+    return x.consensus_hash;
   });
 }
 
@@ -1668,11 +1782,19 @@ function estimateTXBytes(txIn, additionalInputs, additionalOutputs) {
 
 function countDustOutputs() {}
 
-function addUTXOsToFund(txIn, funderAddress, utxos, amountToFund, feeRate) {
-  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(txIn);
+function decodeB40(input) {
+  var characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+';
+  var base = _bigi2.default.valueOf(40);
+  return input.split('').reverse().reduce(function (agg, character, exponent) {
+    return agg.add(_bigi2.default.valueOf(characters.indexOf(character)).multiply(base.pow(_bigi2.default.valueOf(exponent))));
+  }, _bigi2.default.ZERO).toHex();
+}
+
+function addUTXOsToFund(txIn, funderAddress, utxos, amountToFund, feeRate, network) {
+  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(txIn, network);
 
   if (utxos.length === 0) {
-    throw new Error('Not enough UTXOs to fund');
+    throw new Error('Not enough UTXOs for ' + funderAddress + ' to fund: left to fund: ' + amountToFund);
   }
 
   var goodUtxos = utxos.filter(function (utxo) {
@@ -1684,11 +1806,18 @@ function addUTXOsToFund(txIn, funderAddress, utxos, amountToFund, feeRate) {
     });
     var selected = goodUtxos[0];
     var change = selected.value - amountToFund;
-    var changeOutput = txB.outs.find(function (x) {
-      return x.address === funderAddress;
+    var outputAddresses = txB.tx.outs.map(function (x) {
+      if (_bitcoinjsLib2.default.script.toASM(x.script).startsWith('OP_RETURN')) {
+        return '';
+      } else {
+        return _bitcoinjsLib2.default.address.fromOutputScript(x.script, network);
+      }
     });
-    if (changeOutput) {
-      changeOutput.value += change;
+    var changeOutput = outputAddresses.indexOf(funderAddress);
+    if (changeOutput !== -1) {
+      txB.tx.outs[changeOutput].value += change;
+    } else {
+      throw new Error('Couldn\'t find a change output');
     }
     txB.addInput(selected.tx_hash, selected.tx_output_n);
     return txB.buildIncomplete();
@@ -1700,22 +1829,14 @@ function addUTXOsToFund(txIn, funderAddress, utxos, amountToFund, feeRate) {
 
     txB.addInput(largest.tx_hash, largest.tx_output_n);
 
-    var newFees = feeRate * (estimateTXBytes(txIn, 2, 1) - estimateTXBytes(txIn, 1, 0));
+    var newFees = feeRate * (estimateTXBytes(txIn, 2, 1) - estimateTXBytes(txIn, 1, 1));
     var remainToFund = amountToFund + newFees - largest.value;
 
-    return addUTXOsToFund(txB.buildIncomplete(), funderAddress, utxos.slice(1), remainToFund, feeRate);
+    return addUTXOsToFund(txB.buildIncomplete(), funderAddress, utxos.slice(1), remainToFund, feeRate, network);
   }
 }
-
-exports = {
-  addUTXOsToFund: addUTXOsToFund,
-  countDustOutputs: countDustOutputs,
-  getConsensusHash: getConsensusHash,
-  hash160: hash160, hash128: hash128,
-  DUST_MINIMUM: DUST_MINIMUM, getUTXOs: getUTXOs,
-  estimateTXBytes: estimateTXBytes };
 }).call(this,require("buffer").Buffer)
-},{"bitcoinjs-lib":129,"buffer":192,"coinselect/utils":294,"ripemd160":486}],17:[function(require,module,exports){
+},{"bigi":90,"bitcoinjs-lib":129,"buffer":192,"coinselect/utils":294,"ripemd160":486}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
