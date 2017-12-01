@@ -1,14 +1,14 @@
 import bitcoin from 'bitcoinjs-lib'
 import { decodeB40, hash160, hash128, DUST_MINIMUM } from './util'
+import { BlockstackNetwork } from './network'
 
 // todo : add name length / character verification
 
 
-export function makePreorderSkeleton(fullyQualifiedName: string, consensusHash : string,
-                              preorderAddress: string, burnAddress : string,
-                              burnAmount: number,
-                              network: Object,
-                              registerAddress: string = null) {
+export function makePreorderSkeleton(
+  fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
+  burnAddress : string, burnAmount: number, network: BlockstackNetwork,
+  registerAddress: string = null) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -21,7 +21,7 @@ export function makePreorderSkeleton(fullyQualifiedName: string, consensusHash :
   // Returns an unsigned serialized transaction.
 
   const nameBuff = Buffer.from(decodeB40(fullyQualifiedName), 'hex') // base40
-  const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network)
+  const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network.layer1)
 
   const dataBuffers = [nameBuff, scriptPublicKey]
 
@@ -41,7 +41,7 @@ export function makePreorderSkeleton(fullyQualifiedName: string, consensusHash :
 
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
 
-  const tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
@@ -50,8 +50,9 @@ export function makePreorderSkeleton(fullyQualifiedName: string, consensusHash :
   return tx.buildIncomplete()
 }
 
-export function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress: string,
-                              ownerAddress: string, network: Object, valueHash: string = null) {
+export function makeRegisterSkeleton(
+  fullyQualifiedName: string, registerAddress: string, ownerAddress: string,
+  network: BlockstackNetwork, valueHash: string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -77,7 +78,7 @@ export function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress
   const opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload])
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
 
-  const tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(registerAddress, DUST_MINIMUM)
@@ -85,8 +86,9 @@ export function makeRegisterSkeleton(fullyQualifiedName: string, registerAddress
   return tx.buildIncomplete()
 }
 
-export function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: string,
-                              newOwner: string, network: Object, keepZonefile: boolean = false) {
+export function makeTransferSkeleton(
+  fullyQualifiedName: string, consensusHash: string, newOwner: string,
+  network: BlockstackNetwork, keepZonefile: boolean = false) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -109,7 +111,7 @@ export function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: 
 
   const opRetPayload = bitcoin.script.nullDataOutput(opRet)
 
-  const tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(opRetPayload, 0)
   tx.addOutput(newOwner, DUST_MINIMUM)
@@ -118,8 +120,9 @@ export function makeTransferSkeleton(fullyQualifiedName: string, consensusHash: 
 }
 
 
-export function makeUpdateSkeleton(fullyQualifiedName: string, consensusHash: string,
-                            zonefile: Buffer, network: Object) {
+export function makeUpdateSkeleton(
+  fullyQualifiedName: string, consensusHash: string, zonefile: Buffer,
+  network: BlockstackNetwork) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -142,7 +145,7 @@ export function makeUpdateSkeleton(fullyQualifiedName: string, consensusHash: st
 
   const opRetPayload = bitcoin.script.nullDataOutput(opRet)
 
-  const tx = new bitcoin.TransactionBuilder(network)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(opRetPayload, 0)
 

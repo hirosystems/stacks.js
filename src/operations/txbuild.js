@@ -1,13 +1,13 @@
 import bitcoinjs from 'bitcoinjs-lib'
 
-import { addUTXOsToFund, getConsensusHash, getUTXOs, coerceAddress, DUST_MINIMUM,
-         estimateTXBytes, getFeeRate, getNamePrice } from './util'
+import { addUTXOsToFund, DUST_MINIMUM, estimateTXBytes } from './util'
 import { makePreorderSkeleton, makeRegisterSkeleton } from './skeletons'
+import { BlockstackNetwork } from './network'
 
 export function addOwnerInput(utxos: Object,
                               txIn: bitcoinjs.Transaction,
-                              network: Object) {
-  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn, network)
+                              network: BlockstackNetwork) {
+  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn, network.layer1)
   utxos.sort((a, b) => a.value - b.value)
   const selected = utxos[0]
   txB.addInput(selected.tx_hash, selected.tx_output_n)
@@ -17,12 +17,13 @@ export function addOwnerInput(utxos: Object,
 export function performPreorder(fullyQualifiedName: string,
                                 destinationAddress: string,
                                 paymentKey: bitcoinjs.ECPair,
-                                network: Object = bitcoinjs.network.mainnet) {
-  const burnAddress = coerceAddress('1111111111111111111114oLvT2', network)
+                                network: BlockstackNetwork) {
+  const burnAddress = network.coerceAddress('1111111111111111111114oLvT2')
   const registerAddress = destinationAddress
   const preorderAddress = paymentKey.getAddress()
 
-  const preorderPromise = Promise.all([getConsensusHash(), getNamePrice(fullyQualifiedName)])
+  const preorderPromise = Promise.all([network.getConsensusHash(),
+                                       network.getNamePrice(fullyQualifiedName)])
         .then(inputs => {
           const consensusHash = inputs[0]
           const namePrice = inputs[1]
@@ -31,7 +32,7 @@ export function performPreorder(fullyQualifiedName: string,
             namePrice, network, registerAddress)
         })
 
-  return Promise.all([getUTXOs(preorderAddress), getFeeRate(), preorderPromise])
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
     .then(inputs => {
       const utxos = inputs[0]
       const feeRate = inputs[1]
@@ -43,7 +44,7 @@ export function performPreorder(fullyQualifiedName: string,
         preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate, network)
     })
     .then(unsignedTx => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network)
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network.layer1)
       for (let i = 0; i < txB.tx.ins.length; i++) {
         txB.sign(i, paymentKey)
       }
@@ -54,17 +55,17 @@ export function performPreorder(fullyQualifiedName: string,
 export function performRegister(fullyQualifiedName: string,
                                 registerAddress: string,
                                 paymentKey: bitcoinjs.ECPair,
-                                network: Object = bitcoinjs.network.mainnet) {
+                                network: BlockstackNetwork) {
   const registerSkeleton = makeRegisterSkeleton(
     fullyQualifiedName, registerAddress, registerAddress, network)
 
-  const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network)
+  const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1)
   const paymentAddress = paymentKey.getAddress()
   txB.addOutput(paymentAddress, DUST_MINIMUM) // change.
 
   const withChange = txB.buildIncomplete()
 
-  return Promise.all([getUTXOs(paymentAddress), getFeeRate()])
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
     .then(inputs => {
       const utxos = inputs[0]
       const feeRate = inputs[1]
@@ -75,8 +76,8 @@ export function performRegister(fullyQualifiedName: string,
                             feeRate, network)
     })
     .then(unsignedTx => {
-      const signingTxB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network)
-      for (let i = 0; i < txB.tx.ins.length; i++) {
+      const signingTxB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network.layer1)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         signingTxB.sign(i, paymentKey)
       }
       return signingTxB.build()
