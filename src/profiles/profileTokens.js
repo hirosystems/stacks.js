@@ -145,7 +145,7 @@ export function extractProfile(token, publicKeyOrAddress = null) {
   if (publicKeyOrAddress) {
     decodedToken = verifyProfileToken(token, publicKeyOrAddress)
   } else {
-    decodedToken = decodedToken(token)
+    decodedToken = decodeToken(token)
   }
 
   let profile = {}

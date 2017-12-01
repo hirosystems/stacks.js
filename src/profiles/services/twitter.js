@@ -4,7 +4,11 @@ import cheerio from 'cheerio'
 
 class Twitter extends Service {
   static getBaseUrls() {
-    const baseUrls = ['https://twitter.com/']
+    const baseUrls = [
+      'https://twitter.com/',
+      'http://twitter.com/',
+      'twitter.com/'
+    ]
     return baseUrls
   }
 

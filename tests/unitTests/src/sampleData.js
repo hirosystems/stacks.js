@@ -100,6 +100,10 @@ export const sampleAddressBasedVerifications = {
     linkedIn: {
       url: "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
       body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.linkedin.html','utf8')
+    },
+    linkedInBroken: {
+      url: "https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/",
+      body: fs.readFileSync(TEST_DATA_DIR + '/profiles/ken.verification.linkedinbroken.html','utf8')
     }
   }
 }
