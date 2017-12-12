@@ -45,6 +45,28 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
 }
 
 /**
+ * Versioning
+ * @param {string} v1 - the left half of the version inequality
+ * @param {string} v2 - right half of the version inequality
+ * @returns {bool} iff v1 >= v2
+ * @private
+ */
+export function isLaterVersionString(v1: string, v2: string) {
+  const v1tuple = v1.split('.').map(x => parseInt(x, 10))
+  const v2tuple = v2.split('.').map(x => parseInt(x, 10))
+
+  for (let index = 0; index < v2.length; index++) {
+    if (index >= v1.length) {
+      v2tuple.push(0)
+    }
+    if (v1tuple[index] < v2tuple[index]) {
+      return false
+    }
+  }
+  return true
+}
+
+/**
  * UUIDs
  * @private
  */

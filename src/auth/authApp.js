@@ -3,7 +3,7 @@ import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
-import { BLOCKSTACK_HANDLER } from '../utils'
+import { BLOCKSTACK_HANDLER, isLaterVersionString } from '../utils'
 import { makeECPrivateKey } from '../index'
 import { decryptPrivateKey } from './authMessages'
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
@@ -151,7 +151,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
         // TODO: real version handling
         let appPrivateKey = tokenPayload.private_key
         let coreSessionToken = tokenPayload.core_token
-        if (tokenPayload.version === '1.1.0') {
+        if (isLaterVersionString(tokenPayload.version, '1.1.0')) {
           const transitKey = getTransitKey()
           if (transitKey !== undefined && transitKey != null) {
             if (appPrivateKey !== undefined && appPrivateKey !== null) {
@@ -162,13 +162,19 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
             }
           }
         }
+        let hubUrl = 'https://hub.blockstack.org'
+        if (isLaterVersionString(tokenPayload.version, '1.2.0') &&
+            tokenPayload.hubUrl !== null) {
+          hubUrl = tokenPayload.hubUrl
+        }
 
         const userData = {
           username: tokenPayload.username,
           profile: tokenPayload.profile,
           appPrivateKey,
           coreSessionToken,
-          authResponseToken
+          authResponseToken,
+          hubUrl
         }
         const profileURL = tokenPayload.profile_url
         if ((userData.profile === null ||

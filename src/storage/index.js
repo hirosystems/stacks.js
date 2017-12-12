@@ -1,7 +1,7 @@
 /* @flow */
-import { getFile as storageGetFile,
-  putFile as storagePutFile,
-  deleteFile as storageDeleteFile } from 'blockstack-storage'
+
+import { getOrSetLocalGaiaHubConnection,
+         connectToGaiaHub, uploadToGaiaHub } from './hub'
 
 import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
@@ -15,7 +15,8 @@ import { getPublicKeyFromPrivate } from '../keys'
  * or rejects with an error
  */
 export function getFile(path: string, decrypt: boolean = false) {
-  return storageGetFile(path)
+  return getOrSetLocalGaiaHubConnection()
+    .then((gaiaHubConfig) => fetch(`${gaiaHubConfig.url_prefix}${path}`))
     .then((storedContents) => {
       if (decrypt) {
         const privateKey = loadUserData().appPrivateKey
@@ -42,7 +43,8 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
     const cipherObject = encryptECIES(publicKey, content)
     content = JSON.stringify(cipherObject)
   }
-  return storagePutFile(path, content)
+  return getOrSetLocalGaiaHubConnection()
+    .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig))
 }
 
 /**
@@ -52,5 +54,8 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
  * or rejects with an error
  */
 export function deleteFile(path: string) {
-  return storageDeleteFile(path)
+  throw new Error(`Delete of ${path} not supported by gaia hubs`)
 }
+
+export { connectToGaiaHub, uploadToGaiaHub }
+

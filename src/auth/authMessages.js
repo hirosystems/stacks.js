@@ -17,7 +17,7 @@ import {
 
 import { encryptECIES, decryptECIES } from '../encryption'
 
-const VERSION = '1.1.0'
+const VERSION = '1.2.0'
 
 type AuthMetadata = {
   email: ?string,
@@ -93,7 +93,8 @@ export function makeAuthResponse(privateKey: string,
                                  coreToken: ?string = null,
                                  appPrivateKey: ?string = null,
                                  expiresAt: number = nextMonth().getTime(),
-                                 transitPublicKey: ?string = null): string {
+                                 transitPublicKey: ?string = null,
+                                 hubUrl: ?string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -113,6 +114,7 @@ export function makeAuthResponse(privateKey: string,
     additionalProperties = {
       email: metadata.email ? metadata.email : null,
       profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      hubUrl,
       version: VERSION
     }
   } else {
