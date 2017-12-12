@@ -17,7 +17,16 @@ import { getPublicKeyFromPrivate } from '../keys'
 export function getFile(path: string, decrypt: boolean = false) {
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => fetch(getFullReadUrl(path, gaiaHubConfig)))
-    .then((response) => response.text())
+    .then((response) => {
+      const contentType = response.headers.get('Content-Type')
+      if (contentType === null || decrypt ||
+          contentType.startsWith('text') ||
+          contentType === 'application/json') {
+        return response.text()
+      } else {
+        return response.arrayBuffer()
+      }
+    })
     .then((storedContents) => {
       if (decrypt) {
         const privateKey = loadUserData().appPrivateKey
@@ -38,14 +47,19 @@ export function getFile(path: string, decrypt: boolean = false) {
  * if it failed
  */
 export function putFile(path: string, content: string | Buffer, encrypt: boolean = false) {
+  let contentType = 'text/plain'
+  if (typeof(content) !== 'string') {
+    contentType = 'application/octet-stream'
+  }
   if (encrypt) {
     const privateKey = loadUserData().appPrivateKey
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const cipherObject = encryptECIES(publicKey, content)
     content = JSON.stringify(cipherObject)
+    contentType = 'application/json'
   }
   return getOrSetLocalGaiaHubConnection()
-    .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig))
+    .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
 }
 
 /**

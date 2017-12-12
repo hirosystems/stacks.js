@@ -158,11 +158,11 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
               try {
                 appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
               } catch (e) {
-                console.log('Failed decryption of appPrivateKey, will try to use appPrivateKey as given')
+                console.log('Failed decryption of appPrivateKey, will try to use as given')
               }
             }
             if (coreSessionToken !== undefined && coreSessionToken !== null) {
-              try{
+              try {
                 coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
               } catch (e) {
                 console.log('Failed decryption of coreSessionToken, will try to use as given')

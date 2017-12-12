@@ -188,7 +188,7 @@ function handlePendingSignIn() {
               try {
                 appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, appPrivateKey);
               } catch (e) {
-                console.log('Failed decryption of appPrivateKey, will try to use appPrivateKey as given');
+                console.log('Failed decryption of appPrivateKey, will try to use as given');
               }
             }
             if (coreSessionToken !== undefined && coreSessionToken !== null) {
@@ -3552,7 +3552,12 @@ function getFile(path) {
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     return fetch((0, _hub.getFullReadUrl)(path, gaiaHubConfig));
   }).then(function (response) {
-    return response.text();
+    var contentType = response.headers.get('Content-Type');
+    if (contentType === null || decrypt || contentType.startsWith('text') || contentType === 'application/json') {
+      return response.text();
+    } else {
+      return response.arrayBuffer();
+    }
   }).then(function (storedContents) {
     if (decrypt) {
       var privateKey = (0, _auth.loadUserData)().appPrivateKey;
@@ -3575,14 +3580,19 @@ function getFile(path) {
 function putFile(path, content) {
   var encrypt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
+  var contentType = 'text/plain';
+  if (typeof content !== 'string') {
+    contentType = 'application/octet-stream';
+  }
   if (encrypt) {
     var privateKey = (0, _auth.loadUserData)().appPrivateKey;
     var publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
     var cipherObject = (0, _encryption.encryptECIES)(publicKey, content);
     content = JSON.stringify(cipherObject);
+    contentType = 'application/json';
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig);
+    return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType);
   });
 }
 
