@@ -1,6 +1,6 @@
 /* @flow */
 
-import { getOrSetLocalGaiaHubConnection,
+import { getOrSetLocalGaiaHubConnection, getFullReadUrl,
          connectToGaiaHub, uploadToGaiaHub } from './hub'
 
 import { encryptECIES, decryptECIES } from '../encryption'
@@ -16,7 +16,8 @@ import { getPublicKeyFromPrivate } from '../keys'
  */
 export function getFile(path: string, decrypt: boolean = false) {
   return getOrSetLocalGaiaHubConnection()
-    .then((gaiaHubConfig) => fetch(`${gaiaHubConfig.url_prefix}${path}`))
+    .then((gaiaHubConfig) => fetch(getFullReadUrl(path, gaiaHubConfig)))
+    .then((response) => response.text())
     .then((storedContents) => {
       if (decrypt) {
         const privateKey = loadUserData().appPrivateKey

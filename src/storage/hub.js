@@ -33,6 +33,11 @@ export function uploadToGaiaHub(filename: string, contents: any,
 }
 
 
+export function getFullReadUrl(filename: string,
+                               hubConfig: GaiaHubConfig): string {
+  return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
+}
+
 export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
   console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
   const challengeSigner = new bitcoin.ECPair(
@@ -67,15 +72,15 @@ export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string)
  */
 export function setLocalGaiaHubConnection(): Promise<*> {
   const userData = loadUserData()
-  return connectToGaiaHub(userData.gaiaHubUrl, userData.appPrivateKey)
+  return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey)
     .then((gaiaConfig) => {
-      localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, gaiaConfig)
+      localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(gaiaConfig))
       return gaiaConfig
     })
 }
 
 export function getOrSetLocalGaiaHubConnection(): Promise<*> {
-  const hubConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL)
+  const hubConfig = JSON.parse(localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL))
   if (hubConfig !== null) {
     return new Promise((resolve) => resolve(hubConfig))
   } else {

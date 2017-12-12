@@ -155,16 +155,24 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           const transitKey = getTransitKey()
           if (transitKey !== undefined && transitKey != null) {
             if (appPrivateKey !== undefined && appPrivateKey !== null) {
-              appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
+              try {
+                appPrivateKey = decryptPrivateKey(transitKey, appPrivateKey)
+              } catch (e) {
+                console.log('Failed decryption of appPrivateKey, will try to use appPrivateKey as given')
+              }
             }
             if (coreSessionToken !== undefined && coreSessionToken !== null) {
-              coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+              try{
+                coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+              } catch (e) {
+                console.log('Failed decryption of coreSessionToken, will try to use as given')
+              }
             }
           }
         }
         let hubUrl = 'https://hub.blockstack.org'
         if (isLaterVersionString(tokenPayload.version, '1.2.0') &&
-            tokenPayload.hubUrl !== null) {
+            tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
           hubUrl = tokenPayload.hubUrl
         }
 

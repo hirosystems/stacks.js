@@ -185,15 +185,23 @@ function handlePendingSignIn() {
           var transitKey = getTransitKey();
           if (transitKey !== undefined && transitKey != null) {
             if (appPrivateKey !== undefined && appPrivateKey !== null) {
-              appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, appPrivateKey);
+              try {
+                appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, appPrivateKey);
+              } catch (e) {
+                console.log('Failed decryption of appPrivateKey, will try to use appPrivateKey as given');
+              }
             }
             if (coreSessionToken !== undefined && coreSessionToken !== null) {
-              coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
+              try {
+                coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
+              } catch (e) {
+                console.log('Failed decryption of coreSessionToken, will try to use as given');
+              }
             }
           }
         }
         var hubUrl = 'https://hub.blockstack.org';
-        if ((0, _utils.isLaterVersionString)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null) {
+        if ((0, _utils.isLaterVersionString)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
           hubUrl = tokenPayload.hubUrl;
         }
 
@@ -3420,6 +3428,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
 exports.uploadToGaiaHub = uploadToGaiaHub;
+exports.getFullReadUrl = getFullReadUrl;
 exports.connectToGaiaHub = connectToGaiaHub;
 exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
 exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
@@ -3458,6 +3467,10 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
   });
 }
 
+function getFullReadUrl(filename, hubConfig) {
+  return '' + hubConfig.url_prefix + hubConfig.address + '/' + filename;
+}
+
 function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
   console.log('connectToGaiaHub: ' + gaiaHubUrl + '/hub_info');
   var challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(challengeSignerHex));
@@ -3490,14 +3503,14 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
  */
 function setLocalGaiaHubConnection() {
   var userData = (0, _authApp.loadUserData)();
-  return connectToGaiaHub(userData.gaiaHubUrl, userData.appPrivateKey).then(function (gaiaConfig) {
-    localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, gaiaConfig);
+  return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey).then(function (gaiaConfig) {
+    localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(gaiaConfig));
     return gaiaConfig;
   });
 }
 
 function getOrSetLocalGaiaHubConnection() {
-  var hubConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL);
+  var hubConfig = JSON.parse(localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL));
   if (hubConfig !== null) {
     return new Promise(function (resolve) {
       return resolve(hubConfig);
@@ -3537,7 +3550,9 @@ function getFile(path) {
   var decrypt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    return fetch('' + gaiaHubConfig.url_prefix + path);
+    return fetch((0, _hub.getFullReadUrl)(path, gaiaHubConfig));
+  }).then(function (response) {
+    return response.text();
   }).then(function (storedContents) {
     if (decrypt) {
       var privateKey = (0, _auth.loadUserData)().appPrivateKey;
