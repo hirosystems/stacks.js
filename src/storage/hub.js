@@ -7,7 +7,7 @@ export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
 export type GaiaHubConfig = {
   address: string,
-  url_prefix: string, // aaron: investigate if I can rename this field
+  url_prefix: string,
   token: string,
   server: string
 }
