@@ -35,6 +35,8 @@ var _authMessages = require('./authMessages');
 
 var _authConstants = require('./authConstants');
 
+var _storage = require('../storage');
+
 var _profiles = require('../profiles');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -49,8 +51,7 @@ var DEFAULT_PROFILE = {
    * @return {String} the hex encoded private key
    * @private
    */
-};
-function generateAndStoreTransitKey() {
+};function generateAndStoreTransitKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
@@ -181,7 +182,7 @@ function handlePendingSignIn() {
         // TODO: real version handling
         var appPrivateKey = tokenPayload.private_key;
         var coreSessionToken = tokenPayload.core_token;
-        if ((0, _utils.isLaterVersionString)(tokenPayload.version, '1.1.0')) {
+        if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.1.0')) {
           var transitKey = getTransitKey();
           if (transitKey !== undefined && transitKey != null) {
             if (appPrivateKey !== undefined && appPrivateKey !== null) {
@@ -201,7 +202,7 @@ function handlePendingSignIn() {
           }
         }
         var hubUrl = 'https://hub.blockstack.org';
-        if ((0, _utils.isLaterVersionString)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
+        if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
           hubUrl = tokenPayload.hubUrl;
         }
 
@@ -262,12 +263,13 @@ function signUserOut() {
   var redirectURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
   window.localStorage.removeItem(_authConstants.BLOCKSTACK_STORAGE_LABEL);
+  window.localStorage.removeItem(_storage.BLOCKSTACK_GAIA_HUB_LABEL);
 
   if (redirectURL !== null) {
     window.location = redirectURL;
   }
 }
-},{"../index":11,"../profiles":13,"../utils":36,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":231,"jsontokens":311,"query-string":400}],2:[function(require,module,exports){
+},{"../index":11,"../profiles":13,"../storage":35,"../utils":36,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":231,"jsontokens":311,"query-string":400}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1356,6 +1358,12 @@ Object.defineProperty(exports, 'updateQueryStringParameter', {
   enumerable: true,
   get: function get() {
     return _utils.updateQueryStringParameter;
+  }
+});
+Object.defineProperty(exports, 'isLaterVersion', {
+  enumerable: true,
+  get: function get() {
+    return _utils.isLaterVersion;
   }
 });
 
@@ -3526,7 +3534,7 @@ function getOrSetLocalGaiaHubConnection() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
+exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
 exports.getFile = getFile;
 exports.putFile = putFile;
 exports.deleteFile = deleteFile;
@@ -3608,6 +3616,7 @@ function deleteFile(path) {
 
 exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
+exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
 },{"../auth":7,"../encryption":9,"../keys":12,"./hub":34}],36:[function(require,module,exports){
 'use strict';
 
@@ -3618,7 +3627,7 @@ exports.nextYear = nextYear;
 exports.nextMonth = nextMonth;
 exports.nextHour = nextHour;
 exports.updateQueryStringParameter = updateQueryStringParameter;
-exports.isLaterVersionString = isLaterVersionString;
+exports.isLaterVersion = isLaterVersion;
 exports.makeUUID4 = makeUUID4;
 var BLOCKSTACK_HANDLER = exports.BLOCKSTACK_HANDLER = 'blockstack';
 /**
@@ -3658,9 +3667,8 @@ function updateQueryStringParameter(uri, key, value) {
  * @param {string} v1 - the left half of the version inequality
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
- * @private
  */
-function isLaterVersionString(v1, v2) {
+function isLaterVersion(v1, v2) {
   var v1tuple = v1.split('.').map(function (x) {
     return parseInt(x, 10);
   });

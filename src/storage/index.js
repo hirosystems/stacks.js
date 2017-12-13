@@ -1,7 +1,7 @@
 /* @flow */
 
 import { getOrSetLocalGaiaHubConnection, getFullReadUrl,
-         connectToGaiaHub, uploadToGaiaHub } from './hub'
+         connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
 
 import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
@@ -72,5 +72,5 @@ export function deleteFile(path: string) {
   throw new Error(`Delete of ${path} not supported by gaia hubs`)
 }
 
-export { connectToGaiaHub, uploadToGaiaHub }
+export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
 

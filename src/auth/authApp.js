@@ -3,13 +3,15 @@ import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
-import { BLOCKSTACK_HANDLER, isLaterVersionString } from '../utils'
+import { BLOCKSTACK_HANDLER, isLaterVersion } from '../utils'
 import { makeECPrivateKey } from '../index'
 import { decryptPrivateKey } from './authMessages'
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
          BLOCKSTACK_STORAGE_LABEL,
          DEFAULT_BLOCKSTACK_HOST,
          DEFAULT_SCOPE } from './authConstants'
+
+import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage'
 
 import { extractProfile } from '../profiles'
 
@@ -151,7 +153,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
         // TODO: real version handling
         let appPrivateKey = tokenPayload.private_key
         let coreSessionToken = tokenPayload.core_token
-        if (isLaterVersionString(tokenPayload.version, '1.1.0')) {
+        if (isLaterVersion(tokenPayload.version, '1.1.0')) {
           const transitKey = getTransitKey()
           if (transitKey !== undefined && transitKey != null) {
             if (appPrivateKey !== undefined && appPrivateKey !== null) {
@@ -171,7 +173,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           }
         }
         let hubUrl = 'https://hub.blockstack.org'
-        if (isLaterVersionString(tokenPayload.version, '1.2.0') &&
+        if (isLaterVersion(tokenPayload.version, '1.2.0') &&
             tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
           hubUrl = tokenPayload.hubUrl
         }
@@ -235,6 +237,7 @@ export function loadUserData() {
  */
 export function signUserOut(redirectURL: ?string = null) {
   window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
+  window.localStorage.removeItem(BLOCKSTACK_GAIA_HUB_LABEL)
 
   if (redirectURL !== null) {
     window.location = redirectURL

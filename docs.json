@@ -457,22 +457,22 @@
     ],
     "loc": {
       "start": {
-        "line": 84,
+        "line": 86,
         "column": 0
       },
       "end": {
-        "line": 106,
+        "line": 108,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 107,
+          "line": 109,
           "column": 0
         },
         "end": {
-          "line": 113,
+          "line": 115,
           "column": 1
         }
       },
@@ -790,22 +790,22 @@
     ],
     "loc": {
       "start": {
-        "line": 124,
+        "line": 126,
         "column": 0
       },
       "end": {
-        "line": 127,
+        "line": 129,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 128,
+          "line": 130,
           "column": 0
         },
         "end": {
-          "line": 130,
+          "line": 132,
           "column": 1
         }
       },
@@ -1044,22 +1044,22 @@
     ],
     "loc": {
       "start": {
-        "line": 133,
+        "line": 135,
         "column": 0
       },
       "end": {
-        "line": 142,
+        "line": 144,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 143,
+          "line": 145,
           "column": 0
         },
         "end": {
-          "line": 221,
+          "line": 223,
           "column": 1
         }
       },
@@ -1321,22 +1321,22 @@
     ],
     "loc": {
       "start": {
-        "line": 223,
+        "line": 225,
         "column": 0
       },
       "end": {
-        "line": 226,
+        "line": 228,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 227,
+          "line": 229,
           "column": 0
         },
         "end": {
-          "line": 229,
+          "line": 231,
           "column": 1
         }
       },
@@ -1493,22 +1493,22 @@
     ],
     "loc": {
       "start": {
-        "line": 42,
+        "line": 44,
         "column": 0
       },
       "end": {
-        "line": 45,
+        "line": 47,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 46,
+          "line": 48,
           "column": 0
         },
         "end": {
-          "line": 48,
+          "line": 50,
           "column": 1
         }
       },
@@ -1730,22 +1730,22 @@
     ],
     "loc": {
       "start": {
-        "line": 231,
+        "line": 233,
         "column": 0
       },
       "end": {
-        "line": 235,
+        "line": 237,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 236,
+          "line": 238,
           "column": 0
         },
         "end": {
-          "line": 242,
+          "line": 245,
           "column": 1
         }
       },
@@ -2697,22 +2697,22 @@
     ],
     "loc": {
       "start": {
-        "line": 50,
+        "line": 52,
         "column": 0
       },
       "end": {
-        "line": 61,
+        "line": 63,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 62,
+          "line": 64,
           "column": 0
         },
         "end": {
-          "line": 82,
+          "line": 84,
           "column": 1
         }
       },
@@ -2979,22 +2979,22 @@
     ],
     "loc": {
       "start": {
-        "line": 115,
+        "line": 117,
         "column": 0
       },
       "end": {
-        "line": 118,
+        "line": 120,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 119,
+          "line": 121,
           "column": 0
         },
         "end": {
-          "line": 122,
+          "line": 124,
           "column": 1
         }
       },
@@ -7486,5 +7486,320 @@
       }
     ],
     "namespace": "deleteFile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Versioning",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 11,
+                  "offset": 10
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 11,
+              "offset": 10
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 11,
+          "offset": 10
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the left half of the version inequality",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "v1"
+      },
+      {
+        "title": "param",
+        "description": "right half of the version inequality",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "v2"
+      },
+      {
+        "title": "returns",
+        "description": "iff v1 >= v2",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "bool"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 47,
+        "column": 0
+      },
+      "end": {
+        "line": 52,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 53,
+          "column": 0
+        },
+        "end": {
+          "line": 66,
+          "column": 1
+        }
+      },
+      "file": "/home/aaron/devel/blockstack.js/src/utils.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "v1",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the left half of the version inequality",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 40,
+                      "offset": 39
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 40,
+              "offset": 39
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "param",
+        "name": "v2",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "right half of the version inequality",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "iff v1 >= v2",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 13,
+                      "offset": 12
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 13,
+                  "offset": 12
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 13,
+              "offset": 12
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "bool"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "isLaterVersion",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "isLaterVersion",
+        "kind": "function"
+      }
+    ],
+    "namespace": "isLaterVersion"
   }
 ]

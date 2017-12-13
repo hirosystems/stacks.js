@@ -49,9 +49,8 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  * @param {string} v1 - the left half of the version inequality
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
- * @private
  */
-export function isLaterVersionString(v1: string, v2: string) {
+export function isLaterVersion(v1: string, v2: string) {
   const v1tuple = v1.split('.').map(x => parseInt(x, 10))
   const v2tuple = v2.split('.').map(x => parseInt(x, 10))
 
