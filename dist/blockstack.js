@@ -3534,7 +3534,7 @@ function getOrSetLocalGaiaHubConnection() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
+exports.GaiaHubConfig = exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
 exports.getFile = getFile;
 exports.putFile = putFile;
 exports.deleteFile = deleteFile;
@@ -3617,6 +3617,7 @@ function deleteFile(path) {
 exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
 exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
+exports.GaiaHubConfig = _hub.GaiaHubConfig;
 },{"../auth":7,"../encryption":9,"../keys":12,"./hub":34}],36:[function(require,module,exports){
 'use strict';
 
