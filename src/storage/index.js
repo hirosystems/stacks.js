@@ -18,6 +18,9 @@ export function getFile(path: string, decrypt: boolean = false) {
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => fetch(getFullReadUrl(path, gaiaHubConfig)))
     .then((response) => {
+      if (response.status !== 200) {
+        throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+      }
       const contentType = response.headers.get('Content-Type')
       if (contentType === null || decrypt ||
           contentType.startsWith('text') ||

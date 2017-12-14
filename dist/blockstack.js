@@ -3560,6 +3560,9 @@ function getFile(path) {
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     return fetch((0, _hub.getFullReadUrl)(path, gaiaHubConfig));
   }).then(function (response) {
+    if (response.status !== 200) {
+      throw new Error('getFile ' + path + ' failed with HTTP status ' + response.status);
+    }
     var contentType = response.headers.get('Content-Type');
     if (contentType === null || decrypt || contentType.startsWith('text') || contentType === 'application/json') {
       return response.text();
