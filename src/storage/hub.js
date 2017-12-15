@@ -2,6 +2,7 @@ import bitcoin from 'bitcoinjs-lib'
 import bigi from 'bigi'
 
 import { loadUserData } from '../auth/authApp'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
@@ -71,7 +72,17 @@ export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string)
  * @returns {Promise} that resolves to the new gaia hub connection
  */
 export function setLocalGaiaHubConnection(): Promise<*> {
-  const userData = loadUserData()
+  let userData = loadUserData()
+
+  if (!userData.hubUrl) {
+    userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
+
+    window.localStorage.setItem(
+      BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+
+    userData = loadUserData()
+  }
+
   return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey)
     .then((gaiaConfig) => {
       localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(gaiaConfig))
