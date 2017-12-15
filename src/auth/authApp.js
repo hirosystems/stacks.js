@@ -8,6 +8,7 @@ import { makeECPrivateKey } from '../index'
 import { decryptPrivateKey } from './authMessages'
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
          BLOCKSTACK_STORAGE_LABEL,
+         BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
          DEFAULT_BLOCKSTACK_HOST,
          DEFAULT_SCOPE } from './authConstants'
 
@@ -172,7 +173,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
             }
           }
         }
-        let hubUrl = 'https://hub.blockstack.org'
+        let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
         if (isLaterVersion(tokenPayload.version, '1.2.0') &&
             tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
           hubUrl = tokenPayload.hubUrl
