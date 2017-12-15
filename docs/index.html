@@ -233,6 +233,16 @@
                 
                 </li>
               
+                
+                <li><a
+                  href='#deletefile'
+                  class="">
+                  deleteFile
+                  
+                </a>
+                
+                </li>
+              
             </ul>
           </div>
           <div class='mt1 h6 quiet'>
@@ -1752,6 +1762,76 @@ wasString (boolean indicating with or not to return a buffer or string on decryp
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://nodejs.org/api/buffer.html">Buffer</a></code>:
         plaintext, or false if error
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='deletefile'>
+      deleteFile
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Deletes the specified file from the app's data store.</p>
+
+
+  <div class='pre p1 fill-light mt0'>deleteFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the path to the file to delete
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        that resolves when the file has been removed
+or rejects with an error
 
       
     
