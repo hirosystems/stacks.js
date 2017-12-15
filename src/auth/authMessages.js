@@ -54,7 +54,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     redirect_uri: redirectURI,
     version: VERSION,
     do_not_include_profile: true,
-    suppports_hub_url: true,
+    supports_hub_url: true,
     scopes
   }
 
