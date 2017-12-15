@@ -19,7 +19,12 @@ export function getFile(path: string, decrypt: boolean = false) {
     .then((gaiaHubConfig) => fetch(getFullReadUrl(path, gaiaHubConfig)))
     .then((response) => {
       if (response.status !== 200) {
-        throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+        if (response.status === 404) {
+          console.log(`getFile ${path} returned 404, returning null`)
+          return null
+        } else {
+          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+        }
       }
       const contentType = response.headers.get('Content-Type')
       if (contentType === null || decrypt ||

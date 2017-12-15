@@ -3574,7 +3574,12 @@ function getFile(path) {
     return fetch((0, _hub.getFullReadUrl)(path, gaiaHubConfig));
   }).then(function (response) {
     if (response.status !== 200) {
-      throw new Error('getFile ' + path + ' failed with HTTP status ' + response.status);
+      if (response.status === 404) {
+        console.log('getFile ' + path + ' returned 404, returning null');
+        return null;
+      } else {
+        throw new Error('getFile ' + path + ' failed with HTTP status ' + response.status);
+      }
     }
     var contentType = response.headers.get('Content-Type');
     if (contentType === null || decrypt || contentType.startsWith('text') || contentType === 'application/json') {
