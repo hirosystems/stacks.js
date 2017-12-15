@@ -303,7 +303,7 @@ var _encryption = require('../encryption');
 
 require('isomorphic-fetch');
 
-var VERSION = '1.2.0';
+var VERSION = '1.1.0';
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -337,6 +337,7 @@ function makeAuthRequest() {
     redirect_uri: redirectURI,
     version: VERSION,
     do_not_include_profile: true,
+    suppports_hub_url: true,
     scopes: scopes
   };
 

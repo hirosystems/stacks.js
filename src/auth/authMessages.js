@@ -17,7 +17,7 @@ import {
 
 import { encryptECIES, decryptECIES } from '../encryption'
 
-const VERSION = '1.2.0'
+const VERSION = '1.1.0'
 
 type AuthMetadata = {
   email: ?string,
@@ -54,6 +54,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     redirect_uri: redirectURI,
     version: VERSION,
     do_not_include_profile: true,
+    suppports_hub_url: true,
     scopes
   }
 
