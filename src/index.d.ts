@@ -1,6 +1,6 @@
-/// <reference path="./auth/index.d.ts" />
-/// <reference path="./profiles/index.d.ts" />
-/// <reference path="./storage/index.d.ts" />
+export * from './auth/index';
+export * from './profiles/index';
+export * from './storage/index';
 
 
 
