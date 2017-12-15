@@ -17,7 +17,7 @@ npm install blockstack --save
 2) Import Blockstack into your project
 
 ```js
-import blockstack from 'blockstack'
+import * as blockstack from 'blockstack'
 ```
 
 3) Wire up a sign in button
