@@ -201,7 +201,7 @@ function handlePendingSignIn() {
             }
           }
         }
-        var hubUrl = 'https://hub.blockstack.org';
+        var hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
         if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
           hubUrl = tokenPayload.hubUrl;
         }
@@ -280,6 +280,7 @@ var BLOCKSTACK_STORAGE_LABEL = exports.BLOCKSTACK_STORAGE_LABEL = 'blockstack';
 var DEFAULT_BLOCKSTACK_HOST = exports.DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth';
 var DEFAULT_SCOPE = exports.DEFAULT_SCOPE = ['store_write'];
 var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
+var BLOCKSTACK_DEFAULT_GAIA_HUB_URL = exports.BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';
 },{}],3:[function(require,module,exports){
 (function (Buffer){
 'use strict';
@@ -3451,6 +3452,8 @@ var _bigi2 = _interopRequireDefault(_bigi);
 
 var _authApp = require('../auth/authApp');
 
+var _authConstants = require('../auth/authConstants');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
@@ -3511,6 +3514,15 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
  */
 function setLocalGaiaHubConnection() {
   var userData = (0, _authApp.loadUserData)();
+
+  if (!userData.hubUrl) {
+    userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+
+    window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+
+    userData = (0, _authApp.loadUserData)();
+  }
+
   return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey).then(function (gaiaConfig) {
     localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(gaiaConfig));
     return gaiaConfig;
@@ -3528,7 +3540,7 @@ function getOrSetLocalGaiaHubConnection() {
   }
 }
 }).call(this,require("buffer").Buffer)
-},{"../auth/authApp":1,"bigi":39,"bitcoinjs-lib":78,"buffer":134}],35:[function(require,module,exports){
+},{"../auth/authApp":1,"../auth/authConstants":2,"bigi":39,"bitcoinjs-lib":78,"buffer":134}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
