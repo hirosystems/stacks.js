@@ -7,7 +7,7 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib; babel src -d lib",
+    "compile": "rm -rf lib; babel src -d lib && npm run copy-ts-declarations",
     "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run build",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
@@ -18,7 +18,8 @@
     "flow": "flow",
     "lint": "eslint src",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
+    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json",
+    "copy-ts-declarations": "cd src/ && find . -name '*.d.ts' -exec cp --parents '{}' ../lib/ \\; && cd ../"
   },
   "repository": {
     "type": "git",
