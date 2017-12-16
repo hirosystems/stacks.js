@@ -74,7 +74,6 @@
     }
   ],
   "devDependencies": {
-    "@types/node": "^8.0.53",
     "babel-cli": "^6.24.1",
     "babel-eslint": "^6.0.4",
     "babel-preset-es2015": "^6.3.13",
@@ -96,6 +95,7 @@
     "tape-promise": "^2.0.1"
   },
   "dependencies": {
+    "@types/node": "^8.5.1",
     "ajv": "^4.11.5",
     "bigi": "^1.4.2",
     "bitcoinjs-lib": "^2.3.0",
