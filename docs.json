@@ -476,7 +476,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -809,7 +809,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1063,7 +1063,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1340,7 +1340,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1512,7 +1512,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1749,7 +1749,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2025,7 +2025,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2716,7 +2716,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2998,7 +2998,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3379,7 +3379,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -3765,7 +3765,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4120,7 +4120,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4754,7 +4754,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5150,7 +5150,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5769,11 +5769,11 @@
           "column": 0
         },
         "end": {
-          "line": 42,
+          "line": 47,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -6093,26 +6093,26 @@
     ],
     "loc": {
       "start": {
-        "line": 44,
+        "line": 49,
         "column": 0
       },
       "end": {
-        "line": 51,
+        "line": 56,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 52,
+          "line": 57,
           "column": 0
         },
         "end": {
-          "line": 66,
+          "line": 71,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -6511,7 +6511,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/encryption.js"
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
     },
     "augments": [],
     "examples": [],
@@ -6843,7 +6843,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/encryption.js"
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
     },
     "augments": [],
     "examples": [],
@@ -7152,7 +7152,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/hub.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/hub.js"
     },
     "augments": [],
     "examples": [],
@@ -7315,26 +7315,26 @@
     ],
     "loc": {
       "start": {
-        "line": 68,
+        "line": 73,
         "column": 0
       },
       "end": {
-        "line": 73,
+        "line": 78,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 74,
+          "line": 79,
           "column": 0
         },
         "end": {
-          "line": 76,
+          "line": 81,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7592,7 +7592,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/utils.js"
+      "file": "/Users/larry/git/blockstack.js/src/utils.js"
     },
     "augments": [],
     "examples": [],
