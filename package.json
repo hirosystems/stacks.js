@@ -7,7 +7,7 @@
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib; babel src -d lib && npm run copy-ts-declarations",
+    "compile": "rm -rf lib; babel src -d lib; npm run copy-ts-declarations",
     "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run build",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
