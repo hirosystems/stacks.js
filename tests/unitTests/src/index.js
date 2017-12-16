@@ -3,6 +3,7 @@ import { runProfilesUnitTests } from './unitTestsProfiles'
 import { runProofsUnitTests }   from './unitTestsProofs'
 import { runUtilsTests }        from './unitTestsUtils'
 import { runEncryptionTests }   from './unitTestsEncryption'
+import { runStorageTests }      from './unitTestsStorage'
 
 // Utils tests
 runUtilsTests()
@@ -18,3 +19,6 @@ runProofsUnitTests()
 
 // Encryption Tests
 runEncryptionTests()
+
+// Storage Tests
+runStorageTests()
