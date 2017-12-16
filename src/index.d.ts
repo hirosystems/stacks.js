@@ -28,6 +28,7 @@ export declare function nextYear(): number;
 export declare function makeUUID4(): string;
 export declare const hasprop: any; // TODO: What's this?
 export declare function updateQueryStringParameter(uri: string, key: string, value: string): string;
+export declare function isLaterVersion(v1: string, v2: string): boolean;
 
 
 // from jsontokens
