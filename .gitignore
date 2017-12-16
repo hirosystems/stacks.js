@@ -38,3 +38,6 @@ src/testing/browser/blockstack-proofs.js
 
 *.swp
 *.swo
+
+# Generated Javascript files from Typescript declaration tests
+tests/typescriptTests/**/*.js
