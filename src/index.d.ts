@@ -1,7 +1,10 @@
+/// <reference types="node" />
+
+
+
 export * from './auth/index';
 export * from './profiles/index';
 export * from './storage/index';
-
 
 
 // from ./dids.js
