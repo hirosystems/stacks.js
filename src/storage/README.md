@@ -26,6 +26,15 @@ version. These features will be rolled out in future updates._
  });
 ```
 
+## Deleting a file
+
+```JavaScript
+ blockstack.deleteFile("/hello.txt")
+ .then(() => {
+    // /hello.txt is now removed.
+ })
+```
+
 ## Creating an encrypted file
 
 ```JavaScript
