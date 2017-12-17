@@ -1,7 +1,8 @@
 /* @flow */
 
 import { getOrSetLocalGaiaHubConnection, getFullReadUrl, GaiaHubConfig,
-         connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
+         connectToGaiaHub, uploadToGaiaHub, APP_INDEX_FILE_NAME, 
+         BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
 
 import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
@@ -68,6 +69,19 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
   }
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
+}
+
+/**
+ * Stores the app index file which enables multi-reader storage. This file 
+ * will be written to the user's profile and publicly visible if the `appIndex` 
+ * scope was requested during authentication.
+ * @param {String|Buffer} content - the data to store in the file
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
+export function putIndexFile(content: string | Buffer) {
+  const filename = APP_INDEX_FILE_NAME
+  return this.putFile(APP_INDEX_FILE_NAME, content, false)
 }
 
 /**

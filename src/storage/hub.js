@@ -5,6 +5,7 @@ import { loadUserData } from '../auth/authApp'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
+export const APP_INDEX_FILE_NAME = 'app_index.json'
 
 export type GaiaHubConfig = {
   address: string,
@@ -33,10 +34,13 @@ export function uploadToGaiaHub(filename: string, contents: any,
   })
 }
 
-
 export function getFullReadUrl(filename: string,
                                hubConfig: GaiaHubConfig): string {
   return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
+}
+
+export function getAppIndexFileUrl(hubConfig: GaiaHubConfig): string {
+  return `${hubConfig.url_prefix}${hubConfig.address}/${APP_INDEX_FILE_NAME}`
 }
 
 export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
