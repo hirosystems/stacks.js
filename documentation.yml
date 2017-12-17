@@ -37,3 +37,4 @@ toc:
       [Read more about storage](https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md)
   - getFile
   - putFile
+  - putIndexFile

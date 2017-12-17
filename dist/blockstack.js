@@ -337,7 +337,7 @@ function makeAuthRequest() {
     redirect_uri: redirectURI,
     version: VERSION,
     do_not_include_profile: true,
-    suppports_hub_url: true,
+    supports_hub_url: true,
     scopes: scopes
   };
 
@@ -3436,9 +3436,10 @@ exports.Twitter = Twitter;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
+exports.APP_INDEX_FILE_NAME = exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
 exports.uploadToGaiaHub = uploadToGaiaHub;
 exports.getFullReadUrl = getFullReadUrl;
+exports.getAppIndexFileUrl = getAppIndexFileUrl;
 exports.connectToGaiaHub = connectToGaiaHub;
 exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
 exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
@@ -3458,6 +3459,7 @@ var _authConstants = require('../auth/authConstants');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
+var APP_INDEX_FILE_NAME = exports.APP_INDEX_FILE_NAME = 'app_index.json';
 
 function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
@@ -3481,6 +3483,10 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
 
 function getFullReadUrl(filename, hubConfig) {
   return '' + hubConfig.url_prefix + hubConfig.address + '/' + filename;
+}
+
+function getAppIndexFileUrl(hubConfig) {
+  return '' + hubConfig.url_prefix + hubConfig.address + '/' + APP_INDEX_FILE_NAME;
 }
 
 function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
@@ -3550,6 +3556,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.GaiaHubConfig = exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
 exports.getFile = getFile;
 exports.putFile = putFile;
+exports.putIndexFile = putIndexFile;
 exports.deleteFile = deleteFile;
 
 var _hub = require('./hub');
@@ -3623,6 +3630,19 @@ function putFile(path, content) {
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType);
   });
+}
+
+/**
+ * Stores the app index file which enables multi-reader storage. This file 
+ * will be written to the user's profile and publicly visible if the `appIndex` 
+ * scope was requested during authentication.
+ * @param {String|Buffer} content - the data to store in the file
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
+function putIndexFile(content) {
+  var filename = _hub.APP_INDEX_FILE_NAME;
+  return this.putFile(_hub.APP_INDEX_FILE_NAME, content, false);
 }
 
 /**
@@ -5342,34 +5362,51 @@ module.exports = BigInteger
 module.exports={
   "_args": [
     [
-      "bigi@1.4.2",
-      "/home/aaron/devel/blockstack.js"
+      {
+        "raw": "bigi@^1.4.0",
+        "scope": null,
+        "escapedName": "bigi",
+        "name": "bigi",
+        "rawSpec": "^1.4.0",
+        "spec": ">=1.4.0 <2.0.0",
+        "type": "range"
+      },
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/bitcoinjs-lib"
     ]
   ],
-  "_from": "bigi@1.4.2",
+  "_from": "bigi@>=1.4.0 <2.0.0",
   "_id": "bigi@1.4.2",
-  "_inBundle": false,
-  "_integrity": "sha1-nGZalfiLiwj8Bc/XMfVhhZ1yWCU=",
+  "_inCache": true,
   "_location": "/bigi",
+  "_nodeVersion": "6.1.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/bigi-1.4.2.tgz_1469584192413_0.6801238611806184"
+  },
+  "_npmUser": {
+    "name": "jprichardson",
+    "email": "jprichardson@gmail.com"
+  },
+  "_npmVersion": "3.8.6",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "bigi@1.4.2",
-    "name": "bigi",
+    "raw": "bigi@^1.4.0",
+    "scope": null,
     "escapedName": "bigi",
-    "rawSpec": "1.4.2",
-    "saveSpec": null,
-    "fetchSpec": "1.4.2"
+    "name": "bigi",
+    "rawSpec": "^1.4.0",
+    "spec": ">=1.4.0 <2.0.0",
+    "type": "range"
   },
   "_requiredBy": [
-    "/",
     "/bitcoinjs-lib",
     "/ecurve"
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
-  "_spec": "1.4.2",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+  "_shrinkwrap": null,
+  "_spec": "bigi@^1.4.0",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/bitcoinjs-lib",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -5382,6 +5419,12 @@ module.exports={
     "mocha": "^2.1.0",
     "mochify": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+    "tarball": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz"
+  },
+  "gitHead": "c25308081c896ff84702303722bf5ecd8b3f78e3",
   "homepage": "https://github.com/cryptocoinjs/bigi#readme",
   "keywords": [
     "cryptography",
@@ -5401,7 +5444,27 @@ module.exports={
     "float"
   ],
   "main": "./lib/index.js",
+  "maintainers": [
+    {
+      "name": "midnightlightning",
+      "email": "boydb@midnightdesign.ws"
+    },
+    {
+      "name": "sidazhang",
+      "email": "sidazhang89@gmail.com"
+    },
+    {
+      "name": "nadav",
+      "email": "npm@shesek.info"
+    },
+    {
+      "name": "jprichardson",
+      "email": "jprichardson@gmail.com"
+    }
+  ],
   "name": "bigi",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "url": "git+https://github.com/cryptocoinjs/bigi.git",
     "type": "git"
@@ -29170,32 +29233,51 @@ exports.isHtml = function(str) {
 module.exports={
   "_args": [
     [
-      "cheerio@0.22.0",
-      "/home/aaron/devel/blockstack.js"
+      {
+        "raw": "cheerio@0.22.0",
+        "scope": null,
+        "escapedName": "cheerio",
+        "name": "cheerio",
+        "rawSpec": "0.22.0",
+        "spec": "0.22.0",
+        "type": "version"
+      },
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
   "_id": "cheerio@0.22.0",
-  "_inBundle": false,
-  "_integrity": "sha1-qbqoYKP5tZWmuBsahocxIe06Jp4=",
+  "_inCache": true,
   "_location": "/cheerio",
+  "_nodeVersion": "6.2.2",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/cheerio-0.22.0.tgz_1471954900169_0.12557715992443264"
+  },
+  "_npmUser": {
+    "name": "mattmueller",
+    "email": "mattmuelle@gmail.com"
+  },
+  "_npmVersion": "3.10.6",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
     "raw": "cheerio@0.22.0",
-    "name": "cheerio",
+    "scope": null,
     "escapedName": "cheerio",
+    "name": "cheerio",
     "rawSpec": "0.22.0",
-    "saveSpec": null,
-    "fetchSpec": "0.22.0"
+    "spec": "0.22.0",
+    "type": "version"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
-  "_spec": "0.22.0",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
+  "_shrinkwrap": null,
+  "_spec": "cheerio@0.22.0",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -29234,6 +29316,11 @@ module.exports={
     "mocha": "^2.5.3",
     "xyz": "~0.5.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
+    "tarball": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz"
+  },
   "engines": {
     "node": ">= 0.6"
   },
@@ -29241,6 +29328,7 @@ module.exports={
     "index.js",
     "lib"
   ],
+  "gitHead": "35c4917205dca9d08139c95419e2626c0689e38a",
   "homepage": "https://github.com/cheeriojs/cheerio#readme",
   "keywords": [
     "htmlparser",
@@ -29252,7 +29340,27 @@ module.exports={
   ],
   "license": "MIT",
   "main": "./index.js",
+  "maintainers": [
+    {
+      "name": "mattmueller",
+      "email": "mattmuelle@gmail.com"
+    },
+    {
+      "name": "davidchambers",
+      "email": "dc@davidchambers.me"
+    },
+    {
+      "name": "jugglinmike",
+      "email": "mike@mikepennisi.com"
+    },
+    {
+      "name": "feedic",
+      "email": "me@feedic.com"
+    }
+  ],
   "name": "cheerio",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git://github.com/cheeriojs/cheerio.git"
@@ -37422,36 +37530,54 @@ utils.encode = function encode(arr, enc) {
 module.exports={
   "_args": [
     [
-      "elliptic@6.4.0",
-      "/home/aaron/devel/blockstack.js"
+      {
+        "raw": "elliptic@^6.4.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.4.0",
+        "spec": ">=6.4.0 <7.0.0",
+        "type": "range"
+      },
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
-  "_from": "elliptic@6.4.0",
+  "_from": "elliptic@>=6.4.0 <7.0.0",
   "_id": "elliptic@6.4.0",
-  "_inBundle": false,
-  "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
+  "_inCache": true,
   "_location": "/elliptic",
+  "_nodeVersion": "7.0.0",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/elliptic-6.4.0.tgz_1487798866428_0.30510620190761983"
+  },
+  "_npmUser": {
+    "name": "indutny",
+    "email": "fedor@indutny.com"
+  },
+  "_npmVersion": "3.10.8",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "elliptic@6.4.0",
-    "name": "elliptic",
+    "raw": "elliptic@^6.4.0",
+    "scope": null,
     "escapedName": "elliptic",
-    "rawSpec": "6.4.0",
-    "saveSpec": null,
-    "fetchSpec": "6.4.0"
+    "name": "elliptic",
+    "rawSpec": "^6.4.0",
+    "spec": ">=6.4.0 <7.0.0",
+    "type": "range"
   },
   "_requiredBy": [
     "/",
     "/blockstack-storage",
-    "/browserify/browserify-sign",
-    "/browserify/create-ecdh",
+    "/browserify-sign",
+    "/create-ecdh",
     "/jsontokens"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_spec": "6.4.0",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+  "_shrinkwrap": null,
+  "_spec": "elliptic@^6.4.0",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -37485,9 +37611,15 @@ module.exports={
     "jshint": "^2.6.0",
     "mocha": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz"
+  },
   "files": [
     "lib"
   ],
+  "gitHead": "6b0d2b76caae91471649c8e21f0b1d3ba0f96090",
   "homepage": "https://github.com/indutny/elliptic",
   "keywords": [
     "EC",
@@ -37497,7 +37629,15 @@ module.exports={
   ],
   "license": "MIT",
   "main": "lib/elliptic.js",
+  "maintainers": [
+    {
+      "name": "indutny",
+      "email": "fedor@indutny.com"
+    }
+  ],
   "name": "elliptic",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/indutny/elliptic.git"
@@ -50007,7 +50147,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/home/aaron/devel/blockstack.js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -50031,7 +50171,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/home/aaron/devel/blockstack.js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
