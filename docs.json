@@ -6078,22 +6078,22 @@
     ],
     "loc": {
       "start": {
-        "line": 12,
+        "line": 13,
         "column": 0
       },
       "end": {
-        "line": 18,
+        "line": 19,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 19,
+          "line": 20,
           "column": 0
         },
         "end": {
-          "line": 49,
+          "line": 50,
           "column": 1
         }
       },
@@ -6417,22 +6417,22 @@
     ],
     "loc": {
       "start": {
-        "line": 51,
+        "line": 52,
         "column": 0
       },
       "end": {
-        "line": 58,
+        "line": 59,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 59,
+          "line": 60,
           "column": 0
         },
         "end": {
-          "line": 73,
+          "line": 74,
           "column": 1
         }
       },
@@ -6787,22 +6787,22 @@
     ],
     "loc": {
       "start": {
-        "line": 75,
+        "line": 86,
         "column": 0
       },
       "end": {
-        "line": 79,
+        "line": 90,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 81,
+          "line": 91,
           "column": 0
         },
         "end": {
-          "line": 83,
+          "line": 93,
           "column": 1
         }
       },
@@ -7023,22 +7023,22 @@
     ],
     "loc": {
       "start": {
-        "line": 85,
+        "line": 95,
         "column": 0
       },
       "end": {
-        "line": 92,
+        "line": 102,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 93,
+          "line": 103,
           "column": 0
         },
         "end": {
-          "line": 95,
+          "line": 105,
           "column": 1
         }
       },
@@ -7279,9 +7279,23 @@
         "name": "appOrigin"
       },
       {
+        "title": "param",
+        "description": "The URL\nto use for profile lookup",
+        "lineNumber": 4,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
+        },
+        "name": "profileLookupURL",
+        "default": "https://core.blockstack.org/v2/users/"
+      },
+      {
         "title": "return",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 4,
+        "lineNumber": 6,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -7290,22 +7304,22 @@
     ],
     "loc": {
       "start": {
-        "line": 97,
+        "line": 107,
         "column": 0
       },
       "end": {
-        "line": 103,
+        "line": 115,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 104,
+          "line": 116,
           "column": 0
         },
         "end": {
-          "line": 124,
+          "line": 130,
           "column": 1
         }
       },
@@ -7439,12 +7453,68 @@
       {
         "title": "param",
         "name": "profileLookupURL",
-        "lineNumber": 104,
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The URL\nto use for profile lookup",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 26,
+                      "offset": 33
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 26,
+                  "offset": 33
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 26,
+              "offset": 33
+            }
+          }
+        },
         "type": {
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "'https://core.blockstack.org/v2/users/'"
+        "default": "https://core.blockstack.org/v2/users/"
       }
     ],
     "properties": [],
@@ -8269,22 +8339,22 @@
     ],
     "loc": {
       "start": {
-        "line": 72,
+        "line": 68,
         "column": 0
       },
       "end": {
-        "line": 77,
+        "line": 73,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 78,
+          "line": 74,
           "column": 0
         },
         "end": {
-          "line": 95,
+          "line": 91,
           "column": 1
         }
       },
@@ -8384,6 +8454,182 @@
           "children": [
             {
               "type": "text",
+              "value": "Get the app index file URL",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 27,
+          "offset": 26
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "returns",
+        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 76,
+        "column": 0
+      },
+      "end": {
+        "line": 80,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 81,
+          "column": 0
+        },
+        "end": {
+          "line": 84,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 23,
+                      "offset": 69
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 23,
+                  "offset": 69
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 23,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAppIndexFileUrl",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAppIndexFileUrl",
+        "kind": "function"
+      }
+    ],
+    "namespace": "getAppIndexFileUrl"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Deletes the specified file from the app's data store.",
               "position": {
                 "start": {
@@ -8451,22 +8697,22 @@
     ],
     "loc": {
       "start": {
-        "line": 126,
+        "line": 132,
         "column": 0
       },
       "end": {
-        "line": 131,
+        "line": 137,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 132,
+          "line": 138,
           "column": 0
         },
         "end": {
-          "line": 134,
+          "line": 140,
           "column": 1
         }
       },
