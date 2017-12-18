@@ -6478,7 +6478,7 @@
           "column": 0
         },
         "end": {
-          "line": 83,
+          "line": 82,
           "column": 1
         }
       },
@@ -6582,7 +6582,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Stores the app index file which enables multi-reader storage. This file \nwill be written to the user's profile and publicly visible if the ",
+              "value": "Stores the app index file which enables multi-reader storage. This file \nwill be publicly visible in the user's profile data if the ",
               "position": {
                 "start": {
                   "line": 1,
@@ -6591,8 +6591,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 67,
-                  "offset": 139
+                  "column": 60,
+                  "offset": 132
                 },
                 "indent": [
                   1
@@ -6605,13 +6605,13 @@
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 67,
-                  "offset": 139
+                  "column": 60,
+                  "offset": 132
                 },
                 "end": {
                   "line": 2,
-                  "column": 77,
-                  "offset": 149
+                  "column": 70,
+                  "offset": 142
                 },
                 "indent": []
               }
@@ -6622,13 +6622,13 @@
               "position": {
                 "start": {
                   "line": 2,
-                  "column": 77,
-                  "offset": 149
+                  "column": 70,
+                  "offset": 142
                 },
                 "end": {
                   "line": 3,
                   "column": 43,
-                  "offset": 193
+                  "offset": 186
                 },
                 "indent": [
                   1
@@ -6645,7 +6645,7 @@
             "end": {
               "line": 3,
               "column": 43,
-              "offset": 193
+              "offset": 186
             },
             "indent": [
               1,
@@ -6663,7 +6663,7 @@
         "end": {
           "line": 3,
           "column": 43,
-          "offset": 193
+          "offset": 186
         }
       }
     },
@@ -6699,22 +6699,22 @@
     ],
     "loc": {
       "start": {
-        "line": 85,
+        "line": 84,
         "column": 0
       },
       "end": {
-        "line": 92,
+        "line": 91,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 93,
+          "line": 92,
           "column": 0
         },
         "end": {
-          "line": 96,
+          "line": 94,
           "column": 1
         }
       },
@@ -7798,22 +7798,22 @@
     ],
     "loc": {
       "start": {
-        "line": 98,
+        "line": 96,
         "column": 0
       },
       "end": {
-        "line": 103,
+        "line": 101,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 104,
+          "line": 102,
           "column": 0
         },
         "end": {
-          "line": 106,
+          "line": 104,
           "column": 1
         }
       },

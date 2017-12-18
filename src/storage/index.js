@@ -83,7 +83,7 @@ export function getAppIndexFile() {
 
 /**
  * Stores the app index file which enables multi-reader storage. This file 
- * will be written to the user's profile and publicly visible if the `appIndex` 
+ * will be publicly visible in the user's profile data if the `appIndex` 
  * scope was requested during authentication.
  * @param {String|Buffer} content - the data to store in the file
  * @return {Promise} that resolves if the operation succeed and rejects
