@@ -1,13 +1,14 @@
 /* @flow */
 
 import { getOrSetLocalGaiaHubConnection, getFullReadUrl, GaiaHubConfig,
-         connectToGaiaHub, uploadToGaiaHub, APP_INDEX_FILE_NAME, 
-         BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
+         connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
 
 import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
+
+const APP_INDEX_FILE_NAME = 'app_index.json'
 
 /**
  * Retrieves the specified file from the app's data store.
@@ -73,11 +74,20 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
 }
 
 /**
+ * Get the app index file URL
+ * @returns {Promise} That resolves to the URL of the app index file
+ * or rejects if it fails
+ */
+export function getAppIndexFileUrl(): string {
+  return getOrSetLocalGaiaHubConnection()
+    .then((gaiaHubConfig) => `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}/${APP_INDEX_FILE_NAME}`)
+}
+
+/**
  * Retrieves the app index file from the app's data store.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-
 export function getAppIndexFile() {
   return this.getFile(APP_INDEX_FILE_NAME)
 }
