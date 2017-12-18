@@ -215,9 +215,19 @@
               
                 
                 <li><a
-                  href='#putindexfile'
+                  href='#getappindexfile'
                   class="">
-                  putIndexFile
+                  getAppIndexFile
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#putappindexfile'
+                  class="">
+                  putAppIndexFile
                   
                 </a>
                 
@@ -1654,8 +1664,64 @@ if it failed
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='putindexfile'>
-      putIndexFile
+    <h3 class='fl m0' id='getappindexfile'>
+      getAppIndexFile
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Retrieves the app index file from the app's data store.</p>
+
+
+  <div class='pre p1 fill-light mt0'>getAppIndexFile(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        that resolves to the raw data in the file
+or rejects with an error
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='putappindexfile'>
+      putAppIndexFile
     </h3>
     
     
@@ -1667,7 +1733,7 @@ will be written to the user's profile and publicly visible if the <code>appIndex
 scope was requested during authentication.</p>
 
 
-  <div class='pre p1 fill-light mt0'>putIndexFile(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>putAppIndexFile(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 

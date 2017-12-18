@@ -3556,7 +3556,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.GaiaHubConfig = exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
 exports.getFile = getFile;
 exports.putFile = putFile;
-exports.putIndexFile = putIndexFile;
+exports.getAppIndexFile = getAppIndexFile;
+exports.putAppIndexFile = putAppIndexFile;
 exports.deleteFile = deleteFile;
 
 var _hub = require('./hub');
@@ -3633,6 +3634,16 @@ function putFile(path, content) {
 }
 
 /**
+ * Retrieves the app index file from the app's data store.
+ * @returns {Promise} that resolves to the raw data in the file
+ * or rejects with an error
+ */
+
+function getAppIndexFile() {
+  return this.getFile(_hub.APP_INDEX_FILE_NAME);
+}
+
+/**
  * Stores the app index file which enables multi-reader storage. This file 
  * will be written to the user's profile and publicly visible if the `appIndex` 
  * scope was requested during authentication.
@@ -3640,8 +3651,7 @@ function putFile(path, content) {
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-function putIndexFile(content) {
-  var filename = _hub.APP_INDEX_FILE_NAME;
+function putAppIndexFile(content) {
   return this.putFile(_hub.APP_INDEX_FILE_NAME, content, false);
 }
 
