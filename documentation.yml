@@ -23,6 +23,7 @@ toc:
   - signProfileToken
   - verifyProfileToken
   - validateProofs
+  - lookupProfile
   - name: Storage
     description: |
       Store your app's data without servers in storage your user controls.
@@ -39,3 +40,4 @@ toc:
   - putFile
   - getAppIndexFile
   - putAppIndexFile
+  - getUserAppIndex

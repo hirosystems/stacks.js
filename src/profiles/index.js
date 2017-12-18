@@ -30,3 +30,7 @@ export {
   makeProfileZoneFile,
   getTokenFileUrl
 } from './profileZoneFiles'
+
+export {
+  lookupProfile
+} from './profileLookup'
