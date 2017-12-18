@@ -3699,7 +3699,7 @@ function putFile(path, content) {
  */
 function getAppIndexFileUrl() {
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    return '' + gaiaHubConfig.url_prefix + gaiaHubConfig.address + '/' + APP_INDEX_FILE_NAME;
+    return '' + gaiaHubConfig.url_prefix + gaiaHubConfig.address + '\n      /' + APP_INDEX_FILE_NAME;
   });
 }
 

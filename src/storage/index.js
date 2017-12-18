@@ -80,7 +80,8 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
  */
 export function getAppIndexFileUrl(): string {
   return getOrSetLocalGaiaHubConnection()
-    .then((gaiaHubConfig) => `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}/${APP_INDEX_FILE_NAME}`)
+    .then((gaiaHubConfig) => `${gaiaHubConfig.url_prefix}${gaiaHubConfig.address}
+      /${APP_INDEX_FILE_NAME}`)
 }
 
 /**
