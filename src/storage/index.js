@@ -7,6 +7,7 @@ import { getOrSetLocalGaiaHubConnection, getFullReadUrl, GaiaHubConfig,
 import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
+import { lookupProfile } from '../profiles'
 
 /**
  * Retrieves the specified file from the app's data store.
@@ -91,6 +92,31 @@ export function getAppIndexFile() {
  */
 export function putAppIndexFile(content: string | Buffer) {
   return this.putFile(APP_INDEX_FILE_NAME, content, false)
+}
+
+/**
+ * Fetch the app index file for the specified user and app. 
+ * @param {String} name - The blockstack ID of the user to look up
+ * @param {String} appOrigin - The app origin
+ * @param {string} [profileLookupURL=https://core.blockstack.org/v2/users/] The URL
+ * to use for profile lookup 
+ * @return {Promise} that resolves to the raw data in the file
+ * or rejects with an error
+ */
+export function getUserAppIndex(name: string, appOrigin: string, profileLookupURL: string = 'https://core.blockstack.org/v2/users/') {
+  return lookupProfile(name, profileLookupURL)
+    .then(profile => {
+      if (profile.hasOwnProperty('apps')) {
+        if (profile.apps.hasOwnProperty(appOrigin)) {
+          const appIndexFileURL =  profile.apps[appOrigin]
+          return fetch(appIndexFileURL)
+        } else {
+          return null
+        }
+      } else {
+        return null
+      }
+    })
 }
 
 /**
