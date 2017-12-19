@@ -255,6 +255,16 @@
               
                 
                 <li><a
+                  href='#getappindexfileurl'
+                  class="">
+                  getAppIndexFileUrl
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#encryptecies'
                   class="">
                   encryptECIES
@@ -278,16 +288,6 @@
                   href='#setlocalgaiahubconnection'
                   class="">
                   setLocalGaiaHubConnection
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getappindexfileurl'
-                  class="">
-                  getAppIndexFileUrl
                   
                 </a>
                 
@@ -1992,6 +1992,85 @@ or rejects with an error
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='getappindexfileurl'>
+      getAppIndexFileUrl
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Get the app index file URL</p>
+
+
+  <div class='pre p1 fill-light mt0'>getAppIndexFileUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the gaia hub url to generate index file url for
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the app private key used to generate the app address
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        That resolves to the URL of the app index file
+or rejects if it fails
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='encryptecies'>
       encryptECIES
     </h3>
@@ -2187,62 +2266,6 @@ a hub connection, and store the hub config to localstorage</p>
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the new gaia hub connection
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getappindexfileurl'>
-      getAppIndexFileUrl
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Get the app index file URL</p>
-
-
-  <div class='pre p1 fill-light mt0'>getAppIndexFileUrl(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        That resolves to the URL of the app index file
-or rejects if it fails
 
       
     

@@ -41,3 +41,4 @@ toc:
   - getAppIndexFile
   - putAppIndexFile
   - getUserAppIndex
+  - getAppIndexFileUrl
