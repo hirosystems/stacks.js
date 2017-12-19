@@ -3493,12 +3493,13 @@ exports.Twitter = Twitter;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
+exports.APP_INDEX_FILE_NAME = exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
 exports.uploadToGaiaHub = uploadToGaiaHub;
 exports.getFullReadUrl = getFullReadUrl;
 exports.connectToGaiaHub = connectToGaiaHub;
 exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
 exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
+exports.generateAppIndexFilePath = generateAppIndexFilePath;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -3515,6 +3516,7 @@ var _authConstants = require('../auth/authConstants');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
+var APP_INDEX_FILE_NAME = exports.APP_INDEX_FILE_NAME = 'app_index.json';
 
 function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
@@ -3573,6 +3575,8 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
 function setLocalGaiaHubConnection() {
   var userData = (0, _authApp.loadUserData)();
 
+  console.log(userData);
+
   if (!userData.hubUrl) {
     userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
 
@@ -3596,6 +3600,25 @@ function getOrSetLocalGaiaHubConnection() {
   } else {
     return setLocalGaiaHubConnection();
   }
+}
+
+function generateAppIndexFilePath(gaiaHubUrl, appPrivateKey) {
+  console.log('connectToGaiaHub: ' + gaiaHubUrl + '/hub_info');
+  var challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(appPrivateKey));
+  return new Promise(function (resolve) {
+    fetch(gaiaHubUrl + '/hub_info').then(function (response) {
+      return response.text();
+    }).then(function (responseText) {
+      return JSON.parse(responseText);
+    }).then(function (responseJSON) {
+      var readURL = responseJSON.read_url_prefix;
+      var address = challengeSigner.getAddress();
+      var appIndexUrl = '' + readURL + address + '/' + APP_INDEX_FILE_NAME;
+      console.log('generateAppIndexFilePath');
+      console.log(appIndexUrl);
+      resolve(appIndexUrl);
+    });
+  });
 }
 }).call(this,require("buffer").Buffer)
 },{"../auth/authApp":1,"../auth/authConstants":2,"bigi":40,"bitcoinjs-lib":79,"buffer":135}],36:[function(require,module,exports){
@@ -3623,8 +3646,6 @@ var _keys = require('../keys');
 
 var _profiles = require('../profiles');
 
-var APP_INDEX_FILE_NAME = 'app_index.json';
-
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
@@ -3632,8 +3653,6 @@ var APP_INDEX_FILE_NAME = 'app_index.json';
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-
-
 function getFile(path) {
   var decrypt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -3673,6 +3692,8 @@ function getFile(path) {
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
+
+
 function putFile(path, content) {
   var encrypt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
@@ -3694,13 +3715,13 @@ function putFile(path, content) {
 
 /**
  * Get the app index file URL
+ * @param {String} gaiaHubUrl - the gaia hub url to generate index file url for
+ * @param {String} appPrivateKey - the app private key used to generate the app address
  * @returns {Promise} That resolves to the URL of the app index file
  * or rejects if it fails
  */
-function getAppIndexFileUrl() {
-  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    return '' + gaiaHubConfig.url_prefix + gaiaHubConfig.address + '\n      /' + APP_INDEX_FILE_NAME;
-  });
+function getAppIndexFileUrl(gaiaHubUrl, appPrivateKey) {
+  return (0, _hub.generateAppIndexFilePath)(gaiaHubUrl, appPrivateKey);
 }
 
 /**
@@ -3709,7 +3730,7 @@ function getAppIndexFileUrl() {
  * or rejects with an error
  */
 function getAppIndexFile() {
-  return this.getFile(APP_INDEX_FILE_NAME);
+  return this.getFile(_hub.APP_INDEX_FILE_NAME);
 }
 
 /**
@@ -3721,7 +3742,7 @@ function getAppIndexFile() {
  * if it failed
  */
 function putAppIndexFile(content) {
-  return this.putFile(APP_INDEX_FILE_NAME, content, false);
+  return this.putFile(_hub.APP_INDEX_FILE_NAME, content, false);
 }
 
 /**

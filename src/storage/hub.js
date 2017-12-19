@@ -5,7 +5,7 @@ import { loadUserData } from '../auth/authApp'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
-
+export const APP_INDEX_FILE_NAME = 'app_index.json'
 
 export type GaiaHubConfig = {
   address: string,
@@ -74,6 +74,8 @@ export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string)
 export function setLocalGaiaHubConnection(): Promise<*> {
   let userData = loadUserData()
 
+  console.log(userData)
+
   if (!userData.hubUrl) {
     userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
 
@@ -97,4 +99,22 @@ export function getOrSetLocalGaiaHubConnection(): Promise<*> {
   } else {
     return setLocalGaiaHubConnection()
   }
+}
+
+export function generateAppIndexFilePath(gaiaHubUrl, appPrivateKey): Promise<*> {
+  console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
+  const challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))
+  return new Promise((resolve) => {
+    fetch(`${gaiaHubUrl}/hub_info`)
+      .then((response) => response.text())
+      .then((responseText) => JSON.parse(responseText))
+      .then((responseJSON) => {
+        const readURL = responseJSON.read_url_prefix
+        const address = challengeSigner.getAddress()
+        const appIndexUrl = `${readURL}${address}/${APP_INDEX_FILE_NAME}`
+        console.log('generateAppIndexFilePath')
+        console.log(appIndexUrl)
+        resolve(appIndexUrl) 
+      }) 
+  })
 }
