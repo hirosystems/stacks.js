@@ -19,6 +19,10 @@ export class BlockstackNetwork {
       .then(x => x.name_price.satoshis)
   }
 
+  broadcastTransaction(transaction: string) {
+    throw new Error(`Cannot broadcast ${transaction}: not implemented.`)
+  }
+
   getFeeRate() {
     throw new Error('Not implemented.')
   }

@@ -3,7 +3,7 @@ export {
 } from './skeletons'
 
 export {
-  performPreorder, performRegister
+  makePreorder, makeRegister
 } from './txbuild'
 
 export * from './util'

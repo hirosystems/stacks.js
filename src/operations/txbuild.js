@@ -1,6 +1,7 @@
 import bitcoinjs from 'bitcoinjs-lib'
 
-import { addUTXOsToFund, DUST_MINIMUM, estimateTXBytes } from './util'
+import { addUTXOsToFund, DUST_MINIMUM, DEFAULT_BURN_ADDRESS,
+         estimateTXBytes, sumOutputValues } from './util'
 import { makePreorderSkeleton, makeRegisterSkeleton } from './skeletons'
 import { BlockstackNetwork } from './network'
 
@@ -14,11 +15,11 @@ export function addOwnerInput(utxos: Object,
   return txB.buildIncomplete()
 }
 
-export function performPreorder(fullyQualifiedName: string,
-                                destinationAddress: string,
-                                paymentKey: bitcoinjs.ECPair,
-                                network: BlockstackNetwork) {
-  const burnAddress = network.coerceAddress('1111111111111111111114oLvT2')
+export function makePreorder(fullyQualifiedName: string,
+                             destinationAddress: string,
+                             paymentKey: bitcoinjs.ECPair,
+                             network: BlockstackNetwork) {
+  const burnAddress = network.coerceAddress(DEFAULT_BURN_ADDRESS)
   const registerAddress = destinationAddress
   const preorderAddress = paymentKey.getAddress()
 
@@ -36,15 +37,18 @@ export function performPreorder(fullyQualifiedName: string,
     .then(inputs => {
       const utxos = inputs[0]
       const feeRate = inputs[1]
-      const preorderSkeleton = inputs[2]
-      const txFee = estimateTXBytes(preorderSkeleton, 1, 0) * feeRate
-      const outAmounts = preorderSkeleton.outs.reduce((agg, x) => agg + x.value, 0)
+
+      const preorderSkeletonTxB = bitcoinjs.TransactionBuilder.fromTransaction(
+        inputs[2], network.layer1)
+
+      const txFee = estimateTXBytes(preorderSkeletonTxB, 1, 0) * feeRate
+      const outAmounts = sumOutputValues(preorderSkeletonTxB)
+      const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
 
       return addUTXOsToFund(
-        preorderSkeleton, preorderAddress, utxos, txFee + outAmounts, feeRate, network)
+        preorderSkeletonTxB, changeIndex, utxos, txFee + outAmounts, feeRate, network)
     })
-    .then(unsignedTx => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network.layer1)
+    .then(txB => {
       for (let i = 0; i < txB.tx.ins.length; i++) {
         txB.sign(i, paymentKey)
       }
@@ -52,31 +56,29 @@ export function performPreorder(fullyQualifiedName: string,
     })
 }
 
-export function performRegister(fullyQualifiedName: string,
-                                registerAddress: string,
-                                paymentKey: bitcoinjs.ECPair,
-                                network: BlockstackNetwork) {
+export function makeRegister(fullyQualifiedName: string,
+                             registerAddress: string,
+                             paymentKey: bitcoinjs.ECPair,
+                             network: BlockstackNetwork) {
   const registerSkeleton = makeRegisterSkeleton(
     fullyQualifiedName, registerAddress, registerAddress, network)
 
   const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1)
   const paymentAddress = paymentKey.getAddress()
-  txB.addOutput(paymentAddress, DUST_MINIMUM) // change.
-
-  const withChange = txB.buildIncomplete()
+  const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
     .then(inputs => {
       const utxos = inputs[0]
       const feeRate = inputs[1]
-      const txFee = estimateTXBytes(withChange, 1, 0) * feeRate
-      const outAmounts = withChange.outs.reduce((agg, x) => agg + x.value, 0)
 
-      return addUTXOsToFund(withChange, paymentAddress, utxos, txFee + outAmounts,
+      const txFee = estimateTXBytes(txB, 1, 0) * feeRate
+      const outAmounts = sumOutputValues(txB)
+
+      return addUTXOsToFund(txB, changeIndex, utxos, txFee + outAmounts,
                             feeRate, network)
     })
-    .then(unsignedTx => {
-      const signingTxB = bitcoinjs.TransactionBuilder.fromTransaction(unsignedTx, network.layer1)
+    .then(signingTxB => {
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         signingTxB.sign(i, paymentKey)
       }

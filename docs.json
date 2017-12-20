@@ -7152,7 +7152,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/storage/hub.js"
+      "file": "/home/aaron/devel/blockstack.js/src/storage/hub.js"
     },
     "augments": [],
     "examples": [],
@@ -7334,7 +7334,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7592,7 +7592,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/utils.js"
+      "file": "/home/aaron/devel/blockstack.js/src/utils.js"
     },
     "augments": [],
     "examples": [],

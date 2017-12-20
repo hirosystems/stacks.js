@@ -2,10 +2,10 @@ import bitcoinjs from 'bitcoinjs-lib'
 import coinSelectUtils from 'coinselect/utils'
 import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
-import { BlockstackNetwork } from './network'
 
 export const DUST_MINIMUM = 5500
 export const SATOSHIS_PER_BTC = 1e8
+export const DEFAULT_BURN_ADDRESS = '1111111111111111111114oLvT2'
 
 export function hash160(buff: Buffer) {
   const sha256 = bitcoinjs.crypto.sha256(buff)
@@ -16,11 +16,25 @@ export function hash128(buff: Buffer) {
   return Buffer.from(bitcoinjs.crypto.sha256(buff).slice(0, 16))
 }
 
-export function estimateTXBytes(txIn : bitcoinjs.Transaction, additionalInputs : number,
+export function estimateTXBytes(txIn : bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
+                                additionalInputs : number,
                                 additionalOutputs : number) {
-  const inputs = [].concat(txIn.ins, new Array(additionalInputs))
-  const outputs = [].concat(txIn.outs, new Array(additionalOutputs))
+  let innerTx = txIn
+  if (txIn instanceof bitcoinjs.TransactionBuilder) {
+    innerTx = txIn.tx
+  }
+  const inputs = [].concat(innerTx.ins, new Array(additionalInputs))
+  const outputs = [].concat(innerTx.outs, new Array(additionalOutputs))
   return coinSelectUtils.transactionBytes(inputs, outputs)
+}
+
+export function sumOutputValues(txIn : bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
+  let innerTx = txIn
+  if (txIn instanceof bitcoinjs.TransactionBuilder) {
+    innerTx = txIn.tx
+  }
+
+  return innerTx.outs.reduce((agg, x) => agg + x.value, 0)
 }
 
 export function decodeB40(input: string) {
@@ -34,12 +48,12 @@ export function decodeB40(input: string) {
     .toHex()
 }
 
-export function addUTXOsToFund(txIn: bitcoinjs.Transaction, funderAddress: string, utxos: Object,
-                               amountToFund: number, feeRate: number, network: BlockstackNetwork) {
-  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn, network.layer1)
-
+export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder, changeOutput: number,
+                               utxos: Array<{value: number, tx_hash: string, tx_output_n: number}>,
+                               amountToFund: number, feeRate: number) {
+  // This will 100% mutate the provided txbuilder object.
   if (utxos.length === 0) {
-    throw new Error(`Not enough UTXOs for ${funderAddress} to fund: left to fund: ${amountToFund}`)
+    throw new Error(`Not enough UTXOs to fund. Left to fund: ${amountToFund}`)
   }
 
   const goodUtxos = utxos.filter(utxo => utxo.value >= amountToFund)
@@ -47,33 +61,22 @@ export function addUTXOsToFund(txIn: bitcoinjs.Transaction, funderAddress: strin
     goodUtxos.sort((a, b) => a.value - b.value)
     const selected = goodUtxos[0]
     const change = selected.value - amountToFund
-    const outputAddresses = txB.tx.outs.map(
-      x => {
-        if (bitcoinjs.script.toASM(x.script).startsWith('OP_RETURN')) {
-          return ''
-        } else {
-          return bitcoinjs.address.fromOutputScript(x.script, network.layer1)
-        }
-      })
-    const changeOutput = outputAddresses.indexOf(funderAddress)
-    if (changeOutput !== -1) {
-      txB.tx.outs[changeOutput].value += change
-    } else {
-      throw new Error('Couldn\'t find a change output')
-    }
-    txB.addInput(selected.tx_hash, selected.tx_output_n)
-    return txB.buildIncomplete()
+
+    txBuilderIn.tx.outs[changeOutput].value += change
+    txBuilderIn.addInput(selected.tx_hash, selected.tx_output_n)
+    return txBuilderIn
   } else {
     utxos.sort((a, b) => b.value - a.value)
     const largest = utxos[0]
 
-    txB.addInput(largest.tx_hash, largest.tx_output_n)
+    txBuilderIn.addInput(largest.tx_hash, largest.tx_output_n)
 
-    const newFees = feeRate * (estimateTXBytes(txIn, 1, 0) - estimateTXBytes(txIn, 0, 0))
+    const newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0)
+                               - estimateTXBytes(txBuilderIn, 0, 0))
     const remainToFund = amountToFund + newFees - largest.value
 
-    return addUTXOsToFund(txB.buildIncomplete(),
-                          funderAddress, utxos.slice(1),
-                          remainToFund, feeRate, network)
+    return addUTXOsToFund(txBuilderIn,
+                          changeOutput, utxos.slice(1),
+                          remainToFund, feeRate)
   }
 }
