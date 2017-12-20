@@ -36,7 +36,7 @@ export function getFile(path: string, decrypt: boolean = false) {
       }
     })
     .then((storedContents) => {
-      if (decrypt) {
+      if (decrypt && storedContents !== null) {
         const privateKey = loadUserData().appPrivateKey
         const cipherObject = JSON.parse(storedContents)
         return decryptECIES(privateKey, cipherObject)

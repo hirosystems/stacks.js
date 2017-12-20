@@ -1,19 +1,43 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
-
 import bitcoin from 'bitcoinjs-lib'
 
-import { uploadToGaiaHub, getFullReadUrl, connectToGaiaHub } from '../../../lib/storage/hub'
+import localStorage from 'mock-local-storage'
+
+import { uploadToGaiaHub, getFullReadUrl,
+         connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL } from '../../../lib/storage/hub'
+import { getFile } from '../../../lib/storage'
+
+global.window = {}
+window.localStorage = global.localStorage
 
 export function runStorageTests() {
+
+  test('fetch404null', (t) => {
+    t.plan(2)
+    const config = { address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+                     url_prefix: 'gaia.testblockstack.org/hub/',
+                     token: '',
+                     server: 'hub.testblockstack.org' }
+
+    global.localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(config))
+
+    FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
+                  { status: 404 })
+
+    getFile('foo.json', false)
+      .then(x => t.equal(x, null, '404 should return null'))
+    getFile('foo.json', true)
+      .then(x => t.equal(x, null, '404 should return null, even if we try to decrypt'))
+  })
 
   test('uploadToGaiaHub', (t) => {
     t.plan(2)
 
     const config = { address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
-                   url_prefix: 'gaia.testblockstack.org',
-                   token: '',
-                   server: 'hub.testblockstack.org' }
+                     url_prefix: 'gaia.testblockstack.org',
+                     token: '',
+                     server: 'hub.testblockstack.org' }
 
     FetchMock.post(`${config.server}/store/${config.address}/foo.json`,
                    JSON.stringify({publicURL: '${config.url_prefix}/${config.address}/foo.json'}))
@@ -29,9 +53,9 @@ export function runStorageTests() {
     t.plan(1)
 
     const config = { address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
-                   url_prefix: 'gaia.testblockstack.org',
-                   token: '',
-                   server: 'hub.testblockstack.org' }
+                     url_prefix: 'gaia.testblockstack.org',
+                     token: '',
+                     server: 'hub.testblockstack.org' }
 
     const outUrl = getFullReadUrl('foo.json', config)
     t.equal(`${config.url_prefix}${config.address}/foo.json`, outUrl)
