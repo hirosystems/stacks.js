@@ -93,8 +93,8 @@ export function getAppIndexFile() {
 }
 
 /**
- * Stores the app index file which enables multi-reader storage. This file 
- * will be publicly visible in the user's profile data if the `appIndex` 
+ * Stores the app index file which enables multi-reader storage. This file
+ * will be publicly visible in the user's profile data if the `appIndex`
  * scope was requested during authentication.
  * @param {String|Buffer} content - the data to store in the file
  * @return {Promise} that resolves if the operation succeed and rejects
@@ -105,11 +105,11 @@ export function putAppIndexFile(content: string | Buffer) {
 }
 
 /**
- * Fetch the app index file for the specified user and app. 
+ * Fetch the app index file for the specified user and app.
  * @param {String} name - The blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
  * @param {string} [profileLookupURL=https://core.blockstack.org/v2/users/] The URL
- * to use for profile lookup 
+ * to use for profile lookup
  * @return {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
@@ -131,10 +131,10 @@ export function getUserAppIndex(name: string, appOrigin: string, profileLookupUR
     .then((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
-          console.log(`getUserAppIndex ${path} returned 404, returning null`)
+          console.log(`getUserAppIndex ${response.url} returned 404, returning null`)
           return null
         } else {
-          throw new Error(`getUserAppIndex ${path} failed with HTTP status ${response.status}`)
+          throw new Error(`getUserAppIndex ${response.url} failed with status ${response.status}`)
         }
       }
       const contentType = response.headers.get('Content-Type')
@@ -159,4 +159,3 @@ export function deleteFile(path: string) {
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GaiaHubConfig }
-
