@@ -5488,7 +5488,7 @@
       },
       {
         "title": "param",
-        "description": "The URL\nto use for profile lookup",
+        "description": "The URL\nto use for zonefile lookup",
         "lineNumber": 4,
         "type": {
           "type": "OptionalType",
@@ -5497,8 +5497,8 @@
             "name": "string"
           }
         },
-        "name": "profileLookupURL",
-        "default": "https://core.blockstack.org/v2/users/"
+        "name": "zoneFileLookupURL",
+        "default": "http://localhost:6270/v1/names/"
       },
       {
         "title": "returns",
@@ -5512,22 +5512,22 @@
     ],
     "loc": {
       "start": {
-        "line": 3,
+        "line": 4,
         "column": 0
       },
       "end": {
-        "line": 10,
+        "line": 11,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 11,
+          "line": 12,
           "column": 0
         },
         "end": {
-          "line": 35,
+          "line": 37,
           "column": 1
         }
       },
@@ -5599,7 +5599,7 @@
       },
       {
         "title": "param",
-        "name": "profileLookupURL",
+        "name": "zoneFileLookupURL",
         "lineNumber": 4,
         "description": {
           "type": "root",
@@ -5609,7 +5609,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The URL\nto use for profile lookup",
+                  "value": "The URL\nto use for zonefile lookup",
                   "position": {
                     "start": {
                       "line": 1,
@@ -5618,8 +5618,8 @@
                     },
                     "end": {
                       "line": 2,
-                      "column": 26,
-                      "offset": 33
+                      "column": 27,
+                      "offset": 34
                     },
                     "indent": [
                       1
@@ -5635,8 +5635,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 26,
-                  "offset": 33
+                  "column": 27,
+                  "offset": 34
                 },
                 "indent": [
                   1
@@ -5652,8 +5652,8 @@
             },
             "end": {
               "line": 2,
-              "column": 26,
-              "offset": 33
+              "column": 27,
+              "offset": 34
             }
           }
         },
@@ -5661,7 +5661,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "https://core.blockstack.org/v2/users/"
+        "default": "http://localhost:6270/v1/names/"
       }
     ],
     "properties": [],
@@ -6906,7 +6906,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Stores the app index file which enables multi-reader storage. This file \nwill be publicly visible in the user's profile data if the ",
+              "value": "Stores the app index file which enables multi-reader storage. This file\nwill be publicly visible in the user's profile data if the ",
               "position": {
                 "start": {
                   "line": 1,
@@ -6916,7 +6916,7 @@
                 "end": {
                   "line": 2,
                   "column": 60,
-                  "offset": 132
+                  "offset": 131
                 },
                 "indent": [
                   1
@@ -6930,29 +6930,29 @@
                 "start": {
                   "line": 2,
                   "column": 60,
-                  "offset": 132
+                  "offset": 131
                 },
                 "end": {
                   "line": 2,
                   "column": 70,
-                  "offset": 142
+                  "offset": 141
                 },
                 "indent": []
               }
             },
             {
               "type": "text",
-              "value": " \nscope was requested during authentication.",
+              "value": "\nscope was requested during authentication.",
               "position": {
                 "start": {
                   "line": 2,
                   "column": 70,
-                  "offset": 142
+                  "offset": 141
                 },
                 "end": {
                   "line": 3,
                   "column": 43,
-                  "offset": 186
+                  "offset": 184
                 },
                 "indent": [
                   1
@@ -6969,7 +6969,7 @@
             "end": {
               "line": 3,
               "column": 43,
-              "offset": 186
+              "offset": 184
             },
             "indent": [
               1,
@@ -6987,7 +6987,7 @@
         "end": {
           "line": 3,
           "column": 43,
-          "offset": 186
+          "offset": 184
         }
       }
     },
@@ -7280,7 +7280,7 @@
       },
       {
         "title": "param",
-        "description": "The URL\nto use for profile lookup",
+        "description": "The URL\nto use for zonefile lookup",
         "lineNumber": 4,
         "type": {
           "type": "OptionalType",
@@ -7289,8 +7289,8 @@
             "name": "string"
           }
         },
-        "name": "profileLookupURL",
-        "default": "https://core.blockstack.org/v2/users/"
+        "name": "zoneFileLookupURL",
+        "default": "http://localhost:6270/v1/names/"
       },
       {
         "title": "return",
@@ -7452,7 +7452,7 @@
       },
       {
         "title": "param",
-        "name": "profileLookupURL",
+        "name": "zoneFileLookupURL",
         "lineNumber": 4,
         "description": {
           "type": "root",
@@ -7462,7 +7462,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The URL\nto use for profile lookup",
+                  "value": "The URL\nto use for zonefile lookup",
                   "position": {
                     "start": {
                       "line": 1,
@@ -7471,8 +7471,8 @@
                     },
                     "end": {
                       "line": 2,
-                      "column": 26,
-                      "offset": 33
+                      "column": 27,
+                      "offset": 34
                     },
                     "indent": [
                       1
@@ -7488,8 +7488,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 26,
-                  "offset": 33
+                  "column": 27,
+                  "offset": 34
                 },
                 "indent": [
                   1
@@ -7505,8 +7505,8 @@
             },
             "end": {
               "line": 2,
-              "column": 26,
-              "offset": 33
+              "column": 27,
+              "offset": 34
             }
           }
         },
@@ -7514,7 +7514,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "https://core.blockstack.org/v2/users/"
+        "default": "http://localhost:6270/v1/names/"
       }
     ],
     "properties": [],

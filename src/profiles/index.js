@@ -28,7 +28,8 @@ export {
 
 export {
   makeProfileZoneFile,
-  getTokenFileUrl
+  getTokenFileUrl,
+  resolveZoneFileToProfile
 } from './profileZoneFiles'
 
 export {

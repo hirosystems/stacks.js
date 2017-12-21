@@ -1,35 +1,37 @@
 /* @flow */
+import { resolveZoneFileToProfile } from './profileZoneFiles'
 
 /**
  * Look up a user profile by blockstack ID
  *
  * @param {Object} name The Blockstack ID of the profile to look up
- * @param {string} [profileLookupURL=https://core.blockstack.org/v2/users/] The URL
- * to use for profile lookup 
+ * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(name: string, profileLookupURL: string = 'https://core.blockstack.org/v2/users/') {
+export function lookupProfile(name: string, zoneFileLookupURL: string = 'http://localhost:6270/v1/names/') {
   return new Promise((resolve, reject) => {
     if (!name) {
       reject()
     }
-    const url = `${profileLookupURL.replace(/\/$/, '')}/${name}`
+    const url = `${zoneFileLookupURL.replace(/\/$/, '')}/${name}`
     try {
       fetch(url)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
         .then(responseJSON => {
-          if (responseJSON.hasOwnProperty(name)) {
-            resolve(responseJSON[name].profile)
+          if (responseJSON.hasOwnProperty('zonefile')
+            && responseJSON.hasOwnProperty('address')) {
+            resolve(resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address))
           } else {
             reject()
           }
         })
-        .catch(() => {
-          reject()
+        .catch((e) => {
+          reject(e)
         })
     } catch (e) {
-      reject()
+      reject(e)
     }
   })
 }

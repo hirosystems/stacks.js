@@ -108,13 +108,13 @@ export function putAppIndexFile(content: string | Buffer) {
  * Fetch the app index file for the specified user and app.
  * @param {String} name - The blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {string} [profileLookupURL=https://core.blockstack.org/v2/users/] The URL
- * to use for profile lookup
+ * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * to use for zonefile lookup
  * @return {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getUserAppIndex(name: string, appOrigin: string, profileLookupURL: string = 'https://core.blockstack.org/v2/users/') {
-  return lookupProfile(name, profileLookupURL)
+export function getUserAppIndex(name: string, appOrigin: string, zoneFileLookupURL: string = 'http://localhost:6270/v1/names/') {
+  return lookupProfile(name, zoneFileLookupURL)
     .then(profile => {
       if (profile.hasOwnProperty('apps')) {
         if (profile.apps.hasOwnProperty(appOrigin)) {

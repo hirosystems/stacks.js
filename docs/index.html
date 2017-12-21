@@ -1515,7 +1515,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
   <p>Look up a user profile by blockstack ID</p>
 
 
-  <div class='pre p1 fill-light mt0'>lookupProfile(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, profileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>lookupProfile(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1541,10 +1541,10 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>profileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-            = <code>https://core.blockstack.org/v2/users/</code>)</code>
+            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>http://localhost:6270/v1/names/</code>)</code>
 	    The URL
-to use for profile lookup
+to use for zonefile lookup
 
           </div>
           
@@ -1913,7 +1913,7 @@ if it failed
   <p>Fetch the app index file for the specified user and app.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getUserAppIndex(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, profileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>getUserAppIndex(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1948,10 +1948,10 @@ if it failed
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>profileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-            = <code>https://core.blockstack.org/v2/users/</code>)</code>
+            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>http://localhost:6270/v1/names/</code>)</code>
 	    The URL
-to use for profile lookup
+to use for zonefile lookup
 
           </div>
           
