@@ -118,13 +118,32 @@ export function getUserAppIndex(name: string, appOrigin: string, profileLookupUR
     .then(profile => {
       if (profile.hasOwnProperty('apps')) {
         if (profile.apps.hasOwnProperty(appOrigin)) {
-          const appIndexFileURL =  profile.apps[appOrigin]
-          return fetch(appIndexFileURL)
+          const appIndexFileURL = profile.apps[appOrigin]
+          return appIndexFileURL
         } else {
           return null
         }
       } else {
         return null
+      }
+    })
+    .then((appIndexFileURL) => fetch(appIndexFileURL))
+    .then((response) => {
+      if (response.status !== 200) {
+        if (response.status === 404) {
+          console.log(`getUserAppIndex ${path} returned 404, returning null`)
+          return null
+        } else {
+          throw new Error(`getUserAppIndex ${path} failed with HTTP status ${response.status}`)
+        }
+      }
+      const contentType = response.headers.get('Content-Type')
+      if (contentType === null ||
+          contentType.startsWith('text') ||
+          contentType === 'application/json') {
+        return response.text()
+      } else {
+        return response.arrayBuffer()
       }
     })
 }
