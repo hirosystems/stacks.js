@@ -3731,7 +3731,7 @@ function getFile(path) {
       return response.arrayBuffer();
     }
   }).then(function (storedContents) {
-    if (decrypt) {
+    if (decrypt && storedContents !== null) {
       var privateKey = (0, _auth.loadUserData)().appPrivateKey;
       var cipherObject = JSON.parse(storedContents);
       return (0, _encryption.decryptECIES)(privateKey, cipherObject);
