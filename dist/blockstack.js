@@ -3687,6 +3687,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.GaiaHubConfig = exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
 exports.getFile = getFile;
 exports.putFile = putFile;
+exports.getFileReadUrl = getFileReadUrl;
 exports.getAppIndexFileUrl = getAppIndexFileUrl;
 exports.getAppIndexFile = getAppIndexFile;
 exports.putAppIndexFile = putAppIndexFile;
@@ -3767,6 +3768,17 @@ function putFile(path, content) {
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType);
+  });
+}
+
+/**
+ * Get the the read URL of a stored file
+ * @param {String} path - the file path to retrieve read URL for
+ * @returns {Promise} That resolves to the read URL of the specified file
+ */
+function getFileReadUrl(path) {
+  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+    return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
   });
 }
 

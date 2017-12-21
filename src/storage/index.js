@@ -73,6 +73,17 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
 }
 
 /**
+ * Get the the read URL of a stored file
+ * @param {String} path - the file path to retrieve read URL for
+ * @returns {Promise} That resolves to the read URL of the specified file
+ */
+export function getFileReadUrl(path: string) {
+  return getOrSetLocalGaiaHubConnection()
+    .then((gaiaHubConfig) => getFullReadUrl(path, gaiaHubConfig))
+}
+
+
+/**
  * Get the app index file URL
  * @param {String} gaiaHubUrl - the gaia hub url to generate index file url for
  * @param {String} appPrivateKey - the app private key used to generate the app address
