@@ -53,6 +53,13 @@ export class LocalRegtest extends BlockstackNetwork {
     return 0.00001000 * SATOSHIS_PER_BTC
   }
 
+  broadcastTransaction(transaction: string) {
+    const jsonRPC = { jsonrpc: '1.0',
+                      method: 'sendrawtransaction',
+                      params: [transaction] }
+    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+  }
+
   getUTXOs(address: string) {
     const jsonRPCImport = { jsonrpc: '1.0',
                             method: 'importaddress',

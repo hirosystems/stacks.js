@@ -1594,6 +1594,14 @@ var LocalRegtest = exports.LocalRegtest = function (_BlockstackNetwork) {
       return 0.00001000 * _util.SATOSHIS_PER_BTC;
     }
   }, {
+    key: 'broadcastTransaction',
+    value: function broadcastTransaction(transaction) {
+      var jsonRPC = { jsonrpc: '1.0',
+        method: 'sendrawtransaction',
+        params: [transaction] };
+      return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) });
+    }
+  }, {
     key: 'getUTXOs',
     value: function getUTXOs(address) {
       var _this2 = this;
