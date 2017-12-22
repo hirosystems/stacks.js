@@ -63,7 +63,7 @@ export function makeRegister(fullyQualifiedName: string,
                              network: BlockstackNetwork) {
   let valueHash = undefined
   if (!!zonefile) {
-    valueHash = hash160(Buffer.from(zonefile))
+    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   }
 
   const registerSkeleton = makeRegisterSkeleton(

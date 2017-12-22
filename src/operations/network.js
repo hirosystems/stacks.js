@@ -38,8 +38,13 @@ export class BlockstackNetwork {
 
   publishZonefile(zonefile: string) {
     const arg = { zonefile }
-    return fetch(`${this.blockstackAPIUrl}/v1/zonefile`,
-                 { method: 'POST', body: JSON.stringify(arg) })
+    return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
+                 { method: 'POST',
+                   body: JSON.stringify(arg),
+                   headers: {
+                     'Content-Type': 'application/json'
+                   }
+                 })
       .then(resp => resp.json())
       .then(respObj => {
         if (respObj.hasOwnProperty('error')) {

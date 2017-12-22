@@ -7,14 +7,9 @@ import { makePreorder, makeRegister, LOCAL_REGTEST } from '../../../lib/'
 
 const pExec = util.promisify(exec)
 
-
-let dest = btc.ECPair.fromWIF('cNRZucCsNZR3HGFtW4nMEqME38RH3xWXrRgn74hnaBdEqMxeMUKj', btc.networks.testnet)
-let payer = btc.ECPair.fromWIF('cTs14pEWitbXXQF7qN4jRvJGwgeEU4FCcJNTwXYdSngBYkmCkBpi', btc.networks.testnet)
-
-
 async function initializeBlockstackCore() {
 
-  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
+  //await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
 
   try {
     await pExec('docker stop test-bsk-core ; docker rm test-bsk-core ; rm -rf /tmp/.blockstack_int_test')
@@ -39,12 +34,16 @@ function shutdownBlockstackCore() {
 
 export function runIntegrationTests() {
   test('registerName', (t) => {
-    t.plan(3)
+    t.plan(2)
 
-    t.ok(makePreorder)
-    t.ok(makeRegister)
+    const dest = btc.ECPair.fromWIF('cNRZucCsNZR3HGFtW4nMEqME38RH3xWXrRgn74hnaBdEqMxeMUKj',
+                                    btc.networks.testnet)
+    const payer = btc.ECPair.fromWIF('cTs14pEWitbXXQF7qN4jRvJGwgeEU4FCcJNTwXYdSngBYkmCkBpi',
+                                     btc.networks.testnet)
 
-    const zfTest = 'foo the \n bar'
+
+    const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
+          `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/0/profile.json"`
 
     const network = LOCAL_REGTEST
 
@@ -74,6 +73,7 @@ export function runIntegrationTests() {
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(network.coerceAddress(nameInfo.address), dest.getAddress())
+        t.equal(nameInfo.zonefile, zfTest)
       })
       .then(() => shutdownBlockstackCore())
   })
