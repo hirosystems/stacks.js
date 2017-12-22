@@ -61,7 +61,6 @@ export function makeRegister(fullyQualifiedName: string,
                              paymentKey: bitcoinjs.ECPair,
                              zonefile: string = null,
                              network: BlockstackNetwork) {
-
   let valueHash = undefined
   if (!!zonefile) {
     valueHash = hash160(Buffer.from(zonefile))
