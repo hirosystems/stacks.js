@@ -36,6 +36,19 @@ export class BlockstackNetwork {
       .then(resp => resp.json())
   }
 
+  publishZonefile(zonefile: string) {
+    const arg = { zonefile }
+    return fetch(`${this.blockstackAPIUrl}/v1/zonefile`,
+                 { method: 'POST', body: JSON.stringify(arg) })
+      .then(resp => resp.json())
+      .then(respObj => {
+        if (respObj.hasOwnProperty('error')) {
+          throw new Error(respObj.error)
+        }
+        return respObj.servers
+      })
+  }
+
   getConsensusHash() {
     return fetch(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
       .then(resp => resp.json())

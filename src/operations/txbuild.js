@@ -1,7 +1,7 @@
 import bitcoinjs from 'bitcoinjs-lib'
 
 import { addUTXOsToFund, DUST_MINIMUM, DEFAULT_BURN_ADDRESS,
-         estimateTXBytes, sumOutputValues } from './util'
+         estimateTXBytes, sumOutputValues, hash160 } from './util'
 import { makePreorderSkeleton, makeRegisterSkeleton } from './skeletons'
 import { BlockstackNetwork } from './network'
 
@@ -59,9 +59,16 @@ export function makePreorder(fullyQualifiedName: string,
 export function makeRegister(fullyQualifiedName: string,
                              registerAddress: string,
                              paymentKey: bitcoinjs.ECPair,
+                             zonefile: string = null,
                              network: BlockstackNetwork) {
+
+  let valueHash = undefined
+  if (!!zonefile) {
+    valueHash = hash160(Buffer.from(zonefile))
+  }
+
   const registerSkeleton = makeRegisterSkeleton(
-    fullyQualifiedName, registerAddress, registerAddress, network)
+    fullyQualifiedName, registerAddress, registerAddress, network, valueHash)
 
   const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1)
   const paymentAddress = paymentKey.getAddress()

@@ -12,9 +12,9 @@ let dest = btc.ECPair.fromWIF('cNRZucCsNZR3HGFtW4nMEqME38RH3xWXrRgn74hnaBdEqMxeM
 let payer = btc.ECPair.fromWIF('cTs14pEWitbXXQF7qN4jRvJGwgeEU4FCcJNTwXYdSngBYkmCkBpi', btc.networks.testnet)
 
 
-export async function initializeBlockstackCore() {
+async function initializeBlockstackCore() {
 
-  //await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
+  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
 
   try {
     await pExec('docker stop test-bsk-core ; docker rm test-bsk-core ; rm -rf /tmp/.blockstack_int_test')
@@ -33,6 +33,9 @@ export async function initializeBlockstackCore() {
 
 }
 
+function shutdownBlockstackCore() {
+  return pExec('docker stop test-bsk-core')
+}
 
 export function runIntegrationTests() {
   test('registerName', (t) => {
@@ -40,6 +43,8 @@ export function runIntegrationTests() {
 
     t.ok(makePreorder)
     t.ok(makeRegister)
+
+    const zfTest = 'foo the \n bar'
 
     const network = LOCAL_REGTEST
 
@@ -55,7 +60,7 @@ export function runIntegrationTests() {
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
       .then(() => {
-        return makeRegister('aaron.id', dest.getAddress(), payer, network)
+        return makeRegister('aaron.id', dest.getAddress(), payer, zfTest, network)
       })
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
@@ -63,11 +68,14 @@ export function runIntegrationTests() {
         console.log('REGISTER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
+      .then(() => network.publishZonefile(zfTest))
+      .then((zfResp) => console.log(zfResp))
       .then(() => fetch(`${network.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(network.coerceAddress(nameInfo.address), dest.getAddress())
       })
+      .then(() => shutdownBlockstackCore())
   })
 
 }
