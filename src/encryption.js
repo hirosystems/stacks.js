@@ -35,13 +35,16 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
            hmacKey: hashedSecret.slice(32) }
 }
 
-function getHexFromBN(bnInput: Object) {
+export function getHexFromBN(bnInput: Object) {
   const hexOut = bnInput.toString('hex')
 
   if (hexOut.length === 64) {
     return hexOut
+  } else if (hexOut.length < 64) {
+    // pad with leading zeros
+    return hexOut.padStart(64, '0')
   } else {
-    return `0${hexOut}`
+    throw new Error('Generated a > 32-byte BN for encryption. Failing.')
   }
 }
 
