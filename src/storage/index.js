@@ -9,16 +9,40 @@ import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
 
+const APP_INDEX_FILES_KEY = 'files'
+
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
- * @param {Boolean} decrypt - try to decrypt the data with the app private key
+ * @param {Object} [options=null] - options object
+ * @param {Boolean} [options.decrypt=false] - try to decrypt the data with the app private key
+ * @param {String} options.user - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage
+ * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the blockstack 
+ * core endpoint url to use for zonefile lookup
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(path: string, decrypt: boolean = false) {
+export function getFile(path: string, options?: {decrypt?: boolean, user?: string, app?: string, 
+  zoneFileLookupURL?: string}) {
+  const defaults = {
+    decrypt: false,
+    user: null,
+    app: null,
+    zoneFileLookupURL: 'http://localhost:6270/v1/names/'
+  }
+
+  const opt = Object.assign({}, defaults, options)
+
   return getOrSetLocalGaiaHubConnection()
-    .then((gaiaHubConfig) => fetch(getFullReadUrl(path, gaiaHubConfig)))
+    .then((gaiaHubConfig) => {
+      if (opt.user && opt.app) {
+        return this.getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL)
+      } else {
+        return getFullReadUrl(path, gaiaHubConfig)
+      }
+    })
+    .then((readUrl) => fetch(readUrl))
     .then((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
@@ -29,7 +53,7 @@ export function getFile(path: string, decrypt: boolean = false) {
         }
       }
       const contentType = response.headers.get('Content-Type')
-      if (contentType === null || decrypt ||
+      if (contentType === null || opt.decrypt ||
           contentType.startsWith('text') ||
           contentType === 'application/json') {
         return response.text()
@@ -38,7 +62,7 @@ export function getFile(path: string, decrypt: boolean = false) {
       }
     })
     .then((storedContents) => {
-      if (decrypt && storedContents !== null) {
+      if (opt.decrypt && storedContents !== null) {
         const privateKey = loadUserData().appPrivateKey
         const cipherObject = JSON.parse(storedContents)
         return decryptECIES(privateKey, cipherObject)
@@ -52,16 +76,25 @@ export function getFile(path: string, decrypt: boolean = false) {
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
- * @param {Boolean} encrypt - encrypt the data with the app private key
+ * @param {Object} [options=null]- options object
+ * @param {Boolean} [options.encrypt=false] - encrypt the data with the app private key
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-export function putFile(path: string, content: string | Buffer, encrypt: boolean = false) {
+export function putFile(path: string, content: string | Buffer, options?: {encrypt?: boolean,
+  public?: boolean}) {
+  const defaults = {
+    encrypt: false,
+    public: false
+  }
+
+  const opt = Object.assign({}, defaults, options)
+
   let contentType = 'text/plain'
   if (typeof(content) !== 'string') {
     contentType = 'application/octet-stream'
   }
-  if (encrypt) {
+  if (opt.encrypt) {
     const privateKey = loadUserData().appPrivateKey
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const cipherObject = encryptECIES(publicKey, content)
@@ -70,6 +103,13 @@ export function putFile(path: string, content: string | Buffer, encrypt: boolean
   }
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
+    .then((publicUrl) => {
+      if (opt.public) {
+        return this.addToAppIndex(path, publicUrl)
+      } else {
+        return publicUrl
+      }
+    })
 }
 
 /**
@@ -82,6 +122,29 @@ export function getFileReadUrl(path: string) {
     .then((gaiaHubConfig) => getFullReadUrl(path, gaiaHubConfig))
 }
 
+/**
+ * Adds the public URL of a file to the app index file under the `files` property
+ * @param {String} path - the file path
+ * @param {String} publicUrl - the public URL of the file
+ * @returns {Promise} That resolves to the public URL of the specified file
+ */
+export function addToAppIndex(path: string, publicUrl: string) {
+  return this.getAppIndexFile(path)
+    .then((appIndexJSON) => {
+      let newAppIndex = {}
+      if (!appIndexJSON) {
+        newAppIndex = { [APP_INDEX_FILES_KEY]: { [path]: publicUrl } }
+      } else {
+        const appIndex = JSON.parse(appIndexJSON)
+        const newFiles = Object.assign({}, appIndex.files, { [path]: publicUrl })
+
+        newAppIndex = appIndex
+        newAppIndex[APP_INDEX_FILES_KEY] = newFiles
+      }
+      return this.putAppIndexFile(JSON.stringify(newAppIndex))
+    })
+    .then(() => publicUrl)
+}
 
 /**
  * Get the app index file URL
@@ -112,7 +175,7 @@ export function getAppIndexFile() {
  * if it failed
  */
 export function putAppIndexFile(content: string | Buffer) {
-  return this.putFile(APP_INDEX_FILE_NAME, content, false)
+  return this.putFile(APP_INDEX_FILE_NAME, content)
 }
 
 /**
@@ -155,6 +218,29 @@ export function getUserAppIndex(name: string, appOrigin: string, zoneFileLookupU
         return response.text()
       } else {
         return response.arrayBuffer()
+      }
+    })
+}
+
+/**
+ * Fetch the public file read url for the specified user and app.
+ * @param {String} path - the path to the file to read
+ * @param {String} name - The blockstack ID of the user to look up
+ * @param {String} appOrigin - The app origin
+ * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * to use for zonefile lookup
+ * @return {Promise} that resolves to the public read url of the file
+ * or rejects with an error
+ */
+export function getUserAppFileUrl(path: string, name: string, appOrigin: string, 
+  zoneFileLookupURL: string = 'http://localhost:6270/v1/names/') {
+  return getUserAppIndex(name, appOrigin, zoneFileLookupURL)
+    .then((appIndexFileJSON) => {
+      const appIndexFile = JSON.parse(appIndexFileJSON)
+      if (appIndexFile.hasOwnProperty(APP_INDEX_FILES_KEY)) {
+        return appIndexFile.files[path]
+      } else {
+        throw new Error(`getUserAppFileUrl ${path} app index does not contain files key`)
       }
     })
 }

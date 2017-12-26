@@ -6058,18 +6058,70 @@
       },
       {
         "title": "param",
-        "description": "try to decrypt the data with the app private key",
+        "description": "options object",
         "lineNumber": 3,
         "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
         },
-        "name": "decrypt"
+        "name": "options",
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "description": "try to decrypt the data with the app private key",
+        "lineNumber": 4,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Boolean"
+          }
+        },
+        "name": "options.decrypt",
+        "default": "false"
+      },
+      {
+        "title": "param",
+        "description": "the Blockstack ID to lookup for multi-player storage",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "options.user"
+      },
+      {
+        "title": "param",
+        "description": "the app to lookup for multi-player storage",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "options.app"
+      },
+      {
+        "title": "param",
+        "description": "the blockstack \ncore endpoint url to use for zonefile lookup",
+        "lineNumber": 7,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "String"
+          }
+        },
+        "name": "options.zoneFileLookupURL",
+        "default": "http://localhost:6270/v1/names/"
       },
       {
         "title": "returns",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 4,
+        "lineNumber": 9,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6078,22 +6130,22 @@
     ],
     "loc": {
       "start": {
-        "line": 12,
+        "line": 14,
         "column": 0
       },
       "end": {
-        "line": 18,
+        "line": 25,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 19,
+          "line": 26,
           "column": 0
         },
         "end": {
-          "line": 49,
+          "line": 76,
           "column": 1
         }
       },
@@ -6165,7 +6217,7 @@
       },
       {
         "title": "param",
-        "name": "decrypt",
+        "name": "options",
         "lineNumber": 3,
         "description": {
           "type": "root",
@@ -6175,7 +6227,84 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "try to decrypt the data with the app private key",
+                  "value": "options object",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null",
+        "properties": [
+          {
+            "title": "param",
+            "name": "options.decrypt",
+            "lineNumber": 4,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "try to decrypt the data with the app private key",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 49,
+                          "offset": 48
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
                   "position": {
                     "start": {
                       "line": 1,
@@ -6201,29 +6330,204 @@
                   "line": 1,
                   "column": 49,
                   "offset": 48
-                },
-                "indent": []
+                }
               }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
             },
-            "end": {
-              "line": 1,
-              "column": 49,
-              "offset": 48
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            },
+            "default": "false"
+          },
+          {
+            "title": "param",
+            "name": "options.user",
+            "lineNumber": 5,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "the Blockstack ID to lookup for multi-player storage",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 53,
+                          "offset": 52
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "String"
             }
+          },
+          {
+            "title": "param",
+            "name": "options.app",
+            "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "the app to lookup for multi-player storage",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 43,
+                          "offset": 42
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 43,
+                      "offset": 42
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 43,
+                  "offset": 42
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "String"
+            }
+          },
+          {
+            "title": "param",
+            "name": "options.zoneFileLookupURL",
+            "lineNumber": 7,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "the blockstack \ncore endpoint url to use for zonefile lookup",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 45,
+                          "offset": 60
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 45,
+                      "offset": 60
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 45,
+                  "offset": 60
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            "default": "http://localhost:6270/v1/names/"
           }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
-        },
-        "default": "false"
+        ]
       }
     ],
     "properties": [],
@@ -6397,18 +6701,36 @@
       },
       {
         "title": "param",
-        "description": "encrypt the data with the app private key",
+        "description": "options object",
         "lineNumber": 4,
         "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
         },
-        "name": "encrypt"
+        "name": "options",
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "description": "encrypt the data with the app private key",
+        "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Boolean"
+          }
+        },
+        "name": "options.encrypt",
+        "default": "false"
       },
       {
         "title": "return",
         "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 5,
+        "lineNumber": 6,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6417,22 +6739,22 @@
     ],
     "loc": {
       "start": {
-        "line": 51,
+        "line": 78,
         "column": 0
       },
       "end": {
-        "line": 58,
+        "line": 86,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 59,
+          "line": 87,
           "column": 0
         },
         "end": {
-          "line": 73,
+          "line": 121,
           "column": 1
         }
       },
@@ -6574,7 +6896,7 @@
       },
       {
         "title": "param",
-        "name": "encrypt",
+        "name": "options",
         "lineNumber": 4,
         "description": {
           "type": "root",
@@ -6584,7 +6906,84 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "encrypt the data with the app private key",
+                  "value": "options object",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null",
+        "properties": [
+          {
+            "title": "param",
+            "name": "options.encrypt",
+            "lineNumber": 5,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "encrypt the data with the app private key",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 42,
+                          "offset": 41
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
                   "position": {
                     "start": {
                       "line": 1,
@@ -6610,29 +7009,16 @@
                   "line": 1,
                   "column": 42,
                   "offset": 41
-                },
-                "indent": []
+                }
               }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
             },
-            "end": {
-              "line": 1,
-              "column": 42,
-              "offset": 41
-            }
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            },
+            "default": "false"
           }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
-        },
-        "default": "false"
+        ]
       }
     ],
     "properties": [],
@@ -6730,6 +7116,355 @@
           "children": [
             {
               "type": "text",
+              "value": "Adds the public URL of a file to the app index file under the ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "files",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "end": {
+                  "line": 1,
+                  "column": 70,
+                  "offset": 69
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " property",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 70,
+                  "offset": 69
+                },
+                "end": {
+                  "line": 1,
+                  "column": 79,
+                  "offset": 78
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 79,
+              "offset": 78
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 79,
+          "offset": 78
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the file path",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "path"
+      },
+      {
+        "title": "param",
+        "description": "the public URL of the file",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "publicUrl"
+      },
+      {
+        "title": "returns",
+        "description": "That resolves to the public URL of the specified file",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 133,
+        "column": 0
+      },
+      "end": {
+        "line": 138,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 139,
+          "column": 0
+        },
+        "end": {
+          "line": 155,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "path",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the file path",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 14,
+                      "offset": 13
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 14,
+                  "offset": 13
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 14,
+              "offset": 13
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "publicUrl",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the public URL of the file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 27,
+                      "offset": 26
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "That resolves to the public URL of the specified file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 54,
+                      "offset": 53
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 54,
+                  "offset": 53
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 54,
+              "offset": 53
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "addToAppIndex",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "addToAppIndex",
+        "kind": "function"
+      }
+    ],
+    "namespace": "addToAppIndex"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Get the the read URL of a stored file",
               "position": {
                 "start": {
@@ -6797,22 +7532,22 @@
     ],
     "loc": {
       "start": {
-        "line": 75,
+        "line": 123,
         "column": 0
       },
       "end": {
-        "line": 79,
+        "line": 127,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 80,
+          "line": 128,
           "column": 0
         },
         "end": {
-          "line": 83,
+          "line": 131,
           "column": 1
         }
       },
@@ -7031,22 +7766,22 @@
     ],
     "loc": {
       "start": {
-        "line": 97,
+        "line": 168,
         "column": 0
       },
       "end": {
-        "line": 101,
+        "line": 172,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 102,
+          "line": 173,
           "column": 0
         },
         "end": {
-          "line": 104,
+          "line": 175,
           "column": 1
         }
       },
@@ -7267,22 +8002,22 @@
     ],
     "loc": {
       "start": {
-        "line": 106,
+        "line": 177,
         "column": 0
       },
       "end": {
-        "line": 113,
+        "line": 184,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 114,
+          "line": 185,
           "column": 0
         },
         "end": {
-          "line": 116,
+          "line": 187,
           "column": 1
         }
       },
@@ -7457,6 +8192,325 @@
           "children": [
             {
               "type": "text",
+              "value": "Get the app index file URL",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 27,
+          "offset": 26
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the gaia hub url to generate index file url for",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "gaiaHubUrl"
+      },
+      {
+        "title": "param",
+        "description": "the app private key used to generate the app address",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "appPrivateKey"
+      },
+      {
+        "title": "returns",
+        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 157,
+        "column": 0
+      },
+      "end": {
+        "line": 163,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 164,
+          "column": 0
+        },
+        "end": {
+          "line": 166,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "gaiaHubUrl",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the gaia hub url to generate index file url for",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 48,
+                      "offset": 47
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 48,
+                  "offset": 47
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 48,
+              "offset": 47
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "appPrivateKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the app private key used to generate the app address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 23,
+                      "offset": 69
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 23,
+                  "offset": 69
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 23,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAppIndexFileUrl",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAppIndexFileUrl",
+        "kind": "function"
+      }
+    ],
+    "namespace": "getAppIndexFileUrl"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Fetch the app index file for the specified user and app.",
               "position": {
                 "start": {
@@ -7548,22 +8602,22 @@
     ],
     "loc": {
       "start": {
-        "line": 118,
+        "line": 189,
         "column": 0
       },
       "end": {
-        "line": 126,
+        "line": 197,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 127,
+          "line": 198,
           "column": 0
         },
         "end": {
-          "line": 160,
+          "line": 231,
           "column": 1
         }
       },
@@ -7856,7 +8910,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Get the app index file URL",
+              "value": "Fetch the public file read url for the specified user and app.",
               "position": {
                 "start": {
                   "line": 1,
@@ -7865,8 +8919,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 27,
-                  "offset": 26
+                  "column": 63,
+                  "offset": 62
                 },
                 "indent": []
               }
@@ -7880,8 +8934,8 @@
             },
             "end": {
               "line": 1,
-              "column": 27,
-              "offset": 26
+              "column": 63,
+              "offset": 62
             },
             "indent": []
           }
@@ -7895,36 +8949,60 @@
         },
         "end": {
           "line": 1,
-          "column": 27,
-          "offset": 26
+          "column": 63,
+          "offset": 62
         }
       }
     },
     "tags": [
       {
         "title": "param",
-        "description": "the gaia hub url to generate index file url for",
+        "description": "the path to the file to read",
         "lineNumber": 2,
         "type": {
           "type": "NameExpression",
           "name": "String"
         },
-        "name": "gaiaHubUrl"
+        "name": "path"
       },
       {
         "title": "param",
-        "description": "the app private key used to generate the app address",
+        "description": "The blockstack ID of the user to look up",
         "lineNumber": 3,
         "type": {
           "type": "NameExpression",
           "name": "String"
         },
-        "name": "appPrivateKey"
+        "name": "name"
       },
       {
-        "title": "returns",
-        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
+        "title": "param",
+        "description": "The app origin",
         "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "appOrigin"
+      },
+      {
+        "title": "param",
+        "description": "The URL\nto use for zonefile lookup",
+        "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "string"
+          }
+        },
+        "name": "zoneFileLookupURL",
+        "default": "http://localhost:6270/v1/names/"
+      },
+      {
+        "title": "return",
+        "description": "that resolves to the public read url of the file\nor rejects with an error",
+        "lineNumber": 7,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -7933,22 +9011,22 @@
     ],
     "loc": {
       "start": {
-        "line": 86,
+        "line": 233,
         "column": 0
       },
       "end": {
-        "line": 92,
+        "line": 242,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 93,
+          "line": 243,
           "column": 0
         },
         "end": {
-          "line": 95,
+          "line": 257,
           "column": 1
         }
       },
@@ -7959,7 +9037,7 @@
     "params": [
       {
         "title": "param",
-        "name": "gaiaHubUrl",
+        "name": "path",
         "lineNumber": 2,
         "description": {
           "type": "root",
@@ -7969,7 +9047,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "the gaia hub url to generate index file url for",
+                  "value": "the path to the file to read",
                   "position": {
                     "start": {
                       "line": 1,
@@ -7978,8 +9056,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 48,
-                      "offset": 47
+                      "column": 29,
+                      "offset": 28
                     },
                     "indent": []
                   }
@@ -7993,8 +9071,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 48,
-                  "offset": 47
+                  "column": 29,
+                  "offset": 28
                 },
                 "indent": []
               }
@@ -8008,8 +9086,8 @@
             },
             "end": {
               "line": 1,
-              "column": 48,
-              "offset": 47
+              "column": 29,
+              "offset": 28
             }
           }
         },
@@ -8020,7 +9098,7 @@
       },
       {
         "title": "param",
-        "name": "appPrivateKey",
+        "name": "name",
         "lineNumber": 3,
         "description": {
           "type": "root",
@@ -8030,7 +9108,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "the app private key used to generate the app address",
+                  "value": "The blockstack ID of the user to look up",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8039,8 +9117,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 53,
-                      "offset": 52
+                      "column": 41,
+                      "offset": 40
                     },
                     "indent": []
                   }
@@ -8054,8 +9132,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 53,
-                  "offset": 52
+                  "column": 41,
+                  "offset": 40
                 },
                 "indent": []
               }
@@ -8069,8 +9147,8 @@
             },
             "end": {
               "line": 1,
-              "column": 53,
-              "offset": 52
+              "column": 41,
+              "offset": 40
             }
           }
         },
@@ -8078,11 +9156,11 @@
           "type": "NameExpression",
           "name": "String"
         }
-      }
-    ],
-    "properties": [],
-    "returns": [
+      },
       {
+        "title": "param",
+        "name": "appOrigin",
+        "lineNumber": 4,
         "description": {
           "type": "root",
           "children": [
@@ -8091,7 +9169,68 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
+                  "value": "The app origin",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "zoneFileLookupURL",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The URL\nto use for zonefile lookup",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8100,8 +9239,8 @@
                     },
                     "end": {
                       "line": 2,
-                      "column": 23,
-                      "offset": 69
+                      "column": 27,
+                      "offset": 34
                     },
                     "indent": [
                       1
@@ -8117,8 +9256,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 23,
-                  "offset": 69
+                  "column": 27,
+                  "offset": 34
                 },
                 "indent": [
                   1
@@ -8134,8 +9273,74 @@
             },
             "end": {
               "line": 2,
-              "column": 23,
-              "offset": 69
+              "column": 27,
+              "offset": 34
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "http://localhost:6270/v1/names/"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves to the public read url of the file\nor rejects with an error",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 73
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 25,
+                  "offset": 73
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 25,
+              "offset": 73
             }
           }
         },
@@ -8149,7 +9354,7 @@
     "sees": [],
     "throws": [],
     "todos": [],
-    "name": "getAppIndexFileUrl",
+    "name": "getUserAppFileUrl",
     "kind": "function",
     "members": {
       "global": [],
@@ -8160,11 +9365,11 @@
     },
     "path": [
       {
-        "name": "getAppIndexFileUrl",
+        "name": "getUserAppFileUrl",
         "kind": "function"
       }
     ],
-    "namespace": "getAppIndexFileUrl"
+    "namespace": "getUserAppFileUrl"
   },
   {
     "description": {
@@ -9084,22 +10289,22 @@
     ],
     "loc": {
       "start": {
-        "line": 162,
+        "line": 259,
         "column": 0
       },
       "end": {
-        "line": 167,
+        "line": 264,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 168,
+          "line": 265,
           "column": 0
         },
         "end": {
-          "line": 170,
+          "line": 267,
           "column": 1
         }
       },
