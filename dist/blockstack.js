@@ -1110,7 +1110,9 @@ function getHexFromBN(bnInput) {
     return hexOut;
   } else if (hexOut.length < 64) {
     // pad with leading zeros
-    return hexOut.padStart(64, '0');
+    // the padStart function would require node 9
+    var padding = '0'.repeat(64 - hexOut.length);
+    return '' + padding + hexOut;
   } else {
     throw new Error('Generated a > 32-byte BN for encryption. Failing.');
   }
