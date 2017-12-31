@@ -87,6 +87,8 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null]- options object
  * @param {Boolean} [options.encrypt=false] - encrypt the data with the app private key
+ * @param {Boolean} [options.public=false] - make the file discoverable by adding it 
+ * to the app index 
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
