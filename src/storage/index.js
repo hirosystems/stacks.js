@@ -42,7 +42,16 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
         return getFullReadUrl(path, gaiaHubConfig)
       }
     })
-    .then((readUrl) => fetch(readUrl))
+    .then((readUrl) => new Promise((resolve, reject) => {
+      if (!readUrl) {
+        reject(null)
+      } else {
+        resolve(readUrl)
+      }
+    }))
+    .then((readUrl) => {
+      return fetch(readUrl)
+    })
     .then((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {

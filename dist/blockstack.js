@@ -3734,15 +3734,20 @@ function getFile(path, options) {
 
   var opt = Object.assign({}, defaults, options);
 
-  console.log('assigned options');
-  console.log(opt);
-
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     if (opt.user && opt.app) {
       return _this.getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL);
     } else {
       return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
     }
+  }).then(function (readUrl) {
+    return new Promise(function (resolve, reject) {
+      if (!readUrl) {
+        reject(null);
+      } else {
+        resolve(readUrl);
+      }
+    });
   }).then(function (readUrl) {
     return fetch(readUrl);
   }).then(function (response) {
@@ -3777,6 +3782,8 @@ function getFile(path, options) {
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null]- options object
  * @param {Boolean} [options.encrypt=false] - encrypt the data with the app private key
+ * @param {Boolean} [options.public=false] - make the file discoverable by adding it 
+ * to the app index 
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
@@ -3789,11 +3796,6 @@ function putFile(path, content, options) {
   };
 
   var opt = Object.assign({}, defaults, options);
-
-  console.log('putFile path');
-  console.log(path);
-  console.log('options');
-  console.log(opt);
 
   var contentType = 'text/plain';
   if (typeof content !== 'string') {
@@ -3942,10 +3944,7 @@ function getUserAppIndex(name, appOrigin) {
 function getUserAppFileUrl(path, name, appOrigin) {
   var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'http://localhost:6270/v1/names/';
 
-  console.log('getUserAppFileUrl');
   return getUserAppIndex(name, appOrigin, zoneFileLookupURL).then(function (appIndexFileJSON) {
-    console.log('appIndexFileJSON');
-    console.log(appIndexFileJSON);
     var appIndexFile = JSON.parse(appIndexFileJSON);
     if (appIndexFile.hasOwnProperty(APP_INDEX_FILES_KEY)) {
       return appIndexFile.files[path];

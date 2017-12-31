@@ -6145,7 +6145,7 @@
           "column": 0
         },
         "end": {
-          "line": 76,
+          "line": 82,
           "column": 1
         }
       },
@@ -6728,9 +6728,23 @@
         "default": "false"
       },
       {
+        "title": "param",
+        "description": "make the file discoverable by adding it \nto the app index",
+        "lineNumber": 6,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Boolean"
+          }
+        },
+        "name": "options.public",
+        "default": "false"
+      },
+      {
         "title": "return",
         "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 6,
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6739,22 +6753,22 @@
     ],
     "loc": {
       "start": {
-        "line": 78,
+        "line": 84,
         "column": 0
       },
       "end": {
-        "line": 86,
+        "line": 94,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 87,
+          "line": 95,
           "column": 0
         },
         "end": {
-          "line": 121,
+          "line": 124,
           "column": 1
         }
       },
@@ -7017,6 +7031,72 @@
               "name": "Boolean"
             },
             "default": "false"
+          },
+          {
+            "title": "param",
+            "name": "options.public",
+            "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "make the file discoverable by adding it \nto the app index",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 17,
+                          "offset": 57
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 17,
+                      "offset": 57
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 17,
+                  "offset": 57
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            },
+            "default": "false"
           }
         ]
       }
@@ -7227,22 +7307,22 @@
     ],
     "loc": {
       "start": {
-        "line": 133,
+        "line": 136,
         "column": 0
       },
       "end": {
-        "line": 138,
+        "line": 141,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 139,
+          "line": 142,
           "column": 0
         },
         "end": {
-          "line": 155,
+          "line": 158,
           "column": 1
         }
       },
@@ -7532,22 +7612,22 @@
     ],
     "loc": {
       "start": {
-        "line": 123,
+        "line": 126,
         "column": 0
       },
       "end": {
-        "line": 127,
+        "line": 130,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 128,
+          "line": 131,
           "column": 0
         },
         "end": {
-          "line": 131,
+          "line": 134,
           "column": 1
         }
       },
@@ -7766,22 +7846,22 @@
     ],
     "loc": {
       "start": {
-        "line": 168,
+        "line": 171,
         "column": 0
       },
       "end": {
-        "line": 172,
+        "line": 175,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 173,
+          "line": 176,
           "column": 0
         },
         "end": {
-          "line": 175,
+          "line": 178,
           "column": 1
         }
       },
@@ -8002,22 +8082,22 @@
     ],
     "loc": {
       "start": {
-        "line": 177,
+        "line": 180,
         "column": 0
       },
       "end": {
-        "line": 184,
+        "line": 187,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 185,
+          "line": 188,
           "column": 0
         },
         "end": {
-          "line": 187,
+          "line": 190,
           "column": 1
         }
       },
@@ -8269,22 +8349,22 @@
     ],
     "loc": {
       "start": {
-        "line": 157,
+        "line": 160,
         "column": 0
       },
       "end": {
-        "line": 163,
+        "line": 166,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 164,
+          "line": 167,
           "column": 0
         },
         "end": {
-          "line": 166,
+          "line": 169,
           "column": 1
         }
       },
@@ -8602,22 +8682,22 @@
     ],
     "loc": {
       "start": {
-        "line": 189,
+        "line": 192,
         "column": 0
       },
       "end": {
-        "line": 197,
+        "line": 200,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 198,
+          "line": 201,
           "column": 0
         },
         "end": {
-          "line": 231,
+          "line": 234,
           "column": 1
         }
       },
@@ -9011,18 +9091,18 @@
     ],
     "loc": {
       "start": {
-        "line": 233,
+        "line": 236,
         "column": 0
       },
       "end": {
-        "line": 242,
+        "line": 245,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 243,
+          "line": 246,
           "column": 0
         },
         "end": {
