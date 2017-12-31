@@ -49,9 +49,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
         resolve(readUrl)
       }
     }))
-    .then((readUrl) => {
-      return fetch(readUrl)
-    })
+    .then((readUrl) => fetch(readUrl))
     .then((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
