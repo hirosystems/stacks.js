@@ -4,8 +4,10 @@
 import test from 'tape-promise/tape'
 
 import {
- encryptECIES, decryptECIES
+ encryptECIES, decryptECIES, getHexFromBN
 } from '../../../lib/encryption'
+
+import elliptic from 'elliptic'
 
 import { sampleManifests, sampleProfiles, sampleNameRecords } from './sampleData'
 
@@ -45,5 +47,21 @@ export function runEncryptionTests() {
     } catch (e) {
       t.true(true, 'Decryption correctly fails when ciphertext modified')
     }
+  }),
+
+  test('bn-padded-to-64-bytes', (t) => {
+    t.plan(1)
+    var ecurve = new elliptic.ec('secp256k1')
+
+    let evilHexes = ['ba40f85b152bea8c3812da187bcfcfb0dc6e15f9e27cb073633b1c787b19472f',
+                     'e346010f923f768138152d0bad063999ff1da5361a81e6e6f9106241692a0076']
+    let results = evilHexes.map((hex) => {
+      let ephemeralSK = ecurve.keyFromPrivate(hex)
+      let ephemeralPK = ephemeralSK.getPublic()
+      let sharedSecret = ephemeralSK.derive(ephemeralPK)
+      return getHexFromBN(sharedSecret).length === 64
+    })
+
+    t.true(results.every((x) => x), 'Evil hexes must all generate 64-len hex strings')
   })
 }
