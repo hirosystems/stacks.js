@@ -2,6 +2,8 @@ import test from 'tape'
 import fs from 'fs'
 import { ECPair } from 'bitcoinjs-lib'
 import FetchMock from 'fetch-mock'
+import proxyquire from 'proxyquire'
+import sinon from 'sinon'
 
 import {
   signProfileToken,
@@ -15,7 +17,8 @@ import {
   getEntropy,
   makeZoneFileForHostedProfile,
   resolveZoneFileToPerson,
-  makeProfileZoneFile
+  makeProfileZoneFile,
+  lookupProfile
 } from '../../../lib'
 
 import { sampleProfiles, sampleProofs, sampleVerifications, sampleTokenFiles } from './sampleData'
@@ -207,6 +210,27 @@ function testSchemas() {
       t.ok(profile, 'Profile was extracted')
       t.equal(profile.name, "Ryan Shea", 'The profile was recovered with the expected value of the name field')
     })
+  })
+
+  test('profileLookUp', (t) => {
+    t.plan(2)
+
+    const name = 'ryan.id'
+    const zoneFileLookupURL = 'http://localhost:6270/v1/names/'
+
+    const mockZonefile = {
+      "zonefile": "$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 \"https://blockstack.s3.amazonaws.com/ryan.id\"\n", 
+      "address": "19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk", 
+    }
+
+    FetchMock.get('http://localhost:6270/v1/names/ryan.id', mockZonefile)
+    FetchMock.get(sampleTokenFiles.ryan.url, sampleTokenFiles.ryan.body)
+
+    lookupProfile(name, zoneFileLookupURL)
+      .then((profile) => {
+        t.ok(profile, 'zonefile resolves to profile')
+        t.equal(profile.name, "Ryan Shea", 'The profile was recovered with the expected value of the name field')
+      })
   })
 }
 
