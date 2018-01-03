@@ -1057,6 +1057,7 @@ export function getPublicKeyOrAddressFromDID(decentralizedID) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getHexFromBN = getHexFromBN;
 exports.encryptECIES = encryptECIES;
 exports.decryptECIES = decryptECIES;
 
@@ -1107,8 +1108,13 @@ function getHexFromBN(bnInput) {
 
   if (hexOut.length === 64) {
     return hexOut;
+  } else if (hexOut.length < 64) {
+    // pad with leading zeros
+    // the padStart function would require node 9
+    var padding = '0'.repeat(64 - hexOut.length);
+    return '' + padding + hexOut;
   } else {
-    return '0' + hexOut;
+    throw new Error('Generated a > 32-byte BN for encryption. Failing.');
   }
 }
 
