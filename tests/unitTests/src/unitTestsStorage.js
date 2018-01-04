@@ -8,8 +8,8 @@ import localStorage from 'mock-local-storage'
 
 import { uploadToGaiaHub, getFullReadUrl,
          connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
-         generateAppIndexFilePath } from '../../../lib/storage/hub'
-import { getFile, getUserAppIndex, getUserAppFileUrl } from '../../../lib/storage'
+         getBucketUrl } from '../../../lib/storage/hub'
+import { getFile, getUserAppFileUrl } from '../../../lib/storage'
 
 global.window = {}
 window.localStorage = global.localStorage
@@ -99,7 +99,7 @@ export function runStorageTests() {
       })
   })
 
-  test('generateAppIndexFilePath', (t) => {
+  test('getBucketUrl', (t) => {
     t.plan(2)
     const hubServer = 'hub2.testblockstack.org'
 
@@ -113,62 +113,26 @@ export function runStorageTests() {
 
     FetchMock.get(`${hubServer}/hub_info`, JSON.stringify(hubInfo))
 
-    generateAppIndexFilePath(hubServer, privateKey)
-      .then((appIndexFileUrl) => {
-        t.ok(appIndexFileUrl, 'App index file URL returned by generateAppIndexFilePath')
-        t.equal(appIndexFileUrl, `${hubInfo.read_url_prefix}${address}/app_index.json`)
-      })
-  })
-
-  test('getUserAppIndex', (t) => {
-    t.plan(2)
-
-    const name = 'test.id'
-    const app = 'testblockstack.org'
-    const profile = {
-      'apps': {
-        'testblockstack.org': 'https://gaia.testblockstack.org/hub/test123/app_index.json'
-      }
-    }
-
-    const mockAppIndexFile = {
-      files: {
-        "test.json": "https://gaia.testblockstack.org/hub/test234/file.json"
-      }
-    }
-
-    const lookupProfile = sinon.stub().resolves(profile)
-
-    const { getUserAppIndex } = proxyquire('../../../lib/storage', {
-      '../profiles': { lookupProfile }
-    })
-
-    FetchMock.get(profile.apps['testblockstack.org'], mockAppIndexFile)
-
-    getUserAppIndex(name, app)
-      .then((appIndexFile) => {
-        t.ok(appIndexFile, 'Returns app index file')
-        t.same(mockAppIndexFile, JSON.parse(appIndexFile))
+    getBucketUrl(hubServer, privateKey)
+      .then((bucketUrl) => {
+        t.ok(bucketUrl, 'App index file URL returned by getBucketUrl')
+        t.equal(bucketUrl, `${hubInfo.read_url_prefix}${address}/`)
       })
   })
 
   test('getUserAppFileUrl', (t) => {
     t.plan(2)
 
-    const path = 'test.json'
+    const path = 'file.json'
     const name = 'test.id'
     const appOrigin = 'testblockstack.org'
     const profile = {
       'apps': {
-        'testblockstack.org': 'https://gaia.testblockstack.org/hub/test123/app_index.json'
+        'testblockstack.org': 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/'
       }
     }
 
-    const mockAppIndexFile = {
-      files: {
-        "test.json": "https://gaia.testblockstack.org/hub/test234/file.json"
-      }
-    }
+    const fileUrl = "https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json"
 
     const lookupProfile = sinon.stub().resolves(profile)
 
@@ -176,12 +140,10 @@ export function runStorageTests() {
       '../profiles': { lookupProfile }
     })
 
-    FetchMock.get(profile.apps['testblockstack.org'], mockAppIndexFile)
-
     getUserAppFileUrl(path, name, appOrigin)
-      .then((fileUrl) => {
-        t.ok(fileUrl, 'Returns user app file url')
-        t.equals(fileUrl, mockAppIndexFile.files['test.json'])
+      .then((url) => {
+        t.ok(url, 'Returns user app file url')
+        t.equals(url, fileUrl)
       })
   })
 
