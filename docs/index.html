@@ -225,66 +225,6 @@
               
                 
                 <li><a
-                  href='#addtoappindex'
-                  class="">
-                  addToAppIndex
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getfilereadurl'
-                  class="">
-                  getFileReadUrl
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getappindexfile'
-                  class="">
-                  getAppIndexFile
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#putappindexfile'
-                  class="">
-                  putAppIndexFile
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getappindexfileurl'
-                  class="">
-                  getAppIndexFileUrl
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getuserappindex'
-                  class="">
-                  getUserAppIndex
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#getuserappfileurl'
                   class="">
                   getUserAppFileUrl
@@ -318,6 +258,16 @@
                   href='#setlocalgaiahubconnection'
                   class="">
                   setLocalGaiaHubConnection
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#getappbucketurl'
+                  class="">
+                  getAppBucketUrl
                   
                 </a>
                 
@@ -1545,7 +1495,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
   <p>Look up a user profile by blockstack ID</p>
 
 
-  <div class='pre p1 fill-light mt0'>lookupProfile(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>lookupProfile(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1562,7 +1512,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The Blockstack ID of the profile to look up
 
           </div>
@@ -1838,16 +1788,6 @@ or rejects with an error
 </span></td>
                 </tr>
               
-                <tr>
-                  <td class='break-word'><span class='code bold'>options.public</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-                  
-                    (default <code>false</code>)
-                  </td>
-                  <td class='break-word'><span>make the file discoverable by adding it
-to the app index
-</span></td>
-                </tr>
-              
             </tbody>
           </table>
           
@@ -1864,450 +1804,6 @@ to the app index
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves if the operation succeed and rejects
 if it failed
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='addtoappindex'>
-      addToAppIndex
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Adds the public URL of a file to the app index file under the <code>files</code> property</p>
-
-
-  <div class='pre p1 fill-light mt0'>addToAppIndex(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the file path
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>publicUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the public URL of the file
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        That resolves to the public URL of the specified file
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getfilereadurl'>
-      getFileReadUrl
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Get the the read URL of a stored file</p>
-
-
-  <div class='pre p1 fill-light mt0'>getFileReadUrl(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the file path to retrieve read URL for
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        That resolves to the read URL of the specified file
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getappindexfile'>
-      getAppIndexFile
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Retrieves the app index file from the app's data store.</p>
-
-
-  <div class='pre p1 fill-light mt0'>getAppIndexFile(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves to the raw data in the file
-or rejects with an error
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='putappindexfile'>
-      putAppIndexFile
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Stores the app index file which enables multi-reader storage. This file
-will be publicly visible in the user's profile data if the <code>appIndex</code>
-scope was requested during authentication.</p>
-
-
-  <div class='pre p1 fill-light mt0'>putAppIndexFile(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
-	    the data to store in the file
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves if the operation succeed and rejects
-if it failed
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getappindexfileurl'>
-      getAppIndexFileUrl
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Get the app index file URL</p>
-
-
-  <div class='pre p1 fill-light mt0'>getAppIndexFileUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the gaia hub url to generate index file url for
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the app private key used to generate the app address
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        That resolves to the URL of the app index file
-or rejects if it fails
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getuserappindex'>
-      getUserAppIndex
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Fetch the app index file for the specified user and app.</p>
-
-
-  <div class='pre p1 fill-light mt0'>getUserAppIndex(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    The blockstack ID of the user to look up
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>appOrigin</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    The app origin
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-            = <code>http://localhost:6270/v1/names/</code>)</code>
-	    The URL
-to use for zonefile lookup
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves to the raw data in the file
-or rejects with an error
 
       
     
@@ -2626,6 +2122,85 @@ a hub connection, and store the hub config to localstorage</p>
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the new gaia hub connection
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='getappbucketurl'>
+      getAppBucketUrl
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Get the app index file URL</p>
+
+
+  <div class='pre p1 fill-light mt0'>getAppBucketUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the gaia hub url to generate index file url for
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the app private key used to generate the app address
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        That resolves to the URL of the app index file
+or rejects if it fails
 
       
     

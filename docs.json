@@ -5482,7 +5482,7 @@
         "lineNumber": 3,
         "type": {
           "type": "NameExpression",
-          "name": "Object"
+          "name": "string"
         },
         "name": "name"
       },
@@ -5594,7 +5594,7 @@
         },
         "type": {
           "type": "NameExpression",
-          "name": "Object"
+          "name": "string"
         }
       },
       {
@@ -6130,22 +6130,22 @@
     ],
     "loc": {
       "start": {
-        "line": 14,
+        "line": 46,
         "column": 0
       },
       "end": {
-        "line": 25,
+        "line": 57,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 26,
+          "line": 58,
           "column": 0
         },
         "end": {
-          "line": 80,
+          "line": 112,
           "column": 1
         }
       },
@@ -6728,23 +6728,9 @@
         "default": "false"
       },
       {
-        "title": "param",
-        "description": "make the file discoverable by adding it \nto the app index",
-        "lineNumber": 6,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Boolean"
-          }
-        },
-        "name": "options.public",
-        "default": "false"
-      },
-      {
         "title": "return",
         "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 8,
+        "lineNumber": 6,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6753,22 +6739,22 @@
     ],
     "loc": {
       "start": {
-        "line": 82,
+        "line": 114,
         "column": 0
       },
       "end": {
-        "line": 92,
+        "line": 122,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 93,
+          "line": 123,
           "column": 0
         },
         "end": {
-          "line": 122,
+          "line": 143,
           "column": 1
         }
       },
@@ -7031,72 +7017,6 @@
               "name": "Boolean"
             },
             "default": "false"
-          },
-          {
-            "title": "param",
-            "name": "options.public",
-            "lineNumber": 6,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "make the file discoverable by adding it \nto the app index",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 17,
-                          "offset": 57
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 17,
-                      "offset": 57
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 17,
-                  "offset": 57
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "Boolean"
-            },
-            "default": "false"
           }
         ]
       }
@@ -7186,1800 +7106,6 @@
       }
     ],
     "namespace": "putFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Adds the public URL of a file to the app index file under the ",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 63,
-                  "offset": 62
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "files",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 63,
-                  "offset": 62
-                },
-                "end": {
-                  "line": 1,
-                  "column": 70,
-                  "offset": 69
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": " property",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 70,
-                  "offset": 69
-                },
-                "end": {
-                  "line": 1,
-                  "column": 79,
-                  "offset": 78
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 79,
-              "offset": 78
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 79,
-          "offset": 78
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the file path",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "param",
-        "description": "the public URL of the file",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "publicUrl"
-      },
-      {
-        "title": "returns",
-        "description": "That resolves to the public URL of the specified file",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 134,
-        "column": 0
-      },
-      "end": {
-        "line": 139,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 140,
-          "column": 0
-        },
-        "end": {
-          "line": 156,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the file path",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 14,
-                      "offset": 13
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 14,
-                  "offset": 13
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 14,
-              "offset": 13
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "publicUrl",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the public URL of the file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 27,
-                      "offset": 26
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 27,
-                  "offset": 26
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 27,
-              "offset": 26
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "That resolves to the public URL of the specified file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 54,
-                      "offset": 53
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 54,
-                  "offset": 53
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 54,
-              "offset": 53
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "addToAppIndex",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "addToAppIndex",
-        "kind": "function"
-      }
-    ],
-    "namespace": "addToAppIndex"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Get the the read URL of a stored file",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 38,
-                  "offset": 37
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 38,
-              "offset": 37
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 38,
-          "offset": 37
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the file path to retrieve read URL for",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "returns",
-        "description": "That resolves to the read URL of the specified file",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 124,
-        "column": 0
-      },
-      "end": {
-        "line": 128,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 129,
-          "column": 0
-        },
-        "end": {
-          "line": 132,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the file path to retrieve read URL for",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 39,
-                      "offset": 38
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 39,
-                  "offset": 38
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 39,
-              "offset": 38
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "That resolves to the read URL of the specified file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 52,
-                      "offset": 51
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 52,
-                  "offset": 51
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 52,
-              "offset": 51
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "getFileReadUrl",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "getFileReadUrl",
-        "kind": "function"
-      }
-    ],
-    "namespace": "getFileReadUrl"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Retrieves the app index file from the app's data store.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 56,
-                  "offset": 55
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 56,
-              "offset": 55
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 56,
-          "offset": 55
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "returns",
-        "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 169,
-        "column": 0
-      },
-      "end": {
-        "line": 173,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 174,
-          "column": 0
-        },
-        "end": {
-          "line": 176,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves to the raw data in the file\nor rejects with an error",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 25,
-                      "offset": 66
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 25,
-                  "offset": 66
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 25,
-              "offset": 66
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "getAppIndexFile",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "getAppIndexFile",
-        "kind": "function"
-      }
-    ],
-    "namespace": "getAppIndexFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Stores the app index file which enables multi-reader storage. This file\nwill be publicly visible in the user's profile data if the ",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 60,
-                  "offset": 131
-                },
-                "indent": [
-                  1
-                ]
-              }
-            },
-            {
-              "type": "inlineCode",
-              "value": "appIndex",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 60,
-                  "offset": 131
-                },
-                "end": {
-                  "line": 2,
-                  "column": 70,
-                  "offset": 141
-                },
-                "indent": []
-              }
-            },
-            {
-              "type": "text",
-              "value": "\nscope was requested during authentication.",
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 70,
-                  "offset": 141
-                },
-                "end": {
-                  "line": 3,
-                  "column": 43,
-                  "offset": 184
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 3,
-              "column": 43,
-              "offset": 184
-            },
-            "indent": [
-              1,
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 3,
-          "column": 43,
-          "offset": 184
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the data to store in the file",
-        "lineNumber": 4,
-        "type": {
-          "type": "UnionType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            {
-              "type": "NameExpression",
-              "name": "Buffer"
-            }
-          ]
-        },
-        "name": "content"
-      },
-      {
-        "title": "return",
-        "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 5,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 178,
-        "column": 0
-      },
-      "end": {
-        "line": 185,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 186,
-          "column": 0
-        },
-        "end": {
-          "line": 188,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "content",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the data to store in the file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 30,
-                      "offset": 29
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 30,
-              "offset": 29
-            }
-          }
-        },
-        "type": {
-          "type": "UnionType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            {
-              "type": "NameExpression",
-              "name": "Buffer"
-            }
-          ]
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves if the operation succeed and rejects\nif it failed",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 13,
-                      "offset": 63
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 13,
-                  "offset": 63
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 13,
-              "offset": 63
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "putAppIndexFile",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "putAppIndexFile",
-        "kind": "function"
-      }
-    ],
-    "namespace": "putAppIndexFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Get the app index file URL",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 27,
-                  "offset": 26
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 27,
-              "offset": 26
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 27,
-          "offset": 26
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the gaia hub url to generate index file url for",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "gaiaHubUrl"
-      },
-      {
-        "title": "param",
-        "description": "the app private key used to generate the app address",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "appPrivateKey"
-      },
-      {
-        "title": "returns",
-        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 158,
-        "column": 0
-      },
-      "end": {
-        "line": 164,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 165,
-          "column": 0
-        },
-        "end": {
-          "line": 167,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "gaiaHubUrl",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the gaia hub url to generate index file url for",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 48,
-                      "offset": 47
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 48,
-                  "offset": 47
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 48,
-              "offset": 47
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "appPrivateKey",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the app private key used to generate the app address",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 53,
-                      "offset": 52
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 53,
-                  "offset": 52
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 53,
-              "offset": 52
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 23,
-                      "offset": 69
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 23,
-                  "offset": 69
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 23,
-              "offset": 69
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "getAppIndexFileUrl",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "getAppIndexFileUrl",
-        "kind": "function"
-      }
-    ],
-    "namespace": "getAppIndexFileUrl"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Fetch the app index file for the specified user and app.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 57,
-                  "offset": 56
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 57,
-              "offset": 56
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 57,
-          "offset": 56
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "The blockstack ID of the user to look up",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "name"
-      },
-      {
-        "title": "param",
-        "description": "The app origin",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "appOrigin"
-      },
-      {
-        "title": "param",
-        "description": "The URL\nto use for zonefile lookup",
-        "lineNumber": 4,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "string"
-          }
-        },
-        "name": "zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
-      },
-      {
-        "title": "return",
-        "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 190,
-        "column": 0
-      },
-      "end": {
-        "line": 198,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 199,
-          "column": 0
-        },
-        "end": {
-          "line": 232,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "name",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The blockstack ID of the user to look up",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 41,
-                  "offset": 40
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 41,
-              "offset": 40
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "appOrigin",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The app origin",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 15,
-                      "offset": 14
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 15,
-                  "offset": 14
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 15,
-              "offset": 14
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "zoneFileLookupURL",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "The URL\nto use for zonefile lookup",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 27,
-                      "offset": 34
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 27,
-                  "offset": 34
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 27,
-              "offset": 34
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "default": "http://localhost:6270/v1/names/"
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves to the raw data in the file\nor rejects with an error",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 25,
-                      "offset": 66
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 25,
-                  "offset": 66
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 25,
-              "offset": 66
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "getUserAppIndex",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "getUserAppIndex",
-        "kind": "function"
-      }
-    ],
-    "namespace": "getUserAppIndex"
   },
   {
     "description": {
@@ -9091,22 +7217,22 @@
     ],
     "loc": {
       "start": {
-        "line": 234,
+        "line": 12,
         "column": 0
       },
       "end": {
-        "line": 243,
+        "line": 21,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 244,
+          "line": 22,
           "column": 0
         },
         "end": {
-          "line": 255,
+          "line": 44,
           "column": 1
         }
       },
@@ -10187,22 +8313,22 @@
     ],
     "loc": {
       "start": {
-        "line": 68,
+        "line": 67,
         "column": 0
       },
       "end": {
-        "line": 73,
+        "line": 72,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 74,
+          "line": 73,
           "column": 0
         },
         "end": {
-          "line": 91,
+          "line": 90,
           "column": 1
         }
       },
@@ -10302,6 +8428,325 @@
           "children": [
             {
               "type": "text",
+              "value": "Get the app index file URL",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 27,
+          "offset": 26
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the gaia hub url to generate index file url for",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "gaiaHubUrl"
+      },
+      {
+        "title": "param",
+        "description": "the app private key used to generate the app address",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "appPrivateKey"
+      },
+      {
+        "title": "returns",
+        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 145,
+        "column": 0
+      },
+      "end": {
+        "line": 151,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 152,
+          "column": 0
+        },
+        "end": {
+          "line": 154,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "gaiaHubUrl",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the gaia hub url to generate index file url for",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 48,
+                      "offset": 47
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 48,
+                  "offset": 47
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 48,
+              "offset": 47
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "appPrivateKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the app private key used to generate the app address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 23,
+                      "offset": 69
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 23,
+                  "offset": 69
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 23,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAppBucketUrl",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAppBucketUrl",
+        "kind": "function"
+      }
+    ],
+    "namespace": "getAppBucketUrl"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Deletes the specified file from the app's data store.",
               "position": {
                 "start": {
@@ -10369,22 +8814,22 @@
     ],
     "loc": {
       "start": {
-        "line": 257,
+        "line": 156,
         "column": 0
       },
       "end": {
-        "line": 262,
+        "line": 161,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 263,
+          "line": 162,
           "column": 0
         },
         "end": {
-          "line": 265,
+          "line": 164,
           "column": 1
         }
       },

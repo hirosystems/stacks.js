@@ -4,7 +4,7 @@ import { resolveZoneFileToProfile } from './profileZoneFiles'
 /**
  * Look up a user profile by blockstack ID
  *
- * @param {Object} name The Blockstack ID of the profile to look up
+ * @param {string} name The Blockstack ID of the profile to look up
  * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object

@@ -5,7 +5,6 @@ import { loadUserData } from '../auth/authApp'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
-export const APP_INDEX_FILE_NAME = 'app_index.json'
 
 export type GaiaHubConfig = {
   address: string,
@@ -99,7 +98,7 @@ export function getOrSetLocalGaiaHubConnection(): Promise<*> {
   }
 }
 
-export function generateAppIndexFilePath(gaiaHubUrl, appPrivateKey): Promise<*> {
+export function getBucketUrl(gaiaHubUrl, appPrivateKey): Promise<*> {
   console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
   const challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))
   return new Promise((resolve) => {
@@ -109,8 +108,8 @@ export function generateAppIndexFilePath(gaiaHubUrl, appPrivateKey): Promise<*> 
       .then((responseJSON) => {
         const readURL = responseJSON.read_url_prefix
         const address = challengeSigner.getAddress()
-        const appIndexUrl = `${readURL}${address}/${APP_INDEX_FILE_NAME}`
-        resolve(appIndexUrl) 
+        const bucketUrl = `${readURL}${address}/`
+        resolve(bucketUrl) 
       }) 
   })
 }

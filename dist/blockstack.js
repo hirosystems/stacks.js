@@ -1657,7 +1657,7 @@ var _profileZoneFiles = require('./profileZoneFiles');
 /**
  * Look up a user profile by blockstack ID
  *
- * @param {Object} name The Blockstack ID of the profile to look up
+ * @param {string} name The Blockstack ID of the profile to look up
  * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
@@ -3560,13 +3560,13 @@ exports.Twitter = Twitter;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.APP_INDEX_FILE_NAME = exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
+exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
 exports.uploadToGaiaHub = uploadToGaiaHub;
 exports.getFullReadUrl = getFullReadUrl;
 exports.connectToGaiaHub = connectToGaiaHub;
 exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
 exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
-exports.generateAppIndexFilePath = generateAppIndexFilePath;
+exports.getBucketUrl = getBucketUrl;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -3583,7 +3583,6 @@ var _authConstants = require('../auth/authConstants');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
-var APP_INDEX_FILE_NAME = exports.APP_INDEX_FILE_NAME = 'app_index.json';
 
 function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
@@ -3667,7 +3666,7 @@ function getOrSetLocalGaiaHubConnection() {
   }
 }
 
-function generateAppIndexFilePath(gaiaHubUrl, appPrivateKey) {
+function getBucketUrl(gaiaHubUrl, appPrivateKey) {
   console.log('connectToGaiaHub: ' + gaiaHubUrl + '/hub_info');
   var challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(appPrivateKey));
   return new Promise(function (resolve) {
@@ -3678,8 +3677,8 @@ function generateAppIndexFilePath(gaiaHubUrl, appPrivateKey) {
     }).then(function (responseJSON) {
       var readURL = responseJSON.read_url_prefix;
       var address = challengeSigner.getAddress();
-      var appIndexUrl = '' + readURL + address + '/' + APP_INDEX_FILE_NAME;
-      resolve(appIndexUrl);
+      var bucketUrl = '' + readURL + address + '/';
+      resolve(bucketUrl);
     });
   });
 }
@@ -3691,15 +3690,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.GaiaHubConfig = exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
+exports.getUserAppFileUrl = getUserAppFileUrl;
 exports.getFile = getFile;
 exports.putFile = putFile;
-exports.getFileReadUrl = getFileReadUrl;
-exports.addToAppIndex = addToAppIndex;
-exports.getAppIndexFileUrl = getAppIndexFileUrl;
-exports.getAppIndexFile = getAppIndexFile;
-exports.putAppIndexFile = putAppIndexFile;
-exports.getUserAppIndex = getUserAppIndex;
-exports.getUserAppFileUrl = getUserAppFileUrl;
+exports.getAppBucketUrl = getAppBucketUrl;
 exports.deleteFile = deleteFile;
 
 var _hub = require('./hub');
@@ -3712,9 +3706,38 @@ var _keys = require('../keys');
 
 var _profiles = require('../profiles');
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+/**
+ * Fetch the public file read url for the specified user and app.
+ * @param {String} path - the path to the file to read
+ * @param {String} name - The blockstack ID of the user to look up
+ * @param {String} appOrigin - The app origin
+ * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * to use for zonefile lookup
+ * @return {Promise} that resolves to the public read url of the file
+ * or rejects with an error
+ */
+function getUserAppFileUrl(path, name, appOrigin) {
+  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'http://localhost:6270/v1/names/';
 
-var APP_INDEX_FILES_KEY = 'files';
+  return (0, _profiles.lookupProfile)(name, zoneFileLookupURL).then(function (profile) {
+    if (profile.hasOwnProperty('apps')) {
+      if (profile.apps.hasOwnProperty(appOrigin)) {
+        return profile.apps[appOrigin];
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }).then(function (bucketUrl) {
+    if (bucketUrl) {
+      var bucket = bucketUrl.replace(/\/?(\?|#|$)/, '/$1');
+      return '' + bucket + path;
+    } else {
+      return null;
+    }
+  });
+}
 
 /**
  * Retrieves the specified file from the app's data store.
@@ -3728,9 +3751,9 @@ var APP_INDEX_FILES_KEY = 'files';
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-function getFile(path, options) {
-  var _this = this;
 
+
+function getFile(path, options) {
   var defaults = {
     decrypt: false,
     user: null,
@@ -3742,7 +3765,7 @@ function getFile(path, options) {
 
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     if (opt.user && opt.app) {
-      return _this.getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL);
+      return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL);
     } else {
       return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
     }
@@ -3788,17 +3811,12 @@ function getFile(path, options) {
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null]- options object
  * @param {Boolean} [options.encrypt=false] - encrypt the data with the app private key
- * @param {Boolean} [options.public=false] - make the file discoverable by adding it 
- * to the app index 
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
 function putFile(path, content, options) {
-  var _this2 = this;
-
   var defaults = {
-    encrypt: false,
-    public: false
+    encrypt: false
   };
 
   var opt = Object.assign({}, defaults, options);
@@ -3816,49 +3834,6 @@ function putFile(path, content, options) {
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType);
-  }).then(function (publicUrl) {
-    if (opt.public) {
-      return _this2.addToAppIndex(path, publicUrl);
-    } else {
-      return publicUrl;
-    }
-  });
-}
-
-/**
- * Get the the read URL of a stored file
- * @param {String} path - the file path to retrieve read URL for
- * @returns {Promise} That resolves to the read URL of the specified file
- */
-function getFileReadUrl(path) {
-  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
-  });
-}
-
-/**
- * Adds the public URL of a file to the app index file under the `files` property
- * @param {String} path - the file path
- * @param {String} publicUrl - the public URL of the file
- * @returns {Promise} That resolves to the public URL of the specified file
- */
-function addToAppIndex(path, publicUrl) {
-  var _this3 = this;
-
-  return this.getAppIndexFile(path).then(function (appIndexJSON) {
-    var newAppIndex = {};
-    if (!appIndexJSON) {
-      newAppIndex = _defineProperty({}, APP_INDEX_FILES_KEY, _defineProperty({}, path, publicUrl));
-    } else {
-      var appIndex = JSON.parse(appIndexJSON);
-      var newFiles = Object.assign({}, appIndex.files, _defineProperty({}, path, publicUrl));
-
-      newAppIndex = appIndex;
-      newAppIndex[APP_INDEX_FILES_KEY] = newFiles;
-    }
-    return _this3.putAppIndexFile(JSON.stringify(newAppIndex));
-  }).then(function () {
-    return publicUrl;
   });
 }
 
@@ -3869,95 +3844,8 @@ function addToAppIndex(path, publicUrl) {
  * @returns {Promise} That resolves to the URL of the app index file
  * or rejects if it fails
  */
-function getAppIndexFileUrl(gaiaHubUrl, appPrivateKey) {
-  return (0, _hub.generateAppIndexFilePath)(gaiaHubUrl, appPrivateKey);
-}
-
-/**
- * Retrieves the app index file from the app's data store.
- * @returns {Promise} that resolves to the raw data in the file
- * or rejects with an error
- */
-function getAppIndexFile() {
-  return this.getFile(_hub.APP_INDEX_FILE_NAME);
-}
-
-/**
- * Stores the app index file which enables multi-reader storage. This file
- * will be publicly visible in the user's profile data if the `appIndex`
- * scope was requested during authentication.
- * @param {String|Buffer} content - the data to store in the file
- * @return {Promise} that resolves if the operation succeed and rejects
- * if it failed
- */
-function putAppIndexFile(content) {
-  return this.putFile(_hub.APP_INDEX_FILE_NAME, content);
-}
-
-/**
- * Fetch the app index file for the specified user and app.
- * @param {String} name - The blockstack ID of the user to look up
- * @param {String} appOrigin - The app origin
- * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
- * to use for zonefile lookup
- * @return {Promise} that resolves to the raw data in the file
- * or rejects with an error
- */
-function getUserAppIndex(name, appOrigin) {
-  var zoneFileLookupURL = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'http://localhost:6270/v1/names/';
-
-  return (0, _profiles.lookupProfile)(name, zoneFileLookupURL).then(function (profile) {
-    if (profile.hasOwnProperty('apps')) {
-      if (profile.apps.hasOwnProperty(appOrigin)) {
-        var appIndexFileURL = profile.apps[appOrigin];
-        return appIndexFileURL;
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }).then(function (appIndexFileURL) {
-    return fetch(appIndexFileURL);
-  }).then(function (response) {
-    if (response.status !== 200) {
-      if (response.status === 404) {
-        console.log('getUserAppIndex ' + response.url + ' returned 404, returning null');
-        return null;
-      } else {
-        throw new Error('getUserAppIndex ' + response.url + ' failed with status ' + response.status);
-      }
-    }
-    var contentType = response.headers.get('Content-Type');
-    if (contentType === null || contentType.startsWith('text') || contentType === 'application/json') {
-      return response.text();
-    } else {
-      return response.arrayBuffer();
-    }
-  });
-}
-
-/**
- * Fetch the public file read url for the specified user and app.
- * @param {String} path - the path to the file to read
- * @param {String} name - The blockstack ID of the user to look up
- * @param {String} appOrigin - The app origin
- * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
- * to use for zonefile lookup
- * @return {Promise} that resolves to the public read url of the file
- * or rejects with an error
- */
-function getUserAppFileUrl(path, name, appOrigin) {
-  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'http://localhost:6270/v1/names/';
-
-  return getUserAppIndex(name, appOrigin, zoneFileLookupURL).then(function (appIndexFileJSON) {
-    var appIndexFile = JSON.parse(appIndexFileJSON);
-    if (appIndexFile.hasOwnProperty(APP_INDEX_FILES_KEY)) {
-      return appIndexFile.files[path];
-    } else {
-      throw new Error('getUserAppFileUrl ' + path + ' app index does not contain files key');
-    }
-  });
+function getAppBucketUrl(gaiaHubUrl, appPrivateKey) {
+  return (0, _hub.getBucketUrl)(gaiaHubUrl, appPrivateKey);
 }
 
 /**
