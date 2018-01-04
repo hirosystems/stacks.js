@@ -10,13 +10,13 @@ import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
 
 /**
- * Fetch the public file read url for the specified user and app.
+ * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
- * @param {String} name - The blockstack ID of the user to look up
+ * @param {String} name - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
  * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup
- * @return {Promise} that resolves to the public read url of the file
+ * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
 export function getUserAppFileUrl(path: string, name: string, appOrigin: string, 
@@ -50,8 +50,8 @@ export function getUserAppFileUrl(path: string, name: string, appOrigin: string,
  * @param {Boolean} [options.decrypt=false] - try to decrypt the data with the app private key
  * @param {String} options.user - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage
- * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the blockstack 
- * core endpoint url to use for zonefile lookup
+ * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack 
+ * core endpoint URL to use for zonefile lookup
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
@@ -143,8 +143,8 @@ export function putFile(path: string, content: string | Buffer, options?: {encry
 }
 
 /**
- * Get the app index file URL
- * @param {String} gaiaHubUrl - the gaia hub url to generate index file url for
+ * Get the app storage bucket URL
+ * @param {String} gaiaHubUrl - the gaia hub URL
  * @param {String} appPrivateKey - the app private key used to generate the app address
  * @returns {Promise} That resolves to the URL of the app index file
  * or rejects if it fails

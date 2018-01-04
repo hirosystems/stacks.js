@@ -6106,7 +6106,7 @@
       },
       {
         "title": "param",
-        "description": "the blockstack \ncore endpoint url to use for zonefile lookup",
+        "description": "the Blockstack \ncore endpoint URL to use for zonefile lookup",
         "lineNumber": 7,
         "type": {
           "type": "OptionalType",
@@ -6473,7 +6473,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "the blockstack \ncore endpoint url to use for zonefile lookup",
+                      "value": "the Blockstack \ncore endpoint URL to use for zonefile lookup",
                       "position": {
                         "start": {
                           "line": 1,
@@ -7116,7 +7116,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Fetch the public file read url for the specified user and app.",
+              "value": "Get the app storage bucket URL",
               "position": {
                 "start": {
                   "line": 1,
@@ -7125,8 +7125,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 63,
-                  "offset": 62
+                  "column": 31,
+                  "offset": 30
                 },
                 "indent": []
               }
@@ -7140,8 +7140,8 @@
             },
             "end": {
               "line": 1,
-              "column": 63,
-              "offset": 62
+              "column": 31,
+              "offset": 30
             },
             "indent": []
           }
@@ -7155,8 +7155,327 @@
         },
         "end": {
           "line": 1,
-          "column": 63,
-          "offset": 62
+          "column": 31,
+          "offset": 30
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the gaia hub URL",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "gaiaHubUrl"
+      },
+      {
+        "title": "param",
+        "description": "the app private key used to generate the app address",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "appPrivateKey"
+      },
+      {
+        "title": "returns",
+        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 145,
+        "column": 0
+      },
+      "end": {
+        "line": 151,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 152,
+          "column": 0
+        },
+        "end": {
+          "line": 154,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "gaiaHubUrl",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the gaia hub URL",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 17,
+                      "offset": 16
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 17,
+                  "offset": 16
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 17,
+              "offset": 16
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "appPrivateKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the app private key used to generate the app address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 23,
+                      "offset": 69
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 23,
+                  "offset": 69
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 23,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAppBucketUrl",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAppBucketUrl",
+        "kind": "function"
+      }
+    ],
+    "namespace": "getAppBucketUrl"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Fetch the public read URL of a user file for the specified app.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 64,
+                  "offset": 63
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 64,
+              "offset": 63
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 64,
+          "offset": 63
         }
       }
     },
@@ -7173,7 +7492,7 @@
       },
       {
         "title": "param",
-        "description": "The blockstack ID of the user to look up",
+        "description": "The Blockstack ID of the user to look up",
         "lineNumber": 3,
         "type": {
           "type": "NameExpression",
@@ -7207,7 +7526,7 @@
       },
       {
         "title": "return",
-        "description": "that resolves to the public read url of the file\nor rejects with an error",
+        "description": "that resolves to the public read URL of the file\nor rejects with an error",
         "lineNumber": 7,
         "type": {
           "type": "NameExpression",
@@ -7314,7 +7633,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The blockstack ID of the user to look up",
+                  "value": "The Blockstack ID of the user to look up",
                   "position": {
                     "start": {
                       "line": 1,
@@ -7502,7 +7821,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "that resolves to the public read url of the file\nor rejects with an error",
+                  "value": "that resolves to the public read URL of the file\nor rejects with an error",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8418,325 +8737,6 @@
       }
     ],
     "namespace": "setLocalGaiaHubConnection"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Get the app index file URL",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 27,
-                  "offset": 26
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 27,
-              "offset": 26
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 27,
-          "offset": 26
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the gaia hub url to generate index file url for",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "gaiaHubUrl"
-      },
-      {
-        "title": "param",
-        "description": "the app private key used to generate the app address",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "appPrivateKey"
-      },
-      {
-        "title": "returns",
-        "description": "That resolves to the URL of the app index file\nor rejects if it fails",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 145,
-        "column": 0
-      },
-      "end": {
-        "line": 151,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 152,
-          "column": 0
-        },
-        "end": {
-          "line": 154,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "gaiaHubUrl",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the gaia hub url to generate index file url for",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 48,
-                      "offset": 47
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 48,
-                  "offset": 47
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 48,
-              "offset": 47
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "appPrivateKey",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the app private key used to generate the app address",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 53,
-                      "offset": 52
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 53,
-                  "offset": 52
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 53,
-              "offset": 52
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "That resolves to the URL of the app index file\nor rejects if it fails",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 23,
-                      "offset": 69
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 23,
-                  "offset": 69
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 23,
-              "offset": 69
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "getAppBucketUrl",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "getAppBucketUrl",
-        "kind": "function"
-      }
-    ],
-    "namespace": "getAppBucketUrl"
   },
   {
     "description": {

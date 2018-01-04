@@ -38,10 +38,5 @@ toc:
       [Read more about storage](https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md)
   - getFile
   - putFile
-  - addToAppIndex
-  - getFileReadUrl
-  - getAppIndexFile
-  - putAppIndexFile
-  - getAppIndexFileUrl
-  - getUserAppIndex
+  - getAppBucketUrl
   - getUserAppFileUrl

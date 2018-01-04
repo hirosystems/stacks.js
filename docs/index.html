@@ -225,6 +225,16 @@
               
                 
                 <li><a
+                  href='#getappbucketurl'
+                  class="">
+                  getAppBucketUrl
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#getuserappfileurl'
                   class="">
                   getUserAppFileUrl
@@ -258,16 +268,6 @@
                   href='#setlocalgaiahubconnection'
                   class="">
                   setLocalGaiaHubConnection
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#getappbucketurl'
-                  class="">
-                  getAppBucketUrl
                   
                 </a>
                 
@@ -1669,8 +1669,8 @@ version. These features will be rolled out in future updates.</em></p>
                   
                     (default <code>http://localhost:6270/v1/names/</code>)
                   </td>
-                  <td class='break-word'><span>the blockstack
-core endpoint url to use for zonefile lookup
+                  <td class='break-word'><span>the Blockstack
+core endpoint URL to use for zonefile lookup
 </span></td>
                 </tr>
               
@@ -1828,6 +1828,85 @@ if it failed
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='getappbucketurl'>
+      getAppBucketUrl
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Get the app storage bucket URL</p>
+
+
+  <div class='pre p1 fill-light mt0'>getAppBucketUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the gaia hub URL
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the app private key used to generate the app address
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        That resolves to the URL of the app index file
+or rejects if it fails
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='getuserappfileurl'>
       getUserAppFileUrl
     </h3>
@@ -1836,7 +1915,7 @@ if it failed
   </div>
   
 
-  <p>Fetch the public file read url for the specified user and app.</p>
+  <p>Fetch the public read URL of a user file for the specified app.</p>
 
 
   <div class='pre p1 fill-light mt0'>getUserAppFileUrl(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
@@ -1866,7 +1945,7 @@ if it failed
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    The blockstack ID of the user to look up
+	    The Blockstack ID of the user to look up
 
           </div>
           
@@ -1901,7 +1980,7 @@ to use for zonefile lookup
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves to the public read url of the file
+        that resolves to the public read URL of the file
 or rejects with an error
 
       
@@ -2122,85 +2201,6 @@ a hub connection, and store the hub config to localstorage</p>
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the new gaia hub connection
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='getappbucketurl'>
-      getAppBucketUrl
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Get the app index file URL</p>
-
-
-  <div class='pre p1 fill-light mt0'>getAppBucketUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the gaia hub url to generate index file url for
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the app private key used to generate the app address
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        That resolves to the URL of the app index file
-or rejects if it fails
 
       
     
