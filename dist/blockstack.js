@@ -3709,17 +3709,17 @@ var _profiles = require('../profiles');
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
- * @param {String} name - The Blockstack ID of the user to look up
+ * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
  * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
-function getUserAppFileUrl(path, name, appOrigin) {
+function getUserAppFileUrl(path, username, appOrigin) {
   var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'http://localhost:6270/v1/names/';
 
-  return (0, _profiles.lookupProfile)(name, zoneFileLookupURL).then(function (profile) {
+  return (0, _profiles.lookupProfile)(username, zoneFileLookupURL).then(function (profile) {
     if (profile.hasOwnProperty('apps')) {
       if (profile.apps.hasOwnProperty(appOrigin)) {
         return profile.apps[appOrigin];
@@ -3744,9 +3744,10 @@ function getUserAppFileUrl(path, name, appOrigin) {
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=false] - try to decrypt the data with the app private key
- * @param {String} options.user - the Blockstack ID to lookup for multi-player storage
- * @param {String} options.app - the app to lookup for multi-player storage
- * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack 
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack
  * core endpoint URL to use for zonefile lookup
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
@@ -3756,16 +3757,16 @@ function getUserAppFileUrl(path, name, appOrigin) {
 function getFile(path, options) {
   var defaults = {
     decrypt: false,
-    user: null,
-    app: null,
+    username: null,
+    app: window.location.origin,
     zoneFileLookupURL: 'http://localhost:6270/v1/names/'
   };
 
   var opt = Object.assign({}, defaults, options);
 
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    if (opt.user && opt.app) {
-      return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL);
+    if (opt.username) {
+      return getUserAppFileUrl(path, opt.username, opt.app, opt.zoneFileLookupURL);
     } else {
       return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
     }

@@ -12,16 +12,16 @@ import { lookupProfile } from '../profiles'
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
- * @param {String} name - The Blockstack ID of the user to look up
+ * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
  * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
-export function getUserAppFileUrl(path: string, name: string, appOrigin: string,
+export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
   zoneFileLookupURL: string = 'http://localhost:6270/v1/names/') {
-  return lookupProfile(name, zoneFileLookupURL)
+  return lookupProfile(username, zoneFileLookupURL)
     .then(profile => {
       if (profile.hasOwnProperty('apps')) {
         if (profile.apps.hasOwnProperty(appOrigin)) {
@@ -48,7 +48,7 @@ export function getUserAppFileUrl(path: string, name: string, appOrigin: string,
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=false] - try to decrypt the data with the app private key
- * @param {String} options.user - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
  * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack
@@ -56,11 +56,11 @@ export function getUserAppFileUrl(path: string, name: string, appOrigin: string,
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(path: string, options?: {decrypt?: boolean, user?: string, app?: string,
+export function getFile(path: string, options?: {decrypt?: boolean, username?: string, app?: string,
   zoneFileLookupURL?: string}) {
   const defaults = {
     decrypt: false,
-    user: null,
+    username: null,
     app: window.location.origin,
     zoneFileLookupURL: 'http://localhost:6270/v1/names/'
   }
@@ -69,8 +69,8 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
 
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => {
-      if (opt.user) {
-        return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL)
+      if (opt.username) {
+        return getUserAppFileUrl(path, opt.username, opt.app, opt.zoneFileLookupURL)
       } else {
         return getFullReadUrl(path, gaiaHubConfig)
       }
