@@ -5484,7 +5484,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "name": "name"
+        "name": "username"
       },
       {
         "title": "param",
@@ -5538,7 +5538,7 @@
     "params": [
       {
         "title": "param",
-        "name": "name",
+        "name": "username",
         "lineNumber": 3,
         "description": {
           "type": "root",
@@ -6092,11 +6092,11 @@
           "type": "NameExpression",
           "name": "String"
         },
-        "name": "options.user"
+        "name": "options.username"
       },
       {
         "title": "param",
-        "description": "the app to lookup for multi-player storage",
+        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
         "lineNumber": 6,
         "type": {
           "type": "NameExpression",
@@ -6106,8 +6106,8 @@
       },
       {
         "title": "param",
-        "description": "the Blockstack \ncore endpoint URL to use for zonefile lookup",
-        "lineNumber": 7,
+        "description": "the Blockstack\ncore endpoint URL to use for zonefile lookup",
+        "lineNumber": 8,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -6121,7 +6121,7 @@
       {
         "title": "returns",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 9,
+        "lineNumber": 10,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6134,18 +6134,18 @@
         "column": 0
       },
       "end": {
-        "line": 57,
+        "line": 58,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 58,
+          "line": 59,
           "column": 0
         },
         "end": {
-          "line": 112,
+          "line": 113,
           "column": 1
         }
       },
@@ -6341,7 +6341,7 @@
           },
           {
             "title": "param",
-            "name": "options.user",
+            "name": "options.username",
             "lineNumber": 5,
             "description": {
               "type": "root",
@@ -6412,7 +6412,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "the app to lookup for multi-player storage",
+                      "value": "the app to lookup for multi-player storage -\ndefaults to current origin",
                       "position": {
                         "start": {
                           "line": 1,
@@ -6420,11 +6420,13 @@
                           "offset": 0
                         },
                         "end": {
-                          "line": 1,
-                          "column": 43,
-                          "offset": 42
+                          "line": 2,
+                          "column": 27,
+                          "offset": 71
                         },
-                        "indent": []
+                        "indent": [
+                          1
+                        ]
                       }
                     }
                   ],
@@ -6435,11 +6437,13 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 1,
-                      "column": 43,
-                      "offset": 42
+                      "line": 2,
+                      "column": 27,
+                      "offset": 71
                     },
-                    "indent": []
+                    "indent": [
+                      1
+                    ]
                   }
                 }
               ],
@@ -6450,9 +6454,9 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 43,
-                  "offset": 42
+                  "line": 2,
+                  "column": 27,
+                  "offset": 71
                 }
               }
             },
@@ -6464,7 +6468,7 @@
           {
             "title": "param",
             "name": "options.zoneFileLookupURL",
-            "lineNumber": 7,
+            "lineNumber": 8,
             "description": {
               "type": "root",
               "children": [
@@ -6473,7 +6477,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "the Blockstack \ncore endpoint URL to use for zonefile lookup",
+                      "value": "the Blockstack\ncore endpoint URL to use for zonefile lookup",
                       "position": {
                         "start": {
                           "line": 1,
@@ -6483,7 +6487,7 @@
                         "end": {
                           "line": 2,
                           "column": 45,
-                          "offset": 60
+                          "offset": 59
                         },
                         "indent": [
                           1
@@ -6500,7 +6504,7 @@
                     "end": {
                       "line": 2,
                       "column": 45,
-                      "offset": 60
+                      "offset": 59
                     },
                     "indent": [
                       1
@@ -6517,7 +6521,7 @@
                 "end": {
                   "line": 2,
                   "column": 45,
-                  "offset": 60
+                  "offset": 59
                 }
               }
             },
@@ -6739,22 +6743,22 @@
     ],
     "loc": {
       "start": {
-        "line": 114,
+        "line": 115,
         "column": 0
       },
       "end": {
-        "line": 122,
+        "line": 123,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 123,
+          "line": 124,
           "column": 0
         },
         "end": {
-          "line": 143,
+          "line": 144,
           "column": 1
         }
       },
@@ -7193,22 +7197,22 @@
     ],
     "loc": {
       "start": {
-        "line": 145,
+        "line": 146,
         "column": 0
       },
       "end": {
-        "line": 151,
+        "line": 152,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 152,
+          "line": 153,
           "column": 0
         },
         "end": {
-          "line": 154,
+          "line": 155,
           "column": 1
         }
       },
@@ -7498,7 +7502,7 @@
           "type": "NameExpression",
           "name": "String"
         },
-        "name": "name"
+        "name": "username"
       },
       {
         "title": "param",
@@ -7623,7 +7627,7 @@
       },
       {
         "title": "param",
-        "name": "name",
+        "name": "username",
         "lineNumber": 3,
         "description": {
           "type": "root",
@@ -8814,22 +8818,22 @@
     ],
     "loc": {
       "start": {
-        "line": 156,
+        "line": 157,
         "column": 0
       },
       "end": {
-        "line": 161,
+        "line": 162,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 162,
+          "line": 163,
           "column": 0
         },
         "end": {
-          "line": 164,
+          "line": 165,
           "column": 1
         }
       },

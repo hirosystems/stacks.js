@@ -1657,19 +1657,19 @@ var _profileZoneFiles = require('./profileZoneFiles');
 /**
  * Look up a user profile by blockstack ID
  *
- * @param {string} name The Blockstack ID of the profile to look up
+ * @param {string} username The Blockstack ID of the profile to look up
  * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
-function lookupProfile(name) {
+function lookupProfile(username) {
   var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'http://localhost:6270/v1/names/';
 
   return new Promise(function (resolve, reject) {
-    if (!name) {
+    if (!username) {
       reject();
     }
-    var url = zoneFileLookupURL.replace(/\/$/, '') + '/' + name;
+    var url = zoneFileLookupURL.replace(/\/$/, '') + '/' + username;
     try {
       fetch(url).then(function (response) {
         return response.text();
