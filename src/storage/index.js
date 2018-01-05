@@ -19,7 +19,7 @@ import { lookupProfile } from '../profiles'
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
-export function getUserAppFileUrl(path: string, name: string, appOrigin: string, 
+export function getUserAppFileUrl(path: string, name: string, appOrigin: string,
   zoneFileLookupURL: string = 'http://localhost:6270/v1/names/') {
   return lookupProfile(name, zoneFileLookupURL)
     .then(profile => {
@@ -49,13 +49,14 @@ export function getUserAppFileUrl(path: string, name: string, appOrigin: string,
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=false] - try to decrypt the data with the app private key
  * @param {String} options.user - the Blockstack ID to lookup for multi-player storage
- * @param {String} options.app - the app to lookup for multi-player storage
- * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack 
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack
  * core endpoint URL to use for zonefile lookup
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(path: string, options?: {decrypt?: boolean, user?: string, app?: string, 
+export function getFile(path: string, options?: {decrypt?: boolean, user?: string, app?: string,
   zoneFileLookupURL?: string}) {
   const defaults = {
     decrypt: false,
@@ -68,8 +69,13 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
 
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => {
-      if (opt.user && opt.app) {
-        return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL)
+      if (opt.user) {
+        if (opt.app) {
+          return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL)
+        } else {
+          // default to current origin if no app origin is specified
+          return getUserAppFileUrl(path, opt.user, window.location.origin, opt.zoneFileLookupURL)
+        }
       } else {
         return getFullReadUrl(path, gaiaHubConfig)
       }
