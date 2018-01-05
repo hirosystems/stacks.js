@@ -69,7 +69,7 @@ the `publish_data` scope during authentication.
 ```JavaScript
  let options = { 
    user: 'ryan.id', // the Blockstack ID of the user for which to lookup the file
-   app: 'BlockstackApp.com' // origin of the app this file is stored for
+   app: 'http://BlockstackApp.com' // origin of the app this file is stored for
  }
 
  blockstack.getFile("/message.txt", options)
