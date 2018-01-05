@@ -61,7 +61,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
   const defaults = {
     decrypt: false,
     user: null,
-    app: null,
+    app: window.location.origin,
     zoneFileLookupURL: 'http://localhost:6270/v1/names/'
   }
 
@@ -70,12 +70,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, user?: strin
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => {
       if (opt.user) {
-        if (opt.app) {
-          return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL)
-        } else {
-          // default to current origin if no app origin is specified
-          return getUserAppFileUrl(path, opt.user, window.location.origin, opt.zoneFileLookupURL)
-        }
+        return getUserAppFileUrl(path, opt.user, opt.app, opt.zoneFileLookupURL)
       } else {
         return getFullReadUrl(path, gaiaHubConfig)
       }
