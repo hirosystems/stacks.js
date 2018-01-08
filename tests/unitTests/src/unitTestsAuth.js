@@ -18,7 +18,8 @@ import {
   doPublicKeysMatchIssuer,
   doPublicKeysMatchUsername,
   isManifestUriValid,
-  isRedirectUriValid
+  isRedirectUriValid,
+  verifyAuthRequestAndLoadManifest
 } from '../../../lib'
 import blockstack from '../../../lib'
 
@@ -30,7 +31,7 @@ export function runAuthTests() {
   const nameLookupURL = 'https://explorer-api.appartisan.com/get_name_blockchain_record/'
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
-    t.plan(14)
+    t.plan(15)
 
     global.window = {
       location: {
@@ -69,10 +70,32 @@ export function runAuthTests() {
     t.true(doPublicKeysMatchIssuer(authRequest), 'Public keys should match the issuer')
     t.true(isManifestUriValid(authRequest), 'Manifest URI should be on the app origin')
     t.true(isRedirectUriValid(authRequest), 'Redirect URL should be to app origin')
+
+
+
+    const manifiestUrl = 'http://localhost:3000/manifest.json'
+    const manifest = {
+      "name": "App",
+      "start_url": "http://localhost:3000/",
+      "description": "A simple todo app build on blockstack",
+      "icons": [{
+        "src": "http://localhost:3000/logo.png",
+        "sizes": "400x400",
+        "type": "image/png"
+      }]
+    }
+    const manifestString = JSON.stringify(manifest)
+    FetchMock.get(manifiestUrl, manifestString)
+
+    verifyAuthRequestAndLoadManifest(authRequest)
+      .then((appManifest) => {
+        console.log(appManifest)
+        t.equal(appManifest.name, 'App', 'should fetch manifest for valid auth request')
+      })
   })
 
   test('invalid auth request - signature not verified', (t) => {
-    t.plan(2)
+    t.plan(3)
 
     const authRequest = makeAuthRequest(privateKey, 'http://localhost:3000')
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
@@ -85,15 +108,17 @@ export function runAuthTests() {
         t.equal(verified, false, 'auth request should be unverified')
       })
 
-    // console.log(`auth request: ${authRequest}`)
-    // console.log(`invalid auth request: ${invalidAuthRequest}`)
-
-    // console.log('==============================')
-    // console.log(verified)
+    verifyAuthRequestAndLoadManifest(invalidAuthRequest)
+      .then(() => {
+        // no op
+      },
+      () => {
+        t.pass('invalid auth request rejected')
+      })
   })
 
   test('invalid auth request - invalid redirect uri', (t) => {
-    t.plan(2)
+    t.plan(3)
 
     const invalidAuthRequest = makeAuthRequest(privateKey, 'https://example.com')
 
@@ -103,6 +128,14 @@ export function runAuthTests() {
     verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
         t.equal(verified, false, 'auth request should be unverified')
+      })
+
+    verifyAuthRequestAndLoadManifest(invalidAuthRequest)
+      .then(() => {
+        // no op
+      },
+      () => {
+        t.pass('invalid auth request rejected')
       })
   })
 

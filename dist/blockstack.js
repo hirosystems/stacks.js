@@ -460,7 +460,6 @@ function fetchAppManifest(authRequest) {
     } else {
       var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
       var manifestURI = payload.manifest_uri;
-      console.log(payload);
       try {
         fetch(manifestURI).then(function (response) {
           return response.text();
@@ -671,7 +670,6 @@ var _index = require('../index');
 
 function doSignaturesMatchPublicKeys(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
-  console.log(payload);
   var publicKeys = payload.public_keys;
   if (publicKeys.length === 1) {
     var publicKey = publicKeys[0];
@@ -816,22 +814,39 @@ function verifyAuthRequest(token) {
   });
 }
 
+/**
+ * Verify the authentication response is valid and
+ * fetch the app manifest file if valid. Otherwise, reject the promise.
+ * @param  {String} token the authentication request token
+ * @return {Promise} that resolves to the app manifest file in JSON format
+ * or rejects if the auth request or app manifest file is invalid
+ * @private
+ */
 function verifyAuthRequestAndLoadManifest(token) {
-  return new Promise(function () {
+  return new Promise(function (resolve, reject) {
     return verifyAuthRequest(token).then(function (valid) {
       if (valid) {
-        // fetchAppManifest
+        return (0, _index.fetchAppManifest)(token).then(function (appManifest) {
+          resolve(appManifest);
+        });
       } else {
-          // return error
-        }
+        reject();
+        return Promise.reject();
+      }
     });
   });
 }
 
+/**
+ * Verify the authentication response is valid
+ * @param {String} token the authentication request token
+ * @param {String} nameLookupURL the url use to verify owner of a username
+ * @return {Promise} that resolves to true if it is valid and false if it does not
+ * @private
+ */
 function verifyAuthResponse(token, nameLookupURL) {
   return new Promise(function (resolve) {
     Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
-      console.log(values);
       if (values.every(Boolean)) {
         resolve(true);
       } else {
@@ -1021,6 +1036,12 @@ Object.defineProperty(exports, 'isRedirectUriValid', {
   enumerable: true,
   get: function get() {
     return _authVerification.isRedirectUriValid;
+  }
+});
+Object.defineProperty(exports, 'verifyAuthRequestAndLoadManifest', {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.verifyAuthRequestAndLoadManifest;
   }
 });
 },{"./authApp":1,"./authMessages":3,"./authProvider":4,"./authSession":5,"./authVerification":6}],8:[function(require,module,exports){
