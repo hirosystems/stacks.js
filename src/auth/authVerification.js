@@ -134,6 +134,13 @@ export function isRedirectUriValid(token: string) {
   return isSameOriginAbsoluteUrl(payload.domain_name, payload.redirect_uri)
 }
 
+/**
+ * Verify authentication request is valid
+ * @param  {String} token [description]
+ * @return {Promise} that resolves to true if the auth request
+ *  is valid and false if it does not
+ *  @private
+ */
 export function verifyAuthRequest(token: string) {
   return new Promise((resolve, reject) => {
     if (decodeToken(token).header.alg === 'none') {
@@ -182,10 +189,10 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
 
 /**
  * Verify the authentication response is valid
- * @param {String} token the authentication request token
+ * @param {String} token the authentication response token
  * @param {String} nameLookupURL the url use to verify owner of a username
- * @return {Promise} that resolves to true if it is valid and false if it does not
- * @private
+ * @return {Promise} that resolves to true if auth response
+ * is valid and false if it does not
  */
 export function verifyAuthResponse(token: string, nameLookupURL: string) {
   return new Promise((resolve) => {

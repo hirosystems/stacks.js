@@ -798,6 +798,13 @@ function isRedirectUriValid(token) {
   return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.redirect_uri);
 }
 
+/**
+ * Verify authentication request is valid
+ * @param  {String} token [description]
+ * @return {Promise} that resolves to true if the auth request
+ *  is valid and false if it does not
+ *  @private
+ */
 function verifyAuthRequest(token) {
   return new Promise(function (resolve, reject) {
     if ((0, _jsontokens.decodeToken)(token).header.alg === 'none') {
@@ -839,10 +846,10 @@ function verifyAuthRequestAndLoadManifest(token) {
 
 /**
  * Verify the authentication response is valid
- * @param {String} token the authentication request token
+ * @param {String} token the authentication response token
  * @param {String} nameLookupURL the url use to verify owner of a username
- * @return {Promise} that resolves to true if it is valid and false if it does not
- * @private
+ * @return {Promise} that resolves to true if auth response
+ * is valid and false if it does not
  */
 function verifyAuthResponse(token, nameLookupURL) {
   return new Promise(function (resolve) {
