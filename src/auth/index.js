@@ -16,5 +16,6 @@ export {
 export {
   verifyAuthRequest, verifyAuthResponse,
   isExpirationDateValid, isIssuanceDateValid, doPublicKeysMatchUsername,
-  doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys
+  doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
+  isManifestUriValid, isRedirectUriValid
 } from './authVerification'

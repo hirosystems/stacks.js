@@ -1,5 +1,5 @@
 import { decodeToken, TokenVerifier } from 'jsontokens'
-import { getAddressFromDID, publicKeyToAddress } from '../index'
+import { getAddressFromDID, publicKeyToAddress, isSameOriginAbsoluteUrl } from '../index'
 
 export function doSignaturesMatchPublicKeys(token) {
   const payload = decodeToken(token).payload
@@ -123,6 +123,16 @@ export function isExpirationDateValid(token) {
   }
 }
 
+export function isManifestUriValid(token) {
+  const payload = decodeToken(token).payload
+  return isSameOriginAbsoluteUrl(payload.domain_name, payload.manifest_uri)
+}
+
+export function isRedirectUriValid(token) {
+  const payload = decodeToken(token).payload
+  return isSameOriginAbsoluteUrl(payload.domain_name, payload.redirect_uri)
+}
+
 export function verifyAuthRequest(token) {
   return new Promise((resolve, reject) => {
     if (decodeToken(token).header.alg === 'none') {
@@ -133,7 +143,9 @@ export function verifyAuthRequest(token) {
       isExpirationDateValid(token),
       isIssuanceDateValid(token),
       doSignaturesMatchPublicKeys(token),
-      doPublicKeysMatchIssuer(token)
+      doPublicKeysMatchIssuer(token),
+      isManifestUriValid(token),
+      isRedirectUriValid(token)
     ]).then(values => {
       if (values.every(Boolean)) {
         resolve(true)
@@ -142,6 +154,16 @@ export function verifyAuthRequest(token) {
       }
     })
   })
+}
+
+export function verifyAuthRequestAndLoadManifest(token) {
+  return new Promise(() => verifyAuthRequest(token).then(valid => {
+    if (valid) {
+      // fetchAppManifest
+    } else {
+      // return error
+    }
+  }))
 }
 
 export function verifyAuthResponse(token, nameLookupURL) {

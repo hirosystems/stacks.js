@@ -16,7 +16,9 @@ import {
   isIssuanceDateValid,
   doSignaturesMatchPublicKeys,
   doPublicKeysMatchIssuer,
-  doPublicKeysMatchUsername
+  doPublicKeysMatchUsername,
+  isManifestUriValid,
+  isRedirectUriValid
 } from '../../../lib'
 import blockstack from '../../../lib'
 
@@ -28,7 +30,7 @@ export function runAuthTests() {
   const nameLookupURL = 'https://explorer-api.appartisan.com/get_name_blockchain_record/'
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
-    t.plan(12)
+    t.plan(14)
 
     global.window = {
       location: {
@@ -65,12 +67,14 @@ export function runAuthTests() {
     t.true(isIssuanceDateValid(authRequest), 'Issuance date should be valid')
     t.true(doSignaturesMatchPublicKeys(authRequest), 'Signatures should match the public keys')
     t.true(doPublicKeysMatchIssuer(authRequest), 'Public keys should match the issuer')
+    t.true(isManifestUriValid(authRequest), 'Manifest URI should be on the app origin')
+    t.true(isRedirectUriValid(authRequest), 'Redirect URL should be to app origin')
   })
 
-  test('invalid auth request', (t) => {
+  test('invalid auth request - signature not verified', (t) => {
     t.plan(2)
 
-    const authRequest = makeAuthRequest(privateKey, 'localhost:3000')
+    const authRequest = makeAuthRequest(privateKey, 'http://localhost:3000')
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
 
     t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false,
@@ -86,6 +90,34 @@ export function runAuthTests() {
 
     // console.log('==============================')
     // console.log(verified)
+  })
+
+  test('invalid auth request - invalid redirect uri', (t) => {
+    t.plan(2)
+
+    const invalidAuthRequest = makeAuthRequest(privateKey, 'https://example.com')
+
+    t.equal(isRedirectUriValid(invalidAuthRequest), false,
+          'Redirect URI should be invalid since it does not match origin')
+
+    verifyAuthRequest(invalidAuthRequest)
+      .then((verified) => {
+        t.equal(verified, false, 'auth request should be unverified')
+      })
+  })
+
+  test('invalid auth request - invalid manifest uri', (t) => {
+    t.plan(2)
+
+    const invalidAuthRequest = makeAuthRequest(privateKey, 'http://localhost:3000', 'https://example.com/manifest.json')
+
+    t.equal(isManifestUriValid(invalidAuthRequest), false,
+          'Manifest URI should be invalid since it does not match origin')
+
+    verifyAuthRequest(invalidAuthRequest)
+      .then((verified) => {
+        t.equal(verified, false, 'auth request should be unverified')
+      })
   })
 
   test('makeAuthResponse && verifyAuthResponse', (t) => {
