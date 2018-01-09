@@ -9,12 +9,69 @@ import localStorage from 'mock-local-storage'
 import { uploadToGaiaHub, getFullReadUrl,
          connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
          getBucketUrl } from '../../../lib/storage/hub'
-import { getFile, getUserAppFileUrl } from '../../../lib/storage'
+import { getFile, putFile, getUserAppFileUrl } from '../../../lib/storage'
 
 global.window = {}
 window.localStorage = global.localStorage
 
 export function runStorageTests() {
+
+  test('getFile unencrypted', (t) => {
+    t.plan(2)
+
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
+    const fileContent = { test: 'test' }
+
+    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
+    const getFullReadUrl = sinon.stub().resolves(fullReadUrl)
+
+    const { getFile } = proxyquire('../../../lib/storage', {
+      './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl },
+    })
+
+    FetchMock.get(fullReadUrl, fileContent)
+
+    getFile(path)
+      .then((file) => {
+        t.ok(file, 'Returns file content')
+        t.same(JSON.parse(file), fileContent)
+      })
+  })
+
+  test('putFile unencrypted', (t) => {
+    t.plan(1)
+
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
+    const fileContent = { test: 'test' }
+
+    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
+    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl)
+
+    const { putFile } = proxyquire('../../../lib/storage', {
+      './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub },
+    })
+
+    putFile(path, fileContent)
+      .then((publicURL) => {
+        t.ok(publicURL, fullReadUrl)
+      })
+  })
 
   test('fetch404null', (t) => {
     t.plan(2)
