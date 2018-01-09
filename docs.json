@@ -476,7 +476,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -809,7 +809,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1063,7 +1063,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1340,7 +1340,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1512,7 +1512,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1749,7 +1749,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2025,7 +2025,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2716,7 +2716,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2998,7 +2998,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3379,7 +3379,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -3765,7 +3765,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4120,7 +4120,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4754,7 +4754,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5150,7 +5150,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5531,7 +5531,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -6145,11 +6145,11 @@
           "column": 0
         },
         "end": {
-          "line": 115,
+          "line": 113,
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -6743,26 +6743,26 @@
     ],
     "loc": {
       "start": {
-        "line": 117,
+        "line": 115,
         "column": 0
       },
       "end": {
-        "line": 125,
+        "line": 123,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 126,
+          "line": 124,
           "column": 0
         },
         "end": {
-          "line": 146,
+          "line": 144,
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7197,26 +7197,26 @@
     ],
     "loc": {
       "start": {
-        "line": 148,
+        "line": 146,
         "column": 0
       },
       "end": {
-        "line": 154,
+        "line": 152,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 155,
+          "line": 153,
           "column": 0
         },
         "end": {
-          "line": 157,
+          "line": 155,
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7559,7 +7559,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7909,6 +7909,325 @@
           "children": [
             {
               "type": "text",
+              "value": "Verify the authentication response is valid",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 44,
+                  "offset": 43
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 44,
+              "offset": 43
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 44,
+          "offset": 43
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the authentication response token",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "param",
+        "description": "the url use to verify owner of a username",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "nameLookupURL"
+      },
+      {
+        "title": "return",
+        "description": "that resolves to true if auth response\nis valid and false if it does not",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 190,
+        "column": 0
+      },
+      "end": {
+        "line": 196,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 197,
+          "column": 0
+        },
+        "end": {
+          "line": 213,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the authentication response token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 34,
+                  "offset": 33
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 34,
+              "offset": 33
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "nameLookupURL",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the url use to verify owner of a username",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 42,
+                  "offset": 41
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 42,
+              "offset": 41
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves to true if auth response\nis valid and false if it does not",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 72
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 34,
+                  "offset": 72
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 34,
+              "offset": 72
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "verifyAuthResponse",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "verifyAuthResponse",
+        "kind": "function"
+      }
+    ],
+    "namespace": "verifyAuthResponse"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Encrypt content to elliptic curve publicKey using ECIES",
               "position": {
                 "start": {
@@ -8014,7 +8333,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/encryption.js"
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
     },
     "augments": [],
     "examples": [],
@@ -8346,7 +8665,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/encryption.js"
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
     },
     "augments": [],
     "examples": [],
@@ -8655,7 +8974,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/hub.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/hub.js"
     },
     "augments": [],
     "examples": [],
@@ -8818,26 +9137,26 @@
     ],
     "loc": {
       "start": {
-        "line": 159,
+        "line": 157,
         "column": 0
       },
       "end": {
-        "line": 164,
+        "line": 162,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 165,
+          "line": 163,
           "column": 0
         },
         "end": {
-          "line": 167,
+          "line": 165,
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -9076,26 +9395,26 @@
     ],
     "loc": {
       "start": {
-        "line": 47,
+        "line": 49,
         "column": 0
       },
       "end": {
-        "line": 52,
+        "line": 54,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 53,
+          "line": 55,
           "column": 0
         },
         "end": {
-          "line": 66,
+          "line": 68,
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/utils.js"
+      "file": "/Users/larry/git/blockstack.js/src/utils.js"
     },
     "augments": [],
     "examples": [],
