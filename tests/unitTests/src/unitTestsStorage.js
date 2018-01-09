@@ -47,7 +47,7 @@ export function runStorageTests() {
   })
 
   test('getFile unencrypted - multi-reader', (t) => {
-    t.plan(2)
+    t.plan(4)
 
     const path = 'file.json'
     const gaiaHubConfig = {
@@ -154,11 +154,29 @@ export function runStorageTests() {
       username: 'yukan.id',
       app: 'http://localhost:8080'
     }
+
     getFile(path, options)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
       })
+
+    const optionsNoApp = {
+      username: 'yukan.id'
+    }
+
+    global.window = {
+      location: {
+        origin: 'http://localhost:8080'
+      }
+    }
+
+    getFile(path, optionsNoApp)
+      .then((file) => {
+        t.ok(file, 'Returns file content')
+        t.same(JSON.parse(file), JSON.parse(fileContents))
+    })
+
   })
 
   test('putFile unencrypted', (t) => {
