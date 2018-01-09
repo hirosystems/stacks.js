@@ -25,21 +25,15 @@ export function makePreorder(fullyQualifiedName: string,
 
   const preorderPromise = Promise.all([network.getConsensusHash(),
                                        network.getNamePrice(fullyQualifiedName)])
-        .then(inputs => {
-          const consensusHash = inputs[0]
-          const namePrice = inputs[1]
-          return makePreorderSkeleton(
+        .then(([consensusHash, namePrice]) =>
+          makePreorderSkeleton(
             fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
-            namePrice, network, registerAddress)
-        })
+            namePrice, network, registerAddress))
 
   return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
-    .then(inputs => {
-      const utxos = inputs[0]
-      const feeRate = inputs[1]
-
+    .then(([utxos, feeRate, preorderSkeleton]) => {
       const preorderSkeletonTxB = bitcoinjs.TransactionBuilder.fromTransaction(
-        inputs[2], network.layer1)
+        preorderSkeleton, network.layer1)
 
       const txFee = estimateTXBytes(preorderSkeletonTxB, 1, 0) * feeRate
       const outAmounts = sumOutputValues(preorderSkeletonTxB)
@@ -72,13 +66,7 @@ export function makeUpdate(fullyQualifiedName: string,
 
   return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                       network.getUTXOs(ownerAddress), network.getFeeRate()])
-    .then((inputs) => {
-      const txB = inputs[0]
-      const payerUtxos = inputs[1]
-      const ownerUtxos = inputs[2]
-      const feeRate = inputs[3]
-
-
+    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
       // add an owner UTXO and change it back out.
       ownerUtxos.sort((a, b) => a.value - b.value)
       if (ownerUtxos.length < 0) {
@@ -127,16 +115,11 @@ export function makeRegister(fullyQualifiedName: string,
   const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
-    .then(inputs => {
-      const utxos = inputs[0]
-      const feeRate = inputs[1]
-
+    .then(([utxos, feeRate]) => {
       const txFee = estimateTXBytes(txB, 1, 0) * feeRate
       const outAmounts = sumOutputValues(txB)
 
-      return addUTXOsToFund(txB, changeIndex, utxos, txFee + outAmounts)
-    })
-    .then(signingTxB => {
+      const signingTxB = addUTXOsToFund(txB, changeIndex, utxos, txFee + outAmounts)
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         signingTxB.sign(i, paymentKey)
       }
