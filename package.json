@@ -115,6 +115,7 @@
     "request": "^2.79.0",
     "schema-inspector": "^1.6.4",
     "sprintf-js": "^1.0.3",
+    "uri-js": "^3.0.2",
     "uuid": "^3.0.1",
     "validator": "^7.0.0",
     "zone-file": "^0.2.2"
