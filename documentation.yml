@@ -23,6 +23,7 @@ toc:
   - signProfileToken
   - verifyProfileToken
   - validateProofs
+  - lookupProfile
   - name: Storage
     description: |
       Store your app's data without servers in storage your user controls.
@@ -37,3 +38,5 @@ toc:
       [Read more about storage](https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md)
   - getFile
   - putFile
+  - getAppBucketUrl
+  - getUserAppFileUrl
