@@ -121,7 +121,7 @@ export function makeTransferSkeleton(
 
 
 export function makeUpdateSkeleton(
-  fullyQualifiedName: string, consensusHash: string, zonefile: Buffer,
+  fullyQualifiedName: string, consensusHash: string, valueHash: string,
   network: BlockstackNetwork) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
@@ -137,11 +137,9 @@ export function makeUpdateSkeleton(
   const hashedName = hash128(Buffer.concat(
     [nameBuff, consensusBuff]))
 
-  const hashedZonefile = hash160(zonefile)
-
   opRet.write('id+', 0, 3, 'ascii')
   hashedName.copy(opRet, 3)
-  hashedZonefile.copy(opRet, 19)
+  opRet.write(valueHash, 19, 20, 'hex')
 
   const opRetPayload = bitcoin.script.nullDataOutput(opRet)
 
