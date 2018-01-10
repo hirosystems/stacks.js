@@ -4,6 +4,8 @@
 import test from 'tape-promise/tape'
 import { decodeToken } from 'jsontokens'
 import FetchMock from 'fetch-mock'
+
+global.window = {}
 import localStorage from 'mock-local-storage'
 
 import {
@@ -24,7 +26,6 @@ import {
   signUserOut
 } from '../../../lib'
 import blockstack from '../../../lib'
-
 import { sampleManifests, sampleProfiles, sampleNameRecords } from './sampleData'
 
 export function runAuthTests() {
@@ -35,14 +36,11 @@ export function runAuthTests() {
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(15)
 
-    global.window = {
-      location: {
-        origin: 'http://localhost:3000',
-        hostname: 'localhost',
-        host: 'localhost:3000',
-        href: 'http://localhost:3000/signin'
-      },
-      localStorage: global.localStorage
+    global.window.location = {
+      origin: 'http://localhost:3000',
+      hostname: 'localhost',
+      host: 'localhost:3000',
+      href: 'http://localhost:3000/signin'
     }
     const authRequest = makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
