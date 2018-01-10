@@ -1546,6 +1546,24 @@ Object.defineProperty(exports, 'makeRegister', {
     return _txbuild.makeRegister;
   }
 });
+Object.defineProperty(exports, 'makeUpdate', {
+  enumerable: true,
+  get: function get() {
+    return _txbuild.makeUpdate;
+  }
+});
+Object.defineProperty(exports, 'makeTransfer', {
+  enumerable: true,
+  get: function get() {
+    return _txbuild.makeTransfer;
+  }
+});
+Object.defineProperty(exports, 'makeRenewal', {
+  enumerable: true,
+  get: function get() {
+    return _txbuild.makeRenewal;
+  }
+});
 
 var _util = require('./util');
 
@@ -1741,6 +1759,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.makePreorderSkeleton = makePreorderSkeleton;
 exports.makeRegisterSkeleton = makeRegisterSkeleton;
+exports.makeRenewalSkeleton = makeRenewalSkeleton;
 exports.makeTransferSkeleton = makeTransferSkeleton;
 exports.makeUpdateSkeleton = makeUpdateSkeleton;
 
@@ -1801,14 +1820,15 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
   return tx.buildIncomplete();
 }
 
-function makeRegisterSkeleton(fullyQualifiedName, registerAddress, ownerAddress, network) {
-  var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+function makeRegisterSkeleton(fullyQualifiedName, ownerAddress, network) {
+  var valueHash = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
 
-  // You MUST make the first input a UTXO from the current OWNER
+  // You MUST make the first input a UTXO from the current OWNER *or* the
+  //   funder of the PREORDER
 
   // in the case of a renewal, this would need to be modified to include a change address
   //  as output (3) before the burn output (4)
@@ -1832,9 +1852,19 @@ function makeRegisterSkeleton(fullyQualifiedName, registerAddress, ownerAddress,
   var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
 
   tx.addOutput(nullOutput, 0);
-  tx.addOutput(registerAddress, _util.DUST_MINIMUM);
+  tx.addOutput(ownerAddress, _util.DUST_MINIMUM);
 
   return tx.buildIncomplete();
+}
+
+function makeRenewalSkeleton(fullyQualifiedName, nextOwnerAddress, lastOwnerAddress, burnAddress, burnAmount, network) {
+  var valueHash = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+
+  var registerTX = makeRegisterSkeleton(fullyQualifiedName, nextOwnerAddress, network, valueHash);
+  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerTX, network.layer1);
+  txB.addOutput(lastOwnerAddress, _util.DUST_MINIMUM);
+  txB.addOutput(burnAddress, burnAmount);
+  return txB.buildIncomplete();
 }
 
 function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner, network) {
@@ -1870,7 +1900,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner, netwo
   return tx.buildIncomplete();
 }
 
-function makeUpdateSkeleton(fullyQualifiedName, consensusHash, zonefile, network) {
+function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash, network) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -1884,11 +1914,9 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, zonefile, network
 
   var hashedName = (0, _util.hash128)(Buffer.concat([nameBuff, consensusBuff]));
 
-  var hashedZonefile = (0, _util.hash160)(zonefile);
-
   opRet.write('id+', 0, 3, 'ascii');
   hashedName.copy(opRet, 3);
-  hashedZonefile.copy(opRet, 19);
+  opRet.write(valueHash, 19, 20, 'hex');
 
   var opRetPayload = _bitcoinjsLib2.default.script.nullDataOutput(opRet);
 
@@ -1906,9 +1934,15 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, zonefile, network
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 exports.addOwnerInput = addOwnerInput;
+exports.makeRenewal = makeRenewal;
 exports.makePreorder = makePreorder;
+exports.makeUpdate = makeUpdate;
 exports.makeRegister = makeRegister;
+exports.makeTransfer = makeTransfer;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -1922,14 +1956,69 @@ var _network = require('./network');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function addOwnerInput(utxos, txIn, network) {
-  var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(txIn, network.layer1);
+function addOwnerInput(utxos, ownerAddress, txB) {
+  var addChangeOut = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
+  // add an owner UTXO and a change out.
+  if (utxos.length < 0) {
+    throw new Error('Owner has no UTXOs for UPDATE.');
+  }
+
   utxos.sort(function (a, b) {
     return a.value - b.value;
   });
-  var selected = utxos[0];
-  txB.addInput(selected.tx_hash, selected.tx_output_n);
-  return txB.buildIncomplete();
+  var ownerUTXO = utxos[0];
+  var ownerInput = txB.addInput(ownerUTXO.tx_hash, ownerUTXO.tx_output_n);
+  if (addChangeOut) {
+    txB.addOutput(ownerAddress, ownerUTXO.value);
+  }
+  return { index: ownerInput, value: ownerUTXO.value };
+}
+
+function makeRenewal(fullyQualifiedName, destinationAddress, ownerKey, paymentKey, network) {
+  var zonefile = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+
+  var valueHash = undefined;
+  if (!!zonefile) {
+    valueHash = (0, _util.hash160)(Buffer.from(zonefile)).toString('hex');
+  }
+
+  var burnAddress = network.coerceAddress(_util.DEFAULT_BURN_ADDRESS);
+  var ownerAddress = ownerKey.getAddress();
+  var paymentAddress = paymentKey.getAddress();
+
+  var txPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
+    return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, burnAddress, namePrice, network, valueHash);
+  }).then(function (tx) {
+    return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(tx, network.layer1);
+  });
+
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 4),
+        txB = _ref2[0],
+        payerUtxos = _ref2[1],
+        ownerUtxos = _ref2[2],
+        feeRate = _ref2[3];
+
+    var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false);
+    // change index for the payer.
+    var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+
+    // fund the transaction fee.
+    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
+    var outAmounts = (0, _util.sumOutputValues)(txB);
+    var inAmounts = ownerInput.value; // let the owner input fund its output
+
+    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, payerUtxos, txFee + outAmounts - inAmounts, feeRate);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      if (i === ownerInput.index) {
+        signingTxB.sign(i, ownerKey);
+      } else {
+        signingTxB.sign(i, paymentKey);
+      }
+    }
+    return signingTxB.build();
+  });
 }
 
 function makePreorder(fullyQualifiedName, destinationAddress, paymentKey, network) {
@@ -1937,28 +2026,71 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKey, networ
   var registerAddress = destinationAddress;
   var preorderAddress = paymentKey.getAddress();
 
-  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName)]).then(function (inputs) {
-    var consensusHash = inputs[0];
-    var namePrice = inputs[1];
+  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName)]).then(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+        consensusHash = _ref4[0],
+        namePrice = _ref4[1];
+
     return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, network, registerAddress);
   });
 
-  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (inputs) {
-    var utxos = inputs[0];
-    var feeRate = inputs[1];
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 3),
+        utxos = _ref6[0],
+        feeRate = _ref6[1],
+        preorderSkeleton = _ref6[2];
 
-    var preorderSkeletonTxB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(inputs[2], network.layer1);
+    var preorderSkeletonTxB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
 
     var txFee = (0, _util.estimateTXBytes)(preorderSkeletonTxB, 1, 0) * feeRate;
     var outAmounts = (0, _util.sumOutputValues)(preorderSkeletonTxB);
     var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
 
-    return (0, _util.addUTXOsToFund)(preorderSkeletonTxB, changeIndex, utxos, txFee + outAmounts, feeRate, network);
+    return (0, _util.addUTXOsToFund)(preorderSkeletonTxB, changeIndex, utxos, txFee + outAmounts, feeRate);
   }).then(function (txB) {
     for (var i = 0; i < txB.tx.ins.length; i++) {
       txB.sign(i, paymentKey);
     }
     return txB.build();
+  });
+}
+
+function makeUpdate(fullyQualifiedName, ownerKey, paymentKey, zonefile, network) {
+  var valueHash = (0, _util.hash160)(Buffer.from(zonefile)).toString('hex');
+  var paymentAddress = paymentKey.getAddress();
+  var ownerAddress = ownerKey.getAddress();
+
+  var txPromise = network.getConsensusHash().then(function (consensusHash) {
+    return (0, _skeletons.makeUpdateSkeleton)(fullyQualifiedName, consensusHash, valueHash, network);
+  }).then(function (updateTX) {
+    return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(updateTX, network.layer1);
+  });
+
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 4),
+        txB = _ref8[0],
+        payerUtxos = _ref8[1],
+        ownerUtxos = _ref8[2],
+        feeRate = _ref8[3];
+
+    var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
+    // change index for the payer.
+    var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+
+    // fund the transaction fee.
+    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
+    var outAmounts = (0, _util.sumOutputValues)(txB);
+    var inAmounts = ownerInput.value; // let the owner input fund its output
+
+    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, payerUtxos, txFee + outAmounts - inAmounts, feeRate);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      if (i === ownerInput.index) {
+        signingTxB.sign(i, ownerKey);
+      } else {
+        signingTxB.sign(i, paymentKey);
+      }
+    }
+    return signingTxB.build();
   });
 }
 
@@ -1971,23 +2103,61 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKey) {
     valueHash = (0, _util.hash160)(Buffer.from(zonefile)).toString('hex');
   }
 
-  var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, registerAddress, network, valueHash);
+  var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, network, valueHash);
 
   var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1);
   var paymentAddress = paymentKey.getAddress();
   var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
 
-  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (inputs) {
-    var utxos = inputs[0];
-    var feeRate = inputs[1];
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref9) {
+    var _ref10 = _slicedToArray(_ref9, 2),
+        utxos = _ref10[0],
+        feeRate = _ref10[1];
 
     var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
     var outAmounts = (0, _util.sumOutputValues)(txB);
 
-    return (0, _util.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts, feeRate, network);
-  }).then(function (signingTxB) {
+    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       signingTxB.sign(i, paymentKey);
+    }
+    return signingTxB.build();
+  });
+}
+
+function makeTransfer(fullyQualifiedName, destinationAddress, ownerKey, paymentKey, network) {
+  var paymentAddress = paymentKey.getAddress();
+  var ownerAddress = ownerKey.getAddress();
+
+  var txPromise = network.getConsensusHash().then(function (consensusHash) {
+    return (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, consensusHash, destinationAddress, network);
+  }).then(function (transferTX) {
+    return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(transferTX, network.layer1);
+  });
+
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 4),
+        txB = _ref12[0],
+        payerUtxos = _ref12[1],
+        ownerUtxos = _ref12[2],
+        feeRate = _ref12[3];
+
+    var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
+    // change index for the payer
+    var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+
+    // fund the transaction fee
+    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
+    var outAmounts = (0, _util.sumOutputValues)(txB);
+    var inAmounts = ownerInput.value; // let the owner input fund its output
+
+    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, payerUtxos, txFee + outAmounts - inAmounts, feeRate);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      if (i === ownerInput.index) {
+        signingTxB.sign(i, ownerKey);
+      } else {
+        signingTxB.sign(i, paymentKey);
+      }
     }
     return signingTxB.build();
   });

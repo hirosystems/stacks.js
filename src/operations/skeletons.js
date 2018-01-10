@@ -51,13 +51,14 @@ export function makePreorderSkeleton(
 }
 
 export function makeRegisterSkeleton(
-  fullyQualifiedName: string, registerAddress: string, ownerAddress: string,
+  fullyQualifiedName: string, ownerAddress: string,
   network: BlockstackNetwork, valueHash: string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
 
-  // You MUST make the first input a UTXO from the current OWNER
+  // You MUST make the first input a UTXO from the current OWNER *or* the
+  //   funder of the PREORDER
 
   // in the case of a renewal, this would need to be modified to include a change address
   //  as output (3) before the burn output (4)
@@ -81,9 +82,21 @@ export function makeRegisterSkeleton(
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
-  tx.addOutput(registerAddress, DUST_MINIMUM)
+  tx.addOutput(ownerAddress, DUST_MINIMUM)
 
   return tx.buildIncomplete()
+}
+
+export function makeRenewalSkeleton(
+  fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
+  burnAddress: string, burnAmount: string, network: BlockstackNetwork, valueHash: string = null) {
+  const registerTX = makeRegisterSkeleton(
+    fullyQualifiedName, nextOwnerAddress, network, valueHash)
+  const txB = bitcoin.TransactionBuilder.fromTransaction(
+    registerTX, network.layer1)
+  txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
+  txB.addOutput(burnAddress, burnAmount)
+  return txB.buildIncomplete()
 }
 
 export function makeTransferSkeleton(

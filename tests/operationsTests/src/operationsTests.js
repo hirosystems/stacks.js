@@ -3,13 +3,13 @@ import util from 'util'
 import test from 'tape'
 import btc from 'bitcoinjs-lib'
 
-import { makePreorder, makeRegister, makeUpdate, makeTransfer, LOCAL_REGTEST } from '../../../lib/'
+import { makePreorder, makeRegister, makeUpdate, makeTransfer, makeRenewal, LOCAL_REGTEST } from '../../../lib/'
 
 const pExec = util.promisify(exec)
 
 async function initializeBlockstackCore() {
 
-//  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
+  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
 
   console.log('Pulled latest docker image')
 
@@ -38,19 +38,24 @@ function shutdownBlockstackCore() {
 
 export function runIntegrationTests() {
   test('registerName', (t) => {
-    t.plan(4)
+    t.plan(6)
 
     const dest = btc.ECPair.fromWIF('cNRZucCsNZR3HGFtW4nMEqME38RH3xWXrRgn74hnaBdEqMxeMUKj',
                                     btc.networks.testnet)
     const payer = btc.ECPair.fromWIF('cTs14pEWitbXXQF7qN4jRvJGwgeEU4FCcJNTwXYdSngBYkmCkBpi',
                                      btc.networks.testnet)
 
-    const transferDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
+    const secondOwner = btc.ECPair.fromWIF('cQQ9zPkp2FegjLL7EZxawPBU3XaNaHxnaYeNvBX3vLXAHwWEbsnk',
+                                           btc.networks.testnet)
+    const transferDestination = secondOwner.getAddress()
+    const renewalDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
     const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/0/profile.json"`
     const zfTest2 = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/3/profile.json"`
+    const renewalZF = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
+          `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/4/profile.json"`
 
     const network = LOCAL_REGTEST
 
@@ -73,7 +78,6 @@ export function runIntegrationTests() {
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
       .then(() => network.publishZonefile(zfTest))
-      .then((zfResp) => console.log(zfResp))
       .then(() => fetch(`${network.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
@@ -90,7 +94,6 @@ export function runIntegrationTests() {
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
       .then(() => network.publishZonefile(zfTest2))
-      .then((zfResp) => console.log(zfResp))
       .then(() => fetch(`${network.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
@@ -110,7 +113,23 @@ export function runIntegrationTests() {
         t.equal(network.coerceAddress(nameInfo.address), transferDestination,
                 `aaron.id should be owned by ${transferDestination}`)
       })
+      .then(() => makeRenewal('aaron.id', renewalDestination, secondOwner,
+                              payer, network, renewalZF))
+      .then(resolved => resolved.toHex())
+      .then(rawtx => network.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('RENEWAL broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => network.publishZonefile(renewalZF))
+      .then(() => fetch(`${network.blockstackAPIUrl}/v1/names/aaron.id`))
+      .then(resp => resp.json())
+      .then(nameInfo => {
+        t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
+        t.equal(network.coerceAddress(nameInfo.address), renewalDestination,
+                `aaron.id should be owned by ${renewalDestination}`)
 
+      })
       .then(() => shutdownBlockstackCore())
   })
 
