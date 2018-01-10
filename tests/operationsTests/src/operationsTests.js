@@ -3,13 +3,13 @@ import util from 'util'
 import test from 'tape'
 import btc from 'bitcoinjs-lib'
 
-import { makePreorder, makeRegister, makeUpdate, LOCAL_REGTEST } from '../../../lib/'
+import { makePreorder, makeRegister, makeUpdate, makeTransfer, LOCAL_REGTEST } from '../../../lib/'
 
 const pExec = util.promisify(exec)
 
 async function initializeBlockstackCore() {
 
-  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
+//  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
 
   console.log('Pulled latest docker image')
 
@@ -38,13 +38,14 @@ function shutdownBlockstackCore() {
 
 export function runIntegrationTests() {
   test('registerName', (t) => {
-    t.plan(3)
+    t.plan(4)
 
     const dest = btc.ECPair.fromWIF('cNRZucCsNZR3HGFtW4nMEqME38RH3xWXrRgn74hnaBdEqMxeMUKj',
                                     btc.networks.testnet)
     const payer = btc.ECPair.fromWIF('cTs14pEWitbXXQF7qN4jRvJGwgeEU4FCcJNTwXYdSngBYkmCkBpi',
                                      btc.networks.testnet)
 
+    const transferDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
     const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/0/profile.json"`
@@ -95,6 +96,21 @@ export function runIntegrationTests() {
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, zfTest2, 'zonefile should be updated')
       })
+      .then(() => makeTransfer('aaron.id', transferDestination,
+                               dest, payer, network))
+      .then(resolved => resolved.toHex())
+      .then(rawtx => network.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('TRANSFER broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => fetch(`${network.blockstackAPIUrl}/v1/names/aaron.id`))
+      .then(resp => resp.json())
+      .then(nameInfo => {
+        t.equal(network.coerceAddress(nameInfo.address), transferDestination,
+                `aaron.id should be owned by ${transferDestination}`)
+      })
+
       .then(() => shutdownBlockstackCore())
   })
 

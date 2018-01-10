@@ -2,17 +2,24 @@ import bitcoinjs from 'bitcoinjs-lib'
 
 import { addUTXOsToFund, DUST_MINIMUM, DEFAULT_BURN_ADDRESS,
          estimateTXBytes, sumOutputValues, hash160 } from './util'
-import { makePreorderSkeleton, makeRegisterSkeleton, makeUpdateSkeleton } from './skeletons'
+import { makePreorderSkeleton, makeRegisterSkeleton,
+         makeUpdateSkeleton, makeTransferSkeleton } from './skeletons'
 import { BlockstackNetwork } from './network'
 
 export function addOwnerInput(utxos: Object,
-                              txIn: bitcoinjs.Transaction,
-                              network: BlockstackNetwork) {
-  const txB = bitcoinjs.TransactionBuilder.fromTransaction(txIn, network.layer1)
+                              ownerAddress: string,
+                              txB: bitcoinjs.TransactionBuilder) {
+  // add an owner UTXO and a change out.
+  if (utxos.length < 0) {
+    throw new Error('Owner has no UTXOs for UPDATE.')
+  }
+
   utxos.sort((a, b) => a.value - b.value)
-  const selected = utxos[0]
-  txB.addInput(selected.tx_hash, selected.tx_output_n)
-  return txB.buildIncomplete()
+  const ownerUTXO = utxos[0]
+  const ownerInput = txB.addInput(ownerUTXO.tx_hash, ownerUTXO.tx_output_n)
+  txB.addOutput(ownerAddress, ownerUTXO.value)
+
+  return { index: ownerInput, value: ownerUTXO.value }
 }
 
 export function makePreorder(fullyQualifiedName: string,
@@ -67,27 +74,19 @@ export function makeUpdate(fullyQualifiedName: string,
   return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                       network.getUTXOs(ownerAddress), network.getFeeRate()])
     .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
-      // add an owner UTXO and change it back out.
-      ownerUtxos.sort((a, b) => a.value - b.value)
-      if (ownerUtxos.length < 0) {
-        throw new Error('Owner has no UTXOs for UPDATE.')
-      }
-      const ownerUTXO = ownerUtxos[0]
-      const ownerInput = txB.addInput(ownerUTXO.tx_hash, ownerUTXO.tx_output_n)
-      txB.addOutput(ownerAddress, ownerUTXO.value)
-
+      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
       // change index for the payer.
       const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
 
       // fund the transaction fee.
       const txFee = estimateTXBytes(txB, 1, 0) * feeRate
       const outAmounts = sumOutputValues(txB)
-      const inAmounts = ownerUTXO.value
+      const inAmounts = ownerInput.value // let the owner input fund its output
 
       const signingTxB = addUTXOsToFund(txB, changeIndex, payerUtxos,
                                         txFee + outAmounts - inAmounts, feeRate)
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        if (i === ownerInput) {
+        if (i === ownerInput.index) {
           signingTxB.sign(i, ownerKey)
         } else {
           signingTxB.sign(i, paymentKey)
@@ -122,6 +121,45 @@ export function makeRegister(fullyQualifiedName: string,
       const signingTxB = addUTXOsToFund(txB, changeIndex, utxos, txFee + outAmounts)
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         signingTxB.sign(i, paymentKey)
+      }
+      return signingTxB.build()
+    })
+}
+
+export function makeTransfer(fullyQualifiedName: string,
+                             destinationAddress: string,
+                             ownerKey: bitcoinjs.ECPair,
+                             paymentKey: bitcoinjs.ECPair,
+                             network: BlockstackNetwork) {
+  const paymentAddress = paymentKey.getAddress()
+  const ownerAddress = ownerKey.getAddress()
+
+  const txPromise = network.getConsensusHash()
+        .then((consensusHash) =>
+              makeTransferSkeleton(fullyQualifiedName, consensusHash, destinationAddress, network))
+        .then((transferTX) =>
+              bitcoinjs.TransactionBuilder.fromTransaction(transferTX, network.layer1))
+
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress),
+                      network.getUTXOs(ownerAddress), network.getFeeRate()])
+    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
+      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
+      // change index for the payer
+      const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
+
+      // fund the transaction fee
+      const txFee = estimateTXBytes(txB, 1, 0) * feeRate
+      const outAmounts = sumOutputValues(txB)
+      const inAmounts = ownerInput.value // let the owner input fund its output
+
+      const signingTxB = addUTXOsToFund(txB, changeIndex, payerUtxos,
+                                        txFee + outAmounts - inAmounts, feeRate)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        if (i === ownerInput.index) {
+          signingTxB.sign(i, ownerKey)
+        } else {
+          signingTxB.sign(i, paymentKey)
+        }
       }
       return signingTxB.build()
     })
