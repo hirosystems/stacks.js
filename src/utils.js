@@ -1,4 +1,6 @@
 /* @flow */
+import { parse as uriParse } from 'uri-js'
+
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
  * Time
@@ -80,4 +82,28 @@ export function makeUUID4() {
     d = Math.floor(d / 16)
     return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
   })
+}
+
+/**
+ * Checks if both urls pass the same origin check & are absolute
+ * @param  {[type]}  uri1 first uri to check
+ * @param  {[type]}  uri2 second uri to check
+ * @return {Boolean} true if they pass the same origin check
+ * @private
+ */
+export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
+  const parsedUri1 = uriParse(uri1)
+  const parsedUri2 = uriParse(uri2)
+
+  const port1 = parsedUri1.port | 0 || (parsedUri1.scheme === 'https' ? 443 : 80)
+  const port2 = parsedUri2.port | 0 || (parsedUri2.scheme === 'https' ? 443 : 80)
+
+  const match = {
+    scheme: parsedUri1.scheme === parsedUri2.scheme,
+    hostname: parsedUri1.hostname === parsedUri2.hostname,
+    port: port1 === port2,
+    absolute: (parsedUri1.reference === 'absolute') && (parsedUri2.reference === 'absolute')
+  }
+
+  return match.scheme && match.hostname && match.port && match.absolute
 }
