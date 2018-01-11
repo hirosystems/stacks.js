@@ -3,7 +3,7 @@ import util from 'util'
 import test from 'tape'
 import btc from 'bitcoinjs-lib'
 
-import { makePreorder, makeRegister, makeUpdate, makeTransfer, makeRenewal, LOCAL_REGTEST } from '../../../lib/'
+import { transactions, LOCAL_REGTEST } from '../../../lib/'
 
 const pExec = util.promisify(exec)
 
@@ -62,7 +62,7 @@ export function runIntegrationTests() {
     initializeBlockstackCore()
       .then(() => {
         console.log('Blockstack Core initialized.')
-        return makePreorder('aaron.id', dest.getAddress(), payer, network)
+        return transactions.makePreorder('aaron.id', dest.getAddress(), payer, network)
       })
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
@@ -70,7 +70,7 @@ export function runIntegrationTests() {
         console.log('PREORDER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => makeRegister('aaron.id', dest.getAddress(), payer, zfTest, network))
+      .then(() => transactions.makeRegister('aaron.id', dest.getAddress(), payer, zfTest, network))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
       .then(() => {
@@ -85,7 +85,7 @@ export function runIntegrationTests() {
                 `aaron.id should be owned by ${dest.getAddress()}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
       })
-      .then(() => makeUpdate('aaron.id', dest, payer,
+      .then(() => transactions.makeUpdate('aaron.id', dest, payer,
                              zfTest2, network))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
@@ -99,7 +99,7 @@ export function runIntegrationTests() {
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, zfTest2, 'zonefile should be updated')
       })
-      .then(() => makeTransfer('aaron.id', transferDestination,
+      .then(() => transactions.makeTransfer('aaron.id', transferDestination,
                                dest, payer, network))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
@@ -113,7 +113,7 @@ export function runIntegrationTests() {
         t.equal(network.coerceAddress(nameInfo.address), transferDestination,
                 `aaron.id should be owned by ${transferDestination}`)
       })
-      .then(() => makeRenewal('aaron.id', renewalDestination, secondOwner,
+      .then(() => transactions.makeRenewal('aaron.id', renewalDestination, secondOwner,
                               payer, network, renewalZF))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))

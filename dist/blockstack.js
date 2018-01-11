@@ -1534,34 +1534,10 @@ Object.defineProperty(exports, 'makePreorderSkeleton', {
 
 var _txbuild = require('./txbuild');
 
-Object.defineProperty(exports, 'makePreorder', {
+Object.defineProperty(exports, 'transactions', {
   enumerable: true,
   get: function get() {
-    return _txbuild.makePreorder;
-  }
-});
-Object.defineProperty(exports, 'makeRegister', {
-  enumerable: true,
-  get: function get() {
-    return _txbuild.makeRegister;
-  }
-});
-Object.defineProperty(exports, 'makeUpdate', {
-  enumerable: true,
-  get: function get() {
-    return _txbuild.makeUpdate;
-  }
-});
-Object.defineProperty(exports, 'makeTransfer', {
-  enumerable: true,
-  get: function get() {
-    return _txbuild.makeTransfer;
-  }
-});
-Object.defineProperty(exports, 'makeRenewal', {
-  enumerable: true,
-  get: function get() {
-    return _txbuild.makeRenewal;
+    return _txbuild.transactions;
   }
 });
 
@@ -1934,15 +1910,9 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash, networ
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.transactions = undefined;
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-exports.addOwnerInput = addOwnerInput;
-exports.makeRenewal = makeRenewal;
-exports.makePreorder = makePreorder;
-exports.makeUpdate = makeUpdate;
-exports.makeRegister = makeRegister;
-exports.makeTransfer = makeTransfer;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -1975,6 +1945,20 @@ function addOwnerInput(utxos, ownerAddress, txB) {
   return { index: ownerInput, value: ownerUTXO.value };
 }
 
+function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
+  var changeIndex = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+
+  // change index for the payer.
+  if (changeIndex === null) {
+    changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+  }
+  // fund the transaction fee.
+  var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
+  var outAmounts = (0, _util.sumOutputValues)(txB);
+
+  return (0, _util.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts - inAmounts, feeRate);
+}
+
 function makeRenewal(fullyQualifiedName, destinationAddress, ownerKey, paymentKey, network) {
   var zonefile = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
@@ -2001,15 +1985,8 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKey, paymentKe
         feeRate = _ref2[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false);
-    // change index for the payer.
-    var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+    var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
 
-    // fund the transaction fee.
-    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
-    var outAmounts = (0, _util.sumOutputValues)(txB);
-    var inAmounts = ownerInput.value; // let the owner input fund its output
-
-    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, payerUtxos, txFee + outAmounts - inAmounts, feeRate);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       if (i === ownerInput.index) {
         signingTxB.sign(i, ownerKey);
@@ -2040,18 +2017,15 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKey, networ
         feeRate = _ref6[1],
         preorderSkeleton = _ref6[2];
 
-    var preorderSkeletonTxB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
 
-    var txFee = (0, _util.estimateTXBytes)(preorderSkeletonTxB, 1, 0) * feeRate;
-    var outAmounts = (0, _util.sumOutputValues)(preorderSkeletonTxB);
     var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
+    var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
 
-    return (0, _util.addUTXOsToFund)(preorderSkeletonTxB, changeIndex, utxos, txFee + outAmounts, feeRate);
-  }).then(function (txB) {
-    for (var i = 0; i < txB.tx.ins.length; i++) {
-      txB.sign(i, paymentKey);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      signingTxB.sign(i, paymentKey);
     }
-    return txB.build();
+    return signingTxB.build();
   });
 }
 
@@ -2074,15 +2048,8 @@ function makeUpdate(fullyQualifiedName, ownerKey, paymentKey, zonefile, network)
         feeRate = _ref8[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
-    // change index for the payer.
-    var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+    var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
 
-    // fund the transaction fee.
-    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
-    var outAmounts = (0, _util.sumOutputValues)(txB);
-    var inAmounts = ownerInput.value; // let the owner input fund its output
-
-    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, payerUtxos, txFee + outAmounts - inAmounts, feeRate);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       if (i === ownerInput.index) {
         signingTxB.sign(i, ownerKey);
@@ -2107,17 +2074,13 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKey) {
 
   var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1);
   var paymentAddress = paymentKey.getAddress();
-  var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref9) {
     var _ref10 = _slicedToArray(_ref9, 2),
         utxos = _ref10[0],
         feeRate = _ref10[1];
 
-    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
-    var outAmounts = (0, _util.sumOutputValues)(txB);
-
-    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts);
+    var signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       signingTxB.sign(i, paymentKey);
     }
@@ -2143,15 +2106,7 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKey, paymentK
         feeRate = _ref12[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
-    // change index for the payer
-    var changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
-
-    // fund the transaction fee
-    var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
-    var outAmounts = (0, _util.sumOutputValues)(txB);
-    var inAmounts = ownerInput.value; // let the owner input fund its output
-
-    var signingTxB = (0, _util.addUTXOsToFund)(txB, changeIndex, payerUtxos, txFee + outAmounts - inAmounts, feeRate);
+    var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       if (i === ownerInput.index) {
         signingTxB.sign(i, ownerKey);
@@ -2162,6 +2117,10 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKey, paymentK
     return signingTxB.build();
   });
 }
+
+var transactions = exports.transactions = {
+  makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer
+};
 }).call(this,require("buffer").Buffer)
 },{"./network":14,"./skeletons":15,"./util":17,"bitcoinjs-lib":84,"buffer":140}],17:[function(require,module,exports){
 (function (Buffer){

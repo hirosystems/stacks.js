@@ -2,9 +2,7 @@ export {
   makePreorderSkeleton
 } from './skeletons'
 
-export {
-  makePreorder, makeRegister, makeUpdate, makeTransfer, makeRenewal
-} from './txbuild'
+export { transactions } from './txbuild'
 
 export * from './util'
 
