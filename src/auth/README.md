@@ -49,7 +49,7 @@ function showProfile(profile) {
 
 if (blockstack.isUserSignedIn()) {
   const userData = blockstack.loadUserData()
-  const person = new Person(userData.profile)
+  showProfile(userData.profile)
 } else if (blockstack.isSignInPending()) {
   blockstack.handlePendingSignIn(function(userData) {
     window.location = window.location.origin
