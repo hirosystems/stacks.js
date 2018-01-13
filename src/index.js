@@ -11,6 +11,6 @@ export {
 } from './keys'
 export {
   nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter,
-  isLaterVersion
+  isLaterVersion, isSameOriginAbsoluteUrl
 } from './utils'
 export { decodeToken } from 'jsontokens'
