@@ -31,7 +31,7 @@ export declare function makeAuthResponse(privateKey: string, profile?: Object, u
 
 // from ./authProvider
 export declare function getAuthRequestFromURL(): string|null;
-export declare function fetchAppManifest(authRequest: string): Promise<Object>;
+export declare function fetchAppManifest(authRequest: string): Promise<Object>; // TODO: Find a more specific way to describe a manifest
 export declare function redirectUserToApp(authRequest: string, authResponse: string): void; // throws Error
 
 
@@ -49,3 +49,6 @@ export declare function isIssuanceDateValid(token: string): boolean;
 export declare function doPublicKeysMatchUsername(token: string, nameLookupURL: string): Promise<boolean>;
 export declare function doPublicKeysMatchIssuer(token: string): boolean; // throws Error
 export declare function doSignaturesMatchPublicKeys(token: string): boolean; // throws Error
+export declare function isManifestUriValid(token: string): boolean;
+export declare function isRedirectUriValid(token: string): boolean;
+export declare function verifyAuthRequestAndLoadManifest(token: string): Promise<Object>; // TODO: Find a more specific way to describe a manifest
