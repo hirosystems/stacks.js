@@ -21,6 +21,9 @@
  * 
  * [ ] makeProfileZoneFile from ./profileZoneFiles
  * [ ] getTokenFileUrl from ./profileZoneFiles
+ * [x] resolveZoneFileToProfile from ./profileZoneFiles
+ * 
+ * [x] lookupProfile from ./profileLookup
  */
 
 
@@ -84,3 +87,11 @@ export declare function signProfileToken(profile: Object, privateKey: string, su
 export declare function wrapProfileToken(token: string): Object;
 export declare function verifyProfileToken(token: string, publicKeyOrAddress: string): Object; // throws Error
 export declare function extractProfile(token: string, publicKeyOrAddress?: string): Object; // throws Error
+
+
+// from ./profileZoneFiles
+export declare function resolveZoneFileToProfile(zoneFile: string, publicKeyOrAddress: string): Promise<any>; // TODO: What does Person.fromLegacyFormat(profile).profile() return?
+
+
+// from ./profileLookup
+export declare function lookupProfile(username: string, zoneFileLookupURL?: string): Promise<any>; // TODO: See above for return type
