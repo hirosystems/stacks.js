@@ -1613,6 +1613,67 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
       });
     }
   }, {
+    key: 'getBlockHeight',
+    value: function getBlockHeight() {
+      throw new Error('Not implemented');
+    }
+  }, {
+    key: 'getGracePeriod',
+    value: function getGracePeriod() {
+      return new Promise(function (resolve) {
+        return resolve(5000);
+      });
+    }
+  }, {
+    key: 'getNamesOwned',
+    value: function getNamesOwned(address) {
+      var networkAddress = this.coerceAddress(address);
+      return fetch(this.blockstackAPIUrl + '/v1/addresses/bitcoin/' + networkAddress).then(function (resp) {
+        return resp.json();
+      });
+    }
+  }, {
+    key: 'getNamespaceBurnAddress',
+    value: function getNamespaceBurnAddress(namespace) {
+      var _this = this;
+
+      return fetch(this.blockstackAPIUrl + '/v1/namespaces/' + namespace).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('No such namespace \'' + namespace + '\'');
+        } else {
+          return resp.json();
+        }
+      }).then(function (namespaceInfo) {
+        var address = '1111111111111111111114oLvT2'; // default burn address
+        var blockHeights = Object.keys(namespaceInfo.history);
+        blockHeights.sort(function (x, y) {
+          return parseInt(x, 10) - parseInt(y, 10);
+        });
+        blockHeights.forEach(function (blockHeight) {
+          var infoAtBlock = namespaceInfo.history[blockHeight][0];
+          if (infoAtBlock.hasOwnProperty('burn_address')) {
+            address = infoAtBlock.burn_address;
+          }
+        });
+        return address;
+      }).then(function (address) {
+        return _this.coerceAddress(address);
+      });
+    }
+  }, {
+    key: 'getNameInfo',
+    value: function getNameInfo(fullyQualifiedName) {
+      return fetch(this.blockstackAPIUrl + '/v1/names/' + fullyQualifiedName).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Name not found');
+        } else if (resp.status !== 200) {
+          throw new Error('Bad response status: ' + resp.status);
+        } else {
+          return resp.json();
+        }
+      });
+    }
+  }, {
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
       throw new Error('Cannot broadcast ' + transaction + ': not implemented.');
@@ -1672,10 +1733,10 @@ var LocalRegtest = exports.LocalRegtest = function (_BlockstackNetwork) {
   function LocalRegtest(apiUrl, bitcoindUrl) {
     _classCallCheck(this, LocalRegtest);
 
-    var _this = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', _bitcoinjsLib2.default.networks.testnet));
+    var _this2 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', _bitcoinjsLib2.default.networks.testnet));
 
-    _this.bitcoindUrl = bitcoindUrl;
-    return _this;
+    _this2.bitcoindUrl = bitcoindUrl;
+    return _this2;
   }
 
   _createClass(LocalRegtest, [{
@@ -1694,7 +1755,7 @@ var LocalRegtest = exports.LocalRegtest = function (_BlockstackNetwork) {
   }, {
     key: 'getUTXOs',
     value: function getUTXOs(address) {
-      var _this2 = this;
+      var _this3 = this;
 
       var jsonRPCImport = { jsonrpc: '1.0',
         method: 'importaddress',
@@ -1704,7 +1765,7 @@ var LocalRegtest = exports.LocalRegtest = function (_BlockstackNetwork) {
         params: [1, 9999999, [address]] };
 
       return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCImport) }).then(function () {
-        return fetch(_this2.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCUnspent) });
+        return fetch(_this3.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCUnspent) });
       }).then(function (resp) {
         return resp.json();
       }).then(function (x) {

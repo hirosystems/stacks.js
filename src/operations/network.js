@@ -19,6 +19,57 @@ export class BlockstackNetwork {
       .then(x => x.name_price.satoshis)
   }
 
+  getBlockHeight() {
+    throw new Error('Not implemented')
+  }
+
+  getGracePeriod() {
+    return new Promise((resolve) => resolve(5000))
+  }
+
+  getNamesOwned(address: string) {
+    const networkAddress = this.coerceAddress(address)
+    return fetch(`${this.blockstackAPIUrl}/v1/addresses/bitcoin/${networkAddress}`)
+      .then(resp => resp.json())
+  }
+
+  getNamespaceBurnAddress(namespace: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`)
+      .then(resp => {
+        if (resp.status === 404) {
+          throw new Error(`No such namespace '${namespace}'`)
+        } else {
+          return resp.json()
+        }
+      })
+      .then(namespaceInfo => {
+        let address = '1111111111111111111114oLvT2' // default burn address
+        const blockHeights = Object.keys(namespaceInfo.history)
+        blockHeights.sort((x, y) => (parseInt(x, 10) - parseInt(y, 10)))
+        blockHeights.forEach(blockHeight => {
+          const infoAtBlock = namespaceInfo.history[blockHeight][0]
+          if (infoAtBlock.hasOwnProperty('burn_address')) {
+            address = infoAtBlock.burn_address
+          }
+        })
+        return address
+      })
+      .then(address => this.coerceAddress(address))
+  }
+
+  getNameInfo(fullyQualifiedName: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/names/${fullyQualifiedName}`)
+      .then(resp => {
+        if (resp.status === 404) {
+          throw new Error('Name not found')
+        } else if (resp.status !== 200) {
+          throw new Error(`Bad response status: ${resp.status}`)
+        } else {
+          return resp.json()
+        }
+      })
+  }
+
   broadcastTransaction(transaction: string) {
     throw new Error(`Cannot broadcast ${transaction}: not implemented.`)
   }
