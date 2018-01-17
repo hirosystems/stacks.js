@@ -52,6 +52,7 @@ export function getHexFromBN(bnInput: Object) {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
+ * @private
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
@@ -92,6 +93,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer) {
 
 /**
  * Decrypt content encrypted using ECIES
+ * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
