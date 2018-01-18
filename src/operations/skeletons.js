@@ -1,13 +1,13 @@
 import bitcoin from 'bitcoinjs-lib'
 import { decodeB40, hash160, hash128, DUST_MINIMUM } from './util'
-import { BlockstackNetwork } from './network'
+import { config } from '../config'
 
 // todo : add name length / character verification
 
 
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
-  burnAddress : string, burnAmount: number, network: BlockstackNetwork,
+  burnAddress : string, burnAmount: number,
   registerAddress: string = null) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
@@ -19,7 +19,7 @@ export function makePreorderSkeleton(
   //    magic op  hash160(name.ns_id,script_pubkey,register_addr) consensus hash
 
   // Returns an unsigned serialized transaction.
-
+  const network = config.network
   const nameBuff = Buffer.from(decodeB40(fullyQualifiedName), 'hex') // base40
   const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network.layer1)
 
@@ -52,7 +52,7 @@ export function makePreorderSkeleton(
 
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
-  network: BlockstackNetwork, valueHash: string = null) {
+  valueHash: string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -64,6 +64,7 @@ export function makeRegisterSkeleton(
   //  as output (3) before the burn output (4)
 
   let payload
+  const network = config.network
 
   if (valueHash) {
     if (valueHash.length !== 40) {
@@ -89,9 +90,10 @@ export function makeRegisterSkeleton(
 
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
-  burnAddress: string, burnAmount: string, network: BlockstackNetwork, valueHash: string = null) {
+  burnAddress: string, burnAmount: string, valueHash: string = null) {
+  const network = config.network
   const registerTX = makeRegisterSkeleton(
-    fullyQualifiedName, nextOwnerAddress, network, valueHash)
+    fullyQualifiedName, nextOwnerAddress, valueHash)
   const txB = bitcoin.TransactionBuilder.fromTransaction(
     registerTX, network.layer1)
   txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
@@ -101,7 +103,7 @@ export function makeRenewalSkeleton(
 
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
-  network: BlockstackNetwork, keepZonefile: boolean = false) {
+  keepZonefile: boolean = false) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -109,6 +111,7 @@ export function makeTransferSkeleton(
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  const network = config.network
   const opRet = Buffer.alloc(36)
   let keepChar = '~'
   if (keepZonefile) {
@@ -134,14 +137,14 @@ export function makeTransferSkeleton(
 
 
 export function makeUpdateSkeleton(
-  fullyQualifiedName: string, consensusHash: string, valueHash: string,
-  network: BlockstackNetwork) {
+  fullyQualifiedName: string, consensusHash: string, valueHash: string) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  const network = config.network
   const opRet = Buffer.alloc(39)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')

@@ -1,10 +1,11 @@
 import bitcoinjs from 'bitcoinjs-lib'
 
-import { addUTXOsToFund, DUST_MINIMUM, DEFAULT_BURN_ADDRESS,
+import { addUTXOsToFund, DUST_MINIMUM,
          estimateTXBytes, sumOutputValues, hash160 } from './util'
 import { makePreorderSkeleton, makeRegisterSkeleton,
          makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton } from './skeletons'
-import { BlockstackNetwork } from './network'
+import { config } from '../config'
+import { hexStringToECPair } from '../utils'
 
 function addOwnerInput(utxos: Object,
                        ownerAddress: string,
@@ -41,16 +42,22 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
 
 function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
-                     ownerKey: bitcoinjs.ECPair,
-                     paymentKey: bitcoinjs.ECPair,
-                     network: BlockstackNetwork,
+                     ownerKeyHex: string,
+                     paymentKeyHex: string,
                      zonefile: string = null) {
   let valueHash = undefined
+  const network = config.network
+
   if (!!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   }
 
-  const burnAddress = network.coerceAddress(DEFAULT_BURN_ADDRESS)
+  const namespace = fullyQualifiedName.split('.').pop()
+  const burnAddress = network.getNamespaceBurnAddress(namespace)
+
+  const ownerKey = hexStringToECPair(ownerKeyHex)
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+
   const ownerAddress = ownerKey.getAddress()
   const paymentAddress = paymentKey.getAddress()
 
@@ -58,7 +65,7 @@ function makeRenewal(fullyQualifiedName: string,
         .then((namePrice) =>
               makeRenewalSkeleton(
                 fullyQualifiedName, destinationAddress, ownerAddress,
-                burnAddress, namePrice, network, valueHash))
+                burnAddress, namePrice, valueHash))
         .then((tx) => bitcoinjs.TransactionBuilder.fromTransaction(tx, network.layer1))
 
   return Promise.all([txPromise, network.getUTXOs(paymentAddress),
@@ -82,10 +89,14 @@ function makeRenewal(fullyQualifiedName: string,
 
 function makePreorder(fullyQualifiedName: string,
                       destinationAddress: string,
-                      paymentKey: bitcoinjs.ECPair,
-                      network: BlockstackNetwork) {
-  const burnAddress = network.coerceAddress(DEFAULT_BURN_ADDRESS)
+                      paymentKeyHex: string) {
+  const network = config.network
+
+  const namespace = fullyQualifiedName.split('.').pop()
+  const burnAddress = network.getNamespaceBurnAddress(namespace)
+
   const registerAddress = destinationAddress
+  const paymentKey = hexStringToECPair(paymentKeyHex)
   const preorderAddress = paymentKey.getAddress()
 
   const preorderPromise = Promise.all([network.getConsensusHash(),
@@ -93,7 +104,7 @@ function makePreorder(fullyQualifiedName: string,
         .then(([consensusHash, namePrice]) =>
           makePreorderSkeleton(
             fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
-            namePrice, network, registerAddress))
+            namePrice, registerAddress))
 
   return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
     .then(([utxos, feeRate, preorderSkeleton]) => {
@@ -110,17 +121,21 @@ function makePreorder(fullyQualifiedName: string,
 }
 
 function makeUpdate(fullyQualifiedName: string,
-                    ownerKey: bitcoinjs.ECPair,
-                    paymentKey: bitcoinjs.ECPair,
-                    zonefile: string,
-                    network: BlockstackNetwork) {
+                    ownerKeyHex: string,
+                    paymentKeyHex: string,
+                    zonefile: string) {
+  const network = config.network
   const valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+
+  const ownerKey = hexStringToECPair(ownerKeyHex)
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+
   const paymentAddress = paymentKey.getAddress()
   const ownerAddress = ownerKey.getAddress()
 
   const txPromise = network.getConsensusHash()
         .then((consensusHash) =>
-              makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash, network))
+              makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash))
         .then((updateTX) => bitcoinjs.TransactionBuilder.fromTransaction(updateTX, network.layer1))
 
   return Promise.all([txPromise, network.getUTXOs(paymentAddress),
@@ -143,18 +158,19 @@ function makeUpdate(fullyQualifiedName: string,
 
 function makeRegister(fullyQualifiedName: string,
                              registerAddress: string,
-                             paymentKey: bitcoinjs.ECPair,
-                             zonefile: string = null,
-                             network: BlockstackNetwork) {
+                             paymentKeyHex: string,
+                             zonefile: string = null) {
+  const network = config.network
   let valueHash = undefined
   if (!!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   }
 
   const registerSkeleton = makeRegisterSkeleton(
-    fullyQualifiedName, registerAddress, network, valueHash)
+    fullyQualifiedName, registerAddress, valueHash)
 
   const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1)
+  const paymentKey = hexStringToECPair(paymentKeyHex)
   const paymentAddress = paymentKey.getAddress()
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
@@ -169,15 +185,17 @@ function makeRegister(fullyQualifiedName: string,
 
 function makeTransfer(fullyQualifiedName: string,
                       destinationAddress: string,
-                      ownerKey: bitcoinjs.ECPair,
-                      paymentKey: bitcoinjs.ECPair,
-                      network: BlockstackNetwork) {
+                      ownerKeyHex: string,
+                      paymentKeyHex: string) {
+  const network = config.network
+  const ownerKey = hexStringToECPair(ownerKeyHex)
+  const paymentKey = hexStringToECPair(paymentKeyHex)
   const paymentAddress = paymentKey.getAddress()
   const ownerAddress = ownerKey.getAddress()
 
   const txPromise = network.getConsensusHash()
         .then((consensusHash) =>
-              makeTransferSkeleton(fullyQualifiedName, consensusHash, destinationAddress, network))
+              makeTransferSkeleton(fullyQualifiedName, consensusHash, destinationAddress))
         .then((transferTX) =>
               bitcoinjs.TransactionBuilder.fromTransaction(transferTX, network.layer1))
 

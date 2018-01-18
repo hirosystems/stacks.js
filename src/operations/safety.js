@@ -1,4 +1,4 @@
-import { BlockstackNetwork } from './network'
+import { BlockstackNetwork } from '../network'
 
 export function isNameAvailable(fullyQualifiedName: string, network: BlockstackNetwork) {
   return network.getNameInfo(fullyQualifiedName)

@@ -1,7 +1,8 @@
 import bitcoinjs from 'bitcoinjs-lib'
-import { SATOSHIS_PER_BTC } from './util'
 
-export class BlockstackNetwork {
+const SATOSHIS_PER_BTC = 1e8
+
+class BlockstackNetwork {
   constructor(apiUrl: string, utxoProviderUrl: string, network: Object) {
     this.blockstackAPIUrl = apiUrl
     this.utxoProviderUrl = utxoProviderUrl
@@ -112,7 +113,7 @@ export class BlockstackNetwork {
   }
 }
 
-export class LocalRegtest extends BlockstackNetwork {
+class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, bitcoindUrl: string) {
     super(apiUrl, '', bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
@@ -151,10 +152,13 @@ export class LocalRegtest extends BlockstackNetwork {
 
 }
 
-
-export const LOCAL_REGTEST = new LocalRegtest(
+const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/')
 
-export const MAINNET_DEFAULT = new BlockstackNetwork(
+const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org', 'https://blockchain.info/unspent?format=json&active=',
   bitcoinjs.networks.bitcoin)
+
+
+export const network = { BlockstackNetwork, LocalRegtest,
+                         defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }

@@ -4,8 +4,6 @@ import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
 
 export const DUST_MINIMUM = 5500
-export const SATOSHIS_PER_BTC = 1e8
-export const DEFAULT_BURN_ADDRESS = '1111111111111111111114oLvT2'
 
 export function hash160(buff: Buffer) {
   const sha256 = bitcoinjs.crypto.sha256(buff)
