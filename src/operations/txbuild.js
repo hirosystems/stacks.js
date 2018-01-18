@@ -53,7 +53,6 @@ function makeRenewal(fullyQualifiedName: string,
   }
 
   const namespace = fullyQualifiedName.split('.').pop()
-  const burnAddress = network.getNamespaceBurnAddress(namespace)
 
   const ownerKey = hexStringToECPair(ownerKeyHex)
   const paymentKey = hexStringToECPair(paymentKeyHex)
@@ -61,8 +60,9 @@ function makeRenewal(fullyQualifiedName: string,
   const ownerAddress = ownerKey.getAddress()
   const paymentAddress = paymentKey.getAddress()
 
-  const txPromise = network.getNamePrice(fullyQualifiedName)
-        .then((namePrice) =>
+  const txPromise = Promise.all([network.getNamePrice(fullyQualifiedName),
+                                 network.getNamespaceBurnAddress(namespace)])
+        .then(([namePrice, burnAddress]) =>
               makeRenewalSkeleton(
                 fullyQualifiedName, destinationAddress, ownerAddress,
                 burnAddress, namePrice, valueHash))
@@ -93,15 +93,15 @@ function makePreorder(fullyQualifiedName: string,
   const network = config.network
 
   const namespace = fullyQualifiedName.split('.').pop()
-  const burnAddress = network.getNamespaceBurnAddress(namespace)
 
   const registerAddress = destinationAddress
   const paymentKey = hexStringToECPair(paymentKeyHex)
   const preorderAddress = paymentKey.getAddress()
 
   const preorderPromise = Promise.all([network.getConsensusHash(),
-                                       network.getNamePrice(fullyQualifiedName)])
-        .then(([consensusHash, namePrice]) =>
+                                       network.getNamePrice(fullyQualifiedName),
+                                       network.getNamespaceBurnAddress(namespace)])
+        .then(([consensusHash, namePrice, burnAddress]) =>
           makePreorderSkeleton(
             fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
             namePrice, registerAddress))

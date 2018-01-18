@@ -1061,7 +1061,7 @@ exports.config = undefined;
 
 var _network = require('./network');
 
-var config = { network: _network.MAINNET_DEFAULT };
+var config = { network: _network.network.defaults.MAINNET_DEFAULT };
 
 exports.config = config;
 },{"./network":14}],9:[function(require,module,exports){
@@ -2071,7 +2071,6 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
   }
 
   var namespace = fullyQualifiedName.split('.').pop();
-  var burnAddress = network.getNamespaceBurnAddress(namespace);
 
   var ownerKey = (0, _utils.hexStringToECPair)(ownerKeyHex);
   var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
@@ -2079,18 +2078,22 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
   var ownerAddress = ownerKey.getAddress();
   var paymentAddress = paymentKey.getAddress();
 
-  var txPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
+  var txPromise = Promise.all([network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        namePrice = _ref2[0],
+        burnAddress = _ref2[1];
+
     return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, burnAddress, namePrice, valueHash);
   }).then(function (tx) {
     return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(tx, network.layer1);
   });
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 4),
-        txB = _ref2[0],
-        payerUtxos = _ref2[1],
-        ownerUtxos = _ref2[2],
-        feeRate = _ref2[3];
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 4),
+        txB = _ref4[0],
+        payerUtxos = _ref4[1],
+        ownerUtxos = _ref4[2],
+        feeRate = _ref4[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false);
     var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
@@ -2110,25 +2113,25 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
   var network = _config.config.network;
 
   var namespace = fullyQualifiedName.split('.').pop();
-  var burnAddress = network.getNamespaceBurnAddress(namespace);
 
   var registerAddress = destinationAddress;
   var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
   var preorderAddress = paymentKey.getAddress();
 
-  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName)]).then(function (_ref3) {
-    var _ref4 = _slicedToArray(_ref3, 2),
-        consensusHash = _ref4[0],
-        namePrice = _ref4[1];
+  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 3),
+        consensusHash = _ref6[0],
+        namePrice = _ref6[1],
+        burnAddress = _ref6[2];
 
     return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, registerAddress);
   });
 
-  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 3),
-        utxos = _ref6[0],
-        feeRate = _ref6[1],
-        preorderSkeleton = _ref6[2];
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 3),
+        utxos = _ref8[0],
+        feeRate = _ref8[1],
+        preorderSkeleton = _ref8[2];
 
     var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
 
@@ -2158,12 +2161,12 @@ function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
     return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(updateTX, network.layer1);
   });
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref7) {
-    var _ref8 = _slicedToArray(_ref7, 4),
-        txB = _ref8[0],
-        payerUtxos = _ref8[1],
-        ownerUtxos = _ref8[2],
-        feeRate = _ref8[3];
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref9) {
+    var _ref10 = _slicedToArray(_ref9, 4),
+        txB = _ref10[0],
+        payerUtxos = _ref10[1],
+        ownerUtxos = _ref10[2],
+        feeRate = _ref10[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
     var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
@@ -2194,10 +2197,10 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
   var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
   var paymentAddress = paymentKey.getAddress();
 
-  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref9) {
-    var _ref10 = _slicedToArray(_ref9, 2),
-        utxos = _ref10[0],
-        feeRate = _ref10[1];
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 2),
+        utxos = _ref12[0],
+        feeRate = _ref12[1];
 
     var signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
@@ -2220,12 +2223,12 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
     return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(transferTX, network.layer1);
   });
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref11) {
-    var _ref12 = _slicedToArray(_ref11, 4),
-        txB = _ref12[0],
-        payerUtxos = _ref12[1],
-        ownerUtxos = _ref12[2],
-        feeRate = _ref12[3];
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref13) {
+    var _ref14 = _slicedToArray(_ref13, 4),
+        txB = _ref14[0],
+        payerUtxos = _ref14[1],
+        ownerUtxos = _ref14[2],
+        feeRate = _ref14[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
     var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);

@@ -1,5 +1,5 @@
-import { MAINNET_DEFAULT } from './network'
+import { network } from './network'
 
-const config = { network: MAINNET_DEFAULT }
+const config = { network: network.defaults.MAINNET_DEFAULT }
 
 export { config }

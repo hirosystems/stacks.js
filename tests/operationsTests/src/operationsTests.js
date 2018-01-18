@@ -3,7 +3,8 @@ import util from 'util'
 import test from 'tape'
 import btc from 'bitcoinjs-lib'
 
-import { transactions, LOCAL_REGTEST } from '../../../lib/'
+import { transactions, network as bskNetwork, config,
+         ecPairToHexString, hexStringToECPair } from '../../../lib/'
 
 const pExec = util.promisify(exec)
 
@@ -40,29 +41,30 @@ export function runIntegrationTests() {
   test('registerName', (t) => {
     t.plan(6)
 
-    const dest = btc.ECPair.fromWIF('cNRZucCsNZR3HGFtW4nMEqME38RH3xWXrRgn74hnaBdEqMxeMUKj',
-                                    btc.networks.testnet)
-    const payer = btc.ECPair.fromWIF('cTs14pEWitbXXQF7qN4jRvJGwgeEU4FCcJNTwXYdSngBYkmCkBpi',
-                                     btc.networks.testnet)
+    config.network = bskNetwork.defaults.LOCAL_REGTEST
+    const network = config.network
 
-    const secondOwner = btc.ECPair.fromWIF('cQQ9zPkp2FegjLL7EZxawPBU3XaNaHxnaYeNvBX3vLXAHwWEbsnk',
-                                           btc.networks.testnet)
-    const transferDestination = secondOwner.getAddress()
+    const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
+    const destAddress = hexStringToECPair(dest).getAddress()
+
+    const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
+
+    const secondOwner = '54164693e3803223f7fa9a004997bfbf1475f5c44f65593fa45c6783086dafec01'
+    const transferDestination = hexStringToECPair(secondOwner).getAddress()
+
     const renewalDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
     const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/0/profile.json"`
+          `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
     const zfTest2 = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/3/profile.json"`
+          `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
     const renewalZF = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${dest.getAddress()}/4/profile.json"`
-
-    const network = LOCAL_REGTEST
+          `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
 
     initializeBlockstackCore()
       .then(() => {
         console.log('Blockstack Core initialized.')
-        return transactions.makePreorder('aaron.id', dest.getAddress(), payer, network)
+        return transactions.makePreorder('aaron.id', destAddress, payer)
       })
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
@@ -70,7 +72,7 @@ export function runIntegrationTests() {
         console.log('PREORDER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => transactions.makeRegister('aaron.id', dest.getAddress(), payer, zfTest, network))
+      .then(() => transactions.makeRegister('aaron.id', destAddress, payer, zfTest))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
       .then(() => {
@@ -81,12 +83,11 @@ export function runIntegrationTests() {
       .then(() => fetch(`${network.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
-        t.equal(network.coerceAddress(nameInfo.address), dest.getAddress(),
-                `aaron.id should be owned by ${dest.getAddress()}`)
+        t.equal(network.coerceAddress(nameInfo.address), destAddress,
+                `aaron.id should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
       })
-      .then(() => transactions.makeUpdate('aaron.id', dest, payer,
-                             zfTest2, network))
+      .then(() => transactions.makeUpdate('aaron.id', dest, payer, zfTest2))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
       .then(() => {
@@ -99,8 +100,7 @@ export function runIntegrationTests() {
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, zfTest2, 'zonefile should be updated')
       })
-      .then(() => transactions.makeTransfer('aaron.id', transferDestination,
-                               dest, payer, network))
+      .then(() => transactions.makeTransfer('aaron.id', transferDestination, dest, payer))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
       .then(() => {
@@ -113,8 +113,8 @@ export function runIntegrationTests() {
         t.equal(network.coerceAddress(nameInfo.address), transferDestination,
                 `aaron.id should be owned by ${transferDestination}`)
       })
-      .then(() => transactions.makeRenewal('aaron.id', renewalDestination, secondOwner,
-                              payer, network, renewalZF))
+      .then(() => transactions.makeRenewal('aaron.id', renewalDestination,
+                                           secondOwner, payer, renewalZF))
       .then(resolved => resolved.toHex())
       .then(rawtx => network.broadcastTransaction(rawtx))
       .then(() => {
