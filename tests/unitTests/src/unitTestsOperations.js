@@ -2,7 +2,7 @@ import test from 'tape'
 import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
 
-import { addUTXOsToFund } from '../../../lib/operations/util'
+import { addUTXOsToFund } from '../../../lib/operations/utils'
 
 const testAddresses = [
   { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',

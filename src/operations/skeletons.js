@@ -1,5 +1,5 @@
 import bitcoin from 'bitcoinjs-lib'
-import { decodeB40, hash160, hash128, DUST_MINIMUM } from './util'
+import { decodeB40, hash160, hash128, DUST_MINIMUM } from './utils'
 import { config } from '../config'
 
 // todo : add name length / character verification

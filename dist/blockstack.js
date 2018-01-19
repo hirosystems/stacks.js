@@ -1810,18 +1810,18 @@ Object.defineProperty(exports, 'transactions', {
   }
 });
 
-var _util = require('./util');
+var _utils = require('./utils');
 
-Object.keys(_util).forEach(function (key) {
+Object.keys(_utils).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _util[key];
+      return _utils[key];
     }
   });
 });
-},{"./skeletons":16,"./txbuild":17,"./util":18}],16:[function(require,module,exports){
+},{"./skeletons":16,"./txbuild":17,"./utils":18}],16:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -1838,7 +1838,7 @@ var _bitcoinjsLib = require('bitcoinjs-lib');
 
 var _bitcoinjsLib2 = _interopRequireDefault(_bitcoinjsLib);
 
-var _util = require('./util');
+var _utils = require('./utils');
 
 var _config = require('../config');
 
@@ -1861,7 +1861,7 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   // Returns an unsigned serialized transaction.
   var network = _config.config.network;
-  var nameBuff = Buffer.from((0, _util.decodeB40)(fullyQualifiedName), 'hex'); // base40
+  var nameBuff = Buffer.from((0, _utils.decodeB40)(fullyQualifiedName), 'hex'); // base40
   var scriptPublicKey = _bitcoinjsLib2.default.address.toOutputScript(preorderAddress, network.layer1);
 
   var dataBuffers = [nameBuff, scriptPublicKey];
@@ -1873,7 +1873,7 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   var dataBuff = Buffer.concat(dataBuffers);
 
-  var hashed = (0, _util.hash160)(dataBuff);
+  var hashed = (0, _utils.hash160)(dataBuff);
 
   var opReturnBuffer = Buffer.alloc(39);
   opReturnBuffer.write('id?', 0, 3, 'ascii');
@@ -1885,7 +1885,7 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
   var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
 
   tx.addOutput(nullOutput, 0);
-  tx.addOutput(preorderAddress, _util.DUST_MINIMUM);
+  tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
   tx.addOutput(burnAddress, burnAmount);
 
   return tx.buildIncomplete();
@@ -1924,7 +1924,7 @@ function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
   var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
 
   tx.addOutput(nullOutput, 0);
-  tx.addOutput(ownerAddress, _util.DUST_MINIMUM);
+  tx.addOutput(ownerAddress, _utils.DUST_MINIMUM);
 
   return tx.buildIncomplete();
 }
@@ -1935,7 +1935,7 @@ function makeRenewalSkeleton(fullyQualifiedName, nextOwnerAddress, lastOwnerAddr
   var network = _config.config.network;
   var registerTX = makeRegisterSkeleton(fullyQualifiedName, nextOwnerAddress, valueHash);
   var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerTX, network.layer1);
-  txB.addOutput(lastOwnerAddress, _util.DUST_MINIMUM);
+  txB.addOutput(lastOwnerAddress, _utils.DUST_MINIMUM);
   txB.addOutput(burnAddress, burnAmount);
   return txB.buildIncomplete();
 }
@@ -1960,7 +1960,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
   opRet.write('id>', 0, 3, 'ascii');
   opRet.write(keepChar, 3, 1, 'ascii');
 
-  var hashed = (0, _util.hash128)(Buffer.from(fullyQualifiedName, 'ascii'));
+  var hashed = (0, _utils.hash128)(Buffer.from(fullyQualifiedName, 'ascii'));
   hashed.copy(opRet, 4);
   opRet.write(consensusHash, 20, 16, 'hex');
 
@@ -1969,7 +1969,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
   var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
 
   tx.addOutput(opRetPayload, 0);
-  tx.addOutput(newOwner, _util.DUST_MINIMUM);
+  tx.addOutput(newOwner, _utils.DUST_MINIMUM);
 
   return tx.buildIncomplete();
 }
@@ -1987,7 +1987,7 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
   var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
   var consensusBuff = Buffer.from(consensusHash, 'ascii');
 
-  var hashedName = (0, _util.hash128)(Buffer.concat([nameBuff, consensusBuff]));
+  var hashedName = (0, _utils.hash128)(Buffer.concat([nameBuff, consensusBuff]));
 
   opRet.write('id+', 0, 3, 'ascii');
   hashedName.copy(opRet, 3);
@@ -2002,7 +2002,7 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
   return tx.buildIncomplete();
 }
 }).call(this,require("buffer").Buffer)
-},{"../config":8,"./util":18,"bitcoinjs-lib":85,"buffer":141}],17:[function(require,module,exports){
+},{"../config":8,"./utils":18,"bitcoinjs-lib":85,"buffer":141}],17:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -2017,13 +2017,13 @@ var _bitcoinjsLib = require('bitcoinjs-lib');
 
 var _bitcoinjsLib2 = _interopRequireDefault(_bitcoinjsLib);
 
-var _util = require('./util');
+var _utils = require('./utils');
 
 var _skeletons = require('./skeletons');
 
 var _config = require('../config');
 
-var _utils = require('../utils');
+var _utils2 = require('../utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2051,13 +2051,13 @@ function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
 
   // change index for the payer.
   if (changeIndex === null) {
-    changeIndex = txB.addOutput(paymentAddress, _util.DUST_MINIMUM);
+    changeIndex = txB.addOutput(paymentAddress, _utils.DUST_MINIMUM);
   }
   // fund the transaction fee.
-  var txFee = (0, _util.estimateTXBytes)(txB, 1, 0) * feeRate;
-  var outAmounts = (0, _util.sumOutputValues)(txB);
+  var txFee = (0, _utils.estimateTXBytes)(txB, 1, 0) * feeRate;
+  var outAmounts = (0, _utils.sumOutputValues)(txB);
 
-  return (0, _util.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts - inAmounts, feeRate);
+  return (0, _utils.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts - inAmounts, feeRate);
 }
 
 function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
@@ -2067,13 +2067,13 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
   var network = _config.config.network;
 
   if (!!zonefile) {
-    valueHash = (0, _util.hash160)(Buffer.from(zonefile)).toString('hex');
+    valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
   }
 
   var namespace = fullyQualifiedName.split('.').pop();
 
-  var ownerKey = (0, _utils.hexStringToECPair)(ownerKeyHex);
-  var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
+  var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
 
   var ownerAddress = ownerKey.getAddress();
   var paymentAddress = paymentKey.getAddress();
@@ -2105,7 +2105,7 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
         signingTxB.sign(i, paymentKey);
       }
     }
-    return signingTxB.build();
+    return signingTxB.build().toHex();
   });
 }
 
@@ -2115,7 +2115,7 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
   var namespace = fullyQualifiedName.split('.').pop();
 
   var registerAddress = destinationAddress;
-  var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
   var preorderAddress = paymentKey.getAddress();
 
   var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref5) {
@@ -2141,16 +2141,16 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       signingTxB.sign(i, paymentKey);
     }
-    return signingTxB.build();
+    return signingTxB.build().toHex();
   });
 }
 
 function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
   var network = _config.config.network;
-  var valueHash = (0, _util.hash160)(Buffer.from(zonefile)).toString('hex');
+  var valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
 
-  var ownerKey = (0, _utils.hexStringToECPair)(ownerKeyHex);
-  var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
+  var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
 
   var paymentAddress = paymentKey.getAddress();
   var ownerAddress = ownerKey.getAddress();
@@ -2178,7 +2178,7 @@ function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
         signingTxB.sign(i, paymentKey);
       }
     }
-    return signingTxB.build();
+    return signingTxB.build().toHex();
   });
 }
 
@@ -2188,13 +2188,13 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
   var network = _config.config.network;
   var valueHash = undefined;
   if (!!zonefile) {
-    valueHash = (0, _util.hash160)(Buffer.from(zonefile)).toString('hex');
+    valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
   }
 
   var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, valueHash);
 
   var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1);
-  var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
   var paymentAddress = paymentKey.getAddress();
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref11) {
@@ -2206,14 +2206,14 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       signingTxB.sign(i, paymentKey);
     }
-    return signingTxB.build();
+    return signingTxB.build().toHex();
   });
 }
 
 function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
   var network = _config.config.network;
-  var ownerKey = (0, _utils.hexStringToECPair)(ownerKeyHex);
-  var paymentKey = (0, _utils.hexStringToECPair)(paymentKeyHex);
+  var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
   var paymentAddress = paymentKey.getAddress();
   var ownerAddress = ownerKey.getAddress();
 
@@ -2239,7 +2239,7 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
         signingTxB.sign(i, paymentKey);
       }
     }
-    return signingTxB.build();
+    return signingTxB.build().toHex();
   });
 }
 
@@ -2247,7 +2247,7 @@ var transactions = exports.transactions = {
   makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer
 };
 }).call(this,require("buffer").Buffer)
-},{"../config":8,"../utils":43,"./skeletons":16,"./util":18,"bitcoinjs-lib":85,"buffer":141}],18:[function(require,module,exports){
+},{"../config":8,"../utils":43,"./skeletons":16,"./utils":18,"bitcoinjs-lib":85,"buffer":141}],18:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 

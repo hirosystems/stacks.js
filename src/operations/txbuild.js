@@ -1,7 +1,7 @@
 import bitcoinjs from 'bitcoinjs-lib'
 
 import { addUTXOsToFund, DUST_MINIMUM,
-         estimateTXBytes, sumOutputValues, hash160 } from './util'
+         estimateTXBytes, sumOutputValues, hash160 } from './utils'
 import { makePreorderSkeleton, makeRegisterSkeleton,
          makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton } from './skeletons'
 import { config } from '../config'
@@ -82,7 +82,7 @@ function makeRenewal(fullyQualifiedName: string,
           signingTxB.sign(i, paymentKey)
         }
       }
-      return signingTxB.build()
+      return signingTxB.build().toHex()
     })
 }
 
@@ -116,7 +116,7 @@ function makePreorder(fullyQualifiedName: string,
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         signingTxB.sign(i, paymentKey)
       }
-      return signingTxB.build()
+      return signingTxB.build().toHex()
     })
 }
 
@@ -152,7 +152,7 @@ function makeUpdate(fullyQualifiedName: string,
           signingTxB.sign(i, paymentKey)
         }
       }
-      return signingTxB.build()
+      return signingTxB.build().toHex()
     })
 }
 
@@ -179,7 +179,7 @@ function makeRegister(fullyQualifiedName: string,
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         signingTxB.sign(i, paymentKey)
       }
-      return signingTxB.build()
+      return signingTxB.build().toHex()
     })
 }
 
@@ -212,7 +212,7 @@ function makeTransfer(fullyQualifiedName: string,
           signingTxB.sign(i, paymentKey)
         }
       }
-      return signingTxB.build()
+      return signingTxB.build().toHex()
     })
 }
 
