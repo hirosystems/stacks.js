@@ -1584,7 +1584,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var SATOSHIS_PER_BTC = 1e8;
 
 var BlockstackNetwork = function () {
-  function BlockstackNetwork(apiUrl, utxoProviderUrl, network) {
+  function BlockstackNetwork(apiUrl, utxoProviderUrl) {
+    var network = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _bitcoinjsLib2.default.networks.bitcoin;
+
     _classCallCheck(this, BlockstackNetwork);
 
     this.blockstackAPIUrl = apiUrl;
@@ -1781,7 +1783,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
 
 var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/');
 
-var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info/unspent?format=json&active=', _bitcoinjsLib2.default.networks.bitcoin);
+var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info/unspent?format=json&active=');
 
 var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };
