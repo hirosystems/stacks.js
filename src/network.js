@@ -19,6 +19,13 @@ class BlockstackNetwork {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
       .then(x => x.name_price.satoshis)
+      .then(satoshis => {
+        if (satoshis) {
+          return satoshis
+        } else {
+          throw new Error('Failed to parse price of name')
+        }
+      })
   }
 
   getBlockHeight() {
@@ -77,7 +84,7 @@ class BlockstackNetwork {
   }
 
   getFeeRate() {
-    throw new Error('Not implemented.')
+    return Math.floor(0.00001000 * SATOSHIS_PER_BTC)
   }
 
   countDustOutputs() {
@@ -121,7 +128,7 @@ class LocalRegtest extends BlockstackNetwork {
   }
 
   getFeeRate() {
-    return 0.00001000 * SATOSHIS_PER_BTC
+    return Math.floor(0.00001000 * SATOSHIS_PER_BTC)
   }
 
   broadcastTransaction(transaction: string) {

@@ -1607,6 +1607,12 @@ var BlockstackNetwork = function () {
         return resp.json();
       }).then(function (x) {
         return x.name_price.satoshis;
+      }).then(function (satoshis) {
+        if (satoshis) {
+          return satoshis;
+        } else {
+          throw new Error('Failed to parse price of name');
+        }
       });
     }
   }, {
@@ -1678,7 +1684,7 @@ var BlockstackNetwork = function () {
   }, {
     key: 'getFeeRate',
     value: function getFeeRate() {
-      throw new Error('Not implemented.');
+      return Math.floor(0.00001000 * SATOSHIS_PER_BTC);
     }
   }, {
     key: 'countDustOutputs',
@@ -1739,7 +1745,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
   _createClass(LocalRegtest, [{
     key: 'getFeeRate',
     value: function getFeeRate() {
-      return 0.00001000 * SATOSHIS_PER_BTC;
+      return Math.floor(0.00001000 * SATOSHIS_PER_BTC);
     }
   }, {
     key: 'broadcastTransaction',
@@ -2298,8 +2304,14 @@ function estimateTXBytes(txIn, additionalInputs, additionalOutputs) {
   if (txIn instanceof _bitcoinjsLib2.default.TransactionBuilder) {
     innerTx = txIn.tx;
   }
-  var inputs = [].concat(innerTx.ins, new Array(additionalInputs));
-  var outputs = [].concat(innerTx.outs, new Array(additionalOutputs));
+  var dummyInputs = new Array(additionalInputs);
+  dummyInputs.fill(1);
+  var dummyOutputs = new Array(additionalOutputs);
+  dummyOutputs.fill(1);
+
+  var inputs = [].concat(innerTx.ins, dummyInputs);
+  var outputs = [].concat(innerTx.outs, dummyOutputs);
+
   return _utils2.default.transactionBytes(inputs, outputs);
 }
 

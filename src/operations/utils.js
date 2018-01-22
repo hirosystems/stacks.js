@@ -21,8 +21,14 @@ export function estimateTXBytes(txIn : bitcoinjs.Transaction | bitcoinjs.Transac
   if (txIn instanceof bitcoinjs.TransactionBuilder) {
     innerTx = txIn.tx
   }
-  const inputs = [].concat(innerTx.ins, new Array(additionalInputs))
-  const outputs = [].concat(innerTx.outs, new Array(additionalOutputs))
+  const dummyInputs = new Array(additionalInputs)
+  dummyInputs.fill(1)
+  const dummyOutputs = new Array(additionalOutputs)
+  dummyOutputs.fill(1)
+
+  const inputs = [].concat(innerTx.ins, dummyInputs)
+  const outputs = [].concat(innerTx.outs, dummyOutputs)
+
   return coinSelectUtils.transactionBytes(inputs, outputs)
 }
 
