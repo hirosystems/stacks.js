@@ -86,6 +86,31 @@ function makeRenewal(fullyQualifiedName: string,
     })
 }
 
+function estimatePreorder(fullyQualifiedName: string,
+                          destinationAddress: string,
+                          paymentHex: string,
+                          inputUtxos: number = 1) : Promise<number> {
+  const network = config.network
+
+  const registerAddress = destinationAddress
+  const paymentKey = hexStringToECPair(paymentHex)
+  const preorderAddress = paymentKey.getAddress()
+
+  const dummyBurnAddress   = '1111111111111111111114oLvT2'
+  const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+  const preorderPromise = network.getNamePrice(fullyQualifiedName)
+        .then(namePrice => makePreorderSkeleton(
+          fullyQualifiedName, dummyConsensusHash, preorderAddress,
+          dummyBurnAddress, namePrice, registerAddress))
+
+  return Promise.all([network.getFeeRate(), preorderPromise])
+    .then(([feeRate, preorderTX]) => {
+      const outputsValue = sumOutputValues(preorderTX)
+      const txFee = feeRate * estimateTXBytes(preorderTX, inputUtxos, 0)
+      return txFee + outputsValue
+    })
+}
 
 function makePreorder(fullyQualifiedName: string,
                       destinationAddress: string,
@@ -216,7 +241,7 @@ function makeTransfer(fullyQualifiedName: string,
     })
 }
 
-
 export const transactions = {
-  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer
+  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer,
+  estimatePreorder
 }

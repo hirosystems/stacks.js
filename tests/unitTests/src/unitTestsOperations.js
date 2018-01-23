@@ -5,7 +5,7 @@ import btc from 'bitcoinjs-lib'
 import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
          hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
 
-import { transactions } from '../../../lib/'
+import { transactions, config } from '../../../lib/'
 
 const testAddresses = [
   { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
@@ -127,23 +127,80 @@ function utilsTests() {
             Buffer.from(utxos[1].tx_hash, 'hex').reverse().toString('hex'))
 
   })
+
+  test('modifiedTXSets', (t) => {
+    t.plan(11)
+
+    const txStarterHex = '01000000013ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a000000006a473044022050176492b92c79ba23fb815e62a7778ccb45a50ca11b8dabdbadc1828e6ba34002200ce77082a072eba8d3ce49e6a316e6173c1f97d955064574fe620cc25002eadb01210236b07942707a86ab666bb300b58d295d988ce9c3a338a0e08380dd98732fd4faffffffff030000000000000000296a2769643f363da95bc8d5203d1c07bd87c564a1e6395826cfdfe87cfd31ffa2a3b8101e3e93096f2be02c0000000000001976a91441577ec99314a293acbc17d8152137cf4862f7f188ac39050000000000001976a9142ebe7b4729185f68c7185c3c6af60fad1b6eeebf88ac00000000'
+    const txStarter = btc.Transaction.fromHex(txStarterHex)
+
+    const txHash = '22a024f16944d2f568de4a613566fcfab53b86d37f1903668d399f9a366883de'
+
+    t.equal(txStarter.getHash().reverse().toString('hex'), txHash)
+
+    let usedTXHash = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
+    let utxoValues = [287825, 287825]
+    let utxoSet1 = [{ value: utxoValues[0],
+                     tx_hash: usedTXHash,
+                     tx_output_n: 0 },
+                   { value: utxoValues[1],
+                     tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+                     tx_output_n: 0 }]
+
+    let utxoSet2 = []
+
+    config.network.modifyUTXOSetFrom(txStarterHex)
+
+    let testAddress1 = '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR'
+    let testAddress2 = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
+
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}`,
+                  utxoSet1)
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}`,
+                  utxoSet2)
+
+    Promise.all([config.network.getUTXOs(testAddress1),
+                 config.network.getUTXOs(testAddress2)])
+      .then( ([utxos1, utxos2]) => {
+        t.equal( utxos1.length, 2 )
+        t.equal( utxos2.length, 1 )
+        t.ok( utxos1.find( x => x.tx_hash === txHash && x.value === 11488 ), "UTXO set should include the new transaction's outputs")
+        t.ok( utxos2.find( x => x.tx_hash === txHash && x.value === 1337 ), "UTXO set should include the new transaction's outputs")
+        t.ok( ! utxos1.find( x => x.tx_hash === usedTXHash ), "UTXO set shouldn't include the transaction's spent input")
+      })
+      .then( () => {
+        config.network.resetUTXOs(testAddress1)
+        config.network.resetUTXOs(testAddress2)
+        return Promise.all([config.network.getUTXOs(testAddress1),
+                            config.network.getUTXOs(testAddress2)])
+      })
+      .then( ([utxos1, utxos2]) => {
+        t.equal( utxos1.length, 2 )
+        t.equal( utxos2.length, 0 )
+        t.ok( ! utxos1.find( x => x.tx_hash === txHash && x.value === 11488 ), "UTXO set should not include the new transaction's outputs after reset")
+        t.ok( ! utxos2.find( x => x.tx_hash === txHash && x.value === 1337 ), "UTXO set should not include the new transaction's outputs after reset")
+        t.ok( utxos1.find( x => x.tx_hash === usedTXHash ), "UTXO set should include the transaction's input after reset")
+      })
+
+  })
 }
 
 function transactionTests() {
   test('build and fund preorder', (t) => {
-    t.plan(5)
+    t.plan(6)
 
-    let utxoValues = [287825]
+    let utxoValues = [287825, 287825]
     let BURN_AMT = 1337
     let BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
 
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}`,
-                  [{ value: utxoValues[0],
+    let utxoSet = [{ value: utxoValues[0],
                      tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
                      tx_output_n: 0 },
                    { value: utxoValues[1],
                      tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                     tx_output_n: 0 }])
+                     tx_output_n: 0 }]
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}`,
+                  utxoSet)
     FetchMock.get(`https://core.blockstack.org/v1/prices/names/foo.test`,
                   { name_price: { satoshis: BURN_AMT }})
     FetchMock.get(`https://core.blockstack.org/v1/namespaces/test`,
@@ -151,21 +208,36 @@ function transactionTests() {
     FetchMock.get(`https://core.blockstack.org/v1/blockchains/bitcoin/consensus`,
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
 
-    transactions.makePreorder('foo.test',
-                              testAddresses[0].address,
-                              testAddresses[1].skHex)
-      .then(hexTX => {
+    Promise.all(
+      [transactions.estimatePreorder('foo.test',
+                                     testAddresses[0].address,
+                                     testAddresses[1].skHex),
+       transactions.makePreorder('foo.test',
+                                 testAddresses[0].address,
+                                 testAddresses[1].skHex)])
+      .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
         let tx = btc.Transaction.fromHex(hexTX)
         let txLen = hexTX.length / 2
         let outputVals = sumOutputValues(tx)
-        let inputVals = utxoValues.reduce((agg, x) => agg + x, 0)
+        let inputVals = tx.ins.reduce((agg, x) => {
+          let inputTX = utxoSet.find(
+            y => Buffer.from(y.tx_hash, 'hex').reverse().compare(x.hash) === 0 )
+          if (inputTX) {
+            return agg + inputTX.value
+          } else {
+            return agg
+          }
+        }, 0)
         let fee = inputVals - outputVals
         let burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
 
+        let change = tx.outs[1].value
+
+        t.equal(inputVals - change, estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, BURN_ADDR, `Burn address should be ${BURN_ADDR}`)
         t.equal(tx.outs[2].value, BURN_AMT, `Output should have funded name price ${BURN_AMT}`)
-        t.equal(tx.ins.length, utxoValues.length, 'Should use all of the utxos for the payer')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
         t.equal(Math.floor(fee / txLen), 1000,
                 `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
