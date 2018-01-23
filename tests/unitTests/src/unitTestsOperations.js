@@ -154,10 +154,14 @@ function utilsTests() {
     let testAddress1 = '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR'
     let testAddress2 = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
 
+    FetchMock.restore()
+
+    FetchMock.get(`https://bitcoinfees.earn.com/api/v1/fees/recommended`, {fastestFee: 1000})
+
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}`,
-                  utxoSet1)
+                  {unspent_outputs: utxoSet1})
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}`,
-                  utxoSet2)
+                  {unspent_outputs: utxoSet2})
 
     Promise.all([config.network.getUTXOs(testAddress1),
                  config.network.getUTXOs(testAddress2)])
@@ -189,8 +193,10 @@ function transactionTests() {
   test('build and fund preorder', (t) => {
     t.plan(6)
 
-    let utxoValues = [287825, 287825]
-    let BURN_AMT = 1337
+    FetchMock.restore()
+
+    let utxoValues = [288000, 287825]
+    let BURN_AMT = 6500
     let BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
 
     let utxoSet = [{ value: utxoValues[0],
@@ -199,8 +205,11 @@ function transactionTests() {
                    { value: utxoValues[1],
                      tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
                      tx_output_n: 0 }]
+
+    FetchMock.get(`https://bitcoinfees.earn.com/api/v1/fees/recommended`, {fastestFee: 1000})
+
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}`,
-                  utxoSet)
+                  {unspent_outputs: utxoSet})
     FetchMock.get(`https://core.blockstack.org/v1/prices/names/foo.test`,
                   { name_price: { satoshis: BURN_AMT }})
     FetchMock.get(`https://core.blockstack.org/v1/namespaces/test`,

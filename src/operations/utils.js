@@ -1,5 +1,4 @@
 import bitcoinjs from 'bitcoinjs-lib'
-import coinSelectUtils from 'coinselect/utils'
 import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
 
@@ -13,6 +12,31 @@ export function hash160(buff: Buffer) {
 export function hash128(buff: Buffer) {
   return Buffer.from(bitcoinjs.crypto.sha256(buff).slice(0, 16))
 }
+
+
+// COPIED FROM coinselect, because 1 byte matters sometimes.
+// baseline estimates, used to improve performance
+const TX_EMPTY_SIZE = 4 + 1 + 1 + 4
+const TX_INPUT_BASE = 32 + 4 + 1 + 4
+const TX_INPUT_PUBKEYHASH = 107
+const TX_OUTPUT_BASE = 8 + 1
+const TX_OUTPUT_PUBKEYHASH = 25
+
+function inputBytes(input) {
+  return TX_INPUT_BASE + (input.script ? input.script.length : TX_INPUT_PUBKEYHASH)
+}
+
+function outputBytes(output) {
+  return TX_OUTPUT_BASE + (output.script ? output.script.length : TX_OUTPUT_PUBKEYHASH)
+}
+
+function transactionBytes(inputs, outputs) {
+  return TX_EMPTY_SIZE +
+    inputs.reduce((a, x) => (a + inputBytes(x)), 0) +
+    outputs.reduce((a, x) => (a + outputBytes(x)), 0)
+}
+
+//
 
 export function estimateTXBytes(txIn : bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
                                 additionalInputs : number,
@@ -29,7 +53,7 @@ export function estimateTXBytes(txIn : bitcoinjs.Transaction | bitcoinjs.Transac
   const inputs = [].concat(innerTx.ins, dummyInputs)
   const outputs = [].concat(innerTx.outs, dummyOutputs)
 
-  return coinSelectUtils.transactionBytes(inputs, outputs)
+  return transactionBytes(inputs, outputs)
 }
 
 export function sumOutputValues(txIn : bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {

@@ -14,6 +14,7 @@ class BlockstackNetwork {
     this.utxoProviderUrl = utxoProviderUrl
     this.layer1 = network
 
+    this.DUST_MINIMUM = 5500
     this.includeUtxoMap = {}
     this.excludeUtxoSet = []
   }
@@ -29,7 +30,11 @@ class BlockstackNetwork {
       .then(x => x.name_price.satoshis)
       .then(satoshis => {
         if (satoshis) {
-          return satoshis
+          if (satoshis < this.DUST_MINIMUM) {
+            return this.DUST_MINIMUM
+          } else {
+            return satoshis
+          }
         } else {
           throw new Error('Failed to parse price of name')
         }
@@ -91,8 +96,10 @@ class BlockstackNetwork {
     throw new Error(`Cannot broadcast ${transaction}: not implemented.`)
   }
 
-  getFeeRate() {
-    return Math.floor(0.00001000 * SATOSHIS_PER_BTC)
+  getFeeRate() : Promise<number> {
+    return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
+      .then(resp => resp.json())
+      .then(rates => Math.floor(rates.fastestFee))
   }
 
   countDustOutputs() {
@@ -101,14 +108,23 @@ class BlockstackNetwork {
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
     return fetch(`${this.utxoProviderUrl}${address}`)
-      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.status === 500) {
+          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
+          return []
+        } else {
+          return resp.json()
+        }
+      })
+      .then(utxoJSON => utxoJSON.unspent_outputs)
   }
 
   getUTXOs(address: string) : Promise<Array<UTXO>> {
     return this.getNetworkedUTXOs(address)
-      .then(returnSet => {
+      .then(networkedUTXOs => {
+        let returnSet = networkedUTXOs.concat()
         if (this.includeUtxoMap.hasOwnProperty(address)) {
-          returnSet = returnSet.concat(this.includeUtxoMap[address])
+          returnSet = networkedUTXOs.concat(this.includeUtxoMap[address])
         }
 
         // aaron: I am *well* aware this is O(n)*O(m) runtime
@@ -206,8 +222,8 @@ class LocalRegtest extends BlockstackNetwork {
     this.bitcoindUrl = bitcoindUrl
   }
 
-  getFeeRate() {
-    return Math.floor(0.00001000 * SATOSHIS_PER_BTC)
+  getFeeRate() : Promise<number> {
+    return Promise.resolve(Math.floor(0.00001000 * SATOSHIS_PER_BTC))
   }
 
   broadcastTransaction(transaction: string) {
