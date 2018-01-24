@@ -1718,6 +1718,14 @@ var BlockstackNetwork = function () {
         }
       }).then(function (utxoJSON) {
         return utxoJSON.unspent_outputs;
+      }).then(function (utxoList) {
+        return utxoList.map(function (utxo) {
+          var utxoOut = { value: utxo.value,
+            tx_output_n: utxo.tx_output_n,
+            confirmations: utxo.confirmations,
+            tx_hash: utxo.tx_hash_big_endian };
+          return utxoOut;
+        });
       });
     }
   }, {

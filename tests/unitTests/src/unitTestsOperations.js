@@ -141,10 +141,10 @@ function utilsTests() {
     let usedTXHash = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     let utxoValues = [287825, 287825]
     let utxoSet1 = [{ value: utxoValues[0],
-                     tx_hash: usedTXHash,
+                     tx_hash_big_endian: usedTXHash,
                      tx_output_n: 0 },
                    { value: utxoValues[1],
-                     tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+                     tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
                      tx_output_n: 0 }]
 
     let utxoSet2 = []
@@ -200,10 +200,10 @@ function transactionTests() {
     let BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
 
     let utxoSet = [{ value: utxoValues[0],
-                     tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+                     tx_hash_big_endian: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
                      tx_output_n: 0 },
                    { value: utxoValues[1],
-                     tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+                     tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
                      tx_output_n: 0 }]
 
     FetchMock.get(`https://bitcoinfees.earn.com/api/v1/fees/recommended`, {fastestFee: 1000})
@@ -231,7 +231,8 @@ function transactionTests() {
         let outputVals = sumOutputValues(tx)
         let inputVals = tx.ins.reduce((agg, x) => {
           let inputTX = utxoSet.find(
-            y => Buffer.from(y.tx_hash, 'hex').reverse().compare(x.hash) === 0 )
+            y => Buffer.from(y.tx_hash_big_endian, 'hex')
+              .reverse().compare(x.hash) === 0 )
           if (inputTX) {
             return agg + inputTX.value
           } else {
