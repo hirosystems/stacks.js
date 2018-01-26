@@ -14,7 +14,7 @@ export {
   isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString
 } from './utils'
 
-export * from './operations'
+export { transactions, safety } from './operations'
 
 export { network } from './network'
 

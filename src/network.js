@@ -42,7 +42,9 @@ class BlockstackNetwork {
   }
 
   getBlockHeight() {
-    throw new Error('Not implemented')
+    return fetch(`${this.utxoProviderUrl}/latestblock`)
+      .then(resp => resp.json())
+      .then(blockObj => blockObj.height)
   }
 
   getGracePeriod() {
@@ -107,7 +109,7 @@ class BlockstackNetwork {
   }
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
-    return fetch(`${this.utxoProviderUrl}${address}`)
+    return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}`)
       .then(resp => {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
@@ -267,8 +269,7 @@ const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/')
 
 const MAINNET_DEFAULT = new BlockstackNetwork(
-  'https://core.blockstack.org', 'https://blockchain.info/unspent?format=json&active=')
-
+  'https://core.blockstack.org', 'https://blockchain.info')
 
 export const network = { BlockstackNetwork, LocalRegtest,
                          defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }

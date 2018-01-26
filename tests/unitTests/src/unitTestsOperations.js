@@ -5,7 +5,7 @@ import btc from 'bitcoinjs-lib'
 import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
          hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
 
-import { transactions, config } from '../../../lib/'
+import { transactions, safety, config } from '../../../lib/'
 
 const testAddresses = [
   { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
@@ -426,10 +426,128 @@ function transactionTests() {
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
-
 }
+
+function safetyTests() {
+  test('addCanReceiveName', (t) => {
+    t.plan(2)
+    FetchMock.restore()
+    FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[1].address}`,
+                  ['dummy.id','dummy.id','dummy.id'])
+    const namesTooMany = new Array(25)
+    namesTooMany.fill('dummy.id')
+    FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[0].address}`,
+                  namesTooMany)
+
+    Promise.all([safety.addressCanReceiveName(testAddresses[0].address),
+                 safety.addressCanReceiveName(testAddresses[1].address)])
+      .then(([t0, t1]) => {
+        t.ok(t1, 'Test address ${testAddresses[1].address} should not have too many names.')
+        t.ok(!t0, 'Test address ${testAddresses[0].address} should have too many names.')
+      })
+  })
+
+  test('ownsName', (t) => {
+    t.plan(2)
+    FetchMock.restore()
+    FetchMock.get(`https://core.blockstack.org/v1/names/foo.test`,
+                  {'address': testAddresses[0].address})
+
+    Promise.all([safety.ownsName('foo.test', testAddresses[0].address),
+                 safety.ownsName('foo.test', testAddresses[1].address)])
+      .then(([t0, t1]) => {
+        t.ok(t0, 'Test address ${testAddresses[0].address} should own foo.test')
+        t.ok(!t1, 'Test address ${testAddresses[1].address} should not own foo.test')
+      })
+  })
+
+  test('nameInGracePeriod', (t) => {
+    t.plan(4)
+    FetchMock.restore()
+
+    FetchMock.get(`https://core.blockstack.org/v1/names/bar.test`,
+                  {body: 'Name available', status: 404})
+    FetchMock.get(`https://core.blockstack.org/v1/names/foo.test`,
+                  {expires_block: 50})
+    FetchMock.getOnce(`https://blockchain.info/latestblock`,
+                      {height: 49})
+    safety.isInGracePeriod('foo.test')
+      .then(result => {
+        t.ok(!result, 'name should not be in grace period if it isnt expired')
+        FetchMock.getOnce(`https://blockchain.info/latestblock`,
+                          {height: 50})
+        return safety.isInGracePeriod('foo.test')
+      })
+      .then(result => {
+        t.ok(result, 'name should be in grace period')
+        FetchMock.get(`https://blockchain.info/latestblock`,
+                      {height: 5050})
+        return safety.isInGracePeriod('foo.test')
+      })
+      .then(result => {
+        t.ok(!result, 'grace period should have passed')
+        return safety.isInGracePeriod('bar.test')
+      })
+      .then(result => {
+        t.ok(!result, 'bar.test isnt registered. not in grace period')
+      })
+  })
+
+  test('nameAvailable', (t) => {
+    t.plan(2)
+    FetchMock.restore()
+    FetchMock.get(`https://core.blockstack.org/v1/names/foo.test`,
+                  {body: 'Name available', status: 404})
+    FetchMock.get(`https://core.blockstack.org/v1/names/bar.test`,
+                  {'address': testAddresses[0].address})
+
+    Promise.all([safety.isNameAvailable('foo.test'),
+                 safety.isNameAvailable('bar.test')])
+      .then(([t0, t1]) => {
+        t.ok(t0, 'foo.test should be available')
+        t.ok(!t1, 'bar.test isnt available')
+      })
+  })
+
+  test('nameValid', (t) => {
+    t.plan(11)
+
+    let shouldFail = [
+      { name: '123456789012345678901234567890.1234567',
+        reason: 'is too long' },
+      { name: '1234567890123456789012345678901234567',
+        reason: 'has no namespace' },
+      { name: '1.2.3',
+        reason: 'is a subdomain' },
+      { name: null,
+        reason: 'is null' },
+      { name: '.43',
+        reason: 'has no name' },
+      { name: '43#43.xyz',
+        reason: 'illegal character' },
+      { name: '43 43.xyz',
+        reason: 'illegal character' }]
+      .map( x => {
+        safety.isNameValid(x.name).then(
+          passed => t.ok(!passed, `${x.name} should fail for: ${x.reason}`))
+      })
+
+    let shouldPass = ['abc123.id', 'abcd123.1',
+                  '123456789012345678901234567890.123456',
+                  'abc_+-123.id']
+      .map( x => {
+        safety.isNameValid(x).then(
+          passed => t.ok(passed, `${x} should pass`))
+      })
+
+    Promise.all(shouldPass)
+      .then(() => Promise.all(shouldFail))
+  })
+}
+
 
 export function runOperationsTests() {
   utilsTests()
   transactionTests()
+  safetyTests()
 }
