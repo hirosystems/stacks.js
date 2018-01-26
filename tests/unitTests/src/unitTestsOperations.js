@@ -11,7 +11,9 @@ const testAddresses = [
   { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
     address: '1br553PVnK6F5nyBtb4ju1owwBKdsep5c' },
   { skHex: '744196d67ed78fe39009c71fbfd53e6ecca98353fbfe81ccba21b0703a69be9c01',
-    address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR' }
+    address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR' },
+  { address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
+    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001' }
 ]
 
 function utilsTests() {
@@ -143,10 +145,9 @@ function utilsTests() {
     let utxoSet1 = [{ value: utxoValues[0],
                      tx_hash_big_endian: usedTXHash,
                      tx_output_n: 0 },
-                   { value: utxoValues[1],
-                     tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                     tx_output_n: 0 }]
-
+                    { value: utxoValues[1],
+                      tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+                      tx_output_n: 0 }]
     let utxoSet2 = []
 
     config.network.modifyUTXOSetFrom(txStarterHex)
@@ -190,37 +191,62 @@ function utilsTests() {
 }
 
 function transactionTests() {
-  test('build and fund preorder', (t) => {
-    t.plan(6)
+  let utxoValues = [288000, 287825, 287825]
+  let BURN_AMT = 6500
+  let BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
 
+  let utxoSet = [{ value: utxoValues[0],
+                   tx_hash_big_endian: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+                   tx_output_n: 0 },
+                 { value: utxoValues[1],
+                   tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+                   tx_output_n: 0 },
+                 { value: utxoValues[2],
+                   tx_hash_big_endian: 'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+                   tx_output_n: 2 }]
+
+
+  let utxoSet2 = [{ value: 5500,
+                    tx_hash_big_endian: 'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdedffff',
+                    tx_output_n: 0 }]
+
+  function setupMocks() {
     FetchMock.restore()
-
-    let utxoValues = [288000, 287825]
-    let BURN_AMT = 6500
-    let BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
-
-    let utxoSet = [{ value: utxoValues[0],
-                     tx_hash_big_endian: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-                     tx_output_n: 0 },
-                   { value: utxoValues[1],
-                     tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                     tx_output_n: 0 }]
-
     FetchMock.get(`https://bitcoinfees.earn.com/api/v1/fees/recommended`, {fastestFee: 1000})
-
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}`,
                   {unspent_outputs: utxoSet})
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}`,
+                  {unspent_outputs: utxoSet2})
     FetchMock.get(`https://core.blockstack.org/v1/prices/names/foo.test`,
                   { name_price: { satoshis: BURN_AMT }})
     FetchMock.get(`https://core.blockstack.org/v1/namespaces/test`,
                   { history: { 10: [{burn_address : BURN_ADDR}] } })
     FetchMock.get(`https://core.blockstack.org/v1/blockchains/bitcoin/consensus`,
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
+  }
+
+  function getInputVals(inputTX) {
+    let utxos_all = utxoSet.concat()
+    return inputTX.ins.reduce((agg, x) => {
+      let inputTX = utxos_all.find(
+        y => Buffer.from(y.tx_hash_big_endian, 'hex')
+          .reverse().compare(x.hash) === 0 )
+      if (inputTX) {
+        return agg + inputTX.value
+      } else {
+        return agg
+      }
+    }, 0)
+  }
+
+  test('build and fund preorder', (t) => {
+    t.plan(6)
+    setupMocks()
 
     Promise.all(
       [transactions.estimatePreorder('foo.test',
                                      testAddresses[0].address,
-                                     testAddresses[1].skHex),
+                                     testAddresses[1].address),
        transactions.makePreorder('foo.test',
                                  testAddresses[0].address,
                                  testAddresses[1].skHex)])
@@ -229,16 +255,7 @@ function transactionTests() {
         let tx = btc.Transaction.fromHex(hexTX)
         let txLen = hexTX.length / 2
         let outputVals = sumOutputValues(tx)
-        let inputVals = tx.ins.reduce((agg, x) => {
-          let inputTX = utxoSet.find(
-            y => Buffer.from(y.tx_hash_big_endian, 'hex')
-              .reverse().compare(x.hash) === 0 )
-          if (inputTX) {
-            return agg + inputTX.value
-          } else {
-            return agg
-          }
-        }, 0)
+        let inputVals = getInputVals(tx)
         let fee = inputVals - outputVals
         let burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
 
@@ -248,11 +265,168 @@ function transactionTests() {
         t.equal(burnAddress, BURN_ADDR, `Burn address should be ${BURN_ADDR}`)
         t.equal(tx.outs[2].value, BURN_AMT, `Output should have funded name price ${BURN_AMT}`)
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund register', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateRegister('foo.test',
+                                     testAddresses[0].address,
+                                     testAddresses[1].address, true, 2),
+       transactions.makeRegister('foo.test',
+                                 testAddresses[0].address,
+                                 testAddresses[1].skHex, 'hello world')])
+      .then(([estimatedCost, hexTX]) => {
+        let tx = btc.Transaction.fromHex(hexTX)
+        let txLen = hexTX.length / 2
+        let outputVals = sumOutputValues(tx)
+        let inputVals = getInputVals(tx)
+        let fee = inputVals - outputVals
+
+        // change address is the 3rd output usually...
+        let change = tx.outs[2].value
+
+        t.equal(btc.address.fromOutputScript(tx.outs[2].script), testAddresses[1].address,
+                'Payer change should be third output')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 2, 'Should use both payer utxos')
         t.equal(Math.floor(fee / txLen), 1000,
                 `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
+
+  test('build and fund update', (t) => {
+    t.plan(5)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateUpdate('foo.test',
+                                     testAddresses[0].address,
+                                     testAddresses[1].address,
+                                     3),
+       transactions.makeUpdate('foo.test',
+                               testAddresses[0].skHex,
+                               testAddresses[1].skHex,
+                               'hello world')])
+      .then(([estimatedCost, hexTX]) => {
+        let tx = btc.Transaction.fromHex(hexTX)
+        let txLen = hexTX.length / 2
+        let outputVals = sumOutputValues(tx)
+        let inputVals = getInputVals(tx)
+        let fee = inputVals - outputVals
+
+        // payer change address is the 3rd output...
+        let changeOut = tx.outs[2]
+        let ownerChange = tx.outs[1]
+        let change = changeOut.value
+
+        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+                'Owner change should be second output')
+        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+                'Payer change should be third output')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 4, 'Should use all payer utxos and one owner utxo')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund transfer', (t) => {
+    t.plan(6)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateTransfer('foo.test',
+                                    testAddresses[2].address,
+                                    testAddresses[0].address,
+                                    testAddresses[1].address,
+                                    3),
+       transactions.makeTransfer('foo.test',
+                                 testAddresses[2].address,
+                                 testAddresses[0].skHex,
+                                 testAddresses[1].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        let tx = btc.Transaction.fromHex(hexTX)
+        let txLen = hexTX.length / 2
+        let outputVals = sumOutputValues(tx)
+        let inputVals = getInputVals(tx)
+        let fee = inputVals - outputVals
+
+        // payer change address is the 4th output...
+        let changeOut = tx.outs[3]
+        // old owner change address is the 3rd output
+        let ownerChange = tx.outs[2]
+
+        let change = changeOut.value
+
+        t.equal(btc.address.fromOutputScript(tx.outs[1].script), testAddresses[2].address,
+                'New owner should be second output')
+        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+                'Prior owner should be third output')
+        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+                'Payer change should be fourth output')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund renewal', (t) => {
+    t.plan(7)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateRenewal('foo.test',
+                                    testAddresses[2].address,
+                                    testAddresses[0].address,
+                                    testAddresses[1].address,
+                                    true,
+                                    3),
+       transactions.makeRenewal('foo.test',
+                                testAddresses[2].address,
+                                testAddresses[0].skHex,
+                                testAddresses[1].skHex,
+                                'hello world')])
+      .then(([estimatedCost, hexTX]) => {
+        let tx = btc.Transaction.fromHex(hexTX)
+        let txLen = hexTX.length / 2
+        let outputVals = sumOutputValues(tx)
+        let inputVals = getInputVals(tx)
+        let fee = inputVals - outputVals
+
+        // payer change address is the 5th output...
+        let changeOut = tx.outs[4]
+        // old owner change address is the 3rd output
+        let ownerChange = tx.outs[2]
+
+        let change = changeOut.value
+
+        t.equal(btc.address.fromOutputScript(tx.outs[1].script), testAddresses[2].address,
+                'New owner should be second output')
+        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+                'Prior owner should be third output')
+        t.equal(btc.address.fromOutputScript(tx.outs[3].script), BURN_ADDR,
+                'Burn address should be fourth output')
+        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+                'Payer change should be fifth output')
+        t.equal(inputVals - change, estimatedCost - 5500, 'Estimated cost should over-estimate actual by 1 dust change for the old owner.')
+        t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
 }
 
 export function runOperationsTests() {

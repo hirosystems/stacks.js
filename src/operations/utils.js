@@ -23,7 +23,8 @@ const TX_OUTPUT_BASE = 8 + 1
 const TX_OUTPUT_PUBKEYHASH = 25
 
 function inputBytes(input) {
-  return TX_INPUT_BASE + (input.script ? input.script.length : TX_INPUT_PUBKEYHASH)
+  return TX_INPUT_BASE + (input.script && input.script.length > 0 ?
+                          input.script.length : TX_INPUT_PUBKEYHASH)
 }
 
 function outputBytes(output) {
