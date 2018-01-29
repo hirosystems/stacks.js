@@ -419,7 +419,7 @@ function transactionTests() {
                 'Burn address should be fourth output')
         t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
                 'Payer change should be fifth output')
-        t.equal(inputVals - change, estimatedCost - 5500, 'Estimated cost should over-estimate actual by 1 dust change for the old owner.')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should be accurate.')
         t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)

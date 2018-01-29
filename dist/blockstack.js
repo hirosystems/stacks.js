@@ -2281,8 +2281,22 @@ function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
   return (0, _utils.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts - inAmounts, feeRate);
 }
 
+/**
+ * Estimates cost of a preorder transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to preorder
+ * @param {String} destinationAddress - the address to receive the name (this
+ *    must be passed as the 'registrationAddress' in the register transaction)
+ * @param {String} paymentAddress - the address funding the preorder
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the preorder. This includes a 5500 satoshi dust output for the preorder.
+ *    Even though this is a change output, the payer must supply enough funds
+ *    to generate this output, so we include it in the cost.
+ * @private
+ */
 function estimatePreorder(fullyQualifiedName, destinationAddress, paymentAddress) {
-  var inputUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
 
   var network = _config.config.network;
 
@@ -2296,14 +2310,27 @@ function estimatePreorder(fullyQualifiedName, destinationAddress, paymentAddress
         preorderTX = _ref2[1];
 
     var outputsValue = (0, _utils.sumOutputValues)(preorderTX);
-    var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, inputUtxos, 0);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, paymentUtxos, 0);
     return txFee + outputsValue;
   });
 }
 
+/**
+ * Estimates cost of a register transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to register
+ * @param {String} registerAddress - the address to receive the name
+ * @param {String} paymentAddress - the address funding the register
+ * @param {Boolean} includingZonefile - whether or not we will broadcast
+ *    a zonefile hash as part  of the register
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the register.
+ * @private
+ */
 function estimateRegister(fullyQualifiedName, registerAddress, paymentAddress) {
   var includingZonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-  var inputUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+  var paymentUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
 
   var network = _config.config.network;
 
@@ -2317,11 +2344,22 @@ function estimateRegister(fullyQualifiedName, registerAddress, paymentAddress) {
   return network.getFeeRate().then(function (feeRate) {
     var outputsValue = (0, _utils.sumOutputValues)(registerTX);
     // 1 additional output for payer change
-    var txFee = feeRate * (0, _utils.estimateTXBytes)(registerTX, inputUtxos, 1);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(registerTX, paymentUtxos, 1);
     return txFee + outputsValue;
   });
 }
 
+/**
+ * Estimates cost of an update transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to update
+ * @param {String} ownerAddress - the owner of the name
+ * @param {String} paymentAddress - the address funding the update
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the update.
+ * @private
+ */
 function estimateUpdate(fullyQualifiedName, ownerAddress, paymentAddress) {
   var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
 
@@ -2338,6 +2376,18 @@ function estimateUpdate(fullyQualifiedName, ownerAddress, paymentAddress) {
   });
 }
 
+/**
+ * Estimates cost of an transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to transfer
+ * @param {String} destinationAddress - the next owner of the name
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress - the address funding the transfer
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the transfer.
+ * @private
+ */
 function estimateTransfer(fullyQualifiedName, destinationAddress, ownerAddress, paymentAddress) {
   var paymentUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
 
@@ -2354,6 +2404,20 @@ function estimateTransfer(fullyQualifiedName, destinationAddress, ownerAddress, 
   });
 }
 
+/**
+ * Estimates cost of an transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to renew
+ * @param {String} destinationAddress - the next owner of the name
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress - the address funding the transfer
+ * @param {Boolean} includingZonefile - whether or not we will broadcast a zonefile hash
+      in the renewal operation
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the transfer.
+ * @private
+ */
 function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, paymentAddress) {
   var includingZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
   var paymentUtxos = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
@@ -2378,10 +2442,22 @@ function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, p
     // 1 additional input for the owner
     // and renewal skeleton includes all outputs for owner change, but not for payer change.
     var txFee = feeRate * (0, _utils.estimateTXBytes)(renewalTX, 1 + paymentUtxos, 1);
-    return txFee + outputsValue;
+    return txFee + outputsValue - 5500; // don't count the dust change for old owner.
   });
 }
 
+/**
+ * Generates a preorder transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to pre-order
+ * @param {String} destinationAddress - the address to receive the name (this
+ *    must be passed as the 'registrationAddress' in the register transaction)
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
 function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
   var network = _config.config.network;
 
@@ -2417,6 +2493,21 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
   });
 }
 
+/**
+ * Generates an update transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to update
+ * @param {String} ownerKeyHex - a hex string of the owner key. this will
+ *    provide one UTXO input, and also recieve a dust output.
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the transaction's txfees
+ * @param {String} zonefile - the zonefile data to update (this will be hashed
+ *    to include in the transaction), the zonefile itself must be published
+ *    after the UPDATE propagates.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
 function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
   var network = _config.config.network;
   var valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
@@ -2454,6 +2545,23 @@ function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
   });
 }
 
+/**
+ * Generates a register transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to register
+ * @param {String} registerAddress - the address to receive the name (this
+ *    must have been passed as the 'destinationAddress' in the preorder transaction)
+ *    this address will receive a dust UTXO
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the transaction  (this *must* be the same as the payment
+ *    address used to fund the preorder)
+ * @param {String} zonefile - the zonefile data to include (this will be hashed
+ *    to include in the transaction), the zonefile itself must be published
+ *    after the UPDATE propagates.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
 function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
   var zonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
@@ -2482,6 +2590,20 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
   });
 }
 
+/**
+ * Generates a transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to transfer
+ * @param {String} destinationAddress - the address to receive the name.
+ *    this address will receive a dust UTXO
+ * @param {String} ownerKeyHex - a hex string of the current owner's
+ *    private key
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
 function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
   var network = _config.config.network;
   var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
@@ -2515,6 +2637,23 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
   });
 }
 
+/**
+ * Generates a transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to transfer
+ * @param {String} destinationAddress - the address to receive the name after renewal
+ *    this address will receive a dust UTXO
+ * @param {String} ownerKeyHex - a hex string of the current owner's
+ *    private key
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the renewal
+ * @param {String} zonefile - the zonefile data to include (this will be hashed
+ *    to include in the transaction), the zonefile itself must be published
+ *    after the RENEWAL propagates.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
 function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
   var zonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
