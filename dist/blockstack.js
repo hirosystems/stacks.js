@@ -1199,6 +1199,7 @@ function getHexFromBN(bnInput) {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
+ * @private
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
@@ -1235,6 +1236,7 @@ function encryptECIES(publicKey, content) {
 
 /**
  * Decrypt content encrypted using ECIES
+ * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
@@ -5053,6 +5055,7 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
  * These two functions are app-specific connections to gaia hub,
  *   they read the user data object for information on setting up
  *   a hub connection, and store the hub config to localstorage
+ * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
 function setLocalGaiaHubConnection() {

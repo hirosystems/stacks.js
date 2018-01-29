@@ -68,6 +68,7 @@ export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string)
  * These two functions are app-specific connections to gaia hub,
  *   they read the user data object for information on setting up
  *   a hub connection, and store the hub config to localstorage
+ * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
 export function setLocalGaiaHubConnection(): Promise<*> {
