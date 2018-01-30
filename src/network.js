@@ -241,6 +241,8 @@ class LocalRegtest extends BlockstackNetwork {
                       method: 'sendrawtransaction',
                       params: [transaction] }
     return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+      .then(resp => resp.json())
+      .then(respObj => respObj.result)
   }
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
