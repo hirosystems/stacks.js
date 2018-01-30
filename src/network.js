@@ -245,6 +245,34 @@ class LocalRegtest extends BlockstackNetwork {
       .then(respObj => respObj.result)
   }
 
+  getBlockHeight() {
+    const jsonRPC = { jsonrpc: '1.0',
+                      method: 'getblockcount' }
+    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+      .then(resp => resp.json())
+      .then(respObj => respObj.result)
+  }
+
+  getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
+    const jsonRPC = { jsonrpc: '1.0',
+                      method: 'gettransaction',
+                      params: [txHash] }
+    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+      .then(resp => resp.json())
+      .then(respObj => respObj.result)
+      .then(txInfo => txInfo.blockhash)
+      .then(blockhash => {
+        const jsonRPCBlock = { jsonrpc: '1.0',
+                               method: 'getblockheader',
+                               params: [blockhash] }
+        return fetch(this.bitcoindUrl, { method: 'POST',
+                                         body: JSON.stringify(jsonRPCBlock) })
+
+      })
+      .then(resp => resp.json())
+      .then(respObj => ({ block_height: respObj.result.height }))
+  }
+
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
     const jsonRPCImport = { jsonrpc: '1.0',
                             method: 'importaddress',
