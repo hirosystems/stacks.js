@@ -267,7 +267,6 @@ class LocalRegtest extends BlockstackNetwork {
                                params: [blockhash] }
         return fetch(this.bitcoindUrl, { method: 'POST',
                                          body: JSON.stringify(jsonRPCBlock) })
-
       })
       .then(resp => resp.json())
       .then(respObj => ({ block_height: respObj.result.height }))

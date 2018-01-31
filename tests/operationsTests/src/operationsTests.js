@@ -1,11 +1,21 @@
 import { exec } from 'child_process'
-import util from 'util'
 import test from 'tape'
 import btc from 'bitcoinjs-lib'
 
 import { transactions, config, network, hexStringToECPair } from '../../../lib'
 
-const pExec = util.promisify(exec)
+function pExec(cmd) {
+  return new Promise(
+    (resolve, reject) => {
+      exec(cmd, function (err, stdout, stderr) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(stdout, stderr)
+        }
+      })
+    })
+}
 
 async function initializeBlockstackCore() {
 

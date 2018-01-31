@@ -453,7 +453,8 @@ function makeRenewal(fullyQualifiedName: string,
     .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
       const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false)
       const ownerOutput = txB.tx.outs[2]
-      const ownerOutputAddr = bitcoinjs.address.fromOutputScript(ownerOutput.script)
+      const ownerOutputAddr = bitcoinjs.address.fromOutputScript(
+        ownerOutput.script, network.layer1)
       if (ownerOutputAddr !== ownerAddress) {
         throw new Error(`Original owner ${ownerAddress} should have an output at ` +
                         `index 2 in transaction was ${ownerOutputAddr}`)
