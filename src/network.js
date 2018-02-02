@@ -115,6 +115,18 @@ class BlockstackNetwork {
       })
   }
 
+  getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
+    return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.json()
+        } else {
+          throw new Error(`Could not lookup transaction info for '${txHash}'. Server error.`)
+        }
+      })
+      .then(respObj => ({ block_height: respObj.block_height }))
+  }
+
   getFeeRate() : Promise<number> {
     return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
       .then(resp => resp.json())
