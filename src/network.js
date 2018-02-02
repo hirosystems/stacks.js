@@ -1,4 +1,5 @@
 import bitcoinjs from 'bitcoinjs-lib'
+import FormData from 'form-data'
 
 const SATOSHIS_PER_BTC = 1e8
 
@@ -95,7 +96,23 @@ class BlockstackNetwork {
   }
 
   broadcastTransaction(transaction: string) {
-    throw new Error(`Cannot broadcast ${transaction}: not implemented.`)
+    const form = new FormData()
+    form.append('tx', transaction)
+    return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
+                 { method: 'POST',
+                   body: form })
+      .then(resp => resp.text())
+      .then(respText => {
+        if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+          const txHash = bitcoinjs.Transaction.fromHex(transaction)
+                .getHash()
+                .reverse()
+                .toString('hex') // big_endian
+          return txHash
+        } else {
+          throw new Error(`Broadcast transaction failed with message: ${respText}`)
+        }
+      })
   }
 
   getFeeRate() : Promise<number> {
