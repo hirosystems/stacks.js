@@ -3,21 +3,24 @@
   "version": "0.15.1",
   "description": "The Blockstack Javascript library for identity and authentication.",
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib; babel src -d lib",
+    "compile": "rm -rf lib; babel src -d lib; npm run copy-ts-declarations",
     "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; babel --presets es2015 tests/unitTests/src -d tests/unitTests/lib; babel --presets es2015 tests/authTests/src -d tests/authTests/lib;",
     "prepublish": "npm run build",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
-    "test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
+    "test": "npm run lint && npm run flow && npm run compile && npm run test-ts-declarations && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
     "build": "npm run build-documentation && npm run compile && npm run browserify",
     "flow": "flow",
     "lint": "eslint src",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
+    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json",
+    "copy-ts-declarations": "cd src/ && find . -name '*.d.ts' -exec cp --parents '{}' ../lib/ \\; && cd ../",
+    "test-ts-declarations": "tsc tests/typescriptTests/index.ts || (echo 'Failed while trying to generate Typescript declarations.\n' && exit 1)"
   },
   "repository": {
     "type": "git",
@@ -99,6 +102,7 @@
     "tape-promise": "^2.0.1"
   },
   "dependencies": {
+    "@types/node": "^8.5.1",
     "ajv": "^4.11.5",
     "bigi": "^1.4.2",
     "bitcoinjs-lib": "^2.3.0",
@@ -115,6 +119,7 @@
     "request": "^2.79.0",
     "schema-inspector": "^1.6.4",
     "sprintf-js": "^1.0.3",
+    "typescript": "^2.6.2",
     "uri-js": "^3.0.2",
     "uuid": "^3.0.1",
     "validator": "^7.0.0",
