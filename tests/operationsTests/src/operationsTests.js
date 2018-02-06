@@ -17,29 +17,25 @@ function pExec(cmd) {
     })
 }
 
-async function initializeBlockstackCore() {
+function initializeBlockstackCore() {
 
-  await pExec('docker pull quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind')
-
-  console.log('Pulled latest docker image')
-
-  try {
-    await pExec('docker stop test-bsk-core ; docker rm test-bsk-core ; rm -rf /tmp/.blockstack_int_test')
-  } catch (err) {
-  }
-
-  await pExec('docker run --name test-bsk-core -dt -p 16268:16268 -p 18332:18332 ' +
-              '-e BLOCKSTACK_TEST_CLIENT_RPC_PORT=16268 ' +
-              '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 ' +
-              '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 ' +
-              'quay.io/blockstack/integrationtests:feature_set-bitcoind-rpcbind ' +
-              'blockstack-test-scenario --interactive 2 ' +
-              'blockstack_integration_tests.scenarios.portal_test_env')
-
-  console.log('Started regtest container, waiting until initialized')
-
-  await pExec('docker logs -f test-bsk-core | grep -q inished')
-
+  return pExec('docker pull quay.io/blockstack/integrationtests:develop')
+    .then(() => {
+      console.log('Pulled latest docker image')
+      return pExec('docker stop test-bsk-core ; docker rm test-bsk-core ; rm -rf /tmp/.blockstack_int_test')
+        .catch(() => true)
+    })
+    .then(() => pExec('docker run --name test-bsk-core -dt -p 16268:16268 -p 18332:18332 ' +
+                      '-e BLOCKSTACK_TEST_CLIENT_RPC_PORT=16268 ' +
+                      '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 ' +
+                      '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 ' +
+                      'quay.io/blockstack/integrationtests:develop ' +
+                      'blockstack-test-scenario --interactive 2 ' +
+                      'blockstack_integration_tests.scenarios.portal_test_env'))
+    .then(() => {
+      console.log('Started regtest container, waiting until initialized')
+      return pExec('docker logs -f test-bsk-core | grep -q inished')
+    })
 }
 
 function shutdownBlockstackCore() {
