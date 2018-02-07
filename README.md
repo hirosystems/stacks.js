@@ -18,6 +18,17 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
     $ npm install blockstack
 
+### Production usage
+
+**NOTE**: If you uglify your the JavaScript, you'll need to exclude the following variable names from being mangled: `BigInteger`, `ECPair`, `Point`.
+
+This is because of the function-name-duck-typing used in [typeforce](https://github.com/dcousens/typeforce) which is used by the dependency [bitcoinjs-lib](https://github.com/bitcoinjs/bitcoinjs-lib).
+
+Example:
+``` bash
+uglifyjs ... --mangle reserved=['BigInteger','ECPair','Point']
+```
+
 ## About
 
 Blockstack JS is a library for profiles/identity, authentication, and storage.

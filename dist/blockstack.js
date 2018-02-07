@@ -1700,22 +1700,117 @@ var BlockstackNetwork = function () {
         }
       });
     }
+
+    /**
+     * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
+     * transaction until a second transaction has a certain number of confirmations.
+     *
+     * @param  {string} transaction the hex-encoded transaction to broadcast
+     * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
+     * the specified number of confirmations before broadcasting the `transaction`
+     * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
+     * before broadcasting `transaction`.
+     * @return {Promise} returns a Promise that resolves if the request
+     * is accepted by the transaction broadcast service and rejects
+     * if the service responds with an error or is unreachable
+     */
+
   }, {
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
-      var form = new _formData2.default();
-      form.append('tx', transaction);
-      return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
-        body: form }).then(function (resp) {
-        return resp.text();
-      }).then(function (respText) {
-        if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-          var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
-          return txHash;
-        } else {
-          throw new Error('Broadcast transaction failed with message: ' + respText);
-        }
-      });
+      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var confirmations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 6;
+
+
+      if (transactionToWatch === null) {
+        var form = new _formData2.default();
+        form.append('tx', transaction);
+        return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
+          body: form }).then(function (resp) {
+          return resp.text();
+        }).then(function (respText) {
+          if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+            var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
+            return txHash;
+          } else {
+            throw new Error('Broadcast transaction failed with message: ' + respText);
+          }
+        });
+      } else {
+        /*
+         * POST /v1/broadcast
+         * Request body:
+         * JSON.stringify({
+         *  transaction,
+         *  transactionToWatch,
+         *  confirmations
+         * })
+         */
+      }
+    }
+
+    /**
+     * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
+     *
+     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+     * @param  {String} transactionToWatch the hex transaction id of the transaction to watch for confirmation
+     * before broadcasting the zone file to the Atlas network
+     * @return {Promise} returns a Promise that resolves if the request
+     * is accepted by the transaction broadcast service and rejects
+     * if the service responds with an error or is unreachable
+     */
+
+  }, {
+    key: 'broadcastZoneFile',
+    value: function broadcastZoneFile(zoneFile) {
+      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    }
+    /*
+     * POST /v1/broadcastZoneFile
+     * Request body:
+     * JSON.stringify({
+     *  zoneFile,
+     *  transactionToWatch
+     * })
+     */
+
+
+    /**
+     * Sends the preorder and registration transactions and zone file
+     * for a Blockstack name registration
+     * along with the to the transaction broadcast service.
+     *
+     * The transaction broadcast:
+     *
+     * * immediately broadcasts the preorder transaction
+     * * broadcasts the register transactions after the preorder transaction
+     * has an appropriate number of confirmations
+     * * broadcasts the zone file to the Atlas network after the register transaction
+     * has an appropriate number of confirmations
+     *
+     * @param  {String} preorderTransaction the hex-encoded, signed preorder transaction generated
+     * using the `makePreorder` function
+     * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
+     * using the `makeRegister` function
+     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+     * @return {Promise} returns a Promise that resolves if the request
+     * is accepted by the transaction broadcast service and rejects if the service
+     * responds with an error or is unreachable
+     */
+
+  }, {
+    key: 'broadcastNameRegistration',
+    value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
+
+      /*
+       * POST /v1/broadcastNameRegistration
+       * Request body:
+       * JSON.stringify({
+       * preorderTransaction,
+       * registerTransaction,
+       * zoneFile
+       * })
+       */
     }
   }, {
     key: 'getTransactionInfo',
@@ -3149,12 +3244,12 @@ var _profileZoneFiles = require('./profileZoneFiles');
  * Look up a user profile by blockstack ID
  *
  * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
  * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
 function lookupProfile(username) {
-  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'http://localhost:6270/v1/names/';
+  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
 
   return new Promise(function (resolve, reject) {
     if (!username) {

@@ -5498,7 +5498,7 @@
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       },
       {
         "title": "returns",
@@ -5661,7 +5661,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       }
     ],
     "properties": [],
@@ -8218,6 +8218,1544 @@
       }
     ],
     "namespace": "verifyAuthResponse"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the\ntransaction until a second transaction has a certain number of confirmations.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 78,
+                  "offset": 168
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 78,
+              "offset": 168
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 78,
+          "offset": 168
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the hex-encoded transaction to broadcast",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "transaction"
+      },
+      {
+        "title": "param",
+        "description": "the hex transaction id of the transaction to watch for\nthe specified number of confirmations before broadcasting the `transaction`",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "name": "transactionToWatch"
+      },
+      {
+        "title": "param",
+        "description": "the number of confirmations `transactionToWatch` must have\nbefore broadcasting `transaction`.",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "name": "confirmations"
+      },
+      {
+        "title": "return",
+        "description": "returns a Promise that resolves if the request\nis accepted by the transaction broadcast service and rejects\nif the service responds with an error or is unreachable",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 106,
+        "column": 2
+      },
+      "end": {
+        "line": 118,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 119,
+          "column": 2
+        },
+        "end": {
+          "line": 152,
+          "column": 3
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "transaction",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex-encoded transaction to broadcast",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        }
+      },
+      {
+        "title": "param",
+        "name": "transactionToWatch",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex transaction id of the transaction to watch for\nthe specified number of confirmations before broadcasting the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 63,
+                      "offset": 117
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 63,
+                      "offset": 117
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 76,
+                      "offset": 130
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 76,
+                  "offset": 130
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 76,
+              "offset": 130
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "confirmations",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the number of confirmations ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transactionToWatch",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " must have\nbefore broadcasting ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 21,
+                      "offset": 79
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 21,
+                      "offset": 79
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 92
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": ".",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 92
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 35,
+                      "offset": 93
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 35,
+                  "offset": 93
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 35,
+              "offset": 93
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "default": "6"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "returns a Promise that resolves if the request\nis accepted by the transaction broadcast service and rejects\nif the service responds with an error or is unreachable",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 56,
+                      "offset": 163
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 56,
+                  "offset": 163
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 56,
+              "offset": 163
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "broadcastTransaction",
+    "kind": "function",
+    "memberof": "BlockstackNetwork",
+    "scope": "instance",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "broadcastTransaction",
+        "kind": "function",
+        "scope": "instance"
+      }
+    ],
+    "namespace": "#broadcastTransaction"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Broadcasts a zone file to the Atlas network via the transaction broadcast service.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 83,
+                  "offset": 82
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 83,
+              "offset": 82
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 83,
+          "offset": 82
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the zone file to be broadcast to the Atlas network",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "zoneFile"
+      },
+      {
+        "title": "param",
+        "description": "the hex transaction id of the transaction to watch for confirmation\nbefore broadcasting the zone file to the Atlas network",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "transactionToWatch"
+      },
+      {
+        "title": "return",
+        "description": "returns a Promise that resolves if the request\nis accepted by the transaction broadcast service and rejects\nif the service responds with an error or is unreachable",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 154,
+        "column": 2
+      },
+      "end": {
+        "line": 163,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 164,
+          "column": 2
+        },
+        "end": {
+          "line": 174,
+          "column": 3
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "zoneFile",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the zone file to be broadcast to the Atlas network",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "transactionToWatch",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex transaction id of the transaction to watch for confirmation\nbefore broadcasting the zone file to the Atlas network",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 55,
+                      "offset": 122
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 55,
+                  "offset": 122
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 55,
+              "offset": 122
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "returns a Promise that resolves if the request\nis accepted by the transaction broadcast service and rejects\nif the service responds with an error or is unreachable",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 56,
+                      "offset": 163
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 56,
+                  "offset": 163
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 56,
+              "offset": 163
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "broadcastZoneFile",
+    "kind": "function",
+    "memberof": "BlockstackNetwork",
+    "scope": "instance",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "broadcastZoneFile",
+        "kind": "function",
+        "scope": "instance"
+      }
+    ],
+    "namespace": "#broadcastZoneFile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Sends the preorder and registration transactions and zone file\nfor a Blockstack name registration\nalong with the to the transaction broadcast service.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 53,
+                  "offset": 150
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 53,
+              "offset": 150
+            },
+            "indent": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "The transaction broadcast:",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 152
+                },
+                "end": {
+                  "line": 5,
+                  "column": 27,
+                  "offset": 178
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 152
+            },
+            "end": {
+              "line": 5,
+              "column": 27,
+              "offset": 178
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "start": null,
+          "loose": false,
+          "children": [
+            {
+              "type": "listItem",
+              "loose": false,
+              "checked": null,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "immediately broadcasts the preorder transaction",
+                      "position": {
+                        "start": {
+                          "line": 7,
+                          "column": 3,
+                          "offset": 182
+                        },
+                        "end": {
+                          "line": 7,
+                          "column": 50,
+                          "offset": 229
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 3,
+                      "offset": 182
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 50,
+                      "offset": 229
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 1,
+                  "offset": 180
+                },
+                "end": {
+                  "line": 7,
+                  "column": 50,
+                  "offset": 229
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "listItem",
+              "loose": false,
+              "checked": null,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "broadcasts the register transactions after the preorder transaction\nhas an appropriate number of confirmations",
+                      "position": {
+                        "start": {
+                          "line": 8,
+                          "column": 3,
+                          "offset": 232
+                        },
+                        "end": {
+                          "line": 9,
+                          "column": 43,
+                          "offset": 342
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 8,
+                      "column": 3,
+                      "offset": 232
+                    },
+                    "end": {
+                      "line": 9,
+                      "column": 43,
+                      "offset": 342
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 1,
+                  "offset": 230
+                },
+                "end": {
+                  "line": 9,
+                  "column": 43,
+                  "offset": 342
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "listItem",
+              "loose": false,
+              "checked": null,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "broadcasts the zone file to the Atlas network after the register transaction\nhas an appropriate number of confirmations",
+                      "position": {
+                        "start": {
+                          "line": 10,
+                          "column": 3,
+                          "offset": 345
+                        },
+                        "end": {
+                          "line": 11,
+                          "column": 43,
+                          "offset": 464
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 10,
+                      "column": 3,
+                      "offset": 345
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 43,
+                      "offset": 464
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 1,
+                  "offset": 343
+                },
+                "end": {
+                  "line": 11,
+                  "column": 43,
+                  "offset": 464
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 180
+            },
+            "end": {
+              "line": 11,
+              "column": 43,
+              "offset": 464
+            },
+            "indent": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 11,
+          "column": 43,
+          "offset": 464
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the hex-encoded, signed preorder transaction generated\nusing the `makePreorder` function",
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "preorderTransaction"
+      },
+      {
+        "title": "param",
+        "description": "the hex-encoded, signed register transaction generated\nusing the `makeRegister` function",
+        "lineNumber": 15,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "registerTransaction"
+      },
+      {
+        "title": "param",
+        "description": "the zone file to be broadcast to the Atlas network",
+        "lineNumber": 17,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "zoneFile"
+      },
+      {
+        "title": "return",
+        "description": "returns a Promise that resolves if the request\nis accepted by the transaction broadcast service and rejects if the service\nresponds with an error or is unreachable",
+        "lineNumber": 18,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 176,
+        "column": 2
+      },
+      "end": {
+        "line": 197,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 198,
+          "column": 2
+        },
+        "end": {
+          "line": 211,
+          "column": 3
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "preorderTransaction",
+        "lineNumber": 13,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex-encoded, signed preorder transaction generated\nusing the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "makePreorder",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " function",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 88
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 34,
+                  "offset": 88
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 34,
+              "offset": 88
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "registerTransaction",
+        "lineNumber": 15,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex-encoded, signed register transaction generated\nusing the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "makeRegister",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " function",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 88
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 34,
+                  "offset": 88
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 34,
+              "offset": 88
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "zoneFile",
+        "lineNumber": 17,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the zone file to be broadcast to the Atlas network",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "returns a Promise that resolves if the request\nis accepted by the transaction broadcast service and rejects if the service\nresponds with an error or is unreachable",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 41,
+                      "offset": 163
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 41,
+                  "offset": 163
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 41,
+              "offset": 163
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "broadcastNameRegistration",
+    "kind": "function",
+    "memberof": "BlockstackNetwork",
+    "scope": "instance",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "broadcastNameRegistration",
+        "kind": "function",
+        "scope": "instance"
+      }
+    ],
+    "namespace": "#broadcastNameRegistration"
   },
   {
     "description": {
