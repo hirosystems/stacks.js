@@ -1,16 +1,24 @@
+/* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
 
 const SATOSHIS_PER_BTC = 1e8
 
-type UTXO = { value: number,
-              confirmations: number,
+type UTXO = { value?: number,
+              confirmations?: number,
               tx_hash: string,
               tx_output_n: number }
 
 class BlockstackNetwork {
+  blockstackAPIUrl: string
+  utxoProviderUrl: string
+  layer1: Object
+  DUST_MINIMUM: number
+  includeUtxoMap: Object
+  excludeUtxoSet: Array<UTXO>
+
   constructor(apiUrl: string, utxoProviderUrl: string,
-              network: ?Object = bitcoinjs.networks.bitcoin) {
+              network: Object = bitcoinjs.networks.bitcoin) {
     this.blockstackAPIUrl = apiUrl
     this.utxoProviderUrl = utxoProviderUrl
     this.layer1 = network
@@ -142,7 +150,9 @@ class BlockstackNetwork {
       .then(resp => {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
-          return []
+          return {
+            unspent_outputs: []
+          }
         } else {
           return resp.json()
         }
@@ -193,7 +203,7 @@ class BlockstackNetwork {
   modifyUTXOSetFrom(txHex: string) {
     const tx = bitcoinjs.Transaction.fromHex(txHex)
 
-    const excludeSet = this.excludeUtxoSet.concat()
+    const excludeSet: Array<UTXO> = this.excludeUtxoSet.concat()
 
     tx.ins.forEach((utxoUsed) => {
       const reverseHash = Buffer.from(utxoUsed.hash)
@@ -256,6 +266,8 @@ class BlockstackNetwork {
 }
 
 class LocalRegtest extends BlockstackNetwork {
+  bitcoindUrl: string
+
   constructor(apiUrl: string, bitcoindUrl: string) {
     super(apiUrl, '', bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
