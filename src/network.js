@@ -12,15 +12,17 @@ type UTXO = { value?: number,
 class BlockstackNetwork {
   blockstackAPIUrl: string
   utxoProviderUrl: string
+  broadcastServiceUrl: string
   layer1: Object
   DUST_MINIMUM: number
   includeUtxoMap: Object
   excludeUtxoSet: Array<UTXO>
 
-  constructor(apiUrl: string, utxoProviderUrl: string,
+  constructor(apiUrl: string, utxoProviderUrl: string, broadcastServiceUrl: string,
               network: Object = bitcoinjs.networks.bitcoin) {
     this.blockstackAPIUrl = apiUrl
     this.utxoProviderUrl = utxoProviderUrl
+    this.broadcastServiceUrl = broadcastServiceUrl
     this.layer1 = network
 
     this.DUST_MINIMUM = 5500
@@ -119,7 +121,6 @@ class BlockstackNetwork {
   broadcastTransaction(transaction: string,
     transactionToWatch: ?string = null,
     confirmations: number = 6) {
-
     if (transactionToWatch === null) {
       const form = new FormData()
       form.append('tx', transaction)
@@ -140,7 +141,7 @@ class BlockstackNetwork {
         })
     } else {
       /*
-       * POST /v1/broadcast
+       * POST /v1/broadcast/transaction
        * Request body:
        * JSON.stringify({
        *  transaction,
@@ -148,6 +149,26 @@ class BlockstackNetwork {
        *  confirmations
        * })
        */
+      const url = `${this.broadcastServiceUrl}/v1/broadcast/transaction`
+
+      const requestHeaders = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+
+      const requestBody = {
+        transaction,
+        transactionToWatch,
+        confirmations
+      }
+
+      const options = {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify(requestBody)
+      }
+
+      return fetch(url, options)
     }
   }
 
@@ -155,8 +176,8 @@ class BlockstackNetwork {
    * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
    *
    * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-   * @param  {String} transactionToWatch the hex transaction id of the transaction to watch for confirmation
-   * before broadcasting the zone file to the Atlas network
+   * @param  {String} transactionToWatch the hex transaction id of the transaction
+   * to watch for confirmation before broadcasting the zone file to the Atlas network
    * @return {Promise} returns a Promise that resolves if the request
    * is accepted by the transaction broadcast service and rejects
    * if the service responds with an error or is unreachable
@@ -164,13 +185,32 @@ class BlockstackNetwork {
   broadcastZoneFile(zoneFile: string,
     transactionToWatch: ?string = null) {
     /*
-     * POST /v1/broadcastZoneFile
+     * POST /v1/broadcast/zone-file
      * Request body:
      * JSON.stringify({
      *  zoneFile,
      *  transactionToWatch
      * })
      */
+    const url = `${this.broadcastServiceUrl}/v1/broadcast/transaction`
+
+    const requestHeaders = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+
+    const requestBody = {
+      zoneFile,
+      transactionToWatch
+    }
+
+    const options = {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify(requestBody)
+    }
+
+    return fetch(url, options)
   }
 
   /**
@@ -198,9 +238,8 @@ class BlockstackNetwork {
   broadcastNameRegistration(preorderTransaction: string,
       registerTransaction: string,
       zoneFile: string) {
-
       /*
-       * POST /v1/broadcastNameRegistration
+       * POST /v1/broadcast/registration
        * Request body:
        * JSON.stringify({
        * preorderTransaction,
@@ -208,6 +247,26 @@ class BlockstackNetwork {
        * zoneFile
        * })
        */
+
+    const url = `${this.broadcastServiceUrl}/v1/broadcast/registration`
+
+    const requestHeaders = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+
+    const requestBody = {
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    }
+
+    const options = {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify(requestBody)
+    }
+    return fetch(url, options)
   }
 
 
@@ -356,8 +415,8 @@ class BlockstackNetwork {
 class LocalRegtest extends BlockstackNetwork {
   bitcoindUrl: string
 
-  constructor(apiUrl: string, bitcoindUrl: string) {
-    super(apiUrl, '', bitcoinjs.networks.testnet)
+  constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string) {
+    super(apiUrl, '', broadcastServiceUrl, bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
   }
 
@@ -424,10 +483,14 @@ class LocalRegtest extends BlockstackNetwork {
 }
 
 const LOCAL_REGTEST = new LocalRegtest(
-  'http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/')
+  'http://localhost:16268',
+  'http://blockstack:blockstacksystem@127.0.0.1:18332/',
+  'http://localhost:16269')
 
 const MAINNET_DEFAULT = new BlockstackNetwork(
-  'https://core.blockstack.org', 'https://blockchain.info')
+  'https://core.blockstack.org',
+  'https://blockchain.info',
+  'https://broadcast.blockstack.org')
 
 export const network = { BlockstackNetwork, LocalRegtest,
                          defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }
