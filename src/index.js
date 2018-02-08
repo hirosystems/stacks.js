@@ -10,6 +10,7 @@ export {
   getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate
 } from './keys'
 export {
-  nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter
+  nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter,
+  isLaterVersion, isSameOriginAbsoluteUrl
 } from './utils'
 export { decodeToken } from 'jsontokens'

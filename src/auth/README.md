@@ -17,7 +17,7 @@ npm install blockstack --save
 2) Import Blockstack into your project
 
 ```js
-import blockstack from 'blockstack'
+import * as blockstack from 'blockstack'
 ```
 
 3) Wire up a sign in button
@@ -48,9 +48,8 @@ function showProfile(profile) {
 }
 
 if (blockstack.isUserSignedIn()) {
-  blockstack.loadUserData(function(userData) {
-    showProfile(userData.profile)
-  })
+  const userData = blockstack.loadUserData()
+  showProfile(userData.profile)
 } else if (blockstack.isSignInPending()) {
   blockstack.handlePendingSignIn(function(userData) {
     window.location = window.location.origin

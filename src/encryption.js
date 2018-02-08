@@ -35,8 +35,24 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
            hmacKey: hashedSecret.slice(32) }
 }
 
+export function getHexFromBN(bnInput: Object) {
+  const hexOut = bnInput.toString('hex')
+
+  if (hexOut.length === 64) {
+    return hexOut
+  } else if (hexOut.length < 64) {
+    // pad with leading zeros
+    // the padStart function would require node 9
+    const padding = '0'.repeat(64 - hexOut.length)
+    return `${padding}${hexOut}`
+  } else {
+    throw new Error('Generated a > 32-byte BN for encryption. Failing.')
+  }
+}
+
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
+ * @private
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
@@ -47,13 +63,16 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
 export function encryptECIES(publicKey: string, content: string | Buffer) {
   const isString = (typeof(content) === 'string')
   const plainText = new Buffer(content) // always copy to buffer
+
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
   const ephemeralPK = ephemeralSK.getPublic()
-
   const sharedSecret = ephemeralSK.derive(ecPK)
+
+  const sharedSecretHex = getHexFromBN(sharedSecret)
+
   const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecret.toString('hex'), 'hex'))
+    new Buffer(sharedSecretHex, 'hex'))
 
   const initializationVector = crypto.randomBytes(16)
 
@@ -74,6 +93,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer) {
 
 /**
  * Decrypt content encrypted using ECIES
+ * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
@@ -85,8 +105,9 @@ export function decryptECIES(privateKey: string, cipherObject: string) {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
   const ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic()
   const sharedSecret = ecSK.derive(ephemeralPK)
-  const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecret.toString('hex'), 'hex'))
+  const sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex')
+
+  const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
   const ivBuffer = new Buffer(cipherObject.iv, 'hex')
   const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')

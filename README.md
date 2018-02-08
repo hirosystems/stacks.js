@@ -8,6 +8,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 -   [Profiles](https://blockstack.github.io/blockstack.js/index.html#profiles)
 -   [Storage](https://blockstack.github.io/blockstack.js/index.html#storage)
 -   [Documentation](#documentation)
+-   [Compatibility](#compatibility)
 -   [Contributing](#contributing)
 -   [Maintainer](#maintainer)
 -   [Testing](#testing)
@@ -16,6 +17,17 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 ## Installation
 
     $ npm install blockstack
+
+### Production usage
+
+**NOTE**: If you uglify your the JavaScript, you'll need to exclude the following variable names from being mangled: `BigInteger`, `ECPair`, `Point`.
+
+This is because of the function-name-duck-typing used in [typeforce](https://github.com/dcousens/typeforce) which is used by the dependency [bitcoinjs-lib](https://github.com/bitcoinjs/bitcoinjs-lib).
+
+Example:
+``` bash
+uglifyjs ... --mangle reserved=['BigInteger','ECPair','Point']
+```
 
 ## About
 
@@ -41,6 +53,10 @@ _Note: this document uses ES6 in its examples but it is compiled down to Javascr
 ## Documentation
 
 [![Documentation](/docs-button.png)](http://blockstack.github.io/blockstack.js/index.html)
+
+## Compatibility
+
+_Note:_ blockstack.js 0.14.0 and newer versions use a new on-disk format that is not backward compatible with prior versions.
 
 ## Contributing
 

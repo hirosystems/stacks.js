@@ -26,10 +26,23 @@ version. These features will be rolled out in future updates._
  });
 ```
 
+## Deleting a file
+
+```JavaScript
+ blockstack.deleteFile("/hello.txt")
+ .then(() => {
+    // /hello.txt is now removed.
+ })
+```
+
 ## Creating an encrypted file
 
 ```JavaScript
- blockstack.putFile("/message.txt", "Secret hello!", true)
+ let options = { 
+   encrypt: true 
+ }
+
+ blockstack.putFile("/message.txt", "Secret hello!", options)
  .then(() => {
     // message.txt exists now, and has the contents "hello world!".
  })
@@ -38,9 +51,30 @@ version. These features will be rolled out in future updates._
 ## Reading an encrypted file
 
 ```JavaScript
- blockstack.getFile("/message.txt", true)
+ let options = { 
+   decrypt: true 
+ }
+
+ blockstack.getFile("/message.txt", options)
  .then((fileContents) => {
     // get & decrypt the contents of the file /message.txt
     assert(fileContents === "Secret hello!")
+ });
+```
+
+## Reading another user's unencrypted file
+In order for files to be publicly readable, the app must request 
+the `publish_data` scope during authentication.
+
+```JavaScript
+ let options = { 
+   user: 'ryan.id', // the Blockstack ID of the user for which to lookup the file
+   app: 'http://BlockstackApp.com' // origin of the app this file is stored for
+ }
+
+ blockstack.getFile("/message.txt", options)
+ .then((fileContents) => {
+    // get the contents of the file /message.txt
+    assert(fileContents === "hello world!")
  });
 ```
