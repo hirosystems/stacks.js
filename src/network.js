@@ -484,9 +484,11 @@ class BlockstackNetwork {
 class LocalRegtest extends BlockstackNetwork {
   bitcoindUrl: string
 
-  constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string) {
+  constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string,
+    bitcoindCredentials: ?Object = null) {
     super(apiUrl, '', broadcastServiceUrl, bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
+    this.bitcoindCredentials = bitcoindCredentials
   }
 
   getFeeRate() : Promise<number> {
@@ -497,7 +499,12 @@ class LocalRegtest extends BlockstackNetwork {
     const jsonRPC = { jsonrpc: '1.0',
                       method: 'sendrawtransaction',
                       params: [transaction] }
-    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+    const authString = 
+      btoa(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    return fetch(this.bitcoindUrl, { method: 'POST', 
+                                      body: JSON.stringify(jsonRPC), 
+                                      headers })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
   }
@@ -505,7 +512,12 @@ class LocalRegtest extends BlockstackNetwork {
   getBlockHeight() {
     const jsonRPC = { jsonrpc: '1.0',
                       method: 'getblockcount' }
-    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+    const authString = 
+      btoa(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    return fetch(this.bitcoindUrl, { method: 'POST', 
+                                      body: JSON.stringify(jsonRPC), 
+                                      headers })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
   }
@@ -514,7 +526,12 @@ class LocalRegtest extends BlockstackNetwork {
     const jsonRPC = { jsonrpc: '1.0',
                       method: 'gettransaction',
                       params: [txHash] }
-    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) })
+    const authString = 
+      btoa(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    return fetch(this.bitcoindUrl, { method: 'POST', 
+                                      body: JSON.stringify(jsonRPC), 
+                                      headers })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
       .then(txInfo => txInfo.blockhash)
@@ -522,8 +539,10 @@ class LocalRegtest extends BlockstackNetwork {
         const jsonRPCBlock = { jsonrpc: '1.0',
                                method: 'getblockheader',
                                params: [blockhash] }
+        headers.append('Authorization', `Basic ${authString}`)
         return fetch(this.bitcoindUrl, { method: 'POST',
-                                         body: JSON.stringify(jsonRPCBlock) })
+                                         body: JSON.stringify(jsonRPCBlock), 
+                                         headers })
       })
       .then(resp => resp.json())
       .then(respObj => ({ block_height: respObj.result.height }))
@@ -536,9 +555,16 @@ class LocalRegtest extends BlockstackNetwork {
     const jsonRPCUnspent = { jsonrpc: '1.0',
                              method: 'listunspent',
                              params: [1, 9999999, [address]] }
+    const authString = 
+      btoa(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+    const headers = new Headers({ Authorization: `Basic ${authString}` })
 
-    return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCImport) })
-      .then(() => fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCUnspent) }))
+    return fetch(this.bitcoindUrl, { method: 'POST', 
+                                      body: JSON.stringify(jsonRPCImport), 
+                                      headers })
+      .then(() => fetch(this.bitcoindUrl, { method: 'POST', 
+                                            body: JSON.stringify(jsonRPCUnspent), 
+                                            headers }))
       .then(resp => resp.json())
       .then(x => x.result)
       .then(utxos => utxos.map(
@@ -554,7 +580,8 @@ class LocalRegtest extends BlockstackNetwork {
 const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
   'http://blockstack:blockstacksystem@127.0.0.1:18332/',
-  'http://localhost:16269')
+  'http://localhost:16269',
+  { username: 'blockstack', password: 'blockstacksystem' })
 
 const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org',

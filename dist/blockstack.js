@@ -1277,115 +1277,47 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ERROR_CODES = exports.ERROR_CODES = {
-  MISSING_PARAMETER: 'missing_parameter',
-  REMOTE_SERVICE_ERROR: 'remote_service_error',
-  UNKNOWN: 'unknown'
-};
+var MissingParametersError = exports.MissingParametersError = function (_Error) {
+  _inherits(MissingParametersError, _Error);
 
-Object.freeze(ERROR_CODES);
+  function MissingParametersError() {
+    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
-var BlockstackError = exports.BlockstackError = function (_Error) {
-  _inherits(BlockstackError, _Error);
+    _classCallCheck(this, MissingParametersError);
 
-  function BlockstackError(error) {
-    _classCallCheck(this, BlockstackError);
+    var _this = _possibleConstructorReturn(this, (MissingParametersError.__proto__ || Object.getPrototypeOf(MissingParametersError)).call(this));
 
-    var _this = _possibleConstructorReturn(this, (BlockstackError.__proto__ || Object.getPrototypeOf(BlockstackError)).call(this, error.message));
-
-    _this.code = error.code;
-    _this.parameter = error.parameter ? error.parameter : null;
+    _this.name = 'MissingParametersError';
+    _this.message = message;
     return _this;
   }
 
-  _createClass(BlockstackError, [{
-    key: 'toString',
-    value: function toString() {
-      return _get(BlockstackError.prototype.__proto__ || Object.getPrototypeOf(BlockstackError.prototype), 'toString', this).call(this) + '\n    code: ' + this.code + ' param: ' + (this.parameter ? this.parameter : 'n/a');
-    }
-  }]);
-
-  return BlockstackError;
+  return MissingParametersError;
 }(Error);
 
-var InvalidParameterError = exports.InvalidParameterError = function (_BlockstackError) {
-  _inherits(InvalidParameterError, _BlockstackError);
-
-  function InvalidParameterError(parameter) {
-    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-    _classCallCheck(this, InvalidParameterError);
-
-    var _this2 = _possibleConstructorReturn(this, (InvalidParameterError.__proto__ || Object.getPrototypeOf(InvalidParameterError)).call(this, { code: 'missing_parameter', message: message, parameter: '' }));
-
-    _this2.name = 'MissingParametersError';
-    return _this2;
-  }
-
-  return InvalidParameterError;
-}(BlockstackError);
-
-var MissingParameterError = exports.MissingParameterError = function (_BlockstackError2) {
-  _inherits(MissingParameterError, _BlockstackError2);
-
-  function MissingParameterError(parameter) {
-    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-    _classCallCheck(this, MissingParameterError);
-
-    var _this3 = _possibleConstructorReturn(this, (MissingParameterError.__proto__ || Object.getPrototypeOf(MissingParameterError)).call(this, { code: ERROR_CODES.MISSING_PARAMETER, message: message, parameter: parameter }));
-
-    _this3.name = 'MissingParametersError';
-    return _this3;
-  }
-
-  return MissingParameterError;
-}(BlockstackError);
-
-var RemoteServiceError = exports.RemoteServiceError = function (_BlockstackError3) {
-  _inherits(RemoteServiceError, _BlockstackError3);
-
-  function RemoteServiceError(response) {
-    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-    _classCallCheck(this, RemoteServiceError);
-
-    var _this4 = _possibleConstructorReturn(this, (RemoteServiceError.__proto__ || Object.getPrototypeOf(RemoteServiceError)).call(this, { code: ERROR_CODES.REMOTE_SERVICE_ERROR, message: message }));
-
-    _this4.response = response;
-    return _this4;
-  }
-
-  return RemoteServiceError;
-}(BlockstackError);
-
-var InvalidDIDError = exports.InvalidDIDError = function (_BlockstackError4) {
-  _inherits(InvalidDIDError, _BlockstackError4);
+var InvalidDIDError = exports.InvalidDIDError = function (_Error2) {
+  _inherits(InvalidDIDError, _Error2);
 
   function InvalidDIDError() {
     var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
     _classCallCheck(this, InvalidDIDError);
 
-    var _this5 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this, { code: 'invalid_did_error', message: message, param: '' }));
+    var _this2 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this));
 
-    _this5.name = 'InvalidDIDError';
-    _this5.message = message;
-    return _this5;
+    _this2.name = 'InvalidDIDError';
+    _this2.message = message;
+    return _this2;
   }
 
   return InvalidDIDError;
-}(BlockstackError);
+}(Error);
 },{}],12:[function(require,module,exports){
 'use strict';
 
@@ -1651,8 +1583,6 @@ var _formData = require('form-data');
 
 var _formData2 = _interopRequireDefault(_formData);
 
-var _errors = require('./errors');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -1662,19 +1592,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SATOSHIS_PER_BTC = 1e8;
-var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
-var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
-var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
 
 var BlockstackNetwork = function () {
-  function BlockstackNetwork(apiUrl, utxoProviderUrl, broadcastServiceUrl) {
-    var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.networks.bitcoin;
+  function BlockstackNetwork(apiUrl, utxoProviderUrl) {
+    var network = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _bitcoinjsLib2.default.networks.bitcoin;
 
     _classCallCheck(this, BlockstackNetwork);
 
     this.blockstackAPIUrl = apiUrl;
     this.utxoProviderUrl = utxoProviderUrl;
-    this.broadcastServiceUrl = broadcastServiceUrl;
     this.layer1 = network;
 
     this.DUST_MINIMUM = 5500;
@@ -1774,252 +1700,22 @@ var BlockstackNetwork = function () {
         }
       });
     }
-
-    /**
-     * Performs a POST request to the given URL
-     * @param  {String} endpoint  the name of
-     * @param  {String} body [description]
-     * @return {Promise<Object|Error>} Returns a `Promise` that resolves to the object requested.
-     * In the event of an error, it rejects with:
-     * * a `RemoteServiceError` if there is a problem
-     * with the transaction broadcast service
-     * * `MissingParameterError` if you call the function without a required
-     * parameter
-     *
-     * @private
-     */
-
-  }, {
-    key: 'broadcastServiceFetchHelper',
-    value: function broadcastServiceFetchHelper(endpoint, body) {
-      var requestHeaders = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      };
-
-      var options = {
-        method: 'POST',
-        headers: requestHeaders,
-        body: JSON.stringify(body)
-      };
-
-      var url = this.broadcastServiceUrl + '/v1/broadcast/' + endpoint;
-      return fetch(url, options).then(function (response) {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new _errors.RemoteServiceError(response);
-        }
-      });
-    }
-
-    /**
-    * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
-    * transaction until a second transaction has a certain number of confirmations.
-    *
-    * @param  {string} transaction the hex-encoded transaction to broadcast
-    * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
-    * the specified number of confirmations before broadcasting the `transaction`
-    * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
-    * before broadcasting `transaction`.
-    * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
-    * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
-    *
-    * In the event of an error, it rejects with:
-    * * a `RemoteServiceError` if there is a problem
-    *   with the transaction broadcast service
-    * * `MissingParameterError` if you call the function without a required
-    *   parameter
-    */
-
   }, {
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
-      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      var confirmations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 6;
-
-      if (!transaction) {
-        var error = new _errors.MissingParameterError('transaction');
-        return Promise.reject(error);
-      }
-
-      if (!confirmations && confirmations !== 0) {
-        var _error = new _errors.MissingParameterError('confirmations');
-        return Promise.reject(_error);
-      }
-
-      if (transactionToWatch === null) {
-        var form = new _formData2.default();
-        form.append('tx', transaction);
-        return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
-          body: form }).then(function (resp) {
-          var text = resp.text();
-          return text.then(function (respText) {
-            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-              var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
-              return txHash;
-            } else {
-              throw new _errors.RemoteServiceError(resp, 'Broadcast transaction failed with message: ' + respText);
-            }
-          });
-        });
-      } else {
-        /*
-         * POST /v1/broadcast/transaction
-         * Request body:
-         * JSON.stringify({
-         *  transaction,
-         *  transactionToWatch,
-         *  confirmations
-         * })
-         */
-        var endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT;
-
-        var requestBody = {
-          transaction: transaction,
-          transactionToWatch: transactionToWatch,
-          confirmations: confirmations
-        };
-
-        return this.broadcastServiceFetchHelper(endpoint, requestBody);
-      }
-    }
-
-    /**
-     * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
-     *
-     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-     * @param  {String} transactionToWatch the hex transaction id of the transaction
-     * to watch for confirmation before broadcasting the zone file to the Atlas network
-     * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
-     * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
-     *
-     * In the event of an error, it rejects with:
-     * * a `RemoteServiceError` if there is a problem
-     *   with the transaction broadcast service
-     * * `MissingParameterError` if you call the function without a required
-     *   parameter
-     */
-
-  }, {
-    key: 'broadcastZoneFile',
-    value: function broadcastZoneFile(zoneFile) {
-      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (!zoneFile) {
-        return Promise.reject(new _errors.MissingParameterError('zoneFile'));
-      }
-
-      // TODO: validate zonefile
-
-      if (transactionToWatch) {
-        // broadcast via transaction broadcast service
-
-        /*
-         * POST /v1/broadcast/zone-file
-         * Request body:
-         * JSON.stringify({
-         *  zoneFile,
-         *  transactionToWatch
-         * })
-         */
-
-        var requestBody = {
-          zoneFile: zoneFile,
-          transactionToWatch: transactionToWatch
-        };
-
-        var endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT;
-
-        return this.broadcastServiceFetchHelper(endpoint, requestBody);
-      } else {
-        // broadcast via core endpoint
-
-        // zone file is two words but core's api treats it as one word 'zonefile'
-        var _requestBody = { zonefile: zoneFile };
-
-        return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
-          body: JSON.stringify(_requestBody),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(function (resp) {
-          var json = resp.json();
-          return json.then(function (respObj) {
-            if (respObj.hasOwnProperty('error')) {
-              throw new _errors.RemoteServiceError(resp);
-            }
-            return respObj.servers;
-          });
-        });
-      }
-    }
-
-    /**
-     * Sends the preorder and registration transactions and zone file
-     * for a Blockstack name registration
-     * along with the to the transaction broadcast service.
-     *
-     * The transaction broadcast:
-     *
-     * * immediately broadcasts the preorder transaction
-     * * broadcasts the register transactions after the preorder transaction
-     * has an appropriate number of confirmations
-     * * broadcasts the zone file to the Atlas network after the register transaction
-     * has an appropriate number of confirmations
-     *
-     * @param  {String} preorderTransaction the hex-encoded, signed preorder transaction generated
-     * using the `makePreorder` function
-     * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
-     * using the `makeRegister` function
-     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-     * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
-     * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
-     *
-     * In the event of an error, it rejects with:
-     * * a `RemoteServiceError` if there is a problem
-     *   with the transaction broadcast service
-     * * `MissingParameterError` if you call the function without a required
-     *   parameter
-     */
-
-  }, {
-    key: 'broadcastNameRegistration',
-    value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
-      /*
-       * POST /v1/broadcast/registration
-       * Request body:
-       * JSON.stringify({
-       * preorderTransaction,
-       * registerTransaction,
-       * zoneFile
-       * })
-       */
-
-      if (!preorderTransaction) {
-        var error = new _errors.MissingParameterError('preorderTransaction');
-        return Promise.reject(error);
-      }
-
-      if (!registerTransaction) {
-        var _error2 = new _errors.MissingParameterError('registerTransaction');
-        return Promise.reject(_error2);
-      }
-
-      if (!zoneFile) {
-        var _error3 = new _errors.MissingParameterError('zoneFile');
-        return Promise.reject(_error3);
-      }
-
-      var requestBody = {
-        preorderTransaction: preorderTransaction,
-        registerTransaction: registerTransaction,
-        zoneFile: zoneFile
-      };
-
-      var endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT;
-
-      return this.broadcastServiceFetchHelper(endpoint, requestBody);
+      var form = new _formData2.default();
+      form.append('tx', transaction);
+      return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
+        body: form }).then(function (resp) {
+        return resp.text();
+      }).then(function (respText) {
+        if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+          var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
+          return txHash;
+        } else {
+          throw new Error('Broadcast transaction failed with message: ' + respText);
+        }
+      });
     }
   }, {
     key: 'getTransactionInfo',
@@ -2054,9 +1750,7 @@ var BlockstackNetwork = function () {
       return fetch(this.utxoProviderUrl + '/unspent?format=json&active=' + address).then(function (resp) {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []');
-          return {
-            unspent_outputs: []
-          };
+          return [];
         } else {
           return resp.json();
         }
@@ -2150,6 +1844,24 @@ var BlockstackNetwork = function () {
       this.excludeUtxoSet = [];
     }
   }, {
+    key: 'publishZonefile',
+    value: function publishZonefile(zonefile) {
+      var arg = { zonefile: zonefile };
+      return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
+        body: JSON.stringify(arg),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (respObj) {
+        if (respObj.hasOwnProperty('error')) {
+          throw new Error(respObj.error);
+        }
+        return respObj.servers;
+      });
+    }
+  }, {
     key: 'getConsensusHash',
     value: function getConsensusHash() {
       return fetch(this.blockstackAPIUrl + '/v1/blockchains/bitcoin/consensus').then(function (resp) {
@@ -2166,12 +1878,15 @@ var BlockstackNetwork = function () {
 var LocalRegtest = function (_BlockstackNetwork) {
   _inherits(LocalRegtest, _BlockstackNetwork);
 
-  function LocalRegtest(apiUrl, bitcoindUrl, broadcastServiceUrl) {
+  function LocalRegtest(apiUrl, bitcoindUrl) {
+    var bitcoindCredentials = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
     _classCallCheck(this, LocalRegtest);
 
-    var _this5 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', broadcastServiceUrl, _bitcoinjsLib2.default.networks.testnet));
+    var _this5 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', _bitcoinjsLib2.default.networks.testnet));
 
     _this5.bitcoindUrl = bitcoindUrl;
+    _this5.bitcoindCredentials = bitcoindCredentials;
     return _this5;
   }
 
@@ -2186,7 +1901,11 @@ var LocalRegtest = function (_BlockstackNetwork) {
       var jsonRPC = { jsonrpc: '1.0',
         method: 'sendrawtransaction',
         params: [transaction] };
-      return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) }).then(function (resp) {
+      var authString = btoa(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password);
+      var headers = new Headers({ Authorization: 'Basic ' + authString });
+      return fetch(this.bitcoindUrl, { method: 'POST',
+        body: JSON.stringify(jsonRPC),
+        headers: headers }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
         return respObj.result;
@@ -2197,7 +1916,11 @@ var LocalRegtest = function (_BlockstackNetwork) {
     value: function getBlockHeight() {
       var jsonRPC = { jsonrpc: '1.0',
         method: 'getblockcount' };
-      return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) }).then(function (resp) {
+      var authString = btoa(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password);
+      var headers = new Headers({ Authorization: 'Basic ' + authString });
+      return fetch(this.bitcoindUrl, { method: 'POST',
+        body: JSON.stringify(jsonRPC),
+        headers: headers }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
         return respObj.result;
@@ -2211,7 +1934,11 @@ var LocalRegtest = function (_BlockstackNetwork) {
       var jsonRPC = { jsonrpc: '1.0',
         method: 'gettransaction',
         params: [txHash] };
-      return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPC) }).then(function (resp) {
+      var authString = btoa(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password);
+      var headers = new Headers({ Authorization: 'Basic ' + authString });
+      return fetch(this.bitcoindUrl, { method: 'POST',
+        body: JSON.stringify(jsonRPC),
+        headers: headers }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
         return respObj.result;
@@ -2221,8 +1948,10 @@ var LocalRegtest = function (_BlockstackNetwork) {
         var jsonRPCBlock = { jsonrpc: '1.0',
           method: 'getblockheader',
           params: [blockhash] };
+        headers.append('Authorization', 'Basic ' + authString);
         return fetch(_this6.bitcoindUrl, { method: 'POST',
-          body: JSON.stringify(jsonRPCBlock) });
+          body: JSON.stringify(jsonRPCBlock),
+          headers: headers });
       }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
@@ -2240,9 +1969,15 @@ var LocalRegtest = function (_BlockstackNetwork) {
       var jsonRPCUnspent = { jsonrpc: '1.0',
         method: 'listunspent',
         params: [1, 9999999, [address]] };
+      var authString = btoa(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password);
+      var headers = new Headers({ Authorization: 'Basic ' + authString });
 
-      return fetch(this.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCImport) }).then(function () {
-        return fetch(_this7.bitcoindUrl, { method: 'POST', body: JSON.stringify(jsonRPCUnspent) });
+      return fetch(this.bitcoindUrl, { method: 'POST',
+        body: JSON.stringify(jsonRPCImport),
+        headers: headers }).then(function () {
+        return fetch(_this7.bitcoindUrl, { method: 'POST',
+          body: JSON.stringify(jsonRPCUnspent),
+          headers: headers });
       }).then(function (resp) {
         return resp.json();
       }).then(function (x) {
@@ -2261,14 +1996,14 @@ var LocalRegtest = function (_BlockstackNetwork) {
   return LocalRegtest;
 }(BlockstackNetwork);
 
-var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/', 'http://localhost:16269');
+var LOCAL_REGTEST = new LocalRegtest('http://localhost:6270', 'http://localhost:18332/', { username: 'blockstack', password: 'blockstacksystem' });
 
-var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info', 'https://broadcast.blockstack.org');
+var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info');
 
 var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };
 }).call(this,require("buffer").Buffer)
-},{"./errors":11,"bitcoinjs-lib":86,"buffer":142,"form-data":300}],15:[function(require,module,exports){
+},{"bitcoinjs-lib":86,"buffer":142,"form-data":300}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3435,12 +3170,12 @@ var _profileZoneFiles = require('./profileZoneFiles');
  * Look up a user profile by blockstack ID
  *
  * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
+ * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
  * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
 function lookupProfile(username) {
-  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
+  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'http://localhost:6270/v1/names/';
 
   return new Promise(function (resolve, reject) {
     if (!username) {
@@ -5708,7 +5443,6 @@ function updateQueryStringParameter(uri, key, value) {
  * @param {string} v1 - the left half of the version inequality
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
- * @private
  */
 function isLaterVersion(v1, v2) {
   var v1tuple = v1.split('.').map(function (x) {
@@ -7411,34 +7145,51 @@ module.exports = BigInteger
 module.exports={
   "_args": [
     [
-      "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      {
+        "raw": "bigi@^1.4.0",
+        "scope": null,
+        "escapedName": "bigi",
+        "name": "bigi",
+        "rawSpec": "^1.4.0",
+        "spec": ">=1.4.0 <2.0.0",
+        "type": "range"
+      },
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/bitcoinjs-lib"
     ]
   ],
-  "_from": "bigi@1.4.2",
+  "_from": "bigi@>=1.4.0 <2.0.0",
   "_id": "bigi@1.4.2",
-  "_inBundle": false,
-  "_integrity": "sha1-nGZalfiLiwj8Bc/XMfVhhZ1yWCU=",
+  "_inCache": true,
   "_location": "/bigi",
+  "_nodeVersion": "6.1.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/bigi-1.4.2.tgz_1469584192413_0.6801238611806184"
+  },
+  "_npmUser": {
+    "name": "jprichardson",
+    "email": "jprichardson@gmail.com"
+  },
+  "_npmVersion": "3.8.6",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "bigi@1.4.2",
-    "name": "bigi",
+    "raw": "bigi@^1.4.0",
+    "scope": null,
     "escapedName": "bigi",
-    "rawSpec": "1.4.2",
-    "saveSpec": null,
-    "fetchSpec": "1.4.2"
+    "name": "bigi",
+    "rawSpec": "^1.4.0",
+    "spec": ">=1.4.0 <2.0.0",
+    "type": "range"
   },
   "_requiredBy": [
-    "/",
     "/bitcoinjs-lib",
     "/ecurve"
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
-  "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+  "_shrinkwrap": null,
+  "_spec": "bigi@^1.4.0",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/bitcoinjs-lib",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -7451,6 +7202,12 @@ module.exports={
     "mocha": "^2.1.0",
     "mochify": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+    "tarball": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz"
+  },
+  "gitHead": "c25308081c896ff84702303722bf5ecd8b3f78e3",
   "homepage": "https://github.com/cryptocoinjs/bigi#readme",
   "keywords": [
     "cryptography",
@@ -7470,7 +7227,27 @@ module.exports={
     "float"
   ],
   "main": "./lib/index.js",
+  "maintainers": [
+    {
+      "name": "midnightlightning",
+      "email": "boydb@midnightdesign.ws"
+    },
+    {
+      "name": "sidazhang",
+      "email": "sidazhang89@gmail.com"
+    },
+    {
+      "name": "nadav",
+      "email": "npm@shesek.info"
+    },
+    {
+      "name": "jprichardson",
+      "email": "jprichardson@gmail.com"
+    }
+  ],
   "name": "bigi",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "url": "git+https://github.com/cryptocoinjs/bigi.git",
     "type": "git"
@@ -31237,29 +31014,53 @@ exports.isHtml = function(str) {
 
 },{"./parse":227,"dom-serializer":240}],230:[function(require,module,exports){
 module.exports={
-  "_from": "cheerio@^0.22.0",
+  "_args": [
+    [
+      {
+        "raw": "cheerio@0.22.0",
+        "scope": null,
+        "escapedName": "cheerio",
+        "name": "cheerio",
+        "rawSpec": "0.22.0",
+        "spec": "0.22.0",
+        "type": "version"
+      },
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+    ]
+  ],
+  "_from": "cheerio@0.22.0",
   "_id": "cheerio@0.22.0",
-  "_inBundle": false,
-  "_integrity": "sha1-qbqoYKP5tZWmuBsahocxIe06Jp4=",
+  "_inCache": true,
   "_location": "/cheerio",
+  "_nodeVersion": "6.2.2",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/cheerio-0.22.0.tgz_1471954900169_0.12557715992443264"
+  },
+  "_npmUser": {
+    "name": "mattmueller",
+    "email": "mattmuelle@gmail.com"
+  },
+  "_npmVersion": "3.10.6",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
-    "registry": true,
-    "raw": "cheerio@^0.22.0",
-    "name": "cheerio",
+    "raw": "cheerio@0.22.0",
+    "scope": null,
     "escapedName": "cheerio",
-    "rawSpec": "^0.22.0",
-    "saveSpec": null,
-    "fetchSpec": "^0.22.0"
+    "name": "cheerio",
+    "rawSpec": "0.22.0",
+    "spec": "0.22.0",
+    "type": "version"
   },
   "_requiredBy": [
+    "#USER",
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
-  "_spec": "cheerio@^0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_shrinkwrap": null,
+  "_spec": "cheerio@0.22.0",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -31268,7 +31069,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/cheeriojs/cheerio/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "css-select": "~1.2.0",
     "dom-serializer": "~0.1.0",
@@ -31287,7 +31087,6 @@ module.exports={
     "lodash.reject": "^4.4.0",
     "lodash.some": "^4.4.0"
   },
-  "deprecated": false,
   "description": "Tiny, fast, and elegant implementation of core jQuery designed specifically for the server",
   "devDependencies": {
     "benchmark": "^2.1.0",
@@ -31300,6 +31099,11 @@ module.exports={
     "mocha": "^2.5.3",
     "xyz": "~0.5.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
+    "tarball": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz"
+  },
   "engines": {
     "node": ">= 0.6"
   },
@@ -31307,6 +31111,7 @@ module.exports={
     "index.js",
     "lib"
   ],
+  "gitHead": "35c4917205dca9d08139c95419e2626c0689e38a",
   "homepage": "https://github.com/cheeriojs/cheerio#readme",
   "keywords": [
     "htmlparser",
@@ -31318,7 +31123,27 @@ module.exports={
   ],
   "license": "MIT",
   "main": "./index.js",
+  "maintainers": [
+    {
+      "name": "mattmueller",
+      "email": "mattmuelle@gmail.com"
+    },
+    {
+      "name": "davidchambers",
+      "email": "dc@davidchambers.me"
+    },
+    {
+      "name": "jugglinmike",
+      "email": "mike@mikepennisi.com"
+    },
+    {
+      "name": "feedic",
+      "email": "me@feedic.com"
+    }
+  ],
   "name": "cheerio",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git://github.com/cheeriojs/cheerio.git"
@@ -39485,33 +39310,56 @@ utils.encode = function encode(arr, enc) {
 
 },{}],291:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.4.0",
+  "_args": [
+    [
+      {
+        "raw": "elliptic@^6.4.0",
+        "scope": null,
+        "escapedName": "elliptic",
+        "name": "elliptic",
+        "rawSpec": "^6.4.0",
+        "spec": ">=6.4.0 <7.0.0",
+        "type": "range"
+      },
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+    ]
+  ],
+  "_from": "elliptic@>=6.4.0 <7.0.0",
   "_id": "elliptic@6.4.0",
-  "_inBundle": false,
-  "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
+  "_inCache": true,
   "_location": "/elliptic",
+  "_nodeVersion": "7.0.0",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/elliptic-6.4.0.tgz_1487798866428_0.30510620190761983"
+  },
+  "_npmUser": {
+    "name": "indutny",
+    "email": "fedor@indutny.com"
+  },
+  "_npmVersion": "3.10.8",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
-    "registry": true,
     "raw": "elliptic@^6.4.0",
-    "name": "elliptic",
+    "scope": null,
     "escapedName": "elliptic",
+    "name": "elliptic",
     "rawSpec": "^6.4.0",
-    "saveSpec": null,
-    "fetchSpec": "^6.4.0"
+    "spec": ">=6.4.0 <7.0.0",
+    "type": "range"
   },
   "_requiredBy": [
     "/",
     "/blockstack-storage",
-    "/browserify/browserify-sign",
-    "/browserify/create-ecdh",
+    "/browserify-sign",
+    "/create-ecdh",
     "/jsontokens"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+  "_shrinkwrap": null,
   "_spec": "elliptic@^6.4.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -39519,7 +39367,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -39529,7 +39376,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -39547,9 +39393,15 @@ module.exports={
     "jshint": "^2.6.0",
     "mocha": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
+    "tarball": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz"
+  },
   "files": [
     "lib"
   ],
+  "gitHead": "6b0d2b76caae91471649c8e21f0b1d3ba0f96090",
   "homepage": "https://github.com/indutny/elliptic",
   "keywords": [
     "EC",
@@ -39559,7 +39411,15 @@ module.exports={
   ],
   "license": "MIT",
   "main": "lib/elliptic.js",
+  "maintainers": [
+    {
+      "name": "indutny",
+      "email": "fedor@indutny.com"
+    }
+  ],
   "name": "elliptic",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/indutny/elliptic.git"
@@ -52072,29 +51932,34 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":373}],390:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^5.1.0",
+  "_args": [
+    [
+      "elliptic@5.2.1",
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+    ]
+  ],
+  "_from": "elliptic@5.2.1",
   "_id": "elliptic@5.2.1",
   "_inBundle": false,
   "_integrity": "sha1-+ilLZWPG3bybo9yFlGh66ECFjxA=",
   "_location": "/jsontokens/key-encoder/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^5.1.0",
+    "raw": "elliptic@5.2.1",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^5.1.0",
+    "rawSpec": "5.2.1",
     "saveSpec": null,
-    "fetchSpec": "^5.1.0"
+    "fetchSpec": "5.2.1"
   },
   "_requiredBy": [
     "/jsontokens/key-encoder"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
-  "_shasum": "fa294b6563c6ddbc9ba3dc8594687ae840858f10",
-  "_spec": "elliptic@^5.1.0",
-  "_where": "/Users/larry/git/blockstack.js/node_modules/jsontokens/node_modules/key-encoder",
+  "_spec": "5.2.1",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -52102,14 +51967,12 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^3.1.1",
     "brorand": "^1.0.1",
     "hash.js": "^1.0.0",
     "inherits": "^2.0.1"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "browserify": "^3.44.2",
