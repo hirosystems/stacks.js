@@ -1996,7 +1996,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
   return LocalRegtest;
 }(BlockstackNetwork);
 
-var LOCAL_REGTEST = new LocalRegtest('http://localhost:6270', 'http://localhost:18332/', { username: 'blockstack', password: 'blockstacksystem' });
+var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:18332/', { username: 'blockstack', password: 'blockstacksystem' });
 
 var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info');
 
