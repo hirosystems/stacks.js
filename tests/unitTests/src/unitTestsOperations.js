@@ -1,6 +1,9 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
+import nock from 'nock'
+
+import { network } from '../../../lib/network'
 
 import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
          hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
@@ -425,6 +428,118 @@ function transactionTests() {
              `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('broadcastTransaction: send via broadcast service with transaction to watch with default confs', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    const transaction = 'abc'
+    const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
+    const confirmations = 6
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
+    {
+      transaction,
+      transactionToWatch,
+      confirmations
+    }).once().reply(202, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
+      transactionToWatch).then(() => {
+        t.assert(nock.isDone())
+    })
+  })
+
+
+  test('broadcastTransaction: send via broadcast service with transaction to watch with custom confs', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    const transaction = 'abc'
+    const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
+    const confirmations = 8
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
+    {
+      transaction,
+      transactionToWatch,
+      confirmations
+    }).once().reply(202, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
+      transactionToWatch, confirmations).then(() => {
+        t.assert(nock.isDone())
+    })
+  })
+
+  test('broadcastTransaction: send immediately via utxo service', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    const transaction = '01000000010470c3139dc0f0882f98d75ae5bf957e68dadd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e000000001976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac01000000000000001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
+    nock.cleanAll()
+    nock('https://blockchain.info').post('/pushtx?cors=true',
+      body => body.includes(transaction)).once()
+      .reply(202, 'transaction submitted')
+
+    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
+    .then(() => {
+      t.assert(nock.isDone())
+    })
+  })
+
+  test('broadcastZoneFile: send via broadcast service with transaction to watch', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
+
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/zone-file',
+    {
+      zoneFile,
+      transactionToWatch
+    }).once().reply(202, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch).then(() => {
+        t.assert(nock.isDone())
+    })
+  })
+
+  test('broadcastZoneFile: send immediately via core atlas endpoint', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+
+    nock.cleanAll()
+    nock('https://core.blockstack.org').post('/v1/zonefile/',
+    {
+      zonefile: zoneFile
+    }).once().reply(202, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile).then(() => {
+        t.assert(nock.isDone())
+    })
+  })
+
+  test('broadcastNameRegistration', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const preorderTransaction = 'abc'
+    const registerTransaction = '123'
+
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/registration',
+    {
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    }).once().reply(202, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
+      registerTransaction, zoneFile)
+    .then(() => {
+      t.assert(nock.isDone())
+    })
   })
 }
 

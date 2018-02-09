@@ -1592,15 +1592,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SATOSHIS_PER_BTC = 1e8;
+var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
+var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
+var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
 
 var BlockstackNetwork = function () {
-  function BlockstackNetwork(apiUrl, utxoProviderUrl) {
-    var network = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _bitcoinjsLib2.default.networks.bitcoin;
+  function BlockstackNetwork(apiUrl, utxoProviderUrl, broadcastServiceUrl) {
+    var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.networks.bitcoin;
 
     _classCallCheck(this, BlockstackNetwork);
 
     this.blockstackAPIUrl = apiUrl;
     this.utxoProviderUrl = utxoProviderUrl;
+    this.broadcastServiceUrl = broadcastServiceUrl;
     this.layer1 = network;
 
     this.DUST_MINIMUM = 5500;
@@ -1702,6 +1706,39 @@ var BlockstackNetwork = function () {
     }
 
     /**
+     * Performs a POST request to the given URL
+     * @param  {String} endpoint  the name of
+     * @param  {String} body [description]
+     * @return {Promise}      [description]
+     * @private
+     */
+
+  }, {
+    key: 'broadcastServiceFetchHelper',
+    value: function broadcastServiceFetchHelper(endpoint, body) {
+      var requestHeaders = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      var options = {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify(body)
+      };
+
+      var url = this.broadcastServiceUrl + '/v1/broadcast/' + endpoint;
+      return fetch(url, options).then(function (response) {
+        var json = response.json();
+        if (response.ok) {
+          return json;
+        } else {
+          return Promise.reject(json);
+        }
+      });
+    }
+
+    /**
      * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
      * transaction until a second transaction has a certain number of confirmations.
      *
@@ -1721,7 +1758,6 @@ var BlockstackNetwork = function () {
       var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       var confirmations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 6;
 
-
       if (transactionToWatch === null) {
         var form = new _formData2.default();
         form.append('tx', transaction);
@@ -1738,7 +1774,7 @@ var BlockstackNetwork = function () {
         });
       } else {
         /*
-         * POST /v1/broadcast
+         * POST /v1/broadcast/transaction
          * Request body:
          * JSON.stringify({
          *  transaction,
@@ -1746,6 +1782,15 @@ var BlockstackNetwork = function () {
          *  confirmations
          * })
          */
+        var endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT;
+
+        var requestBody = {
+          transaction: transaction,
+          transactionToWatch: transactionToWatch,
+          confirmations: confirmations
+        };
+
+        return this.broadcastServiceFetchHelper(endpoint, requestBody);
       }
     }
 
@@ -1753,8 +1798,8 @@ var BlockstackNetwork = function () {
      * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
      *
      * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-     * @param  {String} transactionToWatch the hex transaction id of the transaction to watch for confirmation
-     * before broadcasting the zone file to the Atlas network
+     * @param  {String} transactionToWatch the hex transaction id of the transaction
+     * to watch for confirmation before broadcasting the zone file to the Atlas network
      * @return {Promise} returns a Promise that resolves if the request
      * is accepted by the transaction broadcast service and rejects
      * if the service responds with an error or is unreachable
@@ -1764,16 +1809,48 @@ var BlockstackNetwork = function () {
     key: 'broadcastZoneFile',
     value: function broadcastZoneFile(zoneFile) {
       var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    }
-    /*
-     * POST /v1/broadcastZoneFile
-     * Request body:
-     * JSON.stringify({
-     *  zoneFile,
-     *  transactionToWatch
-     * })
-     */
 
+      if (transactionToWatch) {
+        // broadcast via transaction broadcast service
+
+        /*
+         * POST /v1/broadcast/zone-file
+         * Request body:
+         * JSON.stringify({
+         *  zoneFile,
+         *  transactionToWatch
+         * })
+         */
+
+        var requestBody = {
+          zoneFile: zoneFile,
+          transactionToWatch: transactionToWatch
+        };
+
+        var endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT;
+
+        return this.broadcastServiceFetchHelper(endpoint, requestBody);
+      } else {
+        // broadcast via core endpoint
+
+        // zone file is two words but core's api treats it as one word 'zonefile'
+        var _requestBody = { zonefile: zoneFile };
+
+        return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
+          body: JSON.stringify(_requestBody),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(function (resp) {
+          return resp.json();
+        }).then(function (respObj) {
+          if (respObj.hasOwnProperty('error')) {
+            throw new Error(respObj.error);
+          }
+          return respObj.servers;
+        });
+      }
+    }
 
     /**
      * Sends the preorder and registration transactions and zone file
@@ -1801,9 +1878,8 @@ var BlockstackNetwork = function () {
   }, {
     key: 'broadcastNameRegistration',
     value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
-
       /*
-       * POST /v1/broadcastNameRegistration
+       * POST /v1/broadcast/registration
        * Request body:
        * JSON.stringify({
        * preorderTransaction,
@@ -1811,6 +1887,16 @@ var BlockstackNetwork = function () {
        * zoneFile
        * })
        */
+
+      var requestBody = {
+        preorderTransaction: preorderTransaction,
+        registerTransaction: registerTransaction,
+        zoneFile: zoneFile
+      };
+
+      var endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT;
+
+      return this.broadcastServiceFetchHelper(endpoint, requestBody);
     }
   }, {
     key: 'getTransactionInfo',
@@ -1941,24 +2027,6 @@ var BlockstackNetwork = function () {
       this.excludeUtxoSet = [];
     }
   }, {
-    key: 'publishZonefile',
-    value: function publishZonefile(zonefile) {
-      var arg = { zonefile: zonefile };
-      return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
-        body: JSON.stringify(arg),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(function (resp) {
-        return resp.json();
-      }).then(function (respObj) {
-        if (respObj.hasOwnProperty('error')) {
-          throw new Error(respObj.error);
-        }
-        return respObj.servers;
-      });
-    }
-  }, {
     key: 'getConsensusHash',
     value: function getConsensusHash() {
       return fetch(this.blockstackAPIUrl + '/v1/blockchains/bitcoin/consensus').then(function (resp) {
@@ -1975,10 +2043,10 @@ var BlockstackNetwork = function () {
 var LocalRegtest = function (_BlockstackNetwork) {
   _inherits(LocalRegtest, _BlockstackNetwork);
 
-  function LocalRegtest(apiUrl, bitcoindUrl) {
+  function LocalRegtest(apiUrl, bitcoindUrl, broadcastServiceUrl) {
     _classCallCheck(this, LocalRegtest);
 
-    var _this5 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', _bitcoinjsLib2.default.networks.testnet));
+    var _this5 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', broadcastServiceUrl, _bitcoinjsLib2.default.networks.testnet));
 
     _this5.bitcoindUrl = bitcoindUrl;
     return _this5;
@@ -2070,9 +2138,9 @@ var LocalRegtest = function (_BlockstackNetwork) {
   return LocalRegtest;
 }(BlockstackNetwork);
 
-var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/');
+var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/', 'http://localhost:16269');
 
-var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info');
+var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info', 'https://broadcast.blockstack.org');
 
 var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };

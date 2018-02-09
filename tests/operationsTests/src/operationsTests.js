@@ -82,7 +82,7 @@ export function runIntegrationTests() {
         console.log('REGISTER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => myNet.publishZonefile(zfTest))
+      .then(() => myNet.broadcastZoneFile(zfTest))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
@@ -96,7 +96,7 @@ export function runIntegrationTests() {
         console.log('UPDATE broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => myNet.publishZonefile(zfTest2))
+      .then(() => myNet.broadcastZoneFile(zfTest2))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
@@ -121,7 +121,7 @@ export function runIntegrationTests() {
         console.log('RENEWAL broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => myNet.publishZonefile(renewalZF))
+      .then(() => myNet.broadcastZoneFile(renewalZF))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
       .then(nameInfo => {
@@ -134,4 +134,3 @@ export function runIntegrationTests() {
   })
 
 }
-

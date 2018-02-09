@@ -2,12 +2,17 @@
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
 
-const SATOSHIS_PER_BTC = 1e8
-
 type UTXO = { value?: number,
               confirmations?: number,
               tx_hash: string,
               tx_output_n: number }
+
+const SATOSHIS_PER_BTC = 1e8
+const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
+const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
+const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
+
+
 
 class BlockstackNetwork {
   blockstackAPIUrl: string
@@ -106,6 +111,37 @@ class BlockstackNetwork {
   }
 
   /**
+   * Performs a POST request to the given URL
+   * @param  {String} endpoint  the name of
+   * @param  {String} body [description]
+   * @return {Promise}      [description]
+   * @private
+   */
+  broadcastServiceFetchHelper(endpoint: string, body: Object) {
+    const requestHeaders = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+
+    const options = {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify(body)
+    }
+
+    const url = `${this.broadcastServiceUrl}/v1/broadcast/${endpoint}`
+    return fetch(url, options)
+    .then(response => {
+      const json = response.json()
+      if (response.ok) {
+        return json
+      } else {
+        return Promise.reject(json)
+      }
+    })
+  }
+
+  /**
    * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
    * transaction until a second transaction has a certain number of confirmations.
    *
@@ -149,12 +185,7 @@ class BlockstackNetwork {
        *  confirmations
        * })
        */
-      const url = `${this.broadcastServiceUrl}/v1/broadcast/transaction`
-
-      const requestHeaders = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
+      const endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT
 
       const requestBody = {
         transaction,
@@ -162,13 +193,7 @@ class BlockstackNetwork {
         confirmations
       }
 
-      const options = {
-        method: 'POST',
-        headers: requestHeaders,
-        body: JSON.stringify(requestBody)
-      }
-
-      return fetch(url, options)
+      return this.broadcastServiceFetchHelper(endpoint, requestBody)
     }
   }
 
@@ -184,33 +209,47 @@ class BlockstackNetwork {
    */
   broadcastZoneFile(zoneFile: string,
     transactionToWatch: ?string = null) {
-    /*
-     * POST /v1/broadcast/zone-file
-     * Request body:
-     * JSON.stringify({
-     *  zoneFile,
-     *  transactionToWatch
-     * })
-     */
-    const url = `${this.broadcastServiceUrl}/v1/broadcast/transaction`
+    if (transactionToWatch) {
+      // broadcast via transaction broadcast service
 
-    const requestHeaders = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
+      /*
+       * POST /v1/broadcast/zone-file
+       * Request body:
+       * JSON.stringify({
+       *  zoneFile,
+       *  transactionToWatch
+       * })
+       */
+
+      const requestBody = {
+        zoneFile,
+        transactionToWatch
+      }
+
+      const endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT
+
+      return this.broadcastServiceFetchHelper(endpoint, requestBody)
+    } else {
+      // broadcast via core endpoint
+
+      // zone file is two words but core's api treats it as one word 'zonefile'
+      const requestBody = { zonefile: zoneFile }
+
+      return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
+                   { method: 'POST',
+                     body: JSON.stringify(requestBody),
+                     headers: {
+                       'Content-Type': 'application/json'
+                     }
+                   })
+        .then(resp => resp.json())
+        .then(respObj => {
+          if (respObj.hasOwnProperty('error')) {
+            throw new Error(respObj.error)
+          }
+          return respObj.servers
+        })
     }
-
-    const requestBody = {
-      zoneFile,
-      transactionToWatch
-    }
-
-    const options = {
-      method: 'POST',
-      headers: requestHeaders,
-      body: JSON.stringify(requestBody)
-    }
-
-    return fetch(url, options)
   }
 
   /**
@@ -248,25 +287,15 @@ class BlockstackNetwork {
        * })
        */
 
-    const url = `${this.broadcastServiceUrl}/v1/broadcast/registration`
-
-    const requestHeaders = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    }
-
     const requestBody = {
       preorderTransaction,
       registerTransaction,
       zoneFile
     }
 
-    const options = {
-      method: 'POST',
-      headers: requestHeaders,
-      body: JSON.stringify(requestBody)
-    }
-    return fetch(url, options)
+    const endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT
+
+    return this.broadcastServiceFetchHelper(endpoint, requestBody)
   }
 
 
@@ -385,24 +414,6 @@ class BlockstackNetwork {
   resetUTXOs(address: string) {
     delete this.includeUtxoMap[address]
     this.excludeUtxoSet = []
-  }
-
-  publishZonefile(zonefile: string) {
-    const arg = { zonefile }
-    return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
-                 { method: 'POST',
-                   body: JSON.stringify(arg),
-                   headers: {
-                     'Content-Type': 'application/json'
-                   }
-                 })
-      .then(resp => resp.json())
-      .then(respObj => {
-        if (respObj.hasOwnProperty('error')) {
-          throw new Error(respObj.error)
-        }
-        return respObj.servers
-      })
   }
 
   getConsensusHash() {
