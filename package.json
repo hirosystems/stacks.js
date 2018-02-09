@@ -16,7 +16,7 @@
     "integration-test-ops": "npm run lint && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
     "build": "npm run build-documentation && npm run compile && npm run browserify",
     "flow": "flow",
-    "lint": "eslint src",
+    "lint": "eslint src && eslint tests",
     "test": "nyc --reporter=text npm run unit-test",
     "documentation": "documentation",
     "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"

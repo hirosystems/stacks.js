@@ -1,13 +1,12 @@
 import { exec } from 'child_process'
 import test from 'tape'
-import btc from 'bitcoinjs-lib'
 
 import { transactions, config, network, hexStringToECPair } from '../../../lib'
 
 function pExec(cmd) {
   return new Promise(
     (resolve, reject) => {
-      exec(cmd, function (err, stdout, stderr) {
+      exec(cmd, (err, stdout, stderr) => {
         if (err) {
           reject(err)
         } else {
@@ -18,11 +17,12 @@ function pExec(cmd) {
 }
 
 function initializeBlockstackCore() {
-
   return pExec('docker pull quay.io/blockstack/integrationtests:develop')
     .then(() => {
       console.log('Pulled latest docker image')
-      return pExec('docker stop test-bsk-core ; docker rm test-bsk-core ; rm -rf /tmp/.blockstack_int_test')
+      return pExec(`docker stop test-bsk-core ;
+        docker rm test-bsk-core ;
+        rm -rf /tmp/.blockstack_int_test`)
         .catch(() => true)
     })
     .then(() => pExec('docker run --name test-bsk-core -dt -p 16268:16268 -p 18332:18332 ' +
@@ -128,9 +128,7 @@ export function runIntegrationTests() {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `aaron.id should be owned by ${renewalDestination}`)
-
       })
       .then(() => shutdownBlockstackCore())
   })
-
 }
