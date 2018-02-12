@@ -20,7 +20,7 @@ export class BlockstackError extends Error {
   constructor(error: ErrorType) {
     super(error.message)
     this.code = error.code
-    this.parameter = this.parameter ? this.parameter : null
+    this.parameter = error.parameter ? error.parameter : null
   }
 
   toString() {

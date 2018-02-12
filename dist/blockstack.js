@@ -1304,7 +1304,7 @@ var BlockstackError = exports.BlockstackError = function (_Error) {
     var _this = _possibleConstructorReturn(this, (BlockstackError.__proto__ || Object.getPrototypeOf(BlockstackError)).call(this, error.message));
 
     _this.code = error.code;
-    _this.parameter = _this.parameter ? _this.parameter : null;
+    _this.parameter = error.parameter ? error.parameter : null;
     return _this;
   }
 
@@ -1853,7 +1853,8 @@ var BlockstackNetwork = function () {
         form.append('tx', transaction);
         return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
           body: form }).then(function (resp) {
-          resp.text().then(function (respText) {
+          var text = resp.text();
+          return text.then(function (respText) {
             if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
               var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
               return txHash;
@@ -1943,7 +1944,8 @@ var BlockstackNetwork = function () {
             'Content-Type': 'application/json'
           }
         }).then(function (resp) {
-          resp.json().then(function (respObj) {
+          var json = resp.json();
+          return json.then(function (respObj) {
             if (respObj.hasOwnProperty('error')) {
               throw new _errors.RemoteServiceError(resp);
             }

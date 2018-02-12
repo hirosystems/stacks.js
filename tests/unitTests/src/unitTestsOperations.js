@@ -4,7 +4,6 @@ import btc from 'bitcoinjs-lib'
 import nock from 'nock'
 
 import { network } from '../../../lib/network'
-
 import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
          hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
 
@@ -479,6 +478,32 @@ function transactionTests() {
       })
   })
 
+  test(`broadcastTransaction:
+    rejects with error when broadcast service has a problem`, (t) => {
+    t.plan(3)
+    FetchMock.restore()
+    const transaction = 'abc'
+    const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
+    const confirmations = 6
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
+      {
+        transaction,
+        transactionToWatch,
+        confirmations
+      })
+      .once()
+      .reply(500, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
+      transactionToWatch)
+      .catch((error) => {
+        t.assert(nock.isDone())
+        t.assert(error.response)
+        t.equal(error.code, 'remote_service_error')
+      })
+  })
+
 
   test(`broadcastTransaction:
     send via broadcast service with transaction to watch with custom confs`, (t) => {
@@ -521,6 +546,26 @@ function transactionTests() {
     })
   })
 
+  test('broadcastTransaction: rejects with error when utxo provider has a problem', (t) => {
+    t.plan(3)
+    FetchMock.restore()
+    const transaction = '01000000010470c3139dc0f0882f98d75ae5bf957e68da'
+    + 'dd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e00000000'
+    + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
+    + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
+    nock.cleanAll()
+    nock('https://blockchain.info').post('/pushtx?cors=true',
+      body => body.includes(transaction)).once()
+      .reply(500, 'something else')
+
+    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
+    .catch((error) => {
+      t.assert(nock.isDone())
+      t.assert(error.response)
+      t.equal(error.code, 'remote_service_error')
+    })
+  })
+
   test('broadcastZoneFile: send via broadcast service with transaction to watch', (t) => {
     t.plan(1)
     FetchMock.restore()
@@ -541,6 +586,49 @@ function transactionTests() {
     })
   })
 
+  test('broadcastZoneFile: rejects with error if broadcast service error', (t) => {
+    t.plan(3)
+    FetchMock.restore()
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
+
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/zone-file',
+      {
+        zoneFile,
+        transactionToWatch
+      })
+      .once()
+      .reply(500, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch)
+    .catch((error) => {
+      t.assert(nock.isDone())
+      t.assert(error.response)
+      t.equal(error.code, 'remote_service_error')
+    })
+  })
+
+  test('broadcastZoneFile: rejects with error if core endpoint error', (t) => {
+    t.plan(3)
+    FetchMock.restore()
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+
+    nock.cleanAll()
+    nock('https://core.blockstack.org').post('/v1/zonefile/',
+      {
+        zonefile: zoneFile
+      })
+      .once()
+      .reply(200, { error: 'core indicates an error like this' })
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile)
+    .catch((error) => {
+      t.assert(nock.isDone())
+      t.assert(error.response)
+      t.equal(error.code, 'remote_service_error')
+    })
+  })
+
   test('broadcastZoneFile: send immediately via core atlas endpoint', (t) => {
     t.plan(1)
     FetchMock.restore()
@@ -556,6 +644,19 @@ function transactionTests() {
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile).then(() => {
       t.assert(nock.isDone())
+    })
+  })
+
+  test(`broadcastZoneFile: rejects with missing parameter error when
+     zone file not provided`, (t) => {
+    t.plan(2)
+    FetchMock.restore()
+    nock.cleanAll()
+
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile()
+    .catch((error) => {
+      t.assert(error)
+      t.equal(error.code, 'missing_parameter')
     })
   })
 
@@ -580,6 +681,66 @@ function transactionTests() {
       registerTransaction, zoneFile)
     .then(() => {
       t.assert(nock.isDone())
+    })
+  })
+
+  test('broadcastNameRegistration: reject with error if service replies with error', (t) => {
+    t.plan(3)
+    FetchMock.restore()
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const preorderTransaction = 'abc'
+    const registerTransaction = '123'
+
+    nock.cleanAll()
+    nock('https://broadcast.blockstack.org').post('/v1/broadcast/registration',
+      {
+        preorderTransaction,
+        registerTransaction,
+        zoneFile
+      })
+      .once()
+      .reply(500, {})
+
+    network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
+      registerTransaction, zoneFile)
+    .catch((error) => {
+      t.assert(error)
+      t.assert(error.response)
+      t.equal(error.code, 'remote_service_error')
+    })
+  })
+
+  test(`broadcastNameRegistration: reject with error
+    when transactions or zoneFile not provided`, (t) => {
+    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const preorderTransaction = 'abc'
+    const registerTransaction = '123'
+    t.plan(9)
+    FetchMock.restore()
+    nock.cleanAll()
+
+    network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(undefined,
+      registerTransaction, zoneFile)
+    .catch((error) => {
+      t.assert(error)
+      t.equal(error.code, 'missing_parameter')
+      t.equal(error.parameter, 'preorderTransaction')
+    })
+
+    network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
+      undefined, zoneFile)
+    .catch((error) => {
+      t.assert(error)
+      t.equal(error.code, 'missing_parameter')
+      t.equal(error.parameter, 'registerTransaction')
+    })
+
+    network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
+      registerTransaction, undefined)
+    .catch((error) => {
+      t.assert(error)
+      t.equal(error.code, 'missing_parameter')
+      t.equal(error.parameter, 'zoneFile')
     })
   })
 }

@@ -184,7 +184,8 @@ class BlockstackNetwork {
                    { method: 'POST',
                      body: form })
         .then(resp => {
-          resp.text()
+          const text = resp.text()
+          return text
           .then(respText => {
             if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
               const txHash = bitcoinjs.Transaction.fromHex(transaction)
@@ -277,7 +278,8 @@ class BlockstackNetwork {
                      }
                    })
       .then(resp => {
-        resp.json()
+        const json = resp.json()
+        return json
         .then(respObj => {
           if (respObj.hasOwnProperty('error')) {
             throw new RemoteServiceError(resp)
