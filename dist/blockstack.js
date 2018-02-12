@@ -5708,6 +5708,7 @@ function updateQueryStringParameter(uri, key, value) {
  * @param {string} v1 - the left half of the version inequality
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
+ * @private
  */
 function isLaterVersion(v1, v2) {
   var v1tuple = v1.split('.').map(function (x) {
