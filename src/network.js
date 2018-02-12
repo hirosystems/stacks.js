@@ -2,6 +2,8 @@
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
 
+import { MissingParameterError, RemoteServiceError } from './errors'
+
 type UTXO = { value?: number,
               confirmations?: number,
               tx_hash: string,
@@ -11,8 +13,6 @@ const SATOSHIS_PER_BTC = 1e8
 const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
-
-
 
 class BlockstackNetwork {
   blockstackAPIUrl: string
@@ -114,10 +114,16 @@ class BlockstackNetwork {
    * Performs a POST request to the given URL
    * @param  {String} endpoint  the name of
    * @param  {String} body [description]
-   * @return {Promise}      [description]
+   * @return {Promise<Object|Error>} Returns a `Promise` that resolves to the object requested.
+   * In the event of an error, it rejects with:
+   * * a `RemoteServiceError` if there is a problem
+   * with the transaction broadcast service
+   * * `MissingParameterError` if you call the function without a required
+   * parameter
+   *
    * @private
    */
-  broadcastServiceFetchHelper(endpoint: string, body: Object) {
+  broadcastServiceFetchHelper(endpoint: string, body: Object) : Promise<Object|Error> {
     const requestHeaders = {
       Accept: 'application/json',
       'Content-Type': 'application/json'
@@ -132,48 +138,65 @@ class BlockstackNetwork {
     const url = `${this.broadcastServiceUrl}/v1/broadcast/${endpoint}`
     return fetch(url, options)
     .then(response => {
-      const json = response.json()
       if (response.ok) {
-        return json
+        return response.json()
       } else {
-        return Promise.reject(json)
+        throw new RemoteServiceError(response)
       }
     })
   }
 
   /**
-   * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
-   * transaction until a second transaction has a certain number of confirmations.
-   *
-   * @param  {string} transaction the hex-encoded transaction to broadcast
-   * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
-   * the specified number of confirmations before broadcasting the `transaction`
-   * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
-   * before broadcasting `transaction`.
-   * @return {Promise} returns a Promise that resolves if the request
-   * is accepted by the transaction broadcast service and rejects
-   * if the service responds with an error or is unreachable
-   */
+  * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
+  * transaction until a second transaction has a certain number of confirmations.
+  *
+  * @param  {string} transaction the hex-encoded transaction to broadcast
+  * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
+  * the specified number of confirmations before broadcasting the `transaction`
+  * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
+  * before broadcasting `transaction`.
+  * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+  * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+  *
+  * In the event of an error, it rejects with:
+  * * a `RemoteServiceError` if there is a problem
+  *   with the transaction broadcast service
+  * * `MissingParameterError` if you call the function without a required
+  *   parameter
+  */
   broadcastTransaction(transaction: string,
     transactionToWatch: ?string = null,
     confirmations: number = 6) {
+    if (!transaction) {
+      const error = new MissingParameterError('transaction')
+      return Promise.reject(error)
+    }
+
+    if (!confirmations && confirmations !== 0) {
+      const error = new MissingParameterError('confirmations')
+      return Promise.reject(error)
+    }
+
     if (transactionToWatch === null) {
       const form = new FormData()
       form.append('tx', transaction)
       return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
                    { method: 'POST',
                      body: form })
-        .then(resp => resp.text())
-        .then(respText => {
-          if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-            const txHash = bitcoinjs.Transaction.fromHex(transaction)
-                  .getHash()
-                  .reverse()
-                  .toString('hex') // big_endian
-            return txHash
-          } else {
-            throw new Error(`Broadcast transaction failed with message: ${respText}`)
-          }
+        .then(resp => {
+          resp.text()
+          .then(respText => {
+            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+              const txHash = bitcoinjs.Transaction.fromHex(transaction)
+                    .getHash()
+                    .reverse()
+                    .toString('hex') // big_endian
+              return txHash
+            } else {
+              throw new RemoteServiceError(resp,
+                `Broadcast transaction failed with message: ${respText}`)
+            }
+          })
         })
     } else {
       /*
@@ -203,12 +226,23 @@ class BlockstackNetwork {
    * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
    * @param  {String} transactionToWatch the hex transaction id of the transaction
    * to watch for confirmation before broadcasting the zone file to the Atlas network
-   * @return {Promise} returns a Promise that resolves if the request
-   * is accepted by the transaction broadcast service and rejects
-   * if the service responds with an error or is unreachable
+   * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+   * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+   *
+   * In the event of an error, it rejects with:
+   * * a `RemoteServiceError` if there is a problem
+   *   with the transaction broadcast service
+   * * `MissingParameterError` if you call the function without a required
+   *   parameter
    */
   broadcastZoneFile(zoneFile: string,
     transactionToWatch: ?string = null) {
+    if (!zoneFile) {
+      return Promise.reject(new MissingParameterError('zoneFile'))
+    }
+
+    // TODO: validate zonefile
+
     if (transactionToWatch) {
       // broadcast via transaction broadcast service
 
@@ -242,13 +276,15 @@ class BlockstackNetwork {
                        'Content-Type': 'application/json'
                      }
                    })
-        .then(resp => resp.json())
+      .then(resp => {
+        resp.json()
         .then(respObj => {
           if (respObj.hasOwnProperty('error')) {
-            throw new Error(respObj.error)
+            throw new RemoteServiceError(resp)
           }
           return respObj.servers
         })
+      })
     }
   }
 
@@ -270,9 +306,14 @@ class BlockstackNetwork {
    * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
    * using the `makeRegister` function
    * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-   * @return {Promise} returns a Promise that resolves if the request
-   * is accepted by the transaction broadcast service and rejects if the service
-   * responds with an error or is unreachable
+   * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+   * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+   *
+   * In the event of an error, it rejects with:
+   * * a `RemoteServiceError` if there is a problem
+   *   with the transaction broadcast service
+   * * `MissingParameterError` if you call the function without a required
+   *   parameter
    */
   broadcastNameRegistration(preorderTransaction: string,
       registerTransaction: string,
@@ -286,6 +327,21 @@ class BlockstackNetwork {
        * zoneFile
        * })
        */
+
+    if (!preorderTransaction) {
+      const error = new MissingParameterError('preorderTransaction')
+      return Promise.reject(error)
+    }
+
+    if (!registerTransaction) {
+      const error = new MissingParameterError('registerTransaction')
+      return Promise.reject(error)
+    }
+
+    if (!zoneFile) {
+      const error = new MissingParameterError('zoneFile')
+      return Promise.reject(error)
+    }
 
     const requestBody = {
       preorderTransaction,
