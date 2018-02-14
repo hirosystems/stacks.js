@@ -476,7 +476,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -809,7 +809,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1063,7 +1063,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1340,7 +1340,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1512,7 +1512,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1749,7 +1749,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2025,7 +2025,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2716,7 +2716,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2998,7 +2998,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3207,7 +3207,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -3698,7 +3698,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4084,7 +4084,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4439,7 +4439,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5073,7 +5073,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5469,7 +5469,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5850,7 +5850,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -6320,254 +6320,6 @@
           "children": [
             {
               "type": "text",
-              "value": "Deletes the specified file from the app's data store.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 54,
-                  "offset": 53
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 54,
-              "offset": 53
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 54,
-          "offset": 53
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the path to the file to delete",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "returns",
-        "description": "that resolves when the file has been removed\nor rejects with an error",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 157,
-        "column": 0
-      },
-      "end": {
-        "line": 162,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 163,
-          "column": 0
-        },
-        "end": {
-          "line": 165,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the path to the file to delete",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 31,
-                      "offset": 30
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 31,
-                  "offset": 30
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 31,
-              "offset": 30
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves when the file has been removed\nor rejects with an error",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 25,
-                      "offset": 69
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 25,
-                  "offset": 69
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 25,
-              "offset": 69
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "deleteFile",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "deleteFile",
-        "kind": "function"
-      }
-    ],
-    "namespace": "deleteFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "Retrieves the specified file from the app's data store.",
               "position": {
                 "start": {
@@ -6716,7 +6468,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7329,7 +7081,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7687,6 +7439,254 @@
           "children": [
             {
               "type": "text",
+              "value": "Deletes the specified file from the app's data store.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 54,
+                  "offset": 53
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 54,
+              "offset": 53
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 54,
+          "offset": 53
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the path to the file to delete",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "path"
+      },
+      {
+        "title": "returns",
+        "description": "that resolves when the file has been removed\nor rejects with an error",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 157,
+        "column": 0
+      },
+      "end": {
+        "line": 162,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 163,
+          "column": 0
+        },
+        "end": {
+          "line": 165,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "path",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the path to the file to delete",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 31,
+                      "offset": 30
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 31,
+              "offset": 30
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves when the file has been removed\nor rejects with an error",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 69
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 25,
+                  "offset": 69
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 25,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "deleteFile",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "deleteFile",
+        "kind": "function"
+      }
+    ],
+    "namespace": "deleteFile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Get the app storage bucket URL",
               "position": {
                 "start": {
@@ -7783,7 +7783,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8126,7 +8126,7 @@
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8674,7 +8674,7 @@
           "column": 3
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/network.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -9455,7 +9455,7 @@
           "column": 3
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/network.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -10339,7 +10339,7 @@
           "column": 3
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/network.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
