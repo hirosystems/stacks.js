@@ -5,6 +5,9 @@ import test from 'tape-promise/tape'
 import { decodeToken } from 'jsontokens'
 import FetchMock from 'fetch-mock'
 
+global.window = {}
+import localStorage from 'mock-local-storage'
+
 import {
   makeAuthRequest,
   makeAuthResponse,
@@ -19,10 +22,10 @@ import {
   doPublicKeysMatchUsername,
   isManifestUriValid,
   isRedirectUriValid,
-  verifyAuthRequestAndLoadManifest
+  verifyAuthRequestAndLoadManifest,
+  signUserOut
 } from '../../../lib'
 import blockstack from '../../../lib'
-
 import { sampleManifests, sampleProfiles, sampleNameRecords } from './sampleData'
 
 export function runAuthTests() {
@@ -33,13 +36,11 @@ export function runAuthTests() {
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(15)
 
-    global.window = {
-      location: {
-        origin: 'http://localhost:3000',
-        hostname: 'localhost',
-        host: 'localhost:3000',
-        href: 'http://localhost:3000/signin'
-      }
+    global.window.location = {
+      origin: 'http://localhost:3000',
+      hostname: 'localhost',
+      host: 'localhost:3000',
+      href: 'http://localhost:3000/signin'
     }
     const authRequest = makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
@@ -210,6 +211,25 @@ export function runAuthTests() {
       .then(verifiedResult => {
         t.true(verifiedResult, 'auth response should be verified')
       })
+  })
+  
+  test('signUserOut with redirect', (t) => {
+    t.plan(1)
+    const startURL = 'https://example.com'
+    const redirectURL = 'https://example.com/redirect'
+    window.location = startURL
+
+    signUserOut(redirectURL)
+    t.equal(redirectURL, window.location, 'User should be redirected to the redirectURL')
+  })
+
+  test('signUserOut without redirect', (t) => {
+    t.plan(1)
+    const startURL = 'https://example.com'
+    window.location = startURL
+
+    signUserOut()
+    t.equal(startURL, window.location, 'User should not be redirected')
   })
 }
 
