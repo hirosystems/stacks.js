@@ -483,12 +483,13 @@ class BlockstackNetwork {
 
 class LocalRegtest extends BlockstackNetwork {
   bitcoindUrl: string
+  bitcoindCredentials: Object
 
   constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string, 
     bitcoindCredentials: ?Object = null) {
     super(apiUrl, '', broadcastServiceUrl, bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
-    this.bitcoindCredentials = bitcoindCredentials
+    this.bitcoindCredentials = Object.assign({}, bitcoindCredentials)
   }
 
   getFeeRate() : Promise<number> {
