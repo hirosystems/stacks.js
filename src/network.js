@@ -483,12 +483,13 @@ class BlockstackNetwork {
 
 class LocalRegtest extends BlockstackNetwork {
   bitcoindUrl: string
+  bitcoindCredentials: Object
 
   constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string,
     bitcoindCredentials: ?Object = null) {
     super(apiUrl, '', broadcastServiceUrl, bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
-    this.bitcoindCredentials = bitcoindCredentials
+    this.bitcoindCredentials = Object.assign({}, bitcoindCredentials)
   }
 
   getFeeRate() : Promise<number> {
@@ -579,7 +580,7 @@ class LocalRegtest extends BlockstackNetwork {
 
 const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
-  'http://blockstack:blockstacksystem@127.0.0.1:18332/',
+  'http://localhost:18332/',
   'http://localhost:16269',
   { username: 'blockstack', password: 'blockstacksystem' })
 
