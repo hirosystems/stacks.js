@@ -1,18 +1,33 @@
+/* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
 
-const SATOSHIS_PER_BTC = 1e8
+import { MissingParameterError, RemoteServiceError } from './errors'
 
-type UTXO = { value: number,
-              confirmations: number,
+type UTXO = { value?: number,
+              confirmations?: number,
               tx_hash: string,
               tx_output_n: number }
 
+const SATOSHIS_PER_BTC = 1e8
+const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
+const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
+const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
+
 class BlockstackNetwork {
-  constructor(apiUrl: string, utxoProviderUrl: string,
-              network: ?Object = bitcoinjs.networks.bitcoin) {
+  blockstackAPIUrl: string
+  utxoProviderUrl: string
+  broadcastServiceUrl: string
+  layer1: Object
+  DUST_MINIMUM: number
+  includeUtxoMap: Object
+  excludeUtxoSet: Array<UTXO>
+
+  constructor(apiUrl: string, utxoProviderUrl: string, broadcastServiceUrl: string,
+              network: Object = bitcoinjs.networks.bitcoin) {
     this.blockstackAPIUrl = apiUrl
     this.utxoProviderUrl = utxoProviderUrl
+    this.broadcastServiceUrl = broadcastServiceUrl
     this.layer1 = network
 
     this.DUST_MINIMUM = 5500
@@ -95,25 +110,252 @@ class BlockstackNetwork {
       })
   }
 
-  broadcastTransaction(transaction: string) {
-    const form = new FormData()
-    form.append('tx', transaction)
-    return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
-                 { method: 'POST',
-                   body: form })
-      .then(resp => resp.text())
-      .then(respText => {
-        if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-          const txHash = bitcoinjs.Transaction.fromHex(transaction)
-                .getHash()
-                .reverse()
-                .toString('hex') // big_endian
-          return txHash
-        } else {
-          throw new Error(`Broadcast transaction failed with message: ${respText}`)
-        }
-      })
+  /**
+   * Performs a POST request to the given URL
+   * @param  {String} endpoint  the name of
+   * @param  {String} body [description]
+   * @return {Promise<Object|Error>} Returns a `Promise` that resolves to the object requested.
+   * In the event of an error, it rejects with:
+   * * a `RemoteServiceError` if there is a problem
+   * with the transaction broadcast service
+   * * `MissingParameterError` if you call the function without a required
+   * parameter
+   *
+   * @private
+   */
+  broadcastServiceFetchHelper(endpoint: string, body: Object) : Promise<Object|Error> {
+    const requestHeaders = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+
+    const options = {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify(body)
+    }
+
+    const url = `${this.broadcastServiceUrl}/v1/broadcast/${endpoint}`
+    return fetch(url, options)
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+      } else {
+        throw new RemoteServiceError(response)
+      }
+    })
   }
+
+  /**
+  * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
+  * transaction until a second transaction has a certain number of confirmations.
+  *
+  * @param  {string} transaction the hex-encoded transaction to broadcast
+  * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
+  * the specified number of confirmations before broadcasting the `transaction`
+  * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
+  * before broadcasting `transaction`.
+  * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+  * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+  *
+  * In the event of an error, it rejects with:
+  * * a `RemoteServiceError` if there is a problem
+  *   with the transaction broadcast service
+  * * `MissingParameterError` if you call the function without a required
+  *   parameter
+  */
+  broadcastTransaction(transaction: string,
+    transactionToWatch: ?string = null,
+    confirmations: number = 6) {
+    if (!transaction) {
+      const error = new MissingParameterError('transaction')
+      return Promise.reject(error)
+    }
+
+    if (!confirmations && confirmations !== 0) {
+      const error = new MissingParameterError('confirmations')
+      return Promise.reject(error)
+    }
+
+    if (transactionToWatch === null) {
+      const form = new FormData()
+      form.append('tx', transaction)
+      return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
+                   { method: 'POST',
+                     body: form })
+        .then(resp => {
+          const text = resp.text()
+          return text
+          .then(respText => {
+            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+              const txHash = bitcoinjs.Transaction.fromHex(transaction)
+                    .getHash()
+                    .reverse()
+                    .toString('hex') // big_endian
+              return txHash
+            } else {
+              throw new RemoteServiceError(resp,
+                `Broadcast transaction failed with message: ${respText}`)
+            }
+          })
+        })
+    } else {
+      /*
+       * POST /v1/broadcast/transaction
+       * Request body:
+       * JSON.stringify({
+       *  transaction,
+       *  transactionToWatch,
+       *  confirmations
+       * })
+       */
+      const endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT
+
+      const requestBody = {
+        transaction,
+        transactionToWatch,
+        confirmations
+      }
+
+      return this.broadcastServiceFetchHelper(endpoint, requestBody)
+    }
+  }
+
+  /**
+   * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
+   *
+   * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+   * @param  {String} transactionToWatch the hex transaction id of the transaction
+   * to watch for confirmation before broadcasting the zone file to the Atlas network
+   * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+   * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+   *
+   * In the event of an error, it rejects with:
+   * * a `RemoteServiceError` if there is a problem
+   *   with the transaction broadcast service
+   * * `MissingParameterError` if you call the function without a required
+   *   parameter
+   */
+  broadcastZoneFile(zoneFile: string,
+    transactionToWatch: ?string = null) {
+    if (!zoneFile) {
+      return Promise.reject(new MissingParameterError('zoneFile'))
+    }
+
+    // TODO: validate zonefile
+
+    if (transactionToWatch) {
+      // broadcast via transaction broadcast service
+
+      /*
+       * POST /v1/broadcast/zone-file
+       * Request body:
+       * JSON.stringify({
+       *  zoneFile,
+       *  transactionToWatch
+       * })
+       */
+
+      const requestBody = {
+        zoneFile,
+        transactionToWatch
+      }
+
+      const endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT
+
+      return this.broadcastServiceFetchHelper(endpoint, requestBody)
+    } else {
+      // broadcast via core endpoint
+
+      // zone file is two words but core's api treats it as one word 'zonefile'
+      const requestBody = { zonefile: zoneFile }
+
+      return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
+                   { method: 'POST',
+                     body: JSON.stringify(requestBody),
+                     headers: {
+                       'Content-Type': 'application/json'
+                     }
+                   })
+      .then(resp => {
+        const json = resp.json()
+        return json
+        .then(respObj => {
+          if (respObj.hasOwnProperty('error')) {
+            throw new RemoteServiceError(resp)
+          }
+          return respObj.servers
+        })
+      })
+    }
+  }
+
+  /**
+   * Sends the preorder and registration transactions and zone file
+   * for a Blockstack name registration
+   * along with the to the transaction broadcast service.
+   *
+   * The transaction broadcast:
+   *
+   * * immediately broadcasts the preorder transaction
+   * * broadcasts the register transactions after the preorder transaction
+   * has an appropriate number of confirmations
+   * * broadcasts the zone file to the Atlas network after the register transaction
+   * has an appropriate number of confirmations
+   *
+   * @param  {String} preorderTransaction the hex-encoded, signed preorder transaction generated
+   * using the `makePreorder` function
+   * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
+   * using the `makeRegister` function
+   * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+   * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+   * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+   *
+   * In the event of an error, it rejects with:
+   * * a `RemoteServiceError` if there is a problem
+   *   with the transaction broadcast service
+   * * `MissingParameterError` if you call the function without a required
+   *   parameter
+   */
+  broadcastNameRegistration(preorderTransaction: string,
+      registerTransaction: string,
+      zoneFile: string) {
+      /*
+       * POST /v1/broadcast/registration
+       * Request body:
+       * JSON.stringify({
+       * preorderTransaction,
+       * registerTransaction,
+       * zoneFile
+       * })
+       */
+
+    if (!preorderTransaction) {
+      const error = new MissingParameterError('preorderTransaction')
+      return Promise.reject(error)
+    }
+
+    if (!registerTransaction) {
+      const error = new MissingParameterError('registerTransaction')
+      return Promise.reject(error)
+    }
+
+    if (!zoneFile) {
+      const error = new MissingParameterError('zoneFile')
+      return Promise.reject(error)
+    }
+
+    const requestBody = {
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    }
+
+    const endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT
+
+    return this.broadcastServiceFetchHelper(endpoint, requestBody)
+  }
+
 
   getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
     return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}`)
@@ -142,7 +384,9 @@ class BlockstackNetwork {
       .then(resp => {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
-          return []
+          return {
+            unspent_outputs: []
+          }
         } else {
           return resp.json()
         }
@@ -193,7 +437,7 @@ class BlockstackNetwork {
   modifyUTXOSetFrom(txHex: string) {
     const tx = bitcoinjs.Transaction.fromHex(txHex)
 
-    const excludeSet = this.excludeUtxoSet.concat()
+    const excludeSet: Array<UTXO> = this.excludeUtxoSet.concat()
 
     tx.ins.forEach((utxoUsed) => {
       const reverseHash = Buffer.from(utxoUsed.hash)
@@ -230,24 +474,6 @@ class BlockstackNetwork {
     this.excludeUtxoSet = []
   }
 
-  publishZonefile(zonefile: string) {
-    const arg = { zonefile }
-    return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
-                 { method: 'POST',
-                   body: JSON.stringify(arg),
-                   headers: {
-                     'Content-Type': 'application/json'
-                   }
-                 })
-      .then(resp => resp.json())
-      .then(respObj => {
-        if (respObj.hasOwnProperty('error')) {
-          throw new Error(respObj.error)
-        }
-        return respObj.servers
-      })
-  }
-
   getConsensusHash() {
     return fetch(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
       .then(resp => resp.json())
@@ -256,8 +482,10 @@ class BlockstackNetwork {
 }
 
 class LocalRegtest extends BlockstackNetwork {
-  constructor(apiUrl: string, bitcoindUrl: string) {
-    super(apiUrl, '', bitcoinjs.networks.testnet)
+  bitcoindUrl: string
+
+  constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string) {
+    super(apiUrl, '', broadcastServiceUrl, bitcoinjs.networks.testnet)
     this.bitcoindUrl = bitcoindUrl
   }
 
@@ -324,10 +552,14 @@ class LocalRegtest extends BlockstackNetwork {
 }
 
 const LOCAL_REGTEST = new LocalRegtest(
-  'http://localhost:16268', 'http://blockstack:blockstacksystem@127.0.0.1:18332/')
+  'http://localhost:16268',
+  'http://blockstack:blockstacksystem@127.0.0.1:18332/',
+  'http://localhost:16269')
 
 const MAINNET_DEFAULT = new BlockstackNetwork(
-  'https://core.blockstack.org', 'https://blockchain.info')
+  'https://core.blockstack.org',
+  'https://blockchain.info',
+  'https://broadcast.blockstack.org')
 
 export const network = { BlockstackNetwork, LocalRegtest,
                          defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }
