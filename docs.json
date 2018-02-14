@@ -3103,6 +3103,325 @@
     "namespace": "getAuthResponseToken"
   },
   {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Verify the authentication response is valid",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 44,
+                  "offset": 43
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 44,
+              "offset": 43
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 44,
+          "offset": 43
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the authentication response token",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "param",
+        "description": "the url use to verify owner of a username",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "nameLookupURL"
+      },
+      {
+        "title": "return",
+        "description": "that resolves to true if auth response\nis valid and false if it does not",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 190,
+        "column": 0
+      },
+      "end": {
+        "line": 196,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 197,
+          "column": 0
+        },
+        "end": {
+          "line": 213,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authVerification.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the authentication response token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 34,
+                      "offset": 33
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 34,
+                  "offset": 33
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 34,
+              "offset": 33
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "nameLookupURL",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the url use to verify owner of a username",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 42,
+                      "offset": 41
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 42,
+                  "offset": 41
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 42,
+              "offset": 41
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves to true if auth response\nis valid and false if it does not",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 72
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 34,
+                  "offset": 72
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 34,
+              "offset": 72
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "verifyAuthResponse",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "verifyAuthResponse",
+        "kind": "function"
+      }
+    ],
+    "namespace": "verifyAuthResponse"
+  },
+  {
     "name": "Profiles",
     "description": {
       "type": "root",
@@ -5498,7 +5817,7 @@
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       },
       {
         "title": "returns",
@@ -5661,7 +5980,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       }
     ],
     "properties": [],
@@ -7120,6 +7439,254 @@
           "children": [
             {
               "type": "text",
+              "value": "Deletes the specified file from the app's data store.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 54,
+                  "offset": 53
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 54,
+              "offset": 53
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 54,
+          "offset": 53
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the path to the file to delete",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "path"
+      },
+      {
+        "title": "returns",
+        "description": "that resolves when the file has been removed\nor rejects with an error",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 157,
+        "column": 0
+      },
+      "end": {
+        "line": 162,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 163,
+          "column": 0
+        },
+        "end": {
+          "line": 165,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "path",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the path to the file to delete",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 31,
+                      "offset": 30
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 31,
+                  "offset": 30
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 31,
+              "offset": 30
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves when the file has been removed\nor rejects with an error",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 69
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 25,
+                  "offset": 69
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 25,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "deleteFile",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "deleteFile",
+        "kind": "function"
+      }
+    ],
+    "namespace": "deleteFile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Get the app storage bucket URL",
               "position": {
                 "start": {
@@ -7901,6 +8468,7 @@
     "namespace": "getUserAppFileUrl"
   },
   {
+    "name": "Blockchain",
     "description": {
       "type": "root",
       "children": [
@@ -7909,7 +8477,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Verify the authentication response is valid",
+              "value": "Generate and broadcast Blockstack blockchain transactions.",
               "position": {
                 "start": {
                   "line": 1,
@@ -7918,8 +8486,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 44,
-                  "offset": 43
+                  "column": 59,
+                  "offset": 58
                 },
                 "indent": []
               }
@@ -7933,8 +8501,8 @@
             },
             "end": {
               "line": 1,
-              "column": 44,
-              "offset": 43
+              "column": 59,
+              "offset": 58
             },
             "indent": []
           }
@@ -7947,221 +8515,38 @@
           "offset": 0
         },
         "end": {
-          "line": 1,
-          "column": 44,
-          "offset": 43
+          "line": 2,
+          "column": 1,
+          "offset": 59
         }
       }
     },
-    "tags": [
+    "kind": "note",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
       {
-        "title": "param",
-        "description": "the authentication response token",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "token"
-      },
-      {
-        "title": "param",
-        "description": "the url use to verify owner of a username",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "nameLookupURL"
-      },
-      {
-        "title": "return",
-        "description": "that resolves to true if auth response\nis valid and false if it does not",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
+        "name": "Blockchain",
+        "kind": "note"
       }
     ],
-    "loc": {
-      "start": {
-        "line": 190,
-        "column": 0
-      },
-      "end": {
-        "line": 196,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 197,
-          "column": 0
-        },
-        "end": {
-          "line": 213,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authVerification.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "token",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
+    "namespace": "Blockchain"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
           "children": [
             {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the authentication response token",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 34,
-                      "offset": 33
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 34,
-                  "offset": 33
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 34,
-              "offset": 33
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "nameLookupURL",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the url use to verify owner of a username",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 42,
-                  "offset": 41
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 42,
-              "offset": 41
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves to true if auth response\nis valid and false if it does not",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 34,
-                      "offset": 72
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
+              "type": "text",
+              "value": "Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the\ntransaction until a second transaction has a certain number of confirmations.",
               "position": {
                 "start": {
                   "line": 1,
@@ -8170,8 +8555,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 34,
-                  "offset": 72
+                  "column": 78,
+                  "offset": 168
                 },
                 "indent": [
                   1
@@ -8187,75 +8572,12 @@
             },
             "end": {
               "line": 2,
-              "column": 34,
-              "offset": 72
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "verifyAuthResponse",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "verifyAuthResponse",
-        "kind": "function"
-      }
-    ],
-    "namespace": "verifyAuthResponse"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Deletes the specified file from the app's data store.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 54,
-                  "offset": 53
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
+              "column": 78,
+              "offset": 168
             },
-            "end": {
-              "line": 1,
-              "column": 54,
-              "offset": 53
-            },
-            "indent": []
+            "indent": [
+              1
+            ]
           }
         }
       ],
@@ -8266,63 +8588,101 @@
           "offset": 0
         },
         "end": {
-          "line": 1,
-          "column": 54,
-          "offset": 53
+          "line": 2,
+          "column": 78,
+          "offset": 168
         }
       }
     },
     "tags": [
       {
         "title": "param",
-        "description": "the path to the file to delete",
-        "lineNumber": 2,
+        "description": "the hex-encoded transaction to broadcast",
+        "lineNumber": 4,
         "type": {
           "type": "NameExpression",
-          "name": "String"
+          "name": "string"
         },
-        "name": "path"
+        "name": "transaction"
       },
       {
-        "title": "returns",
-        "description": "that resolves when the file has been removed\nor rejects with an error",
-        "lineNumber": 3,
+        "title": "param",
+        "description": "the hex transaction id of the transaction to watch for\nthe specified number of confirmations before broadcasting the `transaction`",
+        "lineNumber": 5,
         "type": {
           "type": "NameExpression",
-          "name": "Promise"
+          "name": "string"
+        },
+        "name": "transactionToWatch"
+      },
+      {
+        "title": "param",
+        "description": "the number of confirmations `transactionToWatch` must have\nbefore broadcasting `transaction`.",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "name": "confirmations"
+      },
+      {
+        "title": "return",
+        "description": "Returns a Promise that resolves to an object with a\n`transaction_hash` key containing the transaction hash of the broadcasted transaction.\n\nIn the event of an error, it rejects with:\n* a `RemoteServiceError` if there is a problem\n  with the transaction broadcast service\n* `MissingParameterError` if you call the function without a required\n  parameter",
+        "lineNumber": 9,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Promise"
+          },
+          "applications": [
+            {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Object"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "Error"
+                }
+              ]
+            }
+          ]
         }
       }
     ],
     "loc": {
       "start": {
-        "line": 157,
-        "column": 0
+        "line": 149,
+        "column": 2
       },
       "end": {
-        "line": 162,
-        "column": 3
+        "line": 166,
+        "column": 4
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 163,
-          "column": 0
+          "line": 167,
+          "column": 2
         },
         "end": {
-          "line": 165,
-          "column": 1
+          "line": 222,
+          "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
     "params": [
       {
         "title": "param",
-        "name": "path",
-        "lineNumber": 2,
+        "name": "transaction",
+        "lineNumber": 4,
         "description": {
           "type": "root",
           "children": [
@@ -8331,7 +8691,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "the path to the file to delete",
+                  "value": "the hex-encoded transaction to broadcast",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8340,8 +8700,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 31,
-                      "offset": 30
+                      "column": 41,
+                      "offset": 40
                     },
                     "indent": []
                   }
@@ -8355,8 +8715,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 31,
-                  "offset": 30
+                  "column": 41,
+                  "offset": 40
                 },
                 "indent": []
               }
@@ -8370,15 +8730,232 @@
             },
             "end": {
               "line": 1,
-              "column": 31,
-              "offset": 30
+              "column": 41,
+              "offset": 40
             }
           }
         },
         "type": {
           "type": "NameExpression",
-          "name": "String"
+          "name": "string"
         }
+      },
+      {
+        "title": "param",
+        "name": "transactionToWatch",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex transaction id of the transaction to watch for\nthe specified number of confirmations before broadcasting the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 63,
+                      "offset": 117
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 63,
+                      "offset": 117
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 76,
+                      "offset": 130
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 76,
+                  "offset": 130
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 76,
+              "offset": 130
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "confirmations",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the number of confirmations ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transactionToWatch",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " must have\nbefore broadcasting ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 21,
+                      "offset": 79
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 21,
+                      "offset": 79
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 92
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": ".",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 92
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 35,
+                      "offset": 93
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 35,
+                  "offset": 93
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 35,
+              "offset": 93
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "default": "6"
       }
     ],
     "properties": [],
@@ -8392,21 +8969,1442 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "that resolves when the file has been removed\nor rejects with an error",
+                  "value": "Returns a Promise that resolves to an object with a\n",
                   "position": {
                     "start": {
                       "line": 1,
                       "column": 1,
                       "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 52
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction_hash",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 52
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 19,
+                      "offset": 70
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " key containing the transaction hash of the broadcasted transaction.",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 19,
+                      "offset": 70
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 87,
+                      "offset": 138
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 87,
+                  "offset": 138
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "In the event of an error, it rejects with:",
+                  "position": {
+                    "start": {
+                      "line": 4,
+                      "column": 1,
+                      "offset": 140
+                    },
+                    "end": {
+                      "line": 4,
+                      "column": 43,
+                      "offset": 182
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 140
+                },
+                "end": {
+                  "line": 4,
+                  "column": 43,
+                  "offset": 182
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "loose": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "loose": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a ",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 3,
+                              "offset": 185
+                            },
+                            "end": {
+                              "line": 5,
+                              "column": 5,
+                              "offset": 187
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "inlineCode",
+                          "value": "RemoteServiceError",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 5,
+                              "offset": 187
+                            },
+                            "end": {
+                              "line": 5,
+                              "column": 25,
+                              "offset": 207
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "value": " if there is a problem\nwith the transaction broadcast service",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 25,
+                              "offset": 207
+                            },
+                            "end": {
+                              "line": 6,
+                              "column": 41,
+                              "offset": 270
+                            },
+                            "indent": [
+                              3
+                            ]
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 5,
+                          "column": 3,
+                          "offset": 185
+                        },
+                        "end": {
+                          "line": 6,
+                          "column": 41,
+                          "offset": 270
+                        },
+                        "indent": [
+                          3
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 5,
+                      "column": 1,
+                      "offset": 183
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 41,
+                      "offset": 270
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "listItem",
+                  "loose": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "inlineCode",
+                          "value": "MissingParameterError",
+                          "position": {
+                            "start": {
+                              "line": 7,
+                              "column": 3,
+                              "offset": 273
+                            },
+                            "end": {
+                              "line": 7,
+                              "column": 26,
+                              "offset": 296
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "value": " if you call the function without a required\nparameter",
+                          "position": {
+                            "start": {
+                              "line": 7,
+                              "column": 26,
+                              "offset": 296
+                            },
+                            "end": {
+                              "line": 8,
+                              "column": 12,
+                              "offset": 352
+                            },
+                            "indent": [
+                              3
+                            ]
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 7,
+                          "column": 3,
+                          "offset": 273
+                        },
+                        "end": {
+                          "line": 8,
+                          "column": 12,
+                          "offset": 352
+                        },
+                        "indent": [
+                          3
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 1,
+                      "offset": 271
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 12,
+                      "offset": 352
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 183
+                },
+                "end": {
+                  "line": 8,
+                  "column": 12,
+                  "offset": 352
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 8,
+              "column": 12,
+              "offset": 352
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Promise"
+          },
+          "applications": [
+            {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Object"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "Error"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "broadcastTransaction",
+    "kind": "function",
+    "memberof": "BlockstackNetwork",
+    "scope": "instance",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "broadcastTransaction",
+        "kind": "function",
+        "scope": "instance"
+      }
+    ],
+    "namespace": "#broadcastTransaction"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Broadcasts a zone file to the Atlas network via the transaction broadcast service.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 83,
+                  "offset": 82
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 83,
+              "offset": 82
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 83,
+          "offset": 82
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the zone file to be broadcast to the Atlas network",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "zoneFile"
+      },
+      {
+        "title": "param",
+        "description": "the hex transaction id of the transaction\nto watch for confirmation before broadcasting the zone file to the Atlas network",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "transactionToWatch"
+      },
+      {
+        "title": "return",
+        "description": "Returns a Promise that resolves to an object with a\n`transaction_hash` key containing the transaction hash of the broadcasted transaction.\n\nIn the event of an error, it rejects with:\n* a `RemoteServiceError` if there is a problem\n  with the transaction broadcast service\n* `MissingParameterError` if you call the function without a required\n  parameter",
+        "lineNumber": 6,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Promise"
+          },
+          "applications": [
+            {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Object"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "Error"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 224,
+        "column": 2
+      },
+      "end": {
+        "line": 238,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 239,
+          "column": 2
+        },
+        "end": {
+          "line": 291,
+          "column": 3
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "zoneFile",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the zone file to be broadcast to the Atlas network",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "transactionToWatch",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex transaction id of the transaction\nto watch for confirmation before broadcasting the zone file to the Atlas network",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 81,
+                      "offset": 122
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 81,
+                  "offset": 122
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 81,
+              "offset": 122
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Returns a Promise that resolves to an object with a\n",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 52
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction_hash",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 52
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 19,
+                      "offset": 70
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " key containing the transaction hash of the broadcasted transaction.",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 19,
+                      "offset": 70
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 87,
+                      "offset": 138
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 87,
+                  "offset": 138
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "In the event of an error, it rejects with:",
+                  "position": {
+                    "start": {
+                      "line": 4,
+                      "column": 1,
+                      "offset": 140
+                    },
+                    "end": {
+                      "line": 4,
+                      "column": 43,
+                      "offset": 182
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 140
+                },
+                "end": {
+                  "line": 4,
+                  "column": 43,
+                  "offset": 182
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "loose": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "loose": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a ",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 3,
+                              "offset": 185
+                            },
+                            "end": {
+                              "line": 5,
+                              "column": 5,
+                              "offset": 187
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "inlineCode",
+                          "value": "RemoteServiceError",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 5,
+                              "offset": 187
+                            },
+                            "end": {
+                              "line": 5,
+                              "column": 25,
+                              "offset": 207
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "value": " if there is a problem\nwith the transaction broadcast service",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 25,
+                              "offset": 207
+                            },
+                            "end": {
+                              "line": 6,
+                              "column": 41,
+                              "offset": 270
+                            },
+                            "indent": [
+                              3
+                            ]
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 5,
+                          "column": 3,
+                          "offset": 185
+                        },
+                        "end": {
+                          "line": 6,
+                          "column": 41,
+                          "offset": 270
+                        },
+                        "indent": [
+                          3
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 5,
+                      "column": 1,
+                      "offset": 183
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 41,
+                      "offset": 270
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "listItem",
+                  "loose": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "inlineCode",
+                          "value": "MissingParameterError",
+                          "position": {
+                            "start": {
+                              "line": 7,
+                              "column": 3,
+                              "offset": 273
+                            },
+                            "end": {
+                              "line": 7,
+                              "column": 26,
+                              "offset": 296
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "value": " if you call the function without a required\nparameter",
+                          "position": {
+                            "start": {
+                              "line": 7,
+                              "column": 26,
+                              "offset": 296
+                            },
+                            "end": {
+                              "line": 8,
+                              "column": 12,
+                              "offset": 352
+                            },
+                            "indent": [
+                              3
+                            ]
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 7,
+                          "column": 3,
+                          "offset": 273
+                        },
+                        "end": {
+                          "line": 8,
+                          "column": 12,
+                          "offset": 352
+                        },
+                        "indent": [
+                          3
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 1,
+                      "offset": 271
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 12,
+                      "offset": 352
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 183
+                },
+                "end": {
+                  "line": 8,
+                  "column": 12,
+                  "offset": 352
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 8,
+              "column": 12,
+              "offset": 352
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Promise"
+          },
+          "applications": [
+            {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Object"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "Error"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "broadcastZoneFile",
+    "kind": "function",
+    "memberof": "BlockstackNetwork",
+    "scope": "instance",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "broadcastZoneFile",
+        "kind": "function",
+        "scope": "instance"
+      }
+    ],
+    "namespace": "#broadcastZoneFile"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Sends the preorder and registration transactions and zone file\nfor a Blockstack name registration\nalong with the to the transaction broadcast service.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 53,
+                  "offset": 150
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 53,
+              "offset": 150
+            },
+            "indent": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "The transaction broadcast:",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 152
+                },
+                "end": {
+                  "line": 5,
+                  "column": 27,
+                  "offset": 178
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 5,
+              "column": 1,
+              "offset": 152
+            },
+            "end": {
+              "line": 5,
+              "column": 27,
+              "offset": 178
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "list",
+          "ordered": false,
+          "start": null,
+          "loose": false,
+          "children": [
+            {
+              "type": "listItem",
+              "loose": false,
+              "checked": null,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "immediately broadcasts the preorder transaction",
+                      "position": {
+                        "start": {
+                          "line": 7,
+                          "column": 3,
+                          "offset": 182
+                        },
+                        "end": {
+                          "line": 7,
+                          "column": 50,
+                          "offset": 229
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 3,
+                      "offset": 182
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 50,
+                      "offset": 229
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 1,
+                  "offset": 180
+                },
+                "end": {
+                  "line": 7,
+                  "column": 50,
+                  "offset": 229
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "listItem",
+              "loose": false,
+              "checked": null,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "broadcasts the register transactions after the preorder transaction\nhas an appropriate number of confirmations",
+                      "position": {
+                        "start": {
+                          "line": 8,
+                          "column": 3,
+                          "offset": 232
+                        },
+                        "end": {
+                          "line": 9,
+                          "column": 43,
+                          "offset": 342
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 8,
+                      "column": 3,
+                      "offset": 232
+                    },
+                    "end": {
+                      "line": 9,
+                      "column": 43,
+                      "offset": 342
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 8,
+                  "column": 1,
+                  "offset": 230
+                },
+                "end": {
+                  "line": 9,
+                  "column": 43,
+                  "offset": 342
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "listItem",
+              "loose": false,
+              "checked": null,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "broadcasts the zone file to the Atlas network after the register transaction\nhas an appropriate number of confirmations",
+                      "position": {
+                        "start": {
+                          "line": 10,
+                          "column": 3,
+                          "offset": 345
+                        },
+                        "end": {
+                          "line": 11,
+                          "column": 43,
+                          "offset": 464
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 10,
+                      "column": 3,
+                      "offset": 345
+                    },
+                    "end": {
+                      "line": 11,
+                      "column": 43,
+                      "offset": 464
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 1,
+                  "offset": 343
+                },
+                "end": {
+                  "line": 11,
+                  "column": 43,
+                  "offset": 464
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 180
+            },
+            "end": {
+              "line": 11,
+              "column": 43,
+              "offset": 464
+            },
+            "indent": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 11,
+          "column": 43,
+          "offset": 464
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the hex-encoded, signed preorder transaction generated\nusing the `makePreorder` function",
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "preorderTransaction"
+      },
+      {
+        "title": "param",
+        "description": "the hex-encoded, signed register transaction generated\nusing the `makeRegister` function",
+        "lineNumber": 15,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "registerTransaction"
+      },
+      {
+        "title": "param",
+        "description": "the zone file to be broadcast to the Atlas network",
+        "lineNumber": 17,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "zoneFile"
+      },
+      {
+        "title": "return",
+        "description": "Returns a Promise that resolves to an object with a\n`transaction_hash` key containing the transaction hash of the broadcasted transaction.\n\nIn the event of an error, it rejects with:\n* a `RemoteServiceError` if there is a problem\n  with the transaction broadcast service\n* `MissingParameterError` if you call the function without a required\n  parameter",
+        "lineNumber": 18,
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Promise"
+          },
+          "applications": [
+            {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Object"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "Error"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 293,
+        "column": 2
+      },
+      "end": {
+        "line": 319,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 320,
+          "column": 2
+        },
+        "end": {
+          "line": 357,
+          "column": 3
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "preorderTransaction",
+        "lineNumber": 13,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex-encoded, signed preorder transaction generated\nusing the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "makePreorder",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
                     },
                     "end": {
                       "line": 2,
                       "column": 25,
-                      "offset": 69
+                      "offset": 79
                     },
-                    "indent": [
-                      1
-                    ]
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " function",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 88
+                    },
+                    "indent": []
                   }
                 }
               ],
@@ -8418,8 +10416,8 @@
                 },
                 "end": {
                   "line": 2,
-                  "column": 25,
-                  "offset": 69
+                  "column": 34,
+                  "offset": 88
                 },
                 "indent": [
                   1
@@ -8435,48 +10433,80 @@
             },
             "end": {
               "line": 2,
-              "column": 25,
-              "offset": 69
+              "column": 34,
+              "offset": 88
             }
           }
         },
-        "title": "returns",
         "type": {
           "type": "NameExpression",
-          "name": "Promise"
+          "name": "String"
         }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "deleteFile",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
+      },
       {
-        "name": "deleteFile",
-        "kind": "function"
-      }
-    ],
-    "namespace": "deleteFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
+        "title": "param",
+        "name": "registerTransaction",
+        "lineNumber": 15,
+        "description": {
+          "type": "root",
           "children": [
             {
-              "type": "text",
-              "value": "Versioning",
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex-encoded, signed register transaction generated\nusing the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "makeRegister",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 11,
+                      "offset": 65
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " function",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 25,
+                      "offset": 79
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 34,
+                      "offset": 88
+                    },
+                    "indent": []
+                  }
+                }
+              ],
               "position": {
                 "start": {
                   "line": 1,
@@ -8484,11 +10514,13 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 11,
-                  "offset": 10
+                  "line": 2,
+                  "column": 34,
+                  "offset": 88
                 },
-                "indent": []
+                "indent": [
+                  1
+                ]
               }
             }
           ],
@@ -8499,88 +10531,21 @@
               "offset": 0
             },
             "end": {
-              "line": 1,
-              "column": 11,
-              "offset": 10
-            },
-            "indent": []
+              "line": 2,
+              "column": 34,
+              "offset": 88
+            }
           }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
         },
-        "end": {
-          "line": 1,
-          "column": 11,
-          "offset": 10
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the left half of the version inequality",
-        "lineNumber": 2,
         "type": {
           "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "v1"
+          "name": "String"
+        }
       },
       {
         "title": "param",
-        "description": "right half of the version inequality",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
-        },
-        "name": "v2"
-      },
-      {
-        "title": "returns",
-        "description": "iff v1 >= v2",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "bool"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 52,
-        "column": 0
-      },
-      "end": {
-        "line": 57,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 58,
-          "column": 0
-        },
-        "end": {
-          "line": 71,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/utils.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "v1",
-        "lineNumber": 2,
+        "name": "zoneFile",
+        "lineNumber": 17,
         "description": {
           "type": "root",
           "children": [
@@ -8589,7 +10554,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "the left half of the version inequality",
+                  "value": "the zone file to be broadcast to the Atlas network",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8598,8 +10563,8 @@
                     },
                     "end": {
                       "line": 1,
-                      "column": 40,
-                      "offset": 39
+                      "column": 51,
+                      "offset": 50
                     },
                     "indent": []
                   }
@@ -8613,8 +10578,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 40,
-                  "offset": 39
+                  "column": 51,
+                  "offset": 50
                 },
                 "indent": []
               }
@@ -8628,75 +10593,14 @@
             },
             "end": {
               "line": 1,
-              "column": 40,
-              "offset": 39
+              "column": 51,
+              "offset": 50
             }
           }
         },
         "type": {
           "type": "NameExpression",
-          "name": "string"
-        }
-      },
-      {
-        "title": "param",
-        "name": "v2",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "right half of the version inequality",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 37,
-                      "offset": 36
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 37,
-                  "offset": 36
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 37,
-              "offset": 36
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "string"
+          "name": "String"
         }
       }
     ],
@@ -8711,7 +10615,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "iff v1 >= v2",
+                  "value": "Returns a Promise that resolves to an object with a\n",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8719,9 +10623,45 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 1,
-                      "column": 13,
-                      "offset": 12
+                      "line": 2,
+                      "column": 1,
+                      "offset": 52
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "transaction_hash",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 52
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 19,
+                      "offset": 70
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " key containing the transaction hash of the broadcasted transaction.",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 19,
+                      "offset": 70
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 87,
+                      "offset": 138
                     },
                     "indent": []
                   }
@@ -8734,11 +10674,246 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 1,
-                  "column": 13,
-                  "offset": 12
+                  "line": 2,
+                  "column": 87,
+                  "offset": 138
+                },
+                "indent": [
+                  1
+                ]
+              }
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "In the event of an error, it rejects with:",
+                  "position": {
+                    "start": {
+                      "line": 4,
+                      "column": 1,
+                      "offset": 140
+                    },
+                    "end": {
+                      "line": 4,
+                      "column": 43,
+                      "offset": 182
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 4,
+                  "column": 1,
+                  "offset": 140
+                },
+                "end": {
+                  "line": 4,
+                  "column": 43,
+                  "offset": 182
                 },
                 "indent": []
+              }
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "start": null,
+              "loose": false,
+              "children": [
+                {
+                  "type": "listItem",
+                  "loose": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "value": "a ",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 3,
+                              "offset": 185
+                            },
+                            "end": {
+                              "line": 5,
+                              "column": 5,
+                              "offset": 187
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "inlineCode",
+                          "value": "RemoteServiceError",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 5,
+                              "offset": 187
+                            },
+                            "end": {
+                              "line": 5,
+                              "column": 25,
+                              "offset": 207
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "value": " if there is a problem\nwith the transaction broadcast service",
+                          "position": {
+                            "start": {
+                              "line": 5,
+                              "column": 25,
+                              "offset": 207
+                            },
+                            "end": {
+                              "line": 6,
+                              "column": 41,
+                              "offset": 270
+                            },
+                            "indent": [
+                              3
+                            ]
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 5,
+                          "column": 3,
+                          "offset": 185
+                        },
+                        "end": {
+                          "line": 6,
+                          "column": 41,
+                          "offset": 270
+                        },
+                        "indent": [
+                          3
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 5,
+                      "column": 1,
+                      "offset": 183
+                    },
+                    "end": {
+                      "line": 6,
+                      "column": 41,
+                      "offset": 270
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "listItem",
+                  "loose": false,
+                  "checked": null,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "inlineCode",
+                          "value": "MissingParameterError",
+                          "position": {
+                            "start": {
+                              "line": 7,
+                              "column": 3,
+                              "offset": 273
+                            },
+                            "end": {
+                              "line": 7,
+                              "column": 26,
+                              "offset": 296
+                            },
+                            "indent": []
+                          }
+                        },
+                        {
+                          "type": "text",
+                          "value": " if you call the function without a required\nparameter",
+                          "position": {
+                            "start": {
+                              "line": 7,
+                              "column": 26,
+                              "offset": 296
+                            },
+                            "end": {
+                              "line": 8,
+                              "column": 12,
+                              "offset": 352
+                            },
+                            "indent": [
+                              3
+                            ]
+                          }
+                        }
+                      ],
+                      "position": {
+                        "start": {
+                          "line": 7,
+                          "column": 3,
+                          "offset": 273
+                        },
+                        "end": {
+                          "line": 8,
+                          "column": 12,
+                          "offset": 352
+                        },
+                        "indent": [
+                          3
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 1,
+                      "offset": 271
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 12,
+                      "offset": 352
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 183
+                },
+                "end": {
+                  "line": 8,
+                  "column": 12,
+                  "offset": 352
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
               }
             }
           ],
@@ -8749,24 +10924,44 @@
               "offset": 0
             },
             "end": {
-              "line": 1,
-              "column": 13,
-              "offset": 12
+              "line": 8,
+              "column": 12,
+              "offset": 352
             }
           }
         },
         "title": "returns",
         "type": {
-          "type": "NameExpression",
-          "name": "bool"
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Promise"
+          },
+          "applications": [
+            {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Object"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "Error"
+                }
+              ]
+            }
+          ]
         }
       }
     ],
     "sees": [],
     "throws": [],
     "todos": [],
-    "name": "isLaterVersion",
+    "name": "broadcastNameRegistration",
     "kind": "function",
+    "memberof": "BlockstackNetwork",
+    "scope": "instance",
     "members": {
       "global": [],
       "inner": [],
@@ -8776,10 +10971,11 @@
     },
     "path": [
       {
-        "name": "isLaterVersion",
-        "kind": "function"
+        "name": "broadcastNameRegistration",
+        "kind": "function",
+        "scope": "instance"
       }
     ],
-    "namespace": "isLaterVersion"
+    "namespace": "#broadcastNameRegistration"
   }
 ]

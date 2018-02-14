@@ -1277,47 +1277,115 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var MissingParametersError = exports.MissingParametersError = function (_Error) {
-  _inherits(MissingParametersError, _Error);
+var ERROR_CODES = exports.ERROR_CODES = {
+  MISSING_PARAMETER: 'missing_parameter',
+  REMOTE_SERVICE_ERROR: 'remote_service_error',
+  UNKNOWN: 'unknown'
+};
 
-  function MissingParametersError() {
-    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+Object.freeze(ERROR_CODES);
 
-    _classCallCheck(this, MissingParametersError);
+var BlockstackError = exports.BlockstackError = function (_Error) {
+  _inherits(BlockstackError, _Error);
 
-    var _this = _possibleConstructorReturn(this, (MissingParametersError.__proto__ || Object.getPrototypeOf(MissingParametersError)).call(this));
+  function BlockstackError(error) {
+    _classCallCheck(this, BlockstackError);
 
-    _this.name = 'MissingParametersError';
-    _this.message = message;
+    var _this = _possibleConstructorReturn(this, (BlockstackError.__proto__ || Object.getPrototypeOf(BlockstackError)).call(this, error.message));
+
+    _this.code = error.code;
+    _this.parameter = error.parameter ? error.parameter : null;
     return _this;
   }
 
-  return MissingParametersError;
+  _createClass(BlockstackError, [{
+    key: 'toString',
+    value: function toString() {
+      return _get(BlockstackError.prototype.__proto__ || Object.getPrototypeOf(BlockstackError.prototype), 'toString', this).call(this) + '\n    code: ' + this.code + ' param: ' + (this.parameter ? this.parameter : 'n/a');
+    }
+  }]);
+
+  return BlockstackError;
 }(Error);
 
-var InvalidDIDError = exports.InvalidDIDError = function (_Error2) {
-  _inherits(InvalidDIDError, _Error2);
+var InvalidParameterError = exports.InvalidParameterError = function (_BlockstackError) {
+  _inherits(InvalidParameterError, _BlockstackError);
+
+  function InvalidParameterError(parameter) {
+    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    _classCallCheck(this, InvalidParameterError);
+
+    var _this2 = _possibleConstructorReturn(this, (InvalidParameterError.__proto__ || Object.getPrototypeOf(InvalidParameterError)).call(this, { code: 'missing_parameter', message: message, parameter: '' }));
+
+    _this2.name = 'MissingParametersError';
+    return _this2;
+  }
+
+  return InvalidParameterError;
+}(BlockstackError);
+
+var MissingParameterError = exports.MissingParameterError = function (_BlockstackError2) {
+  _inherits(MissingParameterError, _BlockstackError2);
+
+  function MissingParameterError(parameter) {
+    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    _classCallCheck(this, MissingParameterError);
+
+    var _this3 = _possibleConstructorReturn(this, (MissingParameterError.__proto__ || Object.getPrototypeOf(MissingParameterError)).call(this, { code: ERROR_CODES.MISSING_PARAMETER, message: message, parameter: parameter }));
+
+    _this3.name = 'MissingParametersError';
+    return _this3;
+  }
+
+  return MissingParameterError;
+}(BlockstackError);
+
+var RemoteServiceError = exports.RemoteServiceError = function (_BlockstackError3) {
+  _inherits(RemoteServiceError, _BlockstackError3);
+
+  function RemoteServiceError(response) {
+    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    _classCallCheck(this, RemoteServiceError);
+
+    var _this4 = _possibleConstructorReturn(this, (RemoteServiceError.__proto__ || Object.getPrototypeOf(RemoteServiceError)).call(this, { code: ERROR_CODES.REMOTE_SERVICE_ERROR, message: message }));
+
+    _this4.response = response;
+    return _this4;
+  }
+
+  return RemoteServiceError;
+}(BlockstackError);
+
+var InvalidDIDError = exports.InvalidDIDError = function (_BlockstackError4) {
+  _inherits(InvalidDIDError, _BlockstackError4);
 
   function InvalidDIDError() {
     var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
     _classCallCheck(this, InvalidDIDError);
 
-    var _this2 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this));
+    var _this5 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this, { code: 'invalid_did_error', message: message, param: '' }));
 
-    _this2.name = 'InvalidDIDError';
-    _this2.message = message;
-    return _this2;
+    _this5.name = 'InvalidDIDError';
+    _this5.message = message;
+    return _this5;
   }
 
   return InvalidDIDError;
-}(Error);
+}(BlockstackError);
 },{}],12:[function(require,module,exports){
 'use strict';
 
@@ -1583,6 +1651,8 @@ var _formData = require('form-data');
 
 var _formData2 = _interopRequireDefault(_formData);
 
+var _errors = require('./errors');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -1592,15 +1662,19 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SATOSHIS_PER_BTC = 1e8;
+var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
+var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
+var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
 
 var BlockstackNetwork = function () {
-  function BlockstackNetwork(apiUrl, utxoProviderUrl) {
-    var network = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _bitcoinjsLib2.default.networks.bitcoin;
+  function BlockstackNetwork(apiUrl, utxoProviderUrl, broadcastServiceUrl) {
+    var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.networks.bitcoin;
 
     _classCallCheck(this, BlockstackNetwork);
 
     this.blockstackAPIUrl = apiUrl;
     this.utxoProviderUrl = utxoProviderUrl;
+    this.broadcastServiceUrl = broadcastServiceUrl;
     this.layer1 = network;
 
     this.DUST_MINIMUM = 5500;
@@ -1700,22 +1774,252 @@ var BlockstackNetwork = function () {
         }
       });
     }
+
+    /**
+     * Performs a POST request to the given URL
+     * @param  {String} endpoint  the name of
+     * @param  {String} body [description]
+     * @return {Promise<Object|Error>} Returns a `Promise` that resolves to the object requested.
+     * In the event of an error, it rejects with:
+     * * a `RemoteServiceError` if there is a problem
+     * with the transaction broadcast service
+     * * `MissingParameterError` if you call the function without a required
+     * parameter
+     *
+     * @private
+     */
+
+  }, {
+    key: 'broadcastServiceFetchHelper',
+    value: function broadcastServiceFetchHelper(endpoint, body) {
+      var requestHeaders = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      var options = {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify(body)
+      };
+
+      var url = this.broadcastServiceUrl + '/v1/broadcast/' + endpoint;
+      return fetch(url, options).then(function (response) {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new _errors.RemoteServiceError(response);
+        }
+      });
+    }
+
+    /**
+    * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
+    * transaction until a second transaction has a certain number of confirmations.
+    *
+    * @param  {string} transaction the hex-encoded transaction to broadcast
+    * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
+    * the specified number of confirmations before broadcasting the `transaction`
+    * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
+    * before broadcasting `transaction`.
+    * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+    * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+    *
+    * In the event of an error, it rejects with:
+    * * a `RemoteServiceError` if there is a problem
+    *   with the transaction broadcast service
+    * * `MissingParameterError` if you call the function without a required
+    *   parameter
+    */
+
   }, {
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
-      var form = new _formData2.default();
-      form.append('tx', transaction);
-      return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
-        body: form }).then(function (resp) {
-        return resp.text();
-      }).then(function (respText) {
-        if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-          var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
-          return txHash;
-        } else {
-          throw new Error('Broadcast transaction failed with message: ' + respText);
-        }
-      });
+      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var confirmations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 6;
+
+      if (!transaction) {
+        var error = new _errors.MissingParameterError('transaction');
+        return Promise.reject(error);
+      }
+
+      if (!confirmations && confirmations !== 0) {
+        var _error = new _errors.MissingParameterError('confirmations');
+        return Promise.reject(_error);
+      }
+
+      if (transactionToWatch === null) {
+        var form = new _formData2.default();
+        form.append('tx', transaction);
+        return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
+          body: form }).then(function (resp) {
+          var text = resp.text();
+          return text.then(function (respText) {
+            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+              var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
+              return txHash;
+            } else {
+              throw new _errors.RemoteServiceError(resp, 'Broadcast transaction failed with message: ' + respText);
+            }
+          });
+        });
+      } else {
+        /*
+         * POST /v1/broadcast/transaction
+         * Request body:
+         * JSON.stringify({
+         *  transaction,
+         *  transactionToWatch,
+         *  confirmations
+         * })
+         */
+        var endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT;
+
+        var requestBody = {
+          transaction: transaction,
+          transactionToWatch: transactionToWatch,
+          confirmations: confirmations
+        };
+
+        return this.broadcastServiceFetchHelper(endpoint, requestBody);
+      }
+    }
+
+    /**
+     * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
+     *
+     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+     * @param  {String} transactionToWatch the hex transaction id of the transaction
+     * to watch for confirmation before broadcasting the zone file to the Atlas network
+     * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+     * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+     *
+     * In the event of an error, it rejects with:
+     * * a `RemoteServiceError` if there is a problem
+     *   with the transaction broadcast service
+     * * `MissingParameterError` if you call the function without a required
+     *   parameter
+     */
+
+  }, {
+    key: 'broadcastZoneFile',
+    value: function broadcastZoneFile(zoneFile) {
+      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (!zoneFile) {
+        return Promise.reject(new _errors.MissingParameterError('zoneFile'));
+      }
+
+      // TODO: validate zonefile
+
+      if (transactionToWatch) {
+        // broadcast via transaction broadcast service
+
+        /*
+         * POST /v1/broadcast/zone-file
+         * Request body:
+         * JSON.stringify({
+         *  zoneFile,
+         *  transactionToWatch
+         * })
+         */
+
+        var requestBody = {
+          zoneFile: zoneFile,
+          transactionToWatch: transactionToWatch
+        };
+
+        var endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT;
+
+        return this.broadcastServiceFetchHelper(endpoint, requestBody);
+      } else {
+        // broadcast via core endpoint
+
+        // zone file is two words but core's api treats it as one word 'zonefile'
+        var _requestBody = { zonefile: zoneFile };
+
+        return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
+          body: JSON.stringify(_requestBody),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(function (resp) {
+          var json = resp.json();
+          return json.then(function (respObj) {
+            if (respObj.hasOwnProperty('error')) {
+              throw new _errors.RemoteServiceError(resp);
+            }
+            return respObj.servers;
+          });
+        });
+      }
+    }
+
+    /**
+     * Sends the preorder and registration transactions and zone file
+     * for a Blockstack name registration
+     * along with the to the transaction broadcast service.
+     *
+     * The transaction broadcast:
+     *
+     * * immediately broadcasts the preorder transaction
+     * * broadcasts the register transactions after the preorder transaction
+     * has an appropriate number of confirmations
+     * * broadcasts the zone file to the Atlas network after the register transaction
+     * has an appropriate number of confirmations
+     *
+     * @param  {String} preorderTransaction the hex-encoded, signed preorder transaction generated
+     * using the `makePreorder` function
+     * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
+     * using the `makeRegister` function
+     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+     * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+     * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+     *
+     * In the event of an error, it rejects with:
+     * * a `RemoteServiceError` if there is a problem
+     *   with the transaction broadcast service
+     * * `MissingParameterError` if you call the function without a required
+     *   parameter
+     */
+
+  }, {
+    key: 'broadcastNameRegistration',
+    value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
+      /*
+       * POST /v1/broadcast/registration
+       * Request body:
+       * JSON.stringify({
+       * preorderTransaction,
+       * registerTransaction,
+       * zoneFile
+       * })
+       */
+
+      if (!preorderTransaction) {
+        var error = new _errors.MissingParameterError('preorderTransaction');
+        return Promise.reject(error);
+      }
+
+      if (!registerTransaction) {
+        var _error2 = new _errors.MissingParameterError('registerTransaction');
+        return Promise.reject(_error2);
+      }
+
+      if (!zoneFile) {
+        var _error3 = new _errors.MissingParameterError('zoneFile');
+        return Promise.reject(_error3);
+      }
+
+      var requestBody = {
+        preorderTransaction: preorderTransaction,
+        registerTransaction: registerTransaction,
+        zoneFile: zoneFile
+      };
+
+      var endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT;
+
+      return this.broadcastServiceFetchHelper(endpoint, requestBody);
     }
   }, {
     key: 'getTransactionInfo',
@@ -1750,7 +2054,9 @@ var BlockstackNetwork = function () {
       return fetch(this.utxoProviderUrl + '/unspent?format=json&active=' + address).then(function (resp) {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []');
-          return [];
+          return {
+            unspent_outputs: []
+          };
         } else {
           return resp.json();
         }
@@ -1844,24 +2150,6 @@ var BlockstackNetwork = function () {
       this.excludeUtxoSet = [];
     }
   }, {
-    key: 'publishZonefile',
-    value: function publishZonefile(zonefile) {
-      var arg = { zonefile: zonefile };
-      return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
-        body: JSON.stringify(arg),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(function (resp) {
-        return resp.json();
-      }).then(function (respObj) {
-        if (respObj.hasOwnProperty('error')) {
-          throw new Error(respObj.error);
-        }
-        return respObj.servers;
-      });
-    }
-  }, {
     key: 'getConsensusHash',
     value: function getConsensusHash() {
       return fetch(this.blockstackAPIUrl + '/v1/blockchains/bitcoin/consensus').then(function (resp) {
@@ -1878,15 +2166,15 @@ var BlockstackNetwork = function () {
 var LocalRegtest = function (_BlockstackNetwork) {
   _inherits(LocalRegtest, _BlockstackNetwork);
 
-  function LocalRegtest(apiUrl, bitcoindUrl) {
-    var bitcoindCredentials = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  function LocalRegtest(apiUrl, bitcoindUrl, broadcastServiceUrl) {
+    var bitcoindCredentials = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
     _classCallCheck(this, LocalRegtest);
 
-    var _this5 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', _bitcoinjsLib2.default.networks.testnet));
+    var _this5 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', broadcastServiceUrl, _bitcoinjsLib2.default.networks.testnet));
 
     _this5.bitcoindUrl = bitcoindUrl;
-    _this5.bitcoindCredentials = bitcoindCredentials;
+    _this5.bitcoindCredentials = Object.assign({}, bitcoindCredentials);
     return _this5;
   }
 
@@ -1996,14 +2284,14 @@ var LocalRegtest = function (_BlockstackNetwork) {
   return LocalRegtest;
 }(BlockstackNetwork);
 
-var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:18332/', { username: 'blockstack', password: 'blockstacksystem' });
+var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:18332/', 'http://localhost:16269', { username: 'blockstack', password: 'blockstacksystem' });
 
-var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info');
+var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info', 'https://broadcast.blockstack.org');
 
 var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };
 }).call(this,require("buffer").Buffer)
-},{"bitcoinjs-lib":86,"buffer":142,"form-data":300}],15:[function(require,module,exports){
+},{"./errors":11,"bitcoinjs-lib":86,"buffer":142,"form-data":300}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3170,12 +3458,12 @@ var _profileZoneFiles = require('./profileZoneFiles');
  * Look up a user profile by blockstack ID
  *
  * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
  * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
 function lookupProfile(username) {
-  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'http://localhost:6270/v1/names/';
+  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
 
   return new Promise(function (resolve, reject) {
     if (!username) {
@@ -5443,6 +5731,7 @@ function updateQueryStringParameter(uri, key, value) {
  * @param {string} v1 - the left half of the version inequality
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
+ * @private
  */
 function isLaterVersion(v1, v2) {
   var v1tuple = v1.split('.').map(function (x) {
