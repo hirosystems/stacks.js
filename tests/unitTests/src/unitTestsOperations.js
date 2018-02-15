@@ -808,6 +808,7 @@ function safetyTests() {
       .then(result => {
         t.ok(!result, 'bar.test isnt registered. not in grace period')
       })
+      .catch((err) => console.error(err.stack))
   })
 
   test('nameAvailable', (t) => {
