@@ -1639,7 +1639,7 @@ function getPublicKeyFromPrivate(privateKey) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.network = undefined;
+exports.network = exports.BlockchainInfoApi = exports.InsightClient = exports.BitcoindAPI = exports.BitcoinNetwork = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1667,15 +1667,15 @@ var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
 var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
 
 var BlockstackNetwork = function () {
-  function BlockstackNetwork(apiUrl, utxoProviderUrl, broadcastServiceUrl) {
+  function BlockstackNetwork(apiUrl, broadcastServiceUrl, bitcoinAPI) {
     var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.networks.bitcoin;
 
     _classCallCheck(this, BlockstackNetwork);
 
     this.blockstackAPIUrl = apiUrl;
-    this.utxoProviderUrl = utxoProviderUrl;
     this.broadcastServiceUrl = broadcastServiceUrl;
     this.layer1 = network;
+    this.btc = bitcoinAPI;
 
     this.DUST_MINIMUM = 5500;
     this.includeUtxoMap = {};
@@ -1707,15 +1707,6 @@ var BlockstackNetwork = function () {
         } else {
           throw new Error('Failed to parse price of name');
         }
-      });
-    }
-  }, {
-    key: 'getBlockHeight',
-    value: function getBlockHeight() {
-      return fetch(this.utxoProviderUrl + '/latestblock').then(function (resp) {
-        return resp.json();
-      }).then(function (blockObj) {
-        return blockObj.height;
       });
     }
   }, {
@@ -1860,20 +1851,7 @@ var BlockstackNetwork = function () {
       }
 
       if (transactionToWatch === null) {
-        var form = new _formData2.default();
-        form.append('tx', transaction);
-        return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
-          body: form }).then(function (resp) {
-          var text = resp.text();
-          return text.then(function (respText) {
-            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-              var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
-              return txHash;
-            } else {
-              throw new _errors.RemoteServiceError(resp, 'Broadcast transaction failed with message: ' + respText);
-            }
-          });
-        });
+        return this.btc.broadcastTransaction(transaction);
       } else {
         /*
          * POST /v1/broadcast/transaction
@@ -2033,19 +2011,6 @@ var BlockstackNetwork = function () {
       return this.broadcastServiceFetchHelper(endpoint, requestBody);
     }
   }, {
-    key: 'getTransactionInfo',
-    value: function getTransactionInfo(txHash) {
-      return fetch(this.utxoProviderUrl + '/rawtx/' + txHash).then(function (resp) {
-        if (resp.status === 200) {
-          return resp.json();
-        } else {
-          throw new Error('Could not lookup transaction info for \'' + txHash + '\'. Server error.');
-        }
-      }).then(function (respObj) {
-        return { block_height: respObj.block_height };
-      });
-    }
-  }, {
     key: 'getFeeRate',
     value: function getFeeRate() {
       return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended').then(function (resp) {
@@ -2058,30 +2023,6 @@ var BlockstackNetwork = function () {
     key: 'countDustOutputs',
     value: function countDustOutputs() {
       throw new Error('Not implemented.');
-    }
-  }, {
-    key: 'getNetworkedUTXOs',
-    value: function getNetworkedUTXOs(address) {
-      return fetch(this.utxoProviderUrl + '/unspent?format=json&active=' + address).then(function (resp) {
-        if (resp.status === 500) {
-          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []');
-          return {
-            unspent_outputs: []
-          };
-        } else {
-          return resp.json();
-        }
-      }).then(function (utxoJSON) {
-        return utxoJSON.unspent_outputs;
-      }).then(function (utxoList) {
-        return utxoList.map(function (utxo) {
-          var utxoOut = { value: utxo.value,
-            tx_output_n: utxo.tx_output_n,
-            confirmations: utxo.confirmations,
-            tx_hash: utxo.tx_hash_big_endian };
-          return utxoOut;
-        });
-      });
     }
   }, {
     key: 'getUTXOs',
@@ -2169,6 +2110,21 @@ var BlockstackNetwork = function () {
         return x.consensus_hash;
       });
     }
+  }, {
+    key: 'getTransactionInfo',
+    value: function getTransactionInfo(txHash) {
+      return this.btc.getTransactionInfo(txHash);
+    }
+  }, {
+    key: 'getBlockHeight',
+    value: function getBlockHeight() {
+      return this.btc.getBlockHeight();
+    }
+  }, {
+    key: 'getNetworkedUTXOs',
+    value: function getNetworkedUTXOs(address) {
+      return this.btc.getNetworkedUTXOs(address);
+    }
   }]);
 
   return BlockstackNetwork;
@@ -2177,16 +2133,10 @@ var BlockstackNetwork = function () {
 var LocalRegtest = function (_BlockstackNetwork) {
   _inherits(LocalRegtest, _BlockstackNetwork);
 
-  function LocalRegtest(apiUrl, bitcoindUrl, broadcastServiceUrl) {
-    var bitcoindCredentials = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
+  function LocalRegtest(apiUrl, broadcastServiceUrl, bitcoinAPI) {
     _classCallCheck(this, LocalRegtest);
 
-    var _this6 = _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, '', broadcastServiceUrl, _bitcoinjsLib2.default.networks.testnet));
-
-    _this6.bitcoindUrl = bitcoindUrl;
-    _this6.bitcoindCredentials = Object.assign({}, bitcoindCredentials);
-    return _this6;
+    return _possibleConstructorReturn(this, (LocalRegtest.__proto__ || Object.getPrototypeOf(LocalRegtest)).call(this, apiUrl, broadcastServiceUrl, bitcoinAPI, _bitcoinjsLib2.default.networks.testnet));
   }
 
   _createClass(LocalRegtest, [{
@@ -2194,7 +2144,55 @@ var LocalRegtest = function (_BlockstackNetwork) {
     value: function getFeeRate() {
       return Promise.resolve(Math.floor(0.00001000 * SATOSHIS_PER_BTC));
     }
+  }]);
+
+  return LocalRegtest;
+}(BlockstackNetwork);
+
+var BitcoinNetwork = exports.BitcoinNetwork = function () {
+  function BitcoinNetwork() {
+    _classCallCheck(this, BitcoinNetwork);
+  }
+
+  _createClass(BitcoinNetwork, [{
+    key: 'broadcastTransaction',
+    value: function broadcastTransaction(transaction) {
+      return Promise.reject(new Error('Not implemented, broadcastTransaction(' + transaction + ')'));
+    }
   }, {
+    key: 'getBlockHeight',
+    value: function getBlockHeight() {
+      return Promise.reject(new Error('Not implemented, getBlockHeight()'));
+    }
+  }, {
+    key: 'getTransactionInfo',
+    value: function getTransactionInfo(txid) {
+      return Promise.reject(new Error('Not implemented, getTransactionInfo(' + txid + ')'));
+    }
+  }, {
+    key: 'getNetworkedUTXOs',
+    value: function getNetworkedUTXOs(address) {
+      return Promise.reject(new Error('Not implemented, getNetworkedUTXOs(' + address + ')'));
+    }
+  }]);
+
+  return BitcoinNetwork;
+}();
+
+var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
+  _inherits(BitcoindAPI, _BitcoinNetwork);
+
+  function BitcoindAPI(bitcoindUrl, bitcoindCredentials) {
+    _classCallCheck(this, BitcoindAPI);
+
+    var _this7 = _possibleConstructorReturn(this, (BitcoindAPI.__proto__ || Object.getPrototypeOf(BitcoindAPI)).call(this));
+
+    _this7.bitcoindUrl = bitcoindUrl;
+    _this7.bitcoindCredentials = bitcoindCredentials;
+    return _this7;
+  }
+
+  _createClass(BitcoindAPI, [{
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
       var jsonRPC = { jsonrpc: '1.0',
@@ -2228,7 +2226,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
   }, {
     key: 'getTransactionInfo',
     value: function getTransactionInfo(txHash) {
-      var _this7 = this;
+      var _this8 = this;
 
       var jsonRPC = { jsonrpc: '1.0',
         method: 'gettransaction',
@@ -2248,7 +2246,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
           method: 'getblockheader',
           params: [blockhash] };
         headers.append('Authorization', 'Basic ' + authString);
-        return fetch(_this7.bitcoindUrl, { method: 'POST',
+        return fetch(_this8.bitcoindUrl, { method: 'POST',
           body: JSON.stringify(jsonRPCBlock),
           headers: headers });
       }).then(function (resp) {
@@ -2260,7 +2258,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
   }, {
     key: 'getNetworkedUTXOs',
     value: function getNetworkedUTXOs(address) {
-      var _this8 = this;
+      var _this9 = this;
 
       var jsonRPCImport = { jsonrpc: '1.0',
         method: 'importaddress',
@@ -2274,7 +2272,7 @@ var LocalRegtest = function (_BlockstackNetwork) {
       return fetch(this.bitcoindUrl, { method: 'POST',
         body: JSON.stringify(jsonRPCImport),
         headers: headers }).then(function () {
-        return fetch(_this8.bitcoindUrl, { method: 'POST',
+        return fetch(_this9.bitcoindUrl, { method: 'POST',
           body: JSON.stringify(jsonRPCUnspent),
           headers: headers });
       }).then(function (resp) {
@@ -2292,12 +2290,165 @@ var LocalRegtest = function (_BlockstackNetwork) {
     }
   }]);
 
-  return LocalRegtest;
-}(BlockstackNetwork);
+  return BitcoindAPI;
+}(BitcoinNetwork);
 
-var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:18332/', 'http://localhost:16269', { username: 'blockstack', password: 'blockstacksystem' });
+var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
+  _inherits(InsightClient, _BitcoinNetwork2);
 
-var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://blockchain.info', 'https://broadcast.blockstack.org');
+  function InsightClient() {
+    var insightUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://utxo.technofractal.com/';
+
+    _classCallCheck(this, InsightClient);
+
+    var _this10 = _possibleConstructorReturn(this, (InsightClient.__proto__ || Object.getPrototypeOf(InsightClient)).call(this));
+
+    _this10.apiUrl = insightUrl;
+    return _this10;
+  }
+
+  _createClass(InsightClient, [{
+    key: 'broadcastTransaction',
+    value: function broadcastTransaction(transaction) {
+      var jsonData = { tx: transaction };
+      return fetch(this.apiUrl + '/tx/send', { method: 'POST',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(jsonData) }).then(function (resp) {
+        return resp.json();
+      });
+    }
+  }, {
+    key: 'getBlockHeight',
+    value: function getBlockHeight() {
+      return fetch(this.apiUrl + '/status').then(function (resp) {
+        return resp.json();
+      }).then(function (status) {
+        return status.blocks;
+      });
+    }
+  }, {
+    key: 'getTransactionInfo',
+    value: function getTransactionInfo(txHash) {
+      var _this11 = this;
+
+      return fetch(this.apiUrl + '/tx/' + txHash).then(function (resp) {
+        return resp.json();
+      }).then(function (transactionInfo) {
+        if (transactionInfo.error) {
+          throw new Error('Error finding transaction: ' + transactionInfo.error);
+        }
+        return fetch(_this11.apiUrl + '/block/' + transactionInfo.blockHash);
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (blockInfo) {
+        return { block_height: blockInfo.height };
+      });
+    }
+  }, {
+    key: 'getNetworkedUTXOs',
+    value: function getNetworkedUTXOs(address) {
+      return fetch(this.apiUrl + '/addr/' + address + '/utxo').then(function (resp) {
+        return resp.json();
+      }).then(function (utxos) {
+        return utxos.map(function (x) {
+          return { value: x.value,
+            confirmations: x.confirmations,
+            tx_hash: x.outpoint.txid,
+            tx_output_n: x.outpoint.vout };
+        });
+      });
+    }
+  }]);
+
+  return InsightClient;
+}(BitcoinNetwork);
+
+var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) {
+  _inherits(BlockchainInfoApi, _BitcoinNetwork3);
+
+  function BlockchainInfoApi() {
+    var blockchainInfoUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://blockchain.info';
+
+    _classCallCheck(this, BlockchainInfoApi);
+
+    var _this12 = _possibleConstructorReturn(this, (BlockchainInfoApi.__proto__ || Object.getPrototypeOf(BlockchainInfoApi)).call(this));
+
+    _this12.utxoProviderUrl = blockchainInfoUrl;
+    return _this12;
+  }
+
+  _createClass(BlockchainInfoApi, [{
+    key: 'getBlockHeight',
+    value: function getBlockHeight() {
+      return fetch(this.utxoProviderUrl + '/latestblock').then(function (resp) {
+        return resp.json();
+      }).then(function (blockObj) {
+        return blockObj.height;
+      });
+    }
+  }, {
+    key: 'getNetworkedUTXOs',
+    value: function getNetworkedUTXOs(address) {
+      return fetch(this.utxoProviderUrl + '/unspent?format=json&active=' + address).then(function (resp) {
+        if (resp.status === 500) {
+          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []');
+          return {
+            unspent_outputs: []
+          };
+        } else {
+          return resp.json();
+        }
+      }).then(function (utxoJSON) {
+        return utxoJSON.unspent_outputs;
+      }).then(function (utxoList) {
+        return utxoList.map(function (utxo) {
+          var utxoOut = { value: utxo.value,
+            tx_output_n: utxo.tx_output_n,
+            confirmations: utxo.confirmations,
+            tx_hash: utxo.tx_hash_big_endian };
+          return utxoOut;
+        });
+      });
+    }
+  }, {
+    key: 'getTransactionInfo',
+    value: function getTransactionInfo(txHash) {
+      return fetch(this.utxoProviderUrl + '/rawtx/' + txHash).then(function (resp) {
+        if (resp.status === 200) {
+          return resp.json();
+        } else {
+          throw new Error('Could not lookup transaction info for \'' + txHash + '\'. Server error.');
+        }
+      }).then(function (respObj) {
+        return { block_height: respObj.block_height };
+      });
+    }
+  }, {
+    key: 'broadcastTransaction',
+    value: function broadcastTransaction(transaction) {
+      var form = new _formData2.default();
+      form.append('tx', transaction);
+      return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
+        body: form }).then(function (resp) {
+        var text = resp.text();
+        return text.then(function (respText) {
+          if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+            var txHash = _bitcoinjsLib2.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
+            return txHash;
+          } else {
+            throw new _errors.RemoteServiceError(resp, 'Broadcast transaction failed with message: ' + respText);
+          }
+        });
+      });
+    }
+  }]);
+
+  return BlockchainInfoApi;
+}(BitcoinNetwork);
+
+var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:16269', new BitcoindAPI('http://localhost:18332/', { username: 'blockstack', password: 'blockstacksystem' }));
+
+var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://broadcast.blockstack.org', new BlockchainInfoApi());
 
 var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };
