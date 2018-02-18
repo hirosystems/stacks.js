@@ -77,7 +77,8 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
     })
     .then((readUrl) => new Promise((resolve, reject) => {
       if (!readUrl) {
-        reject(null)
+        console.log(`User does not have apps key, returning null`)
+        return null
       } else {
         resolve(readUrl)
       }
