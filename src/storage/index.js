@@ -75,16 +75,18 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
         return getFullReadUrl(path, gaiaHubConfig)
       }
     })
-    .then((readUrl) => new Promise((resolve, reject) => {
+    .then((readUrl) => {
       if (!readUrl) {
-        console.log(`User does not have apps key, returning null`)
         return null
       } else {
-        resolve(readUrl)
+        fetch(readUrl)
       }
-    }))
-    .then((readUrl) => fetch(readUrl))
+    })
     .then((response) => {
+      if(response == null){
+        console.log(`User does not have apps key, returning null`)
+        return null
+      }
       if (response.status !== 200) {
         if (response.status === 404) {
           console.log(`getFile ${path} returned 404, returning null`)
