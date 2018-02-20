@@ -1639,7 +1639,7 @@ function getPublicKeyFromPrivate(privateKey) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.network = exports.BlockchainInfoApi = exports.InsightClient = exports.BitcoindAPI = exports.BitcoinNetwork = undefined;
+exports.network = exports.BlockchainInfoApi = exports.InsightClient = exports.BitcoindAPI = exports.BitcoinNetwork = exports.LocalRegtest = exports.BlockstackNetwork = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1666,7 +1666,7 @@ var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
 var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
 var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
 
-var BlockstackNetwork = function () {
+var BlockstackNetwork = exports.BlockstackNetwork = function () {
   function BlockstackNetwork(apiUrl, broadcastServiceUrl, bitcoinAPI) {
     var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib2.default.networks.bitcoin;
 
@@ -2130,7 +2130,7 @@ var BlockstackNetwork = function () {
   return BlockstackNetwork;
 }();
 
-var LocalRegtest = function (_BlockstackNetwork) {
+var LocalRegtest = exports.LocalRegtest = function (_BlockstackNetwork) {
   _inherits(LocalRegtest, _BlockstackNetwork);
 
   function LocalRegtest(apiUrl, broadcastServiceUrl, bitcoinAPI) {

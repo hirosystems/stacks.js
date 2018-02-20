@@ -3,7 +3,7 @@ import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
 import nock from 'nock'
 
-import { network } from '../../../lib/network'
+import { network, InsightClient } from '../../../lib/network'
 import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
          hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
 
@@ -17,6 +17,57 @@ const testAddresses = [
   { address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
     skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001' }
 ]
+
+function networkTests() {
+  test('insight-client', (t) => {
+    t.plan(5)
+    const mynet = new InsightClient('https://utxo.tester.com')
+
+    FetchMock.restore()
+
+    FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
+
+    const txhashFound = 'txhash-found'
+    const blockHash = 'block-hash'
+    const txhashNotFound = 'txhash-not-found'
+
+    FetchMock.get(`https://utxo.tester.com/tx/${txhashNotFound}`,
+                  { body: JSON.stringify(
+                    { message: 'error fetching transaction details',
+                      error: '-5: No information available about transaction' }),
+                    status: 400 })
+    FetchMock.get(`https://utxo.tester.com/tx/${txhashFound}`,
+                  { blockHash })
+    FetchMock.get(`https://utxo.tester.com/block/${blockHash}`,
+                  { height: 300 })
+    FetchMock.get(`https://utxo.tester.com/addr/${testAddresses[0].address}/utxo`,
+                  [{ value: 1, confirmations: 2, outpoint: { txid: 'bar', vout: 10 } }])
+
+    FetchMock.get('https://utxo.tester.com/status',
+                  { blocks: 500 })
+    FetchMock.post('https://utxo.tester.com/tx/send',
+                   { body: 'true', status: 202 })
+
+    mynet.broadcastTransaction('test-transaction-text')
+      .then((response) => { t.ok(response, 'Should broadcast successfully') })
+
+    mynet.getBlockHeight()
+      .then((response) => { t.equal(response, 500, 'Should return block height') })
+
+    mynet.getTransactionInfo(txhashNotFound)
+      .then(() => t.ok(false, 'Should not return txinfo for not-found transaction.'))
+      .catch(() => t.ok(true, 'Should throw exception for not-found transaction.'))
+
+    mynet.getTransactionInfo(txhashFound)
+      .then((txInfo) => t.equal(txInfo.block_height, 300, 'Should return txinfo.block_height'))
+      .catch(() => t.ok(false, 'Should not throw exception for a found transaction.'))
+
+    mynet.getNetworkedUTXOs(testAddresses[0].address)
+      .then((utxos) => {
+        t.deepEqual(utxos, [{ value: 1, confirmations: 2, tx_hash: 'bar', tx_output_n: 10 }])
+      })
+  })
+}
 
 function utilsTests() {
   test('estimateTXBytes', (t) => {
@@ -863,6 +914,7 @@ function safetyTests() {
 
 
 export function runOperationsTests() {
+  networkTests()
   utilsTests()
   transactionTests()
   safetyTests()
