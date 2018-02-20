@@ -36,6 +36,10 @@ function initializeBlockstackCore() {
       console.log('Started regtest container, waiting until initialized')
       return pExec('docker logs -f test-bsk-core | grep -q inished')
     })
+    .then(() => {
+      console.log('Initialized, waiting an additional 30 seconds')
+      return new Promise((resolve) => setTimeout(resolve, 30000))
+    })
 }
 
 function shutdownBlockstackCore() {
