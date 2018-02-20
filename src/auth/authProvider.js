@@ -60,7 +60,7 @@ export function fetchAppManifest(authRequest) {
  *
  * @param {String} authRequest  encoded and signed authentication request token
  * @param  {String} authResponse encoded and signed authentication response token
- * @return {undefined}
+ * @return {void}
  * @throws {Error} if there is no redirect uri
  * @private
  */
