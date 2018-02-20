@@ -14,7 +14,7 @@ const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
-class BlockstackNetwork {
+export class BlockstackNetwork {
   blockstackAPIUrl: string
   broadcastServiceUrl: string
   layer1: Object
@@ -442,7 +442,7 @@ class BlockstackNetwork {
   }
 }
 
-class LocalRegtest extends BlockstackNetwork {
+export class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork) {
     super(apiUrl, broadcastServiceUrl, bitcoinAPI, bitcoinjs.networks.testnet)
