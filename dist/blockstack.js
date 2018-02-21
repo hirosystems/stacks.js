@@ -1731,6 +1731,8 @@ var BlockstackNetwork = function () {
       var networkAddress = this.coerceAddress(address);
       return fetch(this.blockstackAPIUrl + '/v1/addresses/bitcoin/' + networkAddress).then(function (resp) {
         return resp.json();
+      }).then(function (obj) {
+        return obj.names;
       });
     }
   }, {

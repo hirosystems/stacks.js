@@ -71,6 +71,7 @@ class BlockstackNetwork {
     const networkAddress = this.coerceAddress(address)
     return fetch(`${this.blockstackAPIUrl}/v1/addresses/bitcoin/${networkAddress}`)
       .then(resp => resp.json())
+      .then(obj => obj.names)
   }
 
   getNamespaceBurnAddress(namespace: string) {

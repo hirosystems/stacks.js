@@ -750,11 +750,11 @@ function safetyTests() {
     t.plan(2)
     FetchMock.restore()
     FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[1].address}`,
-                  ['dummy.id', 'dummy.id', 'dummy.id'])
+                  { names: ['dummy.id', 'dummy.id', 'dummy.id'] })
     const namesTooMany = new Array(25)
     namesTooMany.fill('dummy.id')
     FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[0].address}`,
-                  namesTooMany)
+                  { names: namesTooMany })
 
     Promise.all([safety.addressCanReceiveName(testAddresses[0].address),
                  safety.addressCanReceiveName(testAddresses[1].address)])
