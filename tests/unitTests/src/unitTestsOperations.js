@@ -41,7 +41,8 @@ function networkTests() {
     FetchMock.get(`https://utxo.tester.com/block/${blockHash}`,
                   { height: 300 })
     FetchMock.get(`https://utxo.tester.com/addr/${testAddresses[0].address}/utxo`,
-                  [{ value: 1, confirmations: 2, outpoint: { txid: 'bar', vout: 10 } }])
+                  [{ value: 1, satoshis: 1e8, confirmations: 2,
+                     outpoint: { txid: 'bar', vout: 10 } }])
 
     FetchMock.get('https://utxo.tester.com/status',
                   { blocks: 500 })
@@ -64,7 +65,7 @@ function networkTests() {
 
     mynet.getNetworkedUTXOs(testAddresses[0].address)
       .then((utxos) => {
-        t.deepEqual(utxos, [{ value: 1, confirmations: 2, tx_hash: 'bar', tx_output_n: 10 }])
+        t.deepEqual(utxos, [{ value: 1e8, confirmations: 2, tx_hash: 'bar', tx_output_n: 10 }])
       })
   })
 }

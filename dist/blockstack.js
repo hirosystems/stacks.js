@@ -2353,7 +2353,7 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
         return resp.json();
       }).then(function (utxos) {
         return utxos.map(function (x) {
-          return { value: x.value,
+          return { value: x.satoshis,
             confirmations: x.confirmations,
             tx_hash: x.outpoint.txid,
             tx_output_n: x.outpoint.vout };
@@ -2453,6 +2453,7 @@ var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost
 var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://broadcast.blockstack.org', new BlockchainInfoApi());
 
 var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
+  BlockchainInfoApi: BlockchainInfoApi, BitcoindAPI: BitcoindAPI, InsightClient: InsightClient,
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };
 }).call(this,require("buffer").Buffer)
 },{"./errors":11,"bitcoinjs-lib":86,"buffer":142,"form-data":300}],15:[function(require,module,exports){

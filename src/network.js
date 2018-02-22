@@ -605,7 +605,7 @@ export class InsightClient extends BitcoinNetwork {
     return fetch(`${this.apiUrl}/addr/${address}/utxo`)
       .then(resp => resp.json())
       .then(utxos => utxos.map(
-        x => ({ value: x.value,
+        x => ({ value: x.satoshis,
                 confirmations: x.confirmations,
                 tx_hash: x.outpoint.txid,
                 tx_output_n: x.outpoint.vout })))
@@ -699,4 +699,5 @@ const MAINNET_DEFAULT = new BlockstackNetwork(
   new BlockchainInfoApi())
 
 export const network = { BlockstackNetwork, LocalRegtest,
+                         BlockchainInfoApi, BitcoindAPI, InsightClient,
                          defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }
