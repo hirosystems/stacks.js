@@ -14,21 +14,22 @@ const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
-class BlockstackNetwork {
+export class BlockstackNetwork {
   blockstackAPIUrl: string
-  utxoProviderUrl: string
   broadcastServiceUrl: string
   layer1: Object
   DUST_MINIMUM: number
   includeUtxoMap: Object
   excludeUtxoSet: Array<UTXO>
+  btc: BitcoinNetwork
 
-  constructor(apiUrl: string, utxoProviderUrl: string, broadcastServiceUrl: string,
+  constructor(apiUrl: string, broadcastServiceUrl: string,
+              bitcoinAPI: BitcoinNetwork,
               network: Object = bitcoinjs.networks.bitcoin) {
     this.blockstackAPIUrl = apiUrl
-    this.utxoProviderUrl = utxoProviderUrl
     this.broadcastServiceUrl = broadcastServiceUrl
     this.layer1 = network
+    this.btc = bitcoinAPI
 
     this.DUST_MINIMUM = 5500
     this.includeUtxoMap = {}
@@ -55,12 +56,6 @@ class BlockstackNetwork {
           throw new Error('Failed to parse price of name')
         }
       })
-  }
-
-  getBlockHeight() {
-    return fetch(`${this.utxoProviderUrl}/latestblock`)
-      .then(resp => resp.json())
-      .then(blockObj => blockObj.height)
   }
 
   getGracePeriod() {
@@ -189,27 +184,7 @@ class BlockstackNetwork {
     }
 
     if (transactionToWatch === null) {
-      const form = new FormData()
-      form.append('tx', transaction)
-      return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
-                   { method: 'POST',
-                     body: form })
-        .then(resp => {
-          const text = resp.text()
-          return text
-          .then(respText => {
-            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-              const txHash = bitcoinjs.Transaction.fromHex(transaction)
-                    .getHash()
-                    .reverse()
-                    .toString('hex') // big_endian
-              return txHash
-            } else {
-              throw new RemoteServiceError(resp,
-                `Broadcast transaction failed with message: ${respText}`)
-            }
-          })
-        })
+      return this.btc.broadcastTransaction(transaction)
     } else {
       /*
        * POST /v1/broadcast/transaction
@@ -367,19 +342,6 @@ class BlockstackNetwork {
     return this.broadcastServiceFetchHelper(endpoint, requestBody)
   }
 
-
-  getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
-    return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}`)
-      .then(resp => {
-        if (resp.status === 200) {
-          return resp.json()
-        } else {
-          throw new Error(`Could not lookup transaction info for '${txHash}'. Server error.`)
-        }
-      })
-      .then(respObj => ({ block_height: respObj.block_height }))
-  }
-
   getFeeRate() : Promise<number> {
     return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
       .then(resp => resp.json())
@@ -388,29 +350,6 @@ class BlockstackNetwork {
 
   countDustOutputs() {
     throw new Error('Not implemented.')
-  }
-
-  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
-    return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}`)
-      .then(resp => {
-        if (resp.status === 500) {
-          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
-          return {
-            unspent_outputs: []
-          }
-        } else {
-          return resp.json()
-        }
-      })
-      .then(utxoJSON => utxoJSON.unspent_outputs)
-      .then(utxoList => utxoList.map(
-        utxo => {
-          const utxoOut = { value: utxo.value,
-                            tx_output_n: utxo.tx_output_n,
-                            confirmations: utxo.confirmations,
-                            tx_hash: utxo.tx_hash_big_endian }
-          return utxoOut
-        }))
   }
 
   getUTXOs(address: string) : Promise<Array<UTXO>> {
@@ -490,21 +429,55 @@ class BlockstackNetwork {
       .then(resp => resp.json())
       .then(x => x.consensus_hash)
   }
+
+  getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
+    return this.btc.getTransactionInfo(txHash)
+  }
+
+  getBlockHeight() {
+    return this.btc.getBlockHeight()
+  }
+
+  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
+    return this.btc.getNetworkedUTXOs(address)
+  }
 }
 
-class LocalRegtest extends BlockstackNetwork {
-  bitcoindUrl: string
-  bitcoindCredentials: Object
-
-  constructor(apiUrl: string, bitcoindUrl: string, broadcastServiceUrl: string,
-    bitcoindCredentials: ?Object = null) {
-    super(apiUrl, '', broadcastServiceUrl, bitcoinjs.networks.testnet)
-    this.bitcoindUrl = bitcoindUrl
-    this.bitcoindCredentials = Object.assign({}, bitcoindCredentials)
+export class LocalRegtest extends BlockstackNetwork {
+  constructor(apiUrl: string, broadcastServiceUrl: string,
+              bitcoinAPI: BitcoinNetwork) {
+    super(apiUrl, broadcastServiceUrl, bitcoinAPI, bitcoinjs.networks.testnet)
   }
 
   getFeeRate() : Promise<number> {
     return Promise.resolve(Math.floor(0.00001000 * SATOSHIS_PER_BTC))
+  }
+
+}
+
+export class BitcoinNetwork {
+  broadcastTransaction(transaction: string) : Promise<Object> {
+    return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
+  }
+  getBlockHeight() : Promise<Number> {
+    return Promise.reject(new Error('Not implemented, getBlockHeight()'))
+  }
+  getTransactionInfo(txid: string) : Promise<{block_height: Number}> {
+    return Promise.reject(new Error(`Not implemented, getTransactionInfo(${txid})`))
+  }
+  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
+    return Promise.reject(new Error(`Not implemented, getNetworkedUTXOs(${address})`))
+  }
+}
+
+export class BitcoindAPI extends BitcoinNetwork {
+  bitcoindUrl: string
+  bitcoindCredentials: Object
+
+  constructor(bitcoindUrl: string, bitcoindCredentials: {username: string, password: string}) {
+    super()
+    this.bitcoindUrl = bitcoindUrl
+    this.bitcoindCredentials = bitcoindCredentials
   }
 
   broadcastTransaction(transaction: string) {
@@ -590,19 +563,141 @@ class LocalRegtest extends BlockstackNetwork {
                       tx_output_n: x.vout })))
   }
 
+}
 
+export class InsightClient extends BitcoinNetwork {
+  apiUrl: string
+
+  constructor(insightUrl: string = 'https://utxo.technofractal.com/') {
+    super()
+    this.apiUrl = insightUrl
+  }
+
+  broadcastTransaction(transaction: string) {
+    const jsonData = { tx: transaction }
+    return fetch(`${this.apiUrl}/tx/send`,
+                 { method: 'POST',
+                   headers: new Headers({ 'Content-Type': 'application/json' }),
+                   body: JSON.stringify(jsonData) })
+      .then(resp => resp.json())
+  }
+
+  getBlockHeight() {
+    return fetch(`${this.apiUrl}/status`)
+      .then(resp => resp.json())
+      .then(status => status.blocks)
+  }
+
+  getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
+    return fetch(`${this.apiUrl}/tx/${txHash}`)
+      .then(resp => resp.json())
+      .then(transactionInfo => {
+        if (transactionInfo.error) {
+          throw new Error(`Error finding transaction: ${transactionInfo.error}`)
+        }
+        return fetch(`${this.apiUrl}/block/${transactionInfo.blockHash}`)
+      })
+      .then(resp => resp.json())
+      .then(blockInfo => ({ block_height: blockInfo.height }))
+  }
+
+  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
+    return fetch(`${this.apiUrl}/addr/${address}/utxo`)
+      .then(resp => resp.json())
+      .then(utxos => utxos.map(
+        x => ({ value: x.satoshis,
+                confirmations: x.confirmations,
+                tx_hash: x.outpoint.txid,
+                tx_output_n: x.outpoint.vout })))
+  }
+
+}
+
+export class BlockchainInfoApi extends BitcoinNetwork {
+  utxoProviderUrl: string
+
+  constructor(blockchainInfoUrl: string = 'https://blockchain.info') {
+    super()
+    this.utxoProviderUrl = blockchainInfoUrl
+  }
+
+  getBlockHeight() {
+    return fetch(`${this.utxoProviderUrl}/latestblock`)
+      .then(resp => resp.json())
+      .then(blockObj => blockObj.height)
+  }
+
+  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
+    return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}`)
+      .then(resp => {
+        if (resp.status === 500) {
+          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
+          return {
+            unspent_outputs: []
+          }
+        } else {
+          return resp.json()
+        }
+      })
+      .then(utxoJSON => utxoJSON.unspent_outputs)
+      .then(utxoList => utxoList.map(
+        utxo => {
+          const utxoOut = { value: utxo.value,
+                            tx_output_n: utxo.tx_output_n,
+                            confirmations: utxo.confirmations,
+                            tx_hash: utxo.tx_hash_big_endian }
+          return utxoOut
+        }))
+  }
+
+  getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
+    return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.json()
+        } else {
+          throw new Error(`Could not lookup transaction info for '${txHash}'. Server error.`)
+        }
+      })
+      .then(respObj => ({ block_height: respObj.block_height }))
+  }
+
+  broadcastTransaction(transaction: string) {
+    const form = new FormData()
+    form.append('tx', transaction)
+    return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
+                 { method: 'POST',
+                   body: form })
+      .then(resp => {
+        const text = resp.text()
+        return text
+          .then(respText => {
+            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+              const txHash = bitcoinjs.Transaction.fromHex(transaction)
+                    .getHash()
+                    .reverse()
+                    .toString('hex') // big_endian
+              return txHash
+            } else {
+              throw new RemoteServiceError(resp,
+                                           `Broadcast transaction failed with message: ${respText}`)
+            }
+          })
+      })
+  }
 }
 
 const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
-  'http://localhost:18332/',
   'http://localhost:16269',
-  { username: 'blockstack', password: 'blockstacksystem' })
+  new BitcoindAPI('http://localhost:18332/',
+                  { username: 'blockstack', password: 'blockstacksystem' }))
 
 const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org',
-  'https://blockchain.info',
-  'https://broadcast.blockstack.org')
+  'https://broadcast.blockstack.org',
+  new BlockchainInfoApi())
 
 export const network = { BlockstackNetwork, LocalRegtest,
+                         BlockchainInfoApi, BitcoindAPI, InsightClient,
                          defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }
