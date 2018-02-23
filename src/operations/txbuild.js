@@ -1,3 +1,5 @@
+/* @flow */
+
 import bitcoinjs from 'bitcoinjs-lib'
 
 import { addUTXOsToFund, DUST_MINIMUM,
@@ -332,7 +334,7 @@ function makeUpdate(fullyQualifiedName: string,
 function makeRegister(fullyQualifiedName: string,
                       registerAddress: string,
                       paymentKeyHex: string,
-                      zonefile: string = null) {
+                      zonefile: ?string = null) {
   const network = config.network
   let valueHash = undefined
   if (!!zonefile) {
@@ -424,7 +426,7 @@ function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
                      ownerKeyHex: string,
                      paymentKeyHex: string,
-                     zonefile: string = null) {
+                     zonefile: ?string = null) {
   let valueHash = undefined
   const network = config.network
 

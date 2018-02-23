@@ -1,3 +1,5 @@
+/* @flow */
+
 import bitcoinjs from 'bitcoinjs-lib'
 import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
@@ -22,37 +24,48 @@ const TX_INPUT_PUBKEYHASH = 107
 const TX_OUTPUT_BASE = 8 + 1
 const TX_OUTPUT_PUBKEYHASH = 25
 
-function inputBytes(input) {
-  return TX_INPUT_BASE + (input.script && input.script.length > 0 ?
-                          input.script.length : TX_INPUT_PUBKEYHASH)
+type txPoint = {
+  script: { length: number }
 }
 
-function outputBytes(output) {
-  return TX_OUTPUT_BASE + (output.script ? output.script.length : TX_OUTPUT_PUBKEYHASH)
+function inputBytes(input: txPoint | null) {
+  if (input && input.script && input.script.length > 0) {
+    return TX_INPUT_BASE + input.script.length
+  } else {
+    return TX_INPUT_BASE + TX_INPUT_PUBKEYHASH
+  }
 }
 
-function transactionBytes(inputs, outputs) {
+function outputBytes(output: txPoint | null) {
+  if (output && output.script && output.script.length > 0) {
+    return TX_OUTPUT_BASE + output.script.length
+  } else {
+    return TX_OUTPUT_BASE + TX_OUTPUT_PUBKEYHASH
+  }
+}
+
+function transactionBytes(inputs: Array<txPoint | null>, outputs: Array<txPoint | null>) {
   return TX_EMPTY_SIZE +
-    inputs.reduce((a, x) => (a + inputBytes(x)), 0) +
-    outputs.reduce((a, x) => (a + outputBytes(x)), 0)
+    inputs.reduce((a: number, x: txPoint | null) => (a + inputBytes(x)), 0) +
+    outputs.reduce((a: number, x: txPoint | null) => (a + outputBytes(x)), 0)
 }
 
 //
 
-export function estimateTXBytes(txIn : bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
-                                additionalInputs : number,
-                                additionalOutputs : number) {
+export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
+                                additionalInputs: number,
+                                additionalOutputs: number) {
   let innerTx = txIn
   if (txIn instanceof bitcoinjs.TransactionBuilder) {
     innerTx = txIn.tx
   }
-  const dummyInputs = new Array(additionalInputs)
-  dummyInputs.fill(1)
-  const dummyOutputs = new Array(additionalOutputs)
-  dummyOutputs.fill(1)
+  const dummyInputs: Array<null> = new Array(additionalInputs)
+  dummyInputs.fill(null)
+  const dummyOutputs: Array<null> = new Array(additionalOutputs)
+  dummyOutputs.fill(null)
 
-  const inputs = [].concat(innerTx.ins, dummyInputs)
-  const outputs = [].concat(innerTx.outs, dummyOutputs)
+  const inputs: Array<null | txPoint> = [].concat(innerTx.ins, dummyInputs)
+  const outputs: Array<null | txPoint> = [].concat(innerTx.outs, dummyOutputs)
 
   return transactionBytes(inputs, outputs)
 }
@@ -67,14 +80,29 @@ export function sumOutputValues(txIn : bitcoinjs.Transaction | bitcoinjs.Transac
 }
 
 export function decodeB40(input: string) {
+  // treat input as a base40 integer, and output a hex encoding
+  // of that integer.
+  //
+  //   for each digit of the string, find its location in `characters`
+  //    to get the value of the digit, then multiply by 40^(-index in input)
+  // e.g.,
+  // the 'right-most' character has value: (digit-value) * 40^0
+  //  the next character has value: (digit-value) * 40^1
+  //
+  // hence, we reverse the characters first, and use the index
+  //  to compute the value of each digit, then sum
   const characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+'
   const base = bigi.valueOf(40)
-  return input.split('').reverse()
-    .reduce((agg, character, exponent) =>
-            agg.add(bigi.valueOf(characters.indexOf(character)).multiply(
-              base.pow(bigi.valueOf(exponent)))),
-            bigi.ZERO)
-    .toHex()
+  const inputDigits = input.split('').reverse()
+  const digitValues = inputDigits.map(
+    ((character: string, exponent: number) =>
+     bigi.valueOf(characters.indexOf(character))
+     .multiply(base.pow(bigi.valueOf(exponent)))))
+  const sum = digitValues.reduce(
+    (agg: bigi.BigInteger, cur: bigi.BigInteger) =>
+      agg.add(cur),
+    bigi.ZERO)
+  return sum.toHex()
 }
 
 export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder, changeOutput: number,

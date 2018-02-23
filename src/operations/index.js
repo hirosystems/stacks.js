@@ -1,3 +1,5 @@
+/* @flow */
+
 export {
   makePreorderSkeleton
 } from './skeletons'

@@ -3311,11 +3311,19 @@ var TX_OUTPUT_BASE = 8 + 1;
 var TX_OUTPUT_PUBKEYHASH = 25;
 
 function inputBytes(input) {
-  return TX_INPUT_BASE + (input.script && input.script.length > 0 ? input.script.length : TX_INPUT_PUBKEYHASH);
+  if (input && input.script && input.script.length > 0) {
+    return TX_INPUT_BASE + input.script.length;
+  } else {
+    return TX_INPUT_BASE + TX_INPUT_PUBKEYHASH;
+  }
 }
 
 function outputBytes(output) {
-  return TX_OUTPUT_BASE + (output.script ? output.script.length : TX_OUTPUT_PUBKEYHASH);
+  if (output && output.script && output.script.length > 0) {
+    return TX_OUTPUT_BASE + output.script.length;
+  } else {
+    return TX_OUTPUT_BASE + TX_OUTPUT_PUBKEYHASH;
+  }
 }
 
 function transactionBytes(inputs, outputs) {
@@ -3334,9 +3342,9 @@ function estimateTXBytes(txIn, additionalInputs, additionalOutputs) {
     innerTx = txIn.tx;
   }
   var dummyInputs = new Array(additionalInputs);
-  dummyInputs.fill(1);
+  dummyInputs.fill(null);
   var dummyOutputs = new Array(additionalOutputs);
-  dummyOutputs.fill(1);
+  dummyOutputs.fill(null);
 
   var inputs = [].concat(innerTx.ins, dummyInputs);
   var outputs = [].concat(innerTx.outs, dummyOutputs);
@@ -3356,11 +3364,27 @@ function sumOutputValues(txIn) {
 }
 
 function decodeB40(input) {
+  // treat input as a base40 integer, and output a hex encoding
+  // of that integer.
+  //
+  //   for each digit of the string, find its location in `characters`
+  //    to get the value of the digit, then multiply by 40^(-index in input)
+  // e.g.,
+  // the 'right-most' character has value: (digit-value) * 40^0
+  //  the next character has value: (digit-value) * 40^1
+  //
+  // hence, we reverse the characters first, and use the index
+  //  to compute the value of each digit, then sum
   var characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+';
   var base = _bigi2.default.valueOf(40);
-  return input.split('').reverse().reduce(function (agg, character, exponent) {
-    return agg.add(_bigi2.default.valueOf(characters.indexOf(character)).multiply(base.pow(_bigi2.default.valueOf(exponent))));
-  }, _bigi2.default.ZERO).toHex();
+  var inputDigits = input.split('').reverse();
+  var digitValues = inputDigits.map(function (character, exponent) {
+    return _bigi2.default.valueOf(characters.indexOf(character)).multiply(base.pow(_bigi2.default.valueOf(exponent)));
+  });
+  var sum = digitValues.reduce(function (agg, cur) {
+    return agg.add(cur);
+  }, _bigi2.default.ZERO);
+  return sum.toHex();
 }
 
 function addUTXOsToFund(txBuilderIn, changeOutput, utxos, amountToFund, feeRate) {

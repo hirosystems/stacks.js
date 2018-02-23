@@ -1,3 +1,5 @@
+/* @flow */
+
 import { config } from '../config'
 
 function isNameValid(fullyQualifiedName: ?string = '') {

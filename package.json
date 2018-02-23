@@ -13,7 +13,7 @@
     "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
     "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
-    "integration-test-ops": "npm run lint && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
+    "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
     "build": "npm run build-documentation && npm run compile && npm run browserify",
     "flow": "flow",
     "lint": "eslint src && eslint tests",
