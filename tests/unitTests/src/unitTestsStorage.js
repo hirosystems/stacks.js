@@ -3,14 +3,29 @@ import FetchMock from 'fetch-mock'
 import proxyquire from 'proxyquire'
 import sinon from 'sinon'
 import bitcoin from 'bitcoinjs-lib'
-import 'mock-local-storage'
 import { uploadToGaiaHub, getFullReadUrl,
          connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
          getBucketUrl } from '../../../lib/storage/hub'
 import { getFile } from '../../../lib/storage'
 
+class LocalStorage {
+  constructor() {
+    this.data = {}
+  }
+  setItem(k, v) {
+    this.data[k] = v
+  }
+  removeItem(k) {
+    delete this.data[k]
+  }
+  getItem(k) {
+    return this.data[k]
+  }
+}
+const localStorage = new LocalStorage()
+global.localStorage = localStorage
 global.window = {}
-window.localStorage = global.localStorage
+global.window.localStorage = localStorage
 
 export function runStorageTests() {
   test('getFile unencrypted', (t) => {
@@ -170,11 +185,11 @@ export function runStorageTests() {
       username: 'yukan.id'
     }
 
-    global.window = {
+    global.window = Object.assign({}, global.window, {
       location: {
         origin: 'http://localhost:8080'
       }
-    }
+    })
 
     getFile(path, optionsNoApp)
       .then((file) => {
@@ -217,7 +232,7 @@ export function runStorageTests() {
                      token: '',
                      server: 'hub.testblockstack.org' }
 
-    global.localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(config))
+    global.window.localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(config))
 
     FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
                   { status: 404 })
