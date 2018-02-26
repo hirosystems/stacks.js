@@ -92,14 +92,14 @@ in the proof URL depending on the service.
 
 ### Adding additional social account validation services
 The `Service` class can be extended to provide proof validation service
-to additional social accounts. You will need to override the 
+to additional social account types. You will need to override the 
 `getProofStatement(searchText: string)` method which parses the proof
 body and returns the proof message text. Additionally, the identifier 
 claimed should be verified in the proof URL or in the body by implementing   
 `getProofIdentity(searchText: string)` and setting `shouldValidateIdentityInBody()`
 to return true.
 
-The following snippet uses the meta tags in the page to retrieve the proof message.
+The following snippet uses the meta tags in the proof page to retrieve the proof message.
 ```js
 static getProofStatement(searchText: string) {
 	const $ = cheerio.load(searchText)
