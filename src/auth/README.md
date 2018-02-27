@@ -139,8 +139,12 @@ The app private key serves three functions.
 * It is used to create the credentials that give an app access to the gaia hub storage bucket for that specific app. 
 * It is used in the end-to-end encryption of files stored for the app on the user's gaia hub. 
 * It serves as a cryptographic secret that apps can use to perform other cryptographic functions.
+
 ## Scopes
-To be added
+Scopes define the information and permissions an app requests from the user during authentication. If no `scopes` array is provided to the `redirectToSignIn` or `makeAuthRequest` functions.
+- `store_write` - read and write data to the user's Gaia hub in an app-specific storage bucket
+- `publish_data` - publish data so that other users of the app can discover and interact with the user
+- `email` - requests the user's email if available
 
 ## Authentication tokens
 
