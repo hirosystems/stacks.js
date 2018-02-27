@@ -2355,8 +2355,8 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
         return utxos.map(function (x) {
           return { value: x.satoshis,
             confirmations: x.confirmations,
-            tx_hash: x.outpoint.txid,
-            tx_output_n: x.outpoint.vout };
+            tx_hash: x.txid,
+            tx_output_n: x.vout };
         });
       });
     }

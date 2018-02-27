@@ -607,8 +607,8 @@ export class InsightClient extends BitcoinNetwork {
       .then(utxos => utxos.map(
         x => ({ value: x.satoshis,
                 confirmations: x.confirmations,
-                tx_hash: x.outpoint.txid,
-                tx_output_n: x.outpoint.vout })))
+                tx_hash: x.txid,
+                tx_output_n: x.vout })))
   }
 
 }
