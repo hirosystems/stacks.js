@@ -42,7 +42,7 @@ function networkTests() {
                   { height: 300 })
     FetchMock.get(`https://utxo.tester.com/addr/${testAddresses[0].address}/utxo`,
                   [{ value: 1, satoshis: 1e8, confirmations: 2,
-                     outpoint: { txid: 'bar', vout: 10 } }])
+                     txid: 'bar', vout: 10 }])
 
     FetchMock.get('https://utxo.tester.com/status',
                   { blocks: 500 })
