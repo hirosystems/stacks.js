@@ -5,7 +5,10 @@ Blockstack authentication provides single sign on and authentication without thi
 * [Overview](#overview)
 * [Quickstart](#quickstart)
 * [API Reference](http://blockstack.github.io/blockstack.js/index.html#authentication)
-* [Operations](#operations)
+* [User Flow](#user-flow)
+* [Manifest File](#manifest-file)
+* [Key Pairs](#key-pairs)
+* [Adding Blockstack Authentication to your app](#adding-blockstack-authentication-to-your-app)
 
 
 ## Overview
@@ -157,6 +160,7 @@ Blockstack's authentication tokens are based on the [ RFC 7519 OAuth JSON Web To
 This support is indicated by specifying `ES256K` in the `alg` key to indicated that the JWT signature uses ECDSA using the secp256k1 curve.  We provide both [JavaScript](https://github.com/blockstack/jsontokens-js) and [Ruby](https://github.com/blockstack/ruby-jwt-blockstack/tree/ruby-jwt-blockstack) JWT libraries with support for this curve.
 
 ### Authentication Request Payload Schema
+
 ``` JavaScript
 const requestPayload = {
     jti, // UUID
@@ -201,7 +205,7 @@ The `blockstack:` custom protocol handler is how Blockstack apps send their auth
 
 When apps call [`redirectToSignIn`](http://blockstack.github.io/blockstack.js/index.html#redirecttosignin) or [`redirectToSignInWithAuthRequest`](http://blockstack.github.io/blockstack.js/index.html#redirecttosigninwithauthrequest), the code tries to check if a handler for the `blockstack:` custom protocol is installed and, if so, redirects the user to `blockstack:<authRequestToken>`. This causes the authentication request token to be passed from the app to the Blockstack Browser which in turn validates the request, displays information about the app to the user and asks the user if she wants to approve sign in to the app.
 
-## Adding Blockstack Authentication to your app.
+## Adding Blockstack Authentication to your app
 
 The way you can add Blockstack Authentication to you app depends on whether your app is a modern decentralized Blockstack App where code runs client-side without trusted servers or a legacy client-server app where a server is trusted. 
 
@@ -210,7 +214,7 @@ This method is appropriate for decentralized client-side apps where the user's z
 
 [Blockstack.js](https://github.com/blockstack/blockstack.js) provides API methods that help you to implement Blockstack Authentication in your client-side app.  
 
-### Standard flow
+#### Standard flow
 The preferred way to implement authentication in these apps is to use the standard flow. This flow hides much of the process behind a few easy function calls and makes it very fast to get up and running.
 
 In this process you'll use these four functions:
@@ -220,23 +224,53 @@ In this process you'll use these four functions:
 - `handlePendingSignIn`
 - `loadUserData`
 
-#### Starting the sign in process
+##### Starting the sign in process
+
 When your app wants to start the sign in process, typically when the user clicks a "Sign in with Blockstack" button, your app will call the [`redirectToSignIn`](http://blockstack.github.io/blockstack.js/index.html#redirecttosignin) method of [blockstack.js](https://github.com/blockstack/blockstack.js). 
 
 This creates an ephemeral transit key, stores it in the web browser's `localStorage`, uses it to create an authentication request token and finally redirects the user to the Blockstack browser to approve the sign in request.
 
-```
+##### Handling an authentication response
+
+When a user approves a sign in request, the Blockstack Browser will return the signed authentication response token to the `redirectURI` specified in `redirectToSignIn`. To check for the presence of this token, your app calls `isSignInPending` and if this returns `true` you then call the `handlePendingSignIn` which decodes the token and returns the signed in user's data and simultaneously storing it to `localStorage` so that it can be retrieved later with `loadUserData`.
+
+```js
+import * as blockstack from 'blockstack'
+
+if (blockstack.isSignInPending()) {
+    blockstack.handlePendingSignIn()
+    .then(userData => {
+        const profile = userData.profile
+    })
+} 
 
 ```
 
-#### Handling an authentication response
+#### Manual flow
 
-When a user approves a sign in request, the Blockstack Browser will return the signed authentication response token to the `redirect_uri` specified in `redirectToSignIn`. To check for the presence of this token, your app calls `isSignInPending` and if this returns `true` you then call the `handlePendingSignIn` which decodes the token and returns the signed in user's data and simultaneously storing it to `localStorage` so that it can be retrieved later with `loadUserData`.
+Alternatively, you can manually generate your own transit private key and/or authentication request token. This gives you more control over the experience.
 
-### Manual flow
+For example, you could use the following code to generate an authentication request on `https://alice.example.com` or `https://bob.example.com` for an app running on origin `https://example.com`.
 
-To be added later...
+```js
+
+const transitPrivateKey = generateAndStoreTransitKey()
+const redirectURI = 'https://example.com/authLandingPage'
+const manifestURI = 'https://example.com/manifest.json'
+const scopes = ['scope_write', 'publish_data']
+const appDomain = 'https://example.com'
+
+const authRequest = makeAuthRequest(transitPrivateKey, redirectURI, scopes, appDomain)
+
+redirectToSignInWithAuthRequest(authRequest)
+```
 
 ### Authentication in client-server apps
 
-To be added later...
+*Note: Client-server authentication requires using a library written in the language of your server app. There are private methods in blockstack.js that can be accomplish this on node.js server apps, but they are not currently part of our public, supported API.*
+
+Using Blockstack authentication in client-server apps is very similar to client-side apps. You generate the authentication request using the same code in the client as described above.
+
+The main difference is that you need to verify the authentication response token on the server after the user approves sign in to your app. 
+
+For an example of how verification can be done server side, take a look at the [blockstack-ruby](https://github.com/blockstack/blockstack-ruby#to-verify-an-auth-response) library.
