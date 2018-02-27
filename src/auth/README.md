@@ -1,6 +1,6 @@
 # Blockstack Authentication
 
-Blockstack authentication provides single sign on and authentication without third parties or remote servers.
+Blockstack Authentication provides single sign on and authentication without third parties or remote servers.
 
 * [Overview](#overview)
 * [Quickstart](#quickstart)
@@ -9,14 +9,13 @@ Blockstack authentication provides single sign on and authentication without thi
 * [Manifest file](#manifest-file)
 * [Key pairs](#key-pairs)
 * [Scopes](#scopes)
-* [Authentication tokens](#scopes)
+* [Authentication tokens](#authentication-tokens)
 * [`blockstack:` custom protocol handler](#blockstack-custom-protocol-handler)
 * [Adding Blockstack Authentication to your app](#adding-blockstack-authentication-to-your-app)
 
-
 ## Overview
 
-Blockstack authentication is a bearer token-based authentication system. From an app user's perspective, it functions similar to legacy third-party authentication techniques that they're familiar with. From an app developers' perspective it's a bit different than a typical client-server based OAuth flow that you've seen with centralized sign in services in that authentication happens entirely on the client side.
+Blockstack Authentication is a bearer token-based authentication system. From an app user's perspective, it functions similar to legacy third-party authentication techniques that they're familiar with. From an app developers' perspective it's a bit different than a typical client-server based OAuth flow that you've seen with centralized sign in services in that authentication happens entirely on the client side.
 
 ## Quickstart
 
@@ -128,7 +127,7 @@ The manifest file *MUST* have [Cross-origin resource sharing (CORS) headers](htt
 
 ## Key pairs
 
-Blockstack authentication makes extensive use of public key cryptography. As mentioned above, we use ECDSA with the secp256k1 curve. What follows is a description of the various public-private key pairs used in the authentication process including how they're generated, where they're used and to whom the private key is disclosed.
+Blockstack Authentication makes extensive use of public key cryptography. As mentioned above, we use ECDSA with the secp256k1 curve. What follows is a description of the various public-private key pairs used in the authentication process including how they're generated, where they're used and to whom the private key is disclosed.
 
 ### Transit private key
 
@@ -272,7 +271,7 @@ redirectToSignInWithAuthRequest(authRequest)
 
 *Note: Client-server authentication requires using a library written in the language of your server app. There are private methods in blockstack.js that can be accomplish this on node.js server apps, but they are not currently part of our public, supported API.*
 
-Using Blockstack authentication in client-server apps is very similar to client-side apps. You generate the authentication request using the same code in the client as described above.
+Using Blockstack Authentication in client-server apps is very similar to client-side apps. You generate the authentication request using the same code in the client as described above.
 
 The main difference is that you need to verify the authentication response token on the server after the user approves sign in to your app. 
 
