@@ -5,9 +5,12 @@ Blockstack authentication provides single sign on and authentication without thi
 * [Overview](#overview)
 * [Quickstart](#quickstart)
 * [API Reference](http://blockstack.github.io/blockstack.js/index.html#authentication)
-* [User Flow](#user-flow)
-* [Manifest File](#manifest-file)
-* [Key Pairs](#key-pairs)
+* [User flow](#user-flow)
+* [Manifest file](#manifest-file)
+* [Key pairs](#key-pairs)
+* [Scopes](#scopes)
+* [Authentication tokens](#scopes)
+* [`blockstack:` custom protocol handler](#blockstack-custom-protocol-handler)
 * [Adding Blockstack Authentication to your app](#adding-blockstack-authentication-to-your-app)
 
 
@@ -159,7 +162,7 @@ Blockstack's authentication tokens are based on the [ RFC 7519 OAuth JSON Web To
 
 This support is indicated by specifying `ES256K` in the `alg` key to indicated that the JWT signature uses ECDSA using the secp256k1 curve.  We provide both [JavaScript](https://github.com/blockstack/jsontokens-js) and [Ruby](https://github.com/blockstack/ruby-jwt-blockstack/tree/ruby-jwt-blockstack) JWT libraries with support for this curve.
 
-### Authentication Request Payload Schema
+### Authentication request payload schema
 
 ``` JavaScript
 const requestPayload = {
@@ -179,7 +182,7 @@ const requestPayload = {
 ```
  
   
-### Authentication Response Schema
+### Authentication response payload schema
   
 ```JavaScript
     const responsePayload = {
