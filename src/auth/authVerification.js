@@ -258,6 +258,7 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
  * @param {String} nameLookupURL the url use to verify owner of a username
  * @return {Promise} that resolves to true if auth response
  * is valid and false if it does not
+ * @private
  */
 export function verifyAuthResponse(token: string, nameLookupURL: string) {
   return new Promise((resolve) => {
