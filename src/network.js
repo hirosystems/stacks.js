@@ -622,13 +622,13 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 
   getBlockHeight() {
-    return fetch(`${this.utxoProviderUrl}/latestblock`)
+    return fetch(`${this.utxoProviderUrl}/latestblock?cors=true`)
       .then(resp => resp.json())
       .then(blockObj => blockObj.height)
   }
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
-    return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}`)
+    return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
       .then(resp => {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
@@ -651,7 +651,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 
   getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
-    return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}`)
+    return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}?cors=true`)
       .then(resp => {
         if (resp.status === 200) {
           return resp.json()

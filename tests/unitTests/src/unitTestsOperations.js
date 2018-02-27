@@ -229,9 +229,9 @@ function utilsTests() {
 
     FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
 
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}&cors=true`,
                   { unspent_outputs: utxoSet1 })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}&cors=true`,
                   { unspent_outputs: utxoSet2 })
 
     Promise.all([config.network.getUTXOs(testAddress1),
@@ -292,9 +292,9 @@ function transactionTests() {
   function setupMocks() {
     FetchMock.restore()
     FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}&cors=true`,
                   { unspent_outputs: utxoSet })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}&cors=true`,
                   { unspent_outputs: utxoSet2 })
     FetchMock.get('https://core.blockstack.org/v1/prices/names/foo.test',
                   { name_price: { satoshis: BURN_AMT } })
@@ -838,18 +838,18 @@ function safetyTests() {
                   { body: 'Name available', status: 404 })
     FetchMock.get('https://core.blockstack.org/v1/names/foo.test',
                   { expires_block: 50 })
-    FetchMock.getOnce('https://blockchain.info/latestblock',
+    FetchMock.getOnce('https://blockchain.info/latestblock?cors=true',
                       { height: 49 })
     safety.isInGracePeriod('foo.test')
       .then(result => {
         t.ok(!result, 'name should not be in grace period if it isnt expired')
-        FetchMock.getOnce('https://blockchain.info/latestblock',
+        FetchMock.getOnce('https://blockchain.info/latestblock?cors=true',
                           { height: 50 })
         return safety.isInGracePeriod('foo.test')
       })
       .then(result => {
         t.ok(result, 'name should be in grace period')
-        FetchMock.get('https://blockchain.info/latestblock',
+        FetchMock.get('https://blockchain.info/latestblock?cors=true',
                       { height: 5050 })
         return safety.isInGracePeriod('foo.test')
       })

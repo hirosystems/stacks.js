@@ -2382,7 +2382,7 @@ var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) 
   _createClass(BlockchainInfoApi, [{
     key: 'getBlockHeight',
     value: function getBlockHeight() {
-      return fetch(this.utxoProviderUrl + '/latestblock').then(function (resp) {
+      return fetch(this.utxoProviderUrl + '/latestblock?cors=true').then(function (resp) {
         return resp.json();
       }).then(function (blockObj) {
         return blockObj.height;
@@ -2391,7 +2391,7 @@ var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) 
   }, {
     key: 'getNetworkedUTXOs',
     value: function getNetworkedUTXOs(address) {
-      return fetch(this.utxoProviderUrl + '/unspent?format=json&active=' + address).then(function (resp) {
+      return fetch(this.utxoProviderUrl + '/unspent?format=json&active=' + address + '&cors=true').then(function (resp) {
         if (resp.status === 500) {
           console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []');
           return {
@@ -2415,7 +2415,7 @@ var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) 
   }, {
     key: 'getTransactionInfo',
     value: function getTransactionInfo(txHash) {
-      return fetch(this.utxoProviderUrl + '/rawtx/' + txHash).then(function (resp) {
+      return fetch(this.utxoProviderUrl + '/rawtx/' + txHash + '?cors=true').then(function (resp) {
         if (resp.status === 200) {
           return resp.json();
         } else {
