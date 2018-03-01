@@ -91,7 +91,7 @@ be fetched via an http `GET` from any origin.
 
 ## User flow
 
-What follows is a walk through of the experience of a user, Alice, signing in to your app with Blockstack. 
+What follows is a walk through of the experience of a user, Alice, signing in to your app with Blockstack.
 
 First, Alice clicks the "Sign in with Blockstack" button on your app. She is redirected to her copy of the Blockstack Browser. The Blockstack Browser shows Alice an approval dialog with information about your app including:
 
@@ -140,9 +140,9 @@ The identity address private key is derived from the user's keychain phrase and 
 
 The app private key is an app-specific private key that is generated from the user's identity address private key using the `domain_name` as input. It is deterministic in that for a given Blockstack ID and `domain_name`, the same private key will be generated each time. The app private key is securely shared with the app on each authentication, encrypted by the Blockstack browser with the transit public key.  
 
-The app private key serves three functions. 
-* It is used to create the credentials that give an app access to the gaia hub storage bucket for that specific app. 
-* It is used in the end-to-end encryption of files stored for the app on the user's gaia hub. 
+The app private key serves three functions.
+* It is used to create the credentials that give an app access to the gaia hub storage bucket for that specific app.
+* It is used in the end-to-end encryption of files stored for the app on the user's gaia hub.
 * It serves as a cryptographic secret that apps can use to perform other cryptographic functions.
 
 ## Scopes
@@ -179,10 +179,10 @@ const requestPayload = {
     scopes // an array of string values indicating scopes requested by the app
   }
 ```
- 
-  
+
+
 ### Authentication response payload schema
-  
+
 ```JavaScript
     const responsePayload = {
     jti, // UUID
@@ -200,7 +200,7 @@ const requestPayload = {
     version // version tuple
   }
 ```
-  
+
 ## `blockstack:` custom protocol handler
 
 The `blockstack:` custom protocol handler is how Blockstack apps send their authentication requests to the Blockstack Browser. When the Blockstack Browser is installed on a user's computer, it registers itself as the handler for the `blockstack:` customer protocol.
@@ -209,7 +209,7 @@ When apps call [`redirectToSignIn`](http://blockstack.github.io/blockstack.js/in
 
 ## Adding Blockstack Authentication to your app
 
-The way you can add Blockstack Authentication to you app depends on whether your app is a modern decentralized Blockstack App where code runs client-side without trusted servers or a legacy client-server app where a server is trusted. 
+The way you can add Blockstack Authentication to you app depends on whether your app is a modern decentralized Blockstack App where code runs client-side without trusted servers or a legacy client-server app where a server is trusted.
 
 ### Authentication in Client-side apps
 This method is appropriate for decentralized client-side apps where the user's zone of trust - the parts of the app that the user is trusting - begins and ends with the code running on their own computer. In apps like these, any code the app interacts with that's not on their own computer such as external servers does not need to know who she is.
@@ -228,7 +228,7 @@ In this process you'll use these four functions:
 
 ##### Starting the sign in process
 
-When your app wants to start the sign in process, typically when the user clicks a "Sign in with Blockstack" button, your app will call the [`redirectToSignIn`](http://blockstack.github.io/blockstack.js/index.html#redirecttosignin) method of [blockstack.js](https://github.com/blockstack/blockstack.js). 
+When your app wants to start the sign in process, typically when the user clicks a "Sign in with Blockstack" button, your app will call the [`redirectToSignIn`](http://blockstack.github.io/blockstack.js/index.html#redirecttosignin) method of [blockstack.js](https://github.com/blockstack/blockstack.js).
 
 This creates an ephemeral transit key, stores it in the web browser's `localStorage`, uses it to create an authentication request token and finally redirects the user to the Blockstack browser to approve the sign in request.
 
@@ -244,7 +244,7 @@ if (blockstack.isSignInPending()) {
     .then(userData => {
         const profile = userData.profile
     })
-} 
+}
 
 ```
 
@@ -262,7 +262,7 @@ const manifestURI = 'https://example.com/manifest.json'
 const scopes = ['scope_write', 'publish_data']
 const appDomain = 'https://example.com'
 
-const authRequest = makeAuthRequest(transitPrivateKey, redirectURI, scopes, appDomain)
+const authRequest = makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes, appDomain)
 
 redirectToSignInWithAuthRequest(authRequest)
 ```
@@ -273,6 +273,6 @@ redirectToSignInWithAuthRequest(authRequest)
 
 Using Blockstack Authentication in client-server apps is very similar to client-side apps. You generate the authentication request using the same code in the client as described above.
 
-The main difference is that you need to verify the authentication response token on the server after the user approves sign in to your app. 
+The main difference is that you need to verify the authentication response token on the server after the user approves sign in to your app.
 
 For an example of how verification can be done server side, take a look at the [blockstack-ruby](https://github.com/blockstack/blockstack-ruby#to-verify-an-auth-response) library.
