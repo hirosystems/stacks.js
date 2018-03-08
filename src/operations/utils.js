@@ -3,6 +3,8 @@
 import bitcoinjs from 'bitcoinjs-lib'
 import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
+import { config } from '../config'
+import { hexStringToECPair } from '../utils'
 
 export const DUST_MINIMUM = 5500
 
@@ -135,5 +137,39 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder, change
     return addUTXOsToFund(txBuilderIn,
                           changeOutput, utxos.slice(1),
                           remainToFund, feeRate)
+  }
+}
+
+
+export class MultiSigKeySigner {
+  redeemScript: Buffer
+  privateKeys: Array<string>
+  m: number
+  constructor(redeemScript: string, privateKeys: Array<string>) {
+    this.redeemScript = Buffer.from(redeemScript, 'hex')
+    this.privateKeys = privateKeys
+    try {
+      // try to deduce m (as in m-of-n)
+      const chunks = bitcoinjs.script.decompile(this.redeemScript)
+      const firstOp = chunks[0]
+      this.m = parseInt(bitcoinjs.script.toASM([firstOp]).slice(3), 10)
+    } catch (e) {
+      console.log(e.stack)
+      throw new Error('Improper redeem script for multi-sig input.')
+    }
+  }
+
+  getAddress() {
+    return bitcoinjs.address.toBase58Check(
+      bitcoinjs.crypto.hash160(this.redeemScript),
+      config.network.layer1.scriptHash)
+  }
+
+  sign(txIn: bitcoinjs.TransactionBuilder, signingIndex: number) {
+    const keysToUse = this.privateKeys.slice(0, this.m)
+    keysToUse.forEach((keyHex) => {
+      const ecPair = hexStringToECPair(keyHex)
+      txIn.sign(signingIndex, ecPair, this.redeemScript)
+    })
   }
 }

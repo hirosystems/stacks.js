@@ -3339,8 +3339,8 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
  * @param {String} fullyQualifiedName - the name to transfer
  * @param {String} destinationAddress - the address to receive the name after renewal
  *    this address will receive a dust UTXO
- * @param {String} ownerKeyHex - a hex string of the current owner's
- *    private key
+ * @param {String} ownerKey - either a hex string of the current owner's
+ *    private key, or an object with multi-sig components.
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the renewal
  * @param {String} zonefile - the zonefile data to include (this will be hashed
@@ -3351,7 +3351,7 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
  *    the safety module for those.
  * @private
  */
-function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
+function makeRenewal(fullyQualifiedName, destinationAddress, ownerKey, paymentKeyHex) {
   var zonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
   var valueHash = undefined;
@@ -3363,11 +3363,24 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
 
   var namespace = fullyQualifiedName.split('.').pop();
 
-  var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
+  var ownerKeySigner = void 0;
+
+  if (typeof ownerKey === 'string') {
+    ownerKeySigner = (0, _utils2.hexStringToECPair)(ownerKey);
+  } else if (ownerKey.hasOwnProperty('redeemScript')) {
+    try {
+      ownerKeySigner = new _utils.MultiSigKeySigner(ownerKey.redeemScript, ownerKey.privateKeys);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  } else {
+    return Promise.reject(new Error('Passed invalid object as owner key.'));
+  }
+
   var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
 
-  var ownerAddress = ownerKey.getAddress();
   var paymentAddress = paymentKey.getAddress();
+  var ownerAddress = ownerKeySigner.getAddress();
 
   var txPromise = Promise.all([network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref15) {
     var _ref16 = _slicedToArray(_ref15, 2),
@@ -3397,7 +3410,11 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
 
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
       if (i === ownerInput.index) {
-        signingTxB.sign(i, ownerKey);
+        if (ownerKeySigner instanceof _utils.MultiSigKeySigner) {
+          ownerKeySigner.sign(signingTxB, i);
+        } else {
+          signingTxB.sign(i, ownerKeySigner);
+        }
       } else {
         signingTxB.sign(i, paymentKey);
       }
@@ -3418,7 +3435,10 @@ var transactions = exports.transactions = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DUST_MINIMUM = undefined;
+exports.MultiSigKeySigner = exports.DUST_MINIMUM = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 exports.hash160 = hash160;
 exports.hash128 = hash128;
 exports.estimateTXBytes = estimateTXBytes;
@@ -3438,7 +3458,13 @@ var _bigi = require('bigi');
 
 var _bigi2 = _interopRequireDefault(_bigi);
 
+var _config = require('../config');
+
+var _utils = require('../utils');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var DUST_MINIMUM = exports.DUST_MINIMUM = 5500;
 
@@ -3569,8 +3595,46 @@ function addUTXOsToFund(txBuilderIn, changeOutput, utxos, amountToFund, feeRate)
     return addUTXOsToFund(txBuilderIn, changeOutput, utxos.slice(1), remainToFund, feeRate);
   }
 }
+
+var MultiSigKeySigner = exports.MultiSigKeySigner = function () {
+  function MultiSigKeySigner(redeemScript, privateKeys) {
+    _classCallCheck(this, MultiSigKeySigner);
+
+    this.redeemScript = Buffer.from(redeemScript, 'hex');
+    this.privateKeys = privateKeys;
+    try {
+      // try to deduce m (as in m-of-n)
+      var chunks = _bitcoinjsLib2.default.script.decompile(this.redeemScript);
+      var firstOp = chunks[0];
+      this.m = parseInt(_bitcoinjsLib2.default.script.toASM([firstOp]).slice(3), 10);
+    } catch (e) {
+      console.log(e.stack);
+      throw new Error('Improper redeem script for multi-sig input.');
+    }
+  }
+
+  _createClass(MultiSigKeySigner, [{
+    key: 'getAddress',
+    value: function getAddress() {
+      return _bitcoinjsLib2.default.address.toBase58Check(_bitcoinjsLib2.default.crypto.hash160(this.redeemScript), _config.config.network.layer1.scriptHash);
+    }
+  }, {
+    key: 'sign',
+    value: function sign(txIn, signingIndex) {
+      var _this = this;
+
+      var keysToUse = this.privateKeys.slice(0, this.m);
+      keysToUse.forEach(function (keyHex) {
+        var ecPair = (0, _utils.hexStringToECPair)(keyHex);
+        txIn.sign(signingIndex, ecPair, _this.redeemScript);
+      });
+    }
+  }]);
+
+  return MultiSigKeySigner;
+}();
 }).call(this,require("buffer").Buffer)
-},{"bigi":47,"bitcoinjs-lib":86,"buffer":142,"ripemd160":413}],20:[function(require,module,exports){
+},{"../config":8,"../utils":44,"bigi":47,"bitcoinjs-lib":86,"buffer":142,"ripemd160":413}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

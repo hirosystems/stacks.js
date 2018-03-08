@@ -2,7 +2,7 @@
 
 import bitcoinjs from 'bitcoinjs-lib'
 
-import { addUTXOsToFund, DUST_MINIMUM,
+import { addUTXOsToFund, DUST_MINIMUM, MultiSigKeySigner,
          estimateTXBytes, sumOutputValues, hash160 } from './utils'
 import { makePreorderSkeleton, makeRegisterSkeleton,
          makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton } from './skeletons'
@@ -410,8 +410,8 @@ function makeTransfer(fullyQualifiedName: string,
  * @param {String} fullyQualifiedName - the name to transfer
  * @param {String} destinationAddress - the address to receive the name after renewal
  *    this address will receive a dust UTXO
- * @param {String} ownerKeyHex - a hex string of the current owner's
- *    private key
+ * @param {String} ownerKey - either a hex string of the current owner's
+ *    private key, or an object with multi-sig components.
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the renewal
  * @param {String} zonefile - the zonefile data to include (this will be hashed
@@ -424,7 +424,7 @@ function makeTransfer(fullyQualifiedName: string,
  */
 function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
-                     ownerKeyHex: string,
+                     ownerKey: string | { redeemScript: string, privateKeys: Array<string> },
                      paymentKeyHex: string,
                      zonefile: ?string = null) {
   let valueHash = undefined
@@ -436,11 +436,24 @@ function makeRenewal(fullyQualifiedName: string,
 
   const namespace = fullyQualifiedName.split('.').pop()
 
-  const ownerKey = hexStringToECPair(ownerKeyHex)
+  let ownerKeySigner
+
+  if (typeof(ownerKey) === 'string') {
+    ownerKeySigner = hexStringToECPair(ownerKey)
+  } else if (ownerKey.hasOwnProperty('redeemScript')) {
+    try {
+      ownerKeySigner = new MultiSigKeySigner(ownerKey.redeemScript, ownerKey.privateKeys)
+    } catch (e) {
+      return Promise.reject(e)
+    }
+  } else {
+    return Promise.reject(new Error('Passed invalid object as owner key.'))
+  }
+
   const paymentKey = hexStringToECPair(paymentKeyHex)
 
-  const ownerAddress = ownerKey.getAddress()
   const paymentAddress = paymentKey.getAddress()
+  const ownerAddress = ownerKeySigner.getAddress()
 
   const txPromise = Promise.all([network.getNamePrice(fullyQualifiedName),
                                  network.getNamespaceBurnAddress(namespace)])
@@ -467,7 +480,11 @@ function makeRenewal(fullyQualifiedName: string,
 
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
         if (i === ownerInput.index) {
-          signingTxB.sign(i, ownerKey)
+          if (ownerKeySigner instanceof MultiSigKeySigner) {
+            ownerKeySigner.sign(signingTxB, i)
+          } else {
+            signingTxB.sign(i, ownerKeySigner)
+          }
         } else {
           signingTxB.sign(i, paymentKey)
         }
