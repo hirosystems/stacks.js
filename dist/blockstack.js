@@ -307,7 +307,14 @@ var VERSION = '1.1.0';
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
- * browser for the user to approve sign in.
+ * browser for the user to approve sign in. This authentication request can
+ * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * method.
+ *
+ * *Note: This method should only be used if you want to roll your own authentication
+ * flow. Typically you'd use `redirectToSignIn` which takes care of this
+ * under the hood.*
+ *
  * @param  {String} [transitPrivateKey=generateAndStoreTransitKey()] - hex encoded transit
  *   private key
  * @param {String} redirectURI - location to redirect user to after sign in approval
@@ -356,18 +363,56 @@ function makeAuthRequest() {
   return token;
 }
 
+/**
+ * Encrypts the private key for decryption by the given
+ * public key.
+ * @param  {String} publicKey  [description]
+ * @param  {String} privateKey [description]
+ * @return {String} hex encoded ciphertext
+ * @private
+ */
 function encryptPrivateKey(publicKey, privateKey) {
   var encryptedObj = (0, _encryption.encryptECIES)(publicKey, privateKey);
   var encryptedJSON = JSON.stringify(encryptedObj);
   return new Buffer(encryptedJSON).toString('hex');
 }
 
+/**
+ * Decrypts the hex encrypted private key
+ * @param  {String} privateKey  the private key corresponding to the public
+ * key for which the ciphertext was encrypted
+ * @param  {String} hexedEncrypted the ciphertext
+ * @return {String}  the decrypted private key
+ * @throws {Error} if unable to decrypt
+ */
 function decryptPrivateKey(privateKey, hexedEncrypted) {
   var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
   var encryptedObj = JSON.parse(unhexedString);
   return (0, _encryption.decryptECIES)(privateKey, encryptedObj);
 }
 
+/**
+ * Generates a signed authentication response token for an app. This
+ * token is sent back to apps which use contents to access the
+ * resources and data requested by the app.
+ *
+ * @param  {String} privateKey the identity key of the Blockstack ID generating
+ * the authentication response
+ * @param  {Object} profile the profile object for the Blockstack ID
+ * @param  {String} username the username of the Blockstack ID if any, otherwise `null`
+ * @param  {AuthMetadata} metadata an object containing metadata sent as part of the authentication
+ * response including `email` if requested and available and a URL to the profile
+ * @param  {String} coreToken core session token when responding to a legacy auth request
+ * or `null` for current direct to gaia authentication requests
+ * @param  {String} appPrivateKey the application private key. This private key is
+ * unique and specific for every Blockstack ID and application combination.
+ * @param  {Number} expiresAt an integer in the same format as
+ * `new Date().getTime()`, milliseconds since the Unix epoch
+ * @param {String} transitPublicKey the public key provide by the app
+ * in its authentication request with which secrets will be encrypted 
+ * @param {String} hubUrl URL to the write path of the user's Gaia hub
+ * @return {String} signed and encoded authentication response token
+ */
 function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var username = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
@@ -444,6 +489,12 @@ var _utils = require('../utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Retrieves the authentication request from the query string
+ * @return {String|null} the authentication request or `null` if
+ * the query string parameter `authRequest` is not found
+ * @private
+ */
 function getAuthRequestFromURL() {
   var queryDict = _queryString2.default.parse(location.search);
   if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
@@ -453,6 +504,15 @@ function getAuthRequestFromURL() {
   }
 }
 
+/**
+ * Fetches the contents of the manifest file specified in the authentication request
+ *
+ * @param  {String} authRequest encoded and signed authentication request
+ * @return {Promise<Object|String>} Returns a `Promise` that resolves to the JSON
+ * object manifest file unless there's an error in which case rejects with an error
+ * message.
+ * @private
+ */
 function fetchAppManifest(authRequest) {
   return new Promise(function (resolve, reject) {
     if (!authRequest) {
@@ -479,6 +539,17 @@ function fetchAppManifest(authRequest) {
   });
 }
 
+/**
+ * Redirect the user's browser to the app using the `redirect_uri`
+ * specified in the authentication request, passing the authentication
+ * response token as a query parameter.
+ *
+ * @param {String} authRequest  encoded and signed authentication request token
+ * @param  {String} authResponse encoded and signed authentication response token
+ * @return {void}
+ * @throws {Error} if there is no redirect uri
+ * @private
+ */
 function redirectUserToApp(authRequest, authResponse) {
   var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
   var redirectURI = payload.redirect_uri;
@@ -508,16 +579,18 @@ var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/*
+/**
  * Create an authentication token to be sent to the Core API server
  * in order to generate a Core session JWT.
  *
- * @param appDomain (String) The unique application identifier (e.g. foo.app, www.foo.com, etc).
- * @param appMethods (Array) The list of API methods this application will need.
- * @param appPrivateKey (String) The application-specific private key
- * @param blockchainId (String|null) This is the blockchain ID of the requester,
+ * @param {String} appDomain  The unique application identifier (e.g. foo.app, www.foo.com, etc).
+ * @param {Array} appMethods  The list of API methods this application will need.
+ * @param {String} appPrivateKey  The application-specific private key
+ * @param {String|null} blockchainID  This is the blockchain ID of the requester
+ * @param {String} thisDevice Identifier of the current device
  *
- * @returns a JWT signed by the app's private key
+ * @return {String} a JWT signed by the app's private key
+ * @deprecated
  * @private
  */
 function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
@@ -551,14 +624,18 @@ function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
   return token;
 }
 
-/*
+/**
  * Send Core a request for a session token.
  *
- * @param coreAuthRequest (String) a signed JWT encoding the authentication request
- * @param apiPassword (String) the API password for Core
+ * @param {String} coreHost host name of the core node
+ * @param {Number} corePort port number of the core node
+ * @param {String} coreAuthRequest  a signed JWT encoding the authentication request
+ * @param {String} apiPassword the API password for Core
  *
- * Returns a JWT signed with the Core API server's private key that authorizes the bearer
- * to carry out the requested operations.
+ * @return {Promise} the resolves to a JWT signed with the Core API server's private key
+ * that authorizes the bearer to carry out the requested operations and rejects
+ * with an error message otherwise
+ * @deprecated
  * @private
  */
 function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
@@ -599,17 +676,22 @@ function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword
   });
 }
 
-/*
+/**
  * Get a core session token.  Generate an auth request, sign it, send it to Core,
  * and get back a session token.
  *
- * @param coreHost (String) Core API server's hostname
- * @param corePort (Integer) Core API server's port number
- * @param appPrivateKey (String) Application's private key
- * @param blockchainId (String|null) blockchain ID of the user signing in.
+ * @param {String} coreHost Core API server's hostname
+ * @param {Number} corePort Core API server's port number
+ * @param {String} apiPassword core api password
+ * @param  {String} appPrivateKey Application's private key
+ * @param  {String} blockchainId blockchain ID of the user signing in.
  * `null` if user has no blockchain ID
+ * @param {String} authRequest authentication request token
+ * @param {String} deviceId identifier for the current device
  *
- * Returns a Promise that resolves to a Core session token.
+ * @return {Promise} a Promise that resolves to a Core session token or rejects
+ * with an error message.
+ * @deprecated
  * @private
  */
 function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
@@ -668,6 +750,15 @@ var _jsontokens = require('jsontokens');
 
 var _index = require('../index');
 
+/**
+ * Checks if the ES256k signature on passed `token` match the claimed public key
+ * in the payload key `public_keys`.
+ *
+ * @param  {String} token encoded and signed authentication token
+ * @return {Boolean} Returns `true` if the signature matches the claimed public key
+ * @throws {Error} if `token` contains multiple public keys
+ * @private
+ */
 function doSignaturesMatchPublicKeys(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   var publicKeys = payload.public_keys;
@@ -689,6 +780,16 @@ function doSignaturesMatchPublicKeys(token) {
   }
 }
 
+/**
+ * Makes sure that the identity address portion of
+ * the decentralized identifier passed in the issuer `iss`
+ * key of the token matches the public key
+ *
+ * @param  {String} token encoded and signed authentication token
+ * @return {Boolean} if the identity address and public keys match
+ * @throws {Error} if ` token` has multiple public keys
+ * @private
+ */
 function doPublicKeysMatchIssuer(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   var publicKeys = payload.public_keys;
@@ -706,6 +807,19 @@ function doPublicKeysMatchIssuer(token) {
   return false;
 }
 
+/**
+ * Looks up the identity address that owns the claimed username
+ * in `token` using the lookup endpoint provided in `nameLookupURL`
+ * to determine if the username is owned by the identity address
+ * that matches the claimed public key
+ *
+ * @param  {String} token  encoded and signed authentication token
+ * @param  {String} nameLookupURL a URL to the name lookup endpoint of the Blockstack Core API
+ * @return {Promise<Boolean>} returns a `Promise` that resolves to
+ * `true` if the username is owned by the public key, otherwise the
+ * `Promise` resolves to `false`
+ * @private
+ */
 function doPublicKeysMatchUsername(token, nameLookupURL) {
   return new Promise(function (resolve) {
     var payload = (0, _jsontokens.decodeToken)(token).payload;
@@ -754,6 +868,15 @@ function doPublicKeysMatchUsername(token, nameLookupURL) {
   });
 }
 
+/**
+ * Checks if the if the token issuance time and date is after the
+ * current time and date.
+ *
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if the token was issued after the current time,
+ * otherwise returns `false`
+ * @private
+ */
 function isIssuanceDateValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   if (payload.iat) {
@@ -771,6 +894,12 @@ function isIssuanceDateValid(token) {
   }
 }
 
+/**
+ * Checks if the expiration date of the `token` is before the current time
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if the `token` has not yet expired, `false`
+ * if the `token` has expired
+ */
 function isExpirationDateValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   if (payload.exp) {
@@ -788,21 +917,39 @@ function isExpirationDateValid(token) {
   }
 }
 
+/**
+ * Makes sure the `manifest_uri` is a same origin absolute URL.
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if valid, otherwise `false`
+ * @private
+ */
 function isManifestUriValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.manifest_uri);
 }
 
+/**
+ * Makes sure the `redirect_uri` is a same origin absolute URL.
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if valid, otherwise `false`
+ */
 function isRedirectUriValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.redirect_uri);
 }
 
 /**
- * Verify authentication request is valid
- * @param  {String} token [description]
+ * Verify authentication request is valid. This function performs a number
+ * of checks on the authentication request token:
+ * * Checks that `token` has a valid issuance date & is not expired
+ * * Checks that `token` has a valid signature that matches the public key it claims
+ * * Checks that both the manifest and redirect URLs are absolute and conform to
+ * the same origin policy
+ *
+ * @param  {String} token encoded and signed authentication request token
  * @return {Promise} that resolves to true if the auth request
- *  is valid and false if it does not
+ *  is valid and false if it does not. It rejects with a String if the
+ *  token is not signed
  *  @private
  */
 function verifyAuthRequest(token) {
@@ -822,9 +969,9 @@ function verifyAuthRequest(token) {
 }
 
 /**
- * Verify the authentication response is valid and
+ * Verify the authentication request is valid and
  * fetch the app manifest file if valid. Otherwise, reject the promise.
- * @param  {String} token the authentication request token
+ * @param  {String} token encoded and signed authentication request token
  * @return {Promise} that resolves to the app manifest file in JSON format
  * or rejects if the auth request or app manifest file is invalid
  * @private
@@ -850,6 +997,7 @@ function verifyAuthRequestAndLoadManifest(token) {
  * @param {String} nameLookupURL the url use to verify owner of a username
  * @return {Promise} that resolves to true if auth response
  * is valid and false if it does not
+ * @private
  */
 function verifyAuthResponse(token, nameLookupURL) {
   return new Promise(function (resolve) {
@@ -1242,7 +1390,8 @@ function encryptECIES(publicKey, content) {
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeralPublicKey
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * @return {Buffer} plaintext, or false if error
+ * @return {Buffer} plaintext
+ * @throws {Error} if unable to decrypt
  */
 function decryptECIES(privateKey, cipherObject) {
   var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
