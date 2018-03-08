@@ -472,7 +472,7 @@ function makeRenewal(fullyQualifiedName: string,
           signingTxB.sign(i, paymentKey)
         }
       }
-      return signingTxB.buildIncomplete().toHex()
+      return signingTxB.build().toHex()
     })
 }
 

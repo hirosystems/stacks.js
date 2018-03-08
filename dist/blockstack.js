@@ -3253,7 +3253,7 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
         signingTxB.sign(i, paymentKey);
       }
     }
-    return signingTxB.buildIncomplete().toHex();
+    return signingTxB.build().toHex();
   });
 }
 
