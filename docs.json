@@ -1872,7 +1872,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Generates an authentication request that can be sent to the Blockstack\nbrowser for the user to approve sign in.",
+              "value": "Generates an authentication request that can be sent to the Blockstack\nbrowser for the user to approve sign in. This authentication request can\nthen be used for sign in by passing it to the ",
               "position": {
                 "start": {
                   "line": 1,
@@ -1880,9 +1880,46 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 41,
-                  "offset": 111
+                  "line": 3,
+                  "column": 47,
+                  "offset": 190
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "redirectToSignInWithAuthRequest",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 47,
+                  "offset": 190
+                },
+                "end": {
+                  "line": 3,
+                  "column": 80,
+                  "offset": 223
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": "\nmethod.",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 80,
+                  "offset": 223
+                },
+                "end": {
+                  "line": 4,
+                  "column": 8,
+                  "offset": 231
                 },
                 "indent": [
                   1
@@ -1897,11 +1934,110 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 41,
-              "offset": 111
+              "line": 4,
+              "column": 8,
+              "offset": 231
             },
             "indent": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "emphasis",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Note: This method should only be used if you want to roll your own authentication\nflow. Typically you'd use ",
+                  "position": {
+                    "start": {
+                      "line": 6,
+                      "column": 2,
+                      "offset": 234
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 27,
+                      "offset": 342
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "redirectToSignIn",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 27,
+                      "offset": 342
+                    },
+                    "end": {
+                      "line": 7,
+                      "column": 45,
+                      "offset": 360
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " which takes care of this\nunder the hood.",
+                  "position": {
+                    "start": {
+                      "line": 7,
+                      "column": 45,
+                      "offset": 360
+                    },
+                    "end": {
+                      "line": 8,
+                      "column": 16,
+                      "offset": 401
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 6,
+                  "column": 1,
+                  "offset": 233
+                },
+                "end": {
+                  "line": 8,
+                  "column": 17,
+                  "offset": 402
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 6,
+              "column": 1,
+              "offset": 233
+            },
+            "end": {
+              "line": 8,
+              "column": 17,
+              "offset": 402
+            },
+            "indent": [
+              1,
               1
             ]
           }
@@ -1914,9 +2050,9 @@
           "offset": 0
         },
         "end": {
-          "line": 2,
-          "column": 41,
-          "offset": 111
+          "line": 8,
+          "column": 17,
+          "offset": 402
         }
       }
     },
@@ -1924,7 +2060,7 @@
       {
         "title": "param",
         "description": "hex encoded transit\n  private key",
-        "lineNumber": 3,
+        "lineNumber": 10,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -1938,7 +2074,7 @@
       {
         "title": "param",
         "description": "location to redirect user to after sign in approval",
-        "lineNumber": 5,
+        "lineNumber": 12,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -1948,7 +2084,7 @@
       {
         "title": "param",
         "description": "location of this app's manifest file",
-        "lineNumber": 6,
+        "lineNumber": 13,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -1958,7 +2094,7 @@
       {
         "title": "param",
         "description": "the permissions this app is requesting",
-        "lineNumber": 7,
+        "lineNumber": 14,
         "type": {
           "type": "TypeApplication",
           "expression": {
@@ -1977,7 +2113,7 @@
       {
         "title": "param",
         "description": "the origin of this app",
-        "lineNumber": 8,
+        "lineNumber": 15,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -1987,7 +2123,7 @@
       {
         "title": "param",
         "description": "the time at which this request is no longer valid",
-        "lineNumber": 9,
+        "lineNumber": 16,
         "type": {
           "type": "NameExpression",
           "name": "Number"
@@ -1997,7 +2133,7 @@
       {
         "title": "return",
         "description": "the authentication request",
-        "lineNumber": 10,
+        "lineNumber": 17,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -2010,18 +2146,18 @@
         "column": 0
       },
       "end": {
-        "line": 38,
+        "line": 45,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 39,
+          "line": 46,
           "column": 0
         },
         "end": {
-          "line": 74,
+          "line": 81,
           "column": 1
         }
       },
@@ -2033,7 +2169,7 @@
       {
         "title": "param",
         "name": "transitPrivateKey",
-        "lineNumber": 3,
+        "lineNumber": 10,
         "description": {
           "type": "root",
           "children": [
@@ -2099,7 +2235,7 @@
       {
         "title": "param",
         "name": "redirectURI",
-        "lineNumber": 5,
+        "lineNumber": 12,
         "description": {
           "type": "root",
           "children": [
@@ -2161,7 +2297,7 @@
       {
         "title": "param",
         "name": "manifestURI",
-        "lineNumber": 6,
+        "lineNumber": 13,
         "description": {
           "type": "root",
           "children": [
@@ -2223,7 +2359,7 @@
       {
         "title": "param",
         "name": "scopes",
-        "lineNumber": 7,
+        "lineNumber": 14,
         "description": {
           "type": "root",
           "children": [
@@ -2294,7 +2430,7 @@
       {
         "title": "param",
         "name": "appDomain",
-        "lineNumber": 8,
+        "lineNumber": 15,
         "description": {
           "type": "root",
           "children": [
@@ -2356,7 +2492,7 @@
       {
         "title": "param",
         "name": "expiresAt",
-        "lineNumber": 9,
+        "lineNumber": 16,
         "description": {
           "type": "root",
           "children": [
@@ -3101,325 +3237,6 @@
       }
     ],
     "namespace": "getAuthResponseToken"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Verify the authentication response is valid",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 44,
-                  "offset": 43
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 44,
-              "offset": 43
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 44,
-          "offset": 43
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the authentication response token",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "token"
-      },
-      {
-        "title": "param",
-        "description": "the url use to verify owner of a username",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "nameLookupURL"
-      },
-      {
-        "title": "return",
-        "description": "that resolves to true if auth response\nis valid and false if it does not",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 190,
-        "column": 0
-      },
-      "end": {
-        "line": 196,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 197,
-          "column": 0
-        },
-        "end": {
-          "line": 213,
-          "column": 1
-        }
-      },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "token",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the authentication response token",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 34,
-                      "offset": 33
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 34,
-                  "offset": 33
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 34,
-              "offset": 33
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "nameLookupURL",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the url use to verify owner of a username",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 42,
-                  "offset": 41
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 42,
-              "offset": 41
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves to true if auth response\nis valid and false if it does not",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 34,
-                      "offset": 72
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 34,
-                  "offset": 72
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 34,
-              "offset": 72
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "verifyAuthResponse",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "verifyAuthResponse",
-        "kind": "function"
-      }
-    ],
-    "namespace": "verifyAuthResponse"
   },
   {
     "name": "Profiles",
@@ -8536,6 +8353,2074 @@
       }
     ],
     "namespace": "Blockchain"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Decrypts the hex encrypted private key",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 39,
+                  "offset": 38
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 39,
+              "offset": 38
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 39,
+          "offset": 38
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the private key corresponding to the public\nkey for which the ciphertext was encrypted",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "privateKey"
+      },
+      {
+        "title": "param",
+        "description": "the ciphertext",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "hexedEncrypted"
+      },
+      {
+        "title": "return",
+        "description": "the decrypted private key",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "throws",
+        "description": "if unable to decrypt",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Error"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 98,
+        "column": 0
+      },
+      "end": {
+        "line": 105,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 106,
+          "column": 0
+        },
+        "end": {
+          "line": 111,
+          "column": 1
+        }
+      },
+      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "privateKey",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the private key corresponding to the public\nkey for which the ciphertext was encrypted",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 43,
+                      "offset": 86
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 43,
+                  "offset": 86
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 43,
+              "offset": 86
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "hexedEncrypted",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the ciphertext",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the decrypted private key",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "if unable to decrypt",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 21,
+                      "offset": 20
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 21,
+                  "offset": 20
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 21,
+              "offset": 20
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Error"
+        }
+      }
+    ],
+    "todos": [],
+    "name": "decryptPrivateKey",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "decryptPrivateKey",
+        "kind": "function"
+      }
+    ],
+    "namespace": "decryptPrivateKey"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Generates a signed authentication response token for an app. This\ntoken is sent back to apps which use contents to access the\nresources and data requested by the app.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 41,
+                  "offset": 166
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 41,
+              "offset": 166
+            },
+            "indent": [
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 3,
+          "column": 41,
+          "offset": 166
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the identity key of the Blockstack ID generating\nthe authentication response",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "privateKey"
+      },
+      {
+        "title": "param",
+        "description": "the profile object for the Blockstack ID",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "profile"
+      },
+      {
+        "title": "param",
+        "description": "the username of the Blockstack ID if any, otherwise `null`",
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "username"
+      },
+      {
+        "title": "param",
+        "description": "an object containing metadata sent as part of the authentication\nresponse including `email` if requested and available and a URL to the profile",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "AuthMetadata"
+        },
+        "name": "metadata"
+      },
+      {
+        "title": "param",
+        "description": "core session token when responding to a legacy auth request\nor `null` for current direct to gaia authentication requests",
+        "lineNumber": 11,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "coreToken"
+      },
+      {
+        "title": "param",
+        "description": "the application private key. This private key is\nunique and specific for every Blockstack ID and application combination.",
+        "lineNumber": 13,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "appPrivateKey"
+      },
+      {
+        "title": "param",
+        "description": "an integer in the same format as\n`new Date().getTime()`, milliseconds since the Unix epoch",
+        "lineNumber": 15,
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "name": "expiresAt"
+      },
+      {
+        "title": "param",
+        "description": "the public key provide by the app\nin its authentication request with which secrets will be encrypted",
+        "lineNumber": 17,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "transitPublicKey"
+      },
+      {
+        "title": "param",
+        "description": "URL to the write path of the user's Gaia hub",
+        "lineNumber": 19,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "hubUrl"
+      },
+      {
+        "title": "return",
+        "description": "signed and encoded authentication response token",
+        "lineNumber": 20,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 113,
+        "column": 0
+      },
+      "end": {
+        "line": 134,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 135,
+          "column": 0
+        },
+        "end": {
+          "line": 186,
+          "column": 1
+        }
+      },
+      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "privateKey",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the identity key of the Blockstack ID generating\nthe authentication response",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 28,
+                      "offset": 76
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 28,
+                  "offset": 76
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 28,
+              "offset": 76
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "profile",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the profile object for the Blockstack ID",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "{}"
+      },
+      {
+        "title": "param",
+        "name": "username",
+        "lineNumber": 8,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the username of the Blockstack ID if any, otherwise ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "null",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 53,
+                      "offset": 52
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 59,
+                      "offset": 58
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 59,
+                  "offset": 58
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 59,
+              "offset": 58
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "metadata",
+        "lineNumber": 9,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "an object containing metadata sent as part of the authentication\nresponse including ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 20,
+                      "offset": 84
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "email",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 20,
+                      "offset": 84
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 27,
+                      "offset": 91
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " if requested and available and a URL to the profile",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 27,
+                      "offset": 91
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 79,
+                      "offset": 143
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 79,
+                  "offset": 143
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 79,
+              "offset": 143
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "AuthMetadata"
+        }
+      },
+      {
+        "title": "param",
+        "name": "coreToken",
+        "lineNumber": 11,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "core session token when responding to a legacy auth request\nor ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 4,
+                      "offset": 63
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "null",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 4,
+                      "offset": 63
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 10,
+                      "offset": 69
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " for current direct to gaia authentication requests",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 10,
+                      "offset": 69
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 61,
+                      "offset": 120
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 61,
+                  "offset": 120
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 61,
+              "offset": 120
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "appPrivateKey",
+        "lineNumber": 13,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the application private key. This private key is\nunique and specific for every Blockstack ID and application combination.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 73,
+                      "offset": 121
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 73,
+                  "offset": 121
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 73,
+              "offset": 121
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "expiresAt",
+        "lineNumber": 15,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "an integer in the same format as\n",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 33
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "new Date().getTime()",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 1,
+                      "offset": 33
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 23,
+                      "offset": 55
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": ", milliseconds since the Unix epoch",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 23,
+                      "offset": 55
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 58,
+                      "offset": 90
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 58,
+                  "offset": 90
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 58,
+              "offset": 90
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "default": "nextMonth().getTime()"
+      },
+      {
+        "title": "param",
+        "name": "transitPublicKey",
+        "lineNumber": 17,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the public key provide by the app\nin its authentication request with which secrets will be encrypted",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 67,
+                      "offset": 100
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 67,
+                  "offset": 100
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 67,
+              "offset": 100
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "hubUrl",
+        "lineNumber": 19,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "URL to the write path of the user's Gaia hub",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 45,
+                      "offset": 44
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 45,
+              "offset": 44
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "null"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "signed and encoded authentication response token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 49,
+                      "offset": 48
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 49,
+                  "offset": 48
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 49,
+              "offset": 48
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "makeAuthResponse",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "makeAuthResponse",
+        "kind": "function"
+      }
+    ],
+    "namespace": "makeAuthResponse"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Checks if the expiration date of the ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "token",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "end": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " is before the current time",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 45,
+                  "offset": 44
+                },
+                "end": {
+                  "line": 1,
+                  "column": 72,
+                  "offset": 71
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 72,
+              "offset": 71
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 72,
+          "offset": 71
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "encoded and signed authentication token",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "return",
+        "description": "`true` if the `token` has not yet expired, `false`\nif the `token` has expired",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 151,
+        "column": 0
+      },
+      "end": {
+        "line": 156,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 157,
+          "column": 0
+        },
+        "end": {
+          "line": 172,
+          "column": 1
+        }
+      },
+      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "encoded and signed authentication token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 40,
+                      "offset": 39
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 40,
+              "offset": 39
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "true",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " if the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 22,
+                      "offset": 21
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " has not yet expired, ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 22,
+                      "offset": 21
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 44,
+                      "offset": 43
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "false",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 44,
+                      "offset": 43
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": "\nif the ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 8,
+                      "offset": 58
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "token",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 8,
+                      "offset": 58
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 15,
+                      "offset": 65
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " has expired",
+                  "position": {
+                    "start": {
+                      "line": 2,
+                      "column": 15,
+                      "offset": 65
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 27,
+                      "offset": 77
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 27,
+                  "offset": 77
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 27,
+              "offset": 77
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "isExpirationDateValid",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "isExpirationDateValid",
+        "kind": "function"
+      }
+    ],
+    "namespace": "isExpirationDateValid"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Makes sure the ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "redirect_uri",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " is a same origin absolute URL.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "end": {
+                  "line": 1,
+                  "column": 61,
+                  "offset": 60
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 61,
+              "offset": 60
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 61,
+          "offset": 60
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "encoded and signed authentication token",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "token"
+      },
+      {
+        "title": "return",
+        "description": "`true` if valid, otherwise `false`",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 185,
+        "column": 0
+      },
+      "end": {
+        "line": 189,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 190,
+          "column": 0
+        },
+        "end": {
+          "line": 193,
+          "column": 1
+        }
+      },
+      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "token",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "encoded and signed authentication token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 40,
+                      "offset": 39
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 40,
+              "offset": 39
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "inlineCode",
+                  "value": "true",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "text",
+                  "value": " if valid, otherwise ",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 7,
+                      "offset": 6
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 28,
+                      "offset": 27
+                    },
+                    "indent": []
+                  }
+                },
+                {
+                  "type": "inlineCode",
+                  "value": "false",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 28,
+                      "offset": 27
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 35,
+                      "offset": 34
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 35,
+                  "offset": 34
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 35,
+              "offset": 34
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "isRedirectUriValid",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "isRedirectUriValid",
+        "kind": "function"
+      }
+    ],
+    "namespace": "isRedirectUriValid"
   },
   {
     "description": {
