@@ -1,0 +1,5 @@
+tests/authTests/lib
+tests/browserTests/bundle.js
+tests/browserTests/lib
+tests/operationsTests/lib
+tests/unitTests/lib
