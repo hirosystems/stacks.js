@@ -99,7 +99,8 @@ export function encryptECIES(publicKey: string, content: string | Buffer) {
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeralPublicKey
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * @return {Buffer} plaintext, or false if error
+ * @return {Buffer} plaintext
+ * @throws {Error} if unable to decrypt
  */
 export function decryptECIES(privateKey: string, cipherObject: string) {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
