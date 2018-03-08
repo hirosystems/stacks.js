@@ -1,5 +1,8 @@
 /* @flow */
 import { parse as uriParse } from 'uri-js'
+import { ECPair } from 'bitcoinjs-lib'
+import { config } from './config'
+import BigInteger from 'bigi'
 
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
@@ -51,6 +54,7 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  * @param {string} v1 - the left half of the version inequality
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
+ * @private
  */
 export function isLaterVersion(v1: string, v2: string) {
   const v1tuple = v1.split('.').map(x => parseInt(x, 10))
@@ -65,6 +69,33 @@ export function isLaterVersion(v1: string, v2: string) {
     }
   }
   return true
+}
+
+
+export function hexStringToECPair(skHex: string) {
+  const ecPairOptions = { network: config.network.layer1,
+                          compressed: true }
+  if (skHex.length === 66) {
+    if (skHex.slice(64) !== '01') {
+      throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' +
+                      'indicates compressed key, but last byte must be == 1')
+    }
+    return new ECPair(BigInteger.fromHex(skHex.slice(0, 64)), undefined, ecPairOptions)
+  } else if (skHex.length === 64) {
+    ecPairOptions.compressed = false
+    return new ECPair(BigInteger.fromHex(skHex), undefined, ecPairOptions)
+  } else {
+    throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.')
+  }
+}
+
+export function ecPairToHexString(secretKey: ECPair) {
+  const ecPointHex = secretKey.d.toHex()
+  if (secretKey.compressed) {
+    return `${ecPointHex}01`
+  } else {
+    return ecPointHex
+  }
 }
 
 /**

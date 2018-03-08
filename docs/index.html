@@ -125,6 +125,16 @@
               
                 
                 <li><a
+                  href='#verifyauthresponse'
+                  class="">
+                  verifyAuthResponse
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#profiles'
                   class="h5 bold black caps">
                   Profiles
@@ -225,6 +235,16 @@
               
                 
                 <li><a
+                  href='#deletefile'
+                  class="">
+                  deleteFile
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#getappbucketurl'
                   class="">
                   getAppBucketUrl
@@ -245,9 +265,9 @@
               
                 
                 <li><a
-                  href='#verifyauthresponse'
-                  class="">
-                  verifyAuthResponse
+                  href='#blockchain'
+                  class="h5 bold black caps">
+                  Blockchain
                   
                 </a>
                 
@@ -255,9 +275,9 @@
               
                 
                 <li><a
-                  href='#deletefile'
+                  href='#broadcasttransaction'
                   class="">
-                  deleteFile
+                  broadcastTransaction
                   
                 </a>
                 
@@ -265,9 +285,19 @@
               
                 
                 <li><a
-                  href='#islaterversion'
+                  href='#broadcastzonefile'
                   class="">
-                  isLaterVersion
+                  broadcastZoneFile
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#broadcastnameregistration'
+                  class="">
+                  broadcastNameRegistration
                   
                 </a>
                 
@@ -958,6 +988,85 @@ protocol handler is not detected
       <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
         the authentication token if it exists otherwise 
 <code>null</code>
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='verifyauthresponse'>
+      verifyAuthResponse
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Verify the authentication response is valid</p>
+
+
+  <div class='pre p1 fill-light mt0'>verifyAuthResponse(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the authentication response token
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>nameLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the url use to verify owner of a username
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        that resolves to true if auth response
+is valid and false if it does not
 
       
     
@@ -1809,6 +1918,76 @@ if it failed
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='deletefile'>
+      deleteFile
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Deletes the specified file from the app's data store.</p>
+
+
+  <div class='pre p1 fill-light mt0'>deleteFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the path to the file to delete
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        that resolves when the file has been removed
+or rejects with an error
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='getappbucketurl'>
       getAppBucketUrl
     </h3>
@@ -1982,23 +2161,39 @@ or rejects with an error
           
         
           
+            <div class='keyline-top-not py2'><section class='py2 clearfix'>
+
+  <h2 id='blockchain' class='mt0'>
+    Blockchain
+  </h2>
+
+  
+    <p>Generate and broadcast Blockstack blockchain transactions.</p>
+
+  
+</section>
+</div>
+          
+        
+          
             <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='verifyauthresponse'>
-      verifyAuthResponse
+    <h3 class='fl m0' id='broadcasttransaction'>
+      broadcastTransaction
     </h3>
     
     
   </div>
   
 
-  <p>Verify the authentication response is valid</p>
+  <p>Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
+transaction until a second transaction has a certain number of confirmations.</p>
 
 
-  <div class='pre p1 fill-light mt0'>verifyAuthResponse(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>broadcastTransaction(transaction: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, transactionToWatch: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, confirmations: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
   
   
 
@@ -2015,8 +2210,8 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the authentication response token
+            <span class='code bold'>transaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the hex-encoded transaction to broadcast
 
           </div>
           
@@ -2024,8 +2219,26 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>nameLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the url use to verify owner of a username
+            <span class='code bold'>transactionToWatch</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>null</code>)</code>
+	    the hex transaction id of the transaction to watch for
+the specified number of confirmations before broadcasting the 
+<code>transaction</code>
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>confirmations</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
+            = <code>6</code>)</code>
+	    the number of confirmations 
+<code>transactionToWatch</code>
+ must have
+before broadcasting 
+<code>transaction</code>
+.
 
           </div>
           
@@ -2039,9 +2252,18 @@ or rejects with an error
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves to true if auth response
-is valid and false if it does not
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
+        Returns a Promise that resolves to an object with a
+
+<code>transaction_hash</code>
+ key containing the transaction hash of the broadcasted transaction.
+<p>In the event of an error, it rejects with:</p>
+<ul>
+<li>a <code>RemoteServiceError</code> if there is a problem
+with the transaction broadcast service</li>
+<li><code>MissingParameterError</code> if you call the function without a required
+parameter</li>
+</ul>
 
       
     
@@ -2066,18 +2288,18 @@ is valid and false if it does not
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='deletefile'>
-      deleteFile
+    <h3 class='fl m0' id='broadcastzonefile'>
+      broadcastZoneFile
     </h3>
     
     
   </div>
   
 
-  <p>Deletes the specified file from the app's data store.</p>
+  <p>Broadcasts a zone file to the Atlas network via the transaction broadcast service.</p>
 
 
-  <div class='pre p1 fill-light mt0'>deleteFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>broadcastZoneFile(zoneFile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transactionToWatch: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
   
   
 
@@ -2094,8 +2316,19 @@ is valid and false if it does not
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the path to the file to delete
+            <span class='code bold'>zoneFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the zone file to be broadcast to the Atlas network
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>transactionToWatch</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>null</code>)</code>
+	    the hex transaction id of the transaction
+to watch for confirmation before broadcasting the zone file to the Atlas network
 
           </div>
           
@@ -2109,9 +2342,18 @@ is valid and false if it does not
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves when the file has been removed
-or rejects with an error
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
+        Returns a Promise that resolves to an object with a
+
+<code>transaction_hash</code>
+ key containing the transaction hash of the broadcasted transaction.
+<p>In the event of an error, it rejects with:</p>
+<ul>
+<li>a <code>RemoteServiceError</code> if there is a problem
+with the transaction broadcast service</li>
+<li><code>MissingParameterError</code> if you call the function without a required
+parameter</li>
+</ul>
 
       
     
@@ -2136,18 +2378,28 @@ or rejects with an error
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='islaterversion'>
-      isLaterVersion
+    <h3 class='fl m0' id='broadcastnameregistration'>
+      broadcastNameRegistration
     </h3>
     
     
   </div>
   
 
-  <p>Versioning</p>
+  <p>Sends the preorder and registration transactions and zone file
+for a Blockstack name registration
+along with the to the transaction broadcast service.</p>
+<p>The transaction broadcast:</p>
+<ul>
+<li>immediately broadcasts the preorder transaction</li>
+<li>broadcasts the register transactions after the preorder transaction
+has an appropriate number of confirmations</li>
+<li>broadcasts the zone file to the Atlas network after the register transaction
+has an appropriate number of confirmations</li>
+</ul>
 
 
-  <div class='pre p1 fill-light mt0'>isLaterVersion(v1: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, v2: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): bool</div>
+  <div class='pre p1 fill-light mt0'>broadcastNameRegistration(preorderTransaction: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, registerTransaction: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
   
   
 
@@ -2164,8 +2416,11 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>v1</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    the left half of the version inequality
+            <span class='code bold'>preorderTransaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the hex-encoded, signed preorder transaction generated
+using the 
+<code>makePreorder</code>
+ function
 
           </div>
           
@@ -2173,8 +2428,20 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>v2</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
-	    right half of the version inequality
+            <span class='code bold'>registerTransaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the hex-encoded, signed register transaction generated
+using the 
+<code>makeRegister</code>
+ function
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>zoneFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the zone file to be broadcast to the Atlas network
 
           </div>
           
@@ -2188,8 +2455,18 @@ or rejects with an error
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>bool</code>:
-        iff v1 >= v2
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
+        Returns a Promise that resolves to an object with a
+
+<code>transaction_hash</code>
+ key containing the transaction hash of the broadcasted transaction.
+<p>In the event of an error, it rejects with:</p>
+<ul>
+<li>a <code>RemoteServiceError</code> if there is a problem
+with the transaction broadcast service</li>
+<li><code>MissingParameterError</code> if you call the function without a required
+parameter</li>
+</ul>
 
       
     

@@ -26,7 +26,7 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
   const token = jsontokens.decodeToken(session)
   const payload = token.payload
 
-  console.log(JSON.stringify(payload));
+  console.log(JSON.stringify(payload))
 
   assert(payload.app_domain === 'www.foo.com')
 
@@ -35,8 +35,9 @@ getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', auth
   assert(payload.methods[2] === 'store_admin')
   assert(payload.methods.length === 3)
 
-  assert(payload.app_public_keys.length == 1)
-  assert(payload.app_public_keys[0]['public_key'] === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
+  assert(payload.app_public_keys.length === 1)
+  assert(payload.app_public_keys[0].public_key
+    === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
 
   assert(payload.blockchain_id === 'judecn.id')
   return true
