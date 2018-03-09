@@ -143,8 +143,8 @@ function utilsTests() {
       tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
                     tx_output_n: 0 }]
 
-    t.throws(() => addUTXOsToFund(txB, 1, utxos, 60000, 10),
-             /^Error: Not enough UTXOs to fund/,
+    t.throws(() => addUTXOsToFund(txB, utxos, 60000, 10),
+             /^NotEnoughFundsError: Not enough UTXOs to fund./,
              'Errors when not enough value to fund')
   })
 
@@ -152,7 +152,7 @@ function utilsTests() {
   test('addUTXOsToFundSingleUTXO', (t) => {
     t.plan(2)
 
-    let txB = new btc.TransactionBuilder()
+    const txB = new btc.TransactionBuilder()
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
@@ -160,9 +160,9 @@ function utilsTests() {
       tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
                     tx_output_n: 0 }]
 
-    txB = addUTXOsToFund(txB, 1, utxos, 10000, 10)
+    const change = addUTXOsToFund(txB, utxos, 10000, 10)
 
-    t.equal(txB.tx.outs[1].value, 40000)
+    t.equal(change, 38520) // gots to pay the fee!
     t.equal(txB.tx.ins[0].hash.toString('hex'),
             Buffer.from(utxos[0].tx_hash, 'hex').reverse().toString('hex'))
   })
@@ -170,7 +170,7 @@ function utilsTests() {
   test('addUTXOsToFundTwoUTXOs', (t) => {
     t.plan(3)
 
-    let txB = new btc.TransactionBuilder()
+    const txB = new btc.TransactionBuilder()
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
@@ -181,9 +181,9 @@ function utilsTests() {
                      tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
                     tx_output_n: 0 }]
 
-    txB = addUTXOsToFund(txB, 1, utxos, 55000, 10)
+    const change = addUTXOsToFund(txB, utxos, 55000, 10)
 
-    t.ok(txB.tx.outs[1].value <= 5000, `${txB.tx.outs[1].value} should be less than 5k`)
+    t.ok(change <= 5000, `${txB.tx.outs[1].value} should be less than 5k`)
     t.equal(txB.tx.ins[0].hash.toString('hex'),
             Buffer.from(utxos[0].tx_hash, 'hex').reverse().toString('hex'))
     t.equal(txB.tx.ins[1].hash.toString('hex'),
@@ -459,6 +459,45 @@ function transactionTests() {
              `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('fund bitcoin spends', (t) => {
+    t.plan(9)
+    setupMocks()
+    transactions.makeBitcoinSpend(testAddresses[2].address,
+                                  testAddresses[1].skHex,
+                                  200000)
+      .then(hexTX => {
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx)
+        const fee = inputVals - outputVals
+        t.equal(tx.ins.length, 2, 'Should use 2 inputs')
+        t.equal(tx.outs.length, 2, 'Should have a change output')
+        const changeOut = tx.outs[1]
+        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+                'Must be correct change address')
+        t.ok(Math.abs(1000 * txLen - fee) <= 2000,
+             `Fee should be roughly correct: Actual fee: ${fee}, expected: ${1000 * txLen}`)
+        t.equal(outputVals - changeOut.value, 200000, 'Should fund correct amount')
+      })
+      .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
+                                                testAddresses[1].skHex,
+                                                80000))
+      .then(hexTX => {
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx)
+        const fee = inputVals - outputVals
+        t.equal(tx.ins.length, 1, 'Should use 1 input')
+        t.equal(tx.outs.length, 1, 'Should not have a change output')
+        t.ok(Math.abs(1000 * txLen - fee) <= 1000 * (36),
+             'Fee should be correct (within an output fee): ' +
+             `Actual fee: ${fee}, expected: ${1000 * txLen}`)
+        t.equal(outputVals, 80000, 'Should fund correct amount')
+      })
   })
 
   test('build and fund renewal', (t) => {

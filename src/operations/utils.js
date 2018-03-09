@@ -4,6 +4,8 @@ import bitcoinjs from 'bitcoinjs-lib'
 import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
 
+import { NotEnoughFundsError } from '../errors'
+
 export const DUST_MINIMUM = 5500
 
 export function hash160(buff: Buffer) {
@@ -105,35 +107,52 @@ export function decodeB40(input: string) {
   return sum.toHex()
 }
 
-export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder, changeOutput: number,
+/**
+ * Adds UTXOs to fund a transaction
+ * @param {TransactionBuilder} txBuilderIn - a transaction builder object to add the inputs to. this
+ *    object is _always_ mutated. If not enough UTXOs exist to fund, the tx builder object
+ *    will still contain as many inputs as could be found.
+ * @param {Array<{value: number, tx_hash: string, tx_output_n}>} utxos - the utxo set for the
+ *    payer's address.
+ * @param {number} amountToFund - the amount of satoshis to fund in the transaction. the payer's
+ *    utxos will be included to fund up to this amount of *output* and the corresponding *fees*
+ *    for those additional inputs
+ * @param {number} feeRate - the satoshis/byte fee rate to use for fee calculation
+ * @returns {number} - the amount of leftover change (in satoshis)
+ * @private
+ */
+export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
                                utxos: Array<{value: number, tx_hash: string, tx_output_n: number}>,
                                amountToFund: number, feeRate: number) {
-  // This will 100% mutate the provided txbuilder object.
   if (utxos.length === 0) {
-    throw new Error(`Not enough UTXOs to fund. Left to fund: ${amountToFund}`)
+    throw new NotEnoughFundsError(amountToFund)
   }
 
-  const goodUtxos = utxos.filter(utxo => utxo.value >= amountToFund)
+  // how much are we increasing fees by adding an input ?
+  const newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0)
+                             - estimateTXBytes(txBuilderIn, 0, 0))
+
+  const goodUtxos = utxos.filter(utxo => utxo.value >= amountToFund + newFees)
   if (goodUtxos.length > 0) {
     goodUtxos.sort((a, b) => a.value - b.value)
     const selected = goodUtxos[0]
-    const change = selected.value - amountToFund
+    const change = selected.value - amountToFund - newFees
 
-    txBuilderIn.tx.outs[changeOutput].value += change
     txBuilderIn.addInput(selected.tx_hash, selected.tx_output_n)
-    return txBuilderIn
+    return change
   } else {
     utxos.sort((a, b) => b.value - a.value)
     const largest = utxos[0]
 
+    if (newFees >= largest.value) {
+      throw new NotEnoughFundsError(amountToFund)
+    }
+
     txBuilderIn.addInput(largest.tx_hash, largest.tx_output_n)
 
-    const newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0)
-                               - estimateTXBytes(txBuilderIn, 0, 0))
     const remainToFund = amountToFund + newFees - largest.value
 
-    return addUTXOsToFund(txBuilderIn,
-                          changeOutput, utxos.slice(1),
+    return addUTXOsToFund(txBuilderIn, utxos.slice(1),
                           remainToFund, feeRate)
   }
 }

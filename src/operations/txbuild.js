@@ -39,10 +39,11 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
     changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
   }
   // fund the transaction fee.
-  const txFee = estimateTXBytes(txB, 1, 0) * feeRate
+  const txFee = estimateTXBytes(txB, 0, 0) * feeRate
   const outAmounts = sumOutputValues(txB)
-  return addUTXOsToFund(txB, changeIndex, utxos,
-                        txFee + outAmounts - inAmounts, feeRate)
+  const change = addUTXOsToFund(txB, utxos, txFee + outAmounts - inAmounts, feeRate)
+  txB.tx.outs[changeIndex].value += change
+  return txB
 }
 
 /**
@@ -476,7 +477,67 @@ function makeRenewal(fullyQualifiedName: string,
     })
 }
 
+// will attempt to send *amount* satoshis to the destination address,
+//   and will _cover_ the cost of the fees to do so, as in, if the amount
+//    is 20 and the total fees are 50, the payer will spend ~70 satoshis.
+//   furthermore, this will only generate a change output if it is worthwhile
+//   to do so (i.e., the leftover change is greater than the additional cost of
+//             of a change output)
+function makeBitcoinSpend(destinationAddress: string,
+                          paymentKeyHex: string,
+                          amount: number) {
+  const network = config.network
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+  const paymentAddress = paymentKey.getAddress()
+
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      function bestEffortFund(txB: bitcoinjs.TransactionBuilder, fundingAmount: number) {
+        let change = 0
+        let leftToFund = 0
+        try {
+          change = addUTXOsToFund(txB, utxos, fundingAmount, feeRate)
+        } catch (e) {
+          if (!(e.name === 'NotEnoughFundsError')) {
+            throw e
+          }
+          leftToFund = e.leftToFund
+        }
+        return { change, leftToFund }
+      }
+
+      let txB = new bitcoinjs.TransactionBuilder(network.layer1)
+      let destinationIndex = txB.addOutput(destinationAddress, DUST_MINIMUM)
+
+      const baseFees = feeRate * estimateTXBytes(txB, 0, 0)
+      const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - baseFees
+
+      let tryFund = bestEffortFund(txB, amount + baseFees)
+      let outAmount
+
+      if (tryFund.change > feeForChange) {
+        // let's save the change if it's worthwhile.
+        // create a new transaction, this time, with a change output
+        txB = new bitcoinjs.TransactionBuilder(network.layer1)
+        destinationIndex = txB.addOutput(destinationAddress, DUST_MINIMUM)
+        const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
+        tryFund = bestEffortFund(txB, amount + baseFees + feeForChange)
+        txB.tx.outs[changeIndex].value = tryFund.change
+        console.log(`Amount: ${amount} Change: ${tryFund.change} LeftToFund: ${tryFund.leftToFund}`)
+        outAmount = amount - tryFund.leftToFund
+      } else {
+        console.log(`Amount: ${amount} Fee: ${baseFees} LeftToFund: ${tryFund.leftToFund}`)
+        outAmount = amount - tryFund.leftToFund
+      }
+      txB.tx.outs[destinationIndex].value = outAmount
+      for (let i = 0; i < txB.tx.ins.length; i++) {
+        txB.sign(i, paymentKey)
+      }
+      return txB.build().toHex()
+    })
+}
+
 export const transactions = {
-  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer,
+  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeBitcoinSpend,
   estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal
 }
