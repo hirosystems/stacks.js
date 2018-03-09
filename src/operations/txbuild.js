@@ -523,10 +523,8 @@ function makeBitcoinSpend(destinationAddress: string,
         const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
         tryFund = bestEffortFund(txB, amount + baseFees + feeForChange)
         txB.tx.outs[changeIndex].value = tryFund.change
-        console.log(`Amount: ${amount} Change: ${tryFund.change} LeftToFund: ${tryFund.leftToFund}`)
         outAmount = amount - tryFund.leftToFund
       } else {
-        console.log(`Amount: ${amount} Fee: ${baseFees} LeftToFund: ${tryFund.leftToFund}`)
         outAmount = amount - tryFund.leftToFund
       }
       txB.tx.outs[destinationIndex].value = outAmount

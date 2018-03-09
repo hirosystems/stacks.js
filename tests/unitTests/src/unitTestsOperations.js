@@ -462,7 +462,7 @@ function transactionTests() {
   })
 
   test('fund bitcoin spends', (t) => {
-    t.plan(9)
+    t.plan(13)
     setupMocks()
     transactions.makeBitcoinSpend(testAddresses[2].address,
                                   testAddresses[1].skHex,
@@ -497,6 +497,20 @@ function transactionTests() {
              'Fee should be correct (within an output fee): ' +
              `Actual fee: ${fee}, expected: ${1000 * txLen}`)
         t.equal(outputVals, 80000, 'Should fund correct amount')
+      })
+      .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
+                                                testAddresses[1].skHex,
+                                                288000 + 287825 + 287825))
+      .then(hexTX => {
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx)
+        const fee = inputVals - outputVals
+        t.equal(tx.ins.length, 3, 'Should use 3 inputs')
+        t.equal(tx.outs.length, 1, 'Should not have a change output')
+        t.equal(fee - 2000, 1000 * txLen, 'Fee should be correct.')
+        t.equal(outputVals + fee, 288000 + 287825 + 287825, 'Should fund correct amount')
       })
   })
 
