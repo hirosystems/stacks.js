@@ -70,3 +70,17 @@ export class NotEnoughFundsError extends BlockstackError {
     this.message = message
   }
 }
+
+export class InvalidAmountError extends BlockstackError {
+  fees: number
+  specifiedAmount: number
+  constructor(fees: number, specifiedAmount: number) {
+    const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},` +
+          ` specified spend is  ${specifiedAmount}`
+    super({ code: 'invalid_amount_error', message })
+    this.specifiedAmount = specifiedAmount
+    this.fees = fees
+    this.name = 'InvalidAmountError'
+    this.message = message
+  }
+}

@@ -118,12 +118,16 @@ export function decodeB40(input: string) {
  *    utxos will be included to fund up to this amount of *output* and the corresponding *fees*
  *    for those additional inputs
  * @param {number} feeRate - the satoshis/byte fee rate to use for fee calculation
+ * @param {boolean} fundNewFees - if true, this function will fund `amountToFund` and any new fees
+ *    associated with including the new inputs.
+ *    if false, this function will fund _at most_ `amountToFund`
  * @returns {number} - the amount of leftover change (in satoshis)
  * @private
  */
 export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
                                utxos: Array<{value: number, tx_hash: string, tx_output_n: number}>,
-                               amountToFund: number, feeRate: number) {
+                               amountToFund: number, feeRate: number,
+                               fundNewFees: ?boolean = true) {
   if (utxos.length === 0) {
     throw new NotEnoughFundsError(amountToFund)
   }
@@ -131,12 +135,19 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
   // how much are we increasing fees by adding an input ?
   const newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0)
                              - estimateTXBytes(txBuilderIn, 0, 0))
+  let utxoThreshhold = amountToFund
+  if (fundNewFees) {
+    utxoThreshhold += newFees
+  }
 
-  const goodUtxos = utxos.filter(utxo => utxo.value >= amountToFund + newFees)
+  const goodUtxos = utxos.filter(utxo => utxo.value >= utxoThreshhold)
   if (goodUtxos.length > 0) {
     goodUtxos.sort((a, b) => a.value - b.value)
     const selected = goodUtxos[0]
-    const change = selected.value - amountToFund - newFees
+    let change = selected.value - amountToFund
+    if (fundNewFees) {
+      change -= newFees
+    }
 
     txBuilderIn.addInput(selected.tx_hash, selected.tx_output_n)
     return change
@@ -150,9 +161,12 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
 
     txBuilderIn.addInput(largest.tx_hash, largest.tx_output_n)
 
-    const remainToFund = amountToFund + newFees - largest.value
+    let remainToFund = amountToFund - largest.value
+    if (fundNewFees) {
+      remainToFund += newFees
+    }
 
     return addUTXOsToFund(txBuilderIn, utxos.slice(1),
-                          remainToFund, feeRate)
+                          remainToFund, feeRate, fundNewFees)
   }
 }

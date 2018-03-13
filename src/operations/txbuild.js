@@ -8,6 +8,7 @@ import { makePreorderSkeleton, makeRegisterSkeleton,
          makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton } from './skeletons'
 import { config } from '../config'
 import { hexStringToECPair } from '../utils'
+import { InvalidAmountError, InvalidParameterError } from '../errors'
 
 const dummyBurnAddress   = '1111111111111111111114oLvT2'
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -477,57 +478,76 @@ function makeRenewal(fullyQualifiedName: string,
     })
 }
 
-// will attempt to send *amount* satoshis to the destination address,
-//   and will _cover_ the cost of the fees to do so, as in, if the amount
-//    is 20 and the total fees are 50, the payer will spend ~70 satoshis.
-//   furthermore, this will only generate a change output if it is worthwhile
-//   to do so (i.e., the leftover change is greater than the additional cost of
-//             of a change output)
+/**
+ * Generates a bitcoin spend to a specified address. This will fund up to `amount`
+ *   of satoshis from the payer's UTXOs. It will generate a change output if and only
+ *   if the amount of leftover change is *greater* than the additional fees associated
+ *   with the extra output. If the requested amount is not enough to fund the transaction's
+ *   associated fees, then this will reject with a InvalidAmountError
+ *
+ * UTXOs are selected largest to smallest, and UTXOs which cannot fund the fees associated
+ *   with their own input will not be included.
+ *
+ * If you specify an amount > the total balance of the payer address, then this will
+ *   generate a maximum spend transaction
+ *
+ * @param {String} destinationAddress - the address to receive the bitcoin payment
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the bitcoin spend
+ * @param {number} amount - the amount in satoshis for the payment address to
+ *    spend in this transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * @private
+ */
 function makeBitcoinSpend(destinationAddress: string,
                           paymentKeyHex: string,
                           amount: number) {
+  if (amount <= 0) {
+    return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
+  }
+
   const network = config.network
   const paymentKey = hexStringToECPair(paymentKeyHex)
   const paymentAddress = paymentKey.getAddress()
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
-      function bestEffortFund(txB: bitcoinjs.TransactionBuilder, fundingAmount: number) {
-        let change = 0
-        let leftToFund = 0
-        try {
-          change = addUTXOsToFund(txB, utxos, fundingAmount, feeRate)
-        } catch (e) {
-          if (!(e.name === 'NotEnoughFundsError')) {
-            throw e
-          }
-          leftToFund = e.leftToFund
+      const txB = new bitcoinjs.TransactionBuilder(network.layer1)
+      const destinationIndex = txB.addOutput(destinationAddress, 0)
+
+      // will add utxos up to _amount_ and return the amount of leftover _change_
+      let change
+      try {
+        change = addUTXOsToFund(txB, utxos, amount, feeRate, false)
+      } catch (err) {
+        if (err.name === 'NotEnoughFundsError') {
+          // actual amount funded = amount requested - remainder
+          amount -= err.leftToFund
+          change = 0
+        } else {
+          throw err
         }
-        return { change, leftToFund }
       }
 
-      let txB = new bitcoinjs.TransactionBuilder(network.layer1)
-      let destinationIndex = txB.addOutput(destinationAddress, DUST_MINIMUM)
+      let feesToPay = feeRate * estimateTXBytes(txB, 0, 0)
+      const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - feesToPay
 
-      const baseFees = feeRate * estimateTXBytes(txB, 0, 0)
-      const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - baseFees
-
-      let tryFund = bestEffortFund(txB, amount + baseFees)
-      let outAmount
-
-      if (tryFund.change > feeForChange) {
-        // let's save the change if it's worthwhile.
-        // create a new transaction, this time, with a change output
-        txB = new bitcoinjs.TransactionBuilder(network.layer1)
-        destinationIndex = txB.addOutput(destinationAddress, DUST_MINIMUM)
-        const changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
-        tryFund = bestEffortFund(txB, amount + baseFees + feeForChange)
-        txB.tx.outs[changeIndex].value = tryFund.change
-        outAmount = amount - tryFund.leftToFund
-      } else {
-        outAmount = amount - tryFund.leftToFund
+      // it's worthwhile to add a change output
+      if (change > feeForChange) {
+        feesToPay += feeForChange
+        txB.addOutput(paymentAddress, change)
       }
-      txB.tx.outs[destinationIndex].value = outAmount
+
+      // now let's compute how much output is leftover once we pay the fees.
+      const outputAmount = amount - feesToPay
+      if (outputAmount < DUST_MINIMUM) {
+        throw new InvalidAmountError(feesToPay, amount)
+      }
+
+      // we need to manually set the output values now
+      txB.tx.outs[destinationIndex].value = outputAmount
+
+      // ready to sign.
       for (let i = 0; i < txB.tx.ins.length; i++) {
         txB.sign(i, paymentKey)
       }
