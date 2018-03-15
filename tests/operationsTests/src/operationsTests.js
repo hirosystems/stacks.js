@@ -44,13 +44,17 @@ function shutdownBlockstackCore() {
 
 export function runIntegrationTests() {
   test('registerName', (t) => {
-    t.plan(6)
+    t.plan(7)
 
     config.network = network.defaults.LOCAL_REGTEST
     const myNet = config.network
 
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
     const destAddress = hexStringToECPair(dest).getAddress()
+
+
+    const btcDest = '897f1b92041b798580f96b8be379053f6276f04eb7590a9042a62059d46d6fc301'
+    const btcDestAddress = hexStringToECPair(btcDest).getAddress()
 
     const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
 
@@ -128,6 +132,18 @@ export function runIntegrationTests() {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `aaron.id should be owned by ${renewalDestination}`)
+      })
+      .then(() => transactions.makeBitcoinSpend(btcDestAddress, payer, 500000))
+      .then(rawtx => myNet.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('broadcasted SPEND, waiting 10 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => myNet.getUTXOs(btcDestAddress))
+      .then((utxos) => {
+        t.equal(utxos.length, 1, `Destination address ${btcDestAddress} should have 1 UTXO`)
+        const satoshis = utxos.reduce((agg, utxo) => agg + utxo.value, 0)
+        console.log(`${btcDestAddress} has ${satoshis} satoshis`)
       })
       .then(() => shutdownBlockstackCore())
   })

@@ -1535,6 +1535,45 @@ var InvalidDIDError = exports.InvalidDIDError = function (_BlockstackError4) {
 
   return InvalidDIDError;
 }(BlockstackError);
+
+var NotEnoughFundsError = exports.NotEnoughFundsError = function (_BlockstackError5) {
+  _inherits(NotEnoughFundsError, _BlockstackError5);
+
+  function NotEnoughFundsError(leftToFund) {
+    _classCallCheck(this, NotEnoughFundsError);
+
+    var message = 'Not enough UTXOs to fund. Left to fund: ' + leftToFund;
+
+    var _this6 = _possibleConstructorReturn(this, (NotEnoughFundsError.__proto__ || Object.getPrototypeOf(NotEnoughFundsError)).call(this, { code: 'not_enough_error', message: message }));
+
+    _this6.leftToFund = leftToFund;
+    _this6.name = 'NotEnoughFundsError';
+    _this6.message = message;
+    return _this6;
+  }
+
+  return NotEnoughFundsError;
+}(BlockstackError);
+
+var InvalidAmountError = exports.InvalidAmountError = function (_BlockstackError6) {
+  _inherits(InvalidAmountError, _BlockstackError6);
+
+  function InvalidAmountError(fees, specifiedAmount) {
+    _classCallCheck(this, InvalidAmountError);
+
+    var message = 'Not enough coin to fund fees transaction fees. Fees would be ' + fees + ',' + (' specified spend is  ' + specifiedAmount);
+
+    var _this7 = _possibleConstructorReturn(this, (InvalidAmountError.__proto__ || Object.getPrototypeOf(InvalidAmountError)).call(this, { code: 'invalid_amount_error', message: message }));
+
+    _this7.specifiedAmount = specifiedAmount;
+    _this7.fees = fees;
+    _this7.name = 'InvalidAmountError';
+    _this7.message = message;
+    return _this7;
+  }
+
+  return InvalidAmountError;
+}(BlockstackError);
 },{}],12:[function(require,module,exports){
 'use strict';
 
@@ -2940,6 +2979,8 @@ var _config = require('../config');
 
 var _utils2 = require('../utils');
 
+var _errors = require('../errors');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var dummyBurnAddress = '1111111111111111111114oLvT2';
@@ -2973,9 +3014,11 @@ function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
     changeIndex = txB.addOutput(paymentAddress, _utils.DUST_MINIMUM);
   }
   // fund the transaction fee.
-  var txFee = (0, _utils.estimateTXBytes)(txB, 1, 0) * feeRate;
+  var txFee = (0, _utils.estimateTXBytes)(txB, 0, 0) * feeRate;
   var outAmounts = (0, _utils.sumOutputValues)(txB);
-  return (0, _utils.addUTXOsToFund)(txB, changeIndex, utxos, txFee + outAmounts - inAmounts, feeRate);
+  var change = (0, _utils.addUTXOsToFund)(txB, utxos, txFee + outAmounts - inAmounts, feeRate);
+  txB.tx.outs[changeIndex].value += change;
+  return txB;
 }
 
 /**
@@ -3406,12 +3449,90 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
   });
 }
 
+/**
+ * Generates a bitcoin spend to a specified address. This will fund up to `amount`
+ *   of satoshis from the payer's UTXOs. It will generate a change output if and only
+ *   if the amount of leftover change is *greater* than the additional fees associated
+ *   with the extra output. If the requested amount is not enough to fund the transaction's
+ *   associated fees, then this will reject with a InvalidAmountError
+ *
+ * UTXOs are selected largest to smallest, and UTXOs which cannot fund the fees associated
+ *   with their own input will not be included.
+ *
+ * If you specify an amount > the total balance of the payer address, then this will
+ *   generate a maximum spend transaction
+ *
+ * @param {String} destinationAddress - the address to receive the bitcoin payment
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the bitcoin spend
+ * @param {number} amount - the amount in satoshis for the payment address to
+ *    spend in this transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * @private
+ */
+function makeBitcoinSpend(destinationAddress, paymentKeyHex, amount) {
+  if (amount <= 0) {
+    return Promise.reject(new _errors.InvalidParameterError('amount', 'amount must be greater than zero'));
+  }
+
+  var network = _config.config.network;
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
+  var paymentAddress = paymentKey.getAddress();
+
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref19) {
+    var _ref20 = _slicedToArray(_ref19, 2),
+        utxos = _ref20[0],
+        feeRate = _ref20[1];
+
+    var txB = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+    var destinationIndex = txB.addOutput(destinationAddress, 0);
+
+    // will add utxos up to _amount_ and return the amount of leftover _change_
+    var change = void 0;
+    try {
+      change = (0, _utils.addUTXOsToFund)(txB, utxos, amount, feeRate, false);
+    } catch (err) {
+      if (err.name === 'NotEnoughFundsError') {
+        // actual amount funded = amount requested - remainder
+        amount -= err.leftToFund;
+        change = 0;
+      } else {
+        throw err;
+      }
+    }
+
+    var feesToPay = feeRate * (0, _utils.estimateTXBytes)(txB, 0, 0);
+    var feeForChange = feeRate * (0, _utils.estimateTXBytes)(txB, 0, 1) - feesToPay;
+
+    // it's worthwhile to add a change output
+    if (change > feeForChange) {
+      feesToPay += feeForChange;
+      txB.addOutput(paymentAddress, change);
+    }
+
+    // now let's compute how much output is leftover once we pay the fees.
+    var outputAmount = amount - feesToPay;
+    if (outputAmount < _utils.DUST_MINIMUM) {
+      throw new _errors.InvalidAmountError(feesToPay, amount);
+    }
+
+    // we need to manually set the output values now
+    txB.tx.outs[destinationIndex].value = outputAmount;
+
+    // ready to sign.
+    for (var i = 0; i < txB.tx.ins.length; i++) {
+      txB.sign(i, paymentKey);
+    }
+    return txB.build().toHex();
+  });
+}
+
 var transactions = exports.transactions = {
-  makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer,
+  makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer, makeBitcoinSpend: makeBitcoinSpend,
   estimatePreorder: estimatePreorder, estimateRegister: estimateRegister, estimateTransfer: estimateTransfer, estimateUpdate: estimateUpdate, estimateRenewal: estimateRenewal
 };
 }).call(this,require("buffer").Buffer)
-},{"../config":8,"../utils":44,"./skeletons":17,"./utils":19,"bitcoinjs-lib":103,"buffer":161}],19:[function(require,module,exports){
+},{"../config":8,"../errors":11,"../utils":44,"./skeletons":17,"./utils":19,"bitcoinjs-lib":103,"buffer":161}],19:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -3437,6 +3558,8 @@ var _ripemd2 = _interopRequireDefault(_ripemd);
 var _bigi = require('bigi');
 
 var _bigi2 = _interopRequireDefault(_bigi);
+
+var _errors = require('../errors');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3536,14 +3659,39 @@ function decodeB40(input) {
   return sum.toHex();
 }
 
-function addUTXOsToFund(txBuilderIn, changeOutput, utxos, amountToFund, feeRate) {
-  // This will 100% mutate the provided txbuilder object.
+/**
+ * Adds UTXOs to fund a transaction
+ * @param {TransactionBuilder} txBuilderIn - a transaction builder object to add the inputs to. this
+ *    object is _always_ mutated. If not enough UTXOs exist to fund, the tx builder object
+ *    will still contain as many inputs as could be found.
+ * @param {Array<{value: number, tx_hash: string, tx_output_n}>} utxos - the utxo set for the
+ *    payer's address.
+ * @param {number} amountToFund - the amount of satoshis to fund in the transaction. the payer's
+ *    utxos will be included to fund up to this amount of *output* and the corresponding *fees*
+ *    for those additional inputs
+ * @param {number} feeRate - the satoshis/byte fee rate to use for fee calculation
+ * @param {boolean} fundNewFees - if true, this function will fund `amountToFund` and any new fees
+ *    associated with including the new inputs.
+ *    if false, this function will fund _at most_ `amountToFund`
+ * @returns {number} - the amount of leftover change (in satoshis)
+ * @private
+ */
+function addUTXOsToFund(txBuilderIn, utxos, amountToFund, feeRate) {
+  var fundNewFees = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+
   if (utxos.length === 0) {
-    throw new Error('Not enough UTXOs to fund. Left to fund: ' + amountToFund);
+    throw new _errors.NotEnoughFundsError(amountToFund);
+  }
+
+  // how much are we increasing fees by adding an input ?
+  var newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0) - estimateTXBytes(txBuilderIn, 0, 0));
+  var utxoThreshhold = amountToFund;
+  if (fundNewFees) {
+    utxoThreshhold += newFees;
   }
 
   var goodUtxos = utxos.filter(function (utxo) {
-    return utxo.value >= amountToFund;
+    return utxo.value >= utxoThreshhold;
   });
   if (goodUtxos.length > 0) {
     goodUtxos.sort(function (a, b) {
@@ -3551,26 +3699,34 @@ function addUTXOsToFund(txBuilderIn, changeOutput, utxos, amountToFund, feeRate)
     });
     var selected = goodUtxos[0];
     var change = selected.value - amountToFund;
+    if (fundNewFees) {
+      change -= newFees;
+    }
 
-    txBuilderIn.tx.outs[changeOutput].value += change;
     txBuilderIn.addInput(selected.tx_hash, selected.tx_output_n);
-    return txBuilderIn;
+    return change;
   } else {
     utxos.sort(function (a, b) {
       return b.value - a.value;
     });
     var largest = utxos[0];
 
+    if (newFees >= largest.value) {
+      throw new _errors.NotEnoughFundsError(amountToFund);
+    }
+
     txBuilderIn.addInput(largest.tx_hash, largest.tx_output_n);
 
-    var newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0) - estimateTXBytes(txBuilderIn, 0, 0));
-    var remainToFund = amountToFund + newFees - largest.value;
+    var remainToFund = amountToFund - largest.value;
+    if (fundNewFees) {
+      remainToFund += newFees;
+    }
 
-    return addUTXOsToFund(txBuilderIn, changeOutput, utxos.slice(1), remainToFund, feeRate);
+    return addUTXOsToFund(txBuilderIn, utxos.slice(1), remainToFund, feeRate, fundNewFees);
   }
 }
 }).call(this,require("buffer").Buffer)
-},{"bigi":64,"bitcoinjs-lib":103,"buffer":161,"ripemd160":412}],20:[function(require,module,exports){
+},{"../errors":11,"bigi":64,"bitcoinjs-lib":103,"buffer":161,"ripemd160":412}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
