@@ -8,6 +8,7 @@ import { makePreorderSkeleton, makeRegisterSkeleton,
          makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton } from './skeletons'
 import { config } from '../config'
 import { hexStringToECPair } from '../utils'
+import { InvalidAmountError, InvalidParameterError } from '../errors'
 
 const dummyBurnAddress   = '1111111111111111111114oLvT2'
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -39,10 +40,11 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
     changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
   }
   // fund the transaction fee.
-  const txFee = estimateTXBytes(txB, 1, 0) * feeRate
+  const txFee = estimateTXBytes(txB, 0, 0) * feeRate
   const outAmounts = sumOutputValues(txB)
-  return addUTXOsToFund(txB, changeIndex, utxos,
-                        txFee + outAmounts - inAmounts, feeRate)
+  const change = addUTXOsToFund(txB, utxos, txFee + outAmounts - inAmounts, feeRate)
+  txB.tx.outs[changeIndex].value += change
+  return txB
 }
 
 /**
@@ -476,7 +478,84 @@ function makeRenewal(fullyQualifiedName: string,
     })
 }
 
+/**
+ * Generates a bitcoin spend to a specified address. This will fund up to `amount`
+ *   of satoshis from the payer's UTXOs. It will generate a change output if and only
+ *   if the amount of leftover change is *greater* than the additional fees associated
+ *   with the extra output. If the requested amount is not enough to fund the transaction's
+ *   associated fees, then this will reject with a InvalidAmountError
+ *
+ * UTXOs are selected largest to smallest, and UTXOs which cannot fund the fees associated
+ *   with their own input will not be included.
+ *
+ * If you specify an amount > the total balance of the payer address, then this will
+ *   generate a maximum spend transaction
+ *
+ * @param {String} destinationAddress - the address to receive the bitcoin payment
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the bitcoin spend
+ * @param {number} amount - the amount in satoshis for the payment address to
+ *    spend in this transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * @private
+ */
+function makeBitcoinSpend(destinationAddress: string,
+                          paymentKeyHex: string,
+                          amount: number) {
+  if (amount <= 0) {
+    return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
+  }
+
+  const network = config.network
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+  const paymentAddress = paymentKey.getAddress()
+
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = new bitcoinjs.TransactionBuilder(network.layer1)
+      const destinationIndex = txB.addOutput(destinationAddress, 0)
+
+      // will add utxos up to _amount_ and return the amount of leftover _change_
+      let change
+      try {
+        change = addUTXOsToFund(txB, utxos, amount, feeRate, false)
+      } catch (err) {
+        if (err.name === 'NotEnoughFundsError') {
+          // actual amount funded = amount requested - remainder
+          amount -= err.leftToFund
+          change = 0
+        } else {
+          throw err
+        }
+      }
+
+      let feesToPay = feeRate * estimateTXBytes(txB, 0, 0)
+      const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - feesToPay
+
+      // it's worthwhile to add a change output
+      if (change > feeForChange) {
+        feesToPay += feeForChange
+        txB.addOutput(paymentAddress, change)
+      }
+
+      // now let's compute how much output is leftover once we pay the fees.
+      const outputAmount = amount - feesToPay
+      if (outputAmount < DUST_MINIMUM) {
+        throw new InvalidAmountError(feesToPay, amount)
+      }
+
+      // we need to manually set the output values now
+      txB.tx.outs[destinationIndex].value = outputAmount
+
+      // ready to sign.
+      for (let i = 0; i < txB.tx.ins.length; i++) {
+        txB.sign(i, paymentKey)
+      }
+      return txB.build().toHex()
+    })
+}
+
 export const transactions = {
-  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer,
+  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeBitcoinSpend,
   estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal
 }
