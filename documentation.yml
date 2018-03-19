@@ -13,6 +13,7 @@ toc:
   - makeAuthRequest
   - redirectToSignInWithAuthRequest
   - getAuthResponseToken
+  - verifyAuthResponse
   - name: Profiles
     description: |
       Identity you own and control.
@@ -38,5 +39,12 @@ toc:
       [Read more about storage](https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md)
   - getFile
   - putFile
+  - deleteFile
   - getAppBucketUrl
   - getUserAppFileUrl
+  - name: Blockchain
+    description: |
+      Generate and broadcast Blockstack blockchain transactions.
+  - broadcastTransaction
+  - broadcastNameRegistration
+  - broadcastZoneFile

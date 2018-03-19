@@ -11,6 +11,13 @@ export {
 } from './keys'
 export {
   nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter,
-  isLaterVersion, isSameOriginAbsoluteUrl
+  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString
 } from './utils'
+
+export { transactions, safety } from './operations'
+
+export { network } from './network'
+
 export { decodeToken } from 'jsontokens'
+
+export { config } from './config'
