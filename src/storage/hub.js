@@ -16,21 +16,17 @@ export type GaiaHubConfig = {
 export function uploadToGaiaHub(filename: string, contents: any,
                                 hubConfig: GaiaHubConfig,
                                 contentType: string = 'application/octet-stream'): Promise<*> {
-  return new Promise((resolve) => {
-    console.log(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
-    return fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`,
-          { method: 'POST',
-            headers: {
-              'Content-Type': contentType,
-              Authorization: `bearer ${hubConfig.token}`
-            },
-            body: contents })
-      .then((response) => response.text())
-      .then((responseText) => JSON.parse(responseText))
-      .then((responseJSON) => {
-        resolve(responseJSON.publicURL)
-      })
-  })
+  console.log(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
+  return fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`,
+        { method: 'POST',
+          headers: {
+            'Content-Type': contentType,
+            Authorization: `bearer ${hubConfig.token}`
+          },
+          body: contents })
+    .then((response) => response.text())
+    .then((responseText) => JSON.parse(responseText))
+    .then((responseJSON) => responseJSON.publicURL)
 }
 
 export function getFullReadUrl(filename: string,
@@ -40,28 +36,27 @@ export function getFullReadUrl(filename: string,
 
 export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
   console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
-  const challengeSigner = new bitcoin.ECPair(
-    bigi.fromHex(challengeSignerHex))
-  return new Promise((resolve) => {
-    fetch(`${gaiaHubUrl}/hub_info`)
-      .then((response) => response.text())
-      .then((responseText) => JSON.parse(responseText))
-      .then((responseJSON) => {
-        const readURL = responseJSON.read_url_prefix
-        const challenge = responseJSON.challenge_text
-        const digest = bitcoin.crypto.sha256(challenge)
-        const signature = challengeSigner.sign(digest)
-              .toDER().toString('hex')
-        const publickey = challengeSigner.getPublicKeyBuffer()
-              .toString('hex')
-        const token = new Buffer(JSON.stringify(
-          { publickey, signature })).toString('base64')
-        const address = challengeSigner.getAddress()
-        resolve({ url_prefix: readURL,
-                  address,
-                  token,
-                  server: gaiaHubUrl }
-               ) }) })
+  const challengeSigner = new bitcoin.ECPair(bigi.fromHex(challengeSignerHex))
+
+  return fetch(`${gaiaHubUrl}/hub_info`)
+    .then((response) => response.text())
+    .then((responseText) => JSON.parse(responseText))
+    .then((responseJSON) => {
+      const readURL = responseJSON.read_url_prefix
+      const challenge = responseJSON.challenge_text
+      const digest = bitcoin.crypto.sha256(challenge)
+      const signature = challengeSigner.sign(digest)
+            .toDER().toString('hex')
+      const publickey = challengeSigner.getPublicKeyBuffer()
+            .toString('hex')
+      const token = new Buffer(JSON.stringify(
+        { publickey, signature })).toString('base64')
+      const address = challengeSigner.getAddress()
+      return { url_prefix: readURL,
+                address,
+                token,
+                server: gaiaHubUrl }
+    })
 }
 
 /**
@@ -93,7 +88,7 @@ export function setLocalGaiaHubConnection(): Promise<*> {
 export function getOrSetLocalGaiaHubConnection(): Promise<*> {
   const hubConfig = JSON.parse(localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL))
   if (hubConfig !== null) {
-    return new Promise((resolve) => resolve(hubConfig))
+    return Promise.resolve(hubConfig)
   } else {
     return setLocalGaiaHubConnection()
   }
@@ -102,15 +97,14 @@ export function getOrSetLocalGaiaHubConnection(): Promise<*> {
 export function getBucketUrl(gaiaHubUrl, appPrivateKey): Promise<*> {
   console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
   const challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))
-  return new Promise((resolve) => {
-    fetch(`${gaiaHubUrl}/hub_info`)
-      .then((response) => response.text())
-      .then((responseText) => JSON.parse(responseText))
-      .then((responseJSON) => {
-        const readURL = responseJSON.read_url_prefix
-        const address = challengeSigner.getAddress()
-        const bucketUrl = `${readURL}${address}/`
-        resolve(bucketUrl) 
-      }) 
-  })
+
+  return fetch(`${gaiaHubUrl}/hub_info`)
+    .then((response) => response.text())
+    .then((responseText) => JSON.parse(responseText))
+    .then((responseJSON) => {
+      const readURL = responseJSON.read_url_prefix
+      const address = challengeSigner.getAddress()
+      const bucketUrl = `${readURL}${address}/`
+      return bucketUrl
+    })
 }
