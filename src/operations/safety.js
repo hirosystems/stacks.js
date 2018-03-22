@@ -25,6 +25,12 @@ function isNameValid(fullyQualifiedName: ?string = '') {
       }, true))
 }
 
+function isNamespaceValid(namespaceID: string) {
+  const NAMESPACE_RULE = /^[a-z0-9\-_]{1,19}$/
+  return Promise.resolve(
+    namespaceID.match(NAMESPACE_RULE) !== null)
+}
+
 function isNameAvailable(fullyQualifiedName: string) {
   return config.network.getNameInfo(fullyQualifiedName)
     .then(() => false)
@@ -37,6 +43,19 @@ function isNameAvailable(fullyQualifiedName: string) {
     })
 }
 
+function isNamespaceAvailable(namespaceID: string) {
+  return config.network.getNamespaceInfo(namespaceID)
+    .then(() => false)
+    .catch((e) => {
+      if (e.message === 'Namespace not found') {
+        return true
+      }
+      else {
+        throw e
+      }
+    })
+}       
+
 function ownsName(fullyQualifiedName: string, ownerAddress: string) {
   return config.network.getNameInfo(fullyQualifiedName)
     .then((nameInfo) => nameInfo.address === ownerAddress)
@@ -44,6 +63,32 @@ function ownsName(fullyQualifiedName: string, ownerAddress: string) {
       if (e.message === 'Name not found') {
         return false
       } else {
+        throw e
+      }
+    })
+}
+
+function revealedNamespace(namespaceID: string, revealAddress: string) {
+  return config.network.getNamespaceInfo(namespaceID)
+    .then((namespaceInfo) => namespaceInfo.address === revealAddress)
+    .catch((e) => {
+      if (e.message === 'Namespace not found') {
+        return false
+      }
+      else {
+        throw e
+      }
+    })
+}
+
+function namespaceIsReady(namespaceID: string) {
+  return config.network.getNamespaceInfo(namespaceID)
+    .then((namespaceInfo) => namespaceInfo.ready)
+    .catch((e) => {
+      if (e.message === 'Namespace not found') {
+        return false
+      }
+      else {
         throw e
       }
     })
@@ -73,5 +118,6 @@ function addressCanReceiveName(address: string) {
 }
 
 export const safety = {
-  addressCanReceiveName, isInGracePeriod, ownsName, isNameAvailable, isNameValid
+  addressCanReceiveName, isInGracePeriod, ownsName, isNameAvailable, isNameValid,
+  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady
 }
