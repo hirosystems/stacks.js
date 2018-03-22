@@ -1357,7 +1357,7 @@ function getHexFromBN(bnInput) {
  */
 function encryptECIES(publicKey, content) {
   var isString = typeof content === 'string';
-  var plainText = new Buffer(content); // always copy to buffer
+  var plainText = Buffer.from(content); // always copy to buffer
 
   var ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
   var ephemeralSK = ecurve.genKeyPair();
@@ -5881,20 +5881,18 @@ var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-
 function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
 
-  return new Promise(function (resolve) {
-    console.log('uploadToGaiaHub: uploading ' + filename + ' to ' + hubConfig.server);
-    return fetch(hubConfig.server + '/store/' + hubConfig.address + '/' + filename, { method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: 'bearer ' + hubConfig.token
-      },
-      body: contents }).then(function (response) {
-      return response.text();
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJSON) {
-      resolve(responseJSON.publicURL);
-    });
+  console.log('uploadToGaiaHub: uploading ' + filename + ' to ' + hubConfig.server);
+  return fetch(hubConfig.server + '/store/' + hubConfig.address + '/' + filename, { method: 'POST',
+    headers: {
+      'Content-Type': contentType,
+      Authorization: 'bearer ' + hubConfig.token
+    },
+    body: contents }).then(function (response) {
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    return responseJSON.publicURL;
   });
 }
 
@@ -5904,25 +5902,29 @@ function getFullReadUrl(filename, hubConfig) {
 
 function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
   console.log('connectToGaiaHub: ' + gaiaHubUrl + '/hub_info');
-  var challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(challengeSignerHex));
-  return new Promise(function (resolve) {
-    fetch(gaiaHubUrl + '/hub_info').then(function (response) {
-      return response.text();
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJSON) {
-      var readURL = responseJSON.read_url_prefix;
-      var challenge = responseJSON.challenge_text;
-      var digest = _bitcoinjsLib2.default.crypto.sha256(challenge);
-      var signature = challengeSigner.sign(digest).toDER().toString('hex');
-      var publickey = challengeSigner.getPublicKeyBuffer().toString('hex');
-      var token = new Buffer(JSON.stringify({ publickey: publickey, signature: signature })).toString('base64');
-      var address = challengeSigner.getAddress();
-      resolve({ url_prefix: readURL,
-        address: address,
-        token: token,
-        server: gaiaHubUrl });
-    });
+  var challengeSigner = void 0;
+  try {
+    challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(challengeSignerHex));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+
+  return fetch(gaiaHubUrl + '/hub_info').then(function (response) {
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    var readURL = responseJSON.read_url_prefix;
+    var challenge = responseJSON.challenge_text;
+    var digest = _bitcoinjsLib2.default.crypto.sha256(challenge);
+    var signature = challengeSigner.sign(digest).toDER().toString('hex');
+    var publickey = challengeSigner.getPublicKeyBuffer().toString('hex');
+    var token = new Buffer(JSON.stringify({ publickey: publickey, signature: signature })).toString('base64');
+    var address = challengeSigner.getAddress();
+    return { url_prefix: readURL,
+      address: address,
+      token: token,
+      server: gaiaHubUrl };
   });
 }
 
@@ -5953,28 +5955,29 @@ function setLocalGaiaHubConnection() {
 function getOrSetLocalGaiaHubConnection() {
   var hubConfig = JSON.parse(localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL));
   if (hubConfig !== null) {
-    return new Promise(function (resolve) {
-      return resolve(hubConfig);
-    });
+    return Promise.resolve(hubConfig);
   } else {
     return setLocalGaiaHubConnection();
   }
 }
 
 function getBucketUrl(gaiaHubUrl, appPrivateKey) {
-  console.log('connectToGaiaHub: ' + gaiaHubUrl + '/hub_info');
-  var challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(appPrivateKey));
-  return new Promise(function (resolve) {
-    fetch(gaiaHubUrl + '/hub_info').then(function (response) {
-      return response.text();
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJSON) {
-      var readURL = responseJSON.read_url_prefix;
-      var address = challengeSigner.getAddress();
-      var bucketUrl = '' + readURL + address + '/';
-      resolve(bucketUrl);
-    });
+  var challengeSigner = void 0;
+  try {
+    challengeSigner = new _bitcoinjsLib2.default.ECPair(_bigi2.default.fromHex(appPrivateKey));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+
+  return fetch(gaiaHubUrl + '/hub_info').then(function (response) {
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    var readURL = responseJSON.read_url_prefix;
+    var address = challengeSigner.getAddress();
+    var bucketUrl = '' + readURL + address + '/';
+    return bucketUrl;
   });
 }
 }).call(this,require("buffer").Buffer)
