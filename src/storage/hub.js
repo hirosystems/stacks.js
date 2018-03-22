@@ -36,7 +36,12 @@ export function getFullReadUrl(filename: string,
 
 export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
   console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
-  const challengeSigner = new bitcoin.ECPair(bigi.fromHex(challengeSignerHex))
+  let challengeSigner
+  try {
+    challengeSigner = new bitcoin.ECPair(bigi.fromHex(challengeSignerHex))
+  } catch (e) {
+    return Promise.reject(e)
+  }
 
   return fetch(`${gaiaHubUrl}/hub_info`)
     .then((response) => response.text())
@@ -95,8 +100,12 @@ export function getOrSetLocalGaiaHubConnection(): Promise<*> {
 }
 
 export function getBucketUrl(gaiaHubUrl, appPrivateKey): Promise<*> {
-  console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
-  const challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))
+  let challengeSigner
+  try {
+    challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))
+  } catch (e) {
+    return Promise.reject(e)
+  }
 
   return fetch(`${gaiaHubUrl}/hub_info`)
     .then((response) => response.text())
