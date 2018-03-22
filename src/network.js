@@ -1,7 +1,7 @@
 /* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
-
+import bigi from 'bigi'
 import { MissingParameterError, RemoteServiceError } from './errors'
 
 type UTXO = { value?: number,
@@ -44,16 +44,22 @@ export class BlockstackNetwork {
   getNamePrice(fullyQualifiedName: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
-      .then(x => x.name_price.satoshis)
-      .then(satoshis => {
-        if (satoshis) {
-          if (satoshis < this.DUST_MINIMUM) {
-            return this.DUST_MINIMUM
-          } else {
-            return satoshis
-          }
-        } else {
-          throw new Error('Failed to parse price of name')
+      .then(resp => resp.name_price)
+      .then(namePrice => {
+        return {
+          'units': namePrice.units,
+          'amount': bigi.fromByteArrayUnsigned(namePrice.amount)
+        }
+      })
+  }
+
+  getNamespacePrice(namespaceID: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
+      .then(resp => resp.json())
+      .then(namespacePrice => {
+        return {
+          'units': namespacePrice.units,
+          'amount': bigi.fromByteArrayUnsigned(namespacePrice.amount)
         }
       })
   }
@@ -112,6 +118,59 @@ export class BlockstackNetwork {
           return Object.assign({}, nameInfo, { address: this.coerceAddress(nameInfo.address) })
         } else {
           return nameInfo
+        }
+      })
+  }
+
+  getNamespaceInfo(namespaceID: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
+      .then(resp => {
+        if (resp.status === 404) {
+          throw new Error('Namespace not found')
+        } else if (resp.status !== 200) {
+          throw new Error(`Bad response status: ${resp.status}`)
+        } else {
+          return resp.json()
+        }
+      })
+      .then(namespaceInfo => {
+        // the returned address _should_ be in the correct network ---
+        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  and the regtest transaction generation libraries want to use testnet addresses
+        if (namespaceInfo.address && namespaceInfo.recipient_address) {
+          return Object.assign({}, namespaceInfo, {
+            address: this.coerceAddress(namespaceInfo.address),
+            recipient_address: this.coerceAddress(namespaceInfo.recipient_address),
+          })
+        } else {
+          return nameInfo
+        }
+      })
+  }
+
+  getAccountTokens(address: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.json().then(tokenList => tokenList.tokens)
+        }
+        else {
+          throw new Error(`Bad response status: ${resp.status}`)
+        }
+      })
+  }
+
+  getAccountBalance(address: string, tokenType: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.json()
+            .then((tokenBalance) => {
+              return bigi.fromByteArrayUnsigned(tokenBalance.balance)
+            });
+        }
+        else {
+          throw new Error(`Bad response status: ${resp.status}`)
         }
       })
   }
