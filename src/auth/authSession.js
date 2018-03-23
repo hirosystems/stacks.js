@@ -25,7 +25,6 @@ export function makeCoreSessionRequest(appDomain: string,
     thisDevice = '.default'
   }
 
-  // TODO: multi-device
   const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
   const appPublicKeys = [{
     public_key: appPublicKey,
