@@ -87,7 +87,7 @@ export function runIntegrationTests() {
       })
       .then(() => {
         const ns = transactions.BlockstackNamespace('test')
-        ns.setVersion(3)
+        ns.setVersion(1)
         ns.setLifetime(52595)
         ns.setCoeff(4)
         ns.setBase(4)
