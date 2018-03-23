@@ -47,7 +47,7 @@ export class BlockstackNetwork {
       .then(resp => resp.name_price)
       .then(namePrice => {
         let result = null
-        if (namePrice.hasOwnProperty('satoshis')) {
+        if (namePrice.satoshis) {
           // backwards compatibility 
           result = {
             units: 'BTC',
@@ -69,7 +69,7 @@ export class BlockstackNetwork {
       .then(resp => resp.json())
       .then(namespacePrice => {
         let result = null
-        if (namespacePrice.hasOwnProperty('satoshis')) {
+        if (namespacePrice.satoshis) {
           // backwards compatibility 
           result = {
             units: 'BTC',
