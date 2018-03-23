@@ -702,8 +702,7 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
 
   const paymentKey = hexStringToECPair(paymentKeyHex)
   const preorderAddress = paymentKey.getAddress()
-  const namespaceRevealTX = makeNamespaceRevealSkeleton(
-    namespace, revealAddress, preorderAddress)
+  const namespaceRevealTX = makeNamespaceRevealSkeleton(namespace, revealAddress)
 
   return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
