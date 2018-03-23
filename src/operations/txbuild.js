@@ -239,8 +239,7 @@ function estimateRevoke(fullyQualifiedName: string,
                         paymentAddress: string,
                         paymentUtxos: number = 1) : Promise<number>  {
   const network = config.network
-  const revokeTX = makeRevokeSkeleton(
-    fullyQualifiedName, ownerAddress, paymentAddress)
+  const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
 
   return Promise.all([network.getFeeRate()])
     .then(([feeRate]) => {
@@ -274,8 +273,9 @@ function estimateNamespacePreorder(namespaceID: string,
 
   const preorderPromise = network.getNamespacePrice(namespaceID)
         .then(namespacePrice => makeNamespacePreorderSkeleton(
-          namespaceID, dummyConsensusHash, paymentAddress,
-          network.coerceAddress(dummyBurnAddress), namespacePrice, revealAddress))
+          namespaceID, dummyConsensusHash, 
+          network.coerceAddress(paymentAddress),
+          network.coerceAddress(revealAddress), namespacePrice))
 
   return Promise.all([network.getFeeRate(), preorderPromise])
     .then(([feeRate, preorderTX]) => {
@@ -318,17 +318,15 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
 /**
  * Estimates the cost of a namespace-ready transaction for a namespace
  * @param {String} namespaceID - the namespace to ready
- * @param {String} revealAddress - the address that owns the namespace
  * @param {Number} revealUtxos - the number of UTXOs we expect will
  *  be required from the reveal address
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this ready transaction.
  */
 function estimateNamespaceReady(namespaceID: string,
-                                revealAddress: string,
                                 revealUtxos: number = 1) : Promise<number> {
   const network = config.network
-  const readyTX = makeNamespaceReadySkeleton(namespaceID, revealAddress)
+  const readyTX = makeNamespaceReadySkeleton(namespaceID)
 
   return network.getFeeRate()
     .then((feeRate) => {
@@ -545,8 +543,7 @@ function makeRevoke(fullyQualifiedName: string,
   const paymentAddress = paymentKey.getAddress()
   const ownerAddress = ownerKey.getAddress()
   
-  const revokeTX = makeRevokeSkeleton(
-        fullyQualifiedName, ownerAddress, paymentAddress)
+  const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
 
   const txPromise = bitcoinjs.TransactionBuilder.fromTransaction(revokeTX, network.layer1)
 
@@ -655,7 +652,6 @@ function makeNamespacePreorder(namespaceID: string,
                                revealAddress: string,
                                paymentKeyHex: string) {
   const network = config.network
-  const burnAddress = '1111111111111111111114oLvT2'
 
   const paymentKey = hexStringToECPair(paymentKeyHex)
   const preorderAddress = paymentKey.getAddress()
@@ -664,8 +660,9 @@ function makeNamespacePreorder(namespaceID: string,
                                        network.getNamespacePrice(namespaceID)])
         .then(([consensusHash, namespacePrice]) =>
           makeNamespacePreorderSkeleton(
-            namespaceID, consensusHash, preorderAddress, network.coerceAddress(burnAddress),
-            namespacePrice, revealAddress))
+            namespaceID, consensusHash,
+            network.coerceAddress(preorderAddress),
+            network.coerceAddress(revealAddress), namespacePrice))
 
   return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
     .then(([utxos, feeRate, preorderSkeleton]) => {

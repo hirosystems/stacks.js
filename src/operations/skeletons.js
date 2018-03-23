@@ -181,7 +181,7 @@ export function makePreorderSkeleton(
 
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
-  valueHash: ?string = null, burnTokenAmount: ?Object = null) {
+  valueHash: ?string = null, burnTokenAmountHex: ?string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -199,14 +199,18 @@ export function makeRegisterSkeleton(
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
     }
-    const payloadLen = burnTokenAmount !== null ? 65 : 57
+    if (burnTokenAmountHex) {
+      if (burnTokenAmountHex.length !== 16) {
+        throw new Error('Burn field length incorrect.  Expecting 8-bytes, hex-encoded')
+      }
+    }
+
+    const payloadLen = burnTokenAmountHex ? 65 : 57
     payload = Buffer.alloc(payloadLen, 0)
     payload.write(fullyQualifiedName, 0, 37, 'ascii')
     payload.write(valueHash, 37, 20, 'hex')
-    if (burnTokenAmount !== null) {
-      const burnHex = burnTokenAmount.toHex()
-      const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
-      payload.write(paddedBurnHex, 57, 16, 'hex')
+    if (burnTokenAmountHex) {
+      payload.write(burnTokenAmountHex, 57, 16, 'hex')
     }
   } else {
     payload = Buffer.from(fullyQualifiedName, 'ascii')
@@ -230,8 +234,15 @@ export function makeRenewalSkeleton(
   const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
   const burnBTCAmount = burnAmount.units === 'BTC' ? 
     parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
+  
+  let burnTokenHex = null
+  if (burnTokenAmount) {
+    const burnHex = burnTokenAmount.toHex()
+    burnTokenHex = `0000000000000000${burnHex}`.slice(-16)
+  }
+
   const registerTX = makeRegisterSkeleton(
-    fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenAmount)
+    fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex)
   const txB = bitcoin.TransactionBuilder.fromTransaction(
     registerTX, network.layer1)
   txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
