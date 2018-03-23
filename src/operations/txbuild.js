@@ -71,8 +71,9 @@ function estimatePreorder(fullyQualifiedName: string,
   const network = config.network
   const preorderPromise = network.getNamePrice(fullyQualifiedName)
         .then(namePrice => makePreorderSkeleton(
-          fullyQualifiedName, dummyConsensusHash, paymentAddress,
-          network.coerceAddress(dummyBurnAddress), namePrice, destinationAddress))
+          fullyQualifiedName, dummyConsensusHash, network.coerceAddress(paymentAddress),
+          network.coerceAddress(dummyBurnAddress), namePrice, 
+          network.coerceAddress(destinationAddress)))
 
   return Promise.all([network.getFeeRate(), preorderPromise])
     .then(([feeRate, preorderTX]) => {
