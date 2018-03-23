@@ -49,9 +49,13 @@ export function runIntegrationTests() {
     config.network = network.defaults.LOCAL_REGTEST
     const myNet = config.network
 
+    const nsPay = '6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01'
+    const nsReveal = 'c244642ce0b4eb68da8e098facfcad889e3063c36a68b7951fb4c085de49df1b'
+
+    const nsRevealAddress = hexStringToECPair(nsPay).getAddress()
+
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
     const destAddress = hexStringToECPair(dest).getAddress()
-
 
     const btcDest = '897f1b92041b798580f96b8be379053f6276f04eb7590a9042a62059d46d6fc301'
     const btcDestAddress = hexStringToECPair(btcDest).getAddress()
@@ -63,62 +67,98 @@ export function runIntegrationTests() {
 
     const renewalDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
-    const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
+    const zfTest = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
-    const zfTest2 = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
+    const zfTest2 = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
-    const renewalZF = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
+    const renewalZF = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
 
     initializeBlockstackCore()
       .then(() => {
         console.log('Blockstack Core initialized.')
-        return transactions.makePreorder('aaron.id', destAddress, payer)
+        console.log('Preorder namespace "hello"')
+        return transactions.makeNamespacePreorder('hello', nsRevealAddress, nsPay)
+      })
+      .then(rawtx => myNet.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('NAMESPACE_PREORDER broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => {
+        const ns = transactions.BlockstackNamespace('test')
+        ns.setVersion(3)
+        ns.setLifetime(52595)
+        ns.setCoeff(4)
+        ns.setBase(4)
+        ns.setBuckets([6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+        ns.setNonalphaDiscount(10)
+        ns.setNoVowelDiscount(10)
+        console.log('Reveal namespace "hello"')
+        return transactions.makeNamespaceReveal(ns, nsRevealAddress, nsPay)
+      })
+      .then(rawtx => myNet.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('NAMESPACE_REVEAL broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => {
+        console.log('Launch namespace "hello"')
+        return transactions.makeNamespaceReady('hello', nsReveal)
+      })
+      .then(rawtx => myNet.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('NAMESPACE_READY broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => {
+        console.log('Namespace initialized.  Preordering aaron.hello')
+        return transactions.makePreorder('aaron.hello', destAddress, payer)
       })
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('PREORDER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => transactions.makeRegister('aaron.id', destAddress, payer, zfTest))
+      .then(() => transactions.makeRegister('aaron.hello', destAddress, payer, zfTest))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('REGISTER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
       .then(() => myNet.broadcastZoneFile(zfTest))
-      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
+      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), destAddress,
-                `aaron.id should be owned by ${destAddress}`)
+                `aaron.hello should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
       })
-      .then(() => transactions.makeUpdate('aaron.id', dest, payer, zfTest2))
+      .then(() => transactions.makeUpdate('aaron.hello', dest, payer, zfTest2))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('UPDATE broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
       .then(() => myNet.broadcastZoneFile(zfTest2))
-      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
+      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, zfTest2, 'zonefile should be updated')
       })
-      .then(() => transactions.makeTransfer('aaron.id', transferDestination, dest, payer))
+      .then(() => transactions.makeTransfer('aaron.hello', transferDestination, dest, payer))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('TRANSFER broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
-      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
+      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), transferDestination,
-                `aaron.id should be owned by ${transferDestination}`)
+                `aaron.hello should be owned by ${transferDestination}`)
       })
-      .then(() => transactions.makeRenewal('aaron.id', renewalDestination,
+      .then(() => transactions.makeRenewal('aaron.hello', renewalDestination,
                                            secondOwner, payer, renewalZF))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
@@ -126,12 +166,12 @@ export function runIntegrationTests() {
         return new Promise((resolve) => setTimeout(resolve, 30000))
       })
       .then(() => myNet.broadcastZoneFile(renewalZF))
-      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
+      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
-                `aaron.id should be owned by ${renewalDestination}`)
+                `aaron.hello should be owned by ${renewalDestination}`)
       })
       .then(() => transactions.makeBitcoinSpend(btcDestAddress, payer, 500000))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
