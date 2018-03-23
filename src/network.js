@@ -46,10 +46,11 @@ export class BlockstackNetwork {
       .then(resp => resp.json())
       .then(resp => resp.name_price)
       .then(namePrice => {
-        return {
-          'units': namePrice.units,
-          'amount': bigi.fromByteArrayUnsigned(namePrice.amount)
+        const result = {
+          units: namePrice.units,
+          amount: bigi.fromByteArrayUnsigned(namePrice.amount)
         }
+        return result
       })
   }
 
@@ -57,10 +58,11 @@ export class BlockstackNetwork {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then(resp => resp.json())
       .then(namespacePrice => {
-        return {
-          'units': namespacePrice.units,
-          'amount': bigi.fromByteArrayUnsigned(namespacePrice.amount)
+        const result = {
+          units: namespacePrice.units,
+          amount: bigi.fromByteArrayUnsigned(namespacePrice.amount)
         }
+        return result
       })
   }
 
@@ -140,10 +142,10 @@ export class BlockstackNetwork {
         if (namespaceInfo.address && namespaceInfo.recipient_address) {
           return Object.assign({}, namespaceInfo, {
             address: this.coerceAddress(namespaceInfo.address),
-            recipient_address: this.coerceAddress(namespaceInfo.recipient_address),
+            recipient_address: this.coerceAddress(namespaceInfo.recipient_address)
           })
         } else {
-          return nameInfo
+          return namespaceInfo
         }
       })
   }
@@ -153,8 +155,7 @@ export class BlockstackNetwork {
       .then(resp => {
         if (resp.status === 200) {
           return resp.json().then(tokenList => tokenList.tokens)
-        }
-        else {
+        } else {
           throw new Error(`Bad response status: ${resp.status}`)
         }
       })
@@ -162,14 +163,11 @@ export class BlockstackNetwork {
 
   getAccountBalance(address: string, tokenType: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 200) {
           return resp.json()
-            .then((tokenBalance) => {
-              return bigi.fromByteArrayUnsigned(tokenBalance.balance)
-            });
-        }
-        else {
+            .then((tokenBalance) => bigi.fromByteArrayUnsigned(tokenBalance.balance))
+        } else {
           throw new Error(`Bad response status: ${resp.status}`)
         }
       })
