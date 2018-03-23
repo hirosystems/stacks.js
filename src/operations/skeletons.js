@@ -148,7 +148,7 @@ export function makePreorderSkeleton(
 
   const hashed = hash160(dataBuff)
 
-  const opReturnBufferLen = burnAmount.units === 'BTC' ? 40 : 48
+  const opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
   opReturnBuffer.write('id?', 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
@@ -158,8 +158,8 @@ export function makePreorderSkeleton(
     const burnHex = burnAmount.amount.toHex()
     const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
 
-    opReturnBuffer.write(paddedBurnHex, 40, 8, 'hex')
-    opReturnBuffer.write(burnAmount.units, 48, burnAmount.units.length, 'ascii')
+    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
+    opReturnBuffer.write(burnAmount.units, 47, burnAmount.units.length, 'ascii')
   }
 
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
