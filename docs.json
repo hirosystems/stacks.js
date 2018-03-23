@@ -476,7 +476,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -809,7 +809,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1063,7 +1063,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1340,7 +1340,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1512,7 +1512,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1749,7 +1749,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2161,7 +2161,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2852,7 +2852,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3134,7 +3134,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3515,7 +3515,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -3901,7 +3901,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4256,7 +4256,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4890,7 +4890,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5286,7 +5286,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5667,7 +5667,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -6218,7 +6218,7 @@
           }
         },
         "name": "options.decrypt",
-        "default": "false"
+        "default": "true"
       },
       {
         "title": "param",
@@ -6285,7 +6285,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -6473,7 +6473,7 @@
               "type": "NameExpression",
               "name": "Boolean"
             },
-            "default": "false"
+            "default": "true"
           },
           {
             "title": "param",
@@ -6865,7 +6865,7 @@
           }
         },
         "name": "options.encrypt",
-        "default": "false"
+        "default": "true"
       },
       {
         "title": "return",
@@ -6898,7 +6898,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7156,7 +7156,7 @@
               "type": "NameExpression",
               "name": "Boolean"
             },
-            "default": "false"
+            "default": "true"
           }
         ]
       }
@@ -7342,7 +7342,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7600,7 +7600,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7943,7 +7943,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8468,7 +8468,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -8922,7 +8922,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -9838,7 +9838,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -10239,7 +10239,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -10559,7 +10559,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -11340,7 +11340,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -12224,7 +12224,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],

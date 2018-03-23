@@ -47,7 +47,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
- * @param {Boolean} [options.decrypt=false] - try to decrypt the data with the app private key
+ * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
@@ -59,7 +59,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 export function getFile(path: string, options?: {decrypt?: boolean, username?: string, app?: string,
   zoneFileLookupURL?: string}) {
   const defaults = {
-    decrypt: false,
+    decrypt: true,
     username: null,
     app: window.location.origin,
     zoneFileLookupURL: 'http://localhost:6270/v1/names/'
@@ -116,14 +116,14 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
- * @param {Object} [options=null]- options object
- * @param {Boolean} [options.encrypt=false] - encrypt the data with the app private key
+ * @param {Object} [options=null] - options object
+ * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
 export function putFile(path: string, content: string | Buffer, options?: {encrypt?: boolean}) {
   const defaults = {
-    encrypt: false
+    encrypt: true
   }
 
   const opt = Object.assign({}, defaults, options)
