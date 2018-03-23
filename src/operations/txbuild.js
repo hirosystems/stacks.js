@@ -238,7 +238,6 @@ function estimateRevoke(fullyQualifiedName: string,
                         ownerAddress: string,
                         paymentAddress: string,
                         paymentUtxos: number = 1) : Promise<number>  {
-                          
   const network = config.network
   const revokeTX = makeRevokeSkeleton(
     fullyQualifiedName, ownerAddress, paymentAddress)
@@ -558,10 +557,9 @@ function makeRevoke(fullyQualifiedName: string,
       const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
                                          ownerInput.value)
       for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        if (i == ownerInput.index) {
+        if (i === ownerInput.index) {
           signingTxB.sign(i, ownerKey)
-        }
-        else {
+        } else {
           signingTxB.sign(i, paymentKey)
         }
       }
@@ -658,7 +656,6 @@ function makeNamespacePreorder(namespaceID: string,
                                paymentKeyHex: string) {
   const network = config.network
   const burnAddress = '1111111111111111111114oLvT2'
-  const namespace = namespaceID.split('.').pop()
 
   const paymentKey = hexStringToECPair(paymentKeyHex)
   const preorderAddress = paymentKey.getAddress()
@@ -703,7 +700,7 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
   const network = config.network
 
   if (!namespace.check()) {
-    throw new Error("Invalid namespace")
+    throw new Error('Invalid namespace')
   }
 
   const paymentKey = hexStringToECPair(paymentKeyHex)
@@ -725,7 +722,7 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
 
 /**
  * Generates a namespace ready transaction for a namespace
- * @param {String} namespace - the namespace to launch
+ * @param {String} namespaceID - the namespace to launch
  * @param {String} revealKeyHex - the private key of the 'revealAddress' used
  *  to reveal the namespace.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
@@ -831,9 +828,9 @@ function makeBitcoinSpend(destinationAddress: string,
 }
 
 export const transactions = {
-  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeRevoke, makeNamespacePreorder,
+  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeRevoke,
   makeNamespacePreorder, makeNamespaceReveal, makeNamespaceReady, makeBitcoinSpend,
   BlockstackNamespace,
-  estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal, estimateRevoke,
-  estimateNamespacePreorder, estimateNamespaceReveal, estimateNamespaceReady
+  estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal,
+  estimateRevoke, estimateNamespacePreorder, estimateNamespaceReveal, estimateNamespaceReady
 }
