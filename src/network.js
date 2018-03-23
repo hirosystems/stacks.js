@@ -46,9 +46,19 @@ export class BlockstackNetwork {
       .then(resp => resp.json())
       .then(resp => resp.name_price)
       .then(namePrice => {
-        const result = {
-          units: namePrice.units,
-          amount: bigi.fromByteArrayUnsigned(namePrice.amount)
+        let result = null
+        if (namePrice.hasOwnProperty('satoshis')) {
+          // backwards compatibility 
+          result = {
+            units: 'BTC',
+            amount: bigi.fromByteArrayUnsigned(namePrice.satoshis)
+          }
+        } else {
+          // for STACKs and future tokens
+          result = {
+            units: namePrice.units,
+            amount: bigi.fromByteArrayUnsigned(namePrice.amount)
+          }
         }
         return result
       })
@@ -58,9 +68,19 @@ export class BlockstackNetwork {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then(resp => resp.json())
       .then(namespacePrice => {
-        const result = {
-          units: namespacePrice.units,
-          amount: bigi.fromByteArrayUnsigned(namespacePrice.amount)
+        let result = null
+        if (namespacePrice.hasOwnProperty('satoshis')) {
+          // backwards compatibility 
+          result = {
+            units: 'BTC',
+            amount: bigi.fromByteArrayUnsigned(namespacePrice.satoshis)
+          }
+        } else {
+          // for STACKs
+          result = {
+            units: namespacePrice.units,
+            amount: bigi.fromByteArrayUnsigned(namespacePrice.amount)
+          }
         }
         return result
       })
