@@ -246,7 +246,7 @@ function estimateRevoke(fullyQualifiedName: string,
     .then(([feeRate]) => {
       const outputsValue = sumOutputValues(revokeTX)
       // 1 additional input for owner
-      // 2 additional outputs for owner / payer change
+      // 1 additional output for payer change
       const txFee = feeRate * estimateTXBytes(revokeTX, 1 + paymentUtxos, 2)
       return txFee + outputsValue
     })
@@ -332,7 +332,7 @@ function estimateNamespaceReady(namespaceID: string,
   return network.getFeeRate()
     .then((feeRate) => {
       const outputsValue = sumOutputValues(readyTX)
-      const txFee = feeRate * estimateTXBytes(readyTX, revealUtxos, 0)
+      const txFee = feeRate * estimateTXBytes(readyTX, revealUtxos, 1)
       return txFee + outputsValue
     })
 }
