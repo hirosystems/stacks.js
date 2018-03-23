@@ -50,8 +50,8 @@ export function runStorageTests() {
     })
 
     FetchMock.get(fullReadUrl, fileContent)
-
-    getFile(path)
+    const options = { decrypt: false }
+    getFile(path, options)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), fileContent)
@@ -172,7 +172,8 @@ export function runStorageTests() {
 
     const options = {
       username: 'yukan.id',
-      app: 'http://localhost:8080'
+      app: 'http://localhost:8080',
+      decrypt: false
     }
 
     getFile(path, options)
@@ -182,7 +183,8 @@ export function runStorageTests() {
       })
 
     const optionsNoApp = {
-      username: 'yukan.id'
+      username: 'yukan.id',
+      decrypt: false
     }
 
     global.window = Object.assign({}, global.window, {
@@ -219,7 +221,9 @@ export function runStorageTests() {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
 
-    putFile(path, fileContent)
+    const options = { encrypt: false }
+
+    putFile(path, fileContent, options)
       .then((publicURL) => {
         t.ok(publicURL, fullReadUrl)
       })
@@ -265,9 +269,12 @@ export function runStorageTests() {
     FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
                   { status: 404 })
 
-    getFile('foo.json', false)
+    const optionsNoDecrypt = { decrypt: false }
+    getFile('foo.json', optionsNoDecrypt)
       .then(x => t.equal(x, null, '404 should return null'))
-    getFile('foo.json', true)
+
+    const optionsDecrypt = { decrypt: true }
+    getFile('foo.json', optionsDecrypt)
       .then(x => t.equal(x, null, '404 should return null, even if we try to decrypt'))
   })
 
