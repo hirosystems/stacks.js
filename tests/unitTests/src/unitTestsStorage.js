@@ -245,7 +245,7 @@ export function runStorageTests() {
     })
 
     FetchMock.post(`${fullReadUrl}`, { status: 404, body: 'Not found.' })
-    putFile(path, 'hello world')
+    putFile(path, 'hello world', { encrypt: false })
       .then(() => t.ok(false, 'Should not have returned'))
       .catch(() => t.ok(true, 'Should have rejected promise'))
 
