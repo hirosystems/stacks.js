@@ -51,7 +51,7 @@ export class BlockstackNetwork {
           // backwards compatibility 
           result = {
             units: 'BTC',
-            amount: bigi.fromByteArrayUnsigned(namePrice.satoshis)
+            amount: bigi.fromByteArrayUnsigned(namePrice.satoshis.toString())
           }
         } else {
           // for STACKs and future tokens
@@ -73,7 +73,7 @@ export class BlockstackNetwork {
           // backwards compatibility 
           result = {
             units: 'BTC',
-            amount: bigi.fromByteArrayUnsigned(namespacePrice.satoshis)
+            amount: bigi.fromByteArrayUnsigned(namespacePrice.satoshis.toString())
           }
         } else {
           // for STACKs
