@@ -3,7 +3,6 @@
 import bitcoin from 'bitcoinjs-lib'
 import { decodeB40, hash160, hash128, DUST_MINIMUM } from './utils'
 import { config } from '../config'
-import bigi from 'bigi'
 
 // todo : add name length / character verification
 
@@ -19,10 +18,10 @@ export class BlockstackNamespace {
 
   constructor(namespaceID: string) {
     if (namespaceID.length > 19) {
-      throw new Error("Namespace ID too long (19 chars max)")
+      throw new Error('Namespace ID too long (19 chars max)')
     }
     if (!namespaceID.match('[0123456789abcdefghijklmnopqrstuvwxyz_-]+')) {
-      throw new Error("Namespace ID can only use characters 0123456789abcdefghijklmnopqrstuvwxyz-_")
+      throw new Error('Namespace ID can only use characters 0123456789abcdefghijklmnopqrstuvwxyz-_')
     }
 
     this.namespaceID = namespaceID
@@ -45,48 +44,47 @@ export class BlockstackNamespace {
       this.setNonalphaDiscount(this.nonalphaDiscount)
       this.setNoVowelDiscount(this.noVowelDiscount)
       return true
-    }
-    catch (e) {
+    } catch (e) {
       return false
     }
   }
 
   setVersion(version: number) { 
-    if (version < 0 || version > 2**16 - 1) {
-      throw new Error("Invalid version: must be a 16-bit number")
+    if (version < 0 || version > 2 ** 16 - 1) {
+      throw new Error('Invalid version: must be a 16-bit number')
     }
     this.version = version
   }
 
   setLifetime(lifetime: number) {
-    if (lifetime < 0 || lifetime > 2**32 - 1) {
-      throw new Error("Invalid lifetime: must be a 32-bit number")
+    if (lifetime < 0 || lifetime > 2 ** 32 - 1) {
+      throw new Error('Invalid lifetime: must be a 32-bit number')
     }
     this.lifetime = lifetime
   }
     
   setCoeff(coeff: number) {
     if (coeff < 0 || coeff > 255) {
-      throw new Error("Invalid coeff: must be an 8-bit number")
+      throw new Error('Invalid coeff: must be an 8-bit number')
     }
     this.coeff = coeff
   }
 
   setBase(base: number) {
     if (base < 0 || base > 255) {
-      throw new Error("Invalid base: must be an 8-bit number")
+      throw new Error('Invalid base: must be an 8-bit number')
     }
     this.base = base
   }
 
   setBuckets(buckets: Array<number>) {
-    if (buckets.length != 16) {
-      throw new Error("Invalid buckets: must have 16 entries")
+    if (buckets.length !== 16) {
+      throw new Error('Invalid buckets: must have 16 entries')
     }
 
     for (let i = 0; i < buckets.length; i++) {
       if (buckets[i] < 0 || buckets[i] > 15) {
-        throw new Error("Invalid buckets: must be 4-bit numbers")
+        throw new Error('Invalid buckets: must be 4-bit numbers')
       }
     }
 
@@ -95,25 +93,25 @@ export class BlockstackNamespace {
  
   setNonalphaDiscount(nonalphaDiscount: number) {
     if (nonalphaDiscount < 0 || nonalphaDiscount > 15) {
-      throw new Error("Invalid nonalphaDiscount: must be a 4-bit number")
+      throw new Error('Invalid nonalphaDiscount: must be a 4-bit number')
     }
     this.nonalphaDiscount = nonalphaDiscount
   }
 
   setNoVowelDiscount(noVowelDiscount: number) {
     if (noVowelDiscount < 0 || noVowelDiscount > 15) {
-      throw new Error("Invalid noVowelDiscount: must be a 4-bit number")
+      throw new Error('Invalid noVowelDiscount: must be a 4-bit number')
     }
     this.noVowelDiscount = noVowelDiscount
   }
 
   toHexPayload() {
-    const lifeHex = ('00000000' + this.lifetime.toString(16)).slice(-8)
-    const coeffHex = ('00' + this.coeff.toString(16)).slice(-2)
-    const baseHex = ('00' + this.base.toString(16)).slice(-2)
-    const bucketHex = this.buckets.map((b) => {return b.toString(16);}).reduce((b1, b2) => {return b1 + b2}, '')
+    const lifeHex = `00000000${this.lifetime.toString(16)}`.slice(-8)
+    const coeffHex = `00${this.coeff.toString(16)}`.slice(-2)
+    const baseHex = `00${this.base.toString(16)}`.slice(-2)
+    const bucketHex = this.buckets.map((b) => b.toString(16)).reduce((b1, b2) => b1 + b2, '')
     const discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16)
-    const versionHex = ('0000' + this.version.toString(16)).slice(-4)
+    const versionHex = `0000${this.version.toString(16)}`.slice(-4)
     const namespaceIDHex = new Buffer(this.namespaceID).toString('hex')
 
     return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex
@@ -129,10 +127,10 @@ export function makePreorderSkeleton(
   //                    2. the Preorder's change address (5500 satoshi minimum)
   //                    3. the BURN
   //
-  //    0     2  3                                              23             39          47
-  //    |-----|--|----------------------------------------------|--------------|-----------|
-  //    magic op  hash160(name.ns_id,script_pubkey,register_addr) consensus hash  STACKS
-  //                                                                             (optional)
+  // 0     2  3                                     23             39          47            66
+  // |-----|--|--------------------------------------|--------------|-----------|-------------|
+  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash token burn  token type
+  //                                                                 (optional)   (optional)
 
   // Returns an unsigned serialized transaction.
   const network = config.network
@@ -150,16 +148,18 @@ export function makePreorderSkeleton(
 
   const hashed = hash160(dataBuff)
 
-  const opReturnBufferLen = burnAmount.units == 'BTC' ? 40 : 48
+  const opReturnBufferLen = burnAmount.units === 'BTC' ? 40 : 48
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
   opReturnBuffer.write('id?', 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
-  if (burnAmount.units == 'STACKS') {
+  if (burnAmount.units !== 'BTC') {
     const burnHex = burnAmount.amount.toHex()
-    const paddedBurnHex = ('0000000000000000' + burnHex).slice(-16)
+    const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
+
     opReturnBuffer.write(paddedBurnHex, 40, 8, 'hex')
+    opReturnBuffer.write(burnAmount.units, 48, burnAmount.units.length, 'ascii')
   }
 
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
@@ -169,11 +169,10 @@ export function makePreorderSkeleton(
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
 
-  if (burnAmount.units == 'BTC') {
+  if (burnAmount.units === 'BTC') {
     const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
     tx.addOutput(burnAddress, btcBurnAmount)
-  }
-  else {
+  } else {
     tx.addOutput(burnAddress, DUST_MINIMUM)
   }
 
@@ -206,7 +205,7 @@ export function makeRegisterSkeleton(
     payload.write(valueHash, 37, 20, 'hex')
     if (burnTokenAmount !== null) {
       const burnHex = burnTokenAmount.toHex()
-      const paddedBurnHex = ('0000000000000000' + burnHex).slice(-16)
+      const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
       payload.write(paddedBurnHex, 57, 16, 'hex')
     }
   } else {
@@ -229,7 +228,8 @@ export function makeRenewalSkeleton(
   burnAddress: string, burnAmount: {units: string, amount: Object}, valueHash: ?string = null) {
   const network = config.network
   const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
-  const burnBTCAmount = burnAmount.units == 'BTC' ? parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
+  const burnBTCAmount = burnAmount.units === 'BTC' ? 
+    parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
   const registerTX = makeRegisterSkeleton(
     fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenAmount)
   const txB = bitcoin.TransactionBuilder.fromTransaction(
@@ -334,8 +334,8 @@ export function makeNamespacePreorderSkeleton(
   registerAddress: string, burnAmount: {units: string, amount: Object}) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
-  if (burnAmount.Units !== 'BTC' && burnAmount.units !== 'STACKS') {
-    throw new Error(`Invalid burnUnits ${burnUnits}`)
+  if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
+    throw new Error(`Invalid burnUnits ${burnAmount.units}`)
   }
 
   const network = config.network
@@ -353,8 +353,7 @@ export function makeNamespacePreorderSkeleton(
   let opReturnBufferLen = 40
   if (burnAmount.units === 'STACKS') {
     opReturnBufferLen = 48
-  }
-  else {
+  } else {
     btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
   }
 
@@ -363,9 +362,9 @@ export function makeNamespacePreorderSkeleton(
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
-  if (burnAmount.units == 'STACKS') {
+  if (burnAmount.units === 'STACKS') {
     const burnHex = burnAmount.amount.toHex()
-    const paddedBurnHex = ('0000000000000000' + burnHex).slice(-16)
+    const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
     opReturnBuffer.write(paddedBurnHex, 40, 16, 'hex')
   }
 
@@ -383,13 +382,12 @@ export function makeNamespacePreorderSkeleton(
 
 export function makeNamespaceRevealSkeleton(
   namespace: BlockstackNamespace, revealAddress: string) {
-
   const network = config.network
   const hexPayload = namespace.toHexPayload()
 
-  const opReturnBuffer = Buffer.alloc(3 + hexPayload.length/2)
+  const opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2)
   opReturnBuffer.write('id&', 0, 3, 'ascii')
-  opReturnBuffer.write(hexPayload, 3, hexPayload.length/2, 'hex')
+  opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
@@ -403,7 +401,6 @@ export function makeNamespaceRevealSkeleton(
 
 export function makeNamespaceReadySkeleton(
   namespaceID: string) {
-
   const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
