@@ -361,9 +361,9 @@ export function makeNamespacePreorderSkeleton(
   const hashed = hash160(dataBuff)
   
   let btcBurnAmount = DUST_MINIMUM
-  let opReturnBufferLen = 40
+  let opReturnBufferLen = 39
   if (burnAmount.units === 'STACKS') {
-    opReturnBufferLen = 48
+    opReturnBufferLen = 47
   } else {
     btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
   }
@@ -376,7 +376,7 @@ export function makeNamespacePreorderSkeleton(
   if (burnAmount.units === 'STACKS') {
     const burnHex = burnAmount.amount.toHex()
     const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
-    opReturnBuffer.write(paddedBurnHex, 40, 16, 'hex')
+    opReturnBuffer.write(paddedBurnHex, 39, 16, 'hex')
   }
 
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
