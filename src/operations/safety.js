@@ -49,8 +49,7 @@ function isNamespaceAvailable(namespaceID: string) {
     .catch((e) => {
       if (e.message === 'Namespace not found') {
         return true
-      }
-      else {
+      } else {
         throw e
       }
     })
@@ -74,8 +73,7 @@ function revealedNamespace(namespaceID: string, revealAddress: string) {
     .catch((e) => {
       if (e.message === 'Namespace not found') {
         return false
-      }
-      else {
+      } else {
         throw e
       }
     })
@@ -87,8 +85,7 @@ function namespaceIsReady(namespaceID: string) {
     .catch((e) => {
       if (e.message === 'Namespace not found') {
         return false
-      }
-      else {
+      } else {
         throw e
       }
     })
