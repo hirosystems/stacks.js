@@ -69,7 +69,7 @@ function ownsName(fullyQualifiedName: string, ownerAddress: string) {
 
 function revealedNamespace(namespaceID: string, revealAddress: string) {
   return config.network.getNamespaceInfo(namespaceID)
-    .then((namespaceInfo) => namespaceInfo.address === revealAddress)
+    .then((namespaceInfo) => namespaceInfo.recipient_address === revealAddress)
     .catch((e) => {
       if (e.message === 'Namespace not found') {
         return false
