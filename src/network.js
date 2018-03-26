@@ -46,6 +46,10 @@ export class BlockstackNetwork {
       .then(resp => resp.json())
       .then(resp => resp.name_price)
       .then(namePrice => {
+        if (!namePrice) {
+          throw new Error(
+            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`);
+        }
         let result = null
         if (namePrice.satoshis) {
           // backwards compatibility 
@@ -187,6 +191,17 @@ export class BlockstackNetwork {
         if (resp.status === 200) {
           return resp.json()
             .then((tokenBalance) => bigi.fromByteArrayUnsigned(tokenBalance.balance))
+        } else {
+          throw new Error(`Bad response status: ${resp.status}`)
+        }
+      })
+  }
+
+  getZoneFile(zonefileHash: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.body.buffer().then((buf) => buf.toString)
         } else {
           throw new Error(`Bad response status: ${resp.status}`)
         }
