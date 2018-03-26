@@ -197,7 +197,7 @@ export class BlockstackNetwork {
       })
   }
 
-  getZoneFile(zonefileHash: string) {
+  getZonefile(zonefileHash: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
       .then(resp => {
         if (resp.status === 200) {
