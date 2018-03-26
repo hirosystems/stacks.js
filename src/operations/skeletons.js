@@ -139,7 +139,7 @@ export function makePreorderSkeleton(
 
   const dataBuffers = [nameBuff, scriptPublicKey]
 
-  if (registerAddress) {
+  if (!!registerAddress) {
     const registerBuff = Buffer.from(registerAddress, 'ascii')
     dataBuffers.push(registerBuff)
   }
@@ -195,11 +195,16 @@ export function makeRegisterSkeleton(
   let payload
   const network = config.network
 
-  if (valueHash) {
+  if (!!burnTokenAmountHex && !valueHash) {
+    // empty value hash 
+    valueHash = '0000000000000000000000000000000000000000';
+  }
+
+  if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
     }
-    if (burnTokenAmountHex) {
+    if (!!burnTokenAmountHex) {
       if (burnTokenAmountHex.length !== 16) {
         throw new Error('Burn field length incorrect.  Expecting 8-bytes, hex-encoded')
       }
@@ -209,7 +214,7 @@ export function makeRegisterSkeleton(
     payload = Buffer.alloc(payloadLen, 0)
     payload.write(fullyQualifiedName, 0, 37, 'ascii')
     payload.write(valueHash, 37, 20, 'hex')
-    if (burnTokenAmountHex) {
+    if (!!burnTokenAmountHex) {
       payload.write(burnTokenAmountHex, 57, 16, 'hex')
     }
   } else {
@@ -236,7 +241,7 @@ export function makeRenewalSkeleton(
     parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
   
   let burnTokenHex = null
-  if (burnTokenAmount) {
+  if (!!burnTokenAmount) {
     const burnHex = burnTokenAmount.toHex()
     burnTokenHex = `0000000000000000${burnHex}`.slice(-16)
   }
@@ -413,9 +418,9 @@ export function makeNamespaceRevealSkeleton(
 export function makeNamespaceReadySkeleton(
   namespaceID: string) {
   const network = config.network
-  const opReturnBuffer = Buffer.alloc(3 + namespaceID.length)
+  const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
-  opReturnBuffer.write(namespaceID, 3, namespaceID.length, 'ascii')
+  opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
   const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
