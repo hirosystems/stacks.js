@@ -485,6 +485,7 @@ function makeRegister(fullyQualifiedName: string,
  *    private key
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the transaction
+ * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -493,7 +494,8 @@ function makeRegister(fullyQualifiedName: string,
 function makeTransfer(fullyQualifiedName: string,
                       destinationAddress: string,
                       ownerKeyHex: string,
-                      paymentKeyHex: string) {
+                      paymentKeyHex: string,
+                      keepZonefile: ?boolean = false) {
   const network = config.network
   const ownerKey = hexStringToECPair(ownerKeyHex)
   const paymentKey = hexStringToECPair(paymentKeyHex)
@@ -502,7 +504,8 @@ function makeTransfer(fullyQualifiedName: string,
 
   const txPromise = network.getConsensusHash()
         .then((consensusHash) =>
-              makeTransferSkeleton(fullyQualifiedName, consensusHash, destinationAddress))
+              makeTransferSkeleton(
+                fullyQualifiedName, consensusHash, destinationAddress, keepZonefile))
         .then((transferTX) =>
               bitcoinjs.TransactionBuilder.fromTransaction(transferTX, network.layer1))
 
