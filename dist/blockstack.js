@@ -164,6 +164,7 @@ function isSignInPending() {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
+ * @param {String} authResponseToken - the signed authentication response token
  * @param {String} nameLookupURL - the endpoint against which to verify public
  * keys match claimed username
  *
@@ -171,9 +172,8 @@ function isSignInPending() {
  * if handling the sign in request fails or there was no pending sign in request.
  */
 function handlePendingSignIn() {
-  var nameLookupURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://core.blockstack.org/v1/names/';
-
-  var authResponseToken = getAuthResponseToken();
+  var authResponseToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : getAuthResponseToken();
+  var nameLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
 
   return new Promise(function (resolve, reject) {
     (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
@@ -212,7 +212,8 @@ function handlePendingSignIn() {
           appPrivateKey: appPrivateKey,
           coreSessionToken: coreSessionToken,
           authResponseToken: authResponseToken,
-          hubUrl: hubUrl
+          hubUrl: hubUrl,
+          did: tokenPayload.iss
         };
         var profileURL = tokenPayload.profile_url;
         if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {

@@ -137,15 +137,15 @@ export function isSignInPending() {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
+ * @param {String} authResponseToken - the signed authentication response token
  * @param {String} nameLookupURL - the endpoint against which to verify public
  * keys match claimed username
  *
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/') {
-  const authResponseToken = getAuthResponseToken()
-
+export function handlePendingSignIn(authResponseToken: ?string = getAuthResponseToken(),
+  nameLookupURL: string = 'https://core.blockstack.org/v1/names/') {
   return new Promise((resolve, reject) => {
     verifyAuthResponse(authResponseToken, nameLookupURL)
     .then(isValid => {
@@ -185,7 +185,8 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           appPrivateKey,
           coreSessionToken,
           authResponseToken,
-          hubUrl
+          hubUrl,
+          did: tokenPayload.iss
         }
         const profileURL = tokenPayload.profile_url
         if ((userData.profile === null ||

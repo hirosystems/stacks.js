@@ -534,7 +534,7 @@ An array of strings indicating which permissions this app is requesting.
 to the user data object if the sign in succeeds.</p>
 
 
-  <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>handlePendingSignIn(authResponseToken: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -548,6 +548,16 @@ to the user data object if the sign in succeeds.</p>
   
     <div class='py1 quiet mt1 prose-big'>Parameters</div>
     <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>authResponseToken</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>getAuthResponseToken()</code>)</code>
+	    the signed authentication response token
+
+          </div>
+          
+        </div>
       
         <div class='space-bottom0'>
           <div>
