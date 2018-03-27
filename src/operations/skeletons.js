@@ -197,7 +197,7 @@ export function makeRegisterSkeleton(
 
   if (!!burnTokenAmountHex && !valueHash) {
     // empty value hash 
-    valueHash = '0000000000000000000000000000000000000000';
+    valueHash = '0000000000000000000000000000000000000000'
   }
 
   if (!!valueHash) {
