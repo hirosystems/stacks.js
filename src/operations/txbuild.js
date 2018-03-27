@@ -405,9 +405,12 @@ function makeUpdate(fullyQualifiedName: string,
                     valueHash: ?string = null) {
   const network = config.network
   if (!valueHash) {
-     hash160(Buffer.from(zonefile)).toString('hex')
-  } else if (valueHash.length != 40) {
-    throw new Error(`Invalid valueHash ${valueHash}`);
+    if (!zonefile) {
+      throw new Error('Need zonefile or valueHash arguments')
+    }
+    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+  } else if (valueHash.length !== 40) {
+    throw new Error(`Invalid valueHash ${valueHash}`)
   }
 
   const ownerKey = hexStringToECPair(ownerKeyHex)
@@ -466,7 +469,7 @@ function makeRegister(fullyQualifiedName: string,
   const network = config.network
   if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
-  } else if (!!valueHash && valueHash.length != 40) {
+  } else if (!!valueHash && valueHash.length !== 40) {
     throw new Error(`Invalid zonefile hash ${valueHash}`)
   }
 
