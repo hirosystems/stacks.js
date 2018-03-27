@@ -391,6 +391,8 @@ function makePreorder(fullyQualifiedName: string,
  * @param {String} zonefile - the zonefile data to update (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
+ * @param {String} valueHash - if given, this is the hash to store (instead of
+ *    zonefile).  zonefile will be ignored if this is given.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -399,9 +401,14 @@ function makePreorder(fullyQualifiedName: string,
 function makeUpdate(fullyQualifiedName: string,
                     ownerKeyHex: string,
                     paymentKeyHex: string,
-                    zonefile: string) {
+                    zonefile: string,
+                    valueHash: ?string = null) {
   const network = config.network
-  const valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+  if (!valueHash) {
+     hash160(Buffer.from(zonefile)).toString('hex')
+  } else if (valueHash.length != 40) {
+    throw new Error(`Invalid valueHash ${valueHash}`);
+  }
 
   const ownerKey = hexStringToECPair(ownerKeyHex)
   const paymentKey = hexStringToECPair(paymentKeyHex)
@@ -444,6 +451,8 @@ function makeUpdate(fullyQualifiedName: string,
  * @param {String} zonefile - the zonefile data to include (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
+ * @param {String} valueHash - the hash of the zone file data to include.
+ *    It will be used instead of zonefile, if given
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -452,11 +461,13 @@ function makeUpdate(fullyQualifiedName: string,
 function makeRegister(fullyQualifiedName: string,
                       registerAddress: string,
                       paymentKeyHex: string,
-                      zonefile: ?string = null) {
+                      zonefile: ?string = null,
+                      valueHash: ?string = null) {
   const network = config.network
-  let valueHash = undefined
-  if (!!zonefile) {
+  if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+  } else if (!!valueHash && valueHash.length != 40) {
+    throw new Error(`Invalid zonefile hash ${valueHash}`)
   }
 
   const registerSkeleton = makeRegisterSkeleton(
@@ -577,9 +588,11 @@ function makeRevoke(fullyQualifiedName: string,
  *    private key
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the renewal
- * @param {String} zonefile - the zonefile data to include (this will be hashed
+ * @param {String} zonefile - the zonefile data to include, if given (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the RENEWAL propagates.
+ * @param {String} valueHash - the raw zone file hash to include (this will be used
+ *    instead of zonefile, if given).
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -589,11 +602,11 @@ function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
                      ownerKeyHex: string,
                      paymentKeyHex: string,
-                     zonefile: ?string = null) {
-  let valueHash = undefined
+                     zonefile: ?string = null,
+                     valueHash: ?string = null) {
   const network = config.network
 
-  if (!!zonefile) {
+  if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   }
 
