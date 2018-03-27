@@ -634,7 +634,7 @@ export class BitcoindAPI extends BitcoinNetwork {
                             params: [address] }
     const jsonRPCUnspent = { jsonrpc: '1.0',
                              method: 'listunspent',
-                             params: [1, 9999999, [address]] }
+                             params: [0, 9999999, [address]] }
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')
