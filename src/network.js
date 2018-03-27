@@ -48,7 +48,7 @@ export class BlockstackNetwork {
       .then(namePrice => {
         if (!namePrice) {
           throw new Error(
-            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`);
+            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`)
         }
         let result = null
         if (namePrice.satoshis) {
