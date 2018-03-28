@@ -17,7 +17,7 @@ import {
 
 import { encryptECIES, decryptECIES } from '../encryption'
 
-const VERSION = '1.1.0'
+const VERSION = '1.2.0'
 
 type AuthMetadata = {
   email: ?string,
