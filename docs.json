@@ -6252,7 +6252,7 @@
           }
         },
         "name": "options.zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       },
       {
         "title": "returns",
@@ -6665,7 +6665,7 @@
               "type": "NameExpression",
               "name": "String"
             },
-            "default": "http://localhost:6270/v1/names/"
+            "default": "https://core.blockstack.org/v1/names/"
           }
         ]
       }
@@ -7910,7 +7910,7 @@
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       },
       {
         "title": "return",
@@ -8195,7 +8195,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "http://localhost:6270/v1/names/"
+        "default": "https://core.blockstack.org/v1/names/"
       }
     ],
     "properties": [],

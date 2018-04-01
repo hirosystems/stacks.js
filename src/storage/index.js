@@ -9,18 +9,22 @@ import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
 
+import { network } from '../network'
+
+const { blockstackAPIUrl } = network.defaults.MAINNET_DEFAULT
+
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
  * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
+ * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
  * to use for zonefile lookup
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
 export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
-  zoneFileLookupURL: string = 'http://localhost:6270/v1/names/') {
+  zoneFileLookupURL: string = `${blockstackAPIUrl}/v1/names/`) {
   return lookupProfile(username, zoneFileLookupURL)
     .then(profile => {
       if (profile.hasOwnProperty('apps')) {
@@ -51,7 +55,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack
+ * @param {String} [options.zoneFileLookupURL=https://core.blockstack.org/v1/names/] - the Blockstack
  * core endpoint URL to use for zonefile lookup
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
@@ -62,7 +66,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
     decrypt: true,
     username: null,
     app: window.location.origin,
-    zoneFileLookupURL: 'http://localhost:6270/v1/names/'
+    zoneFileLookupURL: `${blockstackAPIUrl}/v1/names/`
   }
 
   const opt = Object.assign({}, defaults, options)
