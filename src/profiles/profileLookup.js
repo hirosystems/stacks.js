@@ -1,24 +1,20 @@
 /* @flow */
 import { resolveZoneFileToProfile } from './profileZoneFiles'
+import { config } from '../config'
 
 /**
  * Look up a user profile by blockstack ID
  *
  * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
- * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(username: string, zoneFileLookupURL: string = 'https://core.blockstack.org/v1/names/') {
+export function lookupProfile(username: string) {
   return new Promise((resolve, reject) => {
     if (!username) {
       reject()
     }
-    const url = `${zoneFileLookupURL.replace(/\/$/, '')}/${username}`
     try {
-      fetch(url)
-        .then(response => response.text())
-        .then(responseText => JSON.parse(responseText))
+      config.network.getNameInfo(username)
         .then(responseJSON => {
           if (responseJSON.hasOwnProperty('zonefile')
             && responseJSON.hasOwnProperty('address')) {

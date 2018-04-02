@@ -3948,28 +3948,21 @@ exports.lookupProfile = lookupProfile;
 
 var _profileZoneFiles = require('./profileZoneFiles');
 
+var _config = require('../config');
+
 /**
  * Look up a user profile by blockstack ID
  *
  * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
- * to use for zonefile lookup 
  * @returns {Promise} that resolves to a profile object
  */
 function lookupProfile(username) {
-  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
-
   return new Promise(function (resolve, reject) {
     if (!username) {
       reject();
     }
-    var url = zoneFileLookupURL.replace(/\/$/, '') + '/' + username;
     try {
-      fetch(url).then(function (response) {
-        return response.text();
-      }).then(function (responseText) {
-        return JSON.parse(responseText);
-      }).then(function (responseJSON) {
+      _config.config.network.getNameInfo(username).then(function (responseJSON) {
         if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
           resolve((0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address));
         } else {
@@ -3983,7 +3976,7 @@ function lookupProfile(username) {
     }
   });
 }
-},{"./profileZoneFiles":32}],23:[function(require,module,exports){
+},{"../config":8,"./profileZoneFiles":32}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6004,24 +5997,24 @@ var _keys = require('../keys');
 
 var _profiles = require('../profiles');
 
-var _network = require('../network');
-
-var blockstackAPIUrl = _network.network.defaults.MAINNET_DEFAULT.blockstackAPIUrl;
+var _config = require('../config');
 
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
  * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
+ * @param {String} [zoneFileLookupURL=null] The URL
  * to use for zonefile lookup
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
-
 function getUserAppFileUrl(path, username, appOrigin) {
-  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : blockstackAPIUrl + '/v1/names/';
+  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
+  if (!zoneFileLookupURL) {
+    zoneFileLookupURL = _config.config.network.blockstackAPIUrl + '/v1/names/';
+  }
   return (0, _profiles.lookupProfile)(username, zoneFileLookupURL).then(function (profile) {
     if (profile.hasOwnProperty('apps')) {
       if (profile.apps.hasOwnProperty(appOrigin)) {
@@ -6060,7 +6053,7 @@ function getFile(path, options) {
     decrypt: true,
     username: null,
     app: window.location.origin,
-    zoneFileLookupURL: blockstackAPIUrl + '/v1/names/'
+    zoneFileLookupURL: _config.config.network.blockstackAPIUrl + '/v1/names/'
   };
 
   var opt = Object.assign({}, defaults, options);
@@ -6164,7 +6157,7 @@ exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
 exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
 exports.GaiaHubConfig = _hub.GaiaHubConfig;
-},{"../auth":7,"../encryption":10,"../keys":13,"../network":14,"../profiles":20,"./hub":42}],44:[function(require,module,exports){
+},{"../auth":7,"../config":8,"../encryption":10,"../keys":13,"../profiles":20,"./hub":42}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
