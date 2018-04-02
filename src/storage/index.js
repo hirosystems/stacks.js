@@ -8,23 +8,23 @@ import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
-
-import { network } from '../network'
-
-const { blockstackAPIUrl } = network.defaults.MAINNET_DEFAULT
+import { config } from '../config'
 
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
  * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
+ * @param {String} [zoneFileLookupURL=null] The URL
  * to use for zonefile lookup
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
 export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
-  zoneFileLookupURL: string = `${blockstackAPIUrl}/v1/names/`) {
+  zoneFileLookupURL: ?string = null) {
+  if (!zoneFileLookupURL) {
+    zoneFileLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
+  }
   return lookupProfile(username, zoneFileLookupURL)
     .then(profile => {
       if (profile.hasOwnProperty('apps')) {
@@ -66,7 +66,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
     decrypt: true,
     username: null,
     app: window.location.origin,
-    zoneFileLookupURL: `${blockstackAPIUrl}/v1/names/`
+    zoneFileLookupURL: `${config.network.blockstackAPIUrl}/v1/names/`
   }
 
   const opt = Object.assign({}, defaults, options)
