@@ -209,6 +209,8 @@ function handlePendingSignIn() {
         var userData = {
           username: tokenPayload.username,
           profile: tokenPayload.profile,
+          decentralizedID: tokenPayload.iss,
+          identityAddress: (0, _index2.getAddressFromDID)(tokenPayload.iss),
           appPrivateKey: appPrivateKey,
           coreSessionToken: coreSessionToken,
           authResponseToken: authResponseToken,
@@ -3948,42 +3950,41 @@ exports.lookupProfile = lookupProfile;
 
 var _profileZoneFiles = require('./profileZoneFiles');
 
+var _config = require('../config');
+
 /**
  * Look up a user profile by blockstack ID
  *
- * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
- * to use for zonefile lookup 
+ * @param {string} username - The Blockstack ID of the profile to look up
+ * @param {string} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, lookupProfile will use the
+ * blockstack.js getNameInfo function.
  * @returns {Promise} that resolves to a profile object
  */
 function lookupProfile(username) {
-  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
+  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-  return new Promise(function (resolve, reject) {
-    if (!username) {
-      reject();
-    }
+  if (!username) {
+    return Promise.reject();
+  }
+  var lookupPromise = void 0;
+  if (zoneFileLookupURL) {
     var url = zoneFileLookupURL.replace(/\/$/, '') + '/' + username;
-    try {
-      fetch(url).then(function (response) {
-        return response.text();
-      }).then(function (responseText) {
-        return JSON.parse(responseText);
-      }).then(function (responseJSON) {
-        if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
-          resolve((0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address));
-        } else {
-          reject();
-        }
-      }).catch(function (e) {
-        reject(e);
-      });
-    } catch (e) {
-      reject(e);
+    lookupPromise = fetch(url).then(function (response) {
+      return response.json();
+    });
+  } else {
+    lookupPromise = _config.config.network.getNameInfo(username);
+  }
+  return lookupPromise.then(function (responseJSON) {
+    if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
+      return (0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address);
+    } else {
+      throw new Error('Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field');
     }
   });
 }
-},{"./profileZoneFiles":32}],23:[function(require,module,exports){
+},{"../config":8,"./profileZoneFiles":32}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6009,13 +6010,14 @@ var _profiles = require('../profiles');
  * @param {String} path - the path to the file to read
  * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {string} [zoneFileLookupURL=http://localhost:6270/v1/names/] The URL
- * to use for zonefile lookup
+ * @param {String} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
 function getUserAppFileUrl(path, username, appOrigin) {
-  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'http://localhost:6270/v1/names/';
+  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
   return (0, _profiles.lookupProfile)(username, zoneFileLookupURL).then(function (profile) {
     if (profile.hasOwnProperty('apps')) {
@@ -6045,8 +6047,9 @@ function getUserAppFileUrl(path, username, appOrigin) {
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=http://localhost:6270/v1/names/] - the Blockstack
- * core endpoint URL to use for zonefile lookup
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
@@ -6057,7 +6060,7 @@ function getFile(path, options) {
     decrypt: true,
     username: null,
     app: window.location.origin,
-    zoneFileLookupURL: 'http://localhost:6270/v1/names/'
+    zoneFileLookupURL: null
   };
 
   var opt = Object.assign({}, defaults, options);

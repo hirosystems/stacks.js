@@ -59,7 +59,7 @@ export function runStorageTests() {
   })
 
   test('getFile unencrypted - multi-reader', (t) => {
-    t.plan(4)
+    t.plan(6)
 
     const path = 'file.json'
     const gaiaHubConfig = {
@@ -81,7 +81,7 @@ export function runStorageTests() {
 
     FetchMock.get(fullReadUrl, fileContent)
 
-    const nameLookupUrl = 'http://localhost:6270/v1/names/yukan.id'
+    const nameLookupUrl = 'https://core.blockstack.org/v1/names/yukan.id'
 
     const nameRecord = { status: 'registered',
     zonefile: '$ORIGIN yukan.id\n$TTL 3600\n_http._tcp URI 10 1 "https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json"\n',
@@ -177,6 +177,20 @@ export function runStorageTests() {
     }
 
     getFile(path, options)
+      .then((file) => {
+        t.ok(file, 'Returns file content')
+        t.same(JSON.parse(file), JSON.parse(fileContents))
+      })
+
+    const optionsNameLookupUrl = {
+      username: 'yukan.id',
+      app: 'http://localhost:8080',
+      zoneFileLookupURL: 'https://potato/v1/names',
+      decrypt: false
+    }
+
+    FetchMock.get('https://potato/v1/names/yukan.id', nameRecordContent)
+    getFile(path, optionsNameLookupUrl)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
