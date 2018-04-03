@@ -91,6 +91,18 @@ function namespaceIsReady(namespaceID: string) {
     })
 }
 
+function namespaceIsRevealed(namespaceID: string) {
+  return config.network.getNamespaceInfo(namespaceID)
+    .then((namespaceInfo) => !namespaceInfo.ready)
+    .catch((e) => {
+      if (e.message === 'Namespace not found') {
+        return false
+      } else {
+        throw e
+      }
+    })
+}
+
 function isInGracePeriod(fullyQualifiedName: string) {
   const network = config.network
   return Promise.all([network.getNameInfo(fullyQualifiedName),
@@ -116,5 +128,5 @@ function addressCanReceiveName(address: string) {
 
 export const safety = {
   addressCanReceiveName, isInGracePeriod, ownsName, isNameAvailable, isNameValid,
-  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady
+  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady, namespaceIsRevealed
 }
