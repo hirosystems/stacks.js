@@ -1,7 +1,7 @@
 import { exec } from 'child_process'
 import test from 'tape'
 
-import { transactions, config, network, hexStringToECPair } from '../../../lib'
+import { transactions, config, network, hexStringToECPair, hash160 } from '../../../lib'
 
 function pExec(cmd) {
   return new Promise(
@@ -44,7 +44,7 @@ function shutdownBlockstackCore() {
 
 export function runIntegrationTests() {
   test('registerName', (t) => {
-    t.plan(7)
+    t.plan(8)
 
     config.network = network.defaults.LOCAL_REGTEST
     const myNet = config.network
@@ -73,6 +73,8 @@ export function runIntegrationTests() {
           `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
     const renewalZF = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
           `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
+    const importZF = '$ORIGIN import.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
+          `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
 
     initializeBlockstackCore()
       .then(() => {
@@ -101,6 +103,25 @@ export function runIntegrationTests() {
       .then(() => {
         console.log('NAMESPACE_REVEAL broadcasted, waiting 30 seconds.')
         return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => {
+        console.log('NAME_IMPORT import.hello')
+        const zfHash = hash160(Buffer.from(importZF)).toString()
+        return transactions.makeNameImport(
+          'import.hello', renewalDestination, zfHash, nsReveal)
+      })
+      .then(rawtx => myNet.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('NAME_IMPORT broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => myNet.broadcastZoneFile(importZF))
+      .then(() => fetch(`${myNet.broadcastAPIUrl}/v1/names/import.hello`))
+      .then(resp => resp.json())
+      .then(nameInfo => {
+        t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
+                `import.hello should be owned by ${renewalDestination}`)
+        t.equal(nameInfo.zonefile, importZF, 'zonefile should be properly set for import.hello')
       })
       .then(() => {
         console.log('Launch namespace "hello"')
@@ -172,6 +193,17 @@ export function runIntegrationTests() {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `aaron.hello should be owned by ${renewalDestination}`)
+      })
+      .then(() => transactions.makeRevoke('aaron.hello', secondOwner))
+      .then(rawtx => myNet.broadcastTransaction(rawtx))
+      .then(() => {
+        console.log('REVOKE broadcasted, waiting 30 seconds.')
+        return new Promise((resolve) => setTimeout(resolve, 30000))
+      })
+      .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
+      .then(resp => resp.json()) 
+      .then(nameInfo => {
+        t.equal(nameInfo.status, 'revoked', 'Name should be revoked')
       })
       .then(() => transactions.makeBitcoinSpend(btcDestAddress, payer, 500000))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
