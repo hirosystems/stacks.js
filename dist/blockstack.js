@@ -3955,26 +3955,32 @@ var _config = require('../config');
 /**
  * Look up a user profile by blockstack ID
  *
- * @param {string} username The Blockstack ID of the profile to look up
+ * @param {string} username - The Blockstack ID of the profile to look up
+ * @param {string} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, lookupProfile will use the
+ * blockstack.js getNameInfo function.
  * @returns {Promise} that resolves to a profile object
  */
 function lookupProfile(username) {
-  return new Promise(function (resolve, reject) {
-    if (!username) {
-      reject();
-    }
-    try {
-      _config.config.network.getNameInfo(username).then(function (responseJSON) {
-        if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
-          resolve((0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address));
-        } else {
-          reject();
-        }
-      }).catch(function (e) {
-        reject(e);
-      });
-    } catch (e) {
-      reject(e);
+  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (!username) {
+    return Promise.reject();
+  }
+  var lookupPromise = void 0;
+  if (zoneFileLookupURL) {
+    var url = zoneFileLookupURL.replace(/\/$/, '') + '/' + username;
+    lookupPromise = fetch(url).then(function (response) {
+      return response.json();
+    });
+  } else {
+    lookupPromise = _config.config.network.getNameInfo(username);
+  }
+  return lookupPromise.then(function (responseJSON) {
+    if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
+      return (0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address);
+    } else {
+      throw new Error('Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field');
     }
   });
 }
@@ -5999,24 +6005,20 @@ var _keys = require('../keys');
 
 var _profiles = require('../profiles');
 
-var _config = require('../config');
-
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
  * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {String} [zoneFileLookupURL=null] The URL
- * to use for zonefile lookup
+ * @param {String} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
 function getUserAppFileUrl(path, username, appOrigin) {
   var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-  if (!zoneFileLookupURL) {
-    zoneFileLookupURL = _config.config.network.blockstackAPIUrl + '/v1/names/';
-  }
   return (0, _profiles.lookupProfile)(username, zoneFileLookupURL).then(function (profile) {
     if (profile.hasOwnProperty('apps')) {
       if (profile.apps.hasOwnProperty(appOrigin)) {
@@ -6045,17 +6047,20 @@ function getUserAppFileUrl(path, username, appOrigin) {
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=https://core.blockstack.org/v1/names/] - the Blockstack
- * core endpoint URL to use for zonefile lookup
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
+
+
 function getFile(path, options) {
   var defaults = {
     decrypt: true,
     username: null,
     app: window.location.origin,
-    zoneFileLookupURL: _config.config.network.blockstackAPIUrl + '/v1/names/'
+    zoneFileLookupURL: null
   };
 
   var opt = Object.assign({}, defaults, options);
@@ -6159,7 +6164,7 @@ exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
 exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
 exports.GaiaHubConfig = _hub.GaiaHubConfig;
-},{"../auth":7,"../config":8,"../encryption":10,"../keys":13,"../profiles":20,"./hub":42}],44:[function(require,module,exports){
+},{"../auth":7,"../encryption":10,"../keys":13,"../profiles":20,"./hub":42}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9975,7 +9980,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/home/aaron/devel/blockstack.js.2"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -10001,7 +10006,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/home/aaron/devel/blockstack.js.2",
+  "_where": "/home/aaron/devel/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -32808,7 +32813,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/home/aaron/devel/blockstack.js.2"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -32832,7 +32837,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/home/aaron/devel/blockstack.js.2",
+  "_where": "/home/aaron/devel/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -41071,7 +41076,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/home/aaron/devel/blockstack.js.2"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -41098,7 +41103,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/home/aaron/devel/blockstack.js.2",
+  "_where": "/home/aaron/devel/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -53618,7 +53623,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/home/aaron/devel/blockstack.js.2"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -53642,7 +53647,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/home/aaron/devel/blockstack.js.2",
+  "_where": "/home/aaron/devel/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"

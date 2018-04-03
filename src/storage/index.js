@@ -8,23 +8,20 @@ import { encryptECIES, decryptECIES } from '../encryption'
 import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
-import { config } from '../config'
 
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
  * @param {String} username - The Blockstack ID of the user to look up
  * @param {String} appOrigin - The app origin
- * @param {String} [zoneFileLookupURL=null] The URL
- * to use for zonefile lookup
+ * @param {String} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
  * @return {Promise} that resolves to the public read URL of the file
  * or rejects with an error
  */
 export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
   zoneFileLookupURL: ?string = null) {
-  if (!zoneFileLookupURL) {
-    zoneFileLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
-  }
   return lookupProfile(username, zoneFileLookupURL)
     .then(profile => {
       if (profile.hasOwnProperty('apps')) {
@@ -55,18 +52,19 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=https://core.blockstack.org/v1/names/] - the Blockstack
- * core endpoint URL to use for zonefile lookup
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
 export function getFile(path: string, options?: {decrypt?: boolean, username?: string, app?: string,
-  zoneFileLookupURL?: string}) {
+  zoneFileLookupURL?: ?string}) {
   const defaults = {
     decrypt: true,
     username: null,
     app: window.location.origin,
-    zoneFileLookupURL: `${config.network.blockstackAPIUrl}/v1/names/`
+    zoneFileLookupURL: null
   }
 
   const opt = Object.assign({}, defaults, options)
