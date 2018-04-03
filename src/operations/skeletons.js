@@ -192,6 +192,24 @@ export function makeRegisterSkeleton(
   // in the case of a renewal, this would need to be modified to include a change address
   //  as output (3) before the burn output (4)
 
+  /*
+    Formats
+
+    No zonefile hash, and pay with BTC:
+
+    0    2  3                                  39
+    |----|--|----------------------------------|
+    magic op   name.ns_id (up to 37 bytes)
+
+
+    With zonefile hash, and pay with BTC:
+    
+    0    2  3                                  39                  59
+    |----|--|----------------------------------|-------------------|
+    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
+
+  */
+
   let payload
   const network = config.network
 
@@ -235,6 +253,31 @@ export function makeRegisterSkeleton(
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
   burnAddress: string, burnAmount: {units: string, amount: Object}, valueHash: ?string = null) {
+  /*
+    Formats
+
+    No zonefile hash, and pay with BTC:
+
+    0    2  3                                  39
+    |----|--|----------------------------------|
+    magic op   name.ns_id (up to 37 bytes)
+
+
+    With zonefile hash, and pay with BTC:
+    
+    0    2  3                                  39                  59
+    |----|--|----------------------------------|-------------------|
+    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
+
+
+   With renewal payment in a token:
+   (for register, tokens burned is not included)
+   (for renew, tokens burned is the number of tokens to burn)
+    
+   0    2  3                                  39                  59                            67
+   |----|--|----------------------------------|-------------------|------------------------------|
+   magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (little-endian)
+  */
   const network = config.network
   const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
   const burnBTCAmount = burnAmount.units === 'BTC' ? 
@@ -265,6 +308,14 @@ export function makeTransferSkeleton(
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  /*
+    Format
+    
+    0     2  3    4                   20              36
+    |-----|--|----|-------------------|---------------|
+    magic op keep  hash128(name.ns_id) consensus hash
+             data?
+  */
   const network = config.network
   const opRet = Buffer.alloc(36)
   let keepChar = '~'
@@ -298,6 +349,14 @@ export function makeUpdateSkeleton(
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  /*
+    Format:
+    
+    0     2  3                                   19                      39
+    |-----|--|-----------------------------------|-----------------------|
+    magic op  hash128(name.ns_id,consensus hash) hash160(data)
+  */
+
   const network = config.network
   const opRet = Buffer.alloc(39)
 
@@ -328,6 +387,14 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction
+  /*
+   Format:
+
+   0    2  3                             39
+   |----|--|-----------------------------|
+   magic op   name.ns_id (37 bytes)
+  */
+  
   const network = config.network
   const opRet = Buffer.alloc(3)
 
@@ -350,6 +417,23 @@ export function makeNamespacePreorderSkeleton(
   registerAddress: string, burnAmount: {units: string, amount: Object}) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
+  /*
+   Formats:
+
+   Without STACKS:
+
+   0     2   3                                      23               39
+   |-----|---|--------------------------------------|----------------|
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash
+
+
+   with STACKs:
+
+   0     2   3                                      23               39                         47
+   |-----|---|--------------------------------------|----------------|--------------------------|
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (little-endian)
+  */
+
   if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
     throw new Error(`Invalid burnUnits ${burnAmount.units}`)
   }
@@ -398,6 +482,15 @@ export function makeNamespacePreorderSkeleton(
 
 export function makeNamespaceRevealSkeleton(
   namespace: BlockstackNamespace, revealAddress: string) {
+  /*
+   Format:
+   
+   0     2   3    7     8     9    10   11   12   13   14    15    16    17       18      20     39
+   |-----|---|----|-----|-----|----|----|----|----|----|-----|-----|-----|--------|-------|-------|
+   magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
+                                                  bucket exponents        no-vowel
+                                                                          discounts
+  */
   const network = config.network
   const hexPayload = namespace.toHexPayload()
 
@@ -417,6 +510,14 @@ export function makeNamespaceRevealSkeleton(
 
 export function makeNamespaceReadySkeleton(
   namespaceID: string) {
+  /*
+   Format:
+   
+   0     2  3  4           23
+   |-----|--|--|------------|
+   magic op  .  ns_id
+
+   */
   const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
@@ -429,3 +530,63 @@ export function makeNamespaceReadySkeleton(
   
   return tx.buildIncomplete()
 }
+
+
+export function makeNameImportSkeleton(name: string, recipientAddr: string, zonefileHash: string) {
+  /*
+   Format:
+    
+    0    2  3                             39
+    |----|--|-----------------------------|
+    magic op   name.ns_id (37 bytes)
+
+   Output 0: the OP_RETURN
+   Output 1: the recipient
+   Output 2: the zonefile hash
+ */
+  if (zonefileHash.length !== 40) {
+    throw new Error('Invalid zonefile hash: must be 20 bytes hex-encoded')
+  }
+
+  const network = config.network
+  const opReturnBuffer = Buffer.alloc(3 + name.length)
+  opReturnBuffer.write('id;', 0, 3, 'ascii')
+  opReturnBuffer.write(name, 3, name.length, 'ascii')
+
+  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const zonefileHashB58 = bitcoin.address.toBase58Check(
+    new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash)
+
+  tx.addOutput(nullOutput, 0)
+  tx.addOutput(recipientAddr, DUST_MINIMUM)
+  tx.addOutput(zonefileHashB58, DUST_MINIMUM)
+
+  return tx.buildIncomplete()
+}
+
+
+export function makeAnnounceSkeleton(messageHash: string) {
+  /*
+    Format: 
+
+    0    2  3                             23
+    |----|--|-----------------------------|
+    magic op   message hash (160-bit)
+  */
+  if (messageHash.length !== 40) {
+    throw new Error('Invalid message hash: must be 20 bytes hex-encoded')
+  }
+
+  const network = config.network
+  const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
+  opReturnBuffer.write('id#', 0, 3, 'ascii')
+  opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
+
+  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  
+  tx.addOutput(nullOutput, 0)
+  return tx.buildIncomplete()
+}
+
