@@ -419,6 +419,35 @@ function transactionTests() {
       .catch((err) => { console.log(err.stack); throw err })
   })
 
+  test('build and fund name import', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateNameImport(
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
+        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575'),
+       transactions.makeNameImport(
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
+        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575', testAddresses[3].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet2)
+        const fee = inputVals - outputVals
+
+        const change = tx.outs[3].value
+        t.equal(inputVals - change,
+          estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+          `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
   test('build and fund namespace ready', (t) => {
     t.plan(4)
     setupMocks()
@@ -445,6 +474,31 @@ function transactionTests() {
       .catch((err) => { console.log(err.stack); throw err })
   })
 
+  test('build and fund announce', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateAnnounce('53bb740c47435a51b07ecf0b9e086a2ad3c12c1d'),
+       transactions.makeAnnounce(
+         '53bb740c47435a51b07ecf0b9e086a2ad3c12c1d', testAddresses[3].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet2)
+        const fee = inputVals - outputVals
+
+        const change = tx.outs[1].value
+        t.equal(inputVals - change,
+          estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+          `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
 
   test('build and fund preorder', (t) => {
     t.plan(6)
