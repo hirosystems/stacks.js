@@ -59,7 +59,7 @@ export function runStorageTests() {
   })
 
   test('getFile unencrypted - multi-reader', (t) => {
-    t.plan(4)
+    t.plan(6)
 
     const path = 'file.json'
     const gaiaHubConfig = {
@@ -177,6 +177,20 @@ export function runStorageTests() {
     }
 
     getFile(path, options)
+      .then((file) => {
+        t.ok(file, 'Returns file content')
+        t.same(JSON.parse(file), JSON.parse(fileContents))
+      })
+
+    const optionsNameLookupUrl = {
+      username: 'yukan.id',
+      app: 'http://localhost:8080',
+      zoneFileLookupURL: 'https://potato/v1/names',
+      decrypt: false
+    }
+
+    FetchMock.get('https://potato/v1/names/yukan.id', nameRecordContent)
+    getFile(path, optionsNameLookupUrl)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
