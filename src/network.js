@@ -201,7 +201,8 @@ export class BlockstackNetwork {
     return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
       .then(resp => {
         if (resp.status === 200) {
-          return resp.body.buffer().then((buf) => buf.toString)
+          return resp.text()
+            .then(body => body)
         } else {
           throw new Error(`Bad response status: ${resp.status}`)
         }
