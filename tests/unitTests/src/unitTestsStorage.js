@@ -81,7 +81,7 @@ export function runStorageTests() {
 
     FetchMock.get(fullReadUrl, fileContent)
 
-    const nameLookupUrl = 'http://localhost:6270/v1/names/yukan.id'
+    const nameLookupUrl = 'https://core.blockstack.org/v1/names/yukan.id'
 
     const nameRecord = { status: 'registered',
     zonefile: '$ORIGIN yukan.id\n$TTL 3600\n_http._tcp URI 10 1 "https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json"\n',
