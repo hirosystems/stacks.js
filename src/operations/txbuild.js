@@ -8,6 +8,7 @@ import { makePreorderSkeleton, makeRegisterSkeleton,
          makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton,
          makeRevokeSkeleton, makeNamespacePreorderSkeleton,
          makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
+         makeNameImportSkeleton, makeAnnounceSkeleton,
          BlockstackNamespace } from './skeletons'
 import { config } from '../config'
 import { hexStringToECPair } from '../utils'
@@ -322,7 +323,7 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
  * @param {Number} revealUtxos - the number of UTXOs we expect will
  *  be required from the reveal address
  * @returns {Promise} - a promise which resolves to the satoshi cost to
- *  fund this ready transaction.
+ *  fund this namespacey-ready transaction.
  */
 function estimateNamespaceReady(namespaceID: string,
                                 revealUtxos: number = 1) : Promise<number> {
@@ -333,6 +334,52 @@ function estimateNamespaceReady(namespaceID: string,
     .then((feeRate) => {
       const outputsValue = sumOutputValues(readyTX)
       const txFee = feeRate * estimateTXBytes(readyTX, revealUtxos, 1)
+      return txFee + outputsValue
+    })
+}
+
+/**
+ * Estimates the cost of a name-import transaction 
+ * @param {String} name - the fully-qualified name
+ * @param {String} recipientAddr - the recipient
+ * @param {String} zonefileHash - the zone file hash
+ * @param {Number} importUtxos - the number of UTXOs we expect will 
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost 
+ *  to fund this name-import transaction
+ */
+function estimateNameImport(name: string,
+                            recipientAddr: string,
+                            zonefileHash: string,
+                            importUtxos: number = 1) : Promise<number> {
+  const network = config.network
+  const importTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(importTX)
+      const txFee = feeRate * estimateTXBytes(importTX, importUtxos, 1)
+      return txFee + outputsValue
+    })
+}                            
+
+/**
+ * Estimates the cost of an announce transaction 
+ * @param {String} messageHash - the hash of the message 
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost
+ *  to fund this announce transaction
+ */
+function estimateAnnounce(messageHash: string,
+                          senderUtxos: number = 1) : Promise<number> {
+  const network = config.network
+  const announceTX = makeAnnounceSkeleton(messageHash)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(announceTX)
+      const txFee = feeRate * estimateTXBytes(announceTX, senderUtxos, 1)
       return txFee + outputsValue
     })
 }
@@ -765,6 +812,66 @@ function makeNamespaceReady(namespaceID: string,
     })
 }
 
+/**
+ * Generates a name import transaction for a namespace
+ * @param {String} name - the name to import
+ * @param {String} recipientAddr - the address to receive the name 
+ * @param {String} zonefileHash - the hash of the zonefile to give this name
+ * @param {String} importerKeyHex - the private key that pays for the import
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see 
+ * the safety module for those.
+ * @private
+ */
+function makeNameImport(name: string, 
+                        recipientAddr: string, 
+                        zonefileHash: string,
+                        importerKeyHex: string) {
+  const network = config.network
+  
+  const importerKey = hexStringToECPair(importerKeyHex)
+  const importerAddress = importerKey.getAddress()
+  const nameImportTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
+
+  return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
+      const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, importerKey)
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+/**
+ * Generates an announce transaction 
+ * @param {String} messageHash - the hash of the message to send.  Should be
+ *  an already-announced zone file hash
+ * @param {String} senderKeyHex - the private key that pays for the transaction.  Should
+ *  be the key that owns the name that the message recipients subscribe to
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+function makeAnnounce(messageHash: string, senderKeyHex: string) {
+  const network = config.network
+
+  const senderKey = hexStringToECPair(senderKeyHex)
+  const senderAddress = senderKey.getAddress()
+  const announceTX = makeAnnounceSkeleton(messageHash)
+
+  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(announceTX, network.layer1)
+      const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, senderKey)
+      }
+      return signingTxB.build().toHex()
+    })
+}
 
 /**
  * Generates a bitcoin spend to a specified address. This will fund up to `amount`
@@ -846,7 +953,8 @@ function makeBitcoinSpend(destinationAddress: string,
 export const transactions = {
   makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeRevoke,
   makeNamespacePreorder, makeNamespaceReveal, makeNamespaceReady, makeBitcoinSpend,
-  BlockstackNamespace,
+  makeNameImport, makeAnnounce, BlockstackNamespace,
   estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal,
-  estimateRevoke, estimateNamespacePreorder, estimateNamespaceReveal, estimateNamespaceReady
+  estimateRevoke, estimateNamespacePreorder, estimateNamespaceReveal, estimateNamespaceReady,
+  estimateNameImport, estimateAnnounce
 }
