@@ -402,9 +402,9 @@ function makeUpdate(fullyQualifiedName: string,
                     ownerKeyHex: string,
                     paymentKeyHex: string,
                     zonefile: string,
-                    valueHash: ?string = null) {
+                    valueHash: string = '') {
   const network = config.network
-  if (!valueHash) {
+  if (valueHash.length === 0) {
     if (!zonefile) {
       throw new Error('Need zonefile or valueHash arguments')
     }
@@ -509,7 +509,7 @@ function makeTransfer(fullyQualifiedName: string,
                       destinationAddress: string,
                       ownerKeyHex: string,
                       paymentKeyHex: string,
-                      keepZonefile: ?boolean = false) {
+                      keepZonefile: boolean = false) {
   const network = config.network
   const ownerKey = hexStringToECPair(ownerKeyHex)
   const paymentKey = hexStringToECPair(paymentKeyHex)
