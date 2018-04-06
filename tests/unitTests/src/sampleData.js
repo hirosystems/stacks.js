@@ -30,7 +30,9 @@ export const sampleProfiles = {
   ryan: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/ryan.json`)),
   larry: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/larry.json`)),
   google: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/google.json`)),
-  navalLegacy: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy.json`))
+  navalLegacy: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy.json`)),
+  navalLegacyConvert: JSON.parse(
+    fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy-convert.json`))
 }
 
 export const sampleTokenFiles = {
