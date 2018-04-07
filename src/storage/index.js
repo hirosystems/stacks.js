@@ -4,9 +4,9 @@ import { getOrSetLocalGaiaHubConnection, getFullReadUrl, GaiaHubConfig,
          connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
          BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
 
-import { encryptECIES, decryptECIES } from '../encryption'
+import { encryptECIES, decryptECIES, signECDSA, verifyECDSA } from '../encryption'
 import { loadUserData } from '../auth'
-import { getPublicKeyFromPrivate } from '../keys'
+import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 
 /**
@@ -58,16 +58,23 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(path: string, options?: {decrypt?: boolean, username?: string, app?: string,
-  zoneFileLookupURL?: ?string}) {
+export function getFile(path: string, options?: {
+    decrypt?: boolean,
+    verify?: boolean,
+    username?: string, 
+    app?: string,
+    zoneFileLookupURL?: ?string
+  }) {
   const defaults = {
     decrypt: true,
+    verify: false,
     username: null,
     app: window.location.origin,
     zoneFileLookupURL: null
   }
 
   const opt = Object.assign({}, defaults, options)
+  let fileUrl
 
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => {
@@ -81,6 +88,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
       if (!readUrl) {
         reject(null)
       } else {
+        fileUrl = readUrl
         resolve(readUrl)
       }
     }))
@@ -104,10 +112,21 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
       }
     })
     .then((storedContents) => {
-      if (opt.decrypt && storedContents !== null) {
+      if (opt.decrypt && !opt.verify && storedContents !== null) {
         const privateKey = loadUserData().appPrivateKey
         const cipherObject = JSON.parse(storedContents)
+
         return decryptECIES(privateKey, cipherObject)
+      } else if (opt.verify && storedContents !== null) {
+        const signatureObject = JSON.parse(storedContents)
+        const gaiaAddress = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,33})/)[0]
+        const signatureObjectAddress = publicKeyToAddress(signatureObject.publicKey)
+
+        if (gaiaAddress === signatureObjectAddress && verifyECDSA(signatureObject)) {
+          return signatureObject.content
+        } else {
+          throw new Error('Contents do not match signature')
+        }
       } else {
         return storedContents
       }
@@ -123,9 +142,13 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-export function putFile(path: string, content: string | Buffer, options?: {encrypt?: boolean}) {
+export function putFile(path: string, content: string | Buffer, options?: {
+  encrypt?: boolean,
+  sign?: boolean
+  }) {
   const defaults = {
-    encrypt: true
+    encrypt: true,
+    sign: false
   }
 
   const opt = Object.assign({}, defaults, options)
@@ -134,10 +157,16 @@ export function putFile(path: string, content: string | Buffer, options?: {encry
   if (typeof(content) !== 'string') {
     contentType = 'application/octet-stream'
   }
-  if (opt.encrypt) {
+  if (opt.encrypt && !opt.sign) {
     const privateKey = loadUserData().appPrivateKey
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const cipherObject = encryptECIES(publicKey, content)
+    content = JSON.stringify(cipherObject)
+    contentType = 'application/json'
+  } else if (opt.sign) {
+    const privateKey = loadUserData().appPrivateKey
+    const cipherObject = signECDSA(privateKey, content)
+
     content = JSON.stringify(cipherObject)
     contentType = 'application/json'
   }
