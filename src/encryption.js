@@ -1,5 +1,6 @@
 import { ec as EllipticCurve } from 'elliptic'
 import crypto from 'crypto'
+import { getPublicKeyFromPrivate } from './keys'
 
 const ecurve = new EllipticCurve('secp256k1')
 
@@ -129,4 +130,27 @@ export function decryptECIES(privateKey: string, cipherObject: string) {
   } else {
     return plainText
   }
+}
+
+export function signECDSA(privateKey: string, content: string | Buffer) {
+  const contentBuffer = Buffer.from(content)
+  const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
+  const publicKey = getPublicKeyFromPrivate(privateKey)
+  const contentHash = hmacSha256(publicKey, contentBuffer)
+  const signature = ecPrivate.sign(contentHash)
+  const signatureString = signature.toDER('hex')
+
+  return {
+    content,
+    signature: signatureString,
+    publicKey
+  }
+}
+
+export function verifyECDSA(signatureObject: Object) {
+  const { content, signature, publicKey } = signatureObject
+  const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
+  const contentHash = hmacSha256(publicKey, content)
+
+  return ecPublic.verify(contentHash, signature)
 }
