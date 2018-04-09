@@ -450,15 +450,18 @@ function makeUpdate(fullyQualifiedName: string,
                     valueHash: string = '') {
   const network = config.network
   if (!valueHash && !zonefile) {
-    throw new Error('Need zonefile or valueHash arguments')
+    return Promise.reject(
+      new Error('Need zonefile or valueHash arguments'))
   }
   if (valueHash.length === 0) {
     if (!zonefile) {
-      throw new Error('Need zonefile or valueHash arguments')
+      return Promise.reject(
+        new Error('Need zonefile or valueHash arguments'))
     }
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   } else if (valueHash.length !== 40) {
-    throw new Error(`Invalid valueHash ${valueHash}`)
+    return Promise.reject(
+      new Error(`Invalid valueHash ${valueHash}`))
   }
 
   const ownerKey = hexStringToECPair(ownerKeyHex)
@@ -518,7 +521,8 @@ function makeRegister(fullyQualifiedName: string,
   if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   } else if (!!valueHash && valueHash.length !== 40) {
-    throw new Error(`Invalid zonefile hash ${valueHash}`)
+    return Promise.reject(
+      new Error(`Invalid zonefile hash ${valueHash}`))
   }
 
   const registerSkeleton = makeRegisterSkeleton(
@@ -685,8 +689,9 @@ function makeRenewal(fullyQualifiedName: string,
       const ownerOutputAddr = bitcoinjs.address.fromOutputScript(
         ownerOutput.script, network.layer1)
       if (ownerOutputAddr !== ownerAddress) {
-        throw new Error(`Original owner ${ownerAddress} should have an output at ` +
-                        `index 2 in transaction was ${ownerOutputAddr}`)
+        return Promise.reject(
+          new Error(`Original owner ${ownerAddress} should have an output at ` +
+                        `index 2 in transaction was ${ownerOutputAddr}`))
       }
       ownerOutput.value = ownerInput.value
       const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
@@ -764,7 +769,7 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
   const network = config.network
 
   if (!namespace.check()) {
-    throw new Error('Invalid namespace')
+    return Promise.reject(new Error('Invalid namespace'))
   }
 
   const paymentKey = hexStringToECPair(paymentKeyHex)
