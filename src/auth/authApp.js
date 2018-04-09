@@ -4,7 +4,7 @@ import { decodeToken } from 'jsontokens'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
 import { BLOCKSTACK_HANDLER, isLaterVersion } from '../utils'
-import { makeECPrivateKey } from '../index'
+import { getAddressFromDID, makeECPrivateKey } from '../index'
 import { decryptPrivateKey } from './authMessages'
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
          BLOCKSTACK_STORAGE_LABEL,
@@ -182,6 +182,8 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
         const userData = {
           username: tokenPayload.username,
           profile: tokenPayload.profile,
+          decentralizedID: tokenPayload.iss,
+          identityAddress: getAddressFromDID(tokenPayload.iss),
           appPrivateKey,
           coreSessionToken,
           authResponseToken,
