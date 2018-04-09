@@ -403,7 +403,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
   opRet.write('id~', 0, 3, 'ascii')
   
   const opReturnBuffer = Buffer.concat([opRet, nameBuff])
-  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -468,7 +468,7 @@ export function makeNamespacePreorderSkeleton(
     opReturnBuffer.write(paddedBurnHex, 39, 16, 'hex')
   }
 
-  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -498,7 +498,7 @@ export function makeNamespaceRevealSkeleton(
   opReturnBuffer.write('id&', 0, 3, 'ascii')
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
-  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
@@ -523,7 +523,7 @@ export function makeNamespaceReadySkeleton(
   opReturnBuffer.write('id!', 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
-  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
@@ -553,7 +553,7 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
   opReturnBuffer.write('id;', 0, 3, 'ascii')
   opReturnBuffer.write(name, 3, name.length, 'ascii')
 
-  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
   const zonefileHashB58 = bitcoin.address.toBase58Check(
     new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash)
@@ -583,7 +583,7 @@ export function makeAnnounceSkeleton(messageHash: string) {
   opReturnBuffer.write('id#', 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
 
-  const nullOutput = bitcoin.script.nullDataOutput(opReturnBuffer)
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
   
   tx.addOutput(nullOutput, 0)
