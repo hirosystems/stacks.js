@@ -41,6 +41,10 @@ export class BlockstackNetwork {
     return bitcoinjs.address.toBase58Check(addressHash, this.layer1.pubKeyHash)
   }
 
+  getDefaultBurnAddress() {
+    return this.coerceAddress('1111111111111111111114oLvT2')
+  }
+
   getNamePrice(fullyQualifiedName: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
