@@ -14,7 +14,6 @@ import { config } from '../config'
 import { hexStringToECPair } from '../utils'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
 
-const dummyBurnAddress   = '1111111111111111111114oLvT2'
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
 
@@ -72,9 +71,9 @@ function estimatePreorder(fullyQualifiedName: string,
   const network = config.network
   const preorderPromise = network.getNamePrice(fullyQualifiedName)
         .then(namePrice => makePreorderSkeleton(
-          fullyQualifiedName, dummyConsensusHash, network.coerceAddress(paymentAddress),
-          network.coerceAddress(dummyBurnAddress), namePrice, 
-          network.coerceAddress(destinationAddress)))
+          fullyQualifiedName, dummyConsensusHash, paymentAddress,
+          network.getDefaultBurnAddress(), namePrice,
+          destinationAddress))
 
   return Promise.all([network.getFeeRate(), preorderPromise])
     .then(([feeRate, preorderTX]) => {
@@ -213,7 +212,7 @@ function estimateRenewal(fullyQualifiedName: string,
   const renewalPromise = network.getNamePrice(fullyQualifiedName)
         .then((namePrice) => makeRenewalSkeleton(
           fullyQualifiedName, destinationAddress, ownerAddress,
-          network.coerceAddress(dummyBurnAddress), namePrice, valueHash))
+          network.getDefaultBurnAddress(), namePrice, valueHash))
 
   return Promise.all([network.getFeeRate(), renewalPromise])
     .then(([feeRate, renewalTX]) => {
@@ -275,9 +274,8 @@ function estimateNamespacePreorder(namespaceID: string,
 
   const preorderPromise = network.getNamespacePrice(namespaceID)
         .then(namespacePrice => makeNamespacePreorderSkeleton(
-          namespaceID, dummyConsensusHash, 
-          network.coerceAddress(paymentAddress),
-          network.coerceAddress(revealAddress), namespacePrice))
+          namespaceID, dummyConsensusHash, paymentAddress, revealAddress,
+          namespacePrice))
 
   return Promise.all([network.getFeeRate(), preorderPromise])
     .then(([feeRate, preorderTX]) => {
@@ -451,6 +449,9 @@ function makeUpdate(fullyQualifiedName: string,
                     zonefile: string,
                     valueHash: string = '') {
   const network = config.network
+  if (!valueHash && !zonefile) {
+    throw new Error('Need zonefile or valueHash arguments')
+  }
   if (valueHash.length === 0) {
     if (!zonefile) {
       throw new Error('Need zonefile or valueHash arguments')
@@ -727,9 +728,8 @@ function makeNamespacePreorder(namespaceID: string,
                                        network.getNamespacePrice(namespaceID)])
         .then(([consensusHash, namespacePrice]) =>
           makeNamespacePreorderSkeleton(
-            namespaceID, consensusHash,
-            network.coerceAddress(preorderAddress),
-            network.coerceAddress(revealAddress), namespacePrice))
+            namespaceID, consensusHash, preorderAddress, revealAddress,
+            namespacePrice))
 
   return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
     .then(([utxos, feeRate, preorderSkeleton]) => {
