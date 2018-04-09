@@ -156,6 +156,10 @@ export function makePreorderSkeleton(
 
   if (burnAmount.units !== 'BTC') {
     const burnHex = burnAmount.amount.toHex()
+    if (burnHex.length > 16) {
+      // exceeds 2**64; can't fit 
+      throw new Error(`Cannot preorder '${fullyQualifiedName}': cannot fit price into 8 bytes`)
+    }
     const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
 
     opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
@@ -286,6 +290,10 @@ export function makeRenewalSkeleton(
   let burnTokenHex = null
   if (!!burnTokenAmount) {
     const burnHex = burnTokenAmount.toHex()
+    if (burnHex.length > 16) {
+      // exceeds 2**64; can't fit 
+      throw new Error(`Cannot renew '${fullyQualifiedName}': cannot fit price into 8 bytes`)
+    }
     burnTokenHex = `0000000000000000${burnHex}`.slice(-16)
   }
 
@@ -439,7 +447,7 @@ export function makeNamespacePreorderSkeleton(
   }
 
   const network = config.network
-  const burnAddress = network.coerceAddress('1111111111111111111114oLvT2')
+  const burnAddress = network.getDefaultBurnAddress()
   const namespaceIDBuff = Buffer.from(decodeB40(namespaceID), 'hex') // base40
   const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network.layer1)
   const registerBuff = Buffer.from(registerAddress, 'ascii')
