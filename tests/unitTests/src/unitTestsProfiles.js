@@ -208,22 +208,29 @@ function testSchemas() {
   })
 
   test('profileLookUp', (t) => {
-    t.plan(2)
+    t.plan(4)
 
     const name = 'ryan.id'
-    const zoneFileLookupURL = 'http://localhost:6270/v1/names/'
+    const zoneFileLookupURL = 'http://potato:6270/v1/names/'
 
     const mockZonefile = {
       zonefile: '$ORIGIN ryan.id\n$TTL 3600\n_http._tcp IN URI 10 1 "https://blockstack.s3.amazonaws.com/ryan.id"\n',
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk'
     }
 
-    FetchMock.get('http://localhost:6270/v1/names/ryan.id', mockZonefile)
+    FetchMock.get('http://potato:6270/v1/names/ryan.id', mockZonefile)
+    FetchMock.get('https://core.blockstack.org/v1/names/ryan.id', mockZonefile)
     FetchMock.get(sampleTokenFiles.ryan.url, sampleTokenFiles.ryan.body)
 
     lookupProfile(name, zoneFileLookupURL)
       .then((profile) => {
-        t.ok(profile, 'zonefile resolves to profile')
+        t.ok(profile, 'zonefile resolves to profile with zoneFileLookupUrl specified')
+        t.equal(profile.name,
+          'Ryan Shea', 'The profile was recovered with the expected value of the name field')
+      })
+      .then(() => lookupProfile(name))
+      .then((profile) => {
+        t.ok(profile, 'zonefile resolves to profile with default behavior')
         t.equal(profile.name,
           'Ryan Shea', 'The profile was recovered with the expected value of the name field')
       })
