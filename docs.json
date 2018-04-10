@@ -6234,8 +6234,18 @@
       },
       {
         "title": "param",
-        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+        "description": "Whether the content should be verified, only to be used \nwhen `putFile` was set to `sign = true`",
         "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        },
+        "name": "options.verify"
+      },
+      {
+        "title": "param",
+        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -6245,7 +6255,7 @@
       {
         "title": "param",
         "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
-        "lineNumber": 8,
+        "lineNumber": 10,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -6259,7 +6269,7 @@
       {
         "title": "returns",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 11,
+        "lineNumber": 13,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6272,18 +6282,18 @@
         "column": 0
       },
       "end": {
-        "line": 60,
+        "line": 62,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 61,
+          "line": 63,
           "column": 0
         },
         "end": {
-          "line": 134,
+          "line": 136,
           "column": 1
         }
       },
@@ -6540,8 +6550,124 @@
           },
           {
             "title": "param",
-            "name": "options.app",
+            "name": "options.verify",
             "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Whether the content should be verified, only to be used \nwhen ",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 6,
+                          "offset": 62
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "putFile",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 6,
+                          "offset": 62
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 15,
+                          "offset": 71
+                        },
+                        "indent": []
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "value": " was set to ",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 15,
+                          "offset": 71
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 27,
+                          "offset": 83
+                        },
+                        "indent": []
+                      }
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "sign = true",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 27,
+                          "offset": 83
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 40,
+                          "offset": 96
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 40,
+                      "offset": 96
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 40,
+                  "offset": 96
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            }
+          },
+          {
+            "title": "param",
+            "name": "options.app",
+            "lineNumber": 8,
             "description": {
               "type": "root",
               "children": [
@@ -6606,7 +6732,7 @@
           {
             "title": "param",
             "name": "options.zoneFileLookupURL",
-            "lineNumber": 8,
+            "lineNumber": 10,
             "description": {
               "type": "root",
               "children": [
@@ -6872,9 +6998,23 @@
         "default": "true"
       },
       {
+        "title": "param",
+        "description": "sign the data using ECDSA",
+        "lineNumber": 6,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Boolean"
+          }
+        },
+        "name": "options.sign",
+        "default": "false"
+      },
+      {
         "title": "return",
         "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 6,
+        "lineNumber": 7,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6883,22 +7023,22 @@
     ],
     "loc": {
       "start": {
-        "line": 136,
+        "line": 138,
         "column": 0
       },
       "end": {
-        "line": 144,
+        "line": 147,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 145,
+          "line": 148,
           "column": 0
         },
         "end": {
-          "line": 175,
+          "line": 178,
           "column": 1
         }
       },
@@ -7161,6 +7301,68 @@
               "name": "Boolean"
             },
             "default": "true"
+          },
+          {
+            "title": "param",
+            "name": "options.sign",
+            "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "sign the data using ECDSA",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 1,
+                          "column": 26,
+                          "offset": 25
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            },
+            "default": "false"
           }
         ]
       }
@@ -7327,22 +7529,22 @@
     ],
     "loc": {
       "start": {
-        "line": 188,
+        "line": 191,
         "column": 0
       },
       "end": {
-        "line": 193,
+        "line": 196,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 194,
+          "line": 197,
           "column": 0
         },
         "end": {
-          "line": 196,
+          "line": 199,
           "column": 1
         }
       },
@@ -7585,22 +7787,22 @@
     ],
     "loc": {
       "start": {
-        "line": 177,
+        "line": 180,
         "column": 0
       },
       "end": {
-        "line": 183,
+        "line": 186,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 184,
+          "line": 187,
           "column": 0
         },
         "end": {
-          "line": 186,
+          "line": 189,
           "column": 1
         }
       },
@@ -10427,6 +10629,581 @@
       }
     ],
     "namespace": "isRedirectUriValid"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Sign content using ECDSA",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 25,
+          "offset": 24
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "secp256k1 private key hex string",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "privateKey"
+      },
+      {
+        "title": "param",
+        "description": "content to sign",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "content"
+      },
+      {
+        "title": "return",
+        "description": "contains:\ncontent - Original content\nsignature - Hex encoded DER signature\npublic key - Hex encoded private string taken from privateKey",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 135,
+        "column": 0
+      },
+      "end": {
+        "line": 143,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 144,
+          "column": 0
+        },
+        "end": {
+          "line": 157,
+          "column": 1
+        }
+      },
+      "file": "/Users/brandonparee/work/blockstack.js/src/encryption.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "privateKey",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "secp256k1 private key hex string",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 33,
+                      "offset": 32
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 33,
+                  "offset": 32
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 33,
+              "offset": 32
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "content to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 16,
+                      "offset": 15
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 16,
+              "offset": 15
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "contains:\ncontent - Original content\nsignature - Hex encoded DER signature\npublic key - Hex encoded private string taken from privateKey",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 4,
+                      "column": 62,
+                      "offset": 136
+                    },
+                    "indent": [
+                      1,
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 62,
+                  "offset": 136
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 62,
+              "offset": 136
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signECDSA",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signECDSA",
+        "kind": "function"
+      }
+    ],
+    "namespace": "signECDSA"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Verify content using ECDSA",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 27,
+          "offset": 26
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "should contain \ncontent - Content to verify was signed\nsignature - Hex encoded DER signature\npublicKey - secp256k1 private key hex string",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "signatureObject"
+      },
+      {
+        "title": "return",
+        "description": "returns true when signature matches publickey + content, false if not",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 159,
+        "column": 0
+      },
+      "end": {
+        "line": 166,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 167,
+          "column": 0
+        },
+        "end": {
+          "line": 173,
+          "column": 1
+        }
+      },
+      "file": "/Users/brandonparee/work/blockstack.js/src/encryption.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "signatureObject",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "should contain \ncontent - Content to verify was signed\nsignature - Hex encoded DER signature\npublicKey - secp256k1 private key hex string",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 4,
+                      "column": 45,
+                      "offset": 137
+                    },
+                    "indent": [
+                      1,
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 45,
+                  "offset": 137
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 45,
+              "offset": 137
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "returns true when signature matches publickey + content, false if not",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 70,
+                      "offset": 69
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 70,
+                  "offset": 69
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 70,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "verifyECDSA",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "verifyECDSA",
+        "kind": "function"
+      }
+    ],
+    "namespace": "verifyECDSA"
   },
   {
     "description": {

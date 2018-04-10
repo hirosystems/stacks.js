@@ -1425,6 +1425,15 @@ function decryptECIES(privateKey, cipherObject) {
   }
 }
 
+/**
+ * Sign content using ECDSA
+ * @param {String} privateKey - secp256k1 private key hex string
+ * @param {Object} content - content to sign
+ * @return {Object} contains:
+ * content - Original content
+ * signature - Hex encoded DER signature
+ * public key - Hex encoded private string taken from privateKey
+ */
 function signECDSA(privateKey, content) {
   var contentBuffer = Buffer.from(content);
   var ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex');
@@ -1440,6 +1449,14 @@ function signECDSA(privateKey, content) {
   };
 }
 
+/**
+ * Verify content using ECDSA
+ * @param {Object} signatureObject - should contain 
+ * content - Content to verify was signed
+ * signature - Hex encoded DER signature
+ * publicKey - secp256k1 private key hex string
+ * @return {Boolean} returns true when signature matches publickey + content, false if not
+ */
 function verifyECDSA(signatureObject) {
   var content = signatureObject.content,
       signature = signatureObject.signature,
@@ -6075,6 +6092,8 @@ function getUserAppFileUrl(path, username, appOrigin) {
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {Boolean} options.verify - Whether the content should be verified, only to be used 
+ * when `putFile` was set to `sign = true` 
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
  * @param {String} [options.zoneFileLookupURL=null] - The URL
@@ -6157,6 +6176,7 @@ function getFile(path, options) {
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
+ * @param {Boolean} [options.sign=false] - sign the data using ECDSA
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
