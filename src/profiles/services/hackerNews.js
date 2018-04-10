@@ -5,7 +5,7 @@ import cheerio from 'cheerio'
 class HackerNews extends Service {
   static getBaseUrls() {
     const baseUrls = [
-      'https://news.ycombinator.com/user?id=', 
+      'https://news.ycombinator.com/user?id=',
       'http://news.ycombinator.com/user?id=',
       'news.ycombinator.com/user?id='
     ]
@@ -19,7 +19,7 @@ class HackerNews extends Service {
     proofUrl = super.prefixScheme(proofUrl)
 
     for (let i = 0; i < baseUrls.length; i++) {
-      if (proofUrl === `${baseUrls[i]}${proof.identifier}`) {
+      if (proofUrl === `${baseUrls[i]}${proof.identifier.toLowerCase()}`) {
         return proofUrl
       }
     }
@@ -51,7 +51,7 @@ class HackerNews extends Service {
           })
         }
       })
-    } 
+    }
 
     return statement
   }
