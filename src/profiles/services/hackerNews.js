@@ -15,11 +15,10 @@ class HackerNews extends Service {
   static getProofUrl(proof: Object) {
     const baseUrls = this.getBaseUrls()
 
-    let proofUrl = proof.proof_url.toLowerCase()
-    proofUrl = super.prefixScheme(proofUrl)
+    const proofUrl = super.prefixScheme(proof.proof_url)
 
     for (let i = 0; i < baseUrls.length; i++) {
-      if (proofUrl === `${baseUrls[i]}${proof.identifier.toLowerCase()}`) {
+      if (proofUrl === `${baseUrls[i]}${proof.identifier}`) {
         return proofUrl
       }
     }

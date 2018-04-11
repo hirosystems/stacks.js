@@ -291,7 +291,7 @@ export function runProofServicesUnitTests() {
       'https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/',
       'LinkedIn proof URL should match reference')
     t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.bruno[0]),
-      'https://news.ycombinator.com/user?id=brunobernardino',
+      'https://news.ycombinator.com/user?id=BrunoBernardino',
       'Hacker News proof URL should match reference')
 
     t.throws(() => {
