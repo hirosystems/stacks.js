@@ -184,13 +184,17 @@ function testSchemas() {
   })
 
   test('legacyFormat', (t) => {
-    t.plan(2)
+    t.plan(3)
 
     const profileObject = Person.fromLegacyFormat(sampleProfiles.navalLegacy)
     t.ok(profileObject, 'Profile object should have been created from legacy formatted profile')
 
     const validationResults = Person.validateSchema(profileObject.toJSON(), true)
     t.ok(validationResults, 'Profile should be in a valid format')
+
+    t.deepEqual(profileObject.toJSON(),
+                sampleProfiles.navalLegacyConvert,
+                'Parsed Legacy profile should match expectations.')
   })
 
   test('resolveZoneFileToPerson', (t) => {

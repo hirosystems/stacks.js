@@ -1059,7 +1059,7 @@
           "column": 0
         },
         "end": {
-          "line": 224,
+          "line": 226,
           "column": 1
         }
       },
@@ -1321,22 +1321,22 @@
     ],
     "loc": {
       "start": {
-        "line": 226,
+        "line": 228,
         "column": 0
       },
       "end": {
-        "line": 229,
+        "line": 231,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 230,
+          "line": 232,
           "column": 0
         },
         "end": {
-          "line": 232,
+          "line": 234,
           "column": 1
         }
       },
@@ -1730,22 +1730,22 @@
     ],
     "loc": {
       "start": {
-        "line": 234,
+        "line": 236,
         "column": 0
       },
       "end": {
-        "line": 238,
+        "line": 240,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 239,
+          "line": 241,
           "column": 0
         },
         "end": {
-          "line": 246,
+          "line": 248,
           "column": 1
         }
       },
@@ -5624,7 +5624,7 @@
       },
       {
         "title": "param",
-        "description": "The URL\nto use for zonefile lookup",
+        "description": "The URL\nto use for zonefile lookup. If falsey, lookupProfile will use the\nblockstack.js getNameInfo function.",
         "lineNumber": 4,
         "type": {
           "type": "OptionalType",
@@ -5634,12 +5634,12 @@
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       },
       {
         "title": "returns",
         "description": "that resolves to a profile object",
-        "lineNumber": 6,
+        "lineNumber": 7,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -5648,22 +5648,22 @@
     ],
     "loc": {
       "start": {
-        "line": 4,
+        "line": 5,
         "column": 0
       },
       "end": {
-        "line": 11,
+        "line": 13,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 12,
+          "line": 14,
           "column": 0
         },
         "end": {
-          "line": 37,
+          "line": 36,
           "column": 1
         }
       },
@@ -5745,7 +5745,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The URL\nto use for zonefile lookup",
+                  "value": "The URL\nto use for zonefile lookup. If falsey, lookupProfile will use the\nblockstack.js getNameInfo function.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -5753,11 +5753,12 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 27,
-                      "offset": 34
+                      "line": 3,
+                      "column": 36,
+                      "offset": 109
                     },
                     "indent": [
+                      1,
                       1
                     ]
                   }
@@ -5770,11 +5771,12 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 27,
-                  "offset": 34
+                  "line": 3,
+                  "column": 36,
+                  "offset": 109
                 },
                 "indent": [
+                  1,
                   1
                 ]
               }
@@ -5787,9 +5789,9 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 27,
-              "offset": 34
+              "line": 3,
+              "column": 36,
+              "offset": 109
             }
           }
         },
@@ -5797,7 +5799,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       }
     ],
     "properties": [],
@@ -6242,7 +6244,7 @@
       },
       {
         "title": "param",
-        "description": "the Blockstack\ncore endpoint URL to use for zonefile lookup",
+        "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
         "lineNumber": 8,
         "type": {
           "type": "OptionalType",
@@ -6252,12 +6254,12 @@
           }
         },
         "name": "options.zoneFileLookupURL",
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       },
       {
         "title": "returns",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 10,
+        "lineNumber": 11,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6266,22 +6268,22 @@
     ],
     "loc": {
       "start": {
-        "line": 46,
+        "line": 47,
         "column": 0
       },
       "end": {
-        "line": 58,
+        "line": 60,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 59,
+          "line": 61,
           "column": 0
         },
         "end": {
-          "line": 113,
+          "line": 115,
           "column": 1
         }
       },
@@ -6613,7 +6615,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "the Blockstack\ncore endpoint URL to use for zonefile lookup",
+                      "value": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
                       "position": {
                         "start": {
                           "line": 1,
@@ -6621,11 +6623,12 @@
                           "offset": 0
                         },
                         "end": {
-                          "line": 2,
-                          "column": 45,
-                          "offset": 59
+                          "line": 3,
+                          "column": 46,
+                          "offset": 110
                         },
                         "indent": [
+                          1,
                           1
                         ]
                       }
@@ -6638,11 +6641,12 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 45,
-                      "offset": 59
+                      "line": 3,
+                      "column": 46,
+                      "offset": 110
                     },
                     "indent": [
+                      1,
                       1
                     ]
                   }
@@ -6655,9 +6659,9 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 45,
-                  "offset": 59
+                  "line": 3,
+                  "column": 46,
+                  "offset": 110
                 }
               }
             },
@@ -6665,7 +6669,7 @@
               "type": "NameExpression",
               "name": "String"
             },
-            "default": "https://core.blockstack.org/v1/names/"
+            "default": "null"
           }
         ]
       }
@@ -6879,22 +6883,22 @@
     ],
     "loc": {
       "start": {
-        "line": 115,
+        "line": 117,
         "column": 0
       },
       "end": {
-        "line": 123,
+        "line": 125,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 124,
+          "line": 126,
           "column": 0
         },
         "end": {
-          "line": 144,
+          "line": 146,
           "column": 1
         }
       },
@@ -7323,22 +7327,22 @@
     ],
     "loc": {
       "start": {
-        "line": 157,
+        "line": 159,
         "column": 0
       },
       "end": {
-        "line": 162,
+        "line": 164,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 163,
+          "line": 165,
           "column": 0
         },
         "end": {
-          "line": 165,
+          "line": 167,
           "column": 1
         }
       },
@@ -7581,22 +7585,22 @@
     ],
     "loc": {
       "start": {
-        "line": 146,
+        "line": 148,
         "column": 0
       },
       "end": {
-        "line": 152,
+        "line": 154,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 153,
+          "line": 155,
           "column": 0
         },
         "end": {
-          "line": 155,
+          "line": 157,
           "column": 1
         }
       },
@@ -7900,22 +7904,22 @@
       },
       {
         "title": "param",
-        "description": "The URL\nto use for zonefile lookup",
+        "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
         "lineNumber": 5,
         "type": {
           "type": "OptionalType",
           "expression": {
             "type": "NameExpression",
-            "name": "string"
+            "name": "String"
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       },
       {
         "title": "return",
         "description": "that resolves to the public read URL of the file\nor rejects with an error",
-        "lineNumber": 7,
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -7928,18 +7932,18 @@
         "column": 0
       },
       "end": {
-        "line": 21,
+        "line": 22,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 22,
+          "line": 23,
           "column": 0
         },
         "end": {
-          "line": 44,
+          "line": 45,
           "column": 1
         }
       },
@@ -8143,7 +8147,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The URL\nto use for zonefile lookup",
+                  "value": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8151,11 +8155,12 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 27,
-                      "offset": 34
+                      "line": 3,
+                      "column": 46,
+                      "offset": 110
                     },
                     "indent": [
+                      1,
                       1
                     ]
                   }
@@ -8168,11 +8173,12 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 27,
-                  "offset": 34
+                  "line": 3,
+                  "column": 46,
+                  "offset": 110
                 },
                 "indent": [
+                  1,
                   1
                 ]
               }
@@ -8185,17 +8191,17 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 27,
-              "offset": 34
+              "line": 3,
+              "column": 46,
+              "offset": 110
             }
           }
         },
         "type": {
           "type": "NameExpression",
-          "name": "string"
+          "name": "String"
         },
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       }
     ],
     "properties": [],
