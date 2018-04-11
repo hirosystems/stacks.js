@@ -1,5 +1,5 @@
 /* @flow */
-import { resolveZoneFileToProfile } from './profileZoneFiles'
+import { resolveZoneFileToProfilePublicKey } from './profileZoneFiles'
 import { config } from '../config'
 
 /**
@@ -12,6 +12,11 @@ import { config } from '../config'
  * @returns {Promise} that resolves to a profile object
  */
 export function lookupProfile(username: string, zoneFileLookupURL: ?string = null) {
+  return lookupUserInfo(username, zoneFileLookupURL)
+    .then(response => response.profile)
+}
+
+export function lookupUserInfo(username: string, zoneFileLookupURL: ?string = null) {
   if (!username) {
     return Promise.reject()
   }
@@ -23,11 +28,18 @@ export function lookupProfile(username: string, zoneFileLookupURL: ?string = nul
   } else {
     lookupPromise = config.network.getNameInfo(username)
   }
+
   return lookupPromise
-    .then(responseJSON => {
-      if (responseJSON.hasOwnProperty('zonefile')
-          && responseJSON.hasOwnProperty('address')) {
-        return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address)
+    .then(nameResponse => {
+      if (nameResponse.hasOwnProperty('zonefile')
+          && nameResponse.hasOwnProperty('address')) {
+        const zoneFile = nameResponse.zonefile
+        const ownerAddress = nameResponse.address
+        return resolveZoneFileToProfilePublicKey(zoneFile, ownerAddress)
+          .then(profileResponse => ({
+            profile: profileResponse.profile,
+            ownerPublicKey: profileResponse.publicKey,
+            ownerAddress, zoneFile }))
       } else {
         throw new Error('Invalid zonefile lookup response: did not contain `address`' +
                         ' or `zonefile` field')

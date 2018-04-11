@@ -33,5 +33,5 @@ export {
 } from './profileZoneFiles'
 
 export {
-  lookupProfile
+  lookupProfile, lookupUserInfo
 } from './profileLookup'

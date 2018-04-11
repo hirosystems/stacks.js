@@ -1,4 +1,5 @@
 import { makeZoneFile, parseZoneFile } from 'zone-file'
+import { decodeToken } from 'jsontokens'
 import { extractProfile } from './profileTokens'
 import { Person } from './index'
 
@@ -60,6 +61,11 @@ export function getTokenFileUrl(zoneFileJson) {
 }
 
 export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
+  return resolveZoneFileToProfilePublicKey(zoneFile, publicKeyOrAddress)
+    .then(response => response.profile)
+}
+
+export function resolveZoneFileToProfilePublicKey(zoneFile, publicKeyOrAddress) {
   return new Promise((resolve, reject) => {
     let zoneFileJson = null
     try {
@@ -82,7 +88,7 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
       } catch (error) {
         reject(error)
       }
-      resolve(profile)
+      resolve({ profile, publicKey: null })
       return
     }
 
@@ -93,7 +99,9 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
         .then((responseJson) => {
           const tokenRecords = responseJson
           const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress)
-          resolve(profile)
+          const decodedToken = decodeToken(tokenRecords[0].token)
+          const publicKey = decodedToken.payload.issuer.publicKey
+          resolve({ profile, publicKey })
           return
         })
         .catch((error) => {
@@ -102,7 +110,7 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
         })
     } else {
       console.log('Token file url not found. Resolving to blank profile.')
-      resolve({})
+      resolve({ profile: { }, publicKey: null })
       return
     }
   })
