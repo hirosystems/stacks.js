@@ -47,7 +47,8 @@ export const sampleTokenFiles = {
 export const sampleProofs = {
   naval: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval.proofs.json`)),
   larry: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/larry.proofs.json`)),
-  ken: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/ken.proofs.json`))
+  ken: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/ken.proofs.json`)),
+  bruno: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/bruno.proofs.json`))
 }
 
 export const sampleVerifications = {
