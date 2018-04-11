@@ -2,20 +2,6 @@
 import { resolveZoneFileToProfilePublicKey } from './profileZoneFiles'
 import { config } from '../config'
 
-/**
- * Look up a user profile by blockstack ID
- *
- * @param {string} username - The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, lookupProfile will use the
- * blockstack.js getNameInfo function.
- * @returns {Promise} that resolves to a profile object
- */
-export function lookupProfile(username: string, zoneFileLookupURL: ?string = null) {
-  return lookupUserInfo(username, zoneFileLookupURL)
-    .then(response => response.profile)
-}
-
 export function lookupUserInfo(username: string, zoneFileLookupURL: ?string = null) {
   if (!username) {
     return Promise.reject()
@@ -45,4 +31,18 @@ export function lookupUserInfo(username: string, zoneFileLookupURL: ?string = nu
                         ' or `zonefile` field')
       }
     })
+}
+
+/**
+ * Look up a user profile by blockstack ID
+ *
+ * @param {string} username - The Blockstack ID of the profile to look up
+ * @param {string} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, lookupProfile will use the
+ * blockstack.js getNameInfo function.
+ * @returns {Promise} that resolves to a profile object
+ */
+export function lookupProfile(username: string, zoneFileLookupURL: ?string = null) {
+  return lookupUserInfo(username, zoneFileLookupURL)
+    .then(response => response.profile)
 }

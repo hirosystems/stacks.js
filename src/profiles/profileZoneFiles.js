@@ -60,11 +60,6 @@ export function getTokenFileUrl(zoneFileJson) {
   return tokenFileUrl
 }
 
-export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
-  return resolveZoneFileToProfilePublicKey(zoneFile, publicKeyOrAddress)
-    .then(response => response.profile)
-}
-
 export function resolveZoneFileToProfilePublicKey(zoneFile, publicKeyOrAddress) {
   return new Promise((resolve, reject) => {
     let zoneFileJson = null
@@ -114,4 +109,9 @@ export function resolveZoneFileToProfilePublicKey(zoneFile, publicKeyOrAddress) 
       return
     }
   })
+}
+
+export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
+  return resolveZoneFileToProfilePublicKey(zoneFile, publicKeyOrAddress)
+    .then(response => response.profile)
 }
