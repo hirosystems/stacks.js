@@ -268,7 +268,7 @@ export function runProofServicesUnitTests() {
   })
 
   test('get proof url', (t) => {
-    t.plan(10)
+    t.plan(11)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       'https://www.facebook.com/navalr/posts/10152190734077261',
       'Facebook proof URL should match reference')
@@ -290,6 +290,9 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.linkedIn.getProofUrl(sampleProofs.ken[2]),
       'https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/',
       'LinkedIn proof URL should match reference')
+    t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.bruno[0]),
+      'https://news.ycombinator.com/user?id=BrunoBernardino',
+      'Hacker News proof URL should match reference')
 
     t.throws(() => {
       const notNavalTwitter = Object.assign({},
