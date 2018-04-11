@@ -10,7 +10,7 @@ export {
   getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate
 } from './keys'
 export {
-  nextYear, nextMonth, nextHour, makeUUID4, hasprop, updateQueryStringParameter,
+  nextYear, nextMonth, nextHour, makeUUID4, updateQueryStringParameter,
   isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString
 } from './utils'
 
