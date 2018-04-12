@@ -1,7 +1,6 @@
 /* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
-import bigi from 'bigi'
 import { MissingParameterError, RemoteServiceError } from './errors'
 
 type UTXO = { value?: number,
@@ -48,49 +47,34 @@ export class BlockstackNetwork {
   getNamePrice(fullyQualifiedName: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
-      .then(resp => resp.name_price)
-      .then(namePrice => {
-        if (!namePrice) {
-          throw new Error(
-            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`)
-        }
-        let result = null
-        if (namePrice.satoshis) {
-          // backwards compatibility 
-          result = {
-            units: 'BTC',
-            amount: bigi.fromByteArrayUnsigned(namePrice.satoshis.toString())
+      .then(x => x.name_price.satoshis)
+      .then(satoshis => {
+        if (satoshis) {
+          if (satoshis < this.DUST_MINIMUM) {
+            return this.DUST_MINIMUM
+          } else {
+            return satoshis
           }
         } else {
-          // for STACKs and future tokens
-          result = {
-            units: namePrice.units,
-            amount: bigi.fromByteArrayUnsigned(namePrice.amount)
-          }
+          throw new Error('Failed to parse price of name')
         }
-        return result
       })
   }
 
   getNamespacePrice(namespaceID: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then(resp => resp.json())
-      .then(namespacePrice => {
-        let result = null
-        if (namespacePrice.satoshis) {
-          // backwards compatibility 
-          result = {
-            units: 'BTC',
-            amount: bigi.fromByteArrayUnsigned(namespacePrice.satoshis.toString())
+      .then(x => x.satoshis)
+      .then(satoshis => {
+        if (satoshis) {
+          if (satoshis < this.DUST_MINIMUM) {
+            return this.DUST_MINIMUM
+          } else {
+            return satoshis
           }
         } else {
-          // for STACKs
-          result = {
-            units: namespacePrice.units,
-            amount: bigi.fromByteArrayUnsigned(namespacePrice.amount)
-          }
+          throw new Error('Failed to parse price of namespace')
         }
-        return result
       })
   }
 
@@ -174,29 +158,6 @@ export class BlockstackNetwork {
           })
         } else {
           return namespaceInfo
-        }
-      })
-  }
-
-  getAccountTokens(address: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
-      .then(resp => {
-        if (resp.status === 200) {
-          return resp.json().then(tokenList => tokenList.tokens)
-        } else {
-          throw new Error(`Bad response status: ${resp.status}`)
-        }
-      })
-  }
-
-  getAccountBalance(address: string, tokenType: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
-      .then((resp) => {
-        if (resp.status === 200) {
-          return resp.json()
-            .then((tokenBalance) => bigi.fromByteArrayUnsigned(tokenBalance.balance))
-        } else {
-          throw new Error(`Bad response status: ${resp.status}`)
         }
       })
   }
