@@ -15,7 +15,9 @@ const testAddresses = [
   { skHex: '744196d67ed78fe39009c71fbfd53e6ecca98353fbfe81ccba21b0703a69be9c01',
     address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR' },
   { address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
-    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001' }
+    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001' },
+  { address: '16TaQJi78o4A3nKDSzswqZiX3bhecNuNBQ',
+    skHex: '58f7b29ee4a9a8b05855591b8a5405a0647c74c0a539515173adb9a32c964a9a01' }
 ]
 
 function networkTests() {
@@ -267,8 +269,11 @@ function utilsTests() {
 
 function transactionTests() {
   const utxoValues = [288000, 287825, 287825]
+  const namespaceUtxoValues = [6400000000, 488000, 287825]
   const BURN_AMT = 6500
+  const NAMESPACE_PRICE = { satoshis: 6400000000 }
   const BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
+  const NAMESPACE_BURN_ADDR = '1111111111111111111114oLvT2'
 
   const utxoSet = [{ value: utxoValues[0],
                    tx_hash_big_endian:
@@ -289,6 +294,23 @@ function transactionTests() {
                     'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdedffff',
                     tx_output_n: 0 }]
 
+  const namespaceUtxoSet = [{ value: namespaceUtxoValues[0],
+                              tx_hash_big_endian:
+                              '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c',
+                              tx_output_n: 0 },
+                            { value: namespaceUtxoValues[1],
+                              tx_hash_big_endian:
+                              '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
+                              tx_output_n: 0 },
+                            { value: namespaceUtxoValues[2],
+                              tx_hash_big_endian:
+                              'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
+                              tx_output_n: 2 }]
+  const namespaceUtxoSet2 = [{ value: 654321,
+                            tx_hash_big_endian:
+                            'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
+                            tx_output_n: 0 }]
+
   function setupMocks() {
     FetchMock.restore()
     FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
@@ -296,16 +318,22 @@ function transactionTests() {
                   { unspent_outputs: utxoSet })
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}&cors=true`,
                   { unspent_outputs: utxoSet2 })
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[2].address}&cors=true`,
+                  { unspent_outputs: namespaceUtxoSet })
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[3].address}&cors=true`,
+                  { unspent_outputs: namespaceUtxoSet2 })
     FetchMock.get('https://core.blockstack.org/v1/prices/names/foo.test',
                   { name_price: { satoshis: BURN_AMT } })
+    FetchMock.get('https://core.blockstack.org/v1/prices/namespaces/hello',
+                  NAMESPACE_PRICE)
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { history: { 10: [{ burn_address: BURN_ADDR }] } })
     FetchMock.get('https://core.blockstack.org/v1/blockchains/bitcoin/consensus',
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
   }
 
-  function getInputVals(inputTXArgument) {
-    const utxosAll = utxoSet.concat()
+  function getInputVals(inputTXArgument, utxoSets = utxoSet) {
+    const utxosAll = utxoSets.concat()
     return inputTXArgument.ins.reduce((agg, x) => {
       const inputTX = utxosAll.find(
         y => Buffer.from(y.tx_hash_big_endian, 'hex')
@@ -317,6 +345,160 @@ function transactionTests() {
       }
     }, 0)
   }
+
+  test('build and fund namespace preorder', (t) => {
+    t.plan(6)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateNamespacePreorder('hello',
+                                              testAddresses[3].address,
+                                              testAddresses[2].address, 2),
+       transactions.makeNamespacePreorder('hello',
+                                           testAddresses[3].address,
+                                           testAddresses[2].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet)
+        const fee = inputVals - outputVals
+        const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
+
+        const change = tx.outs[1].value
+        
+        t.equal(inputVals - change,
+          estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
+        t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
+        t.equal(tx.outs[2].value, 6400000000, 'Output should have paid 6400000000 for namespace')
+        t.equal(tx.ins.length, 2, 'Should use 2 utxos for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund namespace reveal', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    const ns = new transactions.BlockstackNamespace('hello')
+    ns.setVersion(3)
+    ns.setLifetime(52595)
+    ns.setCoeff(4)
+    ns.setBase(4)
+    ns.setBuckets([6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    ns.setNonalphaDiscount(10)
+    ns.setNoVowelDiscount(10)
+
+    Promise.all(
+      [transactions.estimateNamespaceReveal(ns,
+                                            testAddresses[3].address,
+                                            testAddresses[2].address),
+       transactions.makeNamespaceReveal(ns,
+                                        testAddresses[3].address,
+                                        testAddresses[2].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet)
+        const fee = inputVals - outputVals
+
+        // change address is the 3rd output usually...
+        const change = tx.outs[2].value
+
+        t.equal(btc.address.fromOutputScript(tx.outs[2].script), testAddresses[2].address,
+                'Payer change should be third output')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+                `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund name import', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateNameImport(
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
+        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575'),
+       transactions.makeNameImport(
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
+        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575', testAddresses[3].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet2)
+        const fee = inputVals - outputVals
+
+        const change = tx.outs[3].value
+        t.equal(inputVals - change,
+          estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+          `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund namespace ready', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateNamespaceReady('hello'),
+       transactions.makeNamespaceReady('hello',
+                                       testAddresses[3].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet2)
+        const fee = inputVals - outputVals
+
+        const change = tx.outs[1].value
+        t.equal(inputVals - change,
+          estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund announce', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateAnnounce('53bb740c47435a51b07ecf0b9e086a2ad3c12c1d'),
+       transactions.makeAnnounce(
+         '53bb740c47435a51b07ecf0b9e086a2ad3c12c1d', testAddresses[3].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, namespaceUtxoSet2)
+        const fee = inputVals - outputVals
+
+        const change = tx.outs[1].value
+        t.equal(inputVals - change,
+          estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+          `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
 
   test('build and fund preorder', (t) => {
     t.plan(6)
@@ -457,6 +639,37 @@ function transactionTests() {
         t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund revoke', (t) => {
+    t.plan(4)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateRevoke('foo.test',
+                                   testAddresses[0].address,
+                                   testAddresses[1].address, 2),
+       transactions.makeRevoke('foo.test',
+                               testAddresses[0].skHex,
+                               testAddresses[1].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx)
+        const fee = inputVals - outputVals
+
+        // change address is the 3rd output usually...
+        const change = tx.outs[2].value
+
+        t.equal(btc.address.fromOutputScript(tx.outs[2].script), testAddresses[1].address,
+                'Payer change should be third output')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
+        t.equal(tx.ins.length, 3, 'Should use both payer utxos')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+                `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
