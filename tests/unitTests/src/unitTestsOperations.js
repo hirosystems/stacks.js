@@ -269,9 +269,9 @@ function utilsTests() {
 
 function transactionTests() {
   const utxoValues = [288000, 287825, 287825]
-  const namespaceUtxoValues = [288000, 287825, 287825]
+  const namespaceUtxoValues = [6400000000, 488000, 287825]
   const BURN_AMT = 6500
-  const NAMESPACE_PRICE = { units: 'STACKS', amount: '6400000000' }
+  const NAMESPACE_PRICE = { satoshis: 6400000000 }
   const BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
   const NAMESPACE_BURN_ADDR = '1111111111111111111114oLvT2'
 
@@ -371,7 +371,7 @@ function transactionTests() {
         t.equal(inputVals - change,
           estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
-        t.equal(tx.outs[2].value, 5500, 'Output should have paid dust for namespace')
+        t.equal(tx.outs[2].value, 6400000000, 'Output should have paid 6400000000 for namespace')
         t.equal(tx.ins.length, 2, 'Should use 2 utxos for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
