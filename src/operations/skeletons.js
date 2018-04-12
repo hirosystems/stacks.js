@@ -143,11 +143,10 @@ export function makePreorderSkeleton(
   //                    2. the Preorder's change address (5500 satoshi minimum)
   //                    3. the BURN
   //
-  // 0     2  3                                     23             39          47            66
-  // |-----|--|--------------------------------------|--------------|-----------|-------------|
-  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash token burn  token type
-  //                                                                 (optional)   (optional)
-
+  // 0     2  3                                     23             39
+  // |-----|--|--------------------------------------|--------------|
+  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash
+  //
   // Returns an unsigned serialized transaction.
   const burnAmount = asAmountV2(burn)
   const network = config.network
@@ -165,23 +164,11 @@ export function makePreorderSkeleton(
 
   const hashed = hash160(dataBuff)
 
-  const opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66
+  const opReturnBufferLen = 39
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
   opReturnBuffer.write('id?', 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
-
-  if (burnAmount.units !== 'BTC') {
-    const burnHex = burnAmount.amount.toHex()
-    if (burnHex.length > 16) {
-      // exceeds 2**64; can't fit 
-      throw new Error(`Cannot preorder '${fullyQualifiedName}': cannot fit price into 8 bytes`)
-    }
-    const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
-
-    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
-    opReturnBuffer.write(burnAmount.units, 47, burnAmount.units.length, 'ascii')
-  }
 
   const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
 
@@ -190,19 +177,15 @@ export function makePreorderSkeleton(
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
 
-  if (burnAmount.units === 'BTC') {
-    const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
-    tx.addOutput(burnAddress, btcBurnAmount)
-  } else {
-    tx.addOutput(burnAddress, DUST_MINIMUM)
-  }
+  const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
+  tx.addOutput(burnAddress, btcBurnAmount)
 
   return tx.buildIncomplete()
 }
 
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
-  valueHash: ?string = null, burnTokenAmountHex: ?string = null) {
+  valueHash: ?string = null) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -233,29 +216,15 @@ export function makeRegisterSkeleton(
 
   let payload
   const network = config.network
-
-  if (!!burnTokenAmountHex && !valueHash) {
-    // empty value hash 
-    valueHash = '0000000000000000000000000000000000000000'
-  }
-
   if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
     }
-    if (!!burnTokenAmountHex) {
-      if (burnTokenAmountHex.length !== 16) {
-        throw new Error('Burn field length incorrect.  Expecting 8-bytes, hex-encoded')
-      }
-    }
 
-    const payloadLen = burnTokenAmountHex ? 65 : 57
+    const payloadLen = 57
     payload = Buffer.alloc(payloadLen, 0)
     payload.write(fullyQualifiedName, 0, 37, 'ascii')
     payload.write(valueHash, 37, 20, 'hex')
-    if (!!burnTokenAmountHex) {
-      payload.write(burnTokenAmountHex, 57, 16, 'hex')
-    }
   } else {
     payload = Buffer.from(fullyQualifiedName, 'ascii')
   }
@@ -290,33 +259,13 @@ export function makeRenewalSkeleton(
     |----|--|----------------------------------|-------------------|
     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
 
-
-   With renewal payment in a token:
-   (for register, tokens burned is not included)
-   (for renew, tokens burned is the number of tokens to burn)
-    
-   0    2  3                                  39                  59                            67
-   |----|--|----------------------------------|-------------------|------------------------------|
-   magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (little-endian)
   */
   const burnAmount = asAmountV2(burn)
   const network = config.network
-  const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
-  const burnBTCAmount = burnAmount.units === 'BTC' ? 
-    parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
+  const burnBTCAmount = parseInt(burnAmount.amount.toHex(), 16)
   
-  let burnTokenHex = null
-  if (!!burnTokenAmount) {
-    const burnHex = burnTokenAmount.toHex()
-    if (burnHex.length > 16) {
-      // exceeds 2**64; can't fit 
-      throw new Error(`Cannot renew '${fullyQualifiedName}': cannot fit price into 8 bytes`)
-    }
-    burnTokenHex = `0000000000000000${burnHex}`.slice(-16)
-  }
-
   const registerTX = makeRegisterSkeleton(
-    fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex)
+    fullyQualifiedName, nextOwnerAddress, valueHash)
   const txB = bitcoin.TransactionBuilder.fromTransaction(
     registerTX, network.layer1)
   txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
@@ -446,22 +395,13 @@ export function makeNamespacePreorderSkeleton(
   /*
    Formats:
 
-   Without STACKS:
-
    0     2   3                                      23               39
    |-----|---|--------------------------------------|----------------|
    magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash
-
-
-   with STACKs:
-
-   0     2   3                                      23               39                         47
-   |-----|---|--------------------------------------|----------------|--------------------------|
-   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (little-endian)
   */
 
   const burnAmount = asAmountV2(burn)
-  if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
+  if (burnAmount.units !== 'BTC') {
     throw new Error(`Invalid burnUnits ${burnAmount.units}`)
   }
 
@@ -476,24 +416,13 @@ export function makeNamespacePreorderSkeleton(
 
   const hashed = hash160(dataBuff)
   
-  let btcBurnAmount = DUST_MINIMUM
-  let opReturnBufferLen = 39
-  if (burnAmount.units === 'STACKS') {
-    opReturnBufferLen = 47
-  } else {
-    btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
-  }
+  const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
+  const opReturnBufferLen = 39
 
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
   opReturnBuffer.write('id*', 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
-
-  if (burnAmount.units === 'STACKS') {
-    const burnHex = burnAmount.amount.toHex()
-    const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
-    opReturnBuffer.write(paddedBurnHex, 39, 16, 'hex')
-  }
 
   const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
 
@@ -614,45 +543,6 @@ export function makeAnnounceSkeleton(messageHash: string) {
   const tx = new bitcoin.TransactionBuilder(network.layer1)
   
   tx.addOutput(nullOutput, 0)
-  return tx.buildIncomplete()
-}
-
-
-export function makeTokenTransferSkeleton(recipientAddress: string,
-  consensusHash: string, tokenType: string, tokenAmount: BigInteger, scratchArea: string) {
-  /*
-   Format:
-
-    0     2  3              19         38          46                        80
-    |-----|--|--------------|----------|-----------|-------------------------|
-    magic op  consensus_hash token_type amount (LE) scratch area
-                             (ns_id)
-  */
-  if (scratchArea.length > 34) {
-    throw new Error('Invalid scratch area: must be no more than 34 bytes')
-  }
-
-  const network = config.network
-  const opReturnBuffer = Buffer.alloc(46 + scratchArea.length)
-  
-  const tokenTypeHex = new Buffer(tokenType).toString('hex')
-  const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
-  
-  const tokenValueHex = tokenAmount.toHex()
-  const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
-
-  opReturnBuffer.write('id$', 0, 3, 'ascii')
-  opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex')
-  opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex')
-  opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex')
-  opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii')
-
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
-
-  tx.addOutput(nullOutput, 0)
-  tx.addOutput(recipientAddress, DUST_MINIMUM)
-
   return tx.buildIncomplete()
 }
 
