@@ -3,6 +3,12 @@
 import bitcoin from 'bitcoinjs-lib'
 import { decodeB40, hash160, hash128, DUST_MINIMUM } from './utils'
 import { config } from '../config'
+import BigInteger from 'bigi'
+
+// support v1 and v2 price API endpoint return values
+type AmountTypeV1 = number
+type AmountTypeV2 = { units: string, amount: BigInteger }
+export type AmountType = AmountTypeV1 | AmountTypeV2
 
 // todo : add name length / character verification
 
@@ -118,9 +124,19 @@ export class BlockstackNamespace {
   } 
 }
 
+function asAmountV2(amount: AmountType): AmountTypeV2 {
+  // convert an AmountType v1 or v2 to an AmountTypeV2.
+  // the "units" of a v1 amount type are always 'btc'
+  if (amount.hasOwnProperty('units') && amount.hasOwnProperty('amount')) {
+    return { units: amount.units, amount: amount.amount }
+  } else {
+    return { units: 'BTC', amount: BigInteger.fromByteArrayUnsigned(String(amount)) }
+  }
+}
+
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
-  burnAddress : string, burnAmount: {units: string, amount: Object},
+  burnAddress : string, burn: AmountType,
   registerAddress: ?string = null) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
@@ -133,6 +149,7 @@ export function makePreorderSkeleton(
   //                                                                 (optional)   (optional)
 
   // Returns an unsigned serialized transaction.
+  const burnAmount = asAmountV2(burn)
   const network = config.network
   const nameBuff = Buffer.from(decodeB40(fullyQualifiedName), 'hex') // base40
   const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network.layer1)
@@ -256,7 +273,7 @@ export function makeRegisterSkeleton(
 
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
-  burnAddress: string, burnAmount: {units: string, amount: Object}, valueHash: ?string = null) {
+  burnAddress: string, burn: AmountType, valueHash: ?string = null) {
   /*
     Formats
 
@@ -282,6 +299,7 @@ export function makeRenewalSkeleton(
    |----|--|----------------------------------|-------------------|------------------------------|
    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (little-endian)
   */
+  const burnAmount = asAmountV2(burn)
   const network = config.network
   const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
   const burnBTCAmount = burnAmount.units === 'BTC' ? 
@@ -422,7 +440,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash : string, preorderAddress: string,
-  registerAddress: string, burnAmount: {units: string, amount: Object}) {
+  registerAddress: string, burn: AmountType) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*
@@ -442,6 +460,7 @@ export function makeNamespacePreorderSkeleton(
    magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (little-endian)
   */
 
+  const burnAmount = asAmountV2(burn)
   if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
     throw new Error(`Invalid burnUnits ${burnAmount.units}`)
   }
@@ -595,6 +614,45 @@ export function makeAnnounceSkeleton(messageHash: string) {
   const tx = new bitcoin.TransactionBuilder(network.layer1)
   
   tx.addOutput(nullOutput, 0)
+  return tx.buildIncomplete()
+}
+
+
+export function makeTokenTransferSkeleton(recipientAddress: string,
+  consensusHash: string, tokenType: string, tokenAmount: BigInteger, scratchArea: string) {
+  /*
+   Format:
+
+    0     2  3              19         38          46                        80
+    |-----|--|--------------|----------|-----------|-------------------------|
+    magic op  consensus_hash token_type amount (LE) scratch area
+                             (ns_id)
+  */
+  if (scratchArea.length > 34) {
+    throw new Error('Invalid scratch area: must be no more than 34 bytes')
+  }
+
+  const network = config.network
+  const opReturnBuffer = Buffer.alloc(46 + scratchArea.length)
+  
+  const tokenTypeHex = new Buffer(tokenType).toString('hex')
+  const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
+  
+  const tokenValueHex = tokenAmount.toHex()
+  const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
+
+  opReturnBuffer.write('id$', 0, 3, 'ascii')
+  opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex')
+  opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex')
+  opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex')
+  opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii')
+
+  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const tx = new bitcoin.TransactionBuilder(network.layer1)
+
+  tx.addOutput(nullOutput, 0)
+  tx.addOutput(recipientAddress, DUST_MINIMUM)
+
   return tx.buildIncomplete()
 }
 
