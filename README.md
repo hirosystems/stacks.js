@@ -20,7 +20,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
 ### Production usage
 
-**NOTE**: If you uglify your the JavaScript, you'll need to exclude the following variable names from being mangled: `BigInteger`, `ECPair`, `Point`.
+**NOTE**: If you uglify your JavaScript, you'll need to exclude the following variable names from being mangled: `BigInteger`, `ECPair`, `Point`.
 
 This is because of the function-name-duck-typing used in [typeforce](https://github.com/dcousens/typeforce) which is used by the dependency [bitcoinjs-lib](https://github.com/bitcoinjs/bitcoinjs-lib).
 
@@ -93,6 +93,7 @@ in your browser.
 ## Releasing
 
 - `git flow release start <version>`
+- Add section to `CHANGELOG.md`
 - Increment version in `package.json` and commit
 - `npm publish`
 - Commit built documentation and distribution

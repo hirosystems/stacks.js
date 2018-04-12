@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 0.16.1 | Documentation</title>
+  <title>blockstack 0.17.2 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>0.16.1</code></div>
+          <div class='mb1'><code>0.17.2</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -1567,9 +1567,10 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-            = <code>https://core.blockstack.org/v1/names/</code>)</code>
+            = <code>null</code>)</code>
 	    The URL
-to use for zonefile lookup
+to use for zonefile lookup. If falsey, lookupProfile will use the
+blockstack.js getNameInfo function.
 
           </div>
           
@@ -1689,7 +1690,7 @@ version. These features will be rolled out in future updates.</em></p>
                 <tr>
                   <td class='break-word'><span class='code bold'>options.decrypt</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
                   
-                    (default <code>false</code>)
+                    (default <code>true</code>)
                   </td>
                   <td class='break-word'><span>try to decrypt the data with the app private key
 </span></td>
@@ -1713,10 +1714,11 @@ defaults to current origin
                 <tr>
                   <td class='break-word'><span class='code bold'>options.zoneFileLookupURL</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
                   
-                    (default <code>http://localhost:6270/v1/names/</code>)
+                    (default <code>null</code>)
                   </td>
-                  <td class='break-word'><span>the Blockstack
-core endpoint URL to use for zonefile lookup
+                  <td class='break-word'><span>The URL
+to use for zonefile lookup. If falsey, this will use the
+blockstack.js's getNameInfo function instead.
 </span></td>
                 </tr>
               
@@ -1828,7 +1830,7 @@ or rejects with an error
                 <tr>
                   <td class='break-word'><span class='code bold'>options.encrypt</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
                   
-                    (default <code>false</code>)
+                    (default <code>true</code>)
                   </td>
                   <td class='break-word'><span>encrypt the data with the app private key
 </span></td>
@@ -2034,7 +2036,7 @@ or rejects if it fails
   <p>Fetch the public read URL of a user file for the specified app.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getUserAppFileUrl(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>getUserAppFileUrl(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -2078,10 +2080,11 @@ or rejects if it fails
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
-            = <code>http://localhost:6270/v1/names/</code>)</code>
+            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>null</code>)</code>
 	    The URL
-to use for zonefile lookup
+to use for zonefile lookup. If falsey, this will use the
+blockstack.js's getNameInfo function instead.
 
           </div>
           

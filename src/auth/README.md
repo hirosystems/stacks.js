@@ -62,7 +62,8 @@ if (blockstack.isUserSignedIn()) {
   const userData = blockstack.loadUserData()
   showProfile(userData.profile)
 } else if (blockstack.isSignInPending()) {
-  blockstack.handlePendingSignIn(function(userData) {
+  blockstack.handlePendingSignIn()
+  .then(userData => {
     showProfile(userData.profile)
   })
 }
@@ -205,7 +206,7 @@ const requestPayload = {
     username, // blockstack id username (if any)
     core_token, // encrypted core token payload
     email, // email if email scope is requested & email available
-	  profile_url, // url to signed profile token
+    profile_url, // url to signed profile token
     hubUrl, // url pointing to user's gaia hub
     version // version tuple
   }
