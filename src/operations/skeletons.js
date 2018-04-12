@@ -8,7 +8,7 @@ import BigInteger from 'bigi'
 // support v1 and v2 price API endpoint return values
 type AmountTypeV1 = number
 type AmountTypeV2 = { units: string, amount: BigInteger }
-export type AmountType = AmountTypeV1 | AmountTypeV2
+type AmountType = AmountTypeV1 | AmountTypeV2
 
 // todo : add name length / character verification
 
@@ -126,11 +126,11 @@ export class BlockstackNamespace {
 
 function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
-  // the "units" of a v1 amount type are always 'btc'
-  if (amount.hasOwnProperty('units') && amount.hasOwnProperty('amount')) {
-    return { units: amount.units, amount: amount.amount }
-  } else {
+  // the "units" of a v1 amount type are always 'BTC'
+  if (typeof amount === 'number') {
     return { units: 'BTC', amount: BigInteger.fromByteArrayUnsigned(String(amount)) }
+  } else {
+    return { units: amount.units, amount: amount.amount }
   }
 }
 
