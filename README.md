@@ -93,6 +93,7 @@ in your browser.
 ## Releasing
 
 - `git flow release start <version>`
+- Add section to `CHANGELOG.md`
 - Increment version in `package.json` and commit
 - `npm publish`
 - Commit built documentation and distribution
