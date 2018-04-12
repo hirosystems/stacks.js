@@ -6139,13 +6139,14 @@ function getAppBucketUrl(gaiaHubUrl, appPrivateKey) {
 }
 
 /**
- * Deletes the specified file from the app's data store.
+ * Deletes the specified file from the app's data store. Currently not implemented.
  * @param {String} path - the path to the file to delete
  * @returns {Promise} that resolves when the file has been removed
  * or rejects with an error
+ * @private
  */
 function deleteFile(path) {
-  throw new Error('Delete of ' + path + ' not supported by gaia hubs');
+  Promise.reject(new Error('Delete of ' + path + ' not supported by gaia hubs'));
 }
 
 exports.connectToGaiaHub = _hub.connectToGaiaHub;
