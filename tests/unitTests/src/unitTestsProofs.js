@@ -22,38 +22,40 @@ function mockRequests() {
 function testProofs(profile, username, totalProofs) {
   mockRequests()
 
-  blueTest('Profiles', (t) =>  validateProofs(profile, username).then((proofs) => {
+  blueTest('Profiles', (t) =>  validateProofs(profile, undefined, username).then((proofs) => {
     t.ok(proofs, 'Proofs must have been created')
     t.equal(proofs instanceof Array, true, 'Proofs should be an Array')
     t.equal(proofs.length, totalProofs, 'Should have a proof for each of the 3 claimed accounts')
+    t.equal(proofs.filter(x => x.valid).length, totalProofs, 'Should all be valid claims')
     FetchMock.restore()
   }))
 }
 
 function brokenProofs() {
   const naval = sampleVerifications.naval
-  FetchMock.get(naval.facebook.url, naval.facebook.body)
-  FetchMock.get(`${naval.github.url}/raw`, naval.github.body)
-  FetchMock.get(naval.twitter.url, { body: '', status: 400 })
+  // adding a 'b' to the url, so they don't overlap with other mocked fetches.
   const navalAccounts = [{ '@type': 'Account',
                            service: 'facebook',
                            identifier: 'navalr',
                            proofType: 'http',
-                           proofUrl: 'https://facebook.com/navalr/posts/10152190734077261' },
+                           proofUrl: 'https://facebook.com/navalr/posts/10152190734077261b' },
                          { '@type': 'Account',
                            service: 'twitter',
                            identifier: 'naval',
                            proofType: 'http',
-                           proofUrl: 'https://twitter.com/naval/status/486609266212499456' },
+                           proofUrl: 'https://twitter.com/naval/status/486609266212499456b' },
                          { '@type': 'Account',
                            service: 'github',
                            identifier: 'navalr',
                            proofType: 'http',
-                           proofUrl: 'https://gist.github.com/navalr/f31a74054f859ec0ac6a' }]
+                           proofUrl: 'https://gist.github.com/navalr/f31a74054f859ec0ac6ab' }]
 
   test('brokenProofs', (t) => {
+    FetchMock.get(`${naval.facebook.url}b`, naval.facebook.body)
+    FetchMock.get(`${naval.github.url}b/raw`, naval.github.body)
+    FetchMock.get(`${naval.twitter.url}b`, { body: '', status: 400 })
     t.plan(2)
-    validateProofs({ account: navalAccounts }, 'naval.id')
+    validateProofs({ account: navalAccounts }, undefined, 'naval.id')
       .then((proofs) => {
         t.equal(proofs.length, 3)
         t.equal(proofs.filter(x => x.valid).length, 2)
