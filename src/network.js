@@ -174,25 +174,25 @@ export class BlockstackNetwork {
       })
   }
 
-  getAccountStatus(address: string, tokenType: string, blockHeight: number) {
+  getAccountStatus(address: string, tokenType: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/status`)
       .then(resp => {
         if (resp.status === 404) {
-          throw new Error("Account not found")
+          throw new Error('Account not found')
         } else if (resp.status !== 200) {
           throw new Error(`Bad response status: ${resp.status}`)
         } else {
           return resp.json()
         }
       })
-      .then(accountStatus => {
+      .then(accountStatus => 
         // coerce all addresses, and convert credit/debit to biginteger
-        return Object.assign({}, accountStatus, {
+        Object.assign({}, accountStatus, {
           address: this.coerceAddress(accountStatus.address),
           debit_value: bigi.fromByteArrayUnsigned(String(accountStatus.debit_value)),
           credit_value: bigi.fromByteArrayUnsigned(String(accountStatus.credit_value))
         })
-      })
+      )
   }
         
   /**

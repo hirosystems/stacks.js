@@ -133,5 +133,6 @@ function isAccountSpendable(address: string, tokenType: string, blockHeight: num
 
 export const safety = {
   addressCanReceiveName, isInGracePeriod, ownsName, isNameAvailable, isNameValid,
-  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady, namespaceIsRevealed
+  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady, namespaceIsRevealed,
+  isAccountSpendable
 }
