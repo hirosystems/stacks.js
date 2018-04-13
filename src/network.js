@@ -1,6 +1,7 @@
 /* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
+import bigi from 'bigi'
 import { MissingParameterError, RemoteServiceError } from './errors'
 
 type UTXO = { value?: number,
@@ -44,37 +45,36 @@ export class BlockstackNetwork {
     return this.coerceAddress('1111111111111111111114oLvT2')
   }
 
-  getNamePrice(fullyQualifiedName: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
+
+  getNamePrice(fullyQualifiedName: string) : Promise<*> {
+    return fetch(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
-      .then(x => x.name_price.satoshis)
-      .then(satoshis => {
-        if (satoshis) {
-          if (satoshis < this.DUST_MINIMUM) {
-            return this.DUST_MINIMUM
-          } else {
-            return satoshis
-          }
-        } else {
-          throw new Error('Failed to parse price of name')
+      .then(resp => resp.name_price)
+      .then(namePrice => {
+        if (!namePrice) {
+          throw new Error(
+            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`)
         }
+        const result = {
+          units: namePrice.units,
+          amount: bigi.fromByteArrayUnsigned(namePrice.amount)
+        }
+        return result
       })
   }
 
-  getNamespacePrice(namespaceID: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
+  getNamespacePrice(namespaceID: string) : Promise<*> {
+    return fetch(`${this.blockstackAPIUrl}/v2/prices/namespaces/${namespaceID}`)
       .then(resp => resp.json())
-      .then(x => x.satoshis)
-      .then(satoshis => {
-        if (satoshis) {
-          if (satoshis < this.DUST_MINIMUM) {
-            return this.DUST_MINIMUM
-          } else {
-            return satoshis
-          }
-        } else {
-          throw new Error('Failed to parse price of namespace')
+      .then(namespacePrice => {
+        if (!namespacePrice) {
+          throw new Error(`Failed to get price for ${namespaceID}`)
         }
+        const result = {
+          units: namespacePrice.units,
+          amount: bigi.fromByteArrayUnsigned(namespacePrice.amount)
+        }
+        return result
       })
   }
 
@@ -174,6 +174,27 @@ export class BlockstackNetwork {
       })
   }
 
+  getAccountStatus(address: string, tokenType: string, blockHeight: number) {
+    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/status`)
+      .then(resp => {
+        if (resp.status === 404) {
+          throw new Error("Account not found")
+        } else if (resp.status !== 200) {
+          throw new Error(`Bad response status: ${resp.status}`)
+        } else {
+          return resp.json()
+        }
+      })
+      .then(accountStatus => {
+        // coerce all addresses, and convert credit/debit to biginteger
+        return Object.assign({}, accountStatus, {
+          address: this.coerceAddress(accountStatus.address),
+          debit_value: bigi.fromByteArrayUnsigned(String(accountStatus.debit_value)),
+          credit_value: bigi.fromByteArrayUnsigned(String(accountStatus.credit_value))
+        })
+      })
+  }
+        
   /**
    * Performs a POST request to the given URL
    * @param  {String} endpoint  the name of
