@@ -9,10 +9,12 @@ import { makePreorderSkeleton, makeRegisterSkeleton,
          makeRevokeSkeleton, makeNamespacePreorderSkeleton,
          makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
          makeNameImportSkeleton, makeAnnounceSkeleton,
+         makeTokenTransferSkeleton,
          BlockstackNamespace } from './skeletons'
 import { config } from '../config'
 import { hexStringToECPair } from '../utils'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
+import BigInteger from 'bigi'
 
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
@@ -382,6 +384,35 @@ function estimateAnnounce(messageHash: string,
     })
 }
 
+/**
+ * Estimates the cost of a token-transfer transaction
+ * @param {String} recipientAddress - the recipient of the tokens
+ * @param {String} tokenType - the type of token to spend
+ * @param {Object} tokenAmount - a 64-bit unsigned BigInteger encoding the number of tokens
+ *   to spend
+ * @param {String} scratchArea - an arbitrary string to store with the transaction
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *  fund this token-transfer transaction
+ */
+function estimateTokenTransfer(recipientAddress: string, 
+                               tokenType: string, 
+                               tokenAmount: BigInteger, 
+                               scratchArea: string,
+                               senderUtxos: number = 1) {
+  const network = config.network
+  const tokenTransferTX = makeTokenTransferSkeleton(
+    recipientAddress, dummyConsensusHash, tokenType, tokenAmount, scratchArea)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(tokenTransferTX)
+      const txFee = feeRate * estimateTXBytes(tokenTransferTX, senderUtxos, 1)
+      return txFee + outputsValue
+    })
+}
+ 
 /**
  * Generates a preorder transaction for a domain name.
  * @param {String} fullyQualifiedName - the name to pre-order
@@ -879,6 +910,42 @@ function makeAnnounce(messageHash: string, senderKeyHex: string) {
 }
 
 /**
+ * Generates a token-transfer transaction 
+ * @param {String} recipientAddress - the address to receive the tokens
+ * @param {String} tokenType - the type of tokens to send
+ * @param {Object} tokenAmount - the BigInteger encoding of an unsigned 64-bit number of
+ *  tokens to send
+ * @param {String} scratchArea - an arbitrary string to include with the transaction
+ * @param {String} senderKeyHex - the hex-encoded private key to send the tokens
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * This function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+function makeTokenTransfer(recipientAddress: string, tokenType: string,
+                           tokenAmount: BigInteger, scratchArea: string,
+                           senderKeyHex: string) {
+  const network = config.network
+
+  const senderKey = hexStringToECPair(senderKeyHex)
+  const senderAddress = senderKey.getAddress()
+
+  const txPromise = Promise.all([network.getConsensusHash()])
+    .then(([consensusHash]) =>  makeTokenTransferSkeleton(
+        recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
+
+  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate(), txPromise])
+    .then(([utxos, feeRate, tokenTransferTX]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+      const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, senderKey)
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+/**
  * Generates a bitcoin spend to a specified address. This will fund up to `amount`
  *   of satoshis from the payer's UTXOs. It will generate a change output if and only
  *   if the amount of leftover change is *greater* than the additional fees associated
@@ -958,8 +1025,8 @@ function makeBitcoinSpend(destinationAddress: string,
 export const transactions = {
   makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeRevoke,
   makeNamespacePreorder, makeNamespaceReveal, makeNamespaceReady, makeBitcoinSpend,
-  makeNameImport, makeAnnounce, BlockstackNamespace,
+  makeNameImport, makeAnnounce, makeTokenTransfer, BlockstackNamespace,
   estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal,
   estimateRevoke, estimateNamespacePreorder, estimateNamespaceReveal, estimateNamespaceReady,
-  estimateNameImport, estimateAnnounce
+  estimateNameImport, estimateAnnounce, estimateTokenTransfer
 }
