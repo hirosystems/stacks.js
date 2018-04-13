@@ -30,6 +30,38 @@ function testProofs(profile, username, totalProofs) {
   }))
 }
 
+function brokenProofs() {
+  const naval = sampleVerifications.naval
+  FetchMock.get(naval.facebook.url, naval.facebook.body)
+  FetchMock.get(`${naval.github.url}/raw`, naval.github.body)
+  FetchMock.get(naval.twitter.url, { body: '', status: 400 })
+  const navalAccounts = [{ '@type': 'Account',
+                           service: 'facebook',
+                           identifier: 'navalr',
+                           proofType: 'http',
+                           proofUrl: 'https://facebook.com/navalr/posts/10152190734077261' },
+                         { '@type': 'Account',
+                           service: 'twitter',
+                           identifier: 'naval',
+                           proofType: 'http',
+                           proofUrl: 'https://twitter.com/naval/status/486609266212499456' },
+                         { '@type': 'Account',
+                           service: 'github',
+                           identifier: 'navalr',
+                           proofType: 'http',
+                           proofUrl: 'https://gist.github.com/navalr/f31a74054f859ec0ac6a' }]
+
+  test('brokenProofs', (t) => {
+    t.plan(2)
+    validateProofs({ account: navalAccounts }, 'naval.id')
+      .then((proofs) => {
+        t.equal(proofs.length, 3)
+        t.equal(proofs.filter(x => x.valid).length, 2)
+        FetchMock.restore()
+      })
+  })
+}
+
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
     t.plan(7)
@@ -335,4 +367,6 @@ export function runProofsUnitTests() {
   // Proof HTML
   testProofs(sampleProfiles.naval, 'naval.id', 3)
   testProofs(sampleProfiles.larry, 'larry.id', 1)
+  // Broken proofs
+  brokenProofs()
 }

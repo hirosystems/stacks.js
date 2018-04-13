@@ -10,9 +10,9 @@ import { profileServices } from './services'
  * @param {string} [name=null] The Blockstack name to be validated 
  * @returns {Promise} that resolves to an array of validated proof objects
  */
-export function validateProofs(profile: Object, 
-                                ownerAddress: string, 
-                                name: ?string = null) {
+export function validateProofs(profile: Object,
+                               ownerAddress: string,
+                               name: ?string = null) {
   if (!profile) {
     throw new Error('Profile must not be null')
   }
@@ -24,7 +24,7 @@ export function validateProofs(profile: Object,
     accounts = profile.account
   } else {
     return new Promise((resolve) => {
-      resolve([])  
+      resolve([])
     })
   }
 
@@ -48,10 +48,8 @@ export function validateProofs(profile: Object,
       valid: false
     }
 
-    proofsToValidate.push(new Promise((resolve) => {
-      resolve(profileServices[account.service]
-        .validateProof(proof, ownerAddress, name))
-    }))
+    proofsToValidate.push(profileServices[account.service]
+                          .validateProof(proof, ownerAddress, name))
   })
 
   return Promise.all(proofsToValidate)
