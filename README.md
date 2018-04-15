@@ -40,7 +40,7 @@ The authentication portion of this library can be used to:
 
 The profiles/identity portion of this library can be used to:
 
-1.  transform a JSON profile into cryptographically-signed signed tokens
+1.  transform a JSON profile into cryptographically-signed tokens
 2.  recover a JSON profile from signed tokens
 3.  validate signed profile tokens
 
