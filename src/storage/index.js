@@ -119,11 +119,13 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
- * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+ *                                                  or the provided public key
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-export function putFile(path: string, content: string | Buffer, options?: {encrypt?: boolean}) {
+export function putFile(path: string, content: string | Buffer,
+  options?: {encrypt?: boolean | string}) {
   const defaults = {
     encrypt: true
   }
@@ -135,8 +137,11 @@ export function putFile(path: string, content: string | Buffer, options?: {encry
     contentType = 'application/octet-stream'
   }
   if (opt.encrypt) {
-    const privateKey = loadUserData().appPrivateKey
-    const publicKey = getPublicKeyFromPrivate(privateKey)
+    let publicKey = opt.encrypt
+    if (typeof(opt.encrypt) !== 'string') {
+      const privateKey = loadUserData().appPrivateKey
+      publicKey = getPublicKeyFromPrivate(privateKey)
+    }
     const cipherObject = encryptECIES(publicKey, content)
     content = JSON.stringify(cipherObject)
     contentType = 'application/json'
