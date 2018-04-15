@@ -39,7 +39,7 @@ class Instagram extends Service {
     const $ = cheerio.load(searchText)
     const username = $('meta[property="og:description"]').attr('content')
     if (username !== undefined && username.split(':').length > 1) {
-      return username.split(':')[0].match(/\(([^)]+)\)/)[1].substr(1)
+      return username.split(':')[0].match(/(@\w+)/)[0].substr(1)
     } else {
       return ''
     }
