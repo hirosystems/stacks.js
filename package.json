@@ -1,7 +1,7 @@
 {
   "name": "blockstack",
   "version": "17.2.0",
-  "description": "The Blockstack Javascript library for identity and authentication.",
+  "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
