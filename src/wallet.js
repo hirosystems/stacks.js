@@ -64,12 +64,17 @@ export class BlockstackWallet {
 
   getBitcoinNode(addressIndex: number, chainType: string = EXTERNAL_ADDRESS): HDNode {
     return BlockstackWallet.getNodeFromBitcoinKeychain(
-      this.getBitcoinPrivateKeychain(), addressIndex, chainType)
+      this.getBitcoinPrivateKeychain().toBase58(),
+      addressIndex, chainType)
   }
 
   getIdentityAddressNode(identityIndex: number): HDNode {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
     return identityPrivateKeychain.deriveHardened(identityIndex)
+  }
+
+  static getAppsNode(identityNode: HDNode): HDNode {
+    return identityNode.deriveHardened(APPS_NODE_INDEX)
   }
 
   getIdentitySalt(): string {
@@ -94,7 +99,7 @@ export class BlockstackWallet {
     return this.getIdentityPrivateKeychain().neutered().toBase58()
   }
 
-  static getNodeFromBitcoinKeychain(keychain: HDNode, addressIndex: number,
+  static getNodeFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
                                     chainType: string = EXTERNAL_ADDRESS): HDNode {
     let chain
     if (chainType === EXTERNAL_ADDRESS) {
@@ -104,19 +109,16 @@ export class BlockstackWallet {
     } else {
       throw new Error('Invalid chain type')
     }
+    const keychain = HDNode.fromBase58(keychainBase58)
 
     return keychain.derive(chain).derive(addressIndex)
   }
 
-  static getAddressFromBitcoinKeychain(keychain: HDNode, addressIndex: number,
+  static getAddressFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
                                        chainType: string = EXTERNAL_ADDRESS): string {
     return BlockstackWallet
-      .getNodeFromBitcoinKeychain(keychain, addressIndex, chainType)
+      .getNodeFromBitcoinKeychain(keychainBase58, addressIndex, chainType)
       .getAddress()
-  }
-
-  static getAppsNode(identityNode: HDNode): HDNode {
-    return identityNode.deriveHardened(APPS_NODE_INDEX)
   }
 
   static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
