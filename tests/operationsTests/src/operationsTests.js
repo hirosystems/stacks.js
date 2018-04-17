@@ -38,33 +38,43 @@ function initializeBlockstackCore() {
                         '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 ' +
                         '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 ' +
                         'quay.io/blockstack/integrationtests:develop ' +
-                        'blockstack-test-scenario --interactive-web 30001 ' +
+                        'blockstack-test-scenario --interactive 2 ' +
                         'blockstack_integration_tests.scenarios.portal_test_env'))
       .then(() => {
         console.log('Started regtest container, waiting until initialized')
         return pExec('docker logs -f test-bsk-core | grep -q \'Test finished\'')
       })
+      .then(() => {
+        // try to avoid race with nextBlock()
+        console.log("Wait 10 seconds for test server to bind")
+        return new Promise((resolve) => setTimeout(resolve, 10000))
+      })
   }
 }
 
 function nextBlock(numBlocks) {
-  const options = {
-    method: 'POST'
-  }
+  if (BLOCKSTACK_TEST) {
+    const options = {
+      method: 'POST'
+    }
 
-  if (!!numBlocks) {
-    options.body = `numblocks=${numBlocks}`
-  }
+    if (!!numBlocks) {
+      options.body = `numblocks=${numBlocks}`
+    }
 
-  const url = 'http://localhost:30001/nextblock'
-  return fetch(url, options)
-    .then((resp) => {
-      if (resp.status >= 400) {
-        throw new Error(`Bad test framework status: ${resp.status}`)
-      } else {
-        return true
-      }
-    })
+    const url = 'http://localhost:30001/nextblock'
+    return fetch(url, options)
+      .then((resp) => {
+        if (resp.status >= 400) {
+          throw new Error(`Bad test framework status: ${resp.status}`)
+        } else {
+          return true
+        }
+      })
+  }
+  else {
+    return new Promise((resolve) => setTimeout(resolve, 5000))
+  })
 }
 
 function shutdownBlockstackCore() {
