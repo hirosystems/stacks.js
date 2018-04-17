@@ -74,7 +74,7 @@ function nextBlock(numBlocks) {
   }
   else {
     return new Promise((resolve) => setTimeout(resolve, 5000))
-  })
+  }
 }
 
 function shutdownBlockstackCore() {
