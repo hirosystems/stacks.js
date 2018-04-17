@@ -14,6 +14,8 @@ export {
   isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString
 } from './utils'
 
+export { BlockstackWallet, IdentityKeyPair } from './wallet'
+
 export { transactions, safety } from './operations'
 
 export { network } from './network'
