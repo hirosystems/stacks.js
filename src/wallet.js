@@ -41,13 +41,38 @@ function getNodePublicKey(hdNode): string {
   return hdNode.keyPair.getPublicKeyBuffer().toString('hex')
 }
 
+/**
+ * The BlockstackWallet class manages the hierarchical derivation
+ *  paths for a standard blockstack client wallet. This includes paths
+ *  for bitcoin payment address, blockstack identity addresses, blockstack
+ *  application specific addresses.
+ */
 export class BlockstackWallet {
   rootNode: HDNode
 
-  constructor(seed: Buffer) {
-    this.rootNode = HDNode.fromSeedBuffer(seed)
+  constructor(rootNode: HDNode) {
+    this.rootNode = rootNode
   }
 
+  /**
+   * Initialize a blockstack wallet
+   * @param {Buffer} seed - the input seed for initializing the root node
+   *  of the hierarchical wallet
+   * @return {BlockstackWallet} the constructed wallet
+   */
+  static fromSeedBuffer(seed: Buffer): BlockstackWallet {
+    return new BlockstackWallet(HDNode.fromSeedBuffer(seed))
+  }
+
+  /**
+   * Initialize a blockstack wallet
+   * @param {string} keychain - the Base58 string used to initialize
+   *  the root node of the hierarchical wallet
+   * @return {BlockstackWallet} the constructed wallet
+   */
+  static fromBase58(keychain: string): BlockstackWallet {
+    return new BlockstackWallet(HDNode.fromBase58(keychain))
+  }
 
   getIdentityPrivateKeychain(): HDNode {
     return this.rootNode
@@ -77,24 +102,48 @@ export class BlockstackWallet {
     return identityNode.deriveHardened(APPS_NODE_INDEX)
   }
 
+  /**
+   * Get a salt for use with creating application specific addresses
+   * @return {String} the salt
+   */
   getIdentitySalt(): string {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
     const publicKeyHex = getNodePublicKey(identityPrivateKeychain)
     return crypto.createHash('sha256').update(publicKeyHex).digest('hex')
   }
 
+  /**
+   * Get a bitcoin receive address at a given index
+   * @param {number} addressIndex - the index of the address
+   * @return {String} address
+   */
   getBitcoinAddress(addressIndex: number): string {
     return this.getBitcoinNode(addressIndex).getAddress()
   }
 
+  /**
+   * Get the private key hex-string for a given bitcoin receive address
+   * @param {number} addressIndex - the index of the address
+   * @return {String} the hex-string. this will be either 64
+   * characters long to denote an uncompressed bitcoin address, or 66
+   * characters long for a compressed bitcoin address.
+   */
   getBitcoinPrivateKey(addressIndex: number): string {
     return getNodePrivateKey(this.getBitcoinNode(addressIndex))
   }
 
+  /**
+   * Get the root node for the bitcoin public keychain
+   * @return {String} base58-encoding of the public node
+   */
   getBitcoinPublicKeychain(): string {
     return this.getBitcoinPrivateKeychain().neutered().toBase58()
   }
 
+  /**
+   * Get the root node for the identity public keychain
+   * @return {String} base58-encoding of the public node
+   */
   getIdentityPublicKeychain(): string {
     return this.getIdentityPrivateKeychain().neutered().toBase58()
   }
@@ -114,6 +163,15 @@ export class BlockstackWallet {
     return keychain.derive(chain).derive(addressIndex)
   }
 
+  /**
+   * Get a bitcoin address given a base-58 encoded bitcoin node
+   * (usually called the account node)
+   * @param {String} keychainBase58 - base58-encoding of the node
+   * @param {number} addressIndex - index of the address to get
+   * @param {String} chainType - either 'EXTERNAL_ADDRESS' (for a
+   * "receive" address) or 'CHANGE_ADDRESS'
+   * @return {String} the address
+   */
   static getAddressFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
                                        chainType: string = EXTERNAL_ADDRESS): string {
     return BlockstackWallet
@@ -121,6 +179,17 @@ export class BlockstackWallet {
       .getAddress()
   }
 
+  /**
+   * Get a ECDSA private key hex-string for an application-specific
+   *  address.
+   * @param {String} appsNodeKey - the base58-encoded private key for
+   * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+   * @param {String} salt - a string, used to salt the
+   * application-specific addresses
+   * @param {String} appDomain - the appDomain to generate a key for
+   * @return {String} the private key hex-string. this will be a 64
+   * character string
+   */
   static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
     const hash = crypto
           .createHash('sha256')
@@ -131,6 +200,20 @@ export class BlockstackWallet {
     return getNodePrivateKey(appNode).slice(0, 64)
   }
 
+  /**
+   * Get the keypair information for a given identity index. This
+   * information is used to obtain the private key for an identity address
+   * and derive application specific keys for that address.
+   * @param {number} addressIndex - the identity index
+   * @param {boolean} alwaysUncompressed - if true, always return a
+   *   private-key hex string corresponding to the uncompressed address
+   * @return {Object} an IdentityKeyPair type object with keys:
+   *   .key {String} - the private key hex-string
+   *   .keyID {String} - the public key hex-string
+   *   .address {String} - the identity address
+   *   .appsNodeKey {String} - the base-58 encoding of the applications node
+   *   .salt {String} - the salt used for creating app-specific addresses
+   */
   getIdentityKeyPair(addressIndex: number, alwaysUncompressed: ?boolean = false): IdentityKeyPair {
     const identityNode = this.getIdentityAddressNode(addressIndex)
 
