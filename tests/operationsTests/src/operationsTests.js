@@ -46,7 +46,7 @@ function initializeBlockstackCore() {
       })
       .then(() => {
         // try to avoid race with nextBlock()
-        console.log("Wait 10 seconds for test server to bind")
+        console.log('Wait 10 seconds for test server to bind')
         return new Promise((resolve) => setTimeout(resolve, 10000))
       })
   }
@@ -71,8 +71,7 @@ function nextBlock(numBlocks) {
           return true
         }
       })
-  }
-  else {
+  } else {
     return new Promise((resolve) => setTimeout(resolve, 5000))
   }
 }
