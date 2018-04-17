@@ -1186,6 +1186,133 @@ function safetyTests() {
     Promise.all(shouldPass)
       .then(() => Promise.all(shouldFail))
   })
+
+  test('namespaceValid', (t) => {
+    t.plan(8)
+
+    const shouldFail = [
+      { namespaceID: '',
+        reason: 'empty string' },
+      {
+        namespaceID: '0123456789abcdefghij',
+        reason: 'too long' },
+      {
+        namespaceID: '01234567.89',
+        reason: 'has a period' },
+      {
+        namespaceID: '.123456789',
+        reason: 'starts with a period' },
+      {
+        namespaceID: 'abcdef#ghi',
+        reason: 'illegal character' }]
+    .map(x => 
+      safety.isNamespaceValid(x.namespaceID).then(
+        passed => t.ok(!passed, `${x.namespaceID} should fail for : ${x.reason}`)))
+
+    const shouldPass = ['0123456789abcdefghi', 'a-b-c', 'a_b_c']
+      .map(x => 
+        safety.isNamespaceValid(x).then(
+          passed => t.ok(passed, `${x} should pass`)))
+
+    Promise.all(shouldPass)
+      .then(() => Promise.all(shouldFail))
+  })
+
+  test('namespaceAvailable', (t) => {
+    t.plan(3)
+    FetchMock.restore()
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { body: 'Namespace available', status: 404 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test2',
+                  { address: testAddresses[0].address })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
+                  { body: 'Some error', status: 400 })
+
+    const errorCheck = safety.isNamespaceAvailable('test3').then(() => false).catch(() => true)
+    Promise.all([safety.isNamespaceAvailable('test'),
+                 safety.isNamespaceAvailable('test2'),
+                 errorCheck])
+      .then(([t0, t1, t2]) => {
+        t.ok(t0, 'test should be available')
+        t.ok(!t1, 'test2 isn\'t available')
+        t.ok(t2, 'test3 isn\'t available')
+      })
+  })
+
+  test('revealedNamespace', (t) => {
+    t.plan(4)
+    FetchMock.restore()
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                { recipient_address: testAddresses[0].address })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test2',
+                { recipient_address: testAddresses[1].address })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
+                { body: 'Namespace not found', status: 404 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4',
+                { body: 'Some error', status: 400 })
+
+    const errorCheck = safety.revealedNamespace('test3', testAddresses[0].address)
+      .then(() => false).catch(() => true)
+
+    Promise.all([safety.revealedNamespace('test', testAddresses[0].address),
+                 safety.revealedNamespace('test2', testAddresses[0].address),
+                 safety.revealedNamespace('test3', testAddresses[0].address),
+                 errorCheck])
+      .then(([t0, t1, t2, t3]) => {
+        t.ok(t0, `test should be revealed by ${testAddresses[0].address}`)
+        t.ok(!t1, `test2 isn't revealed by ${testAddresses[0].address}`)
+        t.ok(!t2, 'test3 isn\'t available')
+        t.ok(!t3, 'test4 isn\'t resolvable')
+      })
+  })
+
+  test('namespaceIsReady', (t) => {
+    t.plan(4)
+    FetchMock.restore()
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test', { ready: true })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test2', { ready: false })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3', 
+                { body: 'Namespace not found', status: 404 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4', 
+                { body: 'Some other error', status: 400 })
+
+    const errorCheck = Promise.resolve().then(() => false).catch(() => true)
+
+    Promise.all([safety.namespaceIsReady('test'),
+                 safety.namespaceIsReady('test2'),
+                 safety.namespaceIsReady('test3'),
+                 errorCheck])
+      .then(([t0, t1, t2, t3]) => {
+        t.ok(t0, 'test should be ready')
+        t.ok(!t1, 'test2 should not be ready')
+        t.ok(!t2, 'test3 should not be ready')
+        t.ok(!t3, 'test4 should not be ready')
+      })
+  })
+
+  test('namespaceIsRevealed', (t) => {
+    t.plan(4)
+    FetchMock.restore()
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test', { ready: false })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test2', { ready: true })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3', 
+                { body: 'Namespace not found', status: 404 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4', 
+                { body: 'Some other error', status: 400 })
+
+    const errorCheck = Promise.resolve().then(() => false).catch(() => true)
+
+    Promise.all([safety.namespaceIsRevealed('test'),
+                 safety.namespaceIsRevealed('test2'),
+                 safety.namespaceIsRevealed('test3'),
+                 errorCheck])
+      .then(([t0, t1, t2, t3]) => {
+        t.ok(t0, 'test should be revealed')
+        t.ok(!t1, 'test2 should not be revealed')
+        t.ok(!t2, 'test3 should not be revealed')
+        t.ok(!t3, 'test4 should not be revealed')
+      })
+  })
 }
 
 
