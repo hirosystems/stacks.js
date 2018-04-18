@@ -37,6 +37,7 @@ function initializeBlockstackCore() {
                         '-e BLOCKSTACK_TEST_CLIENT_RPC_PORT=16268 ' +
                         '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 ' +
                         '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 ' +
+                        '-e BLOCKSTACK_WEB_TEST_BIND=0.0.0.0 ' +
                         'quay.io/blockstack/integrationtests:develop ' +
                         'blockstack-test-scenario --interactive 2 ' +
                         'blockstack_integration_tests.scenarios.portal_test_env'))
