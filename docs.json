@@ -476,7 +476,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -809,7 +809,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1063,7 +1063,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1340,7 +1340,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1512,7 +1512,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1749,7 +1749,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2161,7 +2161,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2852,7 +2852,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3134,7 +3134,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3515,7 +3515,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -3901,7 +3901,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4256,7 +4256,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4890,7 +4890,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5286,7 +5286,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5667,7 +5667,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -6287,7 +6287,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -6902,7 +6902,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7356,7 +7356,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7699,7 +7699,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8226,7 +8226,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -8680,7 +8680,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -9596,7 +9596,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -9997,7 +9997,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -10317,7 +10317,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -11098,7 +11098,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -11982,7 +11982,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/aulneau/blockstack/dev-tools/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
