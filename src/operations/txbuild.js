@@ -22,7 +22,7 @@ function addOwnerInput(utxos: Object,
                        txB: bitcoinjs.TransactionBuilder,
                        addChangeOut: boolean = true) {
   // add an owner UTXO and a change out.
-  if (utxos.length < 0) {
+  if (utxos.length <= 0) {
     throw new Error('Owner has no UTXOs for UPDATE.')
   }
 
