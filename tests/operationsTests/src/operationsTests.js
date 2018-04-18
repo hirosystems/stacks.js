@@ -206,7 +206,7 @@ export function runIntegrationTests() {
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
     const destAddress = hexStringToECPair(dest).getAddress()
 
-    const btcDest = '897f1b92041b798580f96b8be379053f6276f04eb7590a9042a62059d46d6fc301'
+    const btcDest = '3ad9f690cc7694572fe7574526ad260ff2e711d608d3224895efd932b1d47c7201'
     const btcDestAddress = hexStringToECPair(btcDest).getAddress()
 
     const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
@@ -363,7 +363,7 @@ export function runIntegrationTests() {
       })
       .then(() => myNet.getUTXOs(btcDestAddress))
       .then((utxos) => {
-        t.equal(utxos.length, 2, `Destination address ${btcDestAddress} should have 1 UTXO`)
+        t.equal(utxos.length, 1, `Destination address ${btcDestAddress} should have 1 UTXO`)
         const satoshis = utxos.reduce((agg, utxo) => agg + utxo.value, 0)
         console.log(`${btcDestAddress} has ${satoshis} satoshis`)
       })
