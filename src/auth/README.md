@@ -62,7 +62,8 @@ if (blockstack.isUserSignedIn()) {
   const userData = blockstack.loadUserData()
   showProfile(userData.profile)
 } else if (blockstack.isSignInPending()) {
-  blockstack.handlePendingSignIn(function(userData) {
+  blockstack.handlePendingSignIn()
+  .then(userData => {
     showProfile(userData.profile)
   })
 }
