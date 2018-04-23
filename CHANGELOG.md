@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The `BlockstackWallet` class in `blockstack.js` supports generating private keys
+  and addresses within the hierarchical derivation scheme used by the Blockstack
+  Browser and supported by the Blockstack ecosystem.
 - `network.BlockstackNetwork.getDefaultBurnAddress()` method to get the default burn address
   regardless of whether or not the code runs in regtest or mainnet.
 - `network.BlockstackNetwork.getNamespacePrice()` method to get the price of a namespace.
