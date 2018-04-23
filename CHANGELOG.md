@@ -52,6 +52,9 @@ as well as the upcoming `/v2/prices/*` endpoints.
 
 ### Changed
 
+- The validateProofs() method should handle errors in proof-checking more seamlessly,
+  properly catching failed promises. Previous error cases which resulted in uncaught
+  exception warnings and null responses should not behave correctly.
 - Modified the transaction builders in `transactions.js` to accept
   `transactions.AmountType` for the price of a name or namespace.  This makes
 them forwards-compatible with the next stable release of Blockstack Core.
