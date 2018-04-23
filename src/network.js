@@ -1,7 +1,6 @@
 /* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
-
 import { MissingParameterError, RemoteServiceError } from './errors'
 
 type UTXO = { value?: number,
@@ -41,6 +40,10 @@ export class BlockstackNetwork {
     return bitcoinjs.address.toBase58Check(addressHash, this.layer1.pubKeyHash)
   }
 
+  getDefaultBurnAddress() {
+    return this.coerceAddress('1111111111111111111114oLvT2')
+  }
+
   getNamePrice(fullyQualifiedName: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
@@ -54,6 +57,23 @@ export class BlockstackNetwork {
           }
         } else {
           throw new Error('Failed to parse price of name')
+        }
+      })
+  }
+
+  getNamespacePrice(namespaceID: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
+      .then(resp => resp.json())
+      .then(x => x.satoshis)
+      .then(satoshis => {
+        if (satoshis) {
+          if (satoshis < this.DUST_MINIMUM) {
+            return this.DUST_MINIMUM
+          } else {
+            return satoshis
+          }
+        } else {
+          throw new Error('Failed to parse price of namespace')
         }
       })
   }
@@ -112,6 +132,44 @@ export class BlockstackNetwork {
           return Object.assign({}, nameInfo, { address: this.coerceAddress(nameInfo.address) })
         } else {
           return nameInfo
+        }
+      })
+  }
+
+  getNamespaceInfo(namespaceID: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
+      .then(resp => {
+        if (resp.status === 404) {
+          throw new Error('Namespace not found')
+        } else if (resp.status !== 200) {
+          throw new Error(`Bad response status: ${resp.status}`)
+        } else {
+          return resp.json()
+        }
+      })
+      .then(namespaceInfo => {
+        // the returned address _should_ be in the correct network ---
+        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  and the regtest transaction generation libraries want to use testnet addresses
+        if (namespaceInfo.address && namespaceInfo.recipient_address) {
+          return Object.assign({}, namespaceInfo, {
+            address: this.coerceAddress(namespaceInfo.address),
+            recipient_address: this.coerceAddress(namespaceInfo.recipient_address)
+          })
+        } else {
+          return namespaceInfo
+        }
+      })
+  }
+
+  getZonefile(zonefileHash: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.text()
+            .then(body => body)
+        } else {
+          throw new Error(`Bad response status: ${resp.status}`)
         }
       })
   }
@@ -542,7 +600,7 @@ export class BitcoindAPI extends BitcoinNetwork {
                             params: [address] }
     const jsonRPCUnspent = { jsonrpc: '1.0',
                              method: 'listunspent',
-                             params: [1, 9999999, [address]] }
+                             params: [0, 9999999, [address]] }
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')

@@ -6,6 +6,8 @@ import FetchMock from 'fetch-mock'
 global.window = {}
 
 import {
+  makeECPrivateKey,
+  getPublicKeyFromPrivate,
   makeAuthRequest,
   makeAuthResponse,
   verifyAuthRequest,
@@ -20,8 +22,11 @@ import {
   isManifestUriValid,
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
+  handlePendingSignIn,
   signUserOut
 } from '../../../lib'
+
+import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
 
@@ -215,7 +220,58 @@ export function runAuthTests() {
         t.true(verifiedResult, 'auth response should be verified')
       })
   })
-  
+
+  test('auth response with invalid private key', (t) => {
+    t.plan(2)
+
+    const url = `${nameLookupURL}ryan.id`
+    // console.log(`URL: ${url}`)
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const appPrivateKey = makeECPrivateKey()
+    const transitPrivateKey = makeECPrivateKey()
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
+    const badTransitPrivateKey = makeECPrivateKey()
+    const metadata = { }
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+                                          metadata, undefined, appPrivateKey, undefined,
+                                          transitPublicKey)
+    // console.log(decodeToken(authResponse))
+    global.window = Object.assign({ }, global.window, {
+      location: {
+        search: `authResponse=${authResponse}`
+      }
+    })
+
+    global.location = global.window.location
+
+    global.localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
+                                badTransitPrivateKey)
+
+    handlePendingSignIn(nameLookupURL)
+      .then(() => {
+        t.fail('Should have failed to decrypt auth response')
+      })
+      .catch((err) => {
+        console.log(err)
+        t.pass('Should fail to decrypt auth response')
+      })
+      .then(() => {
+        global.window.localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
+                                           transitPrivateKey)
+        return handlePendingSignIn(nameLookupURL)
+      })
+      .then(() => {
+        t.pass('Should correctly sign in with correct transit key')
+      })
+      .catch((err) => {
+        console.log(err.stack)
+        t.fail('Should not error')
+      })
+  })
+
   test('signUserOut with redirect', (t) => {
     t.plan(1)
     const startURL = 'https://example.com'
