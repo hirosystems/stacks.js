@@ -327,9 +327,11 @@ function transactionTests() {
     FetchMock.get('https://core.blockstack.org/v1/prices/namespaces/hello',
                   NAMESPACE_PRICE)
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
-                  { version: 2, address: BURN_ADDR })
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
     FetchMock.get('https://core.blockstack.org/v1/blockchains/bitcoin/consensus',
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 601 })
   }
 
   function getInputVals(inputTXArgument, utxoSets = utxoSet) {
@@ -1069,6 +1071,48 @@ function transactionTests() {
       t.equal(error.code, 'missing_parameter')
       t.equal(error.parameter, 'zoneFile')
     })
+  })
+
+  test('getNamespaceBurnAddress: pay to namespace creator before year 1', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 601 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
+    
+    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+      .then((baddr) => {
+        t.equal(baddr, BURN_ADDR, 'Pay to namespace creator in year 1')
+      })
+  })
+
+  test('getNamespaceBurnAddress: pay to burn address after year 1', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 600 + 52595 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
+
+    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+      .then((baddr) => {
+        t.equal(baddr, BURN_ADDR, 'Pay to namespace creator exactly on year 1')
+      })
+  })
+
+  test('getNamespaceBurnAddress: pay to burn address after year 1', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 600 + 52595 + 1 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
+
+    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+      .then((baddr) => {
+        t.equal(baddr, NAMESPACE_BURN_ADDR, 'Pay to burn address after year 1')
+      })
   })
 }
 
