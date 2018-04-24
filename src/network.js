@@ -100,14 +100,10 @@ export class BlockstackNetwork {
       })
       .then(namespaceInfo => {
         let address = '1111111111111111111114oLvT2' // default burn address
-        const blockHeights = Object.keys(namespaceInfo.history)
-        blockHeights.sort((x, y) => (parseInt(x, 10) - parseInt(y, 10)))
-        blockHeights.forEach(blockHeight => {
-          const infoAtBlock = namespaceInfo.history[blockHeight][0]
-          if (infoAtBlock.hasOwnProperty('burn_address')) {
-            address = infoAtBlock.burn_address
-          }
-        })
+        if (namespaceInfo.version === 2) {
+          // pay-to-namespace-creator
+          address = namespaceInfo.address
+        }
         return address
       })
       .then(address => this.coerceAddress(address))
