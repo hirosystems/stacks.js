@@ -327,7 +327,7 @@ function transactionTests() {
     FetchMock.get('https://core.blockstack.org/v1/prices/namespaces/hello',
                   NAMESPACE_PRICE)
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
-                  { history: { 10: [{ burn_address: BURN_ADDR }] } })
+                  { version: 2, address: BURN_ADDR })
     FetchMock.get('https://core.blockstack.org/v1/blockchains/bitcoin/consensus',
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
   }
