@@ -2,6 +2,7 @@
 export const ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',
+  FAILED_DECRYPTION_ERROR: 'failed_decryption_error',
   UNKNOWN: 'unknown'
 }
 
@@ -91,5 +92,13 @@ export class LoginFailedError extends BlockstackError {
     super({ code: 'login_failed', message })
     this.message = message
     this.name = 'LoginFailedError'
+  }
+}
+
+export class FailedDecryptionError extends BlockstackError {
+  constructor(message: ?string) {
+    message = message || 'Unable to decrypt cipher object.'
+    super({ code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message })
+    this.message = message
   }
 }

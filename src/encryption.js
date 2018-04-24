@@ -1,4 +1,5 @@
 import { ec as EllipticCurve } from 'elliptic'
+import { FailedDecryptionError } from './errors'
 import crypto from 'crypto'
 
 const ecurve = new EllipticCurve('secp256k1')
@@ -100,11 +101,19 @@ export function encryptECIES(publicKey: string, content: string | Buffer) {
  *  mac (message authentication code), ephemeralPublicKey
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext
- * @throws {Error} if unable to decrypt
+ * @throws {FailedDecryptionError} if unable to decrypt
  */
 export function decryptECIES(privateKey: string, cipherObject: string) {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
-  const ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic()
+
+  let ephemeralPK = null
+  try {
+    ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic() 
+  } catch (error) {
+    throw new FailedDecryptionError('Unable to get public key from cipher object. ' +
+      'You might be trying to decrypt an unencrypted object.')
+  }
+
   const sharedSecret = ecSK.derive(ephemeralPK)
   const sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex')
 
@@ -114,12 +123,12 @@ export function decryptECIES(privateKey: string, cipherObject: string) {
   const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 new Buffer(ephemeralPK.encodeCompressed()),
-                                 cipherTextBuffer])
+    new Buffer(ephemeralPK.encodeCompressed()),
+    cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = new Buffer(cipherObject.mac, 'hex')
-  if (! equalConstTime(expectedMac, actualMac)) {
-    throw new Error('Decryption failed: failure in MAC check')
+  if (!equalConstTime(expectedMac, actualMac)) {
+    throw new FailedDecryptionError('Decryption failed: failure in MAC check')
   }
   const plainText = aes256CbcDecrypt(
     ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer)

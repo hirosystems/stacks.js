@@ -3,6 +3,7 @@ import test from 'tape-promise/tape'
 import {
  encryptECIES, decryptECIES, getHexFromBN
 } from '../../../lib/encryption'
+import { ERROR_CODES } from '../../../lib/errors'
 
 import elliptic from 'elliptic'
 
@@ -27,7 +28,7 @@ export function runEncryptionTests() {
   })
 
   test('encrypt-to-decrypt fails on bad mac', (t) => {
-    t.plan(1)
+    t.plan(3)
 
     const testString = 'all work and no play makes jack a dull boy'
     const cipherObj = encryptECIES(publicKey, testString)
@@ -41,6 +42,9 @@ export function runEncryptionTests() {
       t.true(false, 'Decryption should have failed when ciphertext modified')
     } catch (e) {
       t.true(true, 'Decryption correctly fails when ciphertext modified')
+      t.equal(e.code, ERROR_CODES.FAILED_DECRYPTION_ERROR, 'Must have proper error code')
+      const assertionMessage = 'Should indicate MAC error'
+      t.notEqual(e.message.indexOf('failure in MAC check'), -1, assertionMessage)
     }
   })
 
@@ -58,5 +62,20 @@ export function runEncryptionTests() {
     })
 
     t.true(results.every((x) => x), 'Evil hexes must all generate 64-len hex strings')
+  })
+
+  test('proper error message when decrypting unencrypted object', (t) => {
+    t.plan(2)
+
+    const cipherObject = 'a plain-text string'
+
+    try {
+      decryptECIES(privateKey, cipherObject)
+      t.true(false, 'Decryption should fail')
+    } catch (e) {
+      t.equal(e.code, ERROR_CODES.FAILED_DECRYPTION_ERROR, 'Must have proper error code')
+      const assertionMessage = 'Should indicate trying to decrypt unencrypted object'
+      t.notEqual(e.message.indexOf('unencrypted'), -1, assertionMessage)
+    }
   })
 }
