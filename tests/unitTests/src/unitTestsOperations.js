@@ -8,6 +8,7 @@ import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
          hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
 
 import { transactions, safety, config } from '../../../lib/'
+import { ERROR_CODES } from '../../../lib/errors'
 
 const testAddresses = [
   { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
@@ -677,7 +678,7 @@ function transactionTests() {
   })
 
   test('fund bitcoin spends', (t) => {
-    t.plan(14)
+    t.plan(15)
     setupMocks()
     const TEST1_AMOUNT = 250000
     const TEST2_AMOUNT = 80000
@@ -705,9 +706,15 @@ function transactionTests() {
                                                 testAddresses[1].skHex,
                                                 TEST2_AMOUNT))
       .then(() => t.fail('Should reject with InvalidAmountError if not enough coin to fund fees.'))
-      .catch((err) => t.equal(
-        err.name, 'InvalidAmountError',
-        'Should reject with InvalidAmountError if not enough coin to fund fees.'))
+      .catch((err) => {
+        t.equal(
+          err.name, 'InvalidAmountError',
+          'Should reject with InvalidAmountError if not enough coin to fund fees.'
+        )
+        t.equal(err.code, ERROR_CODES.INVALID_AMOUNT_ERROR,
+          'Should have proper invalid amount error code'
+        )
+      })
       .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
                                                 testAddresses[1].skHex,
                                                 TEST3_AMOUNT))

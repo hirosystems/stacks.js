@@ -3,6 +3,10 @@ export const ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',
   FAILED_DECRYPTION_ERROR: 'failed_decryption_error',
+  INVALID_DID_ERROR: 'invalid_did_error',
+  NOT_ENOUGH_FUNDS_ERROR: 'not_enough_error',
+  INVALID_AMOUNT_ERROR: 'invalid_amount_error',
+  LOGIN_FAILED_ERROR: 'login_failed',
   UNKNOWN: 'unknown'
 }
 
@@ -32,7 +36,7 @@ export class BlockstackError extends Error {
 
 export class InvalidParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
-    super({ code: 'missing_parameter', message, parameter: '' })
+    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter: '' })
     this.name = 'MissingParametersError'
   }
 }
@@ -55,7 +59,7 @@ export class RemoteServiceError extends BlockstackError {
 
 export class InvalidDIDError extends BlockstackError {
   constructor(message: string = '') {
-    super({ code: 'invalid_did_error', message, param: '' })
+    super({ code: ERROR_CODES.INVALID_DID_ERROR, message, param: '' })
     this.name = 'InvalidDIDError'
     this.message = message
   }
@@ -65,7 +69,7 @@ export class NotEnoughFundsError extends BlockstackError {
   leftToFund: number
   constructor(leftToFund: number) {
     const message = `Not enough UTXOs to fund. Left to fund: ${leftToFund}`
-    super({ code: 'not_enough_error', message })
+    super({ code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message })
     this.leftToFund = leftToFund
     this.name = 'NotEnoughFundsError'
     this.message = message
@@ -78,7 +82,7 @@ export class InvalidAmountError extends BlockstackError {
   constructor(fees: number, specifiedAmount: number) {
     const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},` +
           ` specified spend is  ${specifiedAmount}`
-    super({ code: 'invalid_amount_error', message })
+    super({ code: ERROR_CODES.INVALID_AMOUNT_ERROR, message })
     this.specifiedAmount = specifiedAmount
     this.fees = fees
     this.name = 'InvalidAmountError'
@@ -89,7 +93,7 @@ export class InvalidAmountError extends BlockstackError {
 export class LoginFailedError extends BlockstackError {
   constructor(reason: string) {
     const message = `Failed to login: ${reason}`
-    super({ code: 'login_failed', message })
+    super({ code: ERROR_CODES.LOGIN_FAILED_ERROR, message })
     this.message = message
     this.name = 'LoginFailedError'
   }

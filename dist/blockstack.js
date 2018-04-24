@@ -31,6 +31,8 @@ var _utils = require('../utils');
 
 var _index2 = require('../index');
 
+var _errors = require('../errors');
+
 var _authMessages = require('./authMessages');
 
 var _authConstants = require('./authConstants');
@@ -51,7 +53,8 @@ var DEFAULT_PROFILE = {
    * @return {String} the hex encoded private key
    * @private
    */
-};function generateAndStoreTransitKey() {
+};
+function generateAndStoreTransitKey() {
   var transitKey = (0, _index2.makeECPrivateKey)();
   localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
@@ -175,76 +178,80 @@ function handlePendingSignIn() {
 
   var authResponseToken = getAuthResponseToken();
 
-  return new Promise(function (resolve, reject) {
-    (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
-      if (isValid) {
-        var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
-        // TODO: real version handling
-        var appPrivateKey = tokenPayload.private_key;
-        var coreSessionToken = tokenPayload.core_token;
-        if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.1.0')) {
-          var transitKey = getTransitKey();
-          if (transitKey !== undefined && transitKey != null) {
-            if (appPrivateKey !== undefined && appPrivateKey !== null) {
-              try {
-                appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, appPrivateKey);
-              } catch (e) {
-                console.log('Failed decryption of appPrivateKey, will try to use as given');
-              }
-            }
-            if (coreSessionToken !== undefined && coreSessionToken !== null) {
-              try {
-                coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
-              } catch (e) {
-                console.log('Failed decryption of coreSessionToken, will try to use as given');
-              }
+  return (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
+    if (!isValid) {
+      throw new _errors.LoginFailedError('Invalid authentication response.');
+    }
+    var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
+    // TODO: real version handling
+    var appPrivateKey = tokenPayload.private_key;
+    var coreSessionToken = tokenPayload.core_token;
+    if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.1.0')) {
+      var transitKey = getTransitKey();
+      if (transitKey !== undefined && transitKey != null) {
+        if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
+          try {
+            appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, tokenPayload.private_key);
+          } catch (e) {
+            console.log('Failed decryption of appPrivateKey, will try to use as given');
+            try {
+              (0, _utils.hexStringToECPair)(tokenPayload.private_key);
+            } catch (ecPairError) {
+              throw new _errors.LoginFailedError('Failed decrypting appPrivateKey. Usually means' + ' that the transit key has changed during login.');
             }
           }
         }
-        var hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
-        if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
-          hubUrl = tokenPayload.hubUrl;
-        }
-
-        var userData = {
-          username: tokenPayload.username,
-          profile: tokenPayload.profile,
-          decentralizedID: tokenPayload.iss,
-          identityAddress: (0, _index2.getAddressFromDID)(tokenPayload.iss),
-          appPrivateKey: appPrivateKey,
-          coreSessionToken: coreSessionToken,
-          authResponseToken: authResponseToken,
-          hubUrl: hubUrl
-        };
-        var profileURL = tokenPayload.profile_url;
-        if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
-          fetch(profileURL).then(function (response) {
-            if (!response.ok) {
-              // return blank profile if we fail to fetch
-              userData.profile = Object.assign({}, DEFAULT_PROFILE);
-              window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-              resolve(userData);
-            } else {
-              response.text().then(function (responseText) {
-                return JSON.parse(responseText);
-              }).then(function (wrappedProfile) {
-                return (0, _profiles.extractProfile)(wrappedProfile[0].token);
-              }).then(function (profile) {
-                userData.profile = profile;
-                window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-                resolve(userData);
-              });
-            }
-          });
-        } else {
-          userData.profile = tokenPayload.profile;
-          window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-          resolve(userData);
+        if (coreSessionToken !== undefined && coreSessionToken !== null) {
+          try {
+            coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
+          } catch (e) {
+            console.log('Failed decryption of coreSessionToken, will try to use as given');
+          }
         }
       } else {
-        reject();
+        throw new _errors.LoginFailedError('Authenticating with protocol > 1.1.0 requires transit' + ' key, and none found.');
       }
-    });
+    }
+    var hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+    if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
+      hubUrl = tokenPayload.hubUrl;
+    }
+
+    var userData = {
+      username: tokenPayload.username,
+      profile: tokenPayload.profile,
+      decentralizedID: tokenPayload.iss,
+      identityAddress: (0, _index2.getAddressFromDID)(tokenPayload.iss),
+      appPrivateKey: appPrivateKey,
+      coreSessionToken: coreSessionToken,
+      authResponseToken: authResponseToken,
+      hubUrl: hubUrl
+    };
+    var profileURL = tokenPayload.profile_url;
+    if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
+      return fetch(profileURL).then(function (response) {
+        if (!response.ok) {
+          // return blank profile if we fail to fetch
+          userData.profile = Object.assign({}, DEFAULT_PROFILE);
+          window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+          return userData;
+        } else {
+          return response.text().then(function (responseText) {
+            return JSON.parse(responseText);
+          }).then(function (wrappedProfile) {
+            return (0, _profiles.extractProfile)(wrappedProfile[0].token);
+          }).then(function (profile) {
+            userData.profile = profile;
+            window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+            return userData;
+          });
+        }
+      });
+    } else {
+      userData.profile = tokenPayload.profile;
+      window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
+      return userData;
+    }
   });
 }
 
@@ -271,7 +278,7 @@ function signUserOut() {
     window.location = redirectURL;
   }
 }
-},{"../index":12,"../profiles":20,"../storage":43,"../utils":44,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":263,"jsontokens":356,"query-string":415}],2:[function(require,module,exports){
+},{"../errors":11,"../index":12,"../profiles":20,"../storage":43,"../utils":44,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":263,"jsontokens":356,"query-string":415}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -305,7 +312,7 @@ var _encryption = require('../encryption');
 
 require('isomorphic-fetch');
 
-var VERSION = '1.1.0';
+var VERSION = '1.2.0';
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -603,7 +610,6 @@ function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
     thisDevice = '.default';
   }
 
-  // TODO: multi-device
   var appPublicKey = _jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey);
   var appPublicKeys = [{
     public_key: appPublicKey,
@@ -1292,6 +1298,8 @@ exports.decryptECIES = decryptECIES;
 
 var _elliptic = require('elliptic');
 
+var _errors = require('./errors');
+
 var _crypto = require('crypto');
 
 var _crypto2 = _interopRequireDefault(_crypto);
@@ -1393,11 +1401,18 @@ function encryptECIES(publicKey, content) {
  *  mac (message authentication code), ephemeralPublicKey
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext
- * @throws {Error} if unable to decrypt
+ * @throws {FailedDecryptionError} if unable to decrypt
  */
 function decryptECIES(privateKey, cipherObject) {
   var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
-  var ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
+
+  var ephemeralPK = null;
+  try {
+    ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
+  } catch (error) {
+    throw new _errors.FailedDecryptionError('Unable to get public key from cipher object. ' + 'You might be trying to decrypt an unencrypted object.');
+  }
+
   var sharedSecret = ecSK.derive(ephemeralPK);
   var sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex');
 
@@ -1410,7 +1425,7 @@ function decryptECIES(privateKey, cipherObject) {
   var actualMac = hmacSha256(sharedKeys.hmacKey, macData);
   var expectedMac = new Buffer(cipherObject.mac, 'hex');
   if (!equalConstTime(expectedMac, actualMac)) {
-    throw new Error('Decryption failed: failure in MAC check');
+    throw new _errors.FailedDecryptionError('Decryption failed: failure in MAC check');
   }
   var plainText = aes256CbcDecrypt(ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer);
 
@@ -1421,7 +1436,7 @@ function decryptECIES(privateKey, cipherObject) {
   }
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":157,"crypto":166,"elliptic":282}],11:[function(require,module,exports){
+},{"./errors":11,"buffer":157,"crypto":166,"elliptic":282}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1441,6 +1456,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var ERROR_CODES = exports.ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',
+  FAILED_DECRYPTION_ERROR: 'failed_decryption_error',
+  INVALID_DID_ERROR: 'invalid_did_error',
+  NOT_ENOUGH_FUNDS_ERROR: 'not_enough_error',
+  INVALID_AMOUNT_ERROR: 'invalid_amount_error',
+  LOGIN_FAILED_ERROR: 'login_failed',
   UNKNOWN: 'unknown'
 };
 
@@ -1477,7 +1497,7 @@ var InvalidParameterError = exports.InvalidParameterError = function (_Blockstac
 
     _classCallCheck(this, InvalidParameterError);
 
-    var _this2 = _possibleConstructorReturn(this, (InvalidParameterError.__proto__ || Object.getPrototypeOf(InvalidParameterError)).call(this, { code: 'missing_parameter', message: message, parameter: '' }));
+    var _this2 = _possibleConstructorReturn(this, (InvalidParameterError.__proto__ || Object.getPrototypeOf(InvalidParameterError)).call(this, { code: ERROR_CODES.MISSING_PARAMETER, message: message, parameter: '' }));
 
     _this2.name = 'MissingParametersError';
     return _this2;
@@ -1528,7 +1548,7 @@ var InvalidDIDError = exports.InvalidDIDError = function (_BlockstackError4) {
 
     _classCallCheck(this, InvalidDIDError);
 
-    var _this5 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this, { code: 'invalid_did_error', message: message, param: '' }));
+    var _this5 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this, { code: ERROR_CODES.INVALID_DID_ERROR, message: message, param: '' }));
 
     _this5.name = 'InvalidDIDError';
     _this5.message = message;
@@ -1546,7 +1566,7 @@ var NotEnoughFundsError = exports.NotEnoughFundsError = function (_BlockstackErr
 
     var message = 'Not enough UTXOs to fund. Left to fund: ' + leftToFund;
 
-    var _this6 = _possibleConstructorReturn(this, (NotEnoughFundsError.__proto__ || Object.getPrototypeOf(NotEnoughFundsError)).call(this, { code: 'not_enough_error', message: message }));
+    var _this6 = _possibleConstructorReturn(this, (NotEnoughFundsError.__proto__ || Object.getPrototypeOf(NotEnoughFundsError)).call(this, { code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message: message }));
 
     _this6.leftToFund = leftToFund;
     _this6.name = 'NotEnoughFundsError';
@@ -1565,7 +1585,7 @@ var InvalidAmountError = exports.InvalidAmountError = function (_BlockstackError
 
     var message = 'Not enough coin to fund fees transaction fees. Fees would be ' + fees + ',' + (' specified spend is  ' + specifiedAmount);
 
-    var _this7 = _possibleConstructorReturn(this, (InvalidAmountError.__proto__ || Object.getPrototypeOf(InvalidAmountError)).call(this, { code: 'invalid_amount_error', message: message }));
+    var _this7 = _possibleConstructorReturn(this, (InvalidAmountError.__proto__ || Object.getPrototypeOf(InvalidAmountError)).call(this, { code: ERROR_CODES.INVALID_AMOUNT_ERROR, message: message }));
 
     _this7.specifiedAmount = specifiedAmount;
     _this7.fees = fees;
@@ -1575,6 +1595,41 @@ var InvalidAmountError = exports.InvalidAmountError = function (_BlockstackError
   }
 
   return InvalidAmountError;
+}(BlockstackError);
+
+var LoginFailedError = exports.LoginFailedError = function (_BlockstackError7) {
+  _inherits(LoginFailedError, _BlockstackError7);
+
+  function LoginFailedError(reason) {
+    _classCallCheck(this, LoginFailedError);
+
+    var message = 'Failed to login: ' + reason;
+
+    var _this8 = _possibleConstructorReturn(this, (LoginFailedError.__proto__ || Object.getPrototypeOf(LoginFailedError)).call(this, { code: ERROR_CODES.LOGIN_FAILED_ERROR, message: message }));
+
+    _this8.message = message;
+    _this8.name = 'LoginFailedError';
+    return _this8;
+  }
+
+  return LoginFailedError;
+}(BlockstackError);
+
+var FailedDecryptionError = exports.FailedDecryptionError = function (_BlockstackError8) {
+  _inherits(FailedDecryptionError, _BlockstackError8);
+
+  function FailedDecryptionError(message) {
+    _classCallCheck(this, FailedDecryptionError);
+
+    message = message || 'Unable to decrypt cipher object.';
+
+    var _this9 = _possibleConstructorReturn(this, (FailedDecryptionError.__proto__ || Object.getPrototypeOf(FailedDecryptionError)).call(this, { code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message: message }));
+
+    _this9.message = message;
+    return _this9;
+  }
+
+  return FailedDecryptionError;
 }(BlockstackError);
 },{}],12:[function(require,module,exports){
 'use strict';
@@ -1873,6 +1928,11 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
       return _bitcoinjsLib2.default.address.toBase58Check(addressHash, this.layer1.pubKeyHash);
     }
   }, {
+    key: 'getDefaultBurnAddress',
+    value: function getDefaultBurnAddress() {
+      return this.coerceAddress('1111111111111111111114oLvT2');
+    }
+  }, {
     key: 'getNamePrice',
     value: function getNamePrice(fullyQualifiedName) {
       var _this = this;
@@ -1890,6 +1950,27 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
           }
         } else {
           throw new Error('Failed to parse price of name');
+        }
+      });
+    }
+  }, {
+    key: 'getNamespacePrice',
+    value: function getNamespacePrice(namespaceID) {
+      var _this2 = this;
+
+      return fetch(this.blockstackAPIUrl + '/v1/prices/namespaces/' + namespaceID).then(function (resp) {
+        return resp.json();
+      }).then(function (x) {
+        return x.satoshis;
+      }).then(function (satoshis) {
+        if (satoshis) {
+          if (satoshis < _this2.DUST_MINIMUM) {
+            return _this2.DUST_MINIMUM;
+          } else {
+            return satoshis;
+          }
+        } else {
+          throw new Error('Failed to parse price of namespace');
         }
       });
     }
@@ -1913,7 +1994,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
   }, {
     key: 'getNamespaceBurnAddress',
     value: function getNamespaceBurnAddress(namespace) {
-      var _this2 = this;
+      var _this3 = this;
 
       return fetch(this.blockstackAPIUrl + '/v1/namespaces/' + namespace).then(function (resp) {
         if (resp.status === 404) {
@@ -1935,13 +2016,13 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
         });
         return address;
       }).then(function (address) {
-        return _this2.coerceAddress(address);
+        return _this3.coerceAddress(address);
       });
     }
   }, {
     key: 'getNameInfo',
     value: function getNameInfo(fullyQualifiedName) {
-      var _this3 = this;
+      var _this4 = this;
 
       return fetch(this.blockstackAPIUrl + '/v1/names/' + fullyQualifiedName).then(function (resp) {
         if (resp.status === 404) {
@@ -1956,9 +2037,49 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
         //  blockstackd gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
         if (nameInfo.address) {
-          return Object.assign({}, nameInfo, { address: _this3.coerceAddress(nameInfo.address) });
+          return Object.assign({}, nameInfo, { address: _this4.coerceAddress(nameInfo.address) });
         } else {
           return nameInfo;
+        }
+      });
+    }
+  }, {
+    key: 'getNamespaceInfo',
+    value: function getNamespaceInfo(namespaceID) {
+      var _this5 = this;
+
+      return fetch(this.blockstackAPIUrl + '/v1/namespaces/' + namespaceID).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Namespace not found');
+        } else if (resp.status !== 200) {
+          throw new Error('Bad response status: ' + resp.status);
+        } else {
+          return resp.json();
+        }
+      }).then(function (namespaceInfo) {
+        // the returned address _should_ be in the correct network ---
+        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  and the regtest transaction generation libraries want to use testnet addresses
+        if (namespaceInfo.address && namespaceInfo.recipient_address) {
+          return Object.assign({}, namespaceInfo, {
+            address: _this5.coerceAddress(namespaceInfo.address),
+            recipient_address: _this5.coerceAddress(namespaceInfo.recipient_address)
+          });
+        } else {
+          return namespaceInfo;
+        }
+      });
+    }
+  }, {
+    key: 'getZonefile',
+    value: function getZonefile(zonefileHash) {
+      return fetch(this.blockstackAPIUrl + '/v1/zonefiles/' + zonefileHash).then(function (resp) {
+        if (resp.status === 200) {
+          return resp.text().then(function (body) {
+            return body;
+          });
+        } else {
+          throw new Error('Bad response status: ' + resp.status);
         }
       });
     }
@@ -2213,17 +2334,17 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
   }, {
     key: 'getUTXOs',
     value: function getUTXOs(address) {
-      var _this4 = this;
+      var _this6 = this;
 
       return this.getNetworkedUTXOs(address).then(function (networkedUTXOs) {
         var returnSet = networkedUTXOs.concat();
-        if (_this4.includeUtxoMap.hasOwnProperty(address)) {
-          returnSet = networkedUTXOs.concat(_this4.includeUtxoMap[address]);
+        if (_this6.includeUtxoMap.hasOwnProperty(address)) {
+          returnSet = networkedUTXOs.concat(_this6.includeUtxoMap[address]);
         }
 
         // aaron: I am *well* aware this is O(n)*O(m) runtime
         //    however, clients should clear the exclude set periodically
-        var excludeSet = _this4.excludeUtxoSet;
+        var excludeSet = _this6.excludeUtxoSet;
         returnSet = returnSet.filter(function (utxo) {
           var inExcludeSet = excludeSet.reduce(function (inSet, utxoToCheck) {
             return inSet || utxoToCheck.tx_hash === utxo.tx_hash && utxoToCheck.tx_output_n === utxo.tx_output_n;
@@ -2247,7 +2368,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
   }, {
     key: 'modifyUTXOSetFrom',
     value: function modifyUTXOSetFrom(txHex) {
-      var _this5 = this;
+      var _this7 = this;
 
       var tx = _bitcoinjsLib2.default.Transaction.fromHex(txHex);
 
@@ -2267,18 +2388,18 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
         if (_bitcoinjsLib2.default.script.classifyOutput(utxoCreated.script) === 'nulldata') {
           return;
         }
-        var address = _bitcoinjsLib2.default.address.fromOutputScript(utxoCreated.script, _this5.layer1);
+        var address = _bitcoinjsLib2.default.address.fromOutputScript(utxoCreated.script, _this7.layer1);
 
         var includeSet = [];
-        if (_this5.includeUtxoMap.hasOwnProperty(address)) {
-          includeSet = includeSet.concat(_this5.includeUtxoMap[address]);
+        if (_this7.includeUtxoMap.hasOwnProperty(address)) {
+          includeSet = includeSet.concat(_this7.includeUtxoMap[address]);
         }
 
         includeSet.push({ tx_hash: txHash,
           confirmations: 0,
           value: utxoCreated.value,
           tx_output_n: txOutputN });
-        _this5.includeUtxoMap[address] = includeSet;
+        _this7.includeUtxoMap[address] = includeSet;
       });
     }
   }, {
@@ -2371,11 +2492,11 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
   function BitcoindAPI(bitcoindUrl, bitcoindCredentials) {
     _classCallCheck(this, BitcoindAPI);
 
-    var _this7 = _possibleConstructorReturn(this, (BitcoindAPI.__proto__ || Object.getPrototypeOf(BitcoindAPI)).call(this));
+    var _this9 = _possibleConstructorReturn(this, (BitcoindAPI.__proto__ || Object.getPrototypeOf(BitcoindAPI)).call(this));
 
-    _this7.bitcoindUrl = bitcoindUrl;
-    _this7.bitcoindCredentials = bitcoindCredentials;
-    return _this7;
+    _this9.bitcoindUrl = bitcoindUrl;
+    _this9.bitcoindCredentials = bitcoindCredentials;
+    return _this9;
   }
 
   _createClass(BitcoindAPI, [{
@@ -2412,7 +2533,7 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
   }, {
     key: 'getTransactionInfo',
     value: function getTransactionInfo(txHash) {
-      var _this8 = this;
+      var _this10 = this;
 
       var jsonRPC = { jsonrpc: '1.0',
         method: 'gettransaction',
@@ -2432,7 +2553,7 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
           method: 'getblockheader',
           params: [blockhash] };
         headers.append('Authorization', 'Basic ' + authString);
-        return fetch(_this8.bitcoindUrl, { method: 'POST',
+        return fetch(_this10.bitcoindUrl, { method: 'POST',
           body: JSON.stringify(jsonRPCBlock),
           headers: headers });
       }).then(function (resp) {
@@ -2444,21 +2565,21 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
   }, {
     key: 'getNetworkedUTXOs',
     value: function getNetworkedUTXOs(address) {
-      var _this9 = this;
+      var _this11 = this;
 
       var jsonRPCImport = { jsonrpc: '1.0',
         method: 'importaddress',
         params: [address] };
       var jsonRPCUnspent = { jsonrpc: '1.0',
         method: 'listunspent',
-        params: [1, 9999999, [address]] };
+        params: [0, 9999999, [address]] };
       var authString = Buffer.from(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password).toString('base64');
       var headers = new Headers({ Authorization: 'Basic ' + authString });
 
       return fetch(this.bitcoindUrl, { method: 'POST',
         body: JSON.stringify(jsonRPCImport),
         headers: headers }).then(function () {
-        return fetch(_this9.bitcoindUrl, { method: 'POST',
+        return fetch(_this11.bitcoindUrl, { method: 'POST',
           body: JSON.stringify(jsonRPCUnspent),
           headers: headers });
       }).then(function (resp) {
@@ -2487,10 +2608,10 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
 
     _classCallCheck(this, InsightClient);
 
-    var _this10 = _possibleConstructorReturn(this, (InsightClient.__proto__ || Object.getPrototypeOf(InsightClient)).call(this));
+    var _this12 = _possibleConstructorReturn(this, (InsightClient.__proto__ || Object.getPrototypeOf(InsightClient)).call(this));
 
-    _this10.apiUrl = insightUrl;
-    return _this10;
+    _this12.apiUrl = insightUrl;
+    return _this12;
   }
 
   _createClass(InsightClient, [{
@@ -2515,7 +2636,7 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
   }, {
     key: 'getTransactionInfo',
     value: function getTransactionInfo(txHash) {
-      var _this11 = this;
+      var _this13 = this;
 
       return fetch(this.apiUrl + '/tx/' + txHash).then(function (resp) {
         return resp.json();
@@ -2523,7 +2644,7 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
         if (transactionInfo.error) {
           throw new Error('Error finding transaction: ' + transactionInfo.error);
         }
-        return fetch(_this11.apiUrl + '/block/' + transactionInfo.blockHash);
+        return fetch(_this13.apiUrl + '/block/' + transactionInfo.blockHash);
       }).then(function (resp) {
         return resp.json();
       }).then(function (blockInfo) {
@@ -2557,10 +2678,10 @@ var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) 
 
     _classCallCheck(this, BlockchainInfoApi);
 
-    var _this12 = _possibleConstructorReturn(this, (BlockchainInfoApi.__proto__ || Object.getPrototypeOf(BlockchainInfoApi)).call(this));
+    var _this14 = _possibleConstructorReturn(this, (BlockchainInfoApi.__proto__ || Object.getPrototypeOf(BlockchainInfoApi)).call(this));
 
-    _this12.utxoProviderUrl = blockchainInfoUrl;
-    return _this12;
+    _this14.utxoProviderUrl = blockchainInfoUrl;
+    return _this14;
   }
 
   _createClass(BlockchainInfoApi, [{
@@ -2719,6 +2840,11 @@ function isNameValid() {
   }, true));
 }
 
+function isNamespaceValid(namespaceID) {
+  var NAMESPACE_RULE = /^[a-z0-9\-_]{1,19}$/;
+  return Promise.resolve(namespaceID.match(NAMESPACE_RULE) !== null);
+}
+
 function isNameAvailable(fullyQualifiedName) {
   return _config.config.network.getNameInfo(fullyQualifiedName).then(function () {
     return false;
@@ -2731,11 +2857,59 @@ function isNameAvailable(fullyQualifiedName) {
   });
 }
 
+function isNamespaceAvailable(namespaceID) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function () {
+    return false;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return true;
+    } else {
+      throw e;
+    }
+  });
+}
+
 function ownsName(fullyQualifiedName, ownerAddress) {
   return _config.config.network.getNameInfo(fullyQualifiedName).then(function (nameInfo) {
     return nameInfo.address === ownerAddress;
   }).catch(function (e) {
     if (e.message === 'Name not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function revealedNamespace(namespaceID, revealAddress) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
+    return namespaceInfo.recipient_address === revealAddress;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function namespaceIsReady(namespaceID) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
+    return namespaceInfo.ready;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function namespaceIsRevealed(namespaceID) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
+    return !namespaceInfo.ready;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
       return false;
     } else {
       throw e;
@@ -2769,7 +2943,8 @@ function addressCanReceiveName(address) {
 }
 
 var safety = exports.safety = {
-  addressCanReceiveName: addressCanReceiveName, isInGracePeriod: isInGracePeriod, ownsName: ownsName, isNameAvailable: isNameAvailable, isNameValid: isNameValid
+  addressCanReceiveName: addressCanReceiveName, isInGracePeriod: isInGracePeriod, ownsName: ownsName, isNameAvailable: isNameAvailable, isNameValid: isNameValid,
+  isNamespaceValid: isNamespaceValid, isNamespaceAvailable: isNamespaceAvailable, revealedNamespace: revealedNamespace, namespaceIsReady: namespaceIsReady, namespaceIsRevealed: namespaceIsRevealed
 };
 },{"../config":8}],17:[function(require,module,exports){
 (function (Buffer){
@@ -2778,11 +2953,21 @@ var safety = exports.safety = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.BlockstackNamespace = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 exports.makePreorderSkeleton = makePreorderSkeleton;
 exports.makeRegisterSkeleton = makeRegisterSkeleton;
 exports.makeRenewalSkeleton = makeRenewalSkeleton;
 exports.makeTransferSkeleton = makeTransferSkeleton;
 exports.makeUpdateSkeleton = makeUpdateSkeleton;
+exports.makeRevokeSkeleton = makeRevokeSkeleton;
+exports.makeNamespacePreorderSkeleton = makeNamespacePreorderSkeleton;
+exports.makeNamespaceRevealSkeleton = makeNamespaceRevealSkeleton;
+exports.makeNamespaceReadySkeleton = makeNamespaceReadySkeleton;
+exports.makeNameImportSkeleton = makeNameImportSkeleton;
+exports.makeAnnounceSkeleton = makeAnnounceSkeleton;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -2792,12 +2977,150 @@ var _utils = require('./utils');
 
 var _config = require('../config');
 
+var _bigi = require('bigi');
+
+var _bigi2 = _interopRequireDefault(_bigi);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // todo : add name length / character verification
 
+// support v1 and v2 price API endpoint return values
+var BlockstackNamespace = exports.BlockstackNamespace = function () {
+  function BlockstackNamespace(namespaceID) {
+    _classCallCheck(this, BlockstackNamespace);
 
-function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burnAmount) {
+    if (namespaceID.length > 19) {
+      throw new Error('Namespace ID too long (19 chars max)');
+    }
+    if (!namespaceID.match('[0123456789abcdefghijklmnopqrstuvwxyz_-]+')) {
+      throw new Error('Namespace ID can only use characters 0123456789abcdefghijklmnopqrstuvwxyz-_');
+    }
+
+    this.namespaceID = namespaceID;
+    this.version = -1;
+    this.lifetime = -1;
+    this.coeff = -1;
+    this.base = -1;
+    this.buckets = [-1];
+    this.nonalphaDiscount = -1;
+    this.noVowelDiscount = -1;
+  }
+
+  _createClass(BlockstackNamespace, [{
+    key: 'check',
+    value: function check() {
+      try {
+        this.setVersion(this.version);
+        this.setLifetime(this.lifetime);
+        this.setCoeff(this.coeff);
+        this.setBase(this.base);
+        this.setBuckets(this.buckets);
+        this.setNonalphaDiscount(this.nonalphaDiscount);
+        this.setNoVowelDiscount(this.noVowelDiscount);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+  }, {
+    key: 'setVersion',
+    value: function setVersion(version) {
+      if (version < 0 || version > Math.pow(2, 16) - 1) {
+        throw new Error('Invalid version: must be a 16-bit number');
+      }
+      this.version = version;
+    }
+  }, {
+    key: 'setLifetime',
+    value: function setLifetime(lifetime) {
+      if (lifetime < 0 || lifetime > Math.pow(2, 32) - 1) {
+        throw new Error('Invalid lifetime: must be a 32-bit number');
+      }
+      this.lifetime = lifetime;
+    }
+  }, {
+    key: 'setCoeff',
+    value: function setCoeff(coeff) {
+      if (coeff < 0 || coeff > 255) {
+        throw new Error('Invalid coeff: must be an 8-bit number');
+      }
+      this.coeff = coeff;
+    }
+  }, {
+    key: 'setBase',
+    value: function setBase(base) {
+      if (base < 0 || base > 255) {
+        throw new Error('Invalid base: must be an 8-bit number');
+      }
+      this.base = base;
+    }
+  }, {
+    key: 'setBuckets',
+    value: function setBuckets(buckets) {
+      if (buckets.length !== 16) {
+        throw new Error('Invalid buckets: must have 16 entries');
+      }
+
+      for (var i = 0; i < buckets.length; i++) {
+        if (buckets[i] < 0 || buckets[i] > 15) {
+          throw new Error('Invalid buckets: must be 4-bit numbers');
+        }
+      }
+
+      this.buckets = buckets.slice(0);
+    }
+  }, {
+    key: 'setNonalphaDiscount',
+    value: function setNonalphaDiscount(nonalphaDiscount) {
+      if (nonalphaDiscount < 0 || nonalphaDiscount > 15) {
+        throw new Error('Invalid nonalphaDiscount: must be a 4-bit number');
+      }
+      this.nonalphaDiscount = nonalphaDiscount;
+    }
+  }, {
+    key: 'setNoVowelDiscount',
+    value: function setNoVowelDiscount(noVowelDiscount) {
+      if (noVowelDiscount < 0 || noVowelDiscount > 15) {
+        throw new Error('Invalid noVowelDiscount: must be a 4-bit number');
+      }
+      this.noVowelDiscount = noVowelDiscount;
+    }
+  }, {
+    key: 'toHexPayload',
+    value: function toHexPayload() {
+      var lifeHex = ('00000000' + this.lifetime.toString(16)).slice(-8);
+      var coeffHex = ('00' + this.coeff.toString(16)).slice(-2);
+      var baseHex = ('00' + this.base.toString(16)).slice(-2);
+      var bucketHex = this.buckets.map(function (b) {
+        return b.toString(16);
+      }).reduce(function (b1, b2) {
+        return b1 + b2;
+      }, '');
+      var discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16);
+      var versionHex = ('0000' + this.version.toString(16)).slice(-4);
+      var namespaceIDHex = new Buffer(this.namespaceID).toString('hex');
+
+      return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex;
+    }
+  }]);
+
+  return BlockstackNamespace;
+}();
+
+function asAmountV2(amount) {
+  // convert an AmountType v1 or v2 to an AmountTypeV2.
+  // the "units" of a v1 amount type are always 'BTC'
+  if (typeof amount === 'number') {
+    return { units: 'BTC', amount: _bigi2.default.fromByteArrayUnsigned(String(amount)) };
+  } else {
+    return { units: amount.units, amount: amount.amount };
+  }
+}
+
+function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burn) {
   var registerAddress = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
   // Returns a preorder tx skeleton.
@@ -2805,18 +3128,19 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
   //                    2. the Preorder's change address (5500 satoshi minimum)
   //                    3. the BURN
   //
-  //    0     2  3                                              23             39
-  //    |-----|--|----------------------------------------------|--------------|
-  //    magic op  hash160(name.ns_id,script_pubkey,register_addr) consensus hash
-
+  // 0     2  3                                     23             39
+  // |-----|--|--------------------------------------|--------------|
+  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash
+  //
   // Returns an unsigned serialized transaction.
+  var burnAmount = asAmountV2(burn);
   var network = _config.config.network;
   var nameBuff = Buffer.from((0, _utils.decodeB40)(fullyQualifiedName), 'hex'); // base40
   var scriptPublicKey = _bitcoinjsLib2.default.address.toOutputScript(preorderAddress, network.layer1);
 
   var dataBuffers = [nameBuff, scriptPublicKey];
 
-  if (registerAddress) {
+  if (!!registerAddress) {
     var registerBuff = Buffer.from(registerAddress, 'ascii');
     dataBuffers.push(registerBuff);
   }
@@ -2825,7 +3149,8 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   var hashed = (0, _utils.hash160)(dataBuff);
 
-  var opReturnBuffer = Buffer.alloc(39);
+  var opReturnBufferLen = 39;
+  var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
   opReturnBuffer.write('id?', 0, 3, 'ascii');
   hashed.copy(opReturnBuffer, 3);
   opReturnBuffer.write(consensusHash, 23, 16, 'hex');
@@ -2836,7 +3161,9 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
-  tx.addOutput(burnAddress, burnAmount);
+
+  var btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16);
+  tx.addOutput(burnAddress, btcBurnAmount);
 
   return tx.buildIncomplete();
 }
@@ -2854,14 +3181,28 @@ function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
   // in the case of a renewal, this would need to be modified to include a change address
   //  as output (3) before the burn output (4)
 
+  /*
+    Formats
+     No zonefile hash, and pay with BTC:
+     0    2  3                                  39
+    |----|--|----------------------------------|
+    magic op   name.ns_id (up to 37 bytes)
+      With zonefile hash, and pay with BTC:
+    
+    0    2  3                                  39                  59
+    |----|--|----------------------------------|-------------------|
+    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
+   */
+
   var payload = void 0;
   var network = _config.config.network;
-
-  if (valueHash) {
+  if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded');
     }
-    payload = Buffer.alloc(57, 0);
+
+    var payloadLen = 57;
+    payload = Buffer.alloc(payloadLen, 0);
     payload.write(fullyQualifiedName, 0, 37, 'ascii');
     payload.write(valueHash, 37, 20, 'hex');
   } else {
@@ -2879,14 +3220,29 @@ function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
   return tx.buildIncomplete();
 }
 
-function makeRenewalSkeleton(fullyQualifiedName, nextOwnerAddress, lastOwnerAddress, burnAddress, burnAmount) {
+function makeRenewalSkeleton(fullyQualifiedName, nextOwnerAddress, lastOwnerAddress, burnAddress, burn) {
   var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
+  /*
+    Formats
+     No zonefile hash, and pay with BTC:
+     0    2  3                                  39
+    |----|--|----------------------------------|
+    magic op   name.ns_id (up to 37 bytes)
+      With zonefile hash, and pay with BTC:
+    
+    0    2  3                                  39                  59
+    |----|--|----------------------------------|-------------------|
+    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
+   */
+  var burnAmount = asAmountV2(burn);
   var network = _config.config.network;
+  var burnBTCAmount = parseInt(burnAmount.amount.toHex(), 16);
+
   var registerTX = makeRegisterSkeleton(fullyQualifiedName, nextOwnerAddress, valueHash);
   var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerTX, network.layer1);
   txB.addOutput(lastOwnerAddress, _utils.DUST_MINIMUM);
-  txB.addOutput(burnAddress, burnAmount);
+  txB.addOutput(burnAddress, burnBTCAmount);
   return txB.buildIncomplete();
 }
 
@@ -2900,6 +3256,14 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  /*
+    Format
+    
+    0     2  3    4                   20              36
+    |-----|--|----|-------------------|---------------|
+    magic op keep  hash128(name.ns_id) consensus hash
+             data?
+  */
   var network = _config.config.network;
   var opRet = Buffer.alloc(36);
   var keepChar = '~';
@@ -2931,6 +3295,14 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  /*
+    Format:
+    
+    0     2  3                                   19                      39
+    |-----|--|-----------------------------------|-----------------------|
+    magic op  hash128(name.ns_id,consensus hash) hash160(data)
+  */
+
   var network = _config.config.network;
   var opRet = Buffer.alloc(39);
 
@@ -2951,8 +3323,185 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
 
   return tx.buildIncomplete();
 }
+
+function makeRevokeSkeleton(fullyQualifiedName) {
+  // Returns a revoke tx skeleton 
+  //    with 1 output: 1. the Blockstack revoke OP_RETURN
+  //
+  // You MUST make the first input a UTXO from the current OWNER
+  //
+  // Returns an unsigned serialized transaction
+  /*
+   Format:
+    0    2  3                             39
+   |----|--|-----------------------------|
+   magic op   name.ns_id (37 bytes)
+  */
+
+  var network = _config.config.network;
+  var opRet = Buffer.alloc(3);
+
+  var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
+
+  opRet.write('id~', 0, 3, 'ascii');
+
+  var opReturnBuffer = Buffer.concat([opRet, nameBuff]);
+  var nullOutput = _bitcoinjsLib2.default.script.nullData.output.encode(opReturnBuffer);
+
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+
+  tx.addOutput(nullOutput, 0);
+
+  return tx.buildIncomplete();
+}
+
+function makeNamespacePreorderSkeleton(namespaceID, consensusHash, preorderAddress, registerAddress, burn) {
+  // Returns a namespace preorder tx skeleton.
+  // Returns an unsigned serialized transaction.
+  /*
+   Formats:
+    0     2   3                                      23               39
+   |-----|---|--------------------------------------|----------------|
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash
+  */
+
+  var burnAmount = asAmountV2(burn);
+  if (burnAmount.units !== 'BTC') {
+    throw new Error('Invalid burnUnits ' + burnAmount.units);
+  }
+
+  var network = _config.config.network;
+  var burnAddress = network.getDefaultBurnAddress();
+  var namespaceIDBuff = Buffer.from((0, _utils.decodeB40)(namespaceID), 'hex'); // base40
+  var scriptPublicKey = _bitcoinjsLib2.default.address.toOutputScript(preorderAddress, network.layer1);
+  var registerBuff = Buffer.from(registerAddress, 'ascii');
+
+  var dataBuffers = [namespaceIDBuff, scriptPublicKey, registerBuff];
+  var dataBuff = Buffer.concat(dataBuffers);
+
+  var hashed = (0, _utils.hash160)(dataBuff);
+
+  var btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16);
+  var opReturnBufferLen = 39;
+
+  var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
+  opReturnBuffer.write('id*', 0, 3, 'ascii');
+  hashed.copy(opReturnBuffer, 3);
+  opReturnBuffer.write(consensusHash, 23, 16, 'hex');
+
+  var nullOutput = _bitcoinjsLib2.default.script.nullData.output.encode(opReturnBuffer);
+
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
+  tx.addOutput(burnAddress, btcBurnAmount);
+
+  return tx.buildIncomplete();
+}
+
+function makeNamespaceRevealSkeleton(namespace, revealAddress) {
+  /*
+   Format:
+   
+   0     2   3    7     8     9    10   11   12   13   14    15    16    17       18      20     39
+   |-----|---|----|-----|-----|----|----|----|----|----|-----|-----|-----|--------|-------|-------|
+   magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
+                                                  bucket exponents        no-vowel
+                                                                          discounts
+  */
+  var network = _config.config.network;
+  var hexPayload = namespace.toHexPayload();
+
+  var opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2);
+  opReturnBuffer.write('id&', 0, 3, 'ascii');
+  opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex');
+
+  var nullOutput = _bitcoinjsLib2.default.script.nullData.output.encode(opReturnBuffer);
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(revealAddress, _utils.DUST_MINIMUM);
+
+  return tx.buildIncomplete();
+}
+
+function makeNamespaceReadySkeleton(namespaceID) {
+  /*
+   Format:
+   
+   0     2  3  4           23
+   |-----|--|--|------------|
+   magic op  .  ns_id
+    */
+  var network = _config.config.network;
+  var opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1);
+  opReturnBuffer.write('id!', 0, 3, 'ascii');
+  opReturnBuffer.write('.' + namespaceID, 3, namespaceID.length + 1, 'ascii');
+
+  var nullOutput = _bitcoinjsLib2.default.script.nullData.output.encode(opReturnBuffer);
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+
+  tx.addOutput(nullOutput, 0);
+
+  return tx.buildIncomplete();
+}
+
+function makeNameImportSkeleton(name, recipientAddr, zonefileHash) {
+  /*
+   Format:
+    
+    0    2  3                             39
+    |----|--|-----------------------------|
+    magic op   name.ns_id (37 bytes)
+    Output 0: the OP_RETURN
+   Output 1: the recipient
+   Output 2: the zonefile hash
+  */
+  if (zonefileHash.length !== 40) {
+    throw new Error('Invalid zonefile hash: must be 20 bytes hex-encoded');
+  }
+
+  var network = _config.config.network;
+  var opReturnBuffer = Buffer.alloc(3 + name.length);
+  opReturnBuffer.write('id;', 0, 3, 'ascii');
+  opReturnBuffer.write(name, 3, name.length, 'ascii');
+
+  var nullOutput = _bitcoinjsLib2.default.script.nullData.output.encode(opReturnBuffer);
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var zonefileHashB58 = _bitcoinjsLib2.default.address.toBase58Check(new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash);
+
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(recipientAddr, _utils.DUST_MINIMUM);
+  tx.addOutput(zonefileHashB58, _utils.DUST_MINIMUM);
+
+  return tx.buildIncomplete();
+}
+
+function makeAnnounceSkeleton(messageHash) {
+  /*
+    Format: 
+     0    2  3                             23
+    |----|--|-----------------------------|
+    magic op   message hash (160-bit)
+  */
+  if (messageHash.length !== 40) {
+    throw new Error('Invalid message hash: must be 20 bytes hex-encoded');
+  }
+
+  var network = _config.config.network;
+  var opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2);
+  opReturnBuffer.write('id#', 0, 3, 'ascii');
+  opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex');
+
+  var nullOutput = _bitcoinjsLib2.default.script.nullData.output.encode(opReturnBuffer);
+  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+
+  tx.addOutput(nullOutput, 0);
+  return tx.buildIncomplete();
+}
 }).call(this,require("buffer").Buffer)
-},{"../config":8,"./utils":19,"bitcoinjs-lib":79,"buffer":157}],18:[function(require,module,exports){
+},{"../config":8,"./utils":19,"bigi":66,"bitcoinjs-lib":79,"buffer":157}],18:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -2979,7 +3528,6 @@ var _errors = require('../errors');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var dummyBurnAddress = '1111111111111111111114oLvT2';
 var dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 var dummyZonefileHash = 'ffffffffffffffffffffffffffffffffffffffff';
 
@@ -2987,7 +3535,7 @@ function addOwnerInput(utxos, ownerAddress, txB) {
   var addChangeOut = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
 
   // add an owner UTXO and a change out.
-  if (utxos.length < 0) {
+  if (utxos.length <= 0) {
     throw new Error('Owner has no UTXOs for UPDATE.');
   }
 
@@ -3035,9 +3583,8 @@ function estimatePreorder(fullyQualifiedName, destinationAddress, paymentAddress
   var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
 
   var network = _config.config.network;
-
   var preorderPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
-    return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, dummyConsensusHash, paymentAddress, dummyBurnAddress, namePrice, destinationAddress);
+    return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, dummyConsensusHash, paymentAddress, network.getDefaultBurnAddress(), namePrice, destinationAddress);
   });
 
   return Promise.all([network.getFeeRate(), preorderPromise]).then(function (_ref) {
@@ -3166,7 +3713,7 @@ function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, p
   }
 
   var renewalPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
-    return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, dummyBurnAddress, namePrice, valueHash);
+    return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, network.getDefaultBurnAddress(), namePrice, valueHash);
   });
 
   return Promise.all([network.getFeeRate(), renewalPromise]).then(function (_ref3) {
@@ -3179,6 +3726,162 @@ function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, p
     // and renewal skeleton includes all outputs for owner change, but not for payer change.
     var txFee = feeRate * (0, _utils.estimateTXBytes)(renewalTX, 1 + paymentUtxos, 1);
     return txFee + outputsValue - 5500; // don't count the dust change for old owner.
+  });
+}
+
+/**
+ * Estimates cost of a revoke transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to revoke
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress  the address funding the revoke
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund the
+ *    revoke.
+ * @private
+ */
+function estimateRevoke(fullyQualifiedName, ownerAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+
+  var network = _config.config.network;
+  var revokeTX = (0, _skeletons.makeRevokeSkeleton)(fullyQualifiedName);
+
+  return Promise.all([network.getFeeRate()]).then(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 1),
+        feeRate = _ref6[0];
+
+    var outputsValue = (0, _utils.sumOutputValues)(revokeTX);
+    // 1 additional input for owner
+    // 1 additional output for payer change
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(revokeTX, 1 + paymentUtxos, 2);
+    return txFee + outputsValue;
+  });
+}
+
+/**
+ * Estimates cost of a namespace preorder transaction for a namespace
+ * @param {String} namespaceID - the namespace to preorder
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentAddress - the address funding the preorder
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the preorder. This includes a 5500 satoshi dust output for the preorder.
+ *    Even though this is a change output, the payer must supply enough funds
+ *    to generate this output, so we include it in the cost.
+ * @private
+ */
+function estimateNamespacePreorder(namespaceID, revealAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+
+  var network = _config.config.network;
+
+  var preorderPromise = network.getNamespacePrice(namespaceID).then(function (namespacePrice) {
+    return (0, _skeletons.makeNamespacePreorderSkeleton)(namespaceID, dummyConsensusHash, paymentAddress, revealAddress, namespacePrice);
+  });
+
+  return Promise.all([network.getFeeRate(), preorderPromise]).then(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 2),
+        feeRate = _ref8[0],
+        preorderTX = _ref8[1];
+
+    var outputsValue = (0, _utils.sumOutputValues)(preorderTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, paymentUtxos, 0);
+    return txFee + outputsValue;
+  });
+}
+
+/**
+ * Estimates cost of a namesapce reveal transaction for a namespace
+ * @param {BlockstackNamespace} namespace - the namespace to reveal
+ * @param {String} revealAddress - the address to receive the namespace
+ *    (this must have been passed as 'revealAddress' to a prior namespace
+ *    preorder)
+ * @param {String} paymentAddress - the address that pays for this transaction
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to 
+ *    fund the reveal.  This includes a 5500 satoshi dust output for the
+ *    preorder.  Even though this is a change output, the payer must have
+ *    enough funds to generate this output, so we include it in the cost.
+ */
+function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+
+  var network = _config.config.network;
+  var revealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
+
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(revealTX);
+    // 1 additional output for payer change
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(revealTX, paymentUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+
+/**
+ * Estimates the cost of a namespace-ready transaction for a namespace
+ * @param {String} namespaceID - the namespace to ready
+ * @param {Number} revealUtxos - the number of UTXOs we expect will
+ *  be required from the reveal address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *  fund this namespacey-ready transaction.
+ */
+function estimateNamespaceReady(namespaceID) {
+  var revealUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  var network = _config.config.network;
+  var readyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
+
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(readyTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(readyTX, revealUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+
+/**
+ * Estimates the cost of a name-import transaction 
+ * @param {String} name - the fully-qualified name
+ * @param {String} recipientAddr - the recipient
+ * @param {String} zonefileHash - the zone file hash
+ * @param {Number} importUtxos - the number of UTXOs we expect will 
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost 
+ *  to fund this name-import transaction
+ */
+function estimateNameImport(name, recipientAddr, zonefileHash) {
+  var importUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+
+  var network = _config.config.network;
+  var importTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
+
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(importTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(importTX, importUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+
+/**
+ * Estimates the cost of an announce transaction 
+ * @param {String} messageHash - the hash of the message 
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost
+ *  to fund this announce transaction
+ */
+function estimateAnnounce(messageHash) {
+  var senderUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  var network = _config.config.network;
+  var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
+
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(announceTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(announceTX, senderUtxos, 1);
+    return txFee + outputsValue;
   });
 }
 
@@ -3202,20 +3905,20 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
   var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
   var preorderAddress = paymentKey.getAddress();
 
-  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 3),
-        consensusHash = _ref6[0],
-        namePrice = _ref6[1],
-        burnAddress = _ref6[2];
+  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref9) {
+    var _ref10 = _slicedToArray(_ref9, 3),
+        consensusHash = _ref10[0],
+        namePrice = _ref10[1],
+        burnAddress = _ref10[2];
 
     return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, destinationAddress);
   });
 
-  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref7) {
-    var _ref8 = _slicedToArray(_ref7, 3),
-        utxos = _ref8[0],
-        feeRate = _ref8[1],
-        preorderSkeleton = _ref8[2];
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 3),
+        utxos = _ref12[0],
+        feeRate = _ref12[1],
+        preorderSkeleton = _ref12[2];
 
     var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
 
@@ -3239,14 +3942,28 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyHex) {
  * @param {String} zonefile - the zonefile data to update (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
+ * @param {String} valueHash - if given, this is the hash to store (instead of
+ *    zonefile).  zonefile will be ignored if this is given.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
  */
 function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
+  var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+
   var network = _config.config.network;
-  var valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
+  if (!valueHash && !zonefile) {
+    return Promise.reject(new Error('Need zonefile or valueHash arguments'));
+  }
+  if (valueHash.length === 0) {
+    if (!zonefile) {
+      return Promise.reject(new Error('Need zonefile or valueHash arguments'));
+    }
+    valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
+  } else if (valueHash.length !== 40) {
+    return Promise.reject(new Error('Invalid valueHash ' + valueHash));
+  }
 
   var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
   var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
@@ -3260,12 +3977,12 @@ function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
     return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(updateTX, network.layer1);
   });
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref9) {
-    var _ref10 = _slicedToArray(_ref9, 4),
-        txB = _ref10[0],
-        payerUtxos = _ref10[1],
-        ownerUtxos = _ref10[2],
-        feeRate = _ref10[3];
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref13) {
+    var _ref14 = _slicedToArray(_ref13, 4),
+        txB = _ref14[0],
+        payerUtxos = _ref14[1],
+        ownerUtxos = _ref14[2],
+        feeRate = _ref14[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
     var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
@@ -3293,6 +4010,8 @@ function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
  * @param {String} zonefile - the zonefile data to include (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
+ * @param {String} valueHash - the hash of the zone file data to include.
+ *    It will be used instead of zonefile, if given
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -3300,11 +4019,13 @@ function makeUpdate(fullyQualifiedName, ownerKeyHex, paymentKeyHex, zonefile) {
  */
 function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
   var zonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
   var network = _config.config.network;
-  var valueHash = undefined;
-  if (!!zonefile) {
+  if (!valueHash && !!zonefile) {
     valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
+  } else if (!!valueHash && valueHash.length !== 40) {
+    return Promise.reject(new Error('Invalid zonefile hash ' + valueHash));
   }
 
   var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, valueHash);
@@ -3313,10 +4034,10 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
   var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
   var paymentAddress = paymentKey.getAddress();
 
-  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref11) {
-    var _ref12 = _slicedToArray(_ref11, 2),
-        utxos = _ref12[0],
-        feeRate = _ref12[1];
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref15) {
+    var _ref16 = _slicedToArray(_ref15, 2),
+        utxos = _ref16[0],
+        feeRate = _ref16[1];
 
     var signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0);
     for (var i = 0; i < signingTxB.tx.ins.length; i++) {
@@ -3335,12 +4056,15 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyHex) {
  *    private key
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the transaction
+ * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
  */
 function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
+  var keepZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
   var network = _config.config.network;
   var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
   var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
@@ -3348,17 +4072,60 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
   var ownerAddress = ownerKey.getAddress();
 
   var txPromise = network.getConsensusHash().then(function (consensusHash) {
-    return (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, consensusHash, destinationAddress);
+    return (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, consensusHash, destinationAddress, keepZonefile);
   }).then(function (transferTX) {
     return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(transferTX, network.layer1);
   });
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref13) {
-    var _ref14 = _slicedToArray(_ref13, 4),
-        txB = _ref14[0],
-        payerUtxos = _ref14[1],
-        ownerUtxos = _ref14[2],
-        feeRate = _ref14[3];
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref17) {
+    var _ref18 = _slicedToArray(_ref17, 4),
+        txB = _ref18[0],
+        payerUtxos = _ref18[1],
+        ownerUtxos = _ref18[2],
+        feeRate = _ref18[3];
+
+    var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
+    var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      if (i === ownerInput.index) {
+        signingTxB.sign(i, ownerKey);
+      } else {
+        signingTxB.sign(i, paymentKey);
+      }
+    }
+    return signingTxB.build().toHex();
+  });
+}
+
+/**
+ * Generates a revoke transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to revoke
+ * @param {String} ownerKeyHex - a hex string of the current owner's
+ *    private key
+ * @param {String} paymentKeyHex - a hex string of the private key used to 
+ *    fund the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+function makeRevoke(fullyQualifiedName, ownerKeyHex, paymentKeyHex) {
+  var network = _config.config.network;
+  var ownerKey = (0, _utils2.hexStringToECPair)(ownerKeyHex);
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
+  var paymentAddress = paymentKey.getAddress();
+  var ownerAddress = ownerKey.getAddress();
+
+  var revokeTX = (0, _skeletons.makeRevokeSkeleton)(fullyQualifiedName);
+
+  var txPromise = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(revokeTX, network.layer1);
+
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref19) {
+    var _ref20 = _slicedToArray(_ref19, 4),
+        txB = _ref20[0],
+        payerUtxos = _ref20[1],
+        ownerUtxos = _ref20[2],
+        feeRate = _ref20[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
     var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
@@ -3382,9 +4149,11 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
  *    private key
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the renewal
- * @param {String} zonefile - the zonefile data to include (this will be hashed
+ * @param {String} zonefile - the zonefile data to include, if given (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the RENEWAL propagates.
+ * @param {String} valueHash - the raw zone file hash to include (this will be used
+ *    instead of zonefile, if given).
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -3392,11 +4161,11 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyHex, payme
  */
 function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymentKeyHex) {
   var zonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
-  var valueHash = undefined;
   var network = _config.config.network;
 
-  if (!!zonefile) {
+  if (!valueHash && !!zonefile) {
     valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
   }
 
@@ -3408,28 +4177,28 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
   var ownerAddress = ownerKey.getAddress();
   var paymentAddress = paymentKey.getAddress();
 
-  var txPromise = Promise.all([network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref15) {
-    var _ref16 = _slicedToArray(_ref15, 2),
-        namePrice = _ref16[0],
-        burnAddress = _ref16[1];
+  var txPromise = Promise.all([network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref21) {
+    var _ref22 = _slicedToArray(_ref21, 2),
+        namePrice = _ref22[0],
+        burnAddress = _ref22[1];
 
     return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, burnAddress, namePrice, valueHash);
   }).then(function (tx) {
     return _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(tx, network.layer1);
   });
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref17) {
-    var _ref18 = _slicedToArray(_ref17, 4),
-        txB = _ref18[0],
-        payerUtxos = _ref18[1],
-        ownerUtxos = _ref18[2],
-        feeRate = _ref18[3];
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref23) {
+    var _ref24 = _slicedToArray(_ref23, 4),
+        txB = _ref24[0],
+        payerUtxos = _ref24[1],
+        ownerUtxos = _ref24[2],
+        feeRate = _ref24[3];
 
     var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false);
     var ownerOutput = txB.tx.outs[2];
     var ownerOutputAddr = _bitcoinjsLib2.default.address.fromOutputScript(ownerOutput.script, network.layer1);
     if (ownerOutputAddr !== ownerAddress) {
-      throw new Error('Original owner ' + ownerAddress + ' should have an output at ' + ('index 2 in transaction was ' + ownerOutputAddr));
+      return Promise.reject(new Error('Original owner ' + ownerAddress + ' should have an output at ' + ('index 2 in transaction was ' + ownerOutputAddr)));
     }
     ownerOutput.value = ownerInput.value;
     var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
@@ -3440,6 +4209,182 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyHex, paymen
       } else {
         signingTxB.sign(i, paymentKey);
       }
+    }
+    return signingTxB.build().toHex();
+  });
+}
+
+/**
+ * Generates a namespace preorder transaction for a namespace
+ * @param {String} namespaceID - the namespace to pre-order
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+function makeNamespacePreorder(namespaceID, revealAddress, paymentKeyHex) {
+  var network = _config.config.network;
+
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
+  var preorderAddress = paymentKey.getAddress();
+
+  var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamespacePrice(namespaceID)]).then(function (_ref25) {
+    var _ref26 = _slicedToArray(_ref25, 2),
+        consensusHash = _ref26[0],
+        namespacePrice = _ref26[1];
+
+    return (0, _skeletons.makeNamespacePreorderSkeleton)(namespaceID, consensusHash, preorderAddress, revealAddress, namespacePrice);
+  });
+
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref27) {
+    var _ref28 = _slicedToArray(_ref27, 3),
+        utxos = _ref28[0],
+        feeRate = _ref28[1],
+        preorderSkeleton = _ref28[2];
+
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
+
+    var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
+    var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
+
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      signingTxB.sign(i, paymentKey);
+    }
+    return signingTxB.build().toHex();
+  });
+}
+
+/**
+ * Generates a namespace reveal transaction for a namespace
+ * @param {BlockstackNamespace} namespace - the namespace to reveal
+ * @param {String} revealAddress - the address to receive the namespace (this 
+ *   must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentKeyHex - a hex string of the private key used to fund
+ *   the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *   this function *does not* perform the requisite safety checks -- please see
+ *   the safety module for those.
+ * @private
+ */
+function makeNamespaceReveal(namespace, revealAddress, paymentKeyHex) {
+  var network = _config.config.network;
+
+  if (!namespace.check()) {
+    return Promise.reject(new Error('Invalid namespace'));
+  }
+
+  var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
+  var preorderAddress = paymentKey.getAddress();
+  var namespaceRevealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
+
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()]).then(function (_ref29) {
+    var _ref30 = _slicedToArray(_ref29, 2),
+        utxos = _ref30[0],
+        feeRate = _ref30[1];
+
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(namespaceRevealTX, network.layer1);
+    var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      signingTxB.sign(i, paymentKey);
+    }
+    return signingTxB.build().toHex();
+  });
+}
+
+/**
+ * Generates a namespace ready transaction for a namespace
+ * @param {String} namespaceID - the namespace to launch
+ * @param {String} revealKeyHex - the private key of the 'revealAddress' used
+ *  to reveal the namespace.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *  this function *does not* perform the requisite safety checks -- please see
+ *  the safety module for those.
+ * @private
+ */
+function makeNamespaceReady(namespaceID, revealKeyHex) {
+  var network = _config.config.network;
+
+  var revealKey = (0, _utils2.hexStringToECPair)(revealKeyHex);
+  var revealAddress = revealKey.getAddress();
+  var namespaceReadyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
+
+  return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()]).then(function (_ref31) {
+    var _ref32 = _slicedToArray(_ref31, 2),
+        utxos = _ref32[0],
+        feeRate = _ref32[1];
+
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1);
+    var signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      signingTxB.sign(i, revealKey);
+    }
+    return signingTxB.build().toHex();
+  });
+}
+
+/**
+ * Generates a name import transaction for a namespace
+ * @param {String} name - the name to import
+ * @param {String} recipientAddr - the address to receive the name 
+ * @param {String} zonefileHash - the hash of the zonefile to give this name
+ * @param {String} importerKeyHex - the private key that pays for the import
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see 
+ * the safety module for those.
+ * @private
+ */
+function makeNameImport(name, recipientAddr, zonefileHash, importerKeyHex) {
+  var network = _config.config.network;
+
+  var importerKey = (0, _utils2.hexStringToECPair)(importerKeyHex);
+  var importerAddress = importerKey.getAddress();
+  var nameImportTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
+
+  return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()]).then(function (_ref33) {
+    var _ref34 = _slicedToArray(_ref33, 2),
+        utxos = _ref34[0],
+        feeRate = _ref34[1];
+
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(nameImportTX, network.layer1);
+    var signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      signingTxB.sign(i, importerKey);
+    }
+    return signingTxB.build().toHex();
+  });
+}
+
+/**
+ * Generates an announce transaction 
+ * @param {String} messageHash - the hash of the message to send.  Should be
+ *  an already-announced zone file hash
+ * @param {String} senderKeyHex - the private key that pays for the transaction.  Should
+ *  be the key that owns the name that the message recipients subscribe to
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+function makeAnnounce(messageHash, senderKeyHex) {
+  var network = _config.config.network;
+
+  var senderKey = (0, _utils2.hexStringToECPair)(senderKeyHex);
+  var senderAddress = senderKey.getAddress();
+  var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
+
+  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()]).then(function (_ref35) {
+    var _ref36 = _slicedToArray(_ref35, 2),
+        utxos = _ref36[0],
+        feeRate = _ref36[1];
+
+    var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(announceTX, network.layer1);
+    var signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0);
+    for (var i = 0; i < signingTxB.tx.ins.length; i++) {
+      signingTxB.sign(i, senderKey);
     }
     return signingTxB.build().toHex();
   });
@@ -3475,10 +4420,10 @@ function makeBitcoinSpend(destinationAddress, paymentKeyHex, amount) {
   var paymentKey = (0, _utils2.hexStringToECPair)(paymentKeyHex);
   var paymentAddress = paymentKey.getAddress();
 
-  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref19) {
-    var _ref20 = _slicedToArray(_ref19, 2),
-        utxos = _ref20[0],
-        feeRate = _ref20[1];
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref37) {
+    var _ref38 = _slicedToArray(_ref37, 2),
+        utxos = _ref38[0],
+        feeRate = _ref38[1];
 
     var txB = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
     var destinationIndex = txB.addOutput(destinationAddress, 0);
@@ -3524,8 +4469,12 @@ function makeBitcoinSpend(destinationAddress, paymentKeyHex, amount) {
 }
 
 var transactions = exports.transactions = {
-  makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer, makeBitcoinSpend: makeBitcoinSpend,
-  estimatePreorder: estimatePreorder, estimateRegister: estimateRegister, estimateTransfer: estimateTransfer, estimateUpdate: estimateUpdate, estimateRenewal: estimateRenewal
+  makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer, makeRevoke: makeRevoke,
+  makeNamespacePreorder: makeNamespacePreorder, makeNamespaceReveal: makeNamespaceReveal, makeNamespaceReady: makeNamespaceReady, makeBitcoinSpend: makeBitcoinSpend,
+  makeNameImport: makeNameImport, makeAnnounce: makeAnnounce, BlockstackNamespace: _skeletons.BlockstackNamespace,
+  estimatePreorder: estimatePreorder, estimateRegister: estimateRegister, estimateTransfer: estimateTransfer, estimateUpdate: estimateUpdate, estimateRenewal: estimateRenewal,
+  estimateRevoke: estimateRevoke, estimateNamespacePreorder: estimateNamespacePreorder, estimateNamespaceReveal: estimateNamespaceReveal, estimateNamespaceReady: estimateNamespaceReady,
+  estimateNameImport: estimateNameImport, estimateAnnounce: estimateAnnounce
 };
 }).call(this,require("buffer").Buffer)
 },{"../config":8,"../errors":11,"../utils":44,"./skeletons":17,"./utils":19,"bitcoinjs-lib":79,"buffer":157}],19:[function(require,module,exports){
@@ -5491,7 +6440,7 @@ var Instagram = function (_Service) {
       var $ = _cheerio2.default.load(searchText);
       var username = $('meta[property="og:description"]').attr('content');
       if (username !== undefined && username.split(':').length > 1) {
-        return username.split(':')[0].match(/\(([^)]+)\)/)[1].substr(1);
+        return username.split(':')[0].match(/(@\w+)/)[0].substr(1);
       } else {
         return '';
       }
@@ -9969,7 +10918,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -9995,7 +10944,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -32799,29 +33748,34 @@ exports.isHtml = function(str) {
 
 },{"./parse":245,"dom-serializer":264}],248:[function(require,module,exports){
 module.exports={
-  "_from": "cheerio@^0.22.0",
+  "_args": [
+    [
+      "cheerio@0.22.0",
+      "/Users/hank/blockstack/blockstack.js"
+    ]
+  ],
+  "_from": "cheerio@0.22.0",
   "_id": "cheerio@0.22.0",
   "_inBundle": false,
   "_integrity": "sha1-qbqoYKP5tZWmuBsahocxIe06Jp4=",
   "_location": "/cheerio",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "cheerio@^0.22.0",
+    "raw": "cheerio@0.22.0",
     "name": "cheerio",
     "escapedName": "cheerio",
-    "rawSpec": "^0.22.0",
+    "rawSpec": "0.22.0",
     "saveSpec": null,
-    "fetchSpec": "^0.22.0"
+    "fetchSpec": "0.22.0"
   },
   "_requiredBy": [
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
-  "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
-  "_spec": "cheerio@^0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_spec": "0.22.0",
+  "_where": "/Users/hank/blockstack/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -32830,7 +33784,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/cheeriojs/cheerio/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "css-select": "~1.2.0",
     "dom-serializer": "~0.1.0",
@@ -32849,7 +33802,6 @@ module.exports={
     "lodash.reject": "^4.4.0",
     "lodash.some": "^4.4.0"
   },
-  "deprecated": false,
   "description": "Tiny, fast, and elegant implementation of core jQuery designed specifically for the server",
   "devDependencies": {
     "benchmark": "^2.1.0",
@@ -41065,33 +42017,37 @@ utils.encode = function encode(arr, enc) {
 
 },{}],315:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.4.0",
+  "_args": [
+    [
+      "elliptic@6.4.0",
+      "/Users/hank/blockstack/blockstack.js"
+    ]
+  ],
+  "_from": "elliptic@6.4.0",
   "_id": "elliptic@6.4.0",
   "_inBundle": false,
   "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^6.4.0",
+    "raw": "elliptic@6.4.0",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^6.4.0",
+    "rawSpec": "6.4.0",
     "saveSpec": null,
-    "fetchSpec": "^6.4.0"
+    "fetchSpec": "6.4.0"
   },
   "_requiredBy": [
     "/",
-    "/blockstack-storage",
     "/browserify/browserify-sign",
     "/browserify/create-ecdh",
     "/jsontokens"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-  "_spec": "elliptic@^6.4.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_spec": "6.4.0",
+  "_where": "/Users/hank/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -41099,7 +42055,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -41109,7 +42064,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -53554,7 +54508,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -53578,7 +54532,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
