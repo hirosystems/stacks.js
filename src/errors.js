@@ -23,7 +23,21 @@ export class BlockstackError extends Error {
   code: string
   parameter: ?string
   constructor(error: ErrorType) {
-    super(error.message)
+    let { message } = error
+    let bugMessage = `Error Code: ${error.code}`
+    let stack = null
+    try {
+      throw new Error()
+    } catch (e) {
+      stack = e.stack
+    }
+    if (stack) {
+      bugMessage += `\nStack Trace:\n${stack}`
+    }
+    message += '\nIf you believe this exception is caused by a bug in blockstack.js' +
+      ', please file a bug report: https://community.blockstack.org/bugs?' +
+      `9ndd2=Bug&4ud0i=${encodeURIComponent(bugMessage)}`
+    super(message)
     this.code = error.code
     this.parameter = error.parameter ? error.parameter : null
   }
