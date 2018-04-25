@@ -1,7 +1,7 @@
 {
   "extends": "airbnb",
   "parser": "babel-eslint",
-  "plugins": [],
+  "plugins": ["flowtype"],
   "ecmaFeatures": {
     "jsx": false,
     "modules": true
@@ -31,6 +31,7 @@
     "new-cap": 0,
     "camelcase": 2,
     "semi": [2, "never"],
-    "valid-jsdoc": ["error"]
+    "valid-jsdoc": ["error"],
+    "flowtype/define-flow-type": 1
   }
 }
