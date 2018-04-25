@@ -90,27 +90,28 @@ export class BlockstackNetwork {
   }
 
   getNamespaceBurnAddress(namespace: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`)
-      .then(resp => {
-        if (resp.status === 404) {
-          throw new Error(`No such namespace '${namespace}'`)
-        } else {
-          return resp.json()
+    return Promise.all([
+      fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
+      this.getBlockHeight()
+    ])
+    .then(([resp, blockHeight]) => {
+      if (resp.status === 404) {
+        throw new Error(`No such namespace '${namespace}'`)
+      } else {
+        return Promise.all([resp.json(), blockHeight])
+      }
+    })
+    .then(([namespaceInfo, blockHeight]) => {
+      let address = '1111111111111111111114oLvT2' // default burn address
+      if (namespaceInfo.version === 2) {
+        // pay-to-namespace-creator if this namespace is less than 1 year old
+        if (namespaceInfo.reveal_block + 52595 >= blockHeight) {
+          address = namespaceInfo.address
         }
-      })
-      .then(namespaceInfo => {
-        let address = '1111111111111111111114oLvT2' // default burn address
-        const blockHeights = Object.keys(namespaceInfo.history)
-        blockHeights.sort((x, y) => (parseInt(x, 10) - parseInt(y, 10)))
-        blockHeights.forEach(blockHeight => {
-          const infoAtBlock = namespaceInfo.history[blockHeight][0]
-          if (infoAtBlock.hasOwnProperty('burn_address')) {
-            address = infoAtBlock.burn_address
-          }
-        })
-        return address
-      })
-      .then(address => this.coerceAddress(address))
+      }
+      return address
+    })
+    .then(address => this.coerceAddress(address))
   }
 
   getNameInfo(fullyQualifiedName: string) {
