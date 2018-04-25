@@ -9,6 +9,8 @@ import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate } from '../keys'
 import { lookupProfile } from '../profiles'
 
+import { Logger } from '../logger'
+
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read
@@ -88,7 +90,7 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
     .then((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
-          console.log(`getFile ${path} returned 404, returning null`)
+          Logger.debug(`getFile ${path} returned 404, returning null`)
           return null
         } else {
           throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
