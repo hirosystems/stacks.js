@@ -1156,7 +1156,7 @@ function safetyTests() {
     FetchMock.get('https://core.blockstack.org/v1/names/bar.test',
                   { body: 'Name available', status: 404 })
     FetchMock.get('https://core.blockstack.org/v1/names/foo.test',
-                  { expires_block: 50 })
+                  { expire_block: 50 })
     FetchMock.getOnce('https://blockchain.info/latestblock?cors=true',
                       { height: 49 })
     safety.isInGracePeriod('foo.test')
