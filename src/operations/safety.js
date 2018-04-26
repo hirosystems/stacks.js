@@ -123,7 +123,8 @@ function isInGracePeriod(fullyQualifiedName: string) {
 
 function addressCanReceiveName(address: string) {
   return config.network.getNamesOwned(address)
-    .then((names) => (names.length < 25))
+    .then((names) => (Promise.all(names.map((name) => isNameValid(name)))
+      .then((validNames) => validNames.filter((nameValid) => nameValid).length < 25)))
 }
 
 export const safety = {
