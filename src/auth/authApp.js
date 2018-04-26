@@ -17,6 +17,8 @@ import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage'
 
 import { extractProfile } from '../profiles'
 
+import { Logger } from '../logger'
+
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
@@ -68,17 +70,17 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
   function successCallback() {
-    console.log('protocol handler detected')
+    Logger.info('protocol handler detected')
     // protocolCheck should open the link for us
   }
 
   function failCallback() {
-    console.log('protocol handler not detected')
+    Logger.warn('protocol handler not detected')
     window.location = httpsURI
   }
 
   function unsupportedBrowserCallback() { // Safari is unsupported by protocolCheck
-    console.log('can not detect custom protocols on this browser')
+    Logger.warn('can not detect custom protocols on this browser')
     window.location = protocolURI
   }
 
@@ -163,7 +165,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
             try {
               appPrivateKey = decryptPrivateKey(transitKey, tokenPayload.private_key)
             } catch (e) {
-              console.log('Failed decryption of appPrivateKey, will try to use as given')
+              Logger.warn('Failed decryption of appPrivateKey, will try to use as given')
               try {
                 hexStringToECPair(tokenPayload.private_key)
               } catch (ecPairError) {
@@ -176,7 +178,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
             try {
               coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
             } catch (e) {
-              console.log('Failed decryption of coreSessionToken, will try to use as given')
+              Logger.info('Failed decryption of coreSessionToken, will try to use as given')
             }
           }
         } else {
