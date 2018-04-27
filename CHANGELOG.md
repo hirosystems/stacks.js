@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `encryptContent` and `decryptContent` methods for encrypting strings and buffers with 
+  specific keys, or by default, the appPrivateKey.
 - `network.BlockstackNetwork.getDefaultBurnAddress()` method to get the default burn address
   regardless of whether or not the code runs in regtest or mainnet.
 - `network.BlockstackNetwork.getNamespacePrice()` method to get the price of a namespace.
