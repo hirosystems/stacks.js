@@ -637,7 +637,7 @@ export class BitcoindAPI extends BitcoinNetwork {
       .then(resp => resp.json())
       .then(x => x.result)
       .then(utxos => utxos.map(
-        x => Object({ value: x.amount * SATOSHIS_PER_BTC,
+        x => Object({ value: parseInt(Math.round(x.amount * SATOSHIS_PER_BTC)),
                       confirmations: x.confirmations,
                       tx_hash: x.txid,
                       tx_output_n: x.vout })))
