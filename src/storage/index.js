@@ -117,6 +117,19 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
 }
 
 /**
+ * Encrypts the data provided.
+ * @param {String|Buffer} content - the data to store in the file
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
+export function encryptContent(content: string | Buffer) {
+  const privateKey = loadUserData().appPrivateKey
+  const publicKey = getPublicKeyFromPrivate(privateKey)
+  const cipherObject = encryptECIES(publicKey, content)
+  return JSON.stringify(cipherObject)
+}
+
+/**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
@@ -140,8 +153,7 @@ export function putFile(path: string, content: string | Buffer, options?: {encry
     const privateKey = loadUserData().appPrivateKey
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const cipherObject = encryptECIES(publicKey, content)
-    content = JSON.stringify(cipherObject)
-    contentType = 'application/json'
+    content = encryptContent(content)
   }
   return getOrSetLocalGaiaHubConnection()
     .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
