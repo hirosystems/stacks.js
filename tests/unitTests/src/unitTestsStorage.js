@@ -232,6 +232,16 @@ export function runStorageTests() {
     window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
   })
 
+  test('encrypt & decrypt content -- specify key', (t) => {
+    t.plan(2)
+    const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
+    const content = 'we-all-live-in-a-yellow-submarine'
+    const ciphertext = encryptContent(content, { privateKey })
+    t.ok(ciphertext)
+    const deciphered = decryptContent(ciphertext, { privateKey })
+    t.equal(content, deciphered)
+  })
+
   test('putFile unencrypted', (t) => {
     t.plan(1)
 

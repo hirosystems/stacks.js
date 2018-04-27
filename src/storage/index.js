@@ -49,11 +49,19 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 /**
  * Encrypts the data provided with the transit public key.
  * @param {String|Buffer} content - data to encrypt
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
  * @return {String} Stringified ciphertext object
  */
-export function encryptContent(content: string | Buffer) {
-  const privateKey = loadUserData().appPrivateKey
-  const publicKey = getPublicKeyFromPrivate(privateKey)
+export function encryptContent(content: string | Buffer, options?: {privateKey?: string}) {
+  const defaults = { privateKey: null }
+  const opt = Object.assign({}, defaults, options)
+  if (! opt.privateKey) {
+    opt.privateKey = loadUserData().appPrivateKey
+  }
+
+  const publicKey = getPublicKeyFromPrivate(opt.privateKey)
   const cipherObject = encryptECIES(publicKey, content)
   return JSON.stringify(cipherObject)
 }
@@ -62,12 +70,20 @@ export function encryptContent(content: string | Buffer) {
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
  * @return {String|Buffer} decrypted content.
  */
-export function decryptContent(content: string) {
-  const privateKey = loadUserData().appPrivateKey
+export function decryptContent(content: string, options?: {privateKey?: ?string}) {
+  const defaults = { privateKey: null }
+  const opt = Object.assign({}, defaults, options)
+  if (! opt.privateKey) {
+    opt.privateKey = loadUserData().appPrivateKey
+  }
+
   const cipherObject = JSON.parse(content)
-  return decryptECIES(privateKey, cipherObject)
+  return decryptECIES(opt.privateKey, cipherObject)
 }
 
 /**
