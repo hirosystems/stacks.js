@@ -153,10 +153,15 @@ The app private key serves three functions.
 
 ## Scopes
 
-Scopes define the information and permissions an app requests from the user during authentication. If no `scopes` array is provided to the `redirectToSignIn` or `makeAuthRequest` functions, the following is requested:
+Scopes define the information and permissions an app requests from the
+user during authentication. Requested scopes may be any of the following:
+
 - `store_write` - read and write data to the user's Gaia hub in an app-specific storage bucket
 - `publish_data` - publish data so that other users of the app can discover and interact with the user
 - `email` - requests the user's email if available
+
+ If no `scopes` array is provided to the `redirectToSignIn` or
+`makeAuthRequest` functions, the default is to request `['store_write']`.
 
 ## Authentication tokens
 
