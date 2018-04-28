@@ -1,8 +1,8 @@
 /* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
-
 import { MissingParameterError, RemoteServiceError } from './errors'
+import { Logger } from './logger'
 
 type UTXO = { value?: number,
               confirmations?: number,
@@ -41,6 +41,10 @@ export class BlockstackNetwork {
     return bitcoinjs.address.toBase58Check(addressHash, this.layer1.pubKeyHash)
   }
 
+  getDefaultBurnAddress() {
+    return this.coerceAddress('1111111111111111111114oLvT2')
+  }
+
   getNamePrice(fullyQualifiedName: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
@@ -58,6 +62,23 @@ export class BlockstackNetwork {
       })
   }
 
+  getNamespacePrice(namespaceID: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
+      .then(resp => resp.json())
+      .then(x => x.satoshis)
+      .then(satoshis => {
+        if (satoshis) {
+          if (satoshis < this.DUST_MINIMUM) {
+            return this.DUST_MINIMUM
+          } else {
+            return satoshis
+          }
+        } else {
+          throw new Error('Failed to parse price of namespace')
+        }
+      })
+  }
+
   getGracePeriod() {
     return new Promise((resolve) => resolve(5000))
   }
@@ -70,27 +91,28 @@ export class BlockstackNetwork {
   }
 
   getNamespaceBurnAddress(namespace: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`)
-      .then(resp => {
-        if (resp.status === 404) {
-          throw new Error(`No such namespace '${namespace}'`)
-        } else {
-          return resp.json()
+    return Promise.all([
+      fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
+      this.getBlockHeight()
+    ])
+    .then(([resp, blockHeight]) => {
+      if (resp.status === 404) {
+        throw new Error(`No such namespace '${namespace}'`)
+      } else {
+        return Promise.all([resp.json(), blockHeight])
+      }
+    })
+    .then(([namespaceInfo, blockHeight]) => {
+      let address = '1111111111111111111114oLvT2' // default burn address
+      if (namespaceInfo.version === 2) {
+        // pay-to-namespace-creator if this namespace is less than 1 year old
+        if (namespaceInfo.reveal_block + 52595 >= blockHeight) {
+          address = namespaceInfo.address
         }
-      })
-      .then(namespaceInfo => {
-        let address = '1111111111111111111114oLvT2' // default burn address
-        const blockHeights = Object.keys(namespaceInfo.history)
-        blockHeights.sort((x, y) => (parseInt(x, 10) - parseInt(y, 10)))
-        blockHeights.forEach(blockHeight => {
-          const infoAtBlock = namespaceInfo.history[blockHeight][0]
-          if (infoAtBlock.hasOwnProperty('burn_address')) {
-            address = infoAtBlock.burn_address
-          }
-        })
-        return address
-      })
-      .then(address => this.coerceAddress(address))
+      }
+      return address
+    })
+    .then(address => this.coerceAddress(address))
   }
 
   getNameInfo(fullyQualifiedName: string) {
@@ -112,6 +134,44 @@ export class BlockstackNetwork {
           return Object.assign({}, nameInfo, { address: this.coerceAddress(nameInfo.address) })
         } else {
           return nameInfo
+        }
+      })
+  }
+
+  getNamespaceInfo(namespaceID: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
+      .then(resp => {
+        if (resp.status === 404) {
+          throw new Error('Namespace not found')
+        } else if (resp.status !== 200) {
+          throw new Error(`Bad response status: ${resp.status}`)
+        } else {
+          return resp.json()
+        }
+      })
+      .then(namespaceInfo => {
+        // the returned address _should_ be in the correct network ---
+        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  and the regtest transaction generation libraries want to use testnet addresses
+        if (namespaceInfo.address && namespaceInfo.recipient_address) {
+          return Object.assign({}, namespaceInfo, {
+            address: this.coerceAddress(namespaceInfo.address),
+            recipient_address: this.coerceAddress(namespaceInfo.recipient_address)
+          })
+        } else {
+          return namespaceInfo
+        }
+      })
+  }
+
+  getZonefile(zonefileHash: string) {
+    return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
+      .then(resp => {
+        if (resp.status === 200) {
+          return resp.text()
+            .then(body => body)
+        } else {
+          throw new Error(`Bad response status: ${resp.status}`)
         }
       })
   }
@@ -542,7 +602,7 @@ export class BitcoindAPI extends BitcoinNetwork {
                             params: [address] }
     const jsonRPCUnspent = { jsonrpc: '1.0',
                              method: 'listunspent',
-                             params: [1, 9999999, [address]] }
+                             params: [0, 9999999, [address]] }
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')
@@ -557,7 +617,7 @@ export class BitcoindAPI extends BitcoinNetwork {
       .then(resp => resp.json())
       .then(x => x.result)
       .then(utxos => utxos.map(
-        x => Object({ value: x.amount * SATOSHIS_PER_BTC,
+        x => Object({ value: Math.round(x.amount * SATOSHIS_PER_BTC),
                       confirmations: x.confirmations,
                       tx_hash: x.txid,
                       tx_output_n: x.vout })))
@@ -631,7 +691,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
     return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
       .then(resp => {
         if (resp.status === 500) {
-          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
+          Logger.debug('UTXO provider 500 usually means no UTXOs: returning []')
           return {
             unspent_outputs: []
           }

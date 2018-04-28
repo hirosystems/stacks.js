@@ -26,15 +26,6 @@ version. These features will be rolled out in future updates._
  });
 ```
 
-## Deleting a file
-
-```JavaScript
- blockstack.deleteFile("/hello.txt")
- .then(() => {
-    // /hello.txt is now removed.
- })
-```
-
 ## Creating an encrypted file
 
 ```JavaScript
@@ -77,4 +68,16 @@ the `publish_data` scope during authentication.
     // get the contents of the file /message.txt
     assert(fileContents === "hello world!")
  });
+```
+
+## Deleting a file
+
+_Note: deleteFile is currently not implemented. For now, we recommend
+writing an empty file to wipe data_
+
+```JavaScript
+ blockstack.deleteFile("/hello.txt")
+ .then(() => {
+    // /hello.txt is now removed.
+ })
 ```

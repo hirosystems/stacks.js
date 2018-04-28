@@ -6,7 +6,8 @@ import bitcoin from 'bitcoinjs-lib'
 import { uploadToGaiaHub, getFullReadUrl,
          connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
          getBucketUrl } from '../../../lib/storage/hub'
-import { getFile } from '../../../lib/storage'
+import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
+import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 
 class LocalStorage {
   constructor() {
@@ -212,6 +213,33 @@ export function runStorageTests() {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
       })
+  })
+
+  test('encrypt & decrypt content', (t) => {
+    t.plan(2)
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const userData = JSON.stringify({ appPrivateKey: privateKey })
+    // save any previous content
+    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
+    // simulate fake user signed in
+    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, userData)
+    const content = 'yellowsubmarine'
+    const ciphertext = encryptContent(content)
+    t.ok(ciphertext)
+    const deciphered = decryptContent(ciphertext)
+    t.equal(content, deciphered)
+    // put back whatever was inside before
+    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
+  })
+
+  test('encrypt & decrypt content -- specify key', (t) => {
+    t.plan(2)
+    const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
+    const content = 'we-all-live-in-a-yellow-submarine'
+    const ciphertext = encryptContent(content, { privateKey })
+    t.ok(ciphertext)
+    const deciphered = decryptContent(ciphertext, { privateKey })
+    t.equal(content, deciphered)
   })
 
   test('putFile unencrypted', (t) => {

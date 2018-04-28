@@ -5,12 +5,15 @@ import bitcoinjs from 'bitcoinjs-lib'
 import { addUTXOsToFund, DUST_MINIMUM,
          estimateTXBytes, sumOutputValues, hash160 } from './utils'
 import { makePreorderSkeleton, makeRegisterSkeleton,
-         makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton } from './skeletons'
+         makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton,
+         makeRevokeSkeleton, makeNamespacePreorderSkeleton,
+         makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
+         makeNameImportSkeleton, makeAnnounceSkeleton,
+         BlockstackNamespace } from './skeletons'
 import { config } from '../config'
 import { hexStringToECPair } from '../utils'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
 
-const dummyBurnAddress   = '1111111111111111111114oLvT2'
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
 
@@ -19,7 +22,7 @@ function addOwnerInput(utxos: Object,
                        txB: bitcoinjs.TransactionBuilder,
                        addChangeOut: boolean = true) {
   // add an owner UTXO and a change out.
-  if (utxos.length < 0) {
+  if (utxos.length <= 0) {
     throw new Error('Owner has no UTXOs for UPDATE.')
   }
 
@@ -66,11 +69,11 @@ function estimatePreorder(fullyQualifiedName: string,
                           paymentAddress: string,
                           paymentUtxos: number = 1) : Promise<number> {
   const network = config.network
-
   const preorderPromise = network.getNamePrice(fullyQualifiedName)
         .then(namePrice => makePreorderSkeleton(
           fullyQualifiedName, dummyConsensusHash, paymentAddress,
-          dummyBurnAddress, namePrice, destinationAddress))
+          network.getDefaultBurnAddress(), namePrice,
+          destinationAddress))
 
   return Promise.all([network.getFeeRate(), preorderPromise])
     .then(([feeRate, preorderTX]) => {
@@ -209,7 +212,7 @@ function estimateRenewal(fullyQualifiedName: string,
   const renewalPromise = network.getNamePrice(fullyQualifiedName)
         .then((namePrice) => makeRenewalSkeleton(
           fullyQualifiedName, destinationAddress, ownerAddress,
-          dummyBurnAddress, namePrice, valueHash))
+          network.getDefaultBurnAddress(), namePrice, valueHash))
 
   return Promise.all([network.getFeeRate(), renewalPromise])
     .then(([feeRate, renewalTX]) => {
@@ -218,6 +221,164 @@ function estimateRenewal(fullyQualifiedName: string,
       // and renewal skeleton includes all outputs for owner change, but not for payer change.
       const txFee = feeRate * estimateTXBytes(renewalTX, 1 + paymentUtxos, 1)
       return txFee + outputsValue - 5500 // don't count the dust change for old owner.
+    })
+}
+
+/**
+ * Estimates cost of a revoke transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to revoke
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress  the address funding the revoke
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund the
+ *    revoke.
+ * @private
+ */
+function estimateRevoke(fullyQualifiedName: string,
+                        ownerAddress: string,
+                        paymentAddress: string,
+                        paymentUtxos: number = 1) : Promise<number>  {
+  const network = config.network
+  const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
+
+  return Promise.all([network.getFeeRate()])
+    .then(([feeRate]) => {
+      const outputsValue = sumOutputValues(revokeTX)
+      // 1 additional input for owner
+      // 1 additional output for payer change
+      const txFee = feeRate * estimateTXBytes(revokeTX, 1 + paymentUtxos, 2)
+      return txFee + outputsValue
+    })
+}
+
+/**
+ * Estimates cost of a namespace preorder transaction for a namespace
+ * @param {String} namespaceID - the namespace to preorder
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentAddress - the address funding the preorder
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the preorder. This includes a 5500 satoshi dust output for the preorder.
+ *    Even though this is a change output, the payer must supply enough funds
+ *    to generate this output, so we include it in the cost.
+ * @private
+ */
+function estimateNamespacePreorder(namespaceID: string,
+                                   revealAddress: string,
+                                   paymentAddress: string,
+                                   paymentUtxos: number = 1) : Promise<number> {
+  const network = config.network
+
+  const preorderPromise = network.getNamespacePrice(namespaceID)
+        .then(namespacePrice => makeNamespacePreorderSkeleton(
+          namespaceID, dummyConsensusHash, paymentAddress, revealAddress,
+          namespacePrice))
+
+  return Promise.all([network.getFeeRate(), preorderPromise])
+    .then(([feeRate, preorderTX]) => {
+      const outputsValue = sumOutputValues(preorderTX)
+      const txFee = feeRate * estimateTXBytes(preorderTX, paymentUtxos, 0)
+      return txFee + outputsValue
+    })
+}
+
+/**
+ * Estimates cost of a namesapce reveal transaction for a namespace
+ * @param {BlockstackNamespace} namespace - the namespace to reveal
+ * @param {String} revealAddress - the address to receive the namespace
+ *    (this must have been passed as 'revealAddress' to a prior namespace
+ *    preorder)
+ * @param {String} paymentAddress - the address that pays for this transaction
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to 
+ *    fund the reveal.  This includes a 5500 satoshi dust output for the
+ *    preorder.  Even though this is a change output, the payer must have
+ *    enough funds to generate this output, so we include it in the cost.
+ */
+function estimateNamespaceReveal(namespace: BlockstackNamespace,
+                                 revealAddress: string,
+                                 paymentAddress: string,
+                                 paymentUtxos: number = 1) : Promise<number> {
+  const network = config.network
+  const revealTX = makeNamespaceRevealSkeleton(namespace, revealAddress)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(revealTX)
+      // 1 additional output for payer change
+      const txFee = feeRate * estimateTXBytes(revealTX, paymentUtxos, 1)
+      return txFee + outputsValue
+    })
+}
+
+/**
+ * Estimates the cost of a namespace-ready transaction for a namespace
+ * @param {String} namespaceID - the namespace to ready
+ * @param {Number} revealUtxos - the number of UTXOs we expect will
+ *  be required from the reveal address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *  fund this namespacey-ready transaction.
+ */
+function estimateNamespaceReady(namespaceID: string,
+                                revealUtxos: number = 1) : Promise<number> {
+  const network = config.network
+  const readyTX = makeNamespaceReadySkeleton(namespaceID)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(readyTX)
+      const txFee = feeRate * estimateTXBytes(readyTX, revealUtxos, 1)
+      return txFee + outputsValue
+    })
+}
+
+/**
+ * Estimates the cost of a name-import transaction 
+ * @param {String} name - the fully-qualified name
+ * @param {String} recipientAddr - the recipient
+ * @param {String} zonefileHash - the zone file hash
+ * @param {Number} importUtxos - the number of UTXOs we expect will 
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost 
+ *  to fund this name-import transaction
+ */
+function estimateNameImport(name: string,
+                            recipientAddr: string,
+                            zonefileHash: string,
+                            importUtxos: number = 1) : Promise<number> {
+  const network = config.network
+  const importTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(importTX)
+      const txFee = feeRate * estimateTXBytes(importTX, importUtxos, 1)
+      return txFee + outputsValue
+    })
+}                            
+
+/**
+ * Estimates the cost of an announce transaction 
+ * @param {String} messageHash - the hash of the message 
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost
+ *  to fund this announce transaction
+ */
+function estimateAnnounce(messageHash: string,
+                          senderUtxos: number = 1) : Promise<number> {
+  const network = config.network
+  const announceTX = makeAnnounceSkeleton(messageHash)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(announceTX)
+      const txFee = feeRate * estimateTXBytes(announceTX, senderUtxos, 1)
+      return txFee + outputsValue
     })
 }
 
@@ -275,6 +436,8 @@ function makePreorder(fullyQualifiedName: string,
  * @param {String} zonefile - the zonefile data to update (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
+ * @param {String} valueHash - if given, this is the hash to store (instead of
+ *    zonefile).  zonefile will be ignored if this is given.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -283,9 +446,23 @@ function makePreorder(fullyQualifiedName: string,
 function makeUpdate(fullyQualifiedName: string,
                     ownerKeyHex: string,
                     paymentKeyHex: string,
-                    zonefile: string) {
+                    zonefile: string,
+                    valueHash: string = '') {
   const network = config.network
-  const valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+  if (!valueHash && !zonefile) {
+    return Promise.reject(
+      new Error('Need zonefile or valueHash arguments'))
+  }
+  if (valueHash.length === 0) {
+    if (!zonefile) {
+      return Promise.reject(
+        new Error('Need zonefile or valueHash arguments'))
+    }
+    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+  } else if (valueHash.length !== 40) {
+    return Promise.reject(
+      new Error(`Invalid valueHash ${valueHash}`))
+  }
 
   const ownerKey = hexStringToECPair(ownerKeyHex)
   const paymentKey = hexStringToECPair(paymentKeyHex)
@@ -328,6 +505,8 @@ function makeUpdate(fullyQualifiedName: string,
  * @param {String} zonefile - the zonefile data to include (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
+ * @param {String} valueHash - the hash of the zone file data to include.
+ *    It will be used instead of zonefile, if given
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -336,11 +515,14 @@ function makeUpdate(fullyQualifiedName: string,
 function makeRegister(fullyQualifiedName: string,
                       registerAddress: string,
                       paymentKeyHex: string,
-                      zonefile: ?string = null) {
+                      zonefile: ?string = null,
+                      valueHash: ?string = null) {
   const network = config.network
-  let valueHash = undefined
-  if (!!zonefile) {
+  if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+  } else if (!!valueHash && valueHash.length !== 40) {
+    return Promise.reject(
+      new Error(`Invalid zonefile hash ${valueHash}`))
   }
 
   const registerSkeleton = makeRegisterSkeleton(
@@ -369,6 +551,7 @@ function makeRegister(fullyQualifiedName: string,
  *    private key
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the transaction
+ * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -377,7 +560,8 @@ function makeRegister(fullyQualifiedName: string,
 function makeTransfer(fullyQualifiedName: string,
                       destinationAddress: string,
                       ownerKeyHex: string,
-                      paymentKeyHex: string) {
+                      paymentKeyHex: string,
+                      keepZonefile: boolean = false) {
   const network = config.network
   const ownerKey = hexStringToECPair(ownerKeyHex)
   const paymentKey = hexStringToECPair(paymentKeyHex)
@@ -386,9 +570,52 @@ function makeTransfer(fullyQualifiedName: string,
 
   const txPromise = network.getConsensusHash()
         .then((consensusHash) =>
-              makeTransferSkeleton(fullyQualifiedName, consensusHash, destinationAddress))
+              makeTransferSkeleton(
+                fullyQualifiedName, consensusHash, destinationAddress, keepZonefile))
         .then((transferTX) =>
               bitcoinjs.TransactionBuilder.fromTransaction(transferTX, network.layer1))
+
+  return Promise.all([txPromise, network.getUTXOs(paymentAddress),
+                      network.getUTXOs(ownerAddress), network.getFeeRate()])
+    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
+      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
+      const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
+                                         ownerInput.value)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        if (i === ownerInput.index) {
+          signingTxB.sign(i, ownerKey)
+        } else {
+          signingTxB.sign(i, paymentKey)
+        }
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+/**
+ * Generates a revoke transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to revoke
+ * @param {String} ownerKeyHex - a hex string of the current owner's
+ *    private key
+ * @param {String} paymentKeyHex - a hex string of the private key used to 
+ *    fund the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+function makeRevoke(fullyQualifiedName: string,
+                    ownerKeyHex: string,
+                    paymentKeyHex: string) {
+  const network = config.network
+  const ownerKey = hexStringToECPair(ownerKeyHex)
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+  const paymentAddress = paymentKey.getAddress()
+  const ownerAddress = ownerKey.getAddress()
+  
+  const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
+
+  const txPromise = bitcoinjs.TransactionBuilder.fromTransaction(revokeTX, network.layer1)
 
   return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                       network.getUTXOs(ownerAddress), network.getFeeRate()])
@@ -416,9 +643,11 @@ function makeTransfer(fullyQualifiedName: string,
  *    private key
  * @param {String} paymentKeyHex - a hex string of the private key used to
  *    fund the renewal
- * @param {String} zonefile - the zonefile data to include (this will be hashed
+ * @param {String} zonefile - the zonefile data to include, if given (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the RENEWAL propagates.
+ * @param {String} valueHash - the raw zone file hash to include (this will be used
+ *    instead of zonefile, if given).
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -428,11 +657,11 @@ function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
                      ownerKeyHex: string,
                      paymentKeyHex: string,
-                     zonefile: ?string = null) {
-  let valueHash = undefined
+                     zonefile: ?string = null,
+                     valueHash: ?string = null) {
   const network = config.network
 
-  if (!!zonefile) {
+  if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   }
 
@@ -460,8 +689,9 @@ function makeRenewal(fullyQualifiedName: string,
       const ownerOutputAddr = bitcoinjs.address.fromOutputScript(
         ownerOutput.script, network.layer1)
       if (ownerOutputAddr !== ownerAddress) {
-        throw new Error(`Original owner ${ownerAddress} should have an output at ` +
-                        `index 2 in transaction was ${ownerOutputAddr}`)
+        return Promise.reject(
+          new Error(`Original owner ${ownerAddress} should have an output at ` +
+                        `index 2 in transaction was ${ownerOutputAddr}`))
       }
       ownerOutput.value = ownerInput.value
       const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
@@ -473,6 +703,176 @@ function makeRenewal(fullyQualifiedName: string,
         } else {
           signingTxB.sign(i, paymentKey)
         }
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+
+/**
+ * Generates a namespace preorder transaction for a namespace
+ * @param {String} namespaceID - the namespace to pre-order
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentKeyHex - a hex string of the private key used to
+ *    fund the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+function makeNamespacePreorder(namespaceID: string,
+                               revealAddress: string,
+                               paymentKeyHex: string) {
+  const network = config.network
+
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+  const preorderAddress = paymentKey.getAddress()
+
+  const preorderPromise = Promise.all([network.getConsensusHash(),
+                                       network.getNamespacePrice(namespaceID)])
+        .then(([consensusHash, namespacePrice]) =>
+          makeNamespacePreorderSkeleton(
+            namespaceID, consensusHash, preorderAddress, revealAddress,
+            namespacePrice))
+
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
+    .then(([utxos, feeRate, preorderSkeleton]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+
+      const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
+      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
+
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, paymentKey)
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+
+/**
+ * Generates a namespace reveal transaction for a namespace
+ * @param {BlockstackNamespace} namespace - the namespace to reveal
+ * @param {String} revealAddress - the address to receive the namespace (this 
+ *   must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentKeyHex - a hex string of the private key used to fund
+ *   the transaction
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *   this function *does not* perform the requisite safety checks -- please see
+ *   the safety module for those.
+ * @private
+ */
+function makeNamespaceReveal(namespace: BlockstackNamespace,
+                             revealAddress: string,
+                             paymentKeyHex: string) {
+  const network = config.network
+
+  if (!namespace.check()) {
+    return Promise.reject(new Error('Invalid namespace'))
+  }
+
+  const paymentKey = hexStringToECPair(paymentKeyHex)
+  const preorderAddress = paymentKey.getAddress()
+  const namespaceRevealTX = makeNamespaceRevealSkeleton(namespace, revealAddress)
+
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceRevealTX, network.layer1)
+      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, paymentKey)
+      }
+      return signingTxB.build().toHex()
+    })
+} 
+
+
+/**
+ * Generates a namespace ready transaction for a namespace
+ * @param {String} namespaceID - the namespace to launch
+ * @param {String} revealKeyHex - the private key of the 'revealAddress' used
+ *  to reveal the namespace.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *  this function *does not* perform the requisite safety checks -- please see
+ *  the safety module for those.
+ * @private
+ */
+function makeNamespaceReady(namespaceID: string,
+                            revealKeyHex: string) {
+  const network = config.network
+
+  const revealKey = hexStringToECPair(revealKeyHex)
+  const revealAddress = revealKey.getAddress()
+  const namespaceReadyTX = makeNamespaceReadySkeleton(namespaceID)
+
+  return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
+      const signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, revealKey)
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+/**
+ * Generates a name import transaction for a namespace
+ * @param {String} name - the name to import
+ * @param {String} recipientAddr - the address to receive the name 
+ * @param {String} zonefileHash - the hash of the zonefile to give this name
+ * @param {String} importerKeyHex - the private key that pays for the import
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see 
+ * the safety module for those.
+ * @private
+ */
+function makeNameImport(name: string, 
+                        recipientAddr: string, 
+                        zonefileHash: string,
+                        importerKeyHex: string) {
+  const network = config.network
+  
+  const importerKey = hexStringToECPair(importerKeyHex)
+  const importerAddress = importerKey.getAddress()
+  const nameImportTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
+
+  return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
+      const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, importerKey)
+      }
+      return signingTxB.build().toHex()
+    })
+}
+
+/**
+ * Generates an announce transaction 
+ * @param {String} messageHash - the hash of the message to send.  Should be
+ *  an already-announced zone file hash
+ * @param {String} senderKeyHex - the private key that pays for the transaction.  Should
+ *  be the key that owns the name that the message recipients subscribe to
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+function makeAnnounce(messageHash: string, senderKeyHex: string) {
+  const network = config.network
+
+  const senderKey = hexStringToECPair(senderKeyHex)
+  const senderAddress = senderKey.getAddress()
+  const announceTX = makeAnnounceSkeleton(messageHash)
+
+  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = bitcoinjs.TransactionBuilder.fromTransaction(announceTX, network.layer1)
+      const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
+      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        signingTxB.sign(i, senderKey)
       }
       return signingTxB.build().toHex()
     })
@@ -556,6 +956,10 @@ function makeBitcoinSpend(destinationAddress: string,
 }
 
 export const transactions = {
-  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeBitcoinSpend,
-  estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal
+  makeRenewal, makeUpdate, makePreorder, makeRegister, makeTransfer, makeRevoke,
+  makeNamespacePreorder, makeNamespaceReveal, makeNamespaceReady, makeBitcoinSpend,
+  makeNameImport, makeAnnounce, BlockstackNamespace,
+  estimatePreorder, estimateRegister, estimateTransfer, estimateUpdate, estimateRenewal,
+  estimateRevoke, estimateNamespacePreorder, estimateNamespaceReveal, estimateNamespaceReady,
+  estimateNameImport, estimateAnnounce
 }

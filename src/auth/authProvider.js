@@ -3,6 +3,8 @@ import { decodeToken } from 'jsontokens'
 import { updateQueryStringParameter } from '../index'
 import { BLOCKSTACK_HANDLER } from '../utils'
 
+import { Logger } from '../logger'
+
 /**
  * Retrieves the authentication request from the query string
  * @return {String|null} the authentication request or `null` if
@@ -42,11 +44,11 @@ export function fetchAppManifest(authRequest) {
             resolve(responseJSON)
           })
           .catch((e) => {
-            console.log(e.stack)
+            Logger.debug(e.stack)
             reject('URI request couldn\'t be completed')
           })
       } catch (e) {
-        console.log(e.stack)
+        Logger.debug(e.stack)
         reject('URI request couldn\'t be completed')
       }
     }
@@ -67,7 +69,7 @@ export function fetchAppManifest(authRequest) {
 export function redirectUserToApp(authRequest, authResponse) {
   const payload = decodeToken(authRequest).payload
   let redirectURI = payload.redirect_uri
-  console.log(redirectURI)
+  Logger.debug(redirectURI)
   if (redirectURI) {
     redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
   } else {
