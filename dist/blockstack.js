@@ -2644,7 +2644,7 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
         return x.result;
       }).then(function (utxos) {
         return utxos.map(function (x) {
-          return Object({ value: x.amount * SATOSHIS_PER_BTC,
+          return Object({ value: Math.round(x.amount * SATOSHIS_PER_BTC),
             confirmations: x.confirmations,
             tx_hash: x.txid,
             tx_output_n: x.vout });
@@ -2981,7 +2981,7 @@ function isInGracePeriod(fullyQualifiedName) {
         blockHeight = _ref2[1],
         gracePeriod = _ref2[2];
 
-    var expiresAt = nameInfo.expires_block;
+    var expiresAt = nameInfo.expire_block;
     return blockHeight >= expiresAt && blockHeight < gracePeriod + expiresAt;
   }).catch(function (e) {
     if (e.message === 'Name not found') {
@@ -2994,7 +2994,13 @@ function isInGracePeriod(fullyQualifiedName) {
 
 function addressCanReceiveName(address) {
   return _config.config.network.getNamesOwned(address).then(function (names) {
-    return names.length < 25;
+    return Promise.all(names.map(function (name) {
+      return isNameValid(name);
+    })).then(function (validNames) {
+      return validNames.filter(function (nameValid) {
+        return nameValid;
+      }).length < 25;
+    });
   });
 }
 
@@ -6985,6 +6991,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.GaiaHubConfig = exports.BLOCKSTACK_GAIA_HUB_LABEL = exports.uploadToGaiaHub = exports.connectToGaiaHub = undefined;
 exports.getUserAppFileUrl = getUserAppFileUrl;
+exports.encryptContent = encryptContent;
+exports.decryptContent = decryptContent;
 exports.getFile = getFile;
 exports.putFile = putFile;
 exports.getAppBucketUrl = getAppBucketUrl;
@@ -7034,6 +7042,46 @@ function getUserAppFileUrl(path, username, appOrigin) {
       return null;
     }
   });
+}
+
+/**
+ * Encrypts the data provided with the transit public key.
+ * @param {String|Buffer} content - data to encrypt
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
+ * @return {String} Stringified ciphertext object
+ */
+function encryptContent(content, options) {
+  var defaults = { privateKey: null };
+  var opt = Object.assign({}, defaults, options);
+  if (!opt.privateKey) {
+    opt.privateKey = (0, _auth.loadUserData)().appPrivateKey;
+  }
+
+  var publicKey = (0, _keys.getPublicKeyFromPrivate)(opt.privateKey);
+  var cipherObject = (0, _encryption.encryptECIES)(publicKey, content);
+  return JSON.stringify(cipherObject);
+}
+
+/**
+ * Decrypts data encrypted with `encryptContent` with the
+ * transit private key.
+ * @param {String|Buffer} content - encrypted content.
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
+ * @return {String|Buffer} decrypted content.
+ */
+function decryptContent(content, options) {
+  var defaults = { privateKey: null };
+  var opt = Object.assign({}, defaults, options);
+  if (!opt.privateKey) {
+    opt.privateKey = (0, _auth.loadUserData)().appPrivateKey;
+  }
+
+  var cipherObject = JSON.parse(content);
+  return (0, _encryption.decryptECIES)(opt.privateKey, cipherObject);
 }
 
 /**
@@ -7093,9 +7141,7 @@ function getFile(path, options) {
     }
   }).then(function (storedContents) {
     if (opt.decrypt && storedContents !== null) {
-      var privateKey = (0, _auth.loadUserData)().appPrivateKey;
-      var cipherObject = JSON.parse(storedContents);
-      return (0, _encryption.decryptECIES)(privateKey, cipherObject);
+      return decryptContent(storedContents);
     } else {
       return storedContents;
     }
@@ -7123,10 +7169,7 @@ function putFile(path, content, options) {
     contentType = 'application/octet-stream';
   }
   if (opt.encrypt) {
-    var privateKey = (0, _auth.loadUserData)().appPrivateKey;
-    var publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
-    var cipherObject = (0, _encryption.encryptECIES)(publicKey, content);
-    content = JSON.stringify(cipherObject);
+    content = encryptContent(content);
     contentType = 'application/json';
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
@@ -10976,7 +11019,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/hank/blockstack/blockstack.js"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -11002,7 +11045,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/hank/blockstack/blockstack.js",
+  "_where": "/home/aaron/devel/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -33809,7 +33852,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/hank/blockstack/blockstack.js"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -33833,7 +33876,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/hank/blockstack/blockstack.js",
+  "_where": "/home/aaron/devel/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -42078,7 +42121,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/hank/blockstack/blockstack.js"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -42105,7 +42148,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/hank/blockstack/blockstack.js",
+  "_where": "/home/aaron/devel/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -54566,7 +54609,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/hank/blockstack/blockstack.js"
+      "/home/aaron/devel/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -54590,7 +54633,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/hank/blockstack/blockstack.js",
+  "_where": "/home/aaron/devel/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
