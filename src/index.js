@@ -21,3 +21,5 @@ export { network } from './network'
 export { decodeToken } from 'jsontokens'
 
 export { config } from './config'
+
+export { searchUser } from './search'
