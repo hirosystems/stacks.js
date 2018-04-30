@@ -97,6 +97,11 @@ export const sampleAddressBasedVerifications = {
       url: 'https://www.instagram.com/p/BYj6UDwgaX7/',
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/ken.verification.instagram.html`, 'utf8')
     },
+    instagramRegression: {
+      url: 'https://www.instagram.com/p/BYj6UDwgaX7/',
+      body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/` +
+                            'ken.verification.instagram.regression.html', 'utf8')
+    },
     hackerNews: {
       url: 'https://news.ycombinator.com/user?id=yukanl',
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/ken.verification.hackernews.html`, 'utf8')

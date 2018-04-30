@@ -84,3 +84,12 @@ export class InvalidAmountError extends BlockstackError {
     this.message = message
   }
 }
+
+export class LoginFailedError extends BlockstackError {
+  constructor(reason: string) {
+    const message = `Failed to login: ${reason}`
+    super({ code: 'login_failed', message })
+    this.message = message
+    this.name = 'LoginFailedError'
+  }
+}

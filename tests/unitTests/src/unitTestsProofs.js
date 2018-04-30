@@ -135,10 +135,14 @@ export function runOwnerAddressBasedProofsUnitTests() {
 
 export function runInBodyIdentityVerificationTests() {
   test('getProofIdentity', (t) => {
-    t.plan(2)
+    t.plan(3)
     const ken = sampleAddressBasedVerifications.ken
 
     t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body),
+      'blckstcktest',
+      'Should extract social proof identity from Instagram proof page body')
+
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagramRegression.body),
       'blckstcktest',
       'Should extract social proof identity from Instagram proof page body')
 
