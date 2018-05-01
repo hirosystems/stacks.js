@@ -98,15 +98,15 @@ export class BlockstackNamespace {
   }
  
   setNonalphaDiscount(nonalphaDiscount: number) {
-    if (nonalphaDiscount < 0 || nonalphaDiscount > 15) {
-      throw new Error('Invalid nonalphaDiscount: must be a 4-bit number')
+    if (nonalphaDiscount <= 0 || nonalphaDiscount > 15) {
+      throw new Error('Invalid nonalphaDiscount: must be a positive 4-bit number')
     }
     this.nonalphaDiscount = nonalphaDiscount
   }
 
   setNoVowelDiscount(noVowelDiscount: number) {
-    if (noVowelDiscount < 0 || noVowelDiscount > 15) {
-      throw new Error('Invalid noVowelDiscount: must be a 4-bit number')
+    if (noVowelDiscount <= 0 || noVowelDiscount > 15) {
+      throw new Error('Invalid noVowelDiscount: must be a positive 4-bit number')
     }
     this.noVowelDiscount = noVowelDiscount
   }
