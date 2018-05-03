@@ -203,16 +203,20 @@ export function getFile(path: string, options?: {
                     opt.zoneFileLookupURL, true),
        getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)])
       .then(([fileContents, signatureContents, gaiaAddress]) => {
-        if (!fileContents || !signatureContents || !gaiaAddress) {
-          throw new Error('Failed to fetch file contents')
+        if (!fileContents) {
+          return fileContents
         }
-        if (typeof signatureContents !== 'string') {
-          throw new Error('Expected to get back a string for the signature')
+        if (!gaiaAddress) {
+          throw new SignatureVerificationError('Failed to get gaia address for verification')
+        }
+        if (!signatureContents || typeof signatureContents !== 'string') {
+          throw new SignatureVerificationError('Failed to obtain signature for file')
         }
         const { signature, publicKey } = JSON.parse(signatureContents)
         const signerAddress = publicKeyToAddress(publicKey)
         if (gaiaAddress !== signerAddress) {
-          throw new SignatureVerificationError('Signing public key does not match gaia address')
+          throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
+                                               ` match gaia address (${gaiaAddress})`)
         } else if (! verifyECDSA(Buffer.from(fileContents), publicKey, signature)) {
           throw new SignatureVerificationError('Contents do not match ECDSA signature')
         } else {
@@ -292,6 +296,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
               uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
               uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                               signatureContent, gaiaHubConfig, 'application/json')]))
+      .then(fileUrls => fileUrls[0])
   }
 
   // In all other cases, we only need one upload.
