@@ -127,7 +127,13 @@ function addressCanReceiveName(address: string) {
       .then((validNames) => validNames.filter((nameValid) => nameValid).length < 25)))
 }
 
+function isAccountSpendable(address: string, tokenType: string, blockHeight: number) {
+  return config.network.getAccountStatus(address, tokenType)
+    .then((accountStatus) => accountStatus.transfer_send_block_id >= blockHeight)
+}
+
 export const safety = {
   addressCanReceiveName, isInGracePeriod, ownsName, isNameAvailable, isNameValid,
-  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady, namespaceIsRevealed
+  isNamespaceValid, isNamespaceAvailable, revealedNamespace, namespaceIsReady, namespaceIsRevealed,
+  isAccountSpendable
 }

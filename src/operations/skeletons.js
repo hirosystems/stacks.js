@@ -98,15 +98,15 @@ export class BlockstackNamespace {
   }
  
   setNonalphaDiscount(nonalphaDiscount: number) {
-    if (nonalphaDiscount < 0 || nonalphaDiscount > 15) {
-      throw new Error('Invalid nonalphaDiscount: must be a 4-bit number')
+    if (nonalphaDiscount <= 0 || nonalphaDiscount > 15) {
+      throw new Error('Invalid nonalphaDiscount: must be a positive 4-bit number')
     }
     this.nonalphaDiscount = nonalphaDiscount
   }
 
   setNoVowelDiscount(noVowelDiscount: number) {
-    if (noVowelDiscount < 0 || noVowelDiscount > 15) {
-      throw new Error('Invalid noVowelDiscount: must be a 4-bit number')
+    if (noVowelDiscount <= 0 || noVowelDiscount > 15) {
+      throw new Error('Invalid noVowelDiscount: must be a positive 4-bit number')
     }
     this.noVowelDiscount = noVowelDiscount
   }
@@ -124,6 +124,7 @@ export class BlockstackNamespace {
   } 
 }
 
+
 function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
   // the "units" of a v1 amount type are always 'BTC'
@@ -133,6 +134,7 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
     return { units: amount.units, amount: amount.amount }
   }
 }
+
 
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
