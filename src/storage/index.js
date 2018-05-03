@@ -263,7 +263,7 @@ export function getFile(path: string, options?: {
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA
+ * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes.
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
