@@ -1305,16 +1305,12 @@ Object.defineProperty(exports, "__esModule", {
 exports.getHexFromBN = getHexFromBN;
 exports.encryptECIES = encryptECIES;
 exports.decryptECIES = decryptECIES;
-exports.signECDSA = signECDSA;
-exports.verifyECDSA = verifyECDSA;
 
 var _elliptic = require('elliptic');
 
 var _crypto = require('crypto');
 
 var _crypto2 = _interopRequireDefault(_crypto);
-
-var _keys = require('./keys');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1440,51 +1436,8 @@ function decryptECIES(privateKey, cipherObject) {
     return plainText;
   }
 }
-
-/**
- * Sign content using ECDSA
- * @param {String} privateKey - secp256k1 private key hex string
- * @param {Object} content - content to sign
- * @return {Object} contains:
- * content - Original content
- * signature - Hex encoded DER signature
- * public key - Hex encoded private string taken from privateKey
- */
-function signECDSA(privateKey, content) {
-  var contentBuffer = Buffer.from(content);
-  var ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex');
-  var publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
-  var contentHash = hmacSha256(publicKey, contentBuffer);
-  var signature = ecPrivate.sign(contentHash);
-  var signatureString = signature.toDER('hex');
-
-  return {
-    content: content,
-    signature: signatureString,
-    publicKey: publicKey
-  };
-}
-
-/**
- * Verify content using ECDSA
- * @param {Object} signatureObject - should contain 
- * content - Content to verify was signed
- * signature - Hex encoded DER signature
- * publicKey - secp256k1 private key hex string
- * @return {Boolean} returns true when signature matches publickey + content, false if not
- */
-function verifyECDSA(signatureObject) {
-  var content = signatureObject.content,
-      signature = signatureObject.signature,
-      publicKey = signatureObject.publicKey;
-
-  var ecPublic = ecurve.keyFromPublic(publicKey, 'hex');
-  var contentHash = hmacSha256(publicKey, content);
-
-  return ecPublic.verify(contentHash, signature);
-}
 }).call(this,require("buffer").Buffer)
-},{"./keys":13,"buffer":158,"crypto":167,"elliptic":283}],11:[function(require,module,exports){
+},{"buffer":158,"crypto":167,"elliptic":283}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7137,8 +7090,6 @@ function decryptContent(content, options) {
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {Boolean} options.verify - Whether the content should be verified, only to be used 
- * when `putFile` was set to `sign = true` 
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
  * @param {String} [options.zoneFileLookupURL=null] - The URL
@@ -7150,14 +7101,12 @@ function decryptContent(content, options) {
 function getFile(path, options) {
   var defaults = {
     decrypt: true,
-    verify: false,
     username: null,
     app: window.location.origin,
     zoneFileLookupURL: null
   };
 
   var opt = Object.assign({}, defaults, options);
-  var fileUrl = void 0;
 
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     if (opt.username) {
@@ -7170,7 +7119,6 @@ function getFile(path, options) {
       if (!readUrl) {
         reject(null);
       } else {
-        fileUrl = readUrl;
         resolve(readUrl);
       }
     });
@@ -7192,18 +7140,8 @@ function getFile(path, options) {
       return response.arrayBuffer();
     }
   }).then(function (storedContents) {
-    if (opt.decrypt && !opt.verify && storedContents !== null) {
+    if (opt.decrypt && storedContents !== null) {
       return decryptContent(storedContents);
-    } else if (opt.verify && storedContents !== null) {
-      var signatureObject = JSON.parse(storedContents);
-      var gaiaAddress = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,33})/)[0];
-      var signatureObjectAddress = (0, _keys.publicKeyToAddress)(signatureObject.publicKey);
-
-      if (gaiaAddress === signatureObjectAddress && (0, _encryption.verifyECDSA)(signatureObject)) {
-        return signatureObject.content;
-      } else {
-        throw new Error('Contents do not match signature');
-      }
     } else {
       return storedContents;
     }
@@ -7216,14 +7154,12 @@ function getFile(path, options) {
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
 function putFile(path, content, options) {
   var defaults = {
-    encrypt: true,
-    sign: false
+    encrypt: true
   };
 
   var opt = Object.assign({}, defaults, options);
@@ -7232,15 +7168,8 @@ function putFile(path, content, options) {
   if (typeof content !== 'string') {
     contentType = 'application/octet-stream';
   }
-
-  if (opt.encrypt && !opt.sign) {
+  if (opt.encrypt) {
     content = encryptContent(content);
-    contentType = 'application/json';
-  } else if (opt.sign) {
-    var _privateKey = (0, _auth.loadUserData)().appPrivateKey;
-    var cipherObject = (0, _encryption.signECDSA)(_privateKey, content);
-
-    content = JSON.stringify(cipherObject);
     contentType = 'application/json';
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
