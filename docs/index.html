@@ -295,26 +295,6 @@
               
                 
                 <li><a
-                  href='#signecdsa'
-                  class="">
-                  signECDSA
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#verifyecdsa'
-                  class="">
-                  verifyECDSA
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#broadcasttransaction'
                   class="">
                   broadcastTransaction
@@ -1774,17 +1754,6 @@ version. These features will be rolled out in future updates.</em></p>
                 </tr>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.verify</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-                  </td>
-                  <td class='break-word'><span>Whether the content should be verified, only to be used
-when 
-<code>putFile</code>
- was set to 
-<code>sign = true</code>
-</span></td>
-                </tr>
-              
-                <tr>
                   <td class='break-word'><span class='code bold'>options.app</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
                   </td>
                   <td class='break-word'><span>the app to lookup for multi-player storage -
@@ -1914,15 +1883,6 @@ or rejects with an error
                     (default <code>true</code>)
                   </td>
                   <td class='break-word'><span>encrypt the data with the app private key
-</span></td>
-                </tr>
-              
-                <tr>
-                  <td class='break-word'><span class='code bold'>options.sign</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-                  
-                    (default <code>false</code>)
-                  </td>
-                  <td class='break-word'><span>sign the data using ECDSA
 </span></td>
                 </tr>
               
@@ -2534,159 +2494,6 @@ if the
         <code>true</code>
  if valid, otherwise 
 <code>false</code>
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='signecdsa'>
-      signECDSA
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Sign content using ECDSA</p>
-
-
-  <div class='pre p1 fill-light mt0'>signECDSA(privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    secp256k1 private key hex string
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    content to sign
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
-        contains:
-content - Original content
-signature - Hex encoded DER signature
-public key - Hex encoded private string taken from privateKey
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='verifyecdsa'>
-      verifyECDSA
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Verify content using ECDSA</p>
-
-
-  <div class='pre p1 fill-light mt0'>verifyECDSA(signatureObject: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>signatureObject</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    should contain
-content - Content to verify was signed
-signature - Hex encoded DER signature
-publicKey - secp256k1 private key hex string
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
-        returns true when signature matches publickey + content, false if not
 
       
     
