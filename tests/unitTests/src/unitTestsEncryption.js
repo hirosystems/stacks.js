@@ -44,32 +44,34 @@ export function runEncryptionTests() {
     }
   })
 
-  test('sign-to-veryify-works', (t) => {
+  test('sign-to-verify-works', (t) => {
     t.plan(2)
 
     const testString = 'all work and no play makes jack a dull boy'
-    let signatureObject = signECDSA(privateKey, testString)
-    t.true(verifyECDSA(signatureObject), 'String content should be verified')
+    let sigObj = signECDSA(privateKey, testString)
+    t.true(verifyECDSA(testString, sigObj.publicKey, sigObj.signature),
+           'String content should be verified')
 
     const testBuffer = new Buffer(testString)
-    signatureObject = signECDSA(privateKey, testBuffer)
-    t.true(verifyECDSA(signatureObject), 'Buffer content should be verified')
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.true(verifyECDSA(testBuffer, sigObj.publicKey, sigObj.signature),
+           'String buffer should be verified')
   })
 
-  test('sign-to-veryify-fails', (t) => {
+  test('sign-to-verify-fails', (t) => {
     t.plan(2)
 
     const testString = 'all work and no play makes jack a dull boy'
     const failString = 'I should fail'
-    
-    let signatureObject = signECDSA(privateKey, testString)
-    signatureObject.content = failString
-    t.false(verifyECDSA(signatureObject), 'String content should not be verified')
 
-    const testBuffer = new Buffer(testString)
-    signatureObject = signECDSA(privateKey, testBuffer)
-    signatureObject.content = new Buffer(failString)
-    t.false(verifyECDSA(signatureObject), 'Buffer content should not be verified')
+    let sigObj = signECDSA(privateKey, testString)
+    t.false(verifyECDSA(failString, sigObj.publicKey, sigObj.signature),
+            'String content should not be verified')
+
+    const testBuffer = Buffer.from(testString)
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.false(verifyECDSA(Buffer.from(failString), sigObj.publicKey, sigObj.signature),
+            'Buffer content should not be verified')
   })
 
   test('bn-padded-to-64-bytes', (t) => {
