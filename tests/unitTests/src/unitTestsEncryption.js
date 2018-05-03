@@ -1,7 +1,7 @@
 import test from 'tape-promise/tape'
 
 import {
- encryptECIES, decryptECIES, getHexFromBN
+ encryptECIES, decryptECIES, getHexFromBN, signECDSA, verifyECDSA
 } from '../../../lib/encryption'
 
 import elliptic from 'elliptic'
@@ -42,6 +42,34 @@ export function runEncryptionTests() {
     } catch (e) {
       t.true(true, 'Decryption correctly fails when ciphertext modified')
     }
+  })
+
+  test('sign-to-veryify-works', (t) => {
+    t.plan(2)
+
+    const testString = 'all work and no play makes jack a dull boy'
+    let signatureObject = signECDSA(privateKey, testString)
+    t.true(verifyECDSA(signatureObject), 'String content should be verified')
+
+    const testBuffer = new Buffer(testString)
+    signatureObject = signECDSA(privateKey, testBuffer)
+    t.true(verifyECDSA(signatureObject), 'Buffer content should be verified')
+  })
+
+  test('sign-to-veryify-fails', (t) => {
+    t.plan(2)
+
+    const testString = 'all work and no play makes jack a dull boy'
+    const failString = 'I should fail'
+    
+    let signatureObject = signECDSA(privateKey, testString)
+    signatureObject.content = failString
+    t.false(verifyECDSA(signatureObject), 'String content should not be verified')
+
+    const testBuffer = new Buffer(testString)
+    signatureObject = signECDSA(privateKey, testBuffer)
+    signatureObject.content = new Buffer(failString)
+    t.false(verifyECDSA(signatureObject), 'Buffer content should not be verified')
   })
 
   test('bn-padded-to-64-bytes', (t) => {

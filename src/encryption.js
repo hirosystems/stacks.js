@@ -1,5 +1,6 @@
 import { ec as EllipticCurve } from 'elliptic'
 import crypto from 'crypto'
+import { getPublicKeyFromPrivate } from './keys'
 
 const ecurve = new EllipticCurve('secp256k1')
 
@@ -129,4 +130,44 @@ export function decryptECIES(privateKey: string, cipherObject: string) {
   } else {
     return plainText
   }
+}
+
+/**
+ * Sign content using ECDSA
+ * @param {String} privateKey - secp256k1 private key hex string
+ * @param {Object} content - content to sign
+ * @return {Object} contains:
+ * content - Original content
+ * signature - Hex encoded DER signature
+ * public key - Hex encoded private string taken from privateKey
+ */
+export function signECDSA(privateKey: string, content: string | Buffer) {
+  const contentBuffer = Buffer.from(content)
+  const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
+  const publicKey = getPublicKeyFromPrivate(privateKey)
+  const contentHash = hmacSha256(publicKey, contentBuffer)
+  const signature = ecPrivate.sign(contentHash)
+  const signatureString = signature.toDER('hex')
+
+  return {
+    content,
+    signature: signatureString,
+    publicKey
+  }
+}
+
+/**
+ * Verify content using ECDSA
+ * @param {Object} signatureObject - should contain 
+ * content - Content to verify was signed
+ * signature - Hex encoded DER signature
+ * publicKey - secp256k1 private key hex string
+ * @return {Boolean} returns true when signature matches publickey + content, false if not
+ */
+export function verifyECDSA(signatureObject: Object) {
+  const { content, signature, publicKey } = signatureObject
+  const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
+  const contentHash = hmacSha256(publicKey, content)
+
+  return ecPublic.verify(contentHash, signature)
 }
