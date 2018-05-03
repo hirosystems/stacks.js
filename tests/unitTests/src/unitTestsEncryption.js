@@ -59,7 +59,7 @@ export function runEncryptionTests() {
   })
 
   test('sign-to-verify-fails', (t) => {
-    t.plan(2)
+    t.plan(3)
 
     const testString = 'all work and no play makes jack a dull boy'
     const failString = 'I should fail'
@@ -71,6 +71,11 @@ export function runEncryptionTests() {
     const testBuffer = Buffer.from(testString)
     sigObj = signECDSA(privateKey, testBuffer)
     t.false(verifyECDSA(Buffer.from(failString), sigObj.publicKey, sigObj.signature),
+            'Buffer content should not be verified')
+
+    const badPK = '0288580b020800f421d746f738b221d384f098e911b81939d8c94df89e74cba776'
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.false(verifyECDSA(Buffer.from(failString), badPK, sigObj.signature),
             'Buffer content should not be verified')
   })
 
