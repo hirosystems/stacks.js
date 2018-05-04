@@ -12,8 +12,8 @@ import { makePreorderSkeleton, makeRegisterSkeleton,
          makeTokenTransferSkeleton,
          BlockstackNamespace } from './skeletons'
 import { config } from '../config'
-import { hexStringToECPair } from '../utils'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
+import { TransactionSigner, PubkeyHashSigner } from './signers'
 import BigInteger from 'bigi'
 
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
@@ -296,7 +296,7 @@ function estimateNamespacePreorder(namespaceID: string,
  * @param {String} paymentAddress - the address that pays for this transaction
  * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
  *    from the payment address
- * @returns {Promise} - a promise which resolves to the satoshi cost to 
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
  *    fund the reveal.  This includes a 5500 satoshi dust output for the
  *    preorder.  Even though this is a change output, the payer must have
  *    enough funds to generate this output, so we include it in the cost.
@@ -339,13 +339,13 @@ function estimateNamespaceReady(namespaceID: string,
 }
 
 /**
- * Estimates the cost of a name-import transaction 
+ * Estimates the cost of a name-import transaction
  * @param {String} name - the fully-qualified name
  * @param {String} recipientAddr - the recipient
  * @param {String} zonefileHash - the zone file hash
- * @param {Number} importUtxos - the number of UTXOs we expect will 
+ * @param {Number} importUtxos - the number of UTXOs we expect will
  *  be required from the importer address
- * @returns {Promise} - a promise which resolves to the satoshi cost 
+ * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this name-import transaction
  */
 function estimateNameImport(name: string,
@@ -361,11 +361,11 @@ function estimateNameImport(name: string,
       const txFee = feeRate * estimateTXBytes(importTX, importUtxos, 1)
       return txFee + outputsValue
     })
-}                            
+}
 
 /**
- * Estimates the cost of an announce transaction 
- * @param {String} messageHash - the hash of the message 
+ * Estimates the cost of an announce transaction
+ * @param {String} messageHash - the hash of the message
  * @param {Number} senderUtxos - the number of utxos we expect will
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
@@ -418,8 +418,8 @@ function estimateTokenTransfer(recipientAddress: string,
  * @param {String} fullyQualifiedName - the name to pre-order
  * @param {String} destinationAddress - the address to receive the name (this
  *    must be passed as the 'registrationAddress' in the register transaction)
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the transaction
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction or a transaction signer object
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -427,43 +427,54 @@ function estimateTokenTransfer(recipientAddress: string,
  */
 function makePreorder(fullyQualifiedName: string,
                       destinationAddress: string,
-                      paymentKeyHex: string) {
+                      paymentKeyIn: string | TransactionSigner) {
   const network = config.network
 
   const namespace = fullyQualifiedName.split('.').pop()
 
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const preorderAddress = paymentKey.getAddress()
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-  const preorderPromise = Promise.all([network.getConsensusHash(),
-                                       network.getNamePrice(fullyQualifiedName),
-                                       network.getNamespaceBurnAddress(namespace)])
-        .then(([consensusHash, namePrice, burnAddress]) =>
-          makePreorderSkeleton(
-            fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
-            namePrice, destinationAddress))
+  return paymentKey.getAddress().then((preorderAddress) => {
+    const preorderPromise = Promise.all([network.getConsensusHash(),
+                                         network.getNamePrice(fullyQualifiedName),
+                                         network.getNamespaceBurnAddress(namespace)])
+          .then(([consensusHash, namePrice, burnAddress]) =>
+                makePreorderSkeleton(
+                  fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
+                  namePrice, destinationAddress))
 
-  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
-    .then(([utxos, feeRate, preorderSkeleton]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
+      .then(([utxos, feeRate, preorderSkeleton]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
 
-      const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
-      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
+        const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
+        const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
 
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, paymentKey)
-      }
-      return signingTxB.build().toHex()
-    })
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => paymentKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      })
+      .then((signingTxB) => signingTxB.build().toHex())
+  })
 }
 
 /**
  * Generates an update transaction for a domain name.
  * @param {String} fullyQualifiedName - the name to update
- * @param {String} ownerKeyHex - a hex string of the owner key. this will
- *    provide one UTXO input, and also recieve a dust output.
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the transaction's txfees
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of the
+ *    owner key, or a transaction signer object. This will provide one
+ *    UTXO input, and also recieve a dust output.
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string, or a
+ *    transaction signer object, of the private key used to fund the
+ *    transaction's txfees
  * @param {String} zonefile - the zonefile data to update (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
@@ -475,8 +486,8 @@ function makePreorder(fullyQualifiedName: string,
  * @private
  */
 function makeUpdate(fullyQualifiedName: string,
-                    ownerKeyHex: string,
-                    paymentKeyHex: string,
+                    ownerKeyIn: string | TransactionSigner,
+                    paymentKeyIn: string | TransactionSigner,
                     zonefile: string,
                     valueHash: string = '') {
   const network = config.network
@@ -495,33 +506,49 @@ function makeUpdate(fullyQualifiedName: string,
       new Error(`Invalid valueHash ${valueHash}`))
   }
 
-  const ownerKey = hexStringToECPair(ownerKeyHex)
-  const paymentKey = hexStringToECPair(paymentKeyHex)
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-  const paymentAddress = paymentKey.getAddress()
-  const ownerAddress = ownerKey.getAddress()
+  let ownerKey
+  if (typeof ownerKeyIn === 'string') {
+    ownerKey = PubkeyHashSigner.fromHexString(ownerKeyIn)
+  } else {
+    ownerKey = ownerKeyIn
+  }
 
-  const txPromise = network.getConsensusHash()
-        .then((consensusHash) =>
-              makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash))
-        .then((updateTX) => bitcoinjs.TransactionBuilder.fromTransaction(updateTX, network.layer1))
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()])
+    .then(([ownerAddress, paymentAddress]) => {
+      const txPromise = network.getConsensusHash()
+            .then((consensusHash) =>
+                  makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash))
+            .then((updateTX) =>
+                  bitcoinjs.TransactionBuilder.fromTransaction(updateTX, network.layer1))
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress),
-                      network.getUTXOs(ownerAddress), network.getFeeRate()])
-    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
-      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
-      const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
-                                         ownerInput.value)
+      return Promise.all([txPromise, network.getUTXOs(paymentAddress),
+                          network.getUTXOs(ownerAddress), network.getFeeRate()])
+        .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
+          const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
+          const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
+                                             ownerInput.value)
 
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        if (i === ownerInput.index) {
-          signingTxB.sign(i, ownerKey)
-        } else {
-          signingTxB.sign(i, paymentKey)
-        }
-      }
-      return signingTxB.build().toHex()
+          let signingPromise = Promise.resolve()
+          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+            if (i === ownerInput.index) {
+              signingPromise = signingPromise.then(
+                () => ownerKey.signTransaction(signingTxB, i))
+            } else {
+              signingPromise = signingPromise.then(
+                () => paymentKey.signTransaction(signingTxB, i))
+            }
+          }
+          return signingPromise.then(() => signingTxB)
+        })
     })
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
@@ -530,9 +557,10 @@ function makeUpdate(fullyQualifiedName: string,
  * @param {String} registerAddress - the address to receive the name (this
  *    must have been passed as the 'destinationAddress' in the preorder transaction)
  *    this address will receive a dust UTXO
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the transaction  (this *must* be the same as the payment
- *    address used to fund the preorder)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key (or a TransactionSigner object) used to fund the
+ *    transaction (this *must* be the same as the payment address used
+ *    to fund the preorder)
  * @param {String} zonefile - the zonefile data to include (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the UPDATE propagates.
@@ -545,7 +573,7 @@ function makeUpdate(fullyQualifiedName: string,
  */
 function makeRegister(fullyQualifiedName: string,
                       registerAddress: string,
-                      paymentKeyHex: string,
+                      paymentKeyIn: string | TransactionSigner,
                       zonefile: ?string = null,
                       valueHash: ?string = null) {
   const network = config.network
@@ -560,28 +588,40 @@ function makeRegister(fullyQualifiedName: string,
     fullyQualifiedName, registerAddress, valueHash)
 
   const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1)
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const paymentAddress = paymentKey.getAddress()
 
-  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
-    .then(([utxos, feeRate]) => {
-      const signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, paymentKey)
-      }
-      return signingTxB.build().toHex()
-    })
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
+
+  return paymentKey.getAddress().then(
+    (paymentAddress) => Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
+      .then(([utxos, feeRate]) => {
+        const signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0)
+
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => paymentKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      }))
+    .then((signingTxB) => signingTxB.build().toHex())
 }
+
 
 /**
  * Generates a transfer transaction for a domain name.
  * @param {String} fullyQualifiedName - the name to transfer
  * @param {String} destinationAddress - the address to receive the name.
  *    this address will receive a dust UTXO
- * @param {String} ownerKeyHex - a hex string of the current owner's
- *    private key
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the transaction
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of
+ *    the current owner's private key (or a TransactionSigner object)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction (or a
+ *    TransactionSigner object)
  * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
@@ -590,90 +630,127 @@ function makeRegister(fullyQualifiedName: string,
  */
 function makeTransfer(fullyQualifiedName: string,
                       destinationAddress: string,
-                      ownerKeyHex: string,
-                      paymentKeyHex: string,
+                      ownerKeyIn: string | TransactionSigner,
+                      paymentKeyIn: string | TransactionSigner,
                       keepZonefile: boolean = false) {
   const network = config.network
-  const ownerKey = hexStringToECPair(ownerKeyHex)
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const paymentAddress = paymentKey.getAddress()
-  const ownerAddress = ownerKey.getAddress()
 
-  const txPromise = network.getConsensusHash()
-        .then((consensusHash) =>
-              makeTransferSkeleton(
-                fullyQualifiedName, consensusHash, destinationAddress, keepZonefile))
-        .then((transferTX) =>
-              bitcoinjs.TransactionBuilder.fromTransaction(transferTX, network.layer1))
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress),
-                      network.getUTXOs(ownerAddress), network.getFeeRate()])
-    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
-      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
-      const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
-                                         ownerInput.value)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        if (i === ownerInput.index) {
-          signingTxB.sign(i, ownerKey)
-        } else {
-          signingTxB.sign(i, paymentKey)
-        }
-      }
-      return signingTxB.build().toHex()
+  let ownerKey
+  if (typeof ownerKeyIn === 'string') {
+    ownerKey = PubkeyHashSigner.fromHexString(ownerKeyIn)
+  } else {
+    ownerKey = ownerKeyIn
+  }
+
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()])
+    .then(([ownerAddress, paymentAddress]) => {
+      const txPromise = network.getConsensusHash()
+            .then((consensusHash) =>
+                  makeTransferSkeleton(
+                    fullyQualifiedName, consensusHash, destinationAddress, keepZonefile))
+            .then((transferTX) =>
+                  bitcoinjs.TransactionBuilder.fromTransaction(transferTX, network.layer1))
+
+      return Promise.all([txPromise, network.getUTXOs(paymentAddress),
+                          network.getUTXOs(ownerAddress), network.getFeeRate()])
+        .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
+          const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
+          const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
+                                             ownerInput.value)
+
+          let signingPromise = Promise.resolve()
+          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+            if (i === ownerInput.index) {
+              signingPromise = signingPromise.then(
+                () => ownerKey.signTransaction(signingTxB, i))
+            } else {
+              signingPromise = signingPromise.then(
+                () => paymentKey.signTransaction(signingTxB, i))
+            }
+          }
+          return signingPromise.then(() => signingTxB)
+        })
     })
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
  * Generates a revoke transaction for a domain name.
  * @param {String} fullyQualifiedName - the name to revoke
- * @param {String} ownerKeyHex - a hex string of the current owner's
- *    private key
- * @param {String} paymentKeyHex - a hex string of the private key used to 
- *    fund the transaction
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of
+ *    the current owner's private key (or a TransactionSigner object)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction (or a
+ *    TransactionSigner object)
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
  */
 function makeRevoke(fullyQualifiedName: string,
-                    ownerKeyHex: string,
-                    paymentKeyHex: string) {
+                    ownerKeyIn: string | TransactionSigner,
+                    paymentKeyIn: string | TransactionSigner) {
   const network = config.network
-  const ownerKey = hexStringToECPair(ownerKeyHex)
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const paymentAddress = paymentKey.getAddress()
-  const ownerAddress = ownerKey.getAddress()
-  
-  const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
 
-  const txPromise = bitcoinjs.TransactionBuilder.fromTransaction(revokeTX, network.layer1)
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress),
-                      network.getUTXOs(ownerAddress), network.getFeeRate()])
-    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
-      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
-      const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
-                                         ownerInput.value)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        if (i === ownerInput.index) {
-          signingTxB.sign(i, ownerKey)
-        } else {
-          signingTxB.sign(i, paymentKey)
-        }
-      }
-      return signingTxB.build().toHex()
+  let ownerKey
+  if (typeof ownerKeyIn === 'string') {
+    ownerKey = PubkeyHashSigner.fromHexString(ownerKeyIn)
+  } else {
+    ownerKey = ownerKeyIn
+  }
+
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()])
+    .then(([ownerAddress, paymentAddress]) => {
+      const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
+      const txPromise = bitcoinjs.TransactionBuilder.fromTransaction(revokeTX, network.layer1)
+
+      return Promise.all([txPromise, network.getUTXOs(paymentAddress),
+                          network.getUTXOs(ownerAddress), network.getFeeRate()])
+        .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
+          const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB)
+          const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
+                                             ownerInput.value)
+
+          let signingPromise = Promise.resolve()
+          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+            if (i === ownerInput.index) {
+              signingPromise = signingPromise.then(
+                () => ownerKey.signTransaction(signingTxB, i))
+            } else {
+              signingPromise = signingPromise.then(
+                () => paymentKey.signTransaction(signingTxB, i))
+            }
+          }
+          return signingPromise.then(() => signingTxB)
+        })
     })
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
- * Generates a transfer transaction for a domain name.
+ * Generates a renewal transaction for a domain name.
  * @param {String} fullyQualifiedName - the name to transfer
  * @param {String} destinationAddress - the address to receive the name after renewal
  *    this address will receive a dust UTXO
- * @param {String} ownerKeyHex - a hex string of the current owner's
- *    private key
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the renewal
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of
+ *    the current owner's private key (or a TransactionSigner object)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the renewal (or a TransactionSigner
+ *    object)
  * @param {String} zonefile - the zonefile data to include, if given (this will be hashed
  *    to include in the transaction), the zonefile itself must be published
  *    after the RENEWAL propagates.
@@ -686,8 +763,8 @@ function makeRevoke(fullyQualifiedName: string,
  */
 function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
-                     ownerKeyHex: string,
-                     paymentKeyHex: string,
+                     ownerKeyIn: string | TransactionSigner,
+                     paymentKeyIn: string | TransactionSigner,
                      zonefile: ?string = null,
                      valueHash: ?string = null) {
   const network = config.network
@@ -698,45 +775,59 @@ function makeRenewal(fullyQualifiedName: string,
 
   const namespace = fullyQualifiedName.split('.').pop()
 
-  const ownerKey = hexStringToECPair(ownerKeyHex)
-  const paymentKey = hexStringToECPair(paymentKeyHex)
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-  const ownerAddress = ownerKey.getAddress()
-  const paymentAddress = paymentKey.getAddress()
+  let ownerKey
+  if (typeof ownerKeyIn === 'string') {
+    ownerKey = PubkeyHashSigner.fromHexString(ownerKeyIn)
+  } else {
+    ownerKey = ownerKeyIn
+  }
 
-  const txPromise = Promise.all([network.getNamePrice(fullyQualifiedName),
-                                 network.getNamespaceBurnAddress(namespace)])
-        .then(([namePrice, burnAddress]) =>
-              makeRenewalSkeleton(
-                fullyQualifiedName, destinationAddress, ownerAddress,
-                burnAddress, namePrice, valueHash))
-        .then((tx) => bitcoinjs.TransactionBuilder.fromTransaction(tx, network.layer1))
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()])
+    .then(([ownerAddress, paymentAddress]) => {
+      const txPromise = Promise.all([network.getNamePrice(fullyQualifiedName),
+                                     network.getNamespaceBurnAddress(namespace)])
+            .then(([namePrice, burnAddress]) =>
+                  makeRenewalSkeleton(
+                    fullyQualifiedName, destinationAddress, ownerAddress,
+                    burnAddress, namePrice, valueHash))
+            .then((tx) => bitcoinjs.TransactionBuilder.fromTransaction(tx, network.layer1))
 
-  return Promise.all([txPromise, network.getUTXOs(paymentAddress),
-                      network.getUTXOs(ownerAddress), network.getFeeRate()])
-    .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
-      const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false)
-      const ownerOutput = txB.tx.outs[2]
-      const ownerOutputAddr = bitcoinjs.address.fromOutputScript(
-        ownerOutput.script, network.layer1)
-      if (ownerOutputAddr !== ownerAddress) {
-        return Promise.reject(
-          new Error(`Original owner ${ownerAddress} should have an output at ` +
+      return Promise.all([txPromise, network.getUTXOs(paymentAddress),
+                          network.getUTXOs(ownerAddress), network.getFeeRate()])
+        .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
+          const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false)
+          const ownerOutput = txB.tx.outs[2]
+          const ownerOutputAddr = bitcoinjs.address.fromOutputScript(
+            ownerOutput.script, network.layer1)
+          if (ownerOutputAddr !== ownerAddress) {
+            return Promise.reject(
+              new Error(`Original owner ${ownerAddress} should have an output at ` +
                         `index 2 in transaction was ${ownerOutputAddr}`))
-      }
-      ownerOutput.value = ownerInput.value
-      const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
-                                         ownerInput.value)
-
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        if (i === ownerInput.index) {
-          signingTxB.sign(i, ownerKey)
-        } else {
-          signingTxB.sign(i, paymentKey)
-        }
-      }
-      return signingTxB.build().toHex()
+          }
+          ownerOutput.value = ownerInput.value
+          const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
+                                             ownerInput.value)
+          let signingPromise = Promise.resolve()
+          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+            if (i === ownerInput.index) {
+              signingPromise = signingPromise.then(
+                () => ownerKey.signTransaction(signingTxB, i))
+            } else {
+              signingPromise = signingPromise.then(
+                () => paymentKey.signTransaction(signingTxB, i))
+            }
+          }
+          return signingPromise.then(() => signingTxB)
+        })
     })
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 
@@ -745,8 +836,9 @@ function makeRenewal(fullyQualifiedName: string,
  * @param {String} namespaceID - the namespace to pre-order
  * @param {String} revealAddress - the address to receive the namespace (this
  *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the transaction
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction (or a
+ *    TransactionSigner object)
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -754,41 +846,51 @@ function makeRenewal(fullyQualifiedName: string,
  */
 function makeNamespacePreorder(namespaceID: string,
                                revealAddress: string,
-                               paymentKeyHex: string) {
+                               paymentKeyIn: string | TransactionSigner) {
   const network = config.network
 
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const preorderAddress = paymentKey.getAddress()
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-  const preorderPromise = Promise.all([network.getConsensusHash(),
-                                       network.getNamespacePrice(namespaceID)])
-        .then(([consensusHash, namespacePrice]) =>
-          makeNamespacePreorderSkeleton(
-            namespaceID, consensusHash, preorderAddress, revealAddress,
-            namespacePrice))
+  return paymentKey.getAddress().then((preorderAddress) => {
+    const preorderPromise = Promise.all([network.getConsensusHash(),
+                                         network.getNamespacePrice(namespaceID)])
+          .then(([consensusHash, namespacePrice]) =>
+                makeNamespacePreorderSkeleton(
+                  namespaceID, consensusHash, preorderAddress, revealAddress,
+                  namespacePrice))
 
-  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
-    .then(([utxos, feeRate, preorderSkeleton]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
+      .then(([utxos, feeRate, preorderSkeleton]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
 
-      const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
-      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
+        const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
+        const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
 
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, paymentKey)
-      }
-      return signingTxB.build().toHex()
-    })
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => paymentKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      })
+      .then((signingTxB) => signingTxB.build().toHex())
+  })
 }
 
 
 /**
  * Generates a namespace reveal transaction for a namespace
  * @param {BlockstackNamespace} namespace - the namespace to reveal
- * @param {String} revealAddress - the address to receive the namespace (this 
+ * @param {String} revealAddress - the address to receive the namespace (this
  *   must be passed as the 'revealAddress' in the namespace-reveal transaction)
- * @param {String} paymentKeyHex - a hex string of the private key used to fund
- *   the transaction
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string (or
+ *   a TransactionSigner object) of the private key used to fund the
+ *   transaction
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *   this function *does not* perform the requisite safety checks -- please see
  *   the safety module for those.
@@ -796,117 +898,161 @@ function makeNamespacePreorder(namespaceID: string,
  */
 function makeNamespaceReveal(namespace: BlockstackNamespace,
                              revealAddress: string,
-                             paymentKeyHex: string) {
+                             paymentKeyIn: string | TransactionSigner) {
   const network = config.network
 
   if (!namespace.check()) {
     return Promise.reject(new Error('Invalid namespace'))
   }
 
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const preorderAddress = paymentKey.getAddress()
   const namespaceRevealTX = makeNamespaceRevealSkeleton(namespace, revealAddress)
 
-  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
-    .then(([utxos, feeRate]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceRevealTX, network.layer1)
-      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, paymentKey)
-      }
-      return signingTxB.build().toHex()
-    })
-} 
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
+
+  return paymentKey.getAddress().then(
+    (preorderAddress) =>
+      Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
+      .then(([utxos, feeRate]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceRevealTX, network.layer1)
+        const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0)
+
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => paymentKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      }))
+    .then((signingTxB) => signingTxB.build().toHex())
+}
 
 
 /**
  * Generates a namespace ready transaction for a namespace
  * @param {String} namespaceID - the namespace to launch
- * @param {String} revealKeyHex - the private key of the 'revealAddress' used
- *  to reveal the namespace.
+ * @param {String | TransactionSigner} revealKeyIn - the private key
+ *  of the 'revealAddress' used to reveal the namespace
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *  this function *does not* perform the requisite safety checks -- please see
  *  the safety module for those.
  * @private
  */
 function makeNamespaceReady(namespaceID: string,
-                            revealKeyHex: string) {
+                            revealKeyIn: string | TransactionSigner) {
   const network = config.network
 
-  const revealKey = hexStringToECPair(revealKeyHex)
-  const revealAddress = revealKey.getAddress()
   const namespaceReadyTX = makeNamespaceReadySkeleton(namespaceID)
 
-  return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
-    .then(([utxos, feeRate]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
-      const signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, revealKey)
-      }
-      return signingTxB.build().toHex()
-    })
+  let revealKey
+  if (typeof revealKeyIn === 'string') {
+    revealKey = PubkeyHashSigner.fromHexString(revealKeyIn)
+  } else {
+    revealKey = revealKeyIn
+  }
+
+  return revealKey.getAddress().then(
+    (revealAddress) =>
+      Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
+      .then(([utxos, feeRate]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
+        const signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0)
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => revealKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      }))
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
  * Generates a name import transaction for a namespace
  * @param {String} name - the name to import
- * @param {String} recipientAddr - the address to receive the name 
+ * @param {String} recipientAddr - the address to receive the name
  * @param {String} zonefileHash - the hash of the zonefile to give this name
- * @param {String} importerKeyHex - the private key that pays for the import
+ * @param {String | TransactionSigner} importerKeyIn - the private key
+ * that pays for the import
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
- * this function does not perform the requisite safety checks -- please see 
+ * this function does not perform the requisite safety checks -- please see
  * the safety module for those.
  * @private
  */
-function makeNameImport(name: string, 
-                        recipientAddr: string, 
+function makeNameImport(name: string,
+                        recipientAddr: string,
                         zonefileHash: string,
-                        importerKeyHex: string) {
+                        importerKeyIn: string | TransactionSigner) {
   const network = config.network
-  
-  const importerKey = hexStringToECPair(importerKeyHex)
-  const importerAddress = importerKey.getAddress()
+
   const nameImportTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
 
-  return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
-    .then(([utxos, feeRate]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
-      const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, importerKey)
-      }
-      return signingTxB.build().toHex()
-    })
+  let importerKey
+  if (typeof importerKeyIn === 'string') {
+    importerKey = PubkeyHashSigner.fromHexString(importerKeyIn)
+  } else {
+    importerKey = importerKeyIn
+  }
+
+  return importerKey.getAddress().then(
+    (importerAddress) =>
+      Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
+      .then(([utxos, feeRate]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
+        const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => importerKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      }))
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
- * Generates an announce transaction 
+ * Generates an announce transaction
  * @param {String} messageHash - the hash of the message to send.  Should be
  *  an already-announced zone file hash
- * @param {String} senderKeyHex - the private key that pays for the transaction.  Should
- *  be the key that owns the name that the message recipients subscribe to
+ * @param {String | TransactionSigner} senderKeyIn - the private key
+ *  that pays for the transaction.  Should be the key that owns the
+ *  name that the message recipients subscribe to
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * this function does not perform the requisite safety checks -- please see the
  * safety module for those.
  * @private
  */
-function makeAnnounce(messageHash: string, senderKeyHex: string) {
+function makeAnnounce(messageHash: string,
+                      senderKeyIn: string | TransactionSigner) {
   const network = config.network
 
-  const senderKey = hexStringToECPair(senderKeyHex)
-  const senderAddress = senderKey.getAddress()
   const announceTX = makeAnnounceSkeleton(messageHash)
 
-  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
-    .then(([utxos, feeRate]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(announceTX, network.layer1)
-      const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, senderKey)
-      }
-      return signingTxB.build().toHex()
-    })
+  let senderKey
+  if (typeof senderKeyIn === 'string') {
+    senderKey = PubkeyHashSigner.fromHexString(senderKeyIn)
+  } else {
+    senderKey = senderKeyIn
+  }
+
+  return senderKey.getAddress().then(
+    (senderAddress) =>
+      Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
+      .then(([utxos, feeRate]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(announceTX, network.layer1)
+        const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => senderKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      }))
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
@@ -916,7 +1062,8 @@ function makeAnnounce(messageHash: string, senderKeyHex: string) {
  * @param {Object} tokenAmount - the BigInteger encoding of an unsigned 64-bit number of
  *  tokens to send
  * @param {String} scratchArea - an arbitrary string to include with the transaction
- * @param {String} senderKeyHex - the hex-encoded private key to send the tokens
+ * @param {String | TransactionSigner} senderKeyIn - the hex-encoded private key to send
+ *   the tokens
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * This function does not perform the requisite safety checks -- please see the
  * safety module for those.
@@ -924,25 +1071,34 @@ function makeAnnounce(messageHash: string, senderKeyHex: string) {
  */
 function makeTokenTransfer(recipientAddress: string, tokenType: string,
                            tokenAmount: BigInteger, scratchArea: string,
-                           senderKeyHex: string) {
+                           senderKeyIn: string | TransactionSigner) {
   const network = config.network
 
-  const senderKey = hexStringToECPair(senderKeyHex)
-  const senderAddress = senderKey.getAddress()
+  let senderKey
+  if (typeof senderKeyIn === 'string') {
+    senderKey = PubkeyHashSigner.fromHexString(senderKeyIn)
+  } else {
+    senderKey = senderKeyIn
+  }
 
   const txPromise = Promise.all([network.getConsensusHash()])
     .then(([consensusHash]) =>  makeTokenTransferSkeleton(
         recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
 
-  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate(), txPromise])
-    .then(([utxos, feeRate, tokenTransferTX]) => {
-      const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
-      const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
-      for (let i = 0; i < signingTxB.tx.ins.length; i++) {
-        signingTxB.sign(i, senderKey)
-      }
-      return signingTxB.build().toHex()
-    })
+  return senderKey.getAddress().then(
+    (senderAddress) => {
+      Promise.all([network.getUTXOs(senderAddress), network.getFeeRate(), txPromise])
+      .then(([utxos, feeRate, tokenTransferTX]) => {
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+        const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => senderKey.signTransaction(signingTxB, i))
+        }
+        return signingPromise.then(() => signingTxB)
+      }))
+  .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
@@ -959,67 +1115,77 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
  *   generate a maximum spend transaction
  *
  * @param {String} destinationAddress - the address to receive the bitcoin payment
- * @param {String} paymentKeyHex - a hex string of the private key used to
- *    fund the bitcoin spend
+ * @param {String | TransactionSigner} paymentKeyIn - the private key
+ *    used to fund the bitcoin spend
  * @param {number} amount - the amount in satoshis for the payment address to
  *    spend in this transaction
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
  */
 function makeBitcoinSpend(destinationAddress: string,
-                          paymentKeyHex: string,
+                          paymentKeyIn: string | TransactionSigner,
                           amount: number) {
   if (amount <= 0) {
     return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
   }
 
   const network = config.network
-  const paymentKey = hexStringToECPair(paymentKeyHex)
-  const paymentAddress = paymentKey.getAddress()
 
-  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
-    .then(([utxos, feeRate]) => {
-      const txB = new bitcoinjs.TransactionBuilder(network.layer1)
-      const destinationIndex = txB.addOutput(destinationAddress, 0)
+  let paymentKey
+  if (typeof paymentKeyIn === 'string') {
+    paymentKey = PubkeyHashSigner.fromHexString(paymentKeyIn)
+  } else {
+    paymentKey = paymentKeyIn
+  }
 
-      // will add utxos up to _amount_ and return the amount of leftover _change_
-      let change
-      try {
-        change = addUTXOsToFund(txB, utxos, amount, feeRate, false)
-      } catch (err) {
-        if (err.name === 'NotEnoughFundsError') {
-          // actual amount funded = amount requested - remainder
-          amount -= err.leftToFund
-          change = 0
-        } else {
-          throw err
+  return paymentKey.getAddress().then(
+    (paymentAddress) =>
+      Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
+      .then(([utxos, feeRate]) => {
+        const txB = new bitcoinjs.TransactionBuilder(network.layer1)
+        const destinationIndex = txB.addOutput(destinationAddress, 0)
+
+        // will add utxos up to _amount_ and return the amount of leftover _change_
+        let change
+        try {
+          change = addUTXOsToFund(txB, utxos, amount, feeRate, false)
+        } catch (err) {
+          if (err.name === 'NotEnoughFundsError') {
+            // actual amount funded = amount requested - remainder
+            amount -= err.leftToFund
+            change = 0
+          } else {
+            throw err
+          }
         }
-      }
 
-      let feesToPay = feeRate * estimateTXBytes(txB, 0, 0)
-      const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - feesToPay
+        let feesToPay = feeRate * estimateTXBytes(txB, 0, 0)
+        const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - feesToPay
 
-      // it's worthwhile to add a change output
-      if (change > feeForChange) {
-        feesToPay += feeForChange
-        txB.addOutput(paymentAddress, change)
-      }
+        // it's worthwhile to add a change output
+        if (change > feeForChange) {
+          feesToPay += feeForChange
+          txB.addOutput(paymentAddress, change)
+        }
 
-      // now let's compute how much output is leftover once we pay the fees.
-      const outputAmount = amount - feesToPay
-      if (outputAmount < DUST_MINIMUM) {
-        throw new InvalidAmountError(feesToPay, amount)
-      }
+        // now let's compute how much output is leftover once we pay the fees.
+        const outputAmount = amount - feesToPay
+        if (outputAmount < DUST_MINIMUM) {
+          throw new InvalidAmountError(feesToPay, amount)
+        }
 
-      // we need to manually set the output values now
-      txB.tx.outs[destinationIndex].value = outputAmount
+        // we need to manually set the output values now
+        txB.tx.outs[destinationIndex].value = outputAmount
 
-      // ready to sign.
-      for (let i = 0; i < txB.tx.ins.length; i++) {
-        txB.sign(i, paymentKey)
-      }
-      return txB.build().toHex()
-    })
+        // ready to sign.
+        let signingPromise = Promise.resolve()
+        for (let i = 0; i < txB.tx.ins.length; i++) {
+          signingPromise = signingPromise.then(
+            () => paymentKey.signTransaction(txB, i))
+        }
+        return signingPromise.then(() => txB)
+      }))
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 export const transactions = {
