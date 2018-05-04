@@ -97,9 +97,17 @@ export function decryptContent(content: string, options?: {privateKey?: ?string}
     privateKey = loadUserData().appPrivateKey
   }
 
-  const cipherObject = JSON.parse(content)
-
-  return decryptECIES(privateKey, cipherObject)
+  try {
+    const cipherObject = JSON.parse(content)
+    return decryptECIES(privateKey, cipherObject)
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      throw new Error('Failed to parse encrypted content JSON. The content may not ' +
+                      'be encrypted. If using getFile, try passing { decrypt: false }.')
+    } else {
+      throw err
+    }
+  }
 }
 
 function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?string) {
@@ -212,7 +220,20 @@ export function getFile(path: string, options?: {
         if (!signatureContents || typeof signatureContents !== 'string') {
           throw new SignatureVerificationError('Failed to obtain signature for file')
         }
-        const { signature, publicKey } = JSON.parse(signatureContents)
+        let signature
+        let publicKey
+        try {
+          const sigObject = JSON.parse(signatureContents)
+          signature = sigObject.signature
+          publicKey = sigObject.publicKey
+        } catch (err) {
+          if (err instanceof SyntaxError) {
+            throw new Error('Failed to parse signature content JSON.' +
+                            ' The content may be corrupted.')
+          } else {
+            throw err
+          }
+        }
         const signerAddress = publicKeyToAddress(publicKey)
         if (gaiaAddress !== signerAddress) {
           throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
@@ -238,10 +259,31 @@ export function getFile(path: string, options?: {
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
-        const { cipherText, signature, publicKey } = JSON.parse(storedContents)
+
+        let signature
+        let publicKey
+        let cipherText
+        try {
+          const sigObject = JSON.parse(storedContents)
+          signature = sigObject.signature
+          publicKey = sigObject.publicKey
+          cipherText = sigObject.cipherText
+        }  catch (err) {
+          if (err instanceof SyntaxError) {
+            throw new Error('Failed to parse encrypted, signed content JSON. The content may not ' +
+                            'be encrypted. If using getFile, try passing' +
+                            ' { verify: false, decrypt: false }.')
+          } else {
+            throw err
+          }
+        }
+
         const appPrivateKey = loadUserData().appPrivateKey
         const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
-        if (appPublicKey !== publicKey) {
+        if (!signature || !cipherText || !publicKey) {
+          throw new SignatureVerificationError(
+            'Failed to get signature verification data from file')
+        } else if (appPublicKey !== publicKey) {
           throw new SignatureVerificationError(
             'In Sign+Encrypt mode, signer pubkey should match decryption keypair')
         } else if (! verifyECDSA(cipherText, appPublicKey, signature)) {
