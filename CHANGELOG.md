@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New `TransactionSigner` interface to allow for different signing agents
+  in the `transactions` functions (e.g., makePreorder).
+
 ## [17.2.0]
 
 ### Added
