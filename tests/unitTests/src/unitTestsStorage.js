@@ -6,7 +6,8 @@ import bitcoin from 'bitcoinjs-lib'
 import { uploadToGaiaHub, getFullReadUrl,
          connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
          getBucketUrl } from '../../../lib/storage/hub'
-import { getFile } from '../../../lib/storage'
+import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
+import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 
 class LocalStorage {
   constructor() {
@@ -26,6 +27,8 @@ const localStorage = new LocalStorage()
 global.localStorage = localStorage
 global.window = {}
 global.window.localStorage = localStorage
+global.window.location = {}
+global.window.location.origin = 'https://myApp.blockstack.org'
 
 export function runStorageTests() {
   test('getFile unencrypted', (t) => {
@@ -214,6 +217,33 @@ export function runStorageTests() {
       })
   })
 
+  test('encrypt & decrypt content', (t) => {
+    t.plan(2)
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const userData = JSON.stringify({ appPrivateKey: privateKey })
+    // save any previous content
+    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
+    // simulate fake user signed in
+    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, userData)
+    const content = 'yellowsubmarine'
+    const ciphertext = encryptContent(content)
+    t.ok(ciphertext)
+    const deciphered = decryptContent(ciphertext)
+    t.equal(content, deciphered)
+    // put back whatever was inside before
+    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
+  })
+
+  test('encrypt & decrypt content -- specify key', (t) => {
+    t.plan(2)
+    const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
+    const content = 'we-all-live-in-a-yellow-submarine'
+    const ciphertext = encryptContent(content, { privateKey })
+    t.ok(ciphertext)
+    const deciphered = decryptContent(ciphertext, { privateKey })
+    t.equal(content, deciphered)
+  })
+
   test('putFile unencrypted', (t) => {
     t.plan(1)
 
@@ -240,6 +270,54 @@ export function runStorageTests() {
     putFile(path, fileContent, options)
       .then((publicURL) => {
         t.ok(publicURL, fullReadUrl)
+      })
+  })
+
+  test('putFile & getFile encrypted', (t) => {
+    t.plan(2)
+    // save any previous content
+    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const userData = JSON.stringify({ appPrivateKey: privateKey })
+    // simulate fake user signed in
+    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, userData)
+
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
+    const fileContent = JSON.stringify({ test: 'test' })
+
+    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
+    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+
+    const { putFile } = proxyquire('../../../lib/storage', {
+      './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
+    })
+    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+      './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
+    })
+
+    FetchMock.get(fullReadUrl, encryptContent(fileContent))
+    const encryptOptions = { encrypt: true }
+    const decryptOptions = { decrypt: true }
+    // put and encrypt the file
+    putFile(path, fileContent, encryptOptions)
+      .then((publicURL) => {
+        t.ok(publicURL, fullReadUrl)
+      }).then(() => {
+        // read and decrypt the file
+        getFile(path, decryptOptions).then(readContent => {
+          t.equal(readContent, fileContent)
+          // put back whatever was inside before
+          window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
+        })
       })
   })
 
