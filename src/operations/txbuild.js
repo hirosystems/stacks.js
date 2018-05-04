@@ -1086,7 +1086,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
         recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
 
   return senderKey.getAddress().then(
-    (senderAddress) => {
+    (senderAddress) =>
       Promise.all([network.getUTXOs(senderAddress), network.getFeeRate(), txPromise])
       .then(([utxos, feeRate, tokenTransferTX]) => {
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
@@ -1098,7 +1098,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
         }
         return signingPromise.then(() => signingTxB)
       }))
-  .then((signingTxB) => signingTxB.build().toHex())
+    .then((signingTxB) => signingTxB.build().toHex())
 }
 
 /**
