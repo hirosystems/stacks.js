@@ -110,6 +110,10 @@ export function decryptContent(content: string, options?: {privateKey?: ?string}
   }
 }
 
+/* Get the gaia address used for servicing multiplayer reads for the given
+ * (username, app) pair.
+ * @private
+ */
 function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?string) {
   return Promise.resolve()
     .then(() => {
@@ -121,13 +125,17 @@ function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?stri
       }
     })
     .then(fileUrl => {
-      const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,33})/)
+      const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
       return matches[matches.length - 1]
     })
 }
 
-function innerGetFile(path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
-                      forceText: boolean) : Promise<?string | ?ArrayBuffer> {
+/* Handle fetching the contents from a given path. Handles both
+ *  multi-player reads and reads from own storage.
+ * @private
+ */
+function getFileContents(path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
+                         forceText: boolean) : Promise<?string | ?ArrayBuffer> {
   return Promise.resolve()
     .then(() => {
       if (username) {
@@ -163,6 +171,124 @@ function innerGetFile(path: string, app: string, username: ?string, zoneFileLook
         return response.arrayBuffer()
       }
     })
+}
+
+/* Handle fetching an unencrypted file, its associated signature
+ *  and then validate it. Handles both multi-player reads and reads
+ *  from own storage.
+ * @private
+ */
+function getFileSignedUnencrypted(path: string, opt: {
+  username?: ?string,
+  app: string,
+  zoneFileLookupURL?: ?string
+}) {
+  // future optimization note:
+  //    in the case of _multi-player_ reads, this does a lot of excess
+  //    profile lookups to figure out where to read files
+  //    do browsers cache all these requests if Content-Cache is set?
+  return Promise.all(
+    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false),
+     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+                      opt.zoneFileLookupURL, true),
+     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)])
+    .then(([fileContents, signatureContents, gaiaAddress]) => {
+      if (!fileContents) {
+        return fileContents
+      }
+      if (!gaiaAddress) {
+        throw new SignatureVerificationError('Failed to get gaia address for verification of: ' +
+                                             `${path}`)
+      }
+      if (!signatureContents || typeof signatureContents !== 'string') {
+        throw new SignatureVerificationError('Failed to obtain signature for file: ' +
+                                             `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+      }
+      let signature
+      let publicKey
+      try {
+        const sigObject = JSON.parse(signatureContents)
+        signature = sigObject.signature
+        publicKey = sigObject.publicKey
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          throw new Error('Failed to parse signature content JSON ' +
+                          `(path: ${path}${SIGNATURE_FILE_SUFFIX})` +
+                          ' The content may be corrupted.')
+        } else {
+          throw err
+        }
+      }
+      const signerAddress = publicKeyToAddress(publicKey)
+      if (gaiaAddress !== signerAddress) {
+        throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
+                                             ` match gaia address (${gaiaAddress})`)
+      } else if (! verifyECDSA(Buffer.from(fileContents), publicKey, signature)) {
+        throw new SignatureVerificationError(
+          'Contents do not match ECDSA signature: ' +
+            `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`)
+      } else {
+        return fileContents
+      }
+    })
+}
+
+
+/* Handle signature verification and decryption for contents which are
+ *  expected to be signed and encrypted. This works for single and
+ *  multiplayer reads. In the case of multiplayer reads, it uses the
+ *  gaia address for verification of the claimed public key.
+ * @private
+ */
+function handleSignedEncryptedContents(path: string, storedContents: string,
+                                       app: string, username: ?string, zoneFileLookupURL: ?string) {
+  const appPrivateKey = loadUserData().appPrivateKey
+  const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
+
+  let addressPromise
+  if (username) {
+    addressPromise = getGaiaAddress(app, username, zoneFileLookupURL)
+  } else {
+    const address = publicKeyToAddress(appPublicKey)
+    addressPromise = Promise.resolve(address)
+  }
+
+  return addressPromise.then((address) => {
+    if (!address) {
+      throw new SignatureVerificationError('Failed to get gaia address for verification of: ' +
+                                           `${path}`)
+    }
+    let sigObject
+    try {
+      sigObject = JSON.parse(storedContents)
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        throw new Error('Failed to parse encrypted, signed content JSON. The content may not ' +
+                        'be encrypted. If using getFile, try passing' +
+                        ' { verify: false, decrypt: false }.')
+      } else {
+        throw err
+      }
+    }
+    const signature = sigObject.signature
+    const signerPublicKey = sigObject.publicKey
+    const cipherText = sigObject.cipherText
+    const signerAddress = publicKeyToAddress(signerPublicKey)
+
+    if (!signerPublicKey || !cipherText || !signature) {
+      throw new SignatureVerificationError(
+        'Failed to get signature verification data from file:' +
+          ` ${path}`)
+    } else if (signerAddress !== address) {
+      throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
+                                           ` match gaia address (${address})`)
+    } else if (! verifyECDSA(cipherText, signerPublicKey, signature)) {
+      throw new SignatureVerificationError('Contents do not match ECDSA signature in file:' +
+                                           ` ${path}`)
+    } else {
+      return decryptContent(cipherText)
+    }
+  })
 }
 
 /**
@@ -201,52 +327,10 @@ export function getFile(path: string, options?: {
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.
   if (opt.verify && !opt.decrypt) {
-    // future optimization note:
-    //    in the case of _multi-player_ reads, this does a lot of excess
-    //    profile lookups to figure out where to read files
-    //    do browsers cache all these requests if Content-Cache is set?
-    return Promise.all(
-      [innerGetFile(path, opt.app, opt.username, opt.zoneFileLookupURL, false),
-       innerGetFile(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
-                    opt.zoneFileLookupURL, true),
-       getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)])
-      .then(([fileContents, signatureContents, gaiaAddress]) => {
-        if (!fileContents) {
-          return fileContents
-        }
-        if (!gaiaAddress) {
-          throw new SignatureVerificationError('Failed to get gaia address for verification')
-        }
-        if (!signatureContents || typeof signatureContents !== 'string') {
-          throw new SignatureVerificationError('Failed to obtain signature for file')
-        }
-        let signature
-        let publicKey
-        try {
-          const sigObject = JSON.parse(signatureContents)
-          signature = sigObject.signature
-          publicKey = sigObject.publicKey
-        } catch (err) {
-          if (err instanceof SyntaxError) {
-            throw new Error('Failed to parse signature content JSON.' +
-                            ' The content may be corrupted.')
-          } else {
-            throw err
-          }
-        }
-        const signerAddress = publicKeyToAddress(publicKey)
-        if (gaiaAddress !== signerAddress) {
-          throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
-                                               ` match gaia address (${gaiaAddress})`)
-        } else if (! verifyECDSA(Buffer.from(fileContents), publicKey, signature)) {
-          throw new SignatureVerificationError('Contents do not match ECDSA signature')
-        } else {
-          return fileContents
-        }
-      })
+    return getFileSignedUnencrypted(path, opt)
   }
 
-  return innerGetFile(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
+  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
     .then((storedContents) => {
       if (storedContents === null) {
         return storedContents
@@ -259,38 +343,8 @@ export function getFile(path: string, options?: {
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
-
-        let signature
-        let publicKey
-        let cipherText
-        try {
-          const sigObject = JSON.parse(storedContents)
-          signature = sigObject.signature
-          publicKey = sigObject.publicKey
-          cipherText = sigObject.cipherText
-        }  catch (err) {
-          if (err instanceof SyntaxError) {
-            throw new Error('Failed to parse encrypted, signed content JSON. The content may not ' +
-                            'be encrypted. If using getFile, try passing' +
-                            ' { verify: false, decrypt: false }.')
-          } else {
-            throw err
-          }
-        }
-
-        const appPrivateKey = loadUserData().appPrivateKey
-        const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
-        if (!signature || !cipherText || !publicKey) {
-          throw new SignatureVerificationError(
-            'Failed to get signature verification data from file')
-        } else if (appPublicKey !== publicKey) {
-          throw new SignatureVerificationError(
-            'In Sign+Encrypt mode, signer pubkey should match decryption keypair')
-        } else if (! verifyECDSA(cipherText, appPublicKey, signature)) {
-          throw new SignatureVerificationError('Contents do not match ECDSA signature')
-        } else {
-          return decryptContent(cipherText)
-        }
+        return handleSignedEncryptedContents(path, storedContents,
+                                             opt.app, opt.username, opt.zoneFileLookupURL)
       } else if (!opt.verify && !opt.decrypt) {
         return storedContents
       } else {

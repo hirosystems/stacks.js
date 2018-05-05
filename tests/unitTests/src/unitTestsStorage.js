@@ -322,7 +322,6 @@ export function runStorageTests() {
   })
 
   test('putFile & getFile encrypted, signed', (t) => {
-    t.plan(4)
     // save any previous content
     const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -337,7 +336,7 @@ export function runStorageTests() {
       url_prefix: 'gaia.testblockstack2.org/hub/'
     }
 
-    const readPrefix = 'https://gaia.testblockstack2.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A'
+    const readPrefix = 'https://gaia.testblockstack8.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
     const fullReadUrl = `${readPrefix}/file.json`
     const urlBadPK = `${readPrefix}/badPK.json`
     const urlBadSig = `${readPrefix}/badSig.json`
@@ -355,11 +354,18 @@ export function runStorageTests() {
     const getFullReadUrl = sinon.stub().callsFake( // eslint-disable-line no-shadow
       path => Promise.resolve(`${readPrefix}/${path}`))
 
+    const lookupProfile = sinon.stub().callsFake(
+      username => {
+        t.equal(username, 'applejacks.id', 'Unexpected user lookup request')
+        return Promise.resolve({ apps: { origin: readPrefix } })
+      })
+
     const { putFile } = proxyquire('../../../lib/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
     const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
-      './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
+      './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl },
+      '../profiles': { lookupProfile }
     })
 
     const encryptOptions = { encrypt: true, sign: true }
@@ -384,18 +390,32 @@ export function runStorageTests() {
           t.equal(readContent, fileContent)
         }))
       .then(() =>
+        // read and decrypt the file
+       getFile('file.json', { decrypt: true, verify: true,
+                              username: 'applejacks.id', app: 'origin' })
+            .then(readContent => {
+              t.equal(readContent, fileContent)
+            }))
+      .then(() =>
         getFile('badPK.json', decryptOptions)
           .then(() => t.true(false, 'Should not successfully decrypt file'))
-          .catch((err) => t.ok(err.message.indexOf('pubkey should match') >= 0,
+          .catch((err) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
+                               `Should fail with complaint about mismatch PK: ${err.message}`)))
+      .then(() =>
+        getFile('badPK.json', { decrypt: true, verify: true,
+                                username: 'applejacks.id', app: 'origin' })
+          .then(() => t.true(false, 'Should not successfully decrypt file'))
+          .catch((err) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
                                `Should fail with complaint about mismatch PK: ${err.message}`)))
       .then(() =>
         getFile('badSig.json', decryptOptions)
           .then(() => t.true(false, 'Should not successfully decrypt file'))
           .catch((err) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                                'Should fail with complaint about bad signature')))
-      .catch(() => {})
+      .catch((err) => console.log(err.stack))
       .then(() => {          // put back whatever was inside before
         window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
+        t.end()
       })
   })
 
