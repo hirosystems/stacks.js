@@ -614,7 +614,15 @@ export class BitcoindAPI extends BitcoinNetwork {
                                          headers })
       })
       .then(resp => resp.json())
-      .then(respObj => ({ block_height: respObj.result.height }))
+      .then((respObj) => {
+        if (!respObj) {
+          // unconfirmed 
+          throw new Error("Unconfirmed transaction")
+        }
+        else {
+          return { block_height: respObj.result.height }
+        }
+      })
   }
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
