@@ -615,7 +615,7 @@ export class BitcoindAPI extends BitcoinNetwork {
       })
       .then(resp => resp.json())
       .then((respObj) => {
-        if (!respObj) {
+        if (!respObj || !respObj.result) {
           // unconfirmed 
           throw new Error("Unconfirmed transaction")
         }
