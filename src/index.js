@@ -11,10 +11,13 @@ export {
 } from './keys'
 export {
   nextYear, nextMonth, nextHour, makeUUID4, updateQueryStringParameter,
-  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString
+  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString,
 } from './utils'
 
-export { transactions, safety } from './operations'
+export { 
+  transactions, safety, TransactionSigner,
+  PubkeyHashSigner, addUTXOsToFund, estimateTXBytes
+} from './operations'
 
 export { network } from './network'
 
