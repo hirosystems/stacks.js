@@ -49,6 +49,13 @@ export class BlockstackNetwork {
 
   getNamePrice(fullyQualifiedName: string) : Promise<*> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
+      .then((resp) => {
+        if (resp.status === 404) {
+          // old core node 
+          throw new Error(`The upstream node does not handle the /v2/ price namespace`)
+        }
+        return resp
+      })
       .then(resp => resp.json())
       .then(resp => resp.name_price)
       .then(namePrice => {
@@ -66,6 +73,13 @@ export class BlockstackNetwork {
 
   getNamespacePrice(namespaceID: string) : Promise<*> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/namespaces/${namespaceID}`)
+      .then((resp) => {
+        if (resp.status === 404) {
+          // old core node 
+          throw new Error(`The upstream node does not handle the /v2/ price namespace`)
+        }
+        return resp
+      })
       .then(resp => resp.json())
       .then(namespacePrice => {
         if (!namespacePrice) {
