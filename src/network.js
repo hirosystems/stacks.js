@@ -52,7 +52,7 @@ export class BlockstackNetwork {
       .then((resp) => {
         if (resp.status === 404) {
           // old core node 
-          throw new Error(`The upstream node does not handle the /v2/ price namespace`)
+          throw new Error('The upstream node does not handle the /v2/ price namespace')
         }
         return resp
       })
@@ -76,7 +76,7 @@ export class BlockstackNetwork {
       .then((resp) => {
         if (resp.status === 404) {
           // old core node 
-          throw new Error(`The upstream node does not handle the /v2/ price namespace`)
+          throw new Error('The upstream node does not handle the /v2/ price namespace')
         }
         return resp
       })
@@ -631,9 +631,8 @@ export class BitcoindAPI extends BitcoinNetwork {
       .then((respObj) => {
         if (!respObj || !respObj.result) {
           // unconfirmed 
-          throw new Error("Unconfirmed transaction")
-        }
-        else {
+          throw new Error('Unconfirmed transaction')
+        } else {
           return { block_height: respObj.result.height }
         }
       })
