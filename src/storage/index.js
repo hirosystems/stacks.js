@@ -50,19 +50,19 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * Encrypts the data provided with the transit public key.
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
- * @param {String} options.privateKey - the hex string of the ECDSA private
- * key to use for decryption. If not provided, will use user's appPrivateKey.
+ * @param {String} options.publicKey - the hex string of the ECDSA public
+ * key to use for encryption. If not provided, will use user's appPrivateKey.
  * @return {String} Stringified ciphertext object
  */
-export function encryptContent(content: string | Buffer, options?: {privateKey?: string}) {
-  const defaults = { privateKey: null }
+export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
+  const defaults = { publicKey: null }
   const opt = Object.assign({}, defaults, options)
-  if (! opt.privateKey) {
-    opt.privateKey = loadUserData().appPrivateKey
+  if (! opt.publicKey) {
+    const privateKey = loadUserData().appPrivateKey
+    opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
 
-  const publicKey = getPublicKeyFromPrivate(opt.privateKey)
-  const cipherObject = encryptECIES(publicKey, content)
+  const cipherObject = encryptECIES(opt.publicKey, content)
   return JSON.stringify(cipherObject)
 }
 
@@ -159,11 +159,13 @@ export function getFile(path: string, options?: {decrypt?: boolean, username?: s
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
- * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+ *                                                  or the provided public key
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-export function putFile(path: string, content: string | Buffer, options?: {encrypt?: boolean}) {
+export function putFile(path: string, content: string | Buffer,
+  options?: {encrypt?: boolean | string}) {
   const defaults = {
     encrypt: true
   }
@@ -175,7 +177,12 @@ export function putFile(path: string, content: string | Buffer, options?: {encry
     contentType = 'application/octet-stream'
   }
   if (opt.encrypt) {
-    content = encryptContent(content)
+    if (typeof(opt.encrypt) === 'string') {
+      const encryptOptions = { publicKey: opt.encrypt }
+      content = encryptContent(content, encryptOptions)
+    } else {
+      content = encryptContent(content)
+    }
     contentType = 'application/json'
   }
   return getOrSetLocalGaiaHubConnection()
