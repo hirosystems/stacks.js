@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `encryptContent` now takes a public key instead of a private key to
+encrypt content for other users.
+- `putFile` can now optionally take the public key for which you want 
+to encrypt the file. Thanks to @bodymindarts for this!
+
 ## [17.2.0]
 
 ### Added
