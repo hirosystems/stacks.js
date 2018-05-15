@@ -8,6 +8,8 @@ import { uploadToGaiaHub, getFullReadUrl,
          getBucketUrl } from '../../../lib/storage/hub'
 import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
 import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
+import { getPublicKeyFromPrivate } from '../../../lib/keys'
+
 
 class LocalStorage {
   constructor() {
@@ -237,8 +239,9 @@ export function runStorageTests() {
   test('encrypt & decrypt content -- specify key', (t) => {
     t.plan(2)
     const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
+    const publicKey = getPublicKeyFromPrivate(privateKey)
     const content = 'we-all-live-in-a-yellow-submarine'
-    const ciphertext = encryptContent(content, { privateKey })
+    const ciphertext = encryptContent(content, { publicKey })
     t.ok(ciphertext)
     const deciphered = decryptContent(ciphertext, { privateKey })
     t.equal(content, deciphered)

@@ -54,29 +54,19 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * Encrypts the data provided with the app public key.
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
- * @param {String} options.publicKey - the hex string of the ECDSA private
- * key that will be used for decryption. If neither a public or private key
- * is provided, will use the user's app key pair
- * @param {String} options.privateKey - the hex string of the ECDSA private
- * key that will be used for decryption. The corresponding public key is computed
- * and used for encryption. If neither a publicKey nor private key is provided,
- * use the user's app key pair
+ * @param {String} options.publicKey - the hex string of the ECDSA public
+ * key to use for encryption. If not provided, will use user's appPrivateKey.
  * @return {String} Stringified ciphertext object
  */
-export function encryptContent(content: string | Buffer,
-                               options?: {privateKey?: string, publicKey?: string}) {
-  const defaults = { privateKey: null }
+export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
+  const defaults = { publicKey: null }
   const opt = Object.assign({}, defaults, options)
-  let publicKey
-  if (opt.publicKey) {
-    publicKey = opt.publicKey
-  } else if (opt.privateKey) {
-    publicKey = getPublicKeyFromPrivate(opt.privateKey)
-  } else {
-    publicKey = getPublicKeyFromPrivate(loadUserData().appPrivateKey)
+  if (! opt.publicKey) {
+    const privateKey = loadUserData().appPrivateKey
+    opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
 
-  const cipherObject = encryptECIES(publicKey, content)
+  const cipherObject = encryptECIES(opt.publicKey, content)
   return JSON.stringify(cipherObject)
 }
 
@@ -358,13 +348,15 @@ export function getFile(path: string, options?: {
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
- * @param {Boolean} [options.encrypt=true] - encrypt the data with the app private key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes.
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+ *                                                  or the provided public key
+ * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+ *                                         the app private key
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
 export function putFile(path: string, content: string | Buffer, options?: {
-  encrypt?: boolean,
+  encrypt?: boolean | string,
   sign?: boolean
   }) {
   const defaults = {
@@ -379,11 +371,33 @@ export function putFile(path: string, content: string | Buffer, options?: {
     contentType = 'application/octet-stream'
   }
 
+  // First, let's figure out if we need to get public/private keys,
+  //  or if they were passed in
+
+  let privateKey = ''
+  let publicKey = ''
+  if (opt.sign) {
+    if (typeof(opt.sign) === 'string') {
+      privateKey = opt.sign
+    } else {
+      privateKey = loadUserData().appPrivateKey
+    }
+  }
+  if (opt.encrypt) {
+    if (typeof(opt.encrypt) === 'string') {
+      publicKey = opt.encrypt
+    } else {
+      if (!privateKey) {
+        privateKey = loadUserData().appPrivateKey
+      }
+      publicKey = getPublicKeyFromPrivate(privateKey)
+    }
+  }
+
   // In the case of signing, but *not* encrypting,
   //   we perform two uploads. So the control-flow
   //   here will return there.
   if (!opt.encrypt && opt.sign) {
-    const privateKey = loadUserData().appPrivateKey
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
     return getOrSetLocalGaiaHubConnection()
@@ -397,13 +411,14 @@ export function putFile(path: string, content: string | Buffer, options?: {
 
   // In all other cases, we only need one upload.
   if (opt.encrypt && !opt.sign) {
-    content = encryptContent(content)
+    content = encryptContent(content, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const privateKey = loadUserData().appPrivateKey
-    const cipherText = encryptContent(content, { privateKey })
-    const { signature, publicKey } = signECDSA(privateKey, cipherText)
-    const signedCipherObject = { signature, publicKey, cipherText }
+    const cipherText = encryptContent(content, { publicKey })
+    const signatureObject = signECDSA(privateKey, cipherText)
+    const signedCipherObject = { signature: signatureObject.signature,
+                                 publicKey: signatureObject.publicKey,
+                                 cipherText }
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
   }
