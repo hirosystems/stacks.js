@@ -42,14 +42,17 @@ export function runWalletTests() {
       salt: 'e61f9eb10842fc3e237fba6319947de93fb630df963342914339b96790563a5a' }
   ]
 
-  const expectedAppPrivateKey = 'b21aaf76b684cc1b6bf8c48bcec5df1adb68a7a6970e66c86fc0e86e09b4d244'
+  const expectedLegacyAppSK = 'b21aaf76b684cc1b6bf8c48bcec5df1adb68a7a6970e66c86fc0e86e09b4d244'
+  // I derived the following expected App SK by manually computing the derivation path from the
+  //  sha256 output.
+  const expectedNewAppSK    = '3168aefff6aa53959a002112821384c41f39f538c0e8727a798bb40beb62ca5e'
 
   const wallets = [BlockstackWallet.fromSeedBuffer(Buffer.from(testSeedHex, 'hex')),
                    BlockstackWallet.fromBase58(testSeedB58)]
   wallets
     .forEach((wallet) => {
       test('wallet matches browser 0.26.2 implementation', (t) => {
-        t.plan(5)
+        t.plan(6)
         t.equals(wallet.getIdentityPublicKeychain(), identityXPUB, 'id xpub is correct')
         t.equals(wallet.getBitcoinPublicKeychain(), bitcoinXPUB, 'btc xpub is correct')
         t.equals(wallet.getBitcoinAddress(0), bitcoinAddress, 'btc address correct')
@@ -57,10 +60,15 @@ export function runWalletTests() {
           [0, 1, 2, 3].map(index => wallet.getIdentityKeyPair(index, true)),
           identityKeyPairs, 'keypairs generated correctly')
         const idKeyPair = wallet.getIdentityKeyPair(0, false)
+        t.equals(BlockstackWallet.getLegacyAppPrivateKey(idKeyPair.appsNodeKey,
+                                                         idKeyPair.salt,
+                                                         'https://blockstack-todos.appartisan.com'),
+                 expectedLegacyAppSK,
+                 'blockstack-todos app private key correct')
         t.equals(BlockstackWallet.getAppPrivateKey(idKeyPair.appsNodeKey,
-                                                   idKeyPair.salt,
-                                                   'https://blockstack-todos.appartisan.com'),
-                 expectedAppPrivateKey,
+                                                   'potato potato',
+                                                   'carrot carrot carrot'),
+                 expectedNewAppSK,
                  'blockstack-todos app private key correct')
       })
     })

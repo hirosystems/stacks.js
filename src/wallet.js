@@ -190,13 +190,50 @@ export class BlockstackWallet {
    * @return {String} the private key hex-string. this will be a 64
    * character string
    */
-  static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
+  static getLegacyAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
     const hash = crypto
           .createHash('sha256')
           .update(`${appDomain}${salt}`)
           .digest('hex')
     const appIndex = hashCode(hash)
     const appNode = HDNode.fromBase58(appsNodeKey).deriveHardened(appIndex)
+    return getNodePrivateKey(appNode).slice(0, 64)
+  }
+
+  /**
+   * Get a ECDSA private key hex-string for an application-specific
+   *  address.
+   * @param {String} appsNodeKey - the base58-encoded private key for
+   * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+   * @param {String} salt - a string, used to salt the
+   * application-specific addresses
+   * @param {String} appDomain - the appDomain to generate a key for
+   * @return {String} the private key hex-string. this will be a 64
+   * character string
+   */
+  static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
+    const hash = crypto
+          .createHash('sha256')
+          .update(`${appDomain}${salt}`)
+          .digest('hex')
+    const appIndexHexes = []
+    // note: there's hardcoded numbers here, precisely because I want this
+    //   code to be very specific to the derivation paths we expect.
+    if (hash.length !== 64) {
+      throw new Error(`Unexpected app-domain hash length of ${hash.length}`)
+    }
+    for (let i = 0; i < 11; i++) { // split the hash into 3-byte chunks
+                                   // because child nodes can only be up to 2^31,
+                                   // and we shouldn't deal in partial bytes.
+      appIndexHexes.push(hash.slice(i * 6, i * 6 + 6))
+    }
+    let appNode = HDNode.fromBase58(appsNodeKey)
+    appIndexHexes.forEach((hex) => {
+      if (hex.length > 6) {
+        throw new Error('Invalid hex string length')
+      }
+      appNode = appNode.deriveHardened(parseInt(hex, 16))
+    })
     return getNodePrivateKey(appNode).slice(0, 64)
   }
 
