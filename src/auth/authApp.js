@@ -6,6 +6,7 @@ import protocolCheck from 'custom-protocol-detection-blockstack'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID, makeECPrivateKey } from '../index'
 import { LoginFailedError } from '../errors'
+import { decryptECIES } from '../encryption'
 import { decryptPrivateKey } from './authMessages'
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
          BLOCKSTACK_STORAGE_LABEL,
@@ -160,10 +161,15 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
       let coreSessionToken = tokenPayload.core_token
       if (isLaterVersion(tokenPayload.version, '1.1.0')) {
         const transitKey = getTransitKey()
+        let decryptionFunction = decryptPrivateKey
+        if (isLaterVersion(tokenPayload.version, '1.3.0')) {
+          decryptionFunction = decryptECIES
+        }
+
         if (transitKey !== undefined && transitKey != null) {
           if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
             try {
-              appPrivateKey = decryptPrivateKey(transitKey, tokenPayload.private_key)
+              appPrivateKey = decryptionFunction(transitKey, tokenPayload.private_key)
             } catch (e) {
               Logger.warn('Failed decryption of appPrivateKey, will try to use as given')
               try {
@@ -176,7 +182,7 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
           }
           if (coreSessionToken !== undefined && coreSessionToken !== null) {
             try {
-              coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+              coreSessionToken = decryptionFunction(transitKey, coreSessionToken)
             } catch (e) {
               Logger.info('Failed decryption of coreSessionToken, will try to use as given')
             }

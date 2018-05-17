@@ -19,6 +19,8 @@ import { encryptECIES, decryptECIES } from '../encryption'
 
 import { Logger } from '../logger'
 
+import { isLaterVersion } from '../utils'
+
 const VERSION = '1.2.0'
 
 type AuthMetadata = {
@@ -130,8 +132,10 @@ export function decryptPrivateKey(privateKey: string,
  * @param  {Number} expiresAt an integer in the same format as
  * `new Date().getTime()`, milliseconds since the Unix epoch
  * @param {String} transitPublicKey the public key provide by the app
- * in its authentication request with which secrets will be encrypted 
+ * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
+ * @param {String} requestVersion - the version number in the corresponding
+ *  request object which will result in this response.
  * @return {String} signed and encoded authentication response token
  */
 export function makeAuthResponse(privateKey: string,
@@ -142,7 +146,8 @@ export function makeAuthResponse(privateKey: string,
                                  appPrivateKey: ?string = null,
                                  expiresAt: number = nextMonth().getTime(),
                                  transitPublicKey: ?string = null,
-                                 hubUrl: ?string = null): string {
+                                 hubUrl: ?string = null,
+                                 requestVersion: ?string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -154,9 +159,13 @@ export function makeAuthResponse(privateKey: string,
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
     Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
-      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+      let encryptionFunction = encryptPrivateKey
+      if (requestVersion && isLaterVersion(requestVersion, '1.3.0')) {
+        encryptionFunction = encryptECIES
+      }
+      privateKeyPayload = encryptionFunction(transitPublicKey, appPrivateKey)
       if (coreToken !== undefined && coreToken !== null) {
-        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
+        coreTokenPayload = encryptionFunction(transitPublicKey, coreToken)
       }
     }
     additionalProperties = {
