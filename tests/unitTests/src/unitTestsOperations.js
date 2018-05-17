@@ -327,9 +327,11 @@ function transactionTests() {
     FetchMock.get('https://core.blockstack.org/v1/prices/namespaces/hello',
                   NAMESPACE_PRICE)
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
-                  { history: { 10: [{ burn_address: BURN_ADDR }] } })
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
     FetchMock.get('https://core.blockstack.org/v1/blockchains/bitcoin/consensus',
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 601 })
   }
 
   function getInputVals(inputTXArgument, utxoSets = utxoSet) {
@@ -1070,11 +1072,53 @@ function transactionTests() {
       t.equal(error.parameter, 'zoneFile')
     })
   })
+
+  test('getNamespaceBurnAddress: pay to namespace creator before year 1', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 601 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
+    
+    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+      .then((baddr) => {
+        t.equal(baddr, BURN_ADDR, 'Pay to namespace creator in year 1')
+      })
+  })
+
+  test('getNamespaceBurnAddress: pay to burn address after year 1', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 600 + 52595 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
+
+    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+      .then((baddr) => {
+        t.equal(baddr, BURN_ADDR, 'Pay to namespace creator exactly on year 1')
+      })
+  })
+
+  test('getNamespaceBurnAddress: pay to burn address after year 1', (t) => {
+    t.plan(1)
+    FetchMock.restore()
+    FetchMock.get('https://blockchain.info/latestblock?cors=true',
+                  { height: 600 + 52595 + 1 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
+                  { version: 2, address: BURN_ADDR, reveal_block: 600 })
+
+    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+      .then((baddr) => {
+        t.equal(baddr, NAMESPACE_BURN_ADDR, 'Pay to burn address after year 1')
+      })
+  })
 }
 
 function safetyTests() {
   test('addCanReceiveName', (t) => {
-    t.plan(2)
+    t.plan(3)
     FetchMock.restore()
     FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[1].address}`,
                   { names: ['dummy.id', 'dummy.id', 'dummy.id'] })
@@ -1083,11 +1127,19 @@ function safetyTests() {
     FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[0].address}`,
                   { names: namesTooMany })
 
+    const namesWithSubdomains = new Array(25)
+    namesWithSubdomains.fill('dummy.id')
+    namesWithSubdomains[24] = 'dummy.dummy.id'
+    FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[2].address}`,
+                  { names: namesWithSubdomains })
+
     Promise.all([safety.addressCanReceiveName(testAddresses[0].address),
-                 safety.addressCanReceiveName(testAddresses[1].address)])
-      .then(([t0, t1]) => {
-        t.ok(t1, 'Test address ${testAddresses[1].address} should not have too many names.')
-        t.ok(!t0, 'Test address ${testAddresses[0].address} should have too many names.')
+                 safety.addressCanReceiveName(testAddresses[1].address),
+                 safety.addressCanReceiveName(testAddresses[2].address)])
+      .then(([t0, t1, t2]) => {
+        t.ok(t1, `Test address ${testAddresses[1].address} should not have too many names.`)
+        t.ok(!t0, `Test address ${testAddresses[0].address} should have too many names.`)
+        t.ok(t2, `Test address ${testAddresses[2].address} should not have too many names.`)
       })
   })
 
@@ -1112,7 +1164,7 @@ function safetyTests() {
     FetchMock.get('https://core.blockstack.org/v1/names/bar.test',
                   { body: 'Name available', status: 404 })
     FetchMock.get('https://core.blockstack.org/v1/names/foo.test',
-                  { expires_block: 50 })
+                  { expire_block: 50 })
     FetchMock.getOnce('https://blockchain.info/latestblock?cors=true',
                       { height: 49 })
     safety.isInGracePeriod('foo.test')

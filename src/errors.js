@@ -93,3 +93,12 @@ export class LoginFailedError extends BlockstackError {
     this.name = 'LoginFailedError'
   }
 }
+
+export class SignatureVerificationError extends BlockstackError {
+  constructor(reason: string) {
+    const message = `Failed to verify signature: ${reason}`
+    super({ code: 'signature_verification_failure', message })
+    this.message = message
+    this.name = 'SignatureVerificationError'
+  }
+}
