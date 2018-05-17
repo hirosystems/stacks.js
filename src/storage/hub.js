@@ -1,8 +1,12 @@
 import bitcoin from 'bitcoinjs-lib'
 import bigi from 'bigi'
+import crypto from 'crypto'
 
 import { loadUserData } from '../auth/authApp'
+import { TokenSigner } from 'jsontokens'
+import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
+import { Logger } from '../logger'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
@@ -16,7 +20,7 @@ export type GaiaHubConfig = {
 export function uploadToGaiaHub(filename: string, contents: any,
                                 hubConfig: GaiaHubConfig,
                                 contentType: string = 'application/octet-stream'): Promise<*> {
-  console.log(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
+  Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
   return fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`,
         { method: 'POST',
           headers: {
@@ -34,33 +38,37 @@ export function getFullReadUrl(filename: string,
   return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
 }
 
-export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
-  console.log(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
-  let challengeSigner
-  try {
-    challengeSigner = new bitcoin.ECPair(bigi.fromHex(challengeSignerHex))
-  } catch (e) {
-    return Promise.reject(e)
+function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string): string {
+  const challengeText = hubInfo.challenge_text
+  const handlesV1Auth = (hubInfo.latest_auth_version &&
+                         parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
+  if (!handlesV1Auth) {
+    throw new Error('Connected gaia hub doesn\'t support V1 auth. Refusing downgrade')
   }
 
+  const iss = getPublicKeyFromPrivate(signerKeyHex)
+  const salt = crypto.randomBytes(16).toString('hex')
+  const payload = { gaiaChallenge: challengeText,
+                    iss, salt }
+  const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
+  return `v1:${token}`
+}
+
+export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
+  Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
+
   return fetch(`${gaiaHubUrl}/hub_info`)
-    .then((response) => response.text())
-    .then((responseText) => JSON.parse(responseText))
-    .then((responseJSON) => {
-      const readURL = responseJSON.read_url_prefix
-      const challenge = responseJSON.challenge_text
-      const digest = bitcoin.crypto.sha256(challenge)
-      const signature = challengeSigner.sign(digest)
-            .toDER().toString('hex')
-      const publickey = challengeSigner.getPublicKeyBuffer()
-            .toString('hex')
-      const token = new Buffer(JSON.stringify(
-        { publickey, signature })).toString('base64')
-      const address = challengeSigner.getAddress()
+    .then((response) => response.json())
+    .then((hubInfo) => {
+      const readURL = hubInfo.read_url_prefix
+      const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex)
+      const address = hexStringToECPair(challengeSignerHex +
+                                        (challengeSignerHex.length === 64 ? '01' : ''))
+            .getAddress()
       return { url_prefix: readURL,
-                address,
-                token,
-                server: gaiaHubUrl }
+               address,
+               token,
+               server: gaiaHubUrl }
     })
 }
 

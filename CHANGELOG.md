@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 to encrypt the file. Thanks to @bodymindarts for this!
 
 ### Changed
+- The gaia hub connection functions now use a JWT for authentication,
+  the "v1" gaia authentication token. This is *not* a backwards compatible
+  change-- an app using this version of `blockstack.js` will refuse to
+  downgrade to the old protocol version.
 - `encryptContent` now takes a public key instead of a private key to
 encrypt content for other users.
 
