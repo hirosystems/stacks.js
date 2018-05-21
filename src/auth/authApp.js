@@ -122,9 +122,9 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
-export function getAuthResponseToken() {
+export function getAuthResponseToken(): string {
   const queryDict = queryString.parse(location.search)
-  return queryDict.authResponse ? queryDict.authResponse : null
+  return queryDict.authResponse ? queryDict.authResponse : ''
 }
 
 /**
@@ -142,13 +142,12 @@ export function isSignInPending() {
  *
  * @param {String} nameLookupURL - the endpoint against which to verify public
  * keys match claimed username
- *
+ * @param  {String} authResponseToken - the auth response token
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/') {
-  const authResponseToken = getAuthResponseToken()
-
+export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/', 
+                                    authResponseToken: string = getAuthResponseToken()) {
   return verifyAuthResponse(authResponseToken, nameLookupURL)
     .then(isValid => {
       if (!isValid) {
