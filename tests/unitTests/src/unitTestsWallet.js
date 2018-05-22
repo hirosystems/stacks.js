@@ -24,6 +24,12 @@ function tests62BitMath() {
         output: ['7fffffff', '7fffffff'] },
       { input: 'aaaaaaab55555554',
         output: ['55555555', '55555555'] },
+      { input: 'aaaaaaa955555554',
+        output: ['55555554', '55555555'] },
+      { input: '2aaaaaa955555554',
+        output: ['15555554', '55555555'] },
+      { input: '2aaaaaa955555556',
+        output: ['15555554', '55555555'] },
       { input: '266f7d5ffffffffc',
         output: ['1337beaf', '7fffffff'] }]
     testSet.forEach((testData) => {
@@ -36,7 +42,8 @@ function tests62BitMath() {
             padZeros(parseInt(testData.input.slice(8, 16), 16).toString(2), 32)
       const outputBinary = padZeros(parseInt(testData.output[0], 16).toString(2), 31) +
             padZeros(parseInt(testData.output[1], 16).toString(2), 31)
-      t.equal(outputBinary, inputBinary.slice(0, 62), 'bit strings should match')
+      t.equal(outputBinary, inputBinary.slice(0, 62),
+              `bit strings should match for ${testData.input}`)
     })
 
     t.end()
