@@ -38,15 +38,39 @@ export function getFullReadUrl(filename: string,
   return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
 }
 
+function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): string {
+  // only sign specific legacy auth challenges.
+  let parsedChallenge
+  try {
+    parsedChallenge = JSON.parse(challengeText)
+  } catch (err) {
+    throw new Error('Failed in parsing legacy challenge text from the gaia hub.')
+  }
+  if (parsedChallenge[0] === 'gaiahub' &&
+      parsedChallenge[3] === 'blockstack_storage_please_sign') {
+    const signer = hexStringToECPair(signerKeyHex +
+                                     (signerKeyHex.length === 64 ? '01' : ''))
+    const digest = bitcoin.crypto.sha256(challengeText)
+    const signature = signer.sign(digest).toDER().toString('hex')
+    const publickey = getPublicKeyFromPrivate(signerKeyHex)
+    const token = Buffer.from(JSON.stringify(
+      { publickey, signature })).toString('base64')
+    return token
+  } else {
+    throw new Error('Failed to connect to legacy gaia hub. If you operate this hub, please update.')
+  }
+}
+
 function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version &&
                          parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
+  const iss = getPublicKeyFromPrivate(signerKeyHex)
+
   if (!handlesV1Auth) {
-    throw new Error('Connected gaia hub doesn\'t support V1 auth. Refusing downgrade')
+    makeLegacyAuthToken(challengeText, signerKeyHex)
   }
 
-  const iss = getPublicKeyFromPrivate(signerKeyHex)
   const salt = crypto.randomBytes(16).toString('hex')
   const payload = { gaiaChallenge: challengeText,
                     iss, salt }
