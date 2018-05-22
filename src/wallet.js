@@ -41,6 +41,21 @@ function getNodePublicKey(hdNode): string {
   return hdNode.keyPair.getPublicKeyBuffer().toString('hex')
 }
 
+export function getFirst62BitsAsNumbers(buff: Buffer): Array<number> {
+  // now, lets use the leading 62 bits to get two indexes
+  // start with two ints --> 64 bits
+  const firstInt32 = buff.readInt32BE(0)
+  const secondInt32 = buff.readInt32BE(4)
+  // zero-left shift of one gives us the first 31 bits (as a number < 2^31)
+  const firstIndex = firstInt32 >>> 1
+  // save the 32nd bit
+  const secondIndexLeadingBit = (firstInt32 & 1)
+  // zero-left shift of two gives us the next 30 bits, then we add
+  // that 32nd bit to the front.
+  const secondIndex = (secondInt32 >>> 2) | (secondIndexLeadingBit << 30)
+  return [firstIndex, secondIndex]
+}
+
 /**
  * The BlockstackWallet class manages the hierarchical derivation
  *  paths for a standard blockstack client wallet. This includes paths
@@ -199,6 +214,39 @@ export class BlockstackWallet {
     const appNode = HDNode.fromBase58(appsNodeKey).deriveHardened(appIndex)
     return getNodePrivateKey(appNode).slice(0, 64)
   }
+
+
+  /**
+   * Get a ECDSA private key hex-string for an application-specific
+   *  address, this address will use the first 62 bits of the SHA256 hash
+   *  of `appDomain,sig("app-node-salt" with appsNodeKey)`
+   * @param {String} appsNodeKey - the base58-encoded private key for
+   * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+   * @param {String} salt - a string, used to salt the
+   * application-specific addresses
+   * @param {String} appDomain - the appDomain to generate a key for
+   * @return {String} the private key hex-string. this will be a 64
+   * character string
+   */
+  static getAppPrivateKeySecretSalt(appsNodeKey: string, salt: string, appDomain: string): string {
+    const appsNode = HDNode.fromBase58(appsNodeKey)
+
+    // we will *sign* the input salt, which creates a secret value
+    const saltHash = crypto.createHash('sha256')
+          .update(`app-key-salt:${salt}`)
+          .digest()
+    const secretValue = appsNode.sign(saltHash).toDER().toString('hex')
+
+    const hash = crypto
+          .createHash('sha256')
+          .update(`${appDomain},${secretValue}`)
+          .digest()
+
+    const indexes = getFirst62BitsAsNumbers(hash)
+    const appNode = appsNode.deriveHardened(indexes[0]).deriveHardened(indexes[1])
+    return getNodePrivateKey(appNode).slice(0, 64)
+  }
+
 
   /**
    * Get a ECDSA private key hex-string for an application-specific
