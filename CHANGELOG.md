@@ -21,10 +21,10 @@ to encrypt the file. Thanks to @bodymindarts for this!
 ### Changed
 - `encryptContent` now takes a public key instead of a private key to
 encrypt content for other users.
-- The validateProofs() method should handle errors in proof-checking
+- The validateProofs() method now handles errors in proof-checking
   more seamlessly, properly catching failed promises. Previous error
   cases which resulted in uncaught exception warnings and null
-  responses should not behave correctly.
+  responses should now behave correctly.
 
 ## [17.2.0]
 
