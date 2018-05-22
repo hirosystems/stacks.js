@@ -109,7 +109,7 @@ function isInGracePeriod(fullyQualifiedName: string) {
                       network.getBlockHeight(),
                       network.getGracePeriod(fullyQualifiedName)])
     .then(([nameInfo, blockHeight, gracePeriod]) => {
-      const expiresAt = nameInfo.expires_block
+      const expiresAt = nameInfo.expire_block
       return (blockHeight >= expiresAt) && (blockHeight < (gracePeriod + expiresAt))
     })
     .catch((e) => {
@@ -123,7 +123,8 @@ function isInGracePeriod(fullyQualifiedName: string) {
 
 function addressCanReceiveName(address: string) {
   return config.network.getNamesOwned(address)
-    .then((names) => (names.length < 25))
+    .then((names) => (Promise.all(names.map((name) => isNameValid(name)))
+      .then((validNames) => validNames.filter((nameValid) => nameValid).length < 25)))
 }
 
 export const safety = {
