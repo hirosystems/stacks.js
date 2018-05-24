@@ -1,7 +1,7 @@
 import test from 'tape-promise/tape'
 
 import {
- encryptECIES, decryptECIES, getHexFromBN
+ encryptECIES, decryptECIES, getHexFromBN, signECDSA, verifyECDSA
 } from '../../../lib/encryption'
 import { ERROR_CODES } from '../../../lib/errors'
 
@@ -46,6 +46,41 @@ export function runEncryptionTests() {
       const assertionMessage = 'Should indicate MAC error'
       t.notEqual(e.message.indexOf('failure in MAC check'), -1, assertionMessage)
     }
+  })
+
+  test('sign-to-verify-works', (t) => {
+    t.plan(2)
+
+    const testString = 'all work and no play makes jack a dull boy'
+    let sigObj = signECDSA(privateKey, testString)
+    t.true(verifyECDSA(testString, sigObj.publicKey, sigObj.signature),
+           'String content should be verified')
+
+    const testBuffer = new Buffer(testString)
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.true(verifyECDSA(testBuffer, sigObj.publicKey, sigObj.signature),
+           'String buffer should be verified')
+  })
+
+  test('sign-to-verify-fails', (t) => {
+    t.plan(3)
+
+    const testString = 'all work and no play makes jack a dull boy'
+    const failString = 'I should fail'
+
+    let sigObj = signECDSA(privateKey, testString)
+    t.false(verifyECDSA(failString, sigObj.publicKey, sigObj.signature),
+            'String content should not be verified')
+
+    const testBuffer = Buffer.from(testString)
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.false(verifyECDSA(Buffer.from(failString), sigObj.publicKey, sigObj.signature),
+            'Buffer content should not be verified')
+
+    const badPK = '0288580b020800f421d746f738b221d384f098e911b81939d8c94df89e74cba776'
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.false(verifyECDSA(Buffer.from(failString), badPK, sigObj.signature),
+            'Buffer content should not be verified')
   })
 
   test('bn-padded-to-64-bytes', (t) => {

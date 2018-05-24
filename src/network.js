@@ -2,6 +2,7 @@
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
 import { MissingParameterError, RemoteServiceError } from './errors'
+import { Logger } from './logger'
 
 type UTXO = { value?: number,
               confirmations?: number,
@@ -616,7 +617,7 @@ export class BitcoindAPI extends BitcoinNetwork {
       .then(resp => resp.json())
       .then(x => x.result)
       .then(utxos => utxos.map(
-        x => Object({ value: x.amount * SATOSHIS_PER_BTC,
+        x => Object({ value: Math.round(x.amount * SATOSHIS_PER_BTC),
                       confirmations: x.confirmations,
                       tx_hash: x.txid,
                       tx_output_n: x.vout })))
@@ -690,7 +691,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
     return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
       .then(resp => {
         if (resp.status === 500) {
-          console.log('DEBUG: UTXO provider 500 usually means no UTXOs: returning []')
+          Logger.debug('UTXO provider 500 usually means no UTXOs: returning []')
           return {
             unspent_outputs: []
           }
