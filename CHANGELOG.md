@@ -8,8 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for `verify` and `sign` keywords in `getFile` and `putFile`
+  respectively. This enables support for ECDSA signatures on SHA256
+  hashes in the storage operations, and works for encrypted and
+  unencrypted files, in addition to multi-player reads (for
+  unencrypted files).
 - New `TransactionSigner` interface to allow for different signing agents
   in the `transactions` functions (e.g., makePreorder).
+- `putFile` can now optionally take the public key for which you want
+to encrypt the file. Thanks to @bodymindarts for this!
+
+### Changed
+- `encryptContent` now takes a public key instead of a private key to
+encrypt content for other users.
+- The validateProofs() method now handles errors in proof-checking
+  more seamlessly, properly catching failed promises. Previous error
+  cases which resulted in uncaught exception warnings and null
+  responses should now behave correctly.
 
 ## [17.2.0]
 

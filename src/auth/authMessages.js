@@ -109,7 +109,12 @@ export function decryptPrivateKey(privateKey: string,
                                   hexedEncrypted: string): string | null {
   const unhexedString = new Buffer(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
-  return decryptECIES(privateKey, encryptedObj)
+  const decrypted = decryptECIES(privateKey, encryptedObj)
+  if (typeof decrypted !== 'string') {
+    throw new Error('Unable to correctly decrypt private key')
+  } else {
+    return decrypted
+  }
 }
 
 /**
