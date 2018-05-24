@@ -1,3 +1,5 @@
 machine:
   node:
     version: 6.1.0
+  npm:
+    version: 5.8.0
