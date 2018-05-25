@@ -68,7 +68,7 @@ function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string): string {
   const iss = getPublicKeyFromPrivate(signerKeyHex)
 
   if (!handlesV1Auth) {
-    makeLegacyAuthToken(challengeText, signerKeyHex)
+    return makeLegacyAuthToken(challengeText, signerKeyHex)
   }
 
   const salt = crypto.randomBytes(16).toString('hex')
