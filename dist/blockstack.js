@@ -153,7 +153,7 @@ function redirectToSignIn() {
  */
 function getAuthResponseToken() {
   var queryDict = _queryString2.default.parse(location.search);
-  return queryDict.authResponse ? queryDict.authResponse : null;
+  return queryDict.authResponse ? queryDict.authResponse : '';
 }
 
 /**
@@ -168,16 +168,15 @@ function isSignInPending() {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
- * @param {String} authResponseToken - the signed authentication response token
  * @param {String} nameLookupURL - the endpoint against which to verify public
  * keys match claimed username
- *
+ * @param {String} authResponseToken - the signed authentication response token
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
 function handlePendingSignIn() {
-  var authResponseToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : getAuthResponseToken();
-  var nameLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'https://core.blockstack.org/v1/names/';
+  var nameLookupURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://core.blockstack.org/v1/names/';
+  var authResponseToken = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : getAuthResponseToken();
 
   return (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
     if (!isValid) {
