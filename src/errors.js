@@ -54,7 +54,7 @@ export class RemoteServiceError extends BlockstackError {
 
 export class InvalidDIDError extends BlockstackError {
   constructor(message: string = '') {
-    super({ code: 'invalid_did_error', message, param: '' })
+    super({ code: 'invalid_did_error', message })
     this.name = 'InvalidDIDError'
     this.message = message
   }
