@@ -476,7 +476,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -809,7 +809,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1024,8 +1024,18 @@
     "tags": [
       {
         "title": "param",
-        "description": "the endpoint against which to verify public\nkeys match claimed username",
+        "description": "the signed authentication response token",
         "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "authResponseToken"
+      },
+      {
+        "title": "param",
+        "description": "the endpoint against which to verify public\nkeys match claimed username",
+        "lineNumber": 5,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -1035,7 +1045,7 @@
       {
         "title": "return",
         "description": "that resolves to the user data object if successful and rejects\nif handling the sign in request fails or there was no pending sign in request.",
-        "lineNumber": 7,
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -1048,14 +1058,14 @@
         "column": 0
       },
       "end": {
-        "line": 148,
+        "line": 149,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 149,
+          "line": 150,
           "column": 0
         },
         "end": {
@@ -1063,15 +1073,77 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
     "params": [
       {
         "title": "param",
-        "name": "nameLookupURL",
+        "name": "authResponseToken",
         "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the signed authentication response token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "getAuthResponseToken()"
+      },
+      {
+        "title": "param",
+        "name": "nameLookupURL",
+        "lineNumber": 5,
         "description": {
           "type": "root",
           "children": [
@@ -1340,7 +1412,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1512,7 +1584,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1749,7 +1821,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2161,7 +2233,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2852,7 +2924,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3134,7 +3206,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3515,7 +3587,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -3901,7 +3973,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4256,7 +4328,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4890,7 +4962,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5282,11 +5354,11 @@
           "column": 0
         },
         "end": {
-          "line": 58,
+          "line": 56,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5667,7 +5739,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -6234,8 +6306,18 @@
       },
       {
         "title": "param",
-        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+        "description": "Whether the content should be verified, only to be used\nwhen `putFile` was set to `sign = true`",
         "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        },
+        "name": "options.verify"
+      },
+      {
+        "title": "param",
+        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -6245,7 +6327,7 @@
       {
         "title": "param",
         "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
-        "lineNumber": 8,
+        "lineNumber": 10,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -6259,7 +6341,7 @@
       {
         "title": "returns",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 11,
+        "lineNumber": 13,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6268,26 +6350,26 @@
     ],
     "loc": {
       "start": {
-        "line": 89,
+        "line": 284,
         "column": 0
       },
       "end": {
-        "line": 102,
+        "line": 299,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 103,
+          "line": 300,
           "column": 0
         },
         "end": {
-          "line": 155,
+          "line": 344,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -6540,8 +6622,124 @@
           },
           {
             "title": "param",
-            "name": "options.app",
+            "name": "options.verify",
             "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Whether the content should be verified, only to be used\nwhen ",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 6,
+                          "offset": 61
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "putFile",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 6,
+                          "offset": 61
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 15,
+                          "offset": 70
+                        },
+                        "indent": []
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "value": " was set to ",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 15,
+                          "offset": 70
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 27,
+                          "offset": 82
+                        },
+                        "indent": []
+                      }
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "sign = true",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 27,
+                          "offset": 82
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 40,
+                          "offset": 95
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 40,
+                      "offset": 95
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 40,
+                  "offset": 95
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            }
+          },
+          {
+            "title": "param",
+            "name": "options.app",
+            "lineNumber": 8,
             "description": {
               "type": "root",
               "children": [
@@ -6606,7 +6804,7 @@
           {
             "title": "param",
             "name": "options.zoneFileLookupURL",
-            "lineNumber": 8,
+            "lineNumber": 10,
             "description": {
               "type": "root",
               "children": [
@@ -6859,8 +7057,31 @@
       },
       {
         "title": "param",
-        "description": "encrypt the data with the app private key",
+        "description": "encrypt the data with the app private key\n                                                 or the provided public key",
         "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "UnionType",
+            "elements": [
+              {
+                "type": "NameExpression",
+                "name": "Boolean"
+              },
+              {
+                "type": "NameExpression",
+                "name": "String"
+              }
+            ]
+          }
+        },
+        "name": "options.encrypt",
+        "default": "true"
+      },
+      {
+        "title": "param",
+        "description": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+        "lineNumber": 7,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -6868,13 +7089,13 @@
             "name": "Boolean"
           }
         },
-        "name": "options.encrypt",
-        "default": "true"
+        "name": "options.sign",
+        "default": "false"
       },
       {
         "title": "return",
         "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 6,
+        "lineNumber": 9,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6883,26 +7104,26 @@
     ],
     "loc": {
       "start": {
-        "line": 157,
+        "line": 346,
         "column": 0
       },
       "end": {
-        "line": 165,
+        "line": 357,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 166,
+          "line": 358,
           "column": 0
         },
         "end": {
-          "line": 183,
+          "line": 427,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7112,7 +7333,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "encrypt the data with the app private key",
+                      "value": "encrypt the data with the app private key\n                                                 or the provided public key",
                       "position": {
                         "start": {
                           "line": 1,
@@ -7120,11 +7341,13 @@
                           "offset": 0
                         },
                         "end": {
-                          "line": 1,
-                          "column": 42,
-                          "offset": 41
+                          "line": 2,
+                          "column": 76,
+                          "offset": 117
                         },
-                        "indent": []
+                        "indent": [
+                          1
+                        ]
                       }
                     }
                   ],
@@ -7135,11 +7358,13 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
+                      "line": 2,
+                      "column": 76,
+                      "offset": 117
                     },
-                    "indent": []
+                    "indent": [
+                      1
+                    ]
                   }
                 }
               ],
@@ -7150,9 +7375,84 @@
                   "offset": 0
                 },
                 "end": {
+                  "line": 2,
+                  "column": 76,
+                  "offset": 117
+                }
+              }
+            },
+            "type": {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Boolean"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "String"
+                }
+              ]
+            },
+            "default": "true"
+          },
+          {
+            "title": "param",
+            "name": "options.sign",
+            "lineNumber": 7,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 60,
+                          "offset": 107
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 60,
+                      "offset": 107
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
                   "line": 1,
-                  "column": 42,
-                  "offset": 41
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 60,
+                  "offset": 107
                 }
               }
             },
@@ -7160,7 +7460,7 @@
               "type": "NameExpression",
               "name": "Boolean"
             },
-            "default": "true"
+            "default": "false"
           }
         ]
       }
@@ -7337,26 +7637,26 @@
     ],
     "loc": {
       "start": {
-        "line": 185,
+        "line": 429,
         "column": 0
       },
       "end": {
-        "line": 191,
+        "line": 435,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 192,
+          "line": 436,
           "column": 0
         },
         "end": {
-          "line": 194,
+          "line": 438,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7680,26 +7980,26 @@
     ],
     "loc": {
       "start": {
-        "line": 14,
+        "line": 18,
         "column": 0
       },
       "end": {
-        "line": 24,
+        "line": 28,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 25,
+          "line": 29,
           "column": 0
         },
         "end": {
-          "line": 47,
+          "line": 51,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8222,11 +8522,11 @@
           "column": 0
         },
         "end": {
-          "line": 113,
+          "line": 118,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -8661,26 +8961,26 @@
     ],
     "loc": {
       "start": {
-        "line": 115,
+        "line": 120,
         "column": 0
       },
       "end": {
-        "line": 136,
+        "line": 141,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 137,
+          "line": 142,
           "column": 0
         },
         "end": {
-          "line": 188,
+          "line": 193,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -9596,7 +9896,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -9997,7 +10297,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -10189,6 +10489,731 @@
           "children": [
             {
               "type": "text",
+              "value": "Sign content using ECDSA",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 25,
+          "offset": 24
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "secp256k1 private key hex string",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "privateKey"
+      },
+      {
+        "title": "param",
+        "description": "content to sign",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "content"
+      },
+      {
+        "title": "return",
+        "description": "contains:\nsignature - Hex encoded DER signature\npublic key - Hex encoded private string taken from privateKey",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 143,
+        "column": 0
+      },
+      "end": {
+        "line": 150,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 151,
+          "column": 0
+        },
+        "end": {
+          "line": 164,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "privateKey",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "secp256k1 private key hex string",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 33,
+                      "offset": 32
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 33,
+                  "offset": 32
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 33,
+              "offset": 32
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "content to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 16,
+                      "offset": 15
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 16,
+              "offset": 15
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "contains:\nsignature - Hex encoded DER signature\npublic key - Hex encoded private string taken from privateKey",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 62,
+                      "offset": 109
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 62,
+                  "offset": 109
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 62,
+              "offset": 109
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signECDSA",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signECDSA",
+        "kind": "function"
+      }
+    ],
+    "namespace": "signECDSA"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Verify content using ECDSA",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 27,
+          "offset": 26
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "Content to verify was signed",
+        "lineNumber": 2,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        },
+        "name": "content"
+      },
+      {
+        "title": "param",
+        "description": "secp256k1 private key hex string",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "publicKey"
+      },
+      {
+        "title": "param",
+        "description": "Hex encoded DER signature",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "signature"
+      },
+      {
+        "title": "return",
+        "description": "returns true when signature matches publickey + content, false if not",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 166,
+        "column": 0
+      },
+      "end": {
+        "line": 172,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 173,
+          "column": 0
+        },
+        "end": {
+          "line": 181,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Content to verify was signed",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 29,
+                  "offset": 28
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 29,
+              "offset": 28
+            }
+          }
+        },
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "param",
+        "name": "publicKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "secp256k1 private key hex string",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 33,
+                      "offset": 32
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 33,
+                  "offset": 32
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 33,
+              "offset": 32
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "signature",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Hex encoded DER signature",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "returns true when signature matches publickey + content, false if not",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 70,
+                      "offset": 69
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 70,
+                  "offset": 69
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 70,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "verifyECDSA",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "verifyECDSA",
+        "kind": "function"
+      }
+    ],
+    "namespace": "verifyECDSA"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the\ntransaction until a second transaction has a certain number of confirmations.",
               "position": {
                 "start": {
@@ -10317,7 +11342,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -11098,7 +12123,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -11982,7 +13007,7 @@
           "column": 3
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -12622,6 +13647,594 @@
     "namespace": "#broadcastNameRegistration"
   },
   {
+    "description": "",
+    "tags": [
+      {
+        "title": "returns",
+        "description": "version number of the signer, currently, should always be 1",
+        "lineNumber": 1,
+        "type": null
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 6,
+        "column": 2
+      },
+      "end": {
+        "line": 8,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 2
+        },
+        "end": {
+          "line": 9,
+          "column": 26
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "version number of the signer, currently, should always be 1",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 60,
+                      "offset": 59
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 60,
+                  "offset": 59
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 60,
+              "offset": 59
+            }
+          }
+        },
+        "title": "returns"
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signerVersion",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signerVersion"
+      }
+    ],
+    "namespace": "signerVersion"
+  },
+  {
+    "description": "",
+    "tags": [
+      {
+        "title": "returns",
+        "description": "a string representing the transaction signer's address\n(usually Base58 check encoding)",
+        "lineNumber": 1,
+        "type": null
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 10,
+        "column": 2
+      },
+      "end": {
+        "line": 13,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 14,
+          "column": 2
+        },
+        "end": {
+          "line": 14,
+          "column": 32
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a string representing the transaction signer's address\n(usually Base58 check encoding)",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 32,
+                      "offset": 86
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 32,
+                  "offset": 86
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 32,
+              "offset": 86
+            }
+          }
+        },
+        "title": "returns"
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAddress",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAddress"
+      }
+    ],
+    "namespace": "getAddress"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Signs a transaction input",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 26,
+          "offset": 25
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the transaction to sign",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "TransactionBuilder"
+        },
+        "name": "transaction"
+      },
+      {
+        "title": "param",
+        "description": "the input on the transaction to sign",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "name": "inputIndex"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 2
+        },
+        "end": {
+          "line": 20,
+          "column": 96
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "transaction",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the transaction to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "TransactionBuilder"
+        }
+      },
+      {
+        "title": "param",
+        "name": "inputIndex",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the input on the transaction to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signTransaction",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signTransaction"
+      }
+    ],
+    "namespace": "signTransaction"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Class representing a transaction signer for pubkeyhash addresses\n(a.k.a. single-sig addresses)",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 30,
+                  "offset": 94
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 30,
+              "offset": 94
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 30,
+          "offset": 94
+        }
+      }
+    },
+    "tags": [],
+    "loc": {
+      "start": {
+        "line": 23,
+        "column": 0
+      },
+      "end": {
+        "line": 26,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 27,
+          "column": 0
+        },
+        "end": {
+          "line": 53,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "ecPair",
+        "lineNumber": 30,
+        "type": {
+          "type": "NameExpression",
+          "name": "bitcoinjs.ECPair"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "PubkeyHashSigner",
+    "kind": "class",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "PubkeyHashSigner",
+        "kind": "class"
+      }
+    ],
+    "namespace": "PubkeyHashSigner"
+  },
+  {
     "description": {
       "type": "root",
       "children": [
@@ -12717,7 +14330,7 @@
       },
       {
         "title": "returns",
-        "description": "a promise which resolves to the satoshi cost to \n   fund the reveal.  This includes a 5500 satoshi dust output for the\n   preorder.  Even though this is a change output, the payer must have\n   enough funds to generate this output, so we include it in the cost.",
+        "description": "a promise which resolves to the satoshi cost to\n   fund the reveal.  This includes a 5500 satoshi dust output for the\n   preorder.  Even though this is a change output, the payer must have\n   enough funds to generate this output, so we include it in the cost.",
         "lineNumber": 9,
         "type": {
           "type": "NameExpression",
@@ -12746,7 +14359,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -13018,7 +14631,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "a promise which resolves to the satoshi cost to \n   fund the reveal.  This includes a 5500 satoshi dust output for the\n   preorder.  Even though this is a change output, the payer must have\n   enough funds to generate this output, so we include it in the cost.",
+                  "value": "a promise which resolves to the satoshi cost to\n   fund the reveal.  This includes a 5500 satoshi dust output for the\n   preorder.  Even though this is a change output, the payer must have\n   enough funds to generate this output, so we include it in the cost.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -13028,7 +14641,7 @@
                     "end": {
                       "line": 4,
                       "column": 71,
-                      "offset": 260
+                      "offset": 259
                     },
                     "indent": [
                       1,
@@ -13047,7 +14660,7 @@
                 "end": {
                   "line": 4,
                   "column": 71,
-                  "offset": 260
+                  "offset": 259
                 },
                 "indent": [
                   1,
@@ -13066,7 +14679,7 @@
             "end": {
               "line": 4,
               "column": 71,
-              "offset": 260
+              "offset": 259
             }
           }
         },
@@ -13202,7 +14815,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -13507,7 +15120,7 @@
       },
       {
         "title": "param",
-        "description": "the number of UTXOs we expect will \n be required from the importer address",
+        "description": "the number of UTXOs we expect will\n be required from the importer address",
         "lineNumber": 5,
         "type": {
           "type": "NameExpression",
@@ -13517,7 +15130,7 @@
       },
       {
         "title": "returns",
-        "description": "a promise which resolves to the satoshi cost \n to fund this name-import transaction",
+        "description": "a promise which resolves to the satoshi cost\n to fund this name-import transaction",
         "lineNumber": 7,
         "type": {
           "type": "NameExpression",
@@ -13546,7 +15159,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -13746,7 +15359,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "the number of UTXOs we expect will \n be required from the importer address",
+                  "value": "the number of UTXOs we expect will\n be required from the importer address",
                   "position": {
                     "start": {
                       "line": 1,
@@ -13756,7 +15369,7 @@
                     "end": {
                       "line": 2,
                       "column": 39,
-                      "offset": 74
+                      "offset": 73
                     },
                     "indent": [
                       1
@@ -13773,7 +15386,7 @@
                 "end": {
                   "line": 2,
                   "column": 39,
-                  "offset": 74
+                  "offset": 73
                 },
                 "indent": [
                   1
@@ -13790,7 +15403,7 @@
             "end": {
               "line": 2,
               "column": 39,
-              "offset": 74
+              "offset": 73
             }
           }
         },
@@ -13812,7 +15425,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "a promise which resolves to the satoshi cost \n to fund this name-import transaction",
+                  "value": "a promise which resolves to the satoshi cost\n to fund this name-import transaction",
                   "position": {
                     "start": {
                       "line": 1,
@@ -13822,7 +15435,7 @@
                     "end": {
                       "line": 2,
                       "column": 38,
-                      "offset": 83
+                      "offset": 82
                     },
                     "indent": [
                       1
@@ -13839,7 +15452,7 @@
                 "end": {
                   "line": 2,
                   "column": 38,
-                  "offset": 83
+                  "offset": 82
                 },
                 "indent": [
                   1
@@ -13856,7 +15469,7 @@
             "end": {
               "line": 2,
               "column": 38,
-              "offset": 83
+              "offset": 82
             }
           }
         },
@@ -13992,7 +15605,7 @@
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -14220,7 +15833,7 @@
           "children": [
             {
               "type": "text",
-              "value": "Encrypts the data provided with the transit public key.",
+              "value": "Encrypts the data provided with the app public key.",
               "position": {
                 "start": {
                   "line": 1,
@@ -14229,8 +15842,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 56,
-                  "offset": 55
+                  "column": 52,
+                  "offset": 51
                 },
                 "indent": []
               }
@@ -14244,8 +15857,8 @@
             },
             "end": {
               "line": 1,
-              "column": 56,
-              "offset": 55
+              "column": 52,
+              "offset": 51
             },
             "indent": []
           }
@@ -14259,8 +15872,8 @@
         },
         "end": {
           "line": 1,
-          "column": 56,
-          "offset": 55
+          "column": 52,
+          "offset": 51
         }
       }
     },
@@ -14300,13 +15913,13 @@
       },
       {
         "title": "param",
-        "description": "the hex string of the ECDSA private\nkey to use for decryption. If not provided, will use user's appPrivateKey.",
+        "description": "the hex string of the ECDSA public\nkey to use for encryption. If not provided, will use user's appPrivateKey.",
         "lineNumber": 4,
         "type": {
           "type": "NameExpression",
           "name": "String"
         },
-        "name": "options.privateKey"
+        "name": "options.publicKey"
       },
       {
         "title": "return",
@@ -14320,26 +15933,26 @@
     ],
     "loc": {
       "start": {
-        "line": 49,
+        "line": 53,
         "column": 0
       },
       "end": {
-        "line": 56,
+        "line": 60,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 57,
+          "line": 61,
           "column": 0
         },
         "end": {
-          "line": 67,
+          "line": 71,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -14478,7 +16091,7 @@
         "properties": [
           {
             "title": "param",
-            "name": "options.privateKey",
+            "name": "options.publicKey",
             "lineNumber": 4,
             "description": {
               "type": "root",
@@ -14488,7 +16101,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "the hex string of the ECDSA private\nkey to use for decryption. If not provided, will use user's appPrivateKey.",
+                      "value": "the hex string of the ECDSA public\nkey to use for encryption. If not provided, will use user's appPrivateKey.",
                       "position": {
                         "start": {
                           "line": 1,
@@ -14498,7 +16111,7 @@
                         "end": {
                           "line": 2,
                           "column": 75,
-                          "offset": 110
+                          "offset": 109
                         },
                         "indent": [
                           1
@@ -14515,7 +16128,7 @@
                     "end": {
                       "line": 2,
                       "column": 75,
-                      "offset": 110
+                      "offset": 109
                     },
                     "indent": [
                       1
@@ -14532,7 +16145,7 @@
                 "end": {
                   "line": 2,
                   "column": 75,
-                  "offset": 110
+                  "offset": 109
                 }
               }
             },
@@ -14782,26 +16395,26 @@
     ],
     "loc": {
       "start": {
-        "line": 69,
+        "line": 73,
         "column": 0
       },
       "end": {
-        "line": 77,
+        "line": 81,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 78,
+          "line": 82,
           "column": 0
         },
         "end": {
-          "line": 87,
+          "line": 101,
           "column": 1
         }
       },
-      "file": "/home/aaron/devel/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],

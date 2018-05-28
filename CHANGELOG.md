@@ -25,6 +25,8 @@ encrypt content for other users.
   more seamlessly, properly catching failed promises. Previous error
   cases which resulted in uncaught exception warnings and null
   responses should now behave correctly.
+- `handlePendingSignIn` now takes a second parameter which is the
+   signed authentication response token. Thanks to @muneebm for this!
 
 ## [17.2.0]
 
