@@ -127,15 +127,15 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
   const parsedUri1 = url.parse(uri1)
   const parsedUri2 = url.parse(uri2)
 
-  const port1 = parseInt(parsedUri1.port, 10) | 0 || (parsedUri1.protocol === 'https' ? 443 : 80)
-  const port2 = parseInt(parsedUri2.port, 10) | 0 || (parsedUri2.protocol === 'https' ? 443 : 80)
+  const port1 = parseInt(parsedUri1.port, 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
+  const port2 = parseInt(parsedUri2.port, 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
 
   const match = {
     scheme: parsedUri1.protocol === parsedUri2.protocol,
     hostname: parsedUri1.hostname === parsedUri2.hostname,
     port: port1 === port2,
-    absolute: (uri1.includes('http://') || uri1.includes('https')) 
-    && (uri2.includes('http://') || uri2.includes('https'))
+    absolute: (uri1.includes('http://') || uri1.includes('https://')) 
+    && (uri2.includes('http://') || uri2.includes('https://'))
   }
 
   return match.scheme && match.hostname && match.port && match.absolute
