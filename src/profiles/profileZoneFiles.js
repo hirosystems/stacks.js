@@ -2,6 +2,8 @@ import { makeZoneFile, parseZoneFile } from 'zone-file'
 import { extractProfile } from './profileTokens'
 import { Person } from './index'
 
+import { Logger } from '../logger'
+
 export function makeProfileZoneFile(origin, tokenFileUrl) {
   if (tokenFileUrl.indexOf('://') < 0) {
     throw new Error('Invalid token file url')
@@ -97,11 +99,11 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
           return
         })
         .catch((error) => {
-          console.log(`resolveZoneFileToProfile: error fetching token file ${tokenFileUrl}`, error)
+          Logger.error(`resolveZoneFileToProfile: error fetching token file ${tokenFileUrl}`, error)
           reject(error)
         })
     } else {
-      console.log('Token file url not found. Resolving to blank profile.')
+      Logger.debug('Token file url not found. Resolving to blank profile.')
       resolve({})
       return
     }

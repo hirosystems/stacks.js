@@ -20,7 +20,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
 ### Production usage
 
-**NOTE**: If you uglify your the JavaScript, you'll need to exclude the following variable names from being mangled: `BigInteger`, `ECPair`, `Point`.
+**NOTE**: If you uglify your JavaScript, you'll need to exclude the following variable names from being mangled: `BigInteger`, `ECPair`, `Point`.
 
 This is because of the function-name-duck-typing used in [typeforce](https://github.com/dcousens/typeforce) which is used by the dependency [bitcoinjs-lib](https://github.com/bitcoinjs/bitcoinjs-lib).
 
@@ -40,7 +40,7 @@ The authentication portion of this library can be used to:
 
 The profiles/identity portion of this library can be used to:
 
-1.  transform a JSON profile into cryptographically-signed signed tokens
+1.  transform a JSON profile into cryptographically-signed tokens
 2.  recover a JSON profile from signed tokens
 3.  validate signed profile tokens
 
@@ -77,7 +77,7 @@ functionality so that we can make sure your contribution can be included!
 
 ## Maintainer
 
-This repository is maintained by @larrysalibra.
+This repository is maintained by [larry.id](https://explorer.blockstack.org/name/larry.id).
 
 ## Testing
 
@@ -93,6 +93,7 @@ in your browser.
 ## Releasing
 
 - `git flow release start <version>`
+- Add section to `CHANGELOG.md`
 - Increment version in `package.json` and commit
 - `npm publish`
 - Commit built documentation and distribution

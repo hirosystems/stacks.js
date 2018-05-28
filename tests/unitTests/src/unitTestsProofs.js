@@ -22,12 +22,46 @@ function mockRequests() {
 function testProofs(profile, username, totalProofs) {
   mockRequests()
 
-  blueTest('Profiles', (t) =>  validateProofs(profile, username).then((proofs) => {
+  blueTest('Profiles', (t) =>  validateProofs(profile, undefined, username).then((proofs) => {
     t.ok(proofs, 'Proofs must have been created')
     t.equal(proofs instanceof Array, true, 'Proofs should be an Array')
     t.equal(proofs.length, totalProofs, 'Should have a proof for each of the 3 claimed accounts')
+    t.equal(proofs.filter(x => x.valid).length, totalProofs, 'Should all be valid claims')
     FetchMock.restore()
   }))
+}
+
+function brokenProofs() {
+  const naval = sampleVerifications.naval
+  // adding a 'b' to the url, so they don't overlap with other mocked fetches.
+  const navalAccounts = [{ '@type': 'Account',
+                           service: 'facebook',
+                           identifier: 'navalr',
+                           proofType: 'http',
+                           proofUrl: 'https://facebook.com/navalr/posts/10152190734077261b' },
+                         { '@type': 'Account',
+                           service: 'twitter',
+                           identifier: 'naval',
+                           proofType: 'http',
+                           proofUrl: 'https://twitter.com/naval/status/486609266212499456b' },
+                         { '@type': 'Account',
+                           service: 'github',
+                           identifier: 'navalr',
+                           proofType: 'http',
+                           proofUrl: 'https://gist.github.com/navalr/f31a74054f859ec0ac6ab' }]
+
+  test('brokenProofs', (t) => {
+    FetchMock.get(`${naval.facebook.url}b`, naval.facebook.body)
+    FetchMock.get(`${naval.github.url}b/raw`, naval.github.body)
+    FetchMock.get(`${naval.twitter.url}b`, { body: '', status: 400 })
+    t.plan(2)
+    validateProofs({ account: navalAccounts }, undefined, 'naval.id')
+      .then((proofs) => {
+        t.equal(proofs.length, 3)
+        t.equal(proofs.filter(x => x.valid).length, 2)
+        FetchMock.restore()
+      })
+  })
 }
 
 export function runProofStatementUnitTests() {
@@ -135,10 +169,14 @@ export function runOwnerAddressBasedProofsUnitTests() {
 
 export function runInBodyIdentityVerificationTests() {
   test('getProofIdentity', (t) => {
-    t.plan(2)
+    t.plan(3)
     const ken = sampleAddressBasedVerifications.ken
 
     t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body),
+      'blckstcktest',
+      'Should extract social proof identity from Instagram proof page body')
+
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagramRegression.body),
       'blckstcktest',
       'Should extract social proof identity from Instagram proof page body')
 
@@ -268,7 +306,7 @@ export function runProofServicesUnitTests() {
   })
 
   test('get proof url', (t) => {
-    t.plan(10)
+    t.plan(11)
     t.equal(profileServices.facebook.getProofUrl(sampleProofs.naval[1]),
       'https://www.facebook.com/navalr/posts/10152190734077261',
       'Facebook proof URL should match reference')
@@ -290,6 +328,9 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.linkedIn.getProofUrl(sampleProofs.ken[2]),
       'https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/',
       'LinkedIn proof URL should match reference')
+    t.equal(profileServices.hackerNews.getProofUrl(sampleProofs.bruno[0]),
+      'https://news.ycombinator.com/user?id=BrunoBernardino',
+      'Hacker News proof URL should match reference')
 
     t.throws(() => {
       const notNavalTwitter = Object.assign({},
@@ -332,4 +373,6 @@ export function runProofsUnitTests() {
   // Proof HTML
   testProofs(sampleProfiles.naval, 'naval.id', 3)
   testProofs(sampleProfiles.larry, 'larry.id', 1)
+  // Broken proofs
+  brokenProofs()
 }

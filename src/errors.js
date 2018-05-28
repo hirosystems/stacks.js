@@ -84,3 +84,21 @@ export class InvalidAmountError extends BlockstackError {
     this.message = message
   }
 }
+
+export class LoginFailedError extends BlockstackError {
+  constructor(reason: string) {
+    const message = `Failed to login: ${reason}`
+    super({ code: 'login_failed', message })
+    this.message = message
+    this.name = 'LoginFailedError'
+  }
+}
+
+export class SignatureVerificationError extends BlockstackError {
+  constructor(reason: string) {
+    const message = `Failed to verify signature: ${reason}`
+    super({ code: 'signature_verification_failure', message })
+    this.message = message
+    this.name = 'SignatureVerificationError'
+  }
+}

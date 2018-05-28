@@ -457,22 +457,22 @@
     ],
     "loc": {
       "start": {
-        "line": 87,
+        "line": 90,
         "column": 0
       },
       "end": {
-        "line": 109,
+        "line": 112,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 110,
+          "line": 113,
           "column": 0
         },
         "end": {
-          "line": 116,
+          "line": 119,
           "column": 1
         }
       },
@@ -790,22 +790,22 @@
     ],
     "loc": {
       "start": {
-        "line": 127,
+        "line": 130,
         "column": 0
       },
       "end": {
-        "line": 130,
+        "line": 133,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 131,
+          "line": 134,
           "column": 0
         },
         "end": {
-          "line": 133,
+          "line": 136,
           "column": 1
         }
       },
@@ -1054,22 +1054,22 @@
     ],
     "loc": {
       "start": {
-        "line": 136,
+        "line": 139,
         "column": 0
       },
       "end": {
-        "line": 146,
+        "line": 149,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 147,
+          "line": 150,
           "column": 0
         },
         "end": {
-          "line": 225,
+          "line": 235,
           "column": 1
         }
       },
@@ -1393,22 +1393,22 @@
     ],
     "loc": {
       "start": {
-        "line": 227,
+        "line": 237,
         "column": 0
       },
       "end": {
-        "line": 230,
+        "line": 240,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 231,
+          "line": 241,
           "column": 0
         },
         "end": {
-          "line": 233,
+          "line": 243,
           "column": 1
         }
       },
@@ -1565,22 +1565,22 @@
     ],
     "loc": {
       "start": {
-        "line": 45,
+        "line": 48,
         "column": 0
       },
       "end": {
-        "line": 48,
+        "line": 51,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 49,
+          "line": 52,
           "column": 0
         },
         "end": {
-          "line": 51,
+          "line": 54,
           "column": 1
         }
       },
@@ -1802,22 +1802,22 @@
     ],
     "loc": {
       "start": {
-        "line": 235,
+        "line": 245,
         "column": 0
       },
       "end": {
-        "line": 239,
+        "line": 249,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 240,
+          "line": 250,
           "column": 0
         },
         "end": {
-          "line": 247,
+          "line": 257,
           "column": 1
         }
       },
@@ -2214,22 +2214,22 @@
     ],
     "loc": {
       "start": {
-        "line": 27,
+        "line": 29,
         "column": 0
       },
       "end": {
-        "line": 45,
+        "line": 47,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 46,
+          "line": 48,
           "column": 0
         },
         "end": {
-          "line": 81,
+          "line": 83,
           "column": 1
         }
       },
@@ -2905,22 +2905,22 @@
     ],
     "loc": {
       "start": {
-        "line": 53,
+        "line": 56,
         "column": 0
       },
       "end": {
-        "line": 64,
+        "line": 67,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 65,
+          "line": 68,
           "column": 0
         },
         "end": {
-          "line": 85,
+          "line": 88,
           "column": 1
         }
       },
@@ -3187,22 +3187,22 @@
     ],
     "loc": {
       "start": {
-        "line": 118,
+        "line": 121,
         "column": 0
       },
       "end": {
-        "line": 121,
+        "line": 124,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 122,
+          "line": 125,
           "column": 0
         },
         "end": {
-          "line": 125,
+          "line": 128,
           "column": 1
         }
       },
@@ -5354,7 +5354,7 @@
           "column": 0
         },
         "end": {
-          "line": 58,
+          "line": 56,
           "column": 1
         }
       },
@@ -5696,7 +5696,7 @@
       },
       {
         "title": "param",
-        "description": "The URL\nto use for zonefile lookup",
+        "description": "The URL\nto use for zonefile lookup. If falsey, lookupProfile will use the\nblockstack.js getNameInfo function.",
         "lineNumber": 4,
         "type": {
           "type": "OptionalType",
@@ -5706,12 +5706,12 @@
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       },
       {
         "title": "returns",
         "description": "that resolves to a profile object",
-        "lineNumber": 6,
+        "lineNumber": 7,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -5720,22 +5720,22 @@
     ],
     "loc": {
       "start": {
-        "line": 4,
+        "line": 5,
         "column": 0
       },
       "end": {
-        "line": 11,
+        "line": 13,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 12,
+          "line": 14,
           "column": 0
         },
         "end": {
-          "line": 37,
+          "line": 36,
           "column": 1
         }
       },
@@ -5817,7 +5817,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The URL\nto use for zonefile lookup",
+                  "value": "The URL\nto use for zonefile lookup. If falsey, lookupProfile will use the\nblockstack.js getNameInfo function.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -5825,11 +5825,12 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 27,
-                      "offset": 34
+                      "line": 3,
+                      "column": 36,
+                      "offset": 109
                     },
                     "indent": [
+                      1,
                       1
                     ]
                   }
@@ -5842,11 +5843,12 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 27,
-                  "offset": 34
+                  "line": 3,
+                  "column": 36,
+                  "offset": 109
                 },
                 "indent": [
+                  1,
                   1
                 ]
               }
@@ -5859,9 +5861,9 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 27,
-              "offset": 34
+              "line": 3,
+              "column": 36,
+              "offset": 109
             }
           }
         },
@@ -5869,7 +5871,7 @@
           "type": "NameExpression",
           "name": "string"
         },
-        "default": "https://core.blockstack.org/v1/names/"
+        "default": "null"
       }
     ],
     "properties": [],
@@ -6304,8 +6306,18 @@
       },
       {
         "title": "param",
-        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+        "description": "Whether the content should be verified, only to be used\nwhen `putFile` was set to `sign = true`",
         "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        },
+        "name": "options.verify"
+      },
+      {
+        "title": "param",
+        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -6314,8 +6326,8 @@
       },
       {
         "title": "param",
-        "description": "the Blockstack\ncore endpoint URL to use for zonefile lookup",
-        "lineNumber": 8,
+        "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
+        "lineNumber": 10,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -6324,12 +6336,12 @@
           }
         },
         "name": "options.zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
+        "default": "null"
       },
       {
         "title": "returns",
         "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 10,
+        "lineNumber": 13,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6338,22 +6350,22 @@
     ],
     "loc": {
       "start": {
-        "line": 46,
+        "line": 284,
         "column": 0
       },
       "end": {
-        "line": 58,
+        "line": 299,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 59,
+          "line": 300,
           "column": 0
         },
         "end": {
-          "line": 113,
+          "line": 344,
           "column": 1
         }
       },
@@ -6610,8 +6622,124 @@
           },
           {
             "title": "param",
-            "name": "options.app",
+            "name": "options.verify",
             "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "Whether the content should be verified, only to be used\nwhen ",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 6,
+                          "offset": 61
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "putFile",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 6,
+                          "offset": 61
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 15,
+                          "offset": 70
+                        },
+                        "indent": []
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "value": " was set to ",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 15,
+                          "offset": 70
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 27,
+                          "offset": 82
+                        },
+                        "indent": []
+                      }
+                    },
+                    {
+                      "type": "inlineCode",
+                      "value": "sign = true",
+                      "position": {
+                        "start": {
+                          "line": 2,
+                          "column": 27,
+                          "offset": 82
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 40,
+                          "offset": 95
+                        },
+                        "indent": []
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 40,
+                      "offset": 95
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 40,
+                  "offset": 95
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            }
+          },
+          {
+            "title": "param",
+            "name": "options.app",
+            "lineNumber": 8,
             "description": {
               "type": "root",
               "children": [
@@ -6676,7 +6804,7 @@
           {
             "title": "param",
             "name": "options.zoneFileLookupURL",
-            "lineNumber": 8,
+            "lineNumber": 10,
             "description": {
               "type": "root",
               "children": [
@@ -6685,7 +6813,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "the Blockstack\ncore endpoint URL to use for zonefile lookup",
+                      "value": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
                       "position": {
                         "start": {
                           "line": 1,
@@ -6693,11 +6821,12 @@
                           "offset": 0
                         },
                         "end": {
-                          "line": 2,
-                          "column": 45,
-                          "offset": 59
+                          "line": 3,
+                          "column": 46,
+                          "offset": 110
                         },
                         "indent": [
+                          1,
                           1
                         ]
                       }
@@ -6710,11 +6839,12 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 45,
-                      "offset": 59
+                      "line": 3,
+                      "column": 46,
+                      "offset": 110
                     },
                     "indent": [
+                      1,
                       1
                     ]
                   }
@@ -6727,9 +6857,9 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 45,
-                  "offset": 59
+                  "line": 3,
+                  "column": 46,
+                  "offset": 110
                 }
               }
             },
@@ -6737,7 +6867,7 @@
               "type": "NameExpression",
               "name": "String"
             },
-            "default": "http://localhost:6270/v1/names/"
+            "default": "null"
           }
         ]
       }
@@ -6927,8 +7057,31 @@
       },
       {
         "title": "param",
-        "description": "encrypt the data with the app private key",
+        "description": "encrypt the data with the app private key\n                                                 or the provided public key",
         "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "UnionType",
+            "elements": [
+              {
+                "type": "NameExpression",
+                "name": "Boolean"
+              },
+              {
+                "type": "NameExpression",
+                "name": "String"
+              }
+            ]
+          }
+        },
+        "name": "options.encrypt",
+        "default": "true"
+      },
+      {
+        "title": "param",
+        "description": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+        "lineNumber": 7,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -6936,13 +7089,13 @@
             "name": "Boolean"
           }
         },
-        "name": "options.encrypt",
-        "default": "true"
+        "name": "options.sign",
+        "default": "false"
       },
       {
         "title": "return",
         "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 6,
+        "lineNumber": 9,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -6951,22 +7104,22 @@
     ],
     "loc": {
       "start": {
-        "line": 115,
+        "line": 346,
         "column": 0
       },
       "end": {
-        "line": 123,
+        "line": 357,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 124,
+          "line": 358,
           "column": 0
         },
         "end": {
-          "line": 144,
+          "line": 427,
           "column": 1
         }
       },
@@ -7180,7 +7333,7 @@
                   "children": [
                     {
                       "type": "text",
-                      "value": "encrypt the data with the app private key",
+                      "value": "encrypt the data with the app private key\n                                                 or the provided public key",
                       "position": {
                         "start": {
                           "line": 1,
@@ -7188,11 +7341,13 @@
                           "offset": 0
                         },
                         "end": {
-                          "line": 1,
-                          "column": 42,
-                          "offset": 41
+                          "line": 2,
+                          "column": 76,
+                          "offset": 117
                         },
-                        "indent": []
+                        "indent": [
+                          1
+                        ]
                       }
                     }
                   ],
@@ -7203,11 +7358,13 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 1,
-                      "column": 42,
-                      "offset": 41
+                      "line": 2,
+                      "column": 76,
+                      "offset": 117
                     },
-                    "indent": []
+                    "indent": [
+                      1
+                    ]
                   }
                 }
               ],
@@ -7218,9 +7375,84 @@
                   "offset": 0
                 },
                 "end": {
+                  "line": 2,
+                  "column": 76,
+                  "offset": 117
+                }
+              }
+            },
+            "type": {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Boolean"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "String"
+                }
+              ]
+            },
+            "default": "true"
+          },
+          {
+            "title": "param",
+            "name": "options.sign",
+            "lineNumber": 7,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 60,
+                          "offset": 107
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 60,
+                      "offset": 107
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
                   "line": 1,
-                  "column": 42,
-                  "offset": 41
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 60,
+                  "offset": 107
                 }
               }
             },
@@ -7228,7 +7460,7 @@
               "type": "NameExpression",
               "name": "Boolean"
             },
-            "default": "true"
+            "default": "false"
           }
         ]
       }
@@ -7328,254 +7560,6 @@
           "children": [
             {
               "type": "text",
-              "value": "Deletes the specified file from the app's data store.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 54,
-                  "offset": 53
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 54,
-              "offset": 53
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 54,
-          "offset": 53
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the path to the file to delete",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "returns",
-        "description": "that resolves when the file has been removed\nor rejects with an error",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 157,
-        "column": 0
-      },
-      "end": {
-        "line": 162,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 163,
-          "column": 0
-        },
-        "end": {
-          "line": 165,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the path to the file to delete",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 31,
-                      "offset": 30
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 31,
-                  "offset": 30
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 31,
-              "offset": 30
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves when the file has been removed\nor rejects with an error",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 25,
-                      "offset": 69
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 25,
-                  "offset": 69
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 25,
-              "offset": 69
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "deleteFile",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "deleteFile",
-        "kind": "function"
-      }
-    ],
-    "namespace": "deleteFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "Get the app storage bucket URL",
               "position": {
                 "start": {
@@ -7653,22 +7637,22 @@
     ],
     "loc": {
       "start": {
-        "line": 146,
+        "line": 429,
         "column": 0
       },
       "end": {
-        "line": 152,
+        "line": 435,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 153,
+          "line": 436,
           "column": 0
         },
         "end": {
-          "line": 155,
+          "line": 438,
           "column": 1
         }
       },
@@ -7972,22 +7956,22 @@
       },
       {
         "title": "param",
-        "description": "The URL\nto use for zonefile lookup",
+        "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
         "lineNumber": 5,
         "type": {
           "type": "OptionalType",
           "expression": {
             "type": "NameExpression",
-            "name": "string"
+            "name": "String"
           }
         },
         "name": "zoneFileLookupURL",
-        "default": "http://localhost:6270/v1/names/"
+        "default": "null"
       },
       {
         "title": "return",
         "description": "that resolves to the public read URL of the file\nor rejects with an error",
-        "lineNumber": 7,
+        "lineNumber": 8,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -7996,22 +7980,22 @@
     ],
     "loc": {
       "start": {
-        "line": 12,
+        "line": 18,
         "column": 0
       },
       "end": {
-        "line": 21,
+        "line": 28,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 22,
+          "line": 29,
           "column": 0
         },
         "end": {
-          "line": 44,
+          "line": 51,
           "column": 1
         }
       },
@@ -8215,7 +8199,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "The URL\nto use for zonefile lookup",
+                  "value": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8223,11 +8207,12 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 27,
-                      "offset": 34
+                      "line": 3,
+                      "column": 46,
+                      "offset": 110
                     },
                     "indent": [
+                      1,
                       1
                     ]
                   }
@@ -8240,11 +8225,12 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 27,
-                  "offset": 34
+                  "line": 3,
+                  "column": 46,
+                  "offset": 110
                 },
                 "indent": [
+                  1,
                   1
                 ]
               }
@@ -8257,17 +8243,17 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 27,
-              "offset": 34
+              "line": 3,
+              "column": 46,
+              "offset": 110
             }
           }
         },
         "type": {
           "type": "NameExpression",
-          "name": "string"
+          "name": "String"
         },
-        "default": "http://localhost:6270/v1/names/"
+        "default": "null"
       }
     ],
     "properties": [],
@@ -8521,22 +8507,22 @@
     ],
     "loc": {
       "start": {
-        "line": 98,
+        "line": 100,
         "column": 0
       },
       "end": {
-        "line": 105,
+        "line": 107,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 106,
+          "line": 108,
           "column": 0
         },
         "end": {
-          "line": 111,
+          "line": 118,
           "column": 1
         }
       },
@@ -8975,22 +8961,22 @@
     ],
     "loc": {
       "start": {
-        "line": 113,
+        "line": 120,
         "column": 0
       },
       "end": {
-        "line": 134,
+        "line": 141,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 135,
+          "line": 142,
           "column": 0
         },
         "end": {
-          "line": 186,
+          "line": 193,
           "column": 1
         }
       },
@@ -10503,6 +10489,731 @@
           "children": [
             {
               "type": "text",
+              "value": "Sign content using ECDSA",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 25,
+          "offset": 24
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "secp256k1 private key hex string",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "privateKey"
+      },
+      {
+        "title": "param",
+        "description": "content to sign",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "name": "content"
+      },
+      {
+        "title": "return",
+        "description": "contains:\nsignature - Hex encoded DER signature\npublic key - Hex encoded private string taken from privateKey",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 143,
+        "column": 0
+      },
+      "end": {
+        "line": 150,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 151,
+          "column": 0
+        },
+        "end": {
+          "line": 164,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "privateKey",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "secp256k1 private key hex string",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 33,
+                      "offset": 32
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 33,
+                  "offset": 32
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 33,
+              "offset": 32
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "content to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 16,
+                      "offset": 15
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 16,
+              "offset": 15
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "contains:\nsignature - Hex encoded DER signature\npublic key - Hex encoded private string taken from privateKey",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 62,
+                      "offset": 109
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 62,
+                  "offset": 109
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 62,
+              "offset": 109
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signECDSA",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signECDSA",
+        "kind": "function"
+      }
+    ],
+    "namespace": "signECDSA"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Verify content using ECDSA",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 27,
+                  "offset": 26
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 27,
+              "offset": 26
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 27,
+          "offset": 26
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "Content to verify was signed",
+        "lineNumber": 2,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        },
+        "name": "content"
+      },
+      {
+        "title": "param",
+        "description": "secp256k1 private key hex string",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "publicKey"
+      },
+      {
+        "title": "param",
+        "description": "Hex encoded DER signature",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "signature"
+      },
+      {
+        "title": "return",
+        "description": "returns true when signature matches publickey + content, false if not",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 166,
+        "column": 0
+      },
+      "end": {
+        "line": 172,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 173,
+          "column": 0
+        },
+        "end": {
+          "line": 181,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Content to verify was signed",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 29,
+                  "offset": 28
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 29,
+              "offset": 28
+            }
+          }
+        },
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "param",
+        "name": "publicKey",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "secp256k1 private key hex string",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 33,
+                      "offset": 32
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 33,
+                  "offset": 32
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 33,
+              "offset": 32
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "signature",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Hex encoded DER signature",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 26,
+                      "offset": 25
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "returns true when signature matches publickey + content, false if not",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 70,
+                      "offset": 69
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 70,
+                  "offset": 69
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 70,
+              "offset": 69
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Boolean"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "verifyECDSA",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "verifyECDSA",
+        "kind": "function"
+      }
+    ],
+    "namespace": "verifyECDSA"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the\ntransaction until a second transaction has a certain number of confirmations.",
               "position": {
                 "start": {
@@ -10612,22 +11323,22 @@
     ],
     "loc": {
       "start": {
-        "line": 155,
+        "line": 215,
         "column": 2
       },
       "end": {
-        "line": 172,
+        "line": 232,
         "column": 4
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 173,
+          "line": 233,
           "column": 2
         },
         "end": {
-          "line": 208,
+          "line": 268,
           "column": 3
         }
       },
@@ -11393,22 +12104,22 @@
     ],
     "loc": {
       "start": {
-        "line": 210,
+        "line": 270,
         "column": 2
       },
       "end": {
-        "line": 224,
+        "line": 284,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 225,
+          "line": 285,
           "column": 2
         },
         "end": {
-          "line": 277,
+          "line": 337,
           "column": 3
         }
       },
@@ -12277,22 +12988,22 @@
     ],
     "loc": {
       "start": {
-        "line": 279,
+        "line": 339,
         "column": 2
       },
       "end": {
-        "line": 305,
+        "line": 365,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 306,
+          "line": 366,
           "column": 2
         },
         "end": {
-          "line": 343,
+          "line": 403,
           "column": 3
         }
       },
@@ -12934,5 +13645,3069 @@
       }
     ],
     "namespace": "#broadcastNameRegistration"
+  },
+  {
+    "description": "",
+    "tags": [
+      {
+        "title": "returns",
+        "description": "version number of the signer, currently, should always be 1",
+        "lineNumber": 1,
+        "type": null
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 6,
+        "column": 2
+      },
+      "end": {
+        "line": 8,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 9,
+          "column": 2
+        },
+        "end": {
+          "line": 9,
+          "column": 26
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "version number of the signer, currently, should always be 1",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 60,
+                      "offset": 59
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 60,
+                  "offset": 59
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 60,
+              "offset": 59
+            }
+          }
+        },
+        "title": "returns"
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signerVersion",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signerVersion"
+      }
+    ],
+    "namespace": "signerVersion"
+  },
+  {
+    "description": "",
+    "tags": [
+      {
+        "title": "returns",
+        "description": "a string representing the transaction signer's address\n(usually Base58 check encoding)",
+        "lineNumber": 1,
+        "type": null
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 10,
+        "column": 2
+      },
+      "end": {
+        "line": 13,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 14,
+          "column": 2
+        },
+        "end": {
+          "line": 14,
+          "column": 32
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a string representing the transaction signer's address\n(usually Base58 check encoding)",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 32,
+                      "offset": 86
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 32,
+                  "offset": 86
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 32,
+              "offset": 86
+            }
+          }
+        },
+        "title": "returns"
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "getAddress",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "getAddress"
+      }
+    ],
+    "namespace": "getAddress"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Signs a transaction input",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 26,
+                  "offset": 25
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 26,
+              "offset": 25
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 26,
+          "offset": 25
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the transaction to sign",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "TransactionBuilder"
+        },
+        "name": "transaction"
+      },
+      {
+        "title": "param",
+        "description": "the input on the transaction to sign",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        },
+        "name": "inputIndex"
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 19,
+        "column": 5
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 2
+        },
+        "end": {
+          "line": 20,
+          "column": 96
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "transaction",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the transaction to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "TransactionBuilder"
+        }
+      },
+      {
+        "title": "param",
+        "name": "inputIndex",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the input on the transaction to sign",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 37,
+                      "offset": 36
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 37,
+                  "offset": 36
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 37,
+              "offset": 36
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "number"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "signTransaction",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "signTransaction"
+      }
+    ],
+    "namespace": "signTransaction"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Class representing a transaction signer for pubkeyhash addresses\n(a.k.a. single-sig addresses)",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 30,
+                  "offset": 94
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 30,
+              "offset": 94
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 30,
+          "offset": 94
+        }
+      }
+    },
+    "tags": [],
+    "loc": {
+      "start": {
+        "line": 23,
+        "column": 0
+      },
+      "end": {
+        "line": 26,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 27,
+          "column": 0
+        },
+        "end": {
+          "line": 53,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "ecPair",
+        "lineNumber": 30,
+        "type": {
+          "type": "NameExpression",
+          "name": "bitcoinjs.ECPair"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "PubkeyHashSigner",
+    "kind": "class",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "PubkeyHashSigner",
+        "kind": "class"
+      }
+    ],
+    "namespace": "PubkeyHashSigner"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Estimates cost of a namesapce reveal transaction for a namespace",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 65,
+                  "offset": 64
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 65,
+              "offset": 64
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 65,
+          "offset": 64
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the namespace to reveal",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "BlockstackNamespace"
+        },
+        "name": "namespace"
+      },
+      {
+        "title": "param",
+        "description": "the address to receive the namespace\n   (this must have been passed as 'revealAddress' to a prior namespace\n   preorder)",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "revealAddress"
+      },
+      {
+        "title": "param",
+        "description": "the address that pays for this transaction",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "paymentAddress"
+      },
+      {
+        "title": "param",
+        "description": "the number of UTXOs we expect will be required\n   from the payment address",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "name": "paymentUtxos"
+      },
+      {
+        "title": "returns",
+        "description": "a promise which resolves to the satoshi cost to\n   fund the reveal.  This includes a 5500 satoshi dust output for the\n   preorder.  Even though this is a change output, the payer must have\n   enough funds to generate this output, so we include it in the cost.",
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 288,
+        "column": 0
+      },
+      "end": {
+        "line": 301,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 302,
+          "column": 0
+        },
+        "end": {
+          "line": 316,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "namespace",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the namespace to reveal",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "BlockstackNamespace"
+        }
+      },
+      {
+        "title": "param",
+        "name": "revealAddress",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the address to receive the namespace\n   (this must have been passed as 'revealAddress' to a prior namespace\n   preorder)",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 3,
+                      "column": 13,
+                      "offset": 120
+                    },
+                    "indent": [
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 3,
+                  "column": 13,
+                  "offset": 120
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 3,
+              "column": 13,
+              "offset": 120
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "paymentAddress",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the address that pays for this transaction",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 43,
+                      "offset": 42
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 43,
+                  "offset": 42
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 43,
+              "offset": 42
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "paymentUtxos",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the number of UTXOs we expect will be required\n   from the payment address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 28,
+                      "offset": 74
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 28,
+                  "offset": 74
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 28,
+              "offset": 74
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "default": "1"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a promise which resolves to the satoshi cost to\n   fund the reveal.  This includes a 5500 satoshi dust output for the\n   preorder.  Even though this is a change output, the payer must have\n   enough funds to generate this output, so we include it in the cost.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 4,
+                      "column": 71,
+                      "offset": 259
+                    },
+                    "indent": [
+                      1,
+                      1,
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 71,
+                  "offset": 259
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 71,
+              "offset": 259
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "estimateNamespaceReveal",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "estimateNamespaceReveal",
+        "kind": "function"
+      }
+    ],
+    "namespace": "estimateNamespaceReveal"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Estimates the cost of a namespace-ready transaction for a namespace",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 68,
+                  "offset": 67
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 68,
+              "offset": 67
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 68,
+          "offset": 67
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the namespace to ready",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "namespaceID"
+      },
+      {
+        "title": "param",
+        "description": "the number of UTXOs we expect will\n be required from the reveal address",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "name": "revealUtxos"
+      },
+      {
+        "title": "returns",
+        "description": "a promise which resolves to the satoshi cost to\n fund this namespacey-ready transaction.",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 318,
+        "column": 0
+      },
+      "end": {
+        "line": 325,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 326,
+          "column": 0
+        },
+        "end": {
+          "line": 337,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "namespaceID",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the namespace to ready",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 23,
+                      "offset": 22
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 23,
+                  "offset": 22
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 23,
+              "offset": 22
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "revealUtxos",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the number of UTXOs we expect will\n be required from the reveal address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 37,
+                      "offset": 71
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 37,
+                  "offset": 71
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 37,
+              "offset": 71
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "default": "1"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a promise which resolves to the satoshi cost to\n fund this namespacey-ready transaction.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 41,
+                      "offset": 88
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 41,
+                  "offset": 88
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 41,
+              "offset": 88
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "estimateNamespaceReady",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "estimateNamespaceReady",
+        "kind": "function"
+      }
+    ],
+    "namespace": "estimateNamespaceReady"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Estimates the cost of a name-import transaction",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 48,
+                  "offset": 47
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 48,
+              "offset": 47
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 48,
+          "offset": 47
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the fully-qualified name",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "name"
+      },
+      {
+        "title": "param",
+        "description": "the recipient",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "recipientAddr"
+      },
+      {
+        "title": "param",
+        "description": "the zone file hash",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "zonefileHash"
+      },
+      {
+        "title": "param",
+        "description": "the number of UTXOs we expect will\n be required from the importer address",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "name": "importUtxos"
+      },
+      {
+        "title": "returns",
+        "description": "a promise which resolves to the satoshi cost\n to fund this name-import transaction",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 339,
+        "column": 0
+      },
+      "end": {
+        "line": 348,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 349,
+          "column": 0
+        },
+        "end": {
+          "line": 362,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "name",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the fully-qualified name",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 25,
+                      "offset": 24
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 25,
+                  "offset": 24
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 25,
+              "offset": 24
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "recipientAddr",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the recipient",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 14,
+                      "offset": 13
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 14,
+                  "offset": 13
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 14,
+              "offset": 13
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "zonefileHash",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the zone file hash",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 19,
+                      "offset": 18
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 19,
+                  "offset": 18
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 19,
+              "offset": 18
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "importUtxos",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the number of UTXOs we expect will\n be required from the importer address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 39,
+                      "offset": 73
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 39,
+                  "offset": 73
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 39,
+              "offset": 73
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "default": "1"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a promise which resolves to the satoshi cost\n to fund this name-import transaction",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 38,
+                      "offset": 82
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 38,
+                  "offset": 82
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 38,
+              "offset": 82
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "estimateNameImport",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "estimateNameImport",
+        "kind": "function"
+      }
+    ],
+    "namespace": "estimateNameImport"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Estimates the cost of an announce transaction",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 46,
+                  "offset": 45
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 46,
+              "offset": 45
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 46,
+          "offset": 45
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "the hash of the message",
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "messageHash"
+      },
+      {
+        "title": "param",
+        "description": "the number of utxos we expect will\n be required from the importer address",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "name": "senderUtxos"
+      },
+      {
+        "title": "returns",
+        "description": "a promise which resolves to the satoshi cost\n to fund this announce transaction",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 364,
+        "column": 0
+      },
+      "end": {
+        "line": 371,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 372,
+          "column": 0
+        },
+        "end": {
+          "line": 383,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "messageHash",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hash of the message",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 24,
+                      "offset": 23
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 24,
+                  "offset": 23
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 24,
+              "offset": 23
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "senderUtxos",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the number of utxos we expect will\n be required from the importer address",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 39,
+                      "offset": 73
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 39,
+                  "offset": 73
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 39,
+              "offset": 73
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Number"
+        },
+        "default": "1"
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "a promise which resolves to the satoshi cost\n to fund this announce transaction",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 35,
+                      "offset": 79
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 35,
+                  "offset": 79
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 35,
+              "offset": 79
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "Promise"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "estimateAnnounce",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "estimateAnnounce",
+        "kind": "function"
+      }
+    ],
+    "namespace": "estimateAnnounce"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Encrypts the data provided with the app public key.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 52,
+                  "offset": 51
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 52,
+              "offset": 51
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 52,
+          "offset": 51
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "data to encrypt",
+        "lineNumber": 2,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        },
+        "name": "content"
+      },
+      {
+        "title": "param",
+        "description": "options object",
+        "lineNumber": 3,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        },
+        "name": "options",
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "description": "the hex string of the ECDSA public\nkey to use for encryption. If not provided, will use user's appPrivateKey.",
+        "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "options.publicKey"
+      },
+      {
+        "title": "return",
+        "description": "Stringified ciphertext object",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 53,
+        "column": 0
+      },
+      "end": {
+        "line": 60,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 61,
+          "column": 0
+        },
+        "end": {
+          "line": 71,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "data to encrypt",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 16,
+                      "offset": 15
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 16,
+                  "offset": 15
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 16,
+              "offset": 15
+            }
+          }
+        },
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "param",
+        "name": "options",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "options object",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null",
+        "properties": [
+          {
+            "title": "param",
+            "name": "options.publicKey",
+            "lineNumber": 4,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "the hex string of the ECDSA public\nkey to use for encryption. If not provided, will use user's appPrivateKey.",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 75,
+                          "offset": 109
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 75,
+                      "offset": 109
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 75,
+                  "offset": 109
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "String"
+            }
+          }
+        ]
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "Stringified ciphertext object",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 30,
+                      "offset": 29
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "encryptContent",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "encryptContent",
+        "kind": "function"
+      }
+    ],
+    "namespace": "encryptContent"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Decrypts data encrypted with ",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "encryptContent",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "end": {
+                  "line": 1,
+                  "column": 46,
+                  "offset": 45
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " with the\ntransit private key.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 46,
+                  "offset": 45
+                },
+                "end": {
+                  "line": 2,
+                  "column": 21,
+                  "offset": 75
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 21,
+              "offset": 75
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 21,
+          "offset": 75
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "encrypted content.",
+        "lineNumber": 3,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        },
+        "name": "content"
+      },
+      {
+        "title": "param",
+        "description": "options object",
+        "lineNumber": 4,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        },
+        "name": "options",
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "description": "the hex string of the ECDSA private\nkey to use for decryption. If not provided, will use user's appPrivateKey.",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "options.privateKey"
+      },
+      {
+        "title": "return",
+        "description": "decrypted content.",
+        "lineNumber": 7,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 73,
+        "column": 0
+      },
+      "end": {
+        "line": 81,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 82,
+          "column": 0
+        },
+        "end": {
+          "line": 101,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "encrypted content.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 19,
+                      "offset": 18
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 19,
+                  "offset": 18
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 19,
+              "offset": 18
+            }
+          }
+        },
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "param",
+        "name": "options",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "options object",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null",
+        "properties": [
+          {
+            "title": "param",
+            "name": "options.privateKey",
+            "lineNumber": 5,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "the hex string of the ECDSA private\nkey to use for decryption. If not provided, will use user's appPrivateKey.",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 75,
+                          "offset": 110
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 75,
+                      "offset": 110
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 75,
+                  "offset": 110
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "String"
+            }
+          }
+        ]
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "decrypted content.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 19,
+                      "offset": 18
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 19,
+                  "offset": 18
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 19,
+              "offset": 18
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "decryptContent",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "decryptContent",
+        "kind": "function"
+      }
+    ],
+    "namespace": "decryptContent"
   }
 ]

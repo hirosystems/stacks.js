@@ -17,7 +17,9 @@ import {
 
 import { encryptECIES, decryptECIES } from '../encryption'
 
-const VERSION = '1.1.0'
+import { Logger } from '../logger'
+
+const VERSION = '1.2.0'
 
 type AuthMetadata = {
   email: ?string,
@@ -65,7 +67,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     scopes
   }
 
-  console.log(`blockstack.js: generating v${VERSION} auth request`)
+  Logger.info(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
@@ -107,7 +109,12 @@ export function decryptPrivateKey(privateKey: string,
                                   hexedEncrypted: string): string | null {
   const unhexedString = new Buffer(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
-  return decryptECIES(privateKey, encryptedObj)
+  const decrypted = decryptECIES(privateKey, encryptedObj)
+  if (typeof decrypted !== 'string') {
+    throw new Error('Unable to correctly decrypt private key')
+  } else {
+    return decrypted
+  }
 }
 
 /**
@@ -150,7 +157,7 @@ export function makeAuthResponse(privateKey: string,
   let coreTokenPayload = coreToken
   let additionalProperties = {}
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
-    console.log(`blockstack.js: generating v${VERSION} auth response`)
+    Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
       privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
       if (coreToken !== undefined && coreToken !== null) {
@@ -164,7 +171,7 @@ export function makeAuthResponse(privateKey: string,
       version: VERSION
     }
   } else {
-    console.log('blockstack.js: generating legacy auth response')
+    Logger.info('blockstack.js: generating legacy auth response')
   }
 
   /* Create the payload */

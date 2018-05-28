@@ -1,37 +1,36 @@
 /* @flow */
 import { resolveZoneFileToProfile } from './profileZoneFiles'
+import { config } from '../config'
 
 /**
  * Look up a user profile by blockstack ID
  *
- * @param {string} username The Blockstack ID of the profile to look up
- * @param {string} [zoneFileLookupURL=https://core.blockstack.org/v1/names/] The URL
- * to use for zonefile lookup 
+ * @param {string} username - The Blockstack ID of the profile to look up
+ * @param {string} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, lookupProfile will use the
+ * blockstack.js getNameInfo function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(username: string, zoneFileLookupURL: string = 'https://core.blockstack.org/v1/names/') {
-  return new Promise((resolve, reject) => {
-    if (!username) {
-      reject()
-    }
+export function lookupProfile(username: string, zoneFileLookupURL: ?string = null) {
+  if (!username) {
+    return Promise.reject()
+  }
+  let lookupPromise
+  if (zoneFileLookupURL) {
     const url = `${zoneFileLookupURL.replace(/\/$/, '')}/${username}`
-    try {
-      fetch(url)
-        .then(response => response.text())
-        .then(responseText => JSON.parse(responseText))
-        .then(responseJSON => {
-          if (responseJSON.hasOwnProperty('zonefile')
-            && responseJSON.hasOwnProperty('address')) {
-            resolve(resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address))
-          } else {
-            reject()
-          }
-        })
-        .catch((e) => {
-          reject(e)
-        })
-    } catch (e) {
-      reject(e)
-    }
-  })
+    lookupPromise = fetch(url)
+      .then(response => response.json())
+  } else {
+    lookupPromise = config.network.getNameInfo(username)
+  }
+  return lookupPromise
+    .then(responseJSON => {
+      if (responseJSON.hasOwnProperty('zonefile')
+          && responseJSON.hasOwnProperty('address')) {
+        return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address)
+      } else {
+        throw new Error('Invalid zonefile lookup response: did not contain `address`' +
+                        ' or `zonefile` field')
+      }
+    })
 }
