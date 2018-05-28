@@ -1547,7 +1547,6 @@ var InvalidDIDError = exports.InvalidDIDError = function (_BlockstackError4) {
     var _this5 = _possibleConstructorReturn(this, (InvalidDIDError.__proto__ || Object.getPrototypeOf(InvalidDIDError)).call(this, { code: 'invalid_did_error', message: message }));
 
     _this5.name = 'InvalidDIDError';
-    _this5.message = message;
     return _this5;
   }
 
