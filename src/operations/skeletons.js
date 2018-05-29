@@ -641,6 +641,12 @@ export function makeTokenTransferSkeleton(recipientAddress: string,
   const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
   
   const tokenValueHex = tokenAmount.toHex()
+
+  if (tokenValueHex.length > 16) {
+    // exceeds 2**64; can't fit 
+    throw new Error(`Cannot send tokens: cannot fit ${tokenAmount.toString()} into 8 bytes`)
+  }
+  
   const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
 
   opReturnBuffer.write('id$', 0, 3, 'ascii')
