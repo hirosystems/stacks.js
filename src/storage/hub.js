@@ -1,3 +1,4 @@
+/* @flow */
 import bitcoin from 'bitcoinjs-lib'
 import bigi from 'bigi'
 import crypto from 'crypto'
@@ -78,7 +79,8 @@ function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string): string {
   return `v1:${token}`
 }
 
-export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string): Promise<*> {
+export function connectToGaiaHub(gaiaHubUrl: string,
+                                 challengeSignerHex: string): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   return fetch(`${gaiaHubUrl}/hub_info`)
@@ -103,7 +105,7 @@ export function connectToGaiaHub(gaiaHubUrl: string, challengeSignerHex: string)
  * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
-export function setLocalGaiaHubConnection(): Promise<*> {
+export function setLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
   let userData = loadUserData()
 
   if (!userData.hubUrl) {
@@ -122,16 +124,18 @@ export function setLocalGaiaHubConnection(): Promise<*> {
     })
 }
 
-export function getOrSetLocalGaiaHubConnection(): Promise<*> {
-  const hubConfig = JSON.parse(localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL))
-  if (hubConfig !== null) {
-    return Promise.resolve(hubConfig)
-  } else {
-    return setLocalGaiaHubConnection()
+export function getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
+  const hubConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL)
+  if (hubConfig) {
+    const hubJSON = JSON.parse(hubConfig)
+    if (hubJSON !== null) {
+      return Promise.resolve(hubJSON)
+    }
   }
+  return setLocalGaiaHubConnection()
 }
 
-export function getBucketUrl(gaiaHubUrl, appPrivateKey): Promise<*> {
+export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
   let challengeSigner
   try {
     challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))

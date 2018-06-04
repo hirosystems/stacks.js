@@ -1,8 +1,9 @@
 /* @flow */
 
-import { getOrSetLocalGaiaHubConnection, getFullReadUrl, GaiaHubConfig,
+import { getOrSetLocalGaiaHubConnection, getFullReadUrl,
          connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
          BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
+// export { type GaiaHubConfig } from './hub'
 
 import { encryptECIES, decryptECIES, signECDSA, verifyECDSA } from '../encryption'
 import { loadUserData } from '../auth'
@@ -116,6 +117,9 @@ function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?stri
     })
     .then(fileUrl => {
       const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
+      if (!matches) {
+        throw new Error('Failed to parse gaia address')
+      }
       return matches[matches.length - 1]
     })
 }
@@ -448,4 +452,4 @@ export function deleteFile(path: string) {
   Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
 }
 
-export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GaiaHubConfig }
+export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
