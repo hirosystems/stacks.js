@@ -2,14 +2,13 @@ import test from 'tape'
 import FetchMock from 'fetch-mock'
 import proxyquire from 'proxyquire'
 import sinon from 'sinon'
-import bitcoin from 'bitcoinjs-lib'
 import { uploadToGaiaHub, getFullReadUrl,
          connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
          getBucketUrl } from '../../../lib/storage/hub'
 import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
 import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 import { getPublicKeyFromPrivate } from '../../../lib/keys'
-
+import { TokenVerifier } from 'jsontokens'
 
 class LocalStorage {
   constructor() {
@@ -700,7 +699,8 @@ export function runStorageTests() {
 
     const hubInfo = {
       read_url_prefix: 'gaia.testblockstack.org',
-      challenge_text: 'please-sign'
+      challenge_text: 'please-sign',
+      latest_auth_version: 'v1'
     }
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -717,14 +717,9 @@ export function runStorageTests() {
         t.equal(address, config.address)
         t.equal(hubServer, config.server)
 
-        const verificationKey = bitcoin.ECPair.fromPublicKeyBuffer(Buffer.from(publicKey, 'hex'))
-
-        const decoded = JSON.parse(Buffer.from(config.token, 'base64').toString())
-        const signature = bitcoin.ECSignature.fromDER(Buffer.from(
-          decoded.signature, 'hex'))
-
-        t.ok(verificationKey.verify(
-          bitcoin.crypto.sha256(hubInfo.challenge_text), signature), 'Verified token')
+        const verified = new TokenVerifier('ES256K', publicKey)
+              .verify(config.token.slice('v1:'.length))
+        t.ok(verified, 'Verified token')
       })
   })
 
@@ -734,7 +729,8 @@ export function runStorageTests() {
 
     const hubInfo = {
       read_url_prefix: 'https://gaia.testblockstack.org/hub/',
-      challenge_text: 'please-sign'
+      challenge_text: 'please-sign',
+      latest_auth_version: 'v1'
     }
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
