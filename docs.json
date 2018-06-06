@@ -1033,6 +1033,16 @@
         "name": "nameLookupURL"
       },
       {
+        "title": "param",
+        "description": "the signed authentication response token",
+        "lineNumber": 6,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "authResponseToken"
+      },
+      {
         "title": "return",
         "description": "that resolves to the user data object if successful and rejects\nif handling the sign in request fails or there was no pending sign in request.",
         "lineNumber": 7,
@@ -1059,7 +1069,7 @@
           "column": 0
         },
         "end": {
-          "line": 235,
+          "line": 234,
           "column": 1
         }
       },
@@ -1133,6 +1143,68 @@
           "name": "String"
         },
         "default": "'https://core.blockstack.org/v1/names/'"
+      },
+      {
+        "title": "param",
+        "name": "authResponseToken",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the signed authentication response token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "getAuthResponseToken()"
       }
     ],
     "properties": [],
@@ -1321,22 +1393,22 @@
     ],
     "loc": {
       "start": {
-        "line": 237,
+        "line": 236,
         "column": 0
       },
       "end": {
-        "line": 240,
+        "line": 239,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 241,
+          "line": 240,
           "column": 0
         },
         "end": {
-          "line": 243,
+          "line": 242,
           "column": 1
         }
       },
@@ -1730,22 +1802,22 @@
     ],
     "loc": {
       "start": {
-        "line": 245,
+        "line": 244,
         "column": 0
       },
       "end": {
-        "line": 249,
+        "line": 248,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 250,
+          "line": 249,
           "column": 0
         },
         "end": {
-          "line": 257,
+          "line": 256,
           "column": 1
         }
       },
@@ -6278,22 +6350,22 @@
     ],
     "loc": {
       "start": {
-        "line": 284,
+        "line": 288,
         "column": 0
       },
       "end": {
-        "line": 299,
+        "line": 303,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 300,
+          "line": 304,
           "column": 0
         },
         "end": {
-          "line": 344,
+          "line": 348,
           "column": 1
         }
       },
@@ -7032,22 +7104,22 @@
     ],
     "loc": {
       "start": {
-        "line": 346,
+        "line": 350,
         "column": 0
       },
       "end": {
-        "line": 357,
+        "line": 361,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 358,
+          "line": 362,
           "column": 0
         },
         "end": {
-          "line": 427,
+          "line": 431,
           "column": 1
         }
       },
@@ -7565,22 +7637,22 @@
     ],
     "loc": {
       "start": {
-        "line": 429,
+        "line": 433,
         "column": 0
       },
       "end": {
-        "line": 435,
+        "line": 439,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 436,
+          "line": 440,
           "column": 0
         },
         "end": {
-          "line": 438,
+          "line": 442,
           "column": 1
         }
       },
@@ -7908,22 +7980,22 @@
     ],
     "loc": {
       "start": {
-        "line": 18,
+        "line": 19,
         "column": 0
       },
       "end": {
-        "line": 28,
+        "line": 29,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 29,
+          "line": 30,
           "column": 0
         },
         "end": {
-          "line": 51,
+          "line": 52,
           "column": 1
         }
       },
@@ -15861,22 +15933,22 @@
     ],
     "loc": {
       "start": {
-        "line": 53,
+        "line": 54,
         "column": 0
       },
       "end": {
-        "line": 60,
+        "line": 61,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 61,
+          "line": 62,
           "column": 0
         },
         "end": {
-          "line": 71,
+          "line": 72,
           "column": 1
         }
       },
@@ -16323,22 +16395,22 @@
     ],
     "loc": {
       "start": {
-        "line": 73,
+        "line": 74,
         "column": 0
       },
       "end": {
-        "line": 81,
+        "line": 82,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 82,
+          "line": 83,
           "column": 0
         },
         "end": {
-          "line": 101,
+          "line": 102,
           "column": 1
         }
       },
