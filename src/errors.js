@@ -7,6 +7,7 @@ export const ERROR_CODES = {
   NOT_ENOUGH_FUNDS_ERROR: 'not_enough_error',
   INVALID_AMOUNT_ERROR: 'invalid_amount_error',
   LOGIN_FAILED_ERROR: 'login_failed',
+  SIGNATURE_VERIFICATION_ERROR: 'signature_verification_error',
   UNKNOWN: 'unknown'
 }
 
@@ -118,5 +119,12 @@ export class FailedDecryptionError extends BlockstackError {
     message = message || 'Unable to decrypt cipher object.'
     super({ code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message })
     this.message = message
+  }
+}
+
+export class SignatureVerificationError extends BlockstackError {
+  constructor(message: ?string) {
+    message = message || 'Signature verification failed.'
+    super({ code: ERROR_CODES.SIGNATURE_VERIFICATION_ERROR, message })
   }
 }
