@@ -41,8 +41,9 @@ export function generateAndStoreTransitKey() {
  * @return {String} the hex encoded private key
  * @private
  */
-export function getTransitKey() {
-  return localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
+export function getTransitKey() : string {
+  const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
+  return ((transitKey: any): string)
 }
 
 /**
@@ -143,11 +144,14 @@ export function isSignInPending() {
  * @param {String} nameLookupURL - the endpoint against which to verify public
  * keys match claimed username
  * @param {String} authResponseToken - the signed authentication response token
+ * @param {String} transitKey - the transit private key that corresponds to the transit public key
+ * that was provided in the authentication request  
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
 export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/',
-                                    authResponseToken: string = getAuthResponseToken()) {
+                                    authResponseToken: string = getAuthResponseToken(),
+                                    transitKey: string = getTransitKey()) {
   return verifyAuthResponse(authResponseToken, nameLookupURL)
   .then(isValid => {
     if (!isValid) {
@@ -158,7 +162,6 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
     let appPrivateKey = tokenPayload.private_key
     let coreSessionToken = tokenPayload.core_token
     if (isLaterVersion(tokenPayload.version, '1.1.0')) {
-      const transitKey = getTransitKey()
       if (transitKey !== undefined && transitKey != null) {
         if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
           try {

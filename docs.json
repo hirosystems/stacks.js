@@ -457,22 +457,22 @@
     ],
     "loc": {
       "start": {
-        "line": 90,
+        "line": 91,
         "column": 0
       },
       "end": {
-        "line": 112,
+        "line": 113,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 113,
+          "line": 114,
           "column": 0
         },
         "end": {
-          "line": 119,
+          "line": 120,
           "column": 1
         }
       },
@@ -790,22 +790,22 @@
     ],
     "loc": {
       "start": {
-        "line": 130,
+        "line": 131,
         "column": 0
       },
       "end": {
-        "line": 133,
+        "line": 134,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 134,
+          "line": 135,
           "column": 0
         },
         "end": {
-          "line": 136,
+          "line": 137,
           "column": 1
         }
       },
@@ -1024,8 +1024,18 @@
     "tags": [
       {
         "title": "param",
-        "description": "the signed authentication response token",
+        "description": "the endpoint against which to verify public\nkeys match claimed username",
         "lineNumber": 4,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "nameLookupURL"
+      },
+      {
+        "title": "param",
+        "description": "the signed authentication response token",
+        "lineNumber": 6,
         "type": {
           "type": "NameExpression",
           "name": "String"
@@ -1034,18 +1044,18 @@
       },
       {
         "title": "param",
-        "description": "the endpoint against which to verify public\nkeys match claimed username",
-        "lineNumber": 5,
+        "description": "the transit private key that corresponds to the transit public key\nthat was provided in the authentication request",
+        "lineNumber": 7,
         "type": {
           "type": "NameExpression",
           "name": "String"
         },
-        "name": "nameLookupURL"
+        "name": "transitKey"
       },
       {
         "title": "return",
         "description": "that resolves to the user data object if successful and rejects\nif handling the sign in request fails or there was no pending sign in request.",
-        "lineNumber": 8,
+        "lineNumber": 9,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -1054,22 +1064,22 @@
     ],
     "loc": {
       "start": {
-        "line": 139,
+        "line": 140,
         "column": 0
       },
       "end": {
-        "line": 149,
+        "line": 151,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 150,
+          "line": 152,
           "column": 0
         },
         "end": {
-          "line": 235,
+          "line": 237,
           "column": 1
         }
       },
@@ -1080,70 +1090,8 @@
     "params": [
       {
         "title": "param",
-        "name": "authResponseToken",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the signed authentication response token",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 41,
-                  "offset": 40
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 41,
-              "offset": 40
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "default": "getAuthResponseToken()"
-      },
-      {
-        "title": "param",
         "name": "nameLookupURL",
-        "lineNumber": 5,
+        "lineNumber": 4,
         "description": {
           "type": "root",
           "children": [
@@ -1205,6 +1153,134 @@
           "name": "String"
         },
         "default": "'https://core.blockstack.org/v1/names/'"
+      },
+      {
+        "title": "param",
+        "name": "authResponseToken",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the signed authentication response token",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 41,
+                      "offset": 40
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 41,
+                  "offset": 40
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 41,
+              "offset": 40
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "getAuthResponseToken()"
+      },
+      {
+        "title": "param",
+        "name": "transitKey",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the transit private key that corresponds to the transit public key\nthat was provided in the authentication request",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 48,
+                      "offset": 114
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 48,
+                  "offset": 114
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 48,
+              "offset": 114
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "default": "getTransitKey()"
       }
     ],
     "properties": [],
@@ -1393,22 +1469,22 @@
     ],
     "loc": {
       "start": {
-        "line": 237,
+        "line": 239,
         "column": 0
       },
       "end": {
-        "line": 240,
+        "line": 242,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 241,
+          "line": 243,
           "column": 0
         },
         "end": {
-          "line": 243,
+          "line": 245,
           "column": 1
         }
       },
@@ -1565,22 +1641,22 @@
     ],
     "loc": {
       "start": {
-        "line": 48,
+        "line": 49,
         "column": 0
       },
       "end": {
-        "line": 51,
+        "line": 52,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 52,
+          "line": 53,
           "column": 0
         },
         "end": {
-          "line": 54,
+          "line": 55,
           "column": 1
         }
       },
@@ -1802,22 +1878,22 @@
     ],
     "loc": {
       "start": {
-        "line": 245,
+        "line": 247,
         "column": 0
       },
       "end": {
-        "line": 249,
+        "line": 251,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 250,
+          "line": 252,
           "column": 0
         },
         "end": {
-          "line": 257,
+          "line": 259,
           "column": 1
         }
       },
@@ -2905,22 +2981,22 @@
     ],
     "loc": {
       "start": {
-        "line": 56,
+        "line": 57,
         "column": 0
       },
       "end": {
-        "line": 67,
+        "line": 68,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 68,
+          "line": 69,
           "column": 0
         },
         "end": {
-          "line": 88,
+          "line": 89,
           "column": 1
         }
       },
@@ -3187,22 +3263,22 @@
     ],
     "loc": {
       "start": {
-        "line": 121,
+        "line": 122,
         "column": 0
       },
       "end": {
-        "line": 124,
+        "line": 125,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 125,
+          "line": 126,
           "column": 0
         },
         "end": {
-          "line": 128,
+          "line": 129,
           "column": 1
         }
       },
@@ -6350,22 +6426,22 @@
     ],
     "loc": {
       "start": {
-        "line": 284,
+        "line": 288,
         "column": 0
       },
       "end": {
-        "line": 299,
+        "line": 303,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 300,
+          "line": 304,
           "column": 0
         },
         "end": {
-          "line": 344,
+          "line": 348,
           "column": 1
         }
       },
@@ -7104,22 +7180,22 @@
     ],
     "loc": {
       "start": {
-        "line": 346,
+        "line": 350,
         "column": 0
       },
       "end": {
-        "line": 357,
+        "line": 361,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 358,
+          "line": 362,
           "column": 0
         },
         "end": {
-          "line": 427,
+          "line": 431,
           "column": 1
         }
       },
@@ -7637,22 +7713,22 @@
     ],
     "loc": {
       "start": {
-        "line": 429,
+        "line": 433,
         "column": 0
       },
       "end": {
-        "line": 435,
+        "line": 439,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 436,
+          "line": 440,
           "column": 0
         },
         "end": {
-          "line": 438,
+          "line": 442,
           "column": 1
         }
       },
@@ -7980,22 +8056,22 @@
     ],
     "loc": {
       "start": {
-        "line": 18,
+        "line": 19,
         "column": 0
       },
       "end": {
-        "line": 28,
+        "line": 29,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 29,
+          "line": 30,
           "column": 0
         },
         "end": {
-          "line": 51,
+          "line": 52,
           "column": 1
         }
       },
@@ -15933,22 +16009,22 @@
     ],
     "loc": {
       "start": {
-        "line": 53,
+        "line": 54,
         "column": 0
       },
       "end": {
-        "line": 60,
+        "line": 61,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 61,
+          "line": 62,
           "column": 0
         },
         "end": {
-          "line": 71,
+          "line": 72,
           "column": 1
         }
       },
@@ -16395,22 +16471,22 @@
     ],
     "loc": {
       "start": {
-        "line": 73,
+        "line": 74,
         "column": 0
       },
       "end": {
-        "line": 81,
+        "line": 82,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 82,
+          "line": 83,
           "column": 0
         },
         "end": {
-          "line": 101,
+          "line": 102,
           "column": 1
         }
       },
