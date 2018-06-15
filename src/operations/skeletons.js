@@ -149,7 +149,11 @@ export function makePreorderSkeleton(
   // |-----|--|--------------------------------------|--------------|-----------|-------------|
   // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash token burn  token type
   //                                                                 (optional)   (optional)
-
+  //
+  // output 0: name preorder code
+  // output 1: preorder address
+  // output 2: burn address
+  //
   // Returns an unsigned serialized transaction.
   const burnAmount = asAmountV2(burn)
   const network = config.network
@@ -231,6 +235,8 @@ export function makeRegisterSkeleton(
     |----|--|----------------------------------|-------------------|
     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
 
+    output 0: name registration code
+    output 1: owner address
   */
 
   let payload
@@ -300,6 +306,11 @@ export function makeRenewalSkeleton(
    0    2  3                                  39                  59                            67
    |----|--|----------------------------------|-------------------|------------------------------|
    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (little-endian)
+
+   output 0: renewal code
+   output 1: new owner address
+   output 2: current owner address
+   output 3: burn address
   */
   const burnAmount = asAmountV2(burn)
   const network = config.network
@@ -343,6 +354,9 @@ export function makeTransferSkeleton(
     |-----|--|----|-------------------|---------------|
     magic op keep  hash128(name.ns_id) consensus hash
              data?
+
+    output 0: transfer code
+    output 1: new owner
   */
   const network = config.network
   const opRet = Buffer.alloc(36)
@@ -377,12 +391,16 @@ export function makeUpdateSkeleton(
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  //
+  // output 0: the revoke code
   /*
     Format:
     
     0     2  3                                   19                      39
     |-----|--|-----------------------------------|-----------------------|
     magic op  hash128(name.ns_id,consensus hash) hash160(data)
+
+    output 0: update code
   */
 
   const network = config.network
@@ -421,6 +439,8 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
    0    2  3                             39
    |----|--|-----------------------------|
    magic op   name.ns_id (37 bytes)
+
+   output 0: the revoke code
   */
   
   const network = config.network
@@ -460,6 +480,10 @@ export function makeNamespacePreorderSkeleton(
    0     2   3                                      23               39                         47
    |-----|---|--------------------------------------|----------------|--------------------------|
    magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (little-endian)
+
+   output 0: namespace preorder code
+   output 1: change address
+   otuput 2: burn address
   */
 
   const burnAmount = asAmountV2(burn)
@@ -519,6 +543,9 @@ export function makeNamespaceRevealSkeleton(
    magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
                                                   bucket exponents        no-vowel
                                                                           discounts
+   
+   output 0: namespace reveal code
+   output 1: reveal address
   */
   const network = config.network
   const hexPayload = namespace.toHexPayload()
@@ -546,6 +573,7 @@ export function makeNamespaceReadySkeleton(
    |-----|--|--|------------|
    magic op  .  ns_id
 
+   output 0: namespace ready code
    */
   const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
@@ -602,6 +630,8 @@ export function makeAnnounceSkeleton(messageHash: string) {
     0    2  3                             23
     |----|--|-----------------------------|
     magic op   message hash (160-bit)
+
+    output 0: the OP_RETURN
   */
   if (messageHash.length !== 40) {
     throw new Error('Invalid message hash: must be 20 bytes hex-encoded')
@@ -629,6 +659,9 @@ export function makeTokenTransferSkeleton(recipientAddress: string,
     |-----|--|--------------|----------|-----------|-------------------------|
     magic op  consensus_hash token_type amount (LE) scratch area
                              (ns_id)
+
+    output 0: token transfer code
+    output 1: recipient address
   */
   if (scratchArea.length > 34) {
     throw new Error('Invalid scratch area: must be no more than 34 bytes')
