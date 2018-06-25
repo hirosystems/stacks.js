@@ -262,7 +262,7 @@ export function makeRegisterSkeleton(
     payload.write(fullyQualifiedName, 0, 37, 'ascii')
     payload.write(valueHash, 37, 20, 'hex')
     if (!!burnTokenAmountHex) {
-      payload.write(burnTokenAmountHex, 57, 16, 'hex')
+      payload.write(burnTokenAmountHex, 57, 8, 'hex')
     }
   } else {
     payload = Buffer.from(fullyQualifiedName, 'ascii')
@@ -518,7 +518,7 @@ export function makeNamespacePreorderSkeleton(
   if (burnAmount.units === 'STACKS') {
     const burnHex = burnAmount.amount.toHex()
     const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
-    opReturnBuffer.write(paddedBurnHex, 39, 16, 'hex')
+    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
   }
 
   const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
@@ -640,7 +640,7 @@ export function makeAnnounceSkeleton(messageHash: string) {
   const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
   opReturnBuffer.write('id#', 0, 3, 'ascii')
-  opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
+  opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex')
 
   const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
