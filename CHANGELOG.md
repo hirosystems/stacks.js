@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in the `transactions` functions (e.g., makePreorder).
 - `putFile` can now optionally take the public key for which you want
 to encrypt the file. Thanks to @bodymindarts for this!
+- `handlePendingSignIn` now accepts `transitKey` as an optional 3rd parameter. This
+enables support for more complex sign in flows.
 
 ### Changed
 - The gaia hub connection functions now use a JWT for authentication,
