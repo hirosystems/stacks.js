@@ -317,4 +317,30 @@ export function runAuthTests() {
         t.fail('Should not error')
       })
   })
+
+  test('handlePendingSignIn with authResponseToken and transit key', (t) => {
+    t.plan(1)
+
+    const url = `${nameLookupURL}ryan.id`
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const appPrivateKey = makeECPrivateKey()
+    const transitPrivateKey = makeECPrivateKey()
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
+    const metadata = {}
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+                                          metadata, undefined, appPrivateKey, undefined,
+                                          transitPublicKey)
+
+    handlePendingSignIn(nameLookupURL, authResponse, transitPrivateKey)
+      .then(() => {
+        t.pass('Should correctly sign in with auth response')
+      })
+      .catch((err) => {
+        console.log(err.stack)
+        t.fail('Should not error')
+      })
+  })
 }
