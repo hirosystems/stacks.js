@@ -295,6 +295,26 @@
               
                 
                 <li><a
+                  href='#signecdsa'
+                  class="">
+                  signECDSA
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#verifyecdsa'
+                  class="">
+                  verifyECDSA
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#broadcasttransaction'
                   class="">
                   broadcastTransaction
@@ -318,6 +338,46 @@
                   href='#broadcastnameregistration'
                   class="">
                   broadcastNameRegistration
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#signerversion'
+                  class="">
+                  signerVersion
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#getaddress'
+                  class="">
+                  getAddress
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#signtransaction'
+                  class="">
+                  signTransaction
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#pubkeyhashsigner'
+                  class="">
+                  PubkeyHashSigner
                   
                 </a>
                 
@@ -584,7 +644,7 @@ An array of strings indicating which permissions this app is requesting.
 to the user data object if the sign in succeeds.</p>
 
 
-  <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, authResponseToken: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transitKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -605,6 +665,27 @@ to the user data object if the sign in succeeds.</p>
             = <code>&#39;https://core.blockstack.org/v1/names/&#39;</code>)</code>
 	    the endpoint against which to verify public
 keys match claimed username
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>authResponseToken</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>getAuthResponseToken()</code>)</code>
+	    the signed authentication response token
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>transitKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>getTransitKey()</code>)</code>
+	    the transit private key that corresponds to the transit public key
+that was provided in the authentication request
 
           </div>
           
@@ -1754,6 +1835,17 @@ version. These features will be rolled out in future updates.</em></p>
                 </tr>
               
                 <tr>
+                  <td class='break-word'><span class='code bold'>options.verify</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+                  </td>
+                  <td class='break-word'><span>Whether the content should be verified, only to be used
+when 
+<code>putFile</code>
+ was set to 
+<code>sign = true</code>
+</span></td>
+                </tr>
+              
+                <tr>
                   <td class='break-word'><span class='code bold'>options.app</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
                   </td>
                   <td class='break-word'><span>the app to lookup for multi-player storage -
@@ -1878,11 +1970,22 @@ or rejects with an error
             <tbody class='mt1'>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.encrypt</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+                  <td class='break-word'><span class='code bold'>options.encrypt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
                   
                     (default <code>true</code>)
                   </td>
                   <td class='break-word'><span>encrypt the data with the app private key
+or the provided public key
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.sign</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+                  
+                    (default <code>false</code>)
+                  </td>
+                  <td class='break-word'><span>sign the data using ECDSA on SHA256 hashes with
+the app private key
 </span></td>
                 </tr>
               
@@ -2518,6 +2621,173 @@ if the
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='signecdsa'>
+      signECDSA
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Sign content using ECDSA</p>
+
+
+  <div class='pre p1 fill-light mt0'>signECDSA(privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    secp256k1 private key hex string
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    content to sign
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        contains:
+signature - Hex encoded DER signature
+public key - Hex encoded private string taken from privateKey
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='verifyecdsa'>
+      verifyECDSA
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Verify content using ECDSA</p>
+
+
+  <div class='pre p1 fill-light mt0'>verifyECDSA(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), publicKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, signature: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+	    Content to verify was signed
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>publicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    secp256k1 private key hex string
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>signature</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Hex encoded DER signature
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+        returns true when signature matches publickey + content, false if not
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='broadcasttransaction'>
       broadcastTransaction
     </h3>
@@ -2807,6 +3077,246 @@ parameter</li>
 
       
     
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='signerversion'>
+      signerVersion
+    </h3>
+    
+    
+  </div>
+  
+
+  
+
+  <div class='pre p1 fill-light mt0'>signerVersion</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>any</code>:
+        version number of the signer, currently, should always be 1
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='getaddress'>
+      getAddress
+    </h3>
+    
+    
+  </div>
+  
+
+  
+
+  <div class='pre p1 fill-light mt0'>getAddress</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>any</code>:
+        a string representing the transaction signer's address
+(usually Base58 check encoding)
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='signtransaction'>
+      signTransaction
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Signs a transaction input</p>
+
+
+  <div class='pre p1 fill-light mt0'>signTransaction</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>transaction</span> <code class='quiet'>(TransactionBuilder)</code>
+	    the transaction to sign
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>inputIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    the input on the transaction to sign
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='pubkeyhashsigner'>
+      PubkeyHashSigner
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Class representing a transaction signer for pubkeyhash addresses
+(a.k.a. single-sig addresses)</p>
+
+
+  <div class='pre p1 fill-light mt0'>new PubkeyHashSigner(ecPair: bitcoinjs.ECPair)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>ecPair</span> <code class='quiet'>(bitcoinjs.ECPair)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
   
 
   
@@ -3200,7 +3710,7 @@ to fund this announce transaction
   </div>
   
 
-  <p>Encrypts the data provided with the transit public key.</p>
+  <p>Encrypts the data provided with the app public key.</p>
 
 
   <div class='pre p1 fill-light mt0'>encryptContent(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
@@ -3249,10 +3759,10 @@ to fund this announce transaction
             <tbody class='mt1'>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.privateKey</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  <td class='break-word'><span class='code bold'>options.publicKey</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
                   </td>
-                  <td class='break-word'><span>the hex string of the ECDSA private
-key to use for decryption. If not provided, will use user's appPrivateKey.
+                  <td class='break-word'><span>the hex string of the ECDSA public
+key to use for encryption. If not provided, will use user's appPrivateKey.
 </span></td>
                 </tr>
               

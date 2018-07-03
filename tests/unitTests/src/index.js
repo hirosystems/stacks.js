@@ -6,6 +6,7 @@ import { runEncryptionTests }   from './unitTestsEncryption'
 import { runStorageTests }      from './unitTestsStorage'
 import { runOperationsTests }   from './unitTestsOperations'
 import { runWalletTests }       from './unitTestsWallet'
+import { runErrorsTests }       from './unitTestsErrors'
 
 // Utils tests
 runUtilsTests()
@@ -29,3 +30,6 @@ runStorageTests()
 runOperationsTests()
 
 runWalletTests()
+
+// Errors Tests
+runErrorsTests()
