@@ -215,39 +215,6 @@ export class BlockstackWallet {
     return getNodePrivateKey(appNode).slice(0, 64)
   }
 
-
-  /**
-   * Get a ECDSA private key hex-string for an application-specific
-   *  address, this address will use the first 62 bits of the SHA256 hash
-   *  of `appDomain,sig("app-node-salt" with appsNodeKey)`
-   * @param {String} appsNodeKey - the base58-encoded private key for
-   * applications node (the `appsNodeKey` return in getIdentityKeyPair())
-   * @param {String} salt - a string, used to salt the
-   * application-specific addresses
-   * @param {String} appDomain - the appDomain to generate a key for
-   * @return {String} the private key hex-string. this will be a 64
-   * character string
-   */
-  static getAppPrivateKeySecretSalt(appsNodeKey: string, salt: string, appDomain: string): string {
-    const appsNode = HDNode.fromBase58(appsNodeKey)
-
-    // we will *sign* the input salt, which creates a secret value
-    const saltHash = crypto.createHash('sha256')
-          .update(`app-key-salt:${salt}`)
-          .digest()
-    const secretValue = appsNode.sign(saltHash).toDER().toString('hex')
-
-    const hash = crypto
-          .createHash('sha256')
-          .update(`${appDomain},${secretValue}`)
-          .digest()
-
-    const indexes = getFirst62BitsAsNumbers(hash)
-    const appNode = appsNode.deriveHardened(indexes[0]).deriveHardened(indexes[1])
-    return getNodePrivateKey(appNode).slice(0, 64)
-  }
-
-
   /**
    * Get a ECDSA private key hex-string for an application-specific
    *  address.
