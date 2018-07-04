@@ -1,54 +1,8 @@
 import test from 'tape-promise/tape'
 
 import {
-  BlockstackWallet, getFirst62BitsAsNumbers
-} from '../../../lib/wallet'
-
-function padZeros(s, len) {
-  if (s.length > len) {
-    throw new Error(`Bad input, too long: ${s}!`)
-  }
-  if (s.length !== len) {
-    const pads = '0'.repeat(len - s.length)
-    return `${pads}${s}`
-  }
-  return s
-}
-
-function tests62BitMath() {
-  test('bit manipulation in app private keys', (t) => {
-    const testSet = [
-      { input: 'ffffffffffffffffff',
-        output: ['7fffffff', '7fffffff'] },
-      { input: 'fffffffffffffffc',
-        output: ['7fffffff', '7fffffff'] },
-      { input: 'aaaaaaab55555554',
-        output: ['55555555', '55555555'] },
-      { input: 'aaaaaaa955555554',
-        output: ['55555554', '55555555'] },
-      { input: '2aaaaaa955555554',
-        output: ['15555554', '55555555'] },
-      { input: '2aaaaaa955555556',
-        output: ['15555554', '55555555'] },
-      { input: '266f7d5ffffffffc',
-        output: ['1337beaf', '7fffffff'] }]
-    testSet.forEach((testData) => {
-      const numbers = getFirst62BitsAsNumbers(Buffer.from(testData.input, 'hex'))
-      t.ok(numbers[0] < Math.pow(2, 31), 'Index must be less than 2^31')
-      t.ok(numbers[1] < Math.pow(2, 31), 'Index must be less than 2^31')
-      t.equal(numbers[0], parseInt(testData.output[0], 16))
-      t.equal(numbers[1], parseInt(testData.output[1], 16))
-      const inputBinary = padZeros(parseInt(testData.input.slice(0, 8), 16).toString(2), 32) +
-            padZeros(parseInt(testData.input.slice(8, 16), 16).toString(2), 32)
-      const outputBinary = padZeros(parseInt(testData.output[0], 16).toString(2), 31) +
-            padZeros(parseInt(testData.output[1], 16).toString(2), 31)
-      t.equal(outputBinary, inputBinary.slice(0, 62),
-              `bit strings should match for ${testData.input}`)
-    })
-
-    t.end()
-  })
-}
+  BlockstackWallet
+} from '../../../lib/'
 
 function testsBlockstackWallet() {
   const testSeedHex = 'f17a104387a5b9c67d7c1c17a1a4724a16fdf830e5bbd6fdd214c0e08d9530aeb' +
@@ -122,5 +76,4 @@ function testsBlockstackWallet() {
 
 export function runWalletTests() {
   testsBlockstackWallet()
-  tests62BitMath()
 }

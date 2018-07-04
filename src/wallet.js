@@ -41,21 +41,6 @@ function getNodePublicKey(hdNode): string {
   return hdNode.keyPair.getPublicKeyBuffer().toString('hex')
 }
 
-export function getFirst62BitsAsNumbers(buff: Buffer): Array<number> {
-  // now, lets use the leading 62 bits to get two indexes
-  // start with two ints --> 64 bits
-  const firstInt32 = buff.readInt32BE(0)
-  const secondInt32 = buff.readInt32BE(4)
-  // zero-left shift of one gives us the first 31 bits (as a number < 2^31)
-  const firstIndex = firstInt32 >>> 1
-  // save the 32nd bit
-  const secondIndexLeadingBit = (firstInt32 & 1)
-  // zero-left shift of two gives us the next 30 bits, then we add
-  // that 32nd bit to the front.
-  const secondIndex = (secondInt32 >>> 2) | (secondIndexLeadingBit << 30)
-  return [firstIndex, secondIndex]
-}
-
 /**
  * The BlockstackWallet class manages the hierarchical derivation
  *  paths for a standard blockstack client wallet. This includes paths
