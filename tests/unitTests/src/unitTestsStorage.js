@@ -8,7 +8,7 @@ import { uploadToGaiaHub, getFullReadUrl,
 import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
 import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 import { getPublicKeyFromPrivate } from '../../../lib/keys'
-import { TokenVerifier } from 'jsontokens'
+import { TokenVerifier, decodeToken } from 'jsontokens'
 
 class LocalStorage {
   constructor() {
@@ -693,7 +693,7 @@ export function runStorageTests() {
   })
 
   test('connectToGaiaHub', (t) => {
-    t.plan(5)
+    t.plan(6)
 
     const hubServer = 'hub.testblockstack.org'
 
@@ -716,10 +716,12 @@ export function runStorageTests() {
         t.equal(hubInfo.read_url_prefix, config.url_prefix)
         t.equal(address, config.address)
         t.equal(hubServer, config.server)
+        const jsonTokenPart = config.token.slice('v1:'.length)
 
         const verified = new TokenVerifier('ES256K', publicKey)
-              .verify(config.token.slice('v1:'.length))
+              .verify(jsonTokenPart)
         t.ok(verified, 'Verified token')
+        t.equal(hubServer, decodeToken(jsonTokenPart).payload.hubUrl, 'Intended hubUrl')
       })
   })
 
