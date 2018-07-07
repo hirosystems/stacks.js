@@ -1,6 +1,6 @@
 /* @flow */
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
-import fetch from 'isomorphic-fetch'
+import 'cross-fetch'
 
 /**
  * Create an authentication token to be sent to the Core API server
@@ -85,7 +85,7 @@ export function sendCoreSessionRequest(coreHost: string,
     .then(response => {
       if (!response.ok) {
         reject('HTTP status not OK')
-        return null
+        throw new Error('HTTP status not OK')
       }
       return response.text()
     })

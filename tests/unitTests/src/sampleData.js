@@ -70,7 +70,7 @@ export const sampleVerifications = {
   },
   larry: {
     facebook: {
-      url: 'https://www.facebook.com/larrysalibra/posts/10100341028448093',
+      url: 'https://www.facebook.com/larry.salibra/posts/10100341028448093',
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/larry.verification.facebook.html`, 'utf8')
     }
   }

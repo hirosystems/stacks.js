@@ -1,5 +1,5 @@
 /* @flow */
-import 'isomorphic-fetch'
+import 'cross-fetch'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 
 export class Service {

@@ -12,7 +12,7 @@ import { lookupProfile } from '../profiles'
 
 import { SignatureVerificationError } from '../errors'
 import { Logger } from '../logger'
-// import fetch from 'isomorphic-fetch'
+// import fetch from 'cross-fetch'
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
 

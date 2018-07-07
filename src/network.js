@@ -547,7 +547,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    const headers = { Authorization: `Basic ${authString}` }
     return fetch(this.bitcoindUrl, { method: 'POST',
                                       body: JSON.stringify(jsonRPC),
                                       headers })
@@ -561,7 +561,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    const headers = { Authorization: `Basic ${authString}` }
     return fetch(this.bitcoindUrl, { method: 'POST',
                                       body: JSON.stringify(jsonRPC),
                                       headers })
@@ -576,7 +576,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    const headers = { Authorization: `Basic ${authString}` }
     return fetch(this.bitcoindUrl, { method: 'POST',
                                       body: JSON.stringify(jsonRPC),
                                       headers })
@@ -587,7 +587,7 @@ export class BitcoindAPI extends BitcoinNetwork {
         const jsonRPCBlock = { jsonrpc: '1.0',
                                method: 'getblockheader',
                                params: [blockhash] }
-        headers.append('Authorization', `Basic ${authString}`)
+        headers.Authorization = `Basic ${authString}`
         return fetch(this.bitcoindUrl, { method: 'POST',
                                          body: JSON.stringify(jsonRPCBlock),
                                          headers })
@@ -606,7 +606,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =
       Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
           .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    const headers = { Authorization: `Basic ${authString}` }
 
     return fetch(this.bitcoindUrl, { method: 'POST',
                                       body: JSON.stringify(jsonRPCImport),
@@ -637,7 +637,7 @@ export class InsightClient extends BitcoinNetwork {
     const jsonData = { tx: transaction }
     return fetch(`${this.apiUrl}/tx/send`,
                  { method: 'POST',
-                   headers: new Headers({ 'Content-Type': 'application/json' }),
+                   headers: { 'Content-Type': 'application/json' },
                    body: JSON.stringify(jsonData) })
       .then(resp => resp.json())
   }

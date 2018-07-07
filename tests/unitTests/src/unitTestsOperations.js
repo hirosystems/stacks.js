@@ -1,7 +1,6 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
-import nock from 'nock'
 
 import { network, InsightClient } from '../../../lib/network'
 import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
@@ -369,7 +368,7 @@ function transactionTests() {
         const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
 
         const change = tx.outs[1].value
-        
+
         t.equal(inputVals - change,
           estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
@@ -427,10 +426,10 @@ function transactionTests() {
 
     Promise.all(
       [transactions.estimateNameImport(
-        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv',
         'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575'),
        transactions.makeNameImport(
-        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv',
         'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575', testAddresses[3].skHex)])
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
@@ -791,19 +790,17 @@ function transactionTests() {
     const transaction = 'abc'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const confirmations = 6
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
-      {
-        transaction,
-        transactionToWatch,
-        confirmations
-      })
-      .once()
-      .reply(202, {})
+    FetchMock.post('https://broadcast.blockstack.org/v1/broadcast/transaction',
+    { body: {
+      transaction,
+      transactionToWatch,
+      confirmations
+    },
+      status: 202 })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
       transactionToWatch).then(() => {
-        t.assert(nock.isDone())
+        t.assert(FetchMock.done())
       })
   })
 
@@ -814,20 +811,26 @@ function transactionTests() {
     const transaction = 'abc'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const confirmations = 6
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
-      {
-        transaction,
-        transactionToWatch,
-        confirmations
-      })
-      .once()
-      .reply(500, {})
+    const expectedBody = JSON.stringify({
+      transaction,
+      transactionToWatch,
+      confirmations })
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        result: {},
+        status: 500
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
       transactionToWatch)
       .catch((error) => {
-        t.assert(nock.isDone())
+        t.assert(FetchMock.done())
         t.assert(error.response)
         t.equal(error.code, 'remote_service_error')
       })
@@ -841,19 +844,27 @@ function transactionTests() {
     const transaction = 'abc'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const confirmations = 8
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
-      {
-        transaction,
-        transactionToWatch,
-        confirmations
-      })
-      .once()
-      .reply(202, {})
+
+    const expectedBody = JSON.stringify({
+      transaction,
+      transactionToWatch,
+      confirmations })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
       transactionToWatch, confirmations).then(() => {
-        t.assert(nock.isDone())
+        t.assert(FetchMock.done())
       })
   })
 
@@ -864,14 +875,22 @@ function transactionTests() {
     + 'dd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e00000000'
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
-    nock.cleanAll()
-    nock('https://blockchain.info').post('/pushtx?cors=true',
-      body => body.includes(transaction)).once()
-      .reply(202, 'transaction submitted')
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://blockchain.info/pushtx?cors=true'
+          && opts
+          && opts.body),
+      response: {
+        body: 'transaction submitted',
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
     .then(() => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
     })
   })
 
@@ -882,14 +901,20 @@ function transactionTests() {
     + 'dd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e00000000'
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
-    nock.cleanAll()
-    nock('https://blockchain.info').post('/pushtx?cors=true',
-      body => body.includes(transaction)).once()
-      .reply(500, 'something else')
-
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://blockchain.info/pushtx?cors=true'
+          && opts
+          && opts.body),
+      response: {
+        body: 'something else',
+        status: 500
+      }
+    })
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
     .catch((error) => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
       t.assert(error.response)
       t.equal(error.code, 'remote_service_error')
     })
@@ -901,17 +926,24 @@ function transactionTests() {
     const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/zone-file',
-      {
-        zoneFile,
-        transactionToWatch
-      })
-      .once()
-      .reply(202, {})
+    const expectedBody = JSON.stringify({
+      zoneFile,
+      transactionToWatch })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch).then(() => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
     })
   })
 
@@ -921,18 +953,25 @@ function transactionTests() {
     const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/zone-file',
-      {
-        zoneFile,
-        transactionToWatch
-      })
-      .once()
-      .reply(500, {})
+    const expectedBody = JSON.stringify({
+      zoneFile,
+      transactionToWatch })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 500
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch)
     .catch((error) => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
       t.assert(error.response)
       t.equal(error.code, 'remote_service_error')
     })
@@ -941,18 +980,23 @@ function transactionTests() {
   test('broadcastZoneFile: rejects with error if core endpoint error', (t) => {
     t.plan(3)
     FetchMock.restore()
-    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const expectedBody = JSON.stringify({ zonefile })
 
-    nock.cleanAll()
-    nock('https://core.blockstack.org').post('/v1/zonefile/',
-      {
-        zonefile: zoneFile
-      })
-      .once()
-      .reply(200, { error: 'core indicates an error like this' })
-    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile)
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://core.blockstack.org/v1/zonefile/'
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({ error: 'core indicates an error like this' }),
+        status: 200
+      }
+    })
+
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile)
     .catch((error) => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
       t.assert(error.response)
       t.equal(error.code, 'remote_service_error')
     })
@@ -961,18 +1005,24 @@ function transactionTests() {
   test('broadcastZoneFile: send immediately via core atlas endpoint', (t) => {
     t.plan(1)
     FetchMock.restore()
-    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const expectedBody = JSON.stringify({
+      zonefile })
 
-    nock.cleanAll()
-    nock('https://core.blockstack.org').post('/v1/zonefile/',
-      {
-        zonefile: zoneFile
-      })
-      .once()
-      .reply(202, {})
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://core.blockstack.org/v1/zonefile/'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
-    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile).then(() => {
-      t.assert(nock.isDone())
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile).then(() => {
+      t.assert(FetchMock.done())
     })
   })
 
@@ -980,7 +1030,6 @@ function transactionTests() {
      zone file not provided`, (t) => {
     t.plan(2)
     FetchMock.restore()
-    nock.cleanAll()
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile()
     .catch((error) => {
@@ -996,43 +1045,60 @@ function transactionTests() {
     const preorderTransaction = 'abc'
     const registerTransaction = '123'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/registration',
-      {
-        preorderTransaction,
-        registerTransaction,
-        zoneFile
-      })
-      .once()
-      .reply(202, {})
+    const expectedBody = JSON.stringify({
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
       registerTransaction, zoneFile)
     .then(() => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
     })
   })
 
   test('broadcastNameRegistration: reject with error if service replies with error', (t) => {
-    t.plan(3)
+    t.plan(4)
     FetchMock.restore()
     const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const preorderTransaction = 'abc'
     const registerTransaction = '123'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/registration',
-      {
-        preorderTransaction,
-        registerTransaction,
-        zoneFile
-      })
-      .once()
-      .reply(500, {})
+    const expectedBody = JSON.stringify({
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) =>
+         (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 500
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
       registerTransaction, zoneFile)
     .catch((error) => {
+      t.assert(FetchMock.done())
       t.assert(error)
       t.assert(error.response)
       t.equal(error.code, 'remote_service_error')
@@ -1046,7 +1112,6 @@ function transactionTests() {
     const registerTransaction = '123'
     t.plan(9)
     FetchMock.restore()
-    nock.cleanAll()
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(undefined,
       registerTransaction, zoneFile)
@@ -1080,7 +1145,7 @@ function transactionTests() {
                   { height: 601 })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { version: 2, address: BURN_ADDR, reveal_block: 600 })
-    
+
     network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
       .then((baddr) => {
         t.equal(baddr, BURN_ADDR, 'Pay to namespace creator in year 1')
@@ -1257,12 +1322,12 @@ function safetyTests() {
       {
         namespaceID: 'abcdef#ghi',
         reason: 'illegal character' }]
-    .map(x => 
+    .map(x =>
       safety.isNamespaceValid(x.namespaceID).then(
         passed => t.ok(!passed, `${x.namespaceID} should fail for : ${x.reason}`)))
 
     const shouldPass = ['0123456789abcdefghi', 'a-b-c', 'a_b_c']
-      .map(x => 
+      .map(x =>
         safety.isNamespaceValid(x).then(
           passed => t.ok(passed, `${x} should pass`)))
 
@@ -1323,9 +1388,9 @@ function safetyTests() {
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test', { ready: true })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test2', { ready: false })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3', 
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
                 { body: 'Namespace not found', status: 404 })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4', 
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4',
                 { body: 'Some other error', status: 400 })
 
     const errorCheck = Promise.resolve().then(() => false).catch(() => true)
@@ -1347,9 +1412,9 @@ function safetyTests() {
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test', { ready: false })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test2', { ready: true })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3', 
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
                 { body: 'Namespace not found', status: 404 })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4', 
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4',
                 { body: 'Some other error', status: 400 })
 
     const errorCheck = Promise.resolve().then(() => false).catch(() => true)
