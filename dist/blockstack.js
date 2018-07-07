@@ -9849,18 +9849,17 @@ module.exports = function base (ALPHABET) {
 },{"safe-buffer":427}],62:[function(require,module,exports){
 (function (Buffer){
 "use strict";
-var pad_string_1 = require("./pad-string");
-function encode(input, encoding) {
-    if (encoding === void 0) { encoding = "utf8"; }
+Object.defineProperty(exports, "__esModule", { value: true });
+const pad_string_1 = require("./pad-string");
+function encode(input, encoding = "utf8") {
     if (Buffer.isBuffer(input)) {
         return fromBase64(input.toString("base64"));
     }
-    return fromBase64(new Buffer(input, encoding).toString("base64"));
+    return fromBase64(Buffer.from(input, encoding).toString("base64"));
 }
 ;
-function decode(base64url, encoding) {
-    if (encoding === void 0) { encoding = "utf8"; }
-    return new Buffer(toBase64(base64url), "base64").toString(encoding);
+function decode(base64url, encoding = "utf8") {
+    return Buffer.from(toBase64(base64url), "base64").toString(encoding);
 }
 function toBase64(base64url) {
     base64url = base64url.toString();
@@ -9875,39 +9874,38 @@ function fromBase64(base64) {
         .replace(/\//g, "_");
 }
 function toBuffer(base64url) {
-    return new Buffer(toBase64(base64url), "base64");
+    return Buffer.from(toBase64(base64url), "base64");
 }
-var base64url = encode;
+let base64url = encode;
 base64url.encode = encode;
 base64url.decode = decode;
 base64url.toBase64 = toBase64;
 base64url.fromBase64 = fromBase64;
 base64url.toBuffer = toBuffer;
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = base64url;
 
 }).call(this,require("buffer").Buffer)
 },{"./pad-string":63,"buffer":159}],63:[function(require,module,exports){
 (function (Buffer){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function padString(input) {
-    var segmentLength = 4;
-    var stringLength = input.length;
-    var diff = stringLength % segmentLength;
+    let segmentLength = 4;
+    let stringLength = input.length;
+    let diff = stringLength % segmentLength;
     if (!diff) {
         return input;
     }
-    var position = stringLength;
-    var padLength = segmentLength - diff;
-    var paddedStringLength = stringLength + padLength;
-    var buffer = new Buffer(paddedStringLength);
+    let position = stringLength;
+    let padLength = segmentLength - diff;
+    let paddedStringLength = stringLength + padLength;
+    let buffer = Buffer.alloc(paddedStringLength);
     buffer.write(input);
     while (padLength--) {
         buffer.write("=", position++);
     }
     return buffer.toString();
 }
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = padString;
 
 }).call(this,require("buffer").Buffer)
@@ -46743,6 +46741,15 @@ arguments[4][183][0].apply(exports,arguments)
 arguments[4][183][0].apply(exports,arguments)
 },{"dup":183}],358:[function(require,module,exports){
 (function (Buffer){
+/*
+ * This code is taken from https://github.com/Brightspace/node-ecdsa-sig-formatter
+ * which is licensed under the Apache 2.0 license.
+ * 
+ * It got copied over here to make some adjustments for being compatible with browserify.
+ * Going forward would be either simplifying this code (as we only need 256 bit signatures),
+ * or moving back to the direct dependency; both is future work(TM) for some other day.
+ */
+
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -46771,7 +46778,7 @@ function getParamSize(keySize) {
 var paramBytesForAlg = {
     ES256: getParamSize(256),
     ES384: getParamSize(384),
-    ES512: getParamSize(521)
+    ES512: getParamSize(512)
 };
 
 function getParamBytesForAlg(alg) {
