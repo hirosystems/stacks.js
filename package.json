@@ -80,7 +80,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-eslint": "^6.0.4",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "blue-tape": "^1.0.0",
     "browserify": "^13.1.1",
@@ -113,10 +113,10 @@
     "ecurve": "^1.0.6",
     "elliptic": "^6.4.0",
     "es6-promise": "^4.2.4",
-    "jsontokens": "^0.7.7",
+    "jsontokens": "^0.7.8",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
-    "request": "^2.79.0",
+    "request": "^2.87.0",
     "ripemd160": "^2.0.1",
     "schema-inspector": "^1.6.4",
     "sprintf-js": "^1.0.3",
@@ -126,7 +126,7 @@
   },
   "engines": {
     "node": ">=6",
-    "npm": ">=5"
+    "npm": ">=6"
   },
   "nyc": {
     "include": [
