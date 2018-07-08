@@ -1,6 +1,7 @@
 [ignore]
 .*/node_modules/documentation/*
 .*/node_modules/.staging/*
+.*/node_modules/chalk/*
 
 [include]
 
