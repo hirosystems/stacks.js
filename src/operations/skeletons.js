@@ -305,7 +305,7 @@ export function makeRenewalSkeleton(
     
    0    2  3                                  39                  59                            67
    |----|--|----------------------------------|-------------------|------------------------------|
-   magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (little-endian)
+   magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (big-endian)
 
    output 0: renewal code
    output 1: new owner address
@@ -479,7 +479,7 @@ export function makeNamespacePreorderSkeleton(
 
    0     2   3                                      23               39                         47
    |-----|---|--------------------------------------|----------------|--------------------------|
-   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (little-endian)
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (big-endian)
 
    output 0: namespace preorder code
    output 1: change address
@@ -657,7 +657,7 @@ export function makeTokenTransferSkeleton(recipientAddress: string,
 
     0     2  3              19         38          46                        80
     |-----|--|--------------|----------|-----------|-------------------------|
-    magic op  consensus_hash token_type amount (LE) scratch area
+    magic op  consensus_hash token_type amount (BE) scratch area
                              (ns_id)
 
     output 0: token transfer code
