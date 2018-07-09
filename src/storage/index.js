@@ -462,6 +462,7 @@ export function deleteFile(path: string) {
  * @param {function} callback - the callback to invoke on each file.  If it returns a falsey
  *  value, then the loop stops.  If it returns a truthy value, the loop continues.
  * @returns {Promise} that resolves to the number of files listed.
+ * @private
  */
 function listFilesLoop(hubConfig: GaiaHubConfig,
                        page: string | null,
