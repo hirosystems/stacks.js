@@ -6,7 +6,7 @@ export function containsValidProofStatement(searchText: string, name: ?string = 
 
   searchText = searchText.toLowerCase()
 
-  if (name.split('.').length !== 2) {
+  if (name.split('.').length < 2) {
     throw new Error('Please provide the fully qualified Blockstack name.')
   }
 
