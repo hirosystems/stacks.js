@@ -19,23 +19,23 @@ export type GaiaHubConfig = {
 }
 
 export function uploadToGaiaHub(filename: string, contents: any,
-                                hubConfig: GaiaHubConfig,
-                                contentType: string = 'application/octet-stream'): Promise<*> {
+  hubConfig: GaiaHubConfig,
+  contentType: string = 'application/octet-stream'): Promise<*> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
   return fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`,
-        { method: 'POST',
-          headers: {
-            'Content-Type': contentType,
-            Authorization: `bearer ${hubConfig.token}`
-          },
-          body: contents })
+    { method: 'POST',
+      headers: {
+        'Content-Type': contentType,
+        Authorization: `bearer ${hubConfig.token}`
+      },
+      body: contents })
     .then((response) => response.text())
     .then((responseText) => JSON.parse(responseText))
     .then((responseJSON) => responseJSON.publicURL)
 }
 
 export function getFullReadUrl(filename: string,
-                               hubConfig: GaiaHubConfig): string {
+  hubConfig: GaiaHubConfig): string {
   return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
 }
 
@@ -74,13 +74,13 @@ function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string, hubUrl: stri
 
   const salt = crypto.randomBytes(16).toString('hex')
   const payload = { gaiaChallenge: challengeText,
-                    hubUrl, iss, salt }
+    hubUrl, iss, salt }
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
 }
 
 export function connectToGaiaHub(gaiaHubUrl: string,
-                                 challengeSignerHex: string): Promise<GaiaHubConfig> {
+  challengeSignerHex: string): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   return fetch(`${gaiaHubUrl}/hub_info`)
@@ -90,11 +90,11 @@ export function connectToGaiaHub(gaiaHubUrl: string,
       const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl)
       const address = hexStringToECPair(challengeSignerHex +
                                         (challengeSignerHex.length === 64 ? '01' : ''))
-            .getAddress()
+        .getAddress()
       return { url_prefix: readURL,
-               address,
-               token,
-               server: gaiaHubUrl }
+        address,
+        token,
+        server: gaiaHubUrl }
     })
 }
 

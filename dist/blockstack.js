@@ -1987,7 +1987,7 @@ var Logger = exports.Logger = function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.network = exports.BlockchainInfoApi = exports.InsightClient = exports.BitcoindAPI = exports.BitcoinNetwork = exports.LocalRegtest = exports.BlockstackNetwork = undefined;
+exports.network = exports.BlockchainInfoApi = exports.InsightClient = exports.BitcoindAPI = exports.LocalRegtest = exports.BlockstackNetwork = exports.BitcoinNetwork = undefined;
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -2017,6 +2017,36 @@ var SATOSHIS_PER_BTC = 1e8;
 var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
 var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
 var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
+
+var BitcoinNetwork = exports.BitcoinNetwork = function () {
+  function BitcoinNetwork() {
+    _classCallCheck(this, BitcoinNetwork);
+  }
+
+  _createClass(BitcoinNetwork, [{
+    key: 'broadcastTransaction',
+    value: function broadcastTransaction(transaction) {
+      return Promise.reject(new Error('Not implemented, broadcastTransaction(' + transaction + ')'));
+    }
+  }, {
+    key: 'getBlockHeight',
+    value: function getBlockHeight() {
+      return Promise.reject(new Error('Not implemented, getBlockHeight()'));
+    }
+  }, {
+    key: 'getTransactionInfo',
+    value: function getTransactionInfo(txid) {
+      return Promise.reject(new Error('Not implemented, getTransactionInfo(' + txid + ')'));
+    }
+  }, {
+    key: 'getNetworkedUTXOs',
+    value: function getNetworkedUTXOs(address) {
+      return Promise.reject(new Error('Not implemented, getNetworkedUTXOs(' + address + ')'));
+    }
+  }]);
+
+  return BitcoinNetwork;
+}();
 
 var BlockstackNetwork = exports.BlockstackNetwork = function () {
   function BlockstackNetwork(apiUrl, broadcastServiceUrl, bitcoinAPI) {
@@ -2400,14 +2430,14 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
     key: 'broadcastNameRegistration',
     value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
       /*
-       * POST /v1/broadcast/registration
-       * Request body:
-       * JSON.stringify({
-       * preorderTransaction,
-       * registerTransaction,
-       * zoneFile
-       * })
-       */
+         * POST /v1/broadcast/registration
+         * Request body:
+         * JSON.stringify({
+         * preorderTransaction,
+         * registerTransaction,
+         * zoneFile
+         * })
+         */
 
       if (!preorderTransaction) {
         var error = new _errors.MissingParameterError('preorderTransaction');
@@ -2572,36 +2602,6 @@ var LocalRegtest = exports.LocalRegtest = function (_BlockstackNetwork) {
 
   return LocalRegtest;
 }(BlockstackNetwork);
-
-var BitcoinNetwork = exports.BitcoinNetwork = function () {
-  function BitcoinNetwork() {
-    _classCallCheck(this, BitcoinNetwork);
-  }
-
-  _createClass(BitcoinNetwork, [{
-    key: 'broadcastTransaction',
-    value: function broadcastTransaction(transaction) {
-      return Promise.reject(new Error('Not implemented, broadcastTransaction(' + transaction + ')'));
-    }
-  }, {
-    key: 'getBlockHeight',
-    value: function getBlockHeight() {
-      return Promise.reject(new Error('Not implemented, getBlockHeight()'));
-    }
-  }, {
-    key: 'getTransactionInfo',
-    value: function getTransactionInfo(txid) {
-      return Promise.reject(new Error('Not implemented, getTransactionInfo(' + txid + ')'));
-    }
-  }, {
-    key: 'getNetworkedUTXOs',
-    value: function getNetworkedUTXOs(address) {
-      return Promise.reject(new Error('Not implemented, getNetworkedUTXOs(' + address + ')'));
-    }
-  }]);
-
-  return BitcoinNetwork;
-}();
 
 var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
   _inherits(BitcoindAPI, _BitcoinNetwork);
@@ -6619,7 +6619,7 @@ var Facebook = function (_Service) {
     key: 'normalizeFacebookUrl',
     value: function normalizeFacebookUrl(proof) {
       var proofUrl = proof.proof_url.toLowerCase();
-      var urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9\-]+\.)+facebook\.com/;
+      var urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/;
 
       proofUrl = _get(Facebook.__proto__ || Object.getPrototypeOf(Facebook), 'prefixScheme', this).call(this, proofUrl);
 

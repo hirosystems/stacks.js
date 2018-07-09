@@ -9,7 +9,7 @@ class Facebook extends Service {
 
   static normalizeFacebookUrl(proof: Object) {
     let proofUrl = proof.proof_url.toLowerCase()
-    const urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9\-]+\.)+facebook\.com/
+    const urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/
 
     proofUrl = super.prefixScheme(proofUrl)
 

@@ -134,7 +134,7 @@ export function runIntegrationTests() {
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), destAddress,
-                `aaron.id should be owned by ${destAddress}`)
+          `aaron.id should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
       })
       .then(() => transactions.makeUpdate('aaron.id', dest, payer, zfTest2))
@@ -159,10 +159,10 @@ export function runIntegrationTests() {
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), transferDestination,
-                `aaron.id should be owned by ${transferDestination}`)
+          `aaron.id should be owned by ${transferDestination}`)
       })
       .then(() => transactions.makeRenewal('aaron.id', renewalDestination,
-                                           secondOwner, payer, renewalZF))
+        secondOwner, payer, renewalZF))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('RENEWAL broadcasted, waiting 30 seconds.')
@@ -174,7 +174,7 @@ export function runIntegrationTests() {
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
-                `aaron.id should be owned by ${renewalDestination}`)
+          `aaron.id should be owned by ${renewalDestination}`)
       })
       .then(() => transactions.makeBitcoinSpend(btcDestAddress, payer, 500000))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
@@ -270,7 +270,7 @@ export function runIntegrationTests() {
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
-                `import.hello should be owned by ${renewalDestination}`)
+          `import.hello should be owned by ${renewalDestination}`)
         t.equal(nameInfo.zonefile, importZF, 'zonefile should be properly set for import.hello')
       })
       .then(() => {
@@ -302,7 +302,7 @@ export function runIntegrationTests() {
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), destAddress,
-                `aaron.hello should be owned by ${destAddress}`)
+          `aaron.hello should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
       })
       .then(() => transactions.makeUpdate('aaron.hello', dest, payer, zfTest2))
@@ -327,10 +327,10 @@ export function runIntegrationTests() {
       .then(resp => resp.json())
       .then(nameInfo => {
         t.equal(myNet.coerceAddress(nameInfo.address), transferDestination,
-                `aaron.hello should be owned by ${transferDestination}`)
+          `aaron.hello should be owned by ${transferDestination}`)
       })
       .then(() => transactions.makeRenewal('aaron.hello', renewalDestination,
-                                           secondOwner, payer, renewalZF))
+        secondOwner, payer, renewalZF))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('RENEWAL broadcasted, waiting 30 seconds.')
@@ -342,7 +342,7 @@ export function runIntegrationTests() {
       .then(nameInfo => {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
-                `aaron.hello should be owned by ${renewalDestination}`)
+          `aaron.hello should be owned by ${renewalDestination}`)
       })
       .then(() => transactions.makeRevoke('aaron.hello', renewalKey, payer))
       .then(rawtx => myNet.broadcastTransaction(rawtx))

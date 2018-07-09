@@ -11,8 +11,8 @@ import { profileServices } from './services'
  * @returns {Promise} that resolves to an array of validated proof objects
  */
 export function validateProofs(profile: Object,
-                               ownerAddress: string,
-                               name: ?string = null) {
+  ownerAddress: string,
+  name: ?string = null) {
   if (!profile) {
     throw new Error('Profile must not be null')
   }
@@ -49,7 +49,7 @@ export function validateProofs(profile: Object,
     }
 
     proofsToValidate.push(profileServices[account.service]
-                          .validateProof(proof, ownerAddress, name))
+      .validateProof(proof, ownerAddress, name))
   })
 
   return Promise.all(proofsToValidate)

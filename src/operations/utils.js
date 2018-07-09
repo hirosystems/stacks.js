@@ -55,8 +55,8 @@ function transactionBytes(inputs: Array<txPoint | null>, outputs: Array<txPoint 
 //
 
 export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
-                                additionalInputs: number,
-                                additionalOutputs: number) {
+  additionalInputs: number,
+  additionalOutputs: number) {
   let innerTx = txIn
   if (txIn instanceof bitcoinjs.TransactionBuilder) {
     innerTx = txIn.tx
@@ -98,8 +98,8 @@ export function decodeB40(input: string) {
   const inputDigits = input.split('').reverse()
   const digitValues = inputDigits.map(
     ((character: string, exponent: number) =>
-     bigi.valueOf(characters.indexOf(character))
-     .multiply(base.pow(bigi.valueOf(exponent)))))
+      bigi.valueOf(characters.indexOf(character))
+        .multiply(base.pow(bigi.valueOf(exponent)))))
   const sum = digitValues.reduce(
     (agg: bigi.BigInteger, cur: bigi.BigInteger) =>
       agg.add(cur),
@@ -125,9 +125,9 @@ export function decodeB40(input: string) {
  * @private
  */
 export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
-                               utxos: Array<{value: number, tx_hash: string, tx_output_n: number}>,
-                               amountToFund: number, feeRate: number,
-                               fundNewFees: ?boolean = true) {
+  utxos: Array<{value: number, tx_hash: string, tx_output_n: number}>,
+  amountToFund: number, feeRate: number,
+  fundNewFees: ?boolean = true) {
   if (utxos.length === 0) {
     throw new NotEnoughFundsError(amountToFund)
   }
@@ -167,6 +167,6 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
     }
 
     return addUTXOsToFund(txBuilderIn, utxos.slice(1),
-                          remainToFund, feeRate, fundNewFees)
+      remainToFund, feeRate, fundNewFees)
   }
 }

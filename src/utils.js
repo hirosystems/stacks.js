@@ -75,7 +75,7 @@ export function isLaterVersion(v1: string, v2: string) {
 
 export function hexStringToECPair(skHex: string) {
   const ecPairOptions = { network: config.network.layer1,
-                          compressed: true }
+    compressed: true }
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' +

@@ -59,7 +59,7 @@ function testTokening(filename, profile) {
     // console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile),
-    JSON.stringify(profile), 'Profile should equal the reference')
+      JSON.stringify(profile), 'Profile should equal the reference')
   })
 
   test('makeProfileZoneFile', (t) => {
@@ -105,7 +105,7 @@ function testZoneFile() {
     t.ok(zoneFile, 'Zone file should have been created for hosted profile')
     t.ok(zoneFile.includes(`"${fileUrl}"`), 'Zone file should include quoted entire profile url')
     t.notOk(zoneFile.includes(`"${incorrectFileUrl}"`),
-    'Zone file should not include quoted profile url without protocol')
+      'Zone file should not include quoted profile url without protocol')
   })
 }
 function testSchemas() {
@@ -193,8 +193,8 @@ function testSchemas() {
     t.ok(validationResults, 'Profile should be in a valid format')
 
     t.deepEqual(profileObject.toJSON(),
-                sampleProfiles.navalLegacyConvert,
-                'Parsed Legacy profile should match expectations.')
+      sampleProfiles.navalLegacyConvert,
+      'Parsed Legacy profile should match expectations.')
   })
 
   test('resolveZoneFileToPerson', (t) => {

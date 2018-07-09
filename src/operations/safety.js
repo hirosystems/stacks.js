@@ -106,8 +106,8 @@ function namespaceIsRevealed(namespaceID: string) {
 function isInGracePeriod(fullyQualifiedName: string) {
   const network = config.network
   return Promise.all([network.getNameInfo(fullyQualifiedName),
-                      network.getBlockHeight(),
-                      network.getGracePeriod(fullyQualifiedName)])
+    network.getBlockHeight(),
+    network.getGracePeriod(fullyQualifiedName)])
     .then(([nameInfo, blockHeight, gracePeriod]) => {
       const expiresAt = nameInfo.expire_block
       return (blockHeight >= expiresAt) && (blockHeight < (gracePeriod + expiresAt))

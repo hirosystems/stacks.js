@@ -239,17 +239,17 @@ export function verifyAuthRequest(token: string) {
  */
 export function verifyAuthRequestAndLoadManifest(token: string) {
   return new Promise((resolve, reject) => verifyAuthRequest(token)
-  .then(valid => {
-    if (valid) {
-      return fetchAppManifest(token)
-      .then(appManifest => {
-        resolve(appManifest)
-      })
-    } else {
-      reject()
-      return Promise.reject()
-    }
-  }))
+    .then(valid => {
+      if (valid) {
+        return fetchAppManifest(token)
+          .then(appManifest => {
+            resolve(appManifest)
+          })
+      } else {
+        reject()
+        return Promise.reject()
+      }
+    }))
 }
 
 /**

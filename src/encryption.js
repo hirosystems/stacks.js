@@ -41,7 +41,7 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
   // generate mac and encryption key from shared secret
   const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
   return { encryptionKey: hashedSecret.slice(0, 32),
-           hmacKey: hashedSecret.slice(32) }
+    hmacKey: hashedSecret.slice(32) }
 }
 
 export function getHexFromBN(bnInput: Object) {
@@ -89,15 +89,15 @@ export function encryptECIES(publicKey: string, content: string | Buffer) : Ciph
     initializationVector, sharedKeys.encryptionKey, plainText)
 
   const macData = Buffer.concat([initializationVector,
-                                 new Buffer(ephemeralPK.encodeCompressed()),
-                                 cipherText])
+    new Buffer(ephemeralPK.encodeCompressed()),
+    cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
   return { iv: initializationVector.toString('hex'),
-           ephemeralPK: ephemeralPK.encodeCompressed('hex'),
-           cipherText: cipherText.toString('hex'),
-           mac: mac.toString('hex'),
-           wasString: isString }
+    ephemeralPK: ephemeralPK.encodeCompressed('hex'),
+    cipherText: cipherText.toString('hex'),
+    mac: mac.toString('hex'),
+    wasString: isString }
 }
 
 /**
@@ -123,8 +123,8 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 new Buffer(ephemeralPK.encodeCompressed()),
-                                 cipherTextBuffer])
+    new Buffer(ephemeralPK.encodeCompressed()),
+    cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = new Buffer(cipherObject.mac, 'hex')
   if (! equalConstTime(expectedMac, actualMac)) {
@@ -171,8 +171,8 @@ export function signECDSA(privateKey: string, content: string | Buffer)
  * @return {Boolean} returns true when signature matches publickey + content, false if not
  */
 export function verifyECDSA(content: string | Buffer,
-                            publicKey: string,
-                            signature: string) {
+  publicKey: string,
+  signature: string) {
   const contentBuffer = Buffer.from(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
   const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()

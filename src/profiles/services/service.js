@@ -4,8 +4,8 @@ import { containsValidProofStatement, containsValidAddressProofStatement } from 
 
 export class Service {
   static validateProof(proof: Object,
-                       ownerAddress: string,
-                       name: ?string = null) {
+    ownerAddress: string,
+    name: ?string = null) {
     let proofUrl
     return Promise.resolve()
       .then(() => {
@@ -77,5 +77,4 @@ export class Service {
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
-
 }
