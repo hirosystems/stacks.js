@@ -19,7 +19,7 @@ import { extractProfile } from '../profiles'
 
 import { Logger } from '../logger'
 
-import { network } from '../network'
+import { config } from '../config'
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',
@@ -161,7 +161,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
       nameLookupURL = tokenPayload.nameLookupUrl
     } else {
       // default 
-      nameLookupURL = `${network.blockstackAPIUrl}/v1/names/`
+      nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
     }
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
