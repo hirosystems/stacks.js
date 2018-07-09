@@ -19,6 +19,8 @@ import { extractProfile } from '../profiles'
 
 import { Logger } from '../logger'
 
+import { network } from '../network'
+
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
@@ -149,9 +151,19 @@ export function isSignInPending() {
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/',
+export function handlePendingSignIn(nameLookupURL: string = '',
                                     authResponseToken: string = getAuthResponseToken(),
                                     transitKey: string = getTransitKey()) {
+  if (!nameLookupURL) {
+    // given in the authResponseToken?
+    const tokenPayload = decodeToken(authResponseToken).payload
+    if (!!tokenPayload.nameLookupUrl) {
+      nameLookupURL = tokenPayload.nameLookupUrl
+    } else {
+      // default 
+      nameLookupURL = `${network.blockstackAPIUrl}/v1/names/`
+    }
+  }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
   .then(isValid => {
     if (!isValid) {
