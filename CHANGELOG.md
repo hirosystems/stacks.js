@@ -35,6 +35,8 @@ encrypt content for other users.
   responses should now behave correctly.
 - `handlePendingSignIn` now takes a second parameter which is the
    signed authentication response token. Thanks to @muneebm for this!
+-  Fixed an issue in `ecPairToHexString` that may result in generation of
+   an incorrectly hex string encoding of the private key.
 
 ## [17.2.0]
 
