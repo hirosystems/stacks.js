@@ -23,7 +23,8 @@ import {
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
   handlePendingSignIn,
-  signUserOut
+  signUserOut,
+  config
 } from '../../../lib'
 
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
@@ -345,10 +346,11 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn with authResponseToken, transit key and custom nameLookupUrl', (t) => {
-    t.plan(1)
+    t.plan(2)
 
-    const customNameLookupUrl = 'https://test.name.lookups/v1/names/'
-    const url = `${customNameLookupUrl}ryan.id`
+    const customBlockstackAPIUrl = 'https://test.name.lookups'
+    const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
+    const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
 
     FetchMock.get(url, sampleNameRecords.ryan)
 
@@ -359,11 +361,15 @@ export function runAuthTests() {
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
-                                          transitPublicKey, undefined, customNameLookupUrl)
+                                          transitPublicKey, undefined, customBlockstackAPIUrl)
 
     handlePendingSignIn(null, authResponse, transitPrivateKey)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
+        t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl, 
+          'Should override global Blockstack API URL')
+
+        config.network.blockstackAPIUrl = oldBlockstackAPIUrl
       })
       .catch((err) => {
         console.log(err.stack)
