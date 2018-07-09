@@ -35,6 +35,7 @@ encrypt content for other users.
   responses should now behave correctly.
 - `handlePendingSignIn` now takes a second parameter which is the
    signed authentication response token. Thanks to @muneebm for this!
+- Proofs now support subdomains.
 - Updated a number of dependencies to fix know vulnerablities.
 - Switched from isomorphic-fetch to the better maintained cross-fetch
   which will improve functionality of the library in node environments.
