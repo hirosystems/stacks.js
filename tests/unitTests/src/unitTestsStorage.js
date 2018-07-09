@@ -773,4 +773,44 @@ export function runStorageTests() {
         t.equals(url, fileUrl)
       })
   })
+
+  test('listFiles', (t) => {
+    t.plan(3)
+
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    let callCount = 0
+    FetchMock.post(`${gaiaHubConfig.server}/list-files/${gaiaHubConfig.address}`, () => {
+      callCount += 1
+      if (callCount === 1) {
+        return { entries: [path], page: callCount }
+      } else if (callCount === 2) {
+        return { entries: [], page: callCount }
+      } else {
+        throw new Error('Called too many times')
+      }
+    })
+
+    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
+    const { listFiles } = proxyquire('../../../lib/storage', {
+      './hub': { getOrSetLocalGaiaHubConnection }
+    })
+
+    const files = []
+    listFiles((name) => {
+      files.push(name)
+      return true
+    })
+    .then((count) => {
+      t.equal(files.length, 1, 'Got one file back')
+      t.equal(files[0], 'file.json', 'Got the right file back')
+      t.equal(count, 1, 'Count matches number of files')
+    })
+  })
 }
