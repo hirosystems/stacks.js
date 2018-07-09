@@ -157,12 +157,13 @@ export function handlePendingSignIn(nameLookupURL: string = '',
   if (!nameLookupURL) {
     // given in the authResponseToken?
     const tokenPayload = decodeToken(authResponseToken).payload
-    if (!!tokenPayload.nameLookupUrl) {
-      nameLookupURL = tokenPayload.nameLookupUrl
-    } else {
-      // default 
-      nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
-    }
+    if (!!tokenPayload.blockstackAPIUrl) {
+      // override globally
+      config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
+    } 
+
+    // default 
+    nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
   .then(isValid => {
