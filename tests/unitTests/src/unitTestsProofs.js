@@ -188,7 +188,7 @@ export function runInBodyIdentityVerificationTests() {
 
 export function runProofUtilsUnitTests() {
   test('containsValidProofStatement', (t) => {
-    t.plan(8)
+    t.plan(9)
 
     const naval = sampleVerifications.naval
 
@@ -209,6 +209,12 @@ export function runProofUtilsUnitTests() {
       false, 'Github gist post body should not contain valid proof statement for larry.id')
     t.equal(containsValidProofStatement(larry.facebook.body, 'larry.id'),
       true, 'Facebook post body should contain valid proof statement for larry.id')
+
+    const subdomainId = 'subdomainiac.id.blockstack'
+    t.equal(containsValidProofStatement(
+      `verifying that ${subdomainId} is my blockstack id`,
+      subdomainId
+    ), true, 'Subdomain IDs work as proofs')
 
     t.throws(() => {
       containsValidProofStatement(larry.facebook.body, 'larry')
