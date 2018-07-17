@@ -297,12 +297,12 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
 
 /**
  * Encrypt a raw mnemonic phrase with a password
- * @param {string} data - Hex-encoded string of theEncrypted mnemonic phrase
+ * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
  * @param {string} password - Password for data
  * @return {Promise<Buffer>} the raw mnemonic phrase
  */
-export function decryptMnemonic(data: string, password: string) {
-  const dataBuffer = Buffer.from(data, 'hex')
+export function decryptMnemonic(data: string | Buffer, password: string) {
+  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
   return decryptMnemonicBuffer(dataBuffer, password).catch((err) => {
     // If it was a password error, don't even bother with legacy
     if (err instanceof PasswordError) {
