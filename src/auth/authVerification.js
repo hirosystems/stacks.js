@@ -245,6 +245,9 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
       .then(appManifest => {
         resolve(appManifest)
       })
+      .catch(err => {
+        reject(err)
+      })
     } else {
       reject()
       return Promise.reject()
