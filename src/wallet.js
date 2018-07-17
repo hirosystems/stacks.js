@@ -1,7 +1,9 @@
 /* @flow */
 import { HDNode } from 'bitcoinjs-lib'
 import { ecPairToHexString } from './utils'
-import crypto from 'crypto'
+import { encryptMnemonic, decryptMnemonic } from './encryption'
+import crypto, { randomBytes } from 'crypto'
+import bip39 from 'bip39'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888
@@ -55,7 +57,7 @@ export class BlockstackWallet {
   }
 
   /**
-   * Initialize a blockstack wallet
+   * Initialize a blockstack wallet from a seed buffer
    * @param {Buffer} seed - the input seed for initializing the root node
    *  of the hierarchical wallet
    * @return {BlockstackWallet} the constructed wallet
@@ -65,13 +67,45 @@ export class BlockstackWallet {
   }
 
   /**
-   * Initialize a blockstack wallet
+   * Initialize a blockstack wallet from a base58 string
    * @param {string} keychain - the Base58 string used to initialize
    *  the root node of the hierarchical wallet
    * @return {BlockstackWallet} the constructed wallet
    */
   static fromBase58(keychain: string): BlockstackWallet {
     return new BlockstackWallet(HDNode.fromBase58(keychain))
+  }
+
+  /**
+   * Initialize a blockstack wallet from an encrypted phrase & password. Throws
+   * if the password is incorrect. Supports all formats of Blockstack phrases.
+   * @param {string} data - The encrypted phrase as a hex-encoded string
+   * @param {string} password - The plain password
+   * @return {Promise<BlockstackWallet>} the constructed wallet
+   */
+  static async fromEncryptedMnemonic(data: string, password: string) {
+    const mnemonic = await decryptMnemonic(data, password)
+    const seed = bip39.mnemonicToSeed(mnemonic)
+    return new BlockstackWallet(HDNode.fromSeedBuffer(seed))
+  }
+
+  /**
+   * Generate a BIP-39 12 word mnemonic
+   * @return {Promise<string>} space-separated 12 word phrase
+   */
+  static generateMnemonic() {
+    return bip39.generateMnemonic(128, randomBytes)
+  }
+
+  /**
+   * Encrypt a mnemonic phrase with a password
+   * @param {string} mnemonic - Raw mnemonic phrase
+   * @param {string} password - Password to encrypt mnemonic with
+   * @return {Promise<string>} Hex-encoded encrypted mnemonic
+   */
+  static async encryptMnemonic(mnemonic: string, password: string) {
+    const encryptedBuffer = await encryptMnemonic(mnemonic, password)
+    return encryptedBuffer.toString('hex')
   }
 
   getIdentityPrivateKeychain(): HDNode {
@@ -90,7 +124,9 @@ export class BlockstackWallet {
   getBitcoinNode(addressIndex: number, chainType: string = EXTERNAL_ADDRESS): HDNode {
     return BlockstackWallet.getNodeFromBitcoinKeychain(
       this.getBitcoinPrivateKeychain().toBase58(),
-      addressIndex, chainType)
+      addressIndex,
+      chainType
+    )
   }
 
   getIdentityAddressNode(identityIndex: number): HDNode {
@@ -128,7 +164,7 @@ export class BlockstackWallet {
    * characters long to denote an uncompressed bitcoin address, or 66
    * characters long for a compressed bitcoin address.
    */
-  getBitcoinPrivateKey(addressIndex: number): string {
+  getBitcoinPrivateKey(addressIndex: number): HDNode {
     return getNodePrivateKey(this.getBitcoinNode(addressIndex))
   }
 
@@ -136,20 +172,23 @@ export class BlockstackWallet {
    * Get the root node for the bitcoin public keychain
    * @return {String} base58-encoding of the public node
    */
-  getBitcoinPublicKeychain(): string {
-    return this.getBitcoinPrivateKeychain().neutered().toBase58()
+  getBitcoinPublicKeychain(): HDNode {
+    return this.getBitcoinPrivateKeychain().neutered()
   }
 
   /**
    * Get the root node for the identity public keychain
    * @return {String} base58-encoding of the public node
    */
-  getIdentityPublicKeychain(): string {
-    return this.getIdentityPrivateKeychain().neutered().toBase58()
+  getIdentityPublicKeychain(): HDNode {
+    return this.getIdentityPrivateKeychain().neutered()
   }
 
-  static getNodeFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
-                                    chainType: string = EXTERNAL_ADDRESS): HDNode {
+  static getNodeFromBitcoinKeychain(
+    keychainBase58: string,
+    addressIndex: number,
+    chainType: string = EXTERNAL_ADDRESS
+  ): HDNode {
     let chain
     if (chainType === EXTERNAL_ADDRESS) {
       chain = 0

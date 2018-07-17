@@ -134,7 +134,7 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
     scheme: parsedUri1.protocol === parsedUri2.protocol,
     hostname: parsedUri1.hostname === parsedUri2.hostname,
     port: port1 === port2,
-    absolute: (uri1.includes('http://') || uri1.includes('https://')) 
+    absolute: (uri1.includes('http://') || uri1.includes('https://'))
     && (uri2.includes('http://') || uri2.includes('https://'))
   }
 

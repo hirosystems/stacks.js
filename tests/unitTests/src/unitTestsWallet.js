@@ -53,8 +53,8 @@ function testsBlockstackWallet() {
     .forEach((wallet) => {
       test('wallet matches browser 0.26.2 implementation', (t) => {
         t.plan(6)
-        t.equals(wallet.getIdentityPublicKeychain(), identityXPUB, 'id xpub is correct')
-        t.equals(wallet.getBitcoinPublicKeychain(), bitcoinXPUB, 'btc xpub is correct')
+        t.equals(wallet.getIdentityPublicKeychain().toBase58(), identityXPUB, 'id xpub is correct')
+        t.equals(wallet.getBitcoinPublicKeychain().toBase58(), bitcoinXPUB, 'btc xpub is correct')
         t.equals(wallet.getBitcoinAddress(0), bitcoinAddress, 'btc address correct')
         t.deepEquals(
           [0, 1, 2, 3].map(index => wallet.getIdentityKeyPair(index, true)),
