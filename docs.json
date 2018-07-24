@@ -109,6 +109,12 @@
       }
     },
     "kind": "note",
+    "path": [
+      {
+        "name": "Authentication",
+        "kind": "note"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -116,12 +122,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "Authentication",
-        "kind": "note"
-      }
-    ],
     "namespace": "Authentication"
   },
   {
@@ -709,6 +709,12 @@
     "todos": [],
     "name": "redirectToSignIn",
     "kind": "function",
+    "path": [
+      {
+        "name": "redirectToSignIn",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -716,12 +722,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "redirectToSignIn",
-        "kind": "function"
-      }
-    ],
     "namespace": "redirectToSignIn"
   },
   {
@@ -915,6 +915,12 @@
     "todos": [],
     "name": "isSignInPending",
     "kind": "function",
+    "path": [
+      {
+        "name": "isSignInPending",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -922,12 +928,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "isSignInPending",
-        "kind": "function"
-      }
-    ],
     "namespace": "isSignInPending"
   },
   {
@@ -1354,6 +1354,12 @@
     "todos": [],
     "name": "handlePendingSignIn",
     "kind": "function",
+    "path": [
+      {
+        "name": "handlePendingSignIn",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -1361,12 +1367,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "handlePendingSignIn",
-        "kind": "function"
-      }
-    ],
     "namespace": "handlePendingSignIn"
   },
   {
@@ -1560,6 +1560,12 @@
     "todos": [],
     "name": "loadUserData",
     "kind": "function",
+    "path": [
+      {
+        "name": "loadUserData",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -1567,12 +1573,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "loadUserData",
-        "kind": "function"
-      }
-    ],
     "namespace": "loadUserData"
   },
   {
@@ -1783,6 +1783,12 @@
     "todos": [],
     "name": "isUserSignedIn",
     "kind": "function",
+    "path": [
+      {
+        "name": "isUserSignedIn",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -1790,12 +1796,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "isUserSignedIn",
-        "kind": "function"
-      }
-    ],
     "namespace": "isUserSignedIn"
   },
   {
@@ -1996,6 +1996,12 @@
     "todos": [],
     "name": "signUserOut",
     "kind": "function",
+    "path": [
+      {
+        "name": "signUserOut",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -2003,12 +2009,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "signUserOut",
-        "kind": "function"
-      }
-    ],
     "namespace": "signUserOut"
   },
   {
@@ -2767,6 +2767,12 @@
     "todos": [],
     "name": "makeAuthRequest",
     "kind": "function",
+    "path": [
+      {
+        "name": "makeAuthRequest",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -2774,12 +2780,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "makeAuthRequest",
-        "kind": "function"
-      }
-    ],
     "namespace": "makeAuthRequest"
   },
   {
@@ -3182,6 +3182,12 @@
     "todos": [],
     "name": "redirectToSignInWithAuthRequest",
     "kind": "function",
+    "path": [
+      {
+        "name": "redirectToSignInWithAuthRequest",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -3189,12 +3195,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "redirectToSignInWithAuthRequest",
-        "kind": "function"
-      }
-    ],
     "namespace": "redirectToSignInWithAuthRequest"
   },
   {
@@ -3371,6 +3371,12 @@
     "todos": [],
     "name": "getAuthResponseToken",
     "kind": "function",
+    "path": [
+      {
+        "name": "getAuthResponseToken",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -3378,12 +3384,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "getAuthResponseToken",
-        "kind": "function"
-      }
-    ],
     "namespace": "getAuthResponseToken"
   },
   {
@@ -3496,6 +3496,12 @@
       }
     },
     "kind": "note",
+    "path": [
+      {
+        "name": "Profiles",
+        "kind": "note"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -3503,12 +3509,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "Profiles",
-        "kind": "note"
-      }
-    ],
     "namespace": "Profiles"
   },
   {
@@ -3939,6 +3939,12 @@
     "todos": [],
     "name": "extractProfile",
     "kind": "function",
+    "path": [
+      {
+        "name": "extractProfile",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -3946,12 +3952,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "extractProfile",
-        "kind": "function"
-      }
-    ],
     "namespace": "extractProfile"
   },
   {
@@ -4234,6 +4234,12 @@
     "todos": [],
     "name": "wrapProfileToken",
     "kind": "function",
+    "path": [
+      {
+        "name": "wrapProfileToken",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -4241,12 +4247,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "wrapProfileToken",
-        "kind": "function"
-      }
-    ],
     "namespace": "wrapProfileToken"
   },
   {
@@ -4909,6 +4909,12 @@
     "todos": [],
     "name": "signProfileToken",
     "kind": "function",
+    "path": [
+      {
+        "name": "signProfileToken",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -4916,12 +4922,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "signProfileToken",
-        "kind": "function"
-      }
-    ],
     "namespace": "signProfileToken"
   },
   {
@@ -5296,6 +5296,12 @@
     "todos": [],
     "name": "verifyProfileToken",
     "kind": "function",
+    "path": [
+      {
+        "name": "verifyProfileToken",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -5303,12 +5309,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "verifyProfileToken",
-        "kind": "function"
-      }
-    ],
     "namespace": "verifyProfileToken"
   },
   {
@@ -5691,6 +5691,12 @@
     "todos": [],
     "name": "validateProofs",
     "kind": "function",
+    "path": [
+      {
+        "name": "validateProofs",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -5698,12 +5704,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "validateProofs",
-        "kind": "function"
-      }
-    ],
     "namespace": "validateProofs"
   },
   {
@@ -6017,6 +6017,12 @@
     "todos": [],
     "name": "lookupProfile",
     "kind": "function",
+    "path": [
+      {
+        "name": "lookupProfile",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -6024,12 +6030,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "lookupProfile",
-        "kind": "function"
-      }
-    ],
     "namespace": "lookupProfile"
   },
   {
@@ -6263,6 +6263,12 @@
       }
     },
     "kind": "note",
+    "path": [
+      {
+        "name": "Storage",
+        "kind": "note"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -6270,12 +6276,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "Storage",
-        "kind": "note"
-      }
-    ],
     "namespace": "Storage"
   },
   {
@@ -7019,6 +7019,12 @@
     "todos": [],
     "name": "getFile",
     "kind": "function",
+    "path": [
+      {
+        "name": "getFile",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -7026,12 +7032,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "getFile",
-        "kind": "function"
-      }
-    ],
     "namespace": "getFile"
   },
   {
@@ -7612,6 +7612,12 @@
     "todos": [],
     "name": "putFile",
     "kind": "function",
+    "path": [
+      {
+        "name": "putFile",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -7619,12 +7625,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "putFile",
-        "kind": "function"
-      }
-    ],
     "namespace": "putFile"
   },
   {
@@ -7931,6 +7931,12 @@
     "todos": [],
     "name": "getAppBucketUrl",
     "kind": "function",
+    "path": [
+      {
+        "name": "getAppBucketUrl",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -7938,12 +7944,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "getAppBucketUrl",
-        "kind": "function"
-      }
-    ],
     "namespace": "getAppBucketUrl"
   },
   {
@@ -8403,6 +8403,12 @@
     "todos": [],
     "name": "getUserAppFileUrl",
     "kind": "function",
+    "path": [
+      {
+        "name": "getUserAppFileUrl",
+        "kind": "function"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -8410,12 +8416,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "getUserAppFileUrl",
-        "kind": "function"
-      }
-    ],
     "namespace": "getUserAppFileUrl"
   },
   {
@@ -8473,6 +8473,12 @@
       }
     },
     "kind": "note",
+    "path": [
+      {
+        "name": "Blockchain",
+        "kind": "note"
+      }
+    ],
     "members": {
       "global": [],
       "inner": [],
@@ -8480,12 +8486,6 @@
       "events": [],
       "static": []
     },
-    "path": [
-      {
-        "name": "Blockchain",
-        "kind": "note"
-      }
-    ],
     "namespace": "Blockchain"
   },
   {

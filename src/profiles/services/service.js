@@ -1,5 +1,5 @@
 /* @flow */
-import 'isomorphic-fetch'
+import 'cross-fetch'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 
 export class Service {
@@ -26,11 +26,11 @@ export class Service {
           return proof
         }
         const proofText = this.getProofStatement(text)
-        proof.valid = containsValidProofStatement(proofText, name) ||
-          containsValidAddressProofStatement(proofText, ownerAddress)
+        proof.valid = containsValidProofStatement(proofText, name)
+          || containsValidAddressProofStatement(proofText, ownerAddress)
         return proof
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
         proof.valid = false
         return proof
@@ -77,5 +77,4 @@ export class Service {
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
-
 }

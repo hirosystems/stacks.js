@@ -38,6 +38,10 @@ encrypt content for other users.
 - Fixed an issue in `ecPairToHexString` that may result in generation of
   an incorrectly hex string encoding of the private key.
 - Proofs now support subdomains.
+- Updated a number of dependencies to fix know vulnerablities.
+- Switched from isomorphic-fetch to the better maintained cross-fetch
+  which will improve functionality of the library in node environments.
+
 
 ## [17.2.0]
 
