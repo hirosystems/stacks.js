@@ -19,8 +19,12 @@ jobs:
     steps:
       - checkout
       - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@latest'
+          name: "Update npm"
+          command: |
+            npm install npm@latest
+            sudo rm -rf /usr/local/lib/node_modules/npm
+            sudo mv node_modules/npm /usr/local/lib/node_modules/npm
+            sudo chown -R 500:500 /usr/local/lib/node_modules/npm
 
       # Download and cache dependencies
       - restore_cache:
@@ -29,7 +33,6 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: sudo npm install -g strip-ansi
       - run: npm install
 
       - save_cache:
