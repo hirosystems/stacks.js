@@ -6,6 +6,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for `verify` and `sign` keywords in `getFile` and `putFile`
+  respectively. This enables support for ECDSA signatures on SHA256
+  hashes in the storage operations, and works for encrypted and
+  unencrypted files, in addition to multi-player reads (for
+  unencrypted files).
+- New `TransactionSigner` interface to allow for different signing agents
+  in the `transactions` functions (e.g., makePreorder).
+- `putFile` can now optionally take the public key for which you want
+to encrypt the file. Thanks to @bodymindarts for this!
+- `handlePendingSignIn` now accepts `transitKey` as an optional 3rd parameter. This
+enables support for more complex sign in flows.
+
+### Changed
+- The gaia hub connection functions now use a JWT for authentication,
+  the "v1" gaia authentication token. This is *not* a backwards
+  compatible change-- an app using this version of `blockstack.js`
+  will refuse to downgrade to the old protocol version unless the old
+  gaia authentication provides a very specific challenge text matching
+  the normal gaia hub challenge text.
+- `encryptContent` now takes a public key instead of a private key to
+encrypt content for other users.
+- The validateProofs() method now handles errors in proof-checking
+  more seamlessly, properly catching failed promises. Previous error
+  cases which resulted in uncaught exception warnings and null
+  responses should now behave correctly.
+- `handlePendingSignIn` now takes a second parameter which is the
+   signed authentication response token. Thanks to @muneebm for this!
+- Fixed an issue in `ecPairToHexString` that may result in generation of
+  an incorrectly hex string encoding of the private key.
+- Proofs now support subdomains.
+- Updated a number of dependencies to fix know vulnerablities.
+- Switched from isomorphic-fetch to the better maintained cross-fetch
+  which will improve functionality of the library in node environments.
+
+
 ## [17.2.0]
 
 ### Added

@@ -1,10 +1,9 @@
 import test from 'tape-promise/tape'
 
-import {
- encryptECIES, decryptECIES, getHexFromBN
-} from '../../../lib/encryption'
-
 import elliptic from 'elliptic'
+import {
+  encryptECIES, decryptECIES, getHexFromBN, signECDSA, verifyECDSA
+} from '../../../lib/encryption'
 
 
 export function runEncryptionTests() {
@@ -44,12 +43,47 @@ export function runEncryptionTests() {
     }
   })
 
+  test('sign-to-verify-works', (t) => {
+    t.plan(2)
+
+    const testString = 'all work and no play makes jack a dull boy'
+    let sigObj = signECDSA(privateKey, testString)
+    t.true(verifyECDSA(testString, sigObj.publicKey, sigObj.signature),
+           'String content should be verified')
+
+    const testBuffer = new Buffer(testString)
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.true(verifyECDSA(testBuffer, sigObj.publicKey, sigObj.signature),
+           'String buffer should be verified')
+  })
+
+  test('sign-to-verify-fails', (t) => {
+    t.plan(3)
+
+    const testString = 'all work and no play makes jack a dull boy'
+    const failString = 'I should fail'
+
+    let sigObj = signECDSA(privateKey, testString)
+    t.false(verifyECDSA(failString, sigObj.publicKey, sigObj.signature),
+            'String content should not be verified')
+
+    const testBuffer = Buffer.from(testString)
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.false(verifyECDSA(Buffer.from(failString), sigObj.publicKey, sigObj.signature),
+            'Buffer content should not be verified')
+
+    const badPK = '0288580b020800f421d746f738b221d384f098e911b81939d8c94df89e74cba776'
+    sigObj = signECDSA(privateKey, testBuffer)
+    t.false(verifyECDSA(Buffer.from(failString), badPK, sigObj.signature),
+            'Buffer content should not be verified')
+  })
+
   test('bn-padded-to-64-bytes', (t) => {
     t.plan(1)
     const ecurve = new elliptic.ec('secp256k1')
 
     const evilHexes = ['ba40f85b152bea8c3812da187bcfcfb0dc6e15f9e27cb073633b1c787b19472f',
-                     'e346010f923f768138152d0bad063999ff1da5361a81e6e6f9106241692a0076']
+                       'e346010f923f768138152d0bad063999ff1da5361a81e6e6f9106241692a0076']
     const results = evilHexes.map((hex) => {
       const ephemeralSK = ecurve.keyFromPrivate(hex)
       const ephemeralPK = ephemeralSK.getPublic()
@@ -57,6 +91,6 @@ export function runEncryptionTests() {
       return getHexFromBN(sharedSecret).length === 64
     })
 
-    t.true(results.every((x) => x), 'Evil hexes must all generate 64-len hex strings')
+    t.true(results.every(x => x), 'Evil hexes must all generate 64-len hex strings')
   })
 }

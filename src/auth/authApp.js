@@ -1,17 +1,19 @@
 /* @flow */
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { makeAuthRequest, verifyAuthResponse } from './index'
 import protocolCheck from 'custom-protocol-detection-blockstack'
+import { makeAuthRequest, verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID, makeECPrivateKey } from '../index'
 import { LoginFailedError } from '../errors'
 import { decryptPrivateKey } from './authMessages'
-import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
-         BLOCKSTACK_STORAGE_LABEL,
-         BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
-         DEFAULT_BLOCKSTACK_HOST,
-         DEFAULT_SCOPE } from './authConstants'
+import {
+  BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
+  BLOCKSTACK_STORAGE_LABEL,
+  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
+  DEFAULT_BLOCKSTACK_HOST,
+  DEFAULT_SCOPE
+} from './authConstants'
 
 import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage'
 
@@ -41,8 +43,9 @@ export function generateAndStoreTransitKey() {
  * @return {String} the hex encoded private key
  * @private
  */
-export function getTransitKey() {
-  return localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
+export function getTransitKey() : string {
+  const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
+  return ((transitKey: any): string)
 }
 
 /**
@@ -66,7 +69,8 @@ export function isUserSignedIn() {
  * @return {void}
  */
 export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRequest(),
-                                     blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST) {
+                                                blockstackIDHost: string =
+                                                DEFAULT_BLOCKSTACK_HOST) {
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
   function successCallback() {
@@ -114,7 +118,8 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
                                  manifestURI: string = `${window.location.origin}/manifest.json`,
                                  scopes: Array<string> = DEFAULT_SCOPE) {
   const authRequest = makeAuthRequest(
-    generateAndStoreTransitKey(), redirectURI, manifestURI, scopes)
+    generateAndStoreTransitKey(), redirectURI, manifestURI, scopes
+  )
   redirectToSignInWithAuthRequest(authRequest)
 }
 
@@ -122,9 +127,9 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
-export function getAuthResponseToken() {
+export function getAuthResponseToken(): string {
   const queryDict = queryString.parse(location.search)
-  return queryDict.authResponse ? queryDict.authResponse : null
+  return queryDict.authResponse ? queryDict.authResponse : ''
 }
 
 /**
@@ -142,15 +147,17 @@ export function isSignInPending() {
  *
  * @param {String} nameLookupURL - the endpoint against which to verify public
  * keys match claimed username
- *
+ * @param {String} authResponseToken - the signed authentication response token
+ * @param {String} transitKey - the transit private key that corresponds to the transit public key
+ * that was provided in the authentication request
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/') {
-  const authResponseToken = getAuthResponseToken()
-
+export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/',
+                                    authResponseToken: string = getAuthResponseToken(),
+                                    transitKey: string = getTransitKey()) {
   return verifyAuthResponse(authResponseToken, nameLookupURL)
-    .then(isValid => {
+    .then((isValid) => {
       if (!isValid) {
         throw new LoginFailedError('Invalid authentication response.')
       }
@@ -159,7 +166,6 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
       let appPrivateKey = tokenPayload.private_key
       let coreSessionToken = tokenPayload.core_token
       if (isLaterVersion(tokenPayload.version, '1.1.0')) {
-        const transitKey = getTransitKey()
         if (transitKey !== undefined && transitKey != null) {
           if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
             try {
@@ -169,8 +175,8 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
               try {
                 hexStringToECPair(tokenPayload.private_key)
               } catch (ecPairError) {
-                throw new LoginFailedError('Failed decrypting appPrivateKey. Usually means' +
-                                           ' that the transit key has changed during login.')
+                throw new LoginFailedError('Failed decrypting appPrivateKey. Usually means'
+                                         + ' that the transit key has changed during login.')
               }
             }
           }
@@ -182,13 +188,13 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
             }
           }
         } else {
-          throw new LoginFailedError('Authenticating with protocol > 1.1.0 requires transit' +
-                                     ' key, and none found.')
+          throw new LoginFailedError('Authenticating with protocol > 1.1.0 requires transit'
+                                   + ' key, and none found.')
         }
       }
       let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
-      if (isLaterVersion(tokenPayload.version, '1.2.0') &&
-          tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
+      if (isLaterVersion(tokenPayload.version, '1.2.0')
+        && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
         hubUrl = tokenPayload.hubUrl
       }
 
@@ -203,24 +209,26 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
         hubUrl
       }
       const profileURL = tokenPayload.profile_url
-      if ((userData.profile === null ||
-           userData.profile === undefined) &&
-          profileURL !== undefined && profileURL !== null) {
+      if ((userData.profile === null
+         || userData.profile === undefined)
+        && profileURL !== undefined && profileURL !== null) {
         return fetch(profileURL)
-          .then(response => {
+          .then((response) => {
             if (!response.ok) { // return blank profile if we fail to fetch
               userData.profile = Object.assign({}, DEFAULT_PROFILE)
               window.localStorage.setItem(
-                BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+                BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
+              )
               return userData
             } else {
               return response.text()
                 .then(responseText => JSON.parse(responseText))
                 .then(wrappedProfile => extractProfile(wrappedProfile[0].token))
-                .then(profile => {
+                .then((profile) => {
                   userData.profile = profile
                   window.localStorage.setItem(
-                    BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+                    BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
+                  )
                   return userData
                 })
             }
@@ -228,7 +236,8 @@ export function handlePendingSignIn(nameLookupURL: string = 'https://core.blocks
       } else {
         userData.profile = tokenPayload.profile
         window.localStorage.setItem(
-          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
+        )
         return userData
       }
     })

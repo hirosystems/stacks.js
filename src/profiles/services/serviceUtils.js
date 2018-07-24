@@ -6,7 +6,7 @@ export function containsValidProofStatement(searchText: string, name: ?string = 
 
   searchText = searchText.toLowerCase()
 
-  if (name.split('.').length !== 2) {
+  if (name.split('.').length < 2) {
     throw new Error('Please provide the fully qualified Blockstack name.')
   }
 
@@ -43,9 +43,9 @@ export function containsValidProofStatement(searchText: string, name: ?string = 
     }
   }
 
-  if (username != null &&
-      searchText.includes('verifymyonename') &&
-      searchText.includes(`+${username}`)) {
+  if (username != null
+      && searchText.includes('verifymyonename')
+      && searchText.includes(`+${username}`)) {
     return true
   }
 

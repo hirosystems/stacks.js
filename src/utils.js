@@ -1,8 +1,9 @@
 /* @flow */
-import { parse as uriParse } from 'uri-js'
+import url from 'url'
 import { ECPair } from 'bitcoinjs-lib'
-import { config } from './config'
 import BigInteger from 'bigi'
+import { config } from './config'
+
 
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
@@ -73,12 +74,14 @@ export function isLaterVersion(v1: string, v2: string) {
 
 
 export function hexStringToECPair(skHex: string) {
-  const ecPairOptions = { network: config.network.layer1,
-                          compressed: true }
+  const ecPairOptions = {
+    network: config.network.layer1,
+    compressed: true 
+  }
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
-      throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' +
-                      'indicates compressed key, but last byte must be == 1')
+      throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
+                      + 'indicates compressed key, but last byte must be == 1')
     }
     return new ECPair(BigInteger.fromHex(skHex.slice(0, 64)), undefined, ecPairOptions)
   } else if (skHex.length === 64) {
@@ -90,7 +93,7 @@ export function hexStringToECPair(skHex: string) {
 }
 
 export function ecPairToHexString(secretKey: ECPair) {
-  const ecPointHex = secretKey.d.toHex()
+  const ecPointHex = secretKey.d.toBuffer(32).toString('hex')
   if (secretKey.compressed) {
     return `${ecPointHex}01`
   } else {
@@ -123,17 +126,18 @@ export function makeUUID4() {
  * @private
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
-  const parsedUri1 = uriParse(uri1)
-  const parsedUri2 = uriParse(uri2)
+  const parsedUri1 = url.parse(uri1)
+  const parsedUri2 = url.parse(uri2)
 
-  const port1 = parsedUri1.port | 0 || (parsedUri1.scheme === 'https' ? 443 : 80)
-  const port2 = parsedUri2.port | 0 || (parsedUri2.scheme === 'https' ? 443 : 80)
+  const port1 = parseInt(parsedUri1.port, 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
+  const port2 = parseInt(parsedUri2.port, 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
 
   const match = {
-    scheme: parsedUri1.scheme === parsedUri2.scheme,
+    scheme: parsedUri1.protocol === parsedUri2.protocol,
     hostname: parsedUri1.hostname === parsedUri2.hostname,
     port: port1 === port2,
-    absolute: (parsedUri1.reference === 'absolute') && (parsedUri2.reference === 'absolute')
+    absolute: (uri1.includes('http://') || uri1.includes('https://')) 
+    && (uri2.includes('http://') || uri2.includes('https://'))
   }
 
   return match.scheme && match.hostname && match.port && match.absolute

@@ -14,13 +14,37 @@ const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
+export class BitcoinNetwork {
+  broadcastTransaction(transaction: string) : Promise<Object> {
+    return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
+  }
+
+  getBlockHeight() : Promise<Number> {
+    return Promise.reject(new Error('Not implemented, getBlockHeight()'))
+  }
+
+  getTransactionInfo(txid: string) : Promise<{block_height: Number}> {
+    return Promise.reject(new Error(`Not implemented, getTransactionInfo(${txid})`))
+  }
+
+  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
+    return Promise.reject(new Error(`Not implemented, getNetworkedUTXOs(${address})`))
+  }
+}
+
 export class BlockstackNetwork {
   blockstackAPIUrl: string
+
   broadcastServiceUrl: string
+
   layer1: Object
+
   DUST_MINIMUM: number
+
   includeUtxoMap: Object
+
   excludeUtxoSet: Array<UTXO>
+
   btc: BitcoinNetwork
 
   constructor(apiUrl: string, broadcastServiceUrl: string,
@@ -49,7 +73,7 @@ export class BlockstackNetwork {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then(resp => resp.json())
       .then(x => x.name_price.satoshis)
-      .then(satoshis => {
+      .then((satoshis) => {
         if (satoshis) {
           if (satoshis < this.DUST_MINIMUM) {
             return this.DUST_MINIMUM
@@ -66,7 +90,7 @@ export class BlockstackNetwork {
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then(resp => resp.json())
       .then(x => x.satoshis)
-      .then(satoshis => {
+      .then((satoshis) => {
         if (satoshis) {
           if (satoshis < this.DUST_MINIMUM) {
             return this.DUST_MINIMUM
@@ -80,7 +104,7 @@ export class BlockstackNetwork {
   }
 
   getGracePeriod() {
-    return new Promise((resolve) => resolve(5000))
+    return new Promise(resolve => resolve(5000))
   }
 
   getNamesOwned(address: string) {
@@ -95,29 +119,29 @@ export class BlockstackNetwork {
       fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
       this.getBlockHeight()
     ])
-    .then(([resp, blockHeight]) => {
-      if (resp.status === 404) {
-        throw new Error(`No such namespace '${namespace}'`)
-      } else {
-        return Promise.all([resp.json(), blockHeight])
-      }
-    })
-    .then(([namespaceInfo, blockHeight]) => {
-      let address = '1111111111111111111114oLvT2' // default burn address
-      if (namespaceInfo.version === 2) {
-        // pay-to-namespace-creator if this namespace is less than 1 year old
-        if (namespaceInfo.reveal_block + 52595 >= blockHeight) {
-          address = namespaceInfo.address
+      .then(([resp, blockHeight]) => {
+        if (resp.status === 404) {
+          throw new Error(`No such namespace '${namespace}'`)
+        } else {
+          return Promise.all([resp.json(), blockHeight])
         }
-      }
-      return address
-    })
-    .then(address => this.coerceAddress(address))
+      })
+      .then(([namespaceInfo, blockHeight]) => {
+        let address = '1111111111111111111114oLvT2' // default burn address
+        if (namespaceInfo.version === 2) {
+        // pay-to-namespace-creator if this namespace is less than 1 year old
+          if (namespaceInfo.reveal_block + 52595 >= blockHeight) {
+            address = namespaceInfo.address
+          }
+        }
+        return address
+      })
+      .then(address => this.coerceAddress(address))
   }
 
   getNameInfo(fullyQualifiedName: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/names/${fullyQualifiedName}`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Name not found')
         } else if (resp.status !== 200) {
@@ -126,7 +150,7 @@ export class BlockstackNetwork {
           return resp.json()
         }
       })
-      .then(nameInfo => {
+      .then((nameInfo) => {
         // the returned address _should_ be in the correct network ---
         //  blockstackd gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
@@ -140,7 +164,7 @@ export class BlockstackNetwork {
 
   getNamespaceInfo(namespaceID: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Namespace not found')
         } else if (resp.status !== 200) {
@@ -149,7 +173,7 @@ export class BlockstackNetwork {
           return resp.json()
         }
       })
-      .then(namespaceInfo => {
+      .then((namespaceInfo) => {
         // the returned address _should_ be in the correct network ---
         //  blockstackd gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
@@ -166,7 +190,7 @@ export class BlockstackNetwork {
 
   getZonefile(zonefileHash: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 200) {
           return resp.text()
             .then(body => body)
@@ -203,13 +227,13 @@ export class BlockstackNetwork {
 
     const url = `${this.broadcastServiceUrl}/v1/broadcast/${endpoint}`
     return fetch(url, options)
-    .then(response => {
-      if (response.ok) {
-        return response.json()
-      } else {
-        throw new RemoteServiceError(response)
-      }
-    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          throw new RemoteServiceError(response)
+        }
+      })
   }
 
   /**
@@ -231,8 +255,8 @@ export class BlockstackNetwork {
   *   parameter
   */
   broadcastTransaction(transaction: string,
-    transactionToWatch: ?string = null,
-    confirmations: number = 6) {
+                       transactionToWatch: ?string = null,
+                       confirmations: number = 6) {
     if (!transaction) {
       const error = new MissingParameterError('transaction')
       return Promise.reject(error)
@@ -283,7 +307,7 @@ export class BlockstackNetwork {
    *   parameter
    */
   broadcastZoneFile(zoneFile: string,
-    transactionToWatch: ?string = null) {
+                    transactionToWatch: ?string = null) {
     if (!zoneFile) {
       return Promise.reject(new MissingParameterError('zoneFile'))
     }
@@ -317,22 +341,23 @@ export class BlockstackNetwork {
       const requestBody = { zonefile: zoneFile }
 
       return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
-                   { method: 'POST',
+                   {
+                     method: 'POST',
                      body: JSON.stringify(requestBody),
                      headers: {
                        'Content-Type': 'application/json'
                      }
                    })
-      .then(resp => {
-        const json = resp.json()
-        return json
-        .then(respObj => {
-          if (respObj.hasOwnProperty('error')) {
-            throw new RemoteServiceError(resp)
-          }
-          return respObj.servers
+        .then((resp) => {
+          const json = resp.json()
+          return json
+            .then((respObj) => {
+              if (respObj.hasOwnProperty('error')) {
+                throw new RemoteServiceError(resp)
+              }
+              return respObj.servers
+            })
         })
-      })
     }
   }
 
@@ -364,9 +389,9 @@ export class BlockstackNetwork {
    *   parameter
    */
   broadcastNameRegistration(preorderTransaction: string,
-      registerTransaction: string,
-      zoneFile: string) {
-      /*
+                            registerTransaction: string,
+                            zoneFile: string) {
+    /*
        * POST /v1/broadcast/registration
        * Request body:
        * JSON.stringify({
@@ -414,7 +439,7 @@ export class BlockstackNetwork {
 
   getUTXOs(address: string) : Promise<Array<UTXO>> {
     return this.getNetworkedUTXOs(address)
-      .then(networkedUTXOs => {
+      .then((networkedUTXOs) => {
         let returnSet = networkedUTXOs.concat()
         if (this.includeUtxoMap.hasOwnProperty(address)) {
           returnSet = networkedUTXOs.concat(this.includeUtxoMap[address])
@@ -424,13 +449,14 @@ export class BlockstackNetwork {
         //    however, clients should clear the exclude set periodically
         const excludeSet = this.excludeUtxoSet
         returnSet = returnSet.filter(
-          utxo => {
+          (utxo) => {
             const inExcludeSet = excludeSet.reduce(
-              (inSet, utxoToCheck) =>
-                inSet || (utxoToCheck.tx_hash === utxo.tx_hash &&
-                          utxoToCheck.tx_output_n === utxo.tx_output_n), false)
+              (inSet, utxoToCheck) => inSet || (utxoToCheck.tx_hash === utxo.tx_hash
+                          && utxoToCheck.tx_output_n === utxo.tx_output_n), false
+            )
             return !inExcludeSet
-          })
+          }
+        )
 
         return returnSet
       })
@@ -452,8 +478,10 @@ export class BlockstackNetwork {
     tx.ins.forEach((utxoUsed) => {
       const reverseHash = Buffer.from(utxoUsed.hash)
       reverseHash.reverse()
-      excludeSet.push({ tx_hash: reverseHash.toString('hex'),
-                        tx_output_n: utxoUsed.index })
+      excludeSet.push({
+        tx_hash: reverseHash.toString('hex'),
+        tx_output_n: utxoUsed.index 
+      })
     })
 
     this.excludeUtxoSet = excludeSet
@@ -464,17 +492,20 @@ export class BlockstackNetwork {
         return
       }
       const address = bitcoinjs.address.fromOutputScript(
-        utxoCreated.script, this.layer1)
+        utxoCreated.script, this.layer1
+      )
 
       let includeSet = []
       if (this.includeUtxoMap.hasOwnProperty(address)) {
         includeSet = includeSet.concat(this.includeUtxoMap[address])
       }
 
-      includeSet.push({ tx_hash: txHash,
-                        confirmations: 0,
-                        value: utxoCreated.value,
-                        tx_output_n: txOutputN })
+      includeSet.push({
+        tx_hash: txHash,
+        confirmations: 0,
+        value: utxoCreated.value,
+        tx_output_n: txOutputN 
+      })
       this.includeUtxoMap[address] = includeSet
     })
   }
@@ -512,26 +543,11 @@ export class LocalRegtest extends BlockstackNetwork {
   getFeeRate() : Promise<number> {
     return Promise.resolve(Math.floor(0.00001000 * SATOSHIS_PER_BTC))
   }
-
-}
-
-export class BitcoinNetwork {
-  broadcastTransaction(transaction: string) : Promise<Object> {
-    return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
-  }
-  getBlockHeight() : Promise<Number> {
-    return Promise.reject(new Error('Not implemented, getBlockHeight()'))
-  }
-  getTransactionInfo(txid: string) : Promise<{block_height: Number}> {
-    return Promise.reject(new Error(`Not implemented, getTransactionInfo(${txid})`))
-  }
-  getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
-    return Promise.reject(new Error(`Not implemented, getNetworkedUTXOs(${address})`))
-  }
 }
 
 export class BitcoindAPI extends BitcoinNetwork {
   bitcoindUrl: string
+
   bitcoindCredentials: Object
 
   constructor(bitcoindUrl: string, bitcoindCredentials: {username: string, password: string}) {
@@ -541,88 +557,110 @@ export class BitcoindAPI extends BitcoinNetwork {
   }
 
   broadcastTransaction(transaction: string) {
-    const jsonRPC = { jsonrpc: '1.0',
-                      method: 'sendrawtransaction',
-                      params: [transaction] }
-    const authString =
-      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
-          .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
-    return fetch(this.bitcoindUrl, { method: 'POST',
-                                      body: JSON.stringify(jsonRPC),
-                                      headers })
+    const jsonRPC = {
+      jsonrpc: '1.0',
+      method: 'sendrawtransaction',
+      params: [transaction] 
+    }
+    const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+      .toString('base64')
+    const headers = { Authorization: `Basic ${authString}` }
+    return fetch(this.bitcoindUrl, {
+      method: 'POST',
+      body: JSON.stringify(jsonRPC),
+      headers 
+    })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
   }
 
   getBlockHeight() {
-    const jsonRPC = { jsonrpc: '1.0',
-                      method: 'getblockcount' }
-    const authString =
-      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
-          .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
-    return fetch(this.bitcoindUrl, { method: 'POST',
-                                      body: JSON.stringify(jsonRPC),
-                                      headers })
+    const jsonRPC = {
+      jsonrpc: '1.0',
+      method: 'getblockcount' 
+    }
+    const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+      .toString('base64')
+    const headers = { Authorization: `Basic ${authString}` }
+    return fetch(this.bitcoindUrl, {
+      method: 'POST',
+      body: JSON.stringify(jsonRPC),
+      headers 
+    })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
   }
 
   getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
-    const jsonRPC = { jsonrpc: '1.0',
-                      method: 'gettransaction',
-                      params: [txHash] }
-    const authString =
-      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
-          .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
-    return fetch(this.bitcoindUrl, { method: 'POST',
-                                      body: JSON.stringify(jsonRPC),
-                                      headers })
+    const jsonRPC = {
+      jsonrpc: '1.0',
+      method: 'gettransaction',
+      params: [txHash] 
+    }
+    const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+      .toString('base64')
+    const headers = { Authorization: `Basic ${authString}` }
+    return fetch(this.bitcoindUrl, {
+      method: 'POST',
+      body: JSON.stringify(jsonRPC),
+      headers 
+    })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
       .then(txInfo => txInfo.blockhash)
-      .then(blockhash => {
-        const jsonRPCBlock = { jsonrpc: '1.0',
-                               method: 'getblockheader',
-                               params: [blockhash] }
-        headers.append('Authorization', `Basic ${authString}`)
-        return fetch(this.bitcoindUrl, { method: 'POST',
-                                         body: JSON.stringify(jsonRPCBlock),
-                                         headers })
+      .then((blockhash) => {
+        const jsonRPCBlock = {
+          jsonrpc: '1.0',
+          method: 'getblockheader',
+          params: [blockhash] 
+        }
+        headers.Authorization = `Basic ${authString}`
+        return fetch(this.bitcoindUrl, {
+          method: 'POST',
+          body: JSON.stringify(jsonRPCBlock),
+          headers 
+        })
       })
       .then(resp => resp.json())
       .then(respObj => ({ block_height: respObj.result.height }))
   }
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
-    const jsonRPCImport = { jsonrpc: '1.0',
-                            method: 'importaddress',
-                            params: [address] }
-    const jsonRPCUnspent = { jsonrpc: '1.0',
-                             method: 'listunspent',
-                             params: [0, 9999999, [address]] }
-    const authString =
-      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
-          .toString('base64')
-    const headers = new Headers({ Authorization: `Basic ${authString}` })
+    const jsonRPCImport = {
+      jsonrpc: '1.0',
+      method: 'importaddress',
+      params: [address] 
+    }
+    const jsonRPCUnspent = {
+      jsonrpc: '1.0',
+      method: 'listunspent',
+      params: [0, 9999999, [address]] 
+    }
+    const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+      .toString('base64')
+    const headers = { Authorization: `Basic ${authString}` }
 
-    return fetch(this.bitcoindUrl, { method: 'POST',
-                                      body: JSON.stringify(jsonRPCImport),
-                                      headers })
-      .then(() => fetch(this.bitcoindUrl, { method: 'POST',
-                                            body: JSON.stringify(jsonRPCUnspent),
-                                            headers }))
+    return fetch(this.bitcoindUrl, {
+      method: 'POST',
+      body: JSON.stringify(jsonRPCImport),
+      headers 
+    })
+      .then(() => fetch(this.bitcoindUrl, {
+        method: 'POST',
+        body: JSON.stringify(jsonRPCUnspent),
+        headers 
+      }))
       .then(resp => resp.json())
       .then(x => x.result)
       .then(utxos => utxos.map(
-        x => Object({ value: Math.round(x.amount * SATOSHIS_PER_BTC),
-                      confirmations: x.confirmations,
-                      tx_hash: x.txid,
-                      tx_output_n: x.vout })))
+        x => Object({
+          value: Math.round(x.amount * SATOSHIS_PER_BTC),
+          confirmations: x.confirmations,
+          tx_hash: x.txid,
+          tx_output_n: x.vout 
+        })
+      ))
   }
-
 }
 
 export class InsightClient extends BitcoinNetwork {
@@ -636,9 +674,11 @@ export class InsightClient extends BitcoinNetwork {
   broadcastTransaction(transaction: string) {
     const jsonData = { tx: transaction }
     return fetch(`${this.apiUrl}/tx/send`,
-                 { method: 'POST',
-                   headers: new Headers({ 'Content-Type': 'application/json' }),
-                   body: JSON.stringify(jsonData) })
+                 {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify(jsonData) 
+                 })
       .then(resp => resp.json())
   }
 
@@ -651,7 +691,7 @@ export class InsightClient extends BitcoinNetwork {
   getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
     return fetch(`${this.apiUrl}/tx/${txHash}`)
       .then(resp => resp.json())
-      .then(transactionInfo => {
+      .then((transactionInfo) => {
         if (transactionInfo.error) {
           throw new Error(`Error finding transaction: ${transactionInfo.error}`)
         }
@@ -665,12 +705,14 @@ export class InsightClient extends BitcoinNetwork {
     return fetch(`${this.apiUrl}/addr/${address}/utxo`)
       .then(resp => resp.json())
       .then(utxos => utxos.map(
-        x => ({ value: x.satoshis,
-                confirmations: x.confirmations,
-                tx_hash: x.txid,
-                tx_output_n: x.vout })))
+        x => ({
+          value: x.satoshis,
+          confirmations: x.confirmations,
+          tx_hash: x.txid,
+          tx_output_n: x.vout 
+        })
+      ))
   }
-
 }
 
 export class BlockchainInfoApi extends BitcoinNetwork {
@@ -689,7 +731,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
 
   getNetworkedUTXOs(address: string) : Promise<Array<UTXO>> {
     return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 500) {
           Logger.debug('UTXO provider 500 usually means no UTXOs: returning []')
           return {
@@ -701,18 +743,21 @@ export class BlockchainInfoApi extends BitcoinNetwork {
       })
       .then(utxoJSON => utxoJSON.unspent_outputs)
       .then(utxoList => utxoList.map(
-        utxo => {
-          const utxoOut = { value: utxo.value,
-                            tx_output_n: utxo.tx_output_n,
-                            confirmations: utxo.confirmations,
-                            tx_hash: utxo.tx_hash_big_endian }
+        (utxo) => {
+          const utxoOut = {
+            value: utxo.value,
+            tx_output_n: utxo.tx_output_n,
+            confirmations: utxo.confirmations,
+            tx_hash: utxo.tx_hash_big_endian 
+          }
           return utxoOut
-        }))
+        }
+      ))
   }
 
   getTransactionInfo(txHash: string) : Promise<{block_height: Number}> {
     return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}?cors=true`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 200) {
           return resp.json()
         } else {
@@ -726,17 +771,19 @@ export class BlockchainInfoApi extends BitcoinNetwork {
     const form = new FormData()
     form.append('tx', transaction)
     return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
-                 { method: 'POST',
-                   body: form })
-      .then(resp => {
+                 {
+                   method: 'POST',
+                   body: form 
+                 })
+      .then((resp) => {
         const text = resp.text()
         return text
-          .then(respText => {
+          .then((respText) => {
             if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
               const txHash = bitcoinjs.Transaction.fromHex(transaction)
-                    .getHash()
-                    .reverse()
-                    .toString('hex') // big_endian
+                .getHash()
+                .reverse()
+                .toString('hex') // big_endian
               return txHash
             } else {
               throw new RemoteServiceError(resp,
@@ -751,13 +798,20 @@ const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
   'http://localhost:16269',
   new BitcoindAPI('http://localhost:18332/',
-                  { username: 'blockstack', password: 'blockstacksystem' }))
+                  { username: 'blockstack', password: 'blockstacksystem' })
+)
 
 const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org',
   'https://broadcast.blockstack.org',
-  new BlockchainInfoApi())
+  new BlockchainInfoApi()
+)
 
-export const network = { BlockstackNetwork, LocalRegtest,
-                         BlockchainInfoApi, BitcoindAPI, InsightClient,
-                         defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } }
+export const network = {
+  BlockstackNetwork,
+  LocalRegtest,
+  BlockchainInfoApi,
+  BitcoindAPI,
+  InsightClient,
+  defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } 
+}

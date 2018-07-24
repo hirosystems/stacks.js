@@ -1,6 +1,6 @@
 /* @flow */
-import { Service } from './service'
 import cheerio from 'cheerio'
+import { Service } from './service'
 
 class Instagram extends Service {
   static getBaseUrls() {
@@ -48,7 +48,7 @@ class Instagram extends Service {
   static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[property="og:description"]')
-                        .attr('content')
+      .attr('content')
 
     if (statement !== undefined && statement.split(':').length > 1) {
       return statement.split(':')[1].trim().replace('“', '').replace('”', '')

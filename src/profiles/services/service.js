@@ -1,44 +1,40 @@
 /* @flow */
-import 'isomorphic-fetch'
+import 'cross-fetch'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 
 export class Service {
-  static validateProof(proof: Object, 
-                        ownerAddress: string,
-                        name: ?string = null) {
-    return new Promise((resolve) => {
-      try {
-        const proofUrl = this.getProofUrl(proof)
-        fetch(proofUrl).then((res) => {
-          if (res.status === 200) {
-            res.text().then((text) => {
-              // Validate identity in provided proof body/tags if required
-              if (this.shouldValidateIdentityInBody() 
-                && proof.identifier !== this.getProofIdentity(text)) {
-                return resolve(proof)
-              }
-              const proofText = this.getProofStatement(text)
-              proof.valid = containsValidProofStatement(proofText, name) || 
-                containsValidAddressProofStatement(proofText, ownerAddress)
-              return resolve(proof)
-            })
-          } else {
-            console.error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
+  static validateProof(proof: Object,
+                       ownerAddress: string,
+                       name: ?string = null) {
+    let proofUrl
+    return Promise.resolve()
+      .then(() => {
+        proofUrl = this.getProofUrl(proof)
+        return fetch(proofUrl)
+      })
+      .then((res) => {
+        if (res.status !== 200) {
+          throw new Error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
               Unable to validate proof.`)
-            proof.valid = false
-            resolve(proof)
-          }
-        }).catch((err) => {
-          console.error(err)
-          proof.valid = false
-          resolve(proof)
-        })
-      } catch (e) {
-        console.error(e)
+        }
+        return res.text()
+      })
+      .then((text) => {
+        // Validate identity in provided proof body/tags if required
+        if (this.shouldValidateIdentityInBody()
+            && proof.identifier !== this.getProofIdentity(text)) {
+          return proof
+        }
+        const proofText = this.getProofStatement(text)
+        proof.valid = containsValidProofStatement(proofText, name)
+          || containsValidAddressProofStatement(proofText, ownerAddress)
+        return proof
+      })
+      .catch((error) => {
+        console.error(error)
         proof.valid = false
-        resolve(proof)
-      }
-    })
+        return proof
+      })
   }
 
   static getBaseUrls() {
@@ -81,5 +77,4 @@ export class Service {
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
-
 }

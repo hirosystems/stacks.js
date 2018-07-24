@@ -1,7 +1,8 @@
 import test from 'tape-promise/tape'
 import { SECP256K1Client } from 'jsontokens'
 import {
-  getEntropy, makeECPrivateKey, publicKeyToAddress, isSameOriginAbsoluteUrl
+  getEntropy, makeECPrivateKey, publicKeyToAddress, isSameOriginAbsoluteUrl,
+  ecPairToHexString, hexStringToECPair
 } from '../../../lib'
 
 export function runUtilsTests() {
@@ -20,6 +21,18 @@ export function runUtilsTests() {
     const address = publicKeyToAddress(publicKey)
     t.ok(address, 'Address should have been created')
     t.equal(typeof address, 'string', 'Address should be a string')
+  })
+
+  test('ecPairToHexString', (t) => {
+    t.plan(2)
+
+    const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01'
+    const expectedAddress = '1WykMawQRnLh7SWmmoRL4qTDNCgAsVRF1'
+
+    const computedECPair = hexStringToECPair(privateKey)
+    t.equal(privateKey, ecPairToHexString(computedECPair), 'Should return same hex string')
+
+    t.equal(expectedAddress, computedECPair.getAddress(), 'Should parse to correct address')
   })
 
   test('isSameOriginAbsoluteUrl', (t) => {

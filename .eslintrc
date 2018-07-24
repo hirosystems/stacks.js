@@ -1,17 +1,25 @@
 {
   "extends": "airbnb",
   "parser": "babel-eslint",
-  "plugins": [],
-  "ecmaFeatures": {
-    "jsx": false,
-    "modules": true
-  },
+  "plugins": ["flowtype"],
   "env": {
     "browser": true,
     "es6": true,
     "node": true,
   },
   "rules": {
+    "no-tabs": 0,
+    "no-restricted-globals": 0,
+    "import/prefer-default-export": 0,
+    "no-buffer-constructor": 0,
+    "no-mixed-operators": 0,
+    "no-plusplus": 0,
+    "no-bitwise": 0,
+    "prefer-promise-reject-errors": 0,
+    "class-methods-use-this": 0,
+    "import/no-cycle": 0,
+    "prefer-destructuring": 0,
+    "no-prototype-builtins": 0,
     "comma-dangle": ["error", "never"],
     "quotes": [2, "single"],
     "eol-last": 2,
@@ -31,6 +39,15 @@
     "new-cap": 0,
     "camelcase": 2,
     "semi": [2, "never"],
-    "valid-jsdoc": ["error"]
+    "valid-jsdoc": ["error"],
+    "flowtype/define-flow-type": 1,
+    "indent": [2, 2, {
+     "FunctionDeclaration" : { "parameters": "first" },
+     "FunctionExpression" : { "parameters": "first" },
+     "ObjectExpression": "first",
+     "ArrayExpression": "first",
+     "ImportDeclaration": "first",
+     "CallExpression": { "arguments": "first" }
+     }],
   }
 }

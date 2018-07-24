@@ -4,7 +4,8 @@ import { runProofsUnitTests }   from './unitTestsProofs'
 import { runUtilsTests }        from './unitTestsUtils'
 import { runEncryptionTests }   from './unitTestsEncryption'
 import { runStorageTests }      from './unitTestsStorage'
-import { runOperationsTests }      from './unitTestsOperations'
+import { runOperationsTests }   from './unitTestsOperations'
+import { runErrorsTests }       from './unitTestsErrors'
 
 // Utils tests
 runUtilsTests()
@@ -26,3 +27,6 @@ runStorageTests()
 
 // Operations Tests
 runOperationsTests()
+
+// Errors Tests
+runErrorsTests()
