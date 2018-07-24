@@ -13,7 +13,7 @@ import {
   verifyAuthRequest,
   verifyAuthResponse,
   publicKeyToAddress,
-  makeDIDFromAddress,
+  makeDIDFromPublicKey,
   isExpirationDateValid,
   isIssuanceDateValid,
   doSignaturesMatchPublicKeys,
@@ -52,8 +52,7 @@ export function runAuthTests() {
     t.ok(decodedToken, 'auth request token should have been decoded')
     console.log(JSON.stringify(decodedToken, null, 2))
 
-    const address = publicKeyToAddress(publicKey)
-    const referenceDID = makeDIDFromAddress(address)
+    const referenceDID = makeDIDFromPublicKey(publicKey)
     const origin = 'http://localhost:3000'
     t.equal(decodedToken.payload.iss,
       referenceDID, 'auth request issuer should include the public key')
@@ -161,7 +160,7 @@ export function runAuthTests() {
   })
 
   test('makeAuthResponse && verifyAuthResponse', (t) => {
-    t.plan(11)
+    t.plan(12)
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan)
     t.ok(authResponse, 'auth response should have been created')
@@ -171,7 +170,7 @@ export function runAuthTests() {
     // console.log(JSON.stringify(decodedToken, null, 2))
 
     const address = publicKeyToAddress(publicKey)
-    const referenceDID = makeDIDFromAddress(address)
+    const referenceDID = makeDIDFromPublicKey(publicKey)
     t.equal(decodedToken.payload.iss,
       referenceDID, 'auth response issuer should include the public key')
 
@@ -179,6 +178,7 @@ export function runAuthTests() {
     JSON.stringify(sampleProfiles.ryan), 'auth response profile should equal the reference value')
 
     t.equal(decodedToken.payload.username, null, 'auth response username should be null')
+    t.equal(decodedToken.payload.identity_address, address, 'identity address is correct')
 
     // const verified = verifyAuthResponse(authResponse)
     // t.equal(verified, true, 'auth response should be verified')

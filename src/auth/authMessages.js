@@ -7,7 +7,7 @@ import {
 } from 'jsontokens'
 
 import {
-  makeDIDFromAddress, generateAndStoreTransitKey, makeUUID4,
+  makeDIDFromPublicKey, generateAndStoreTransitKey, makeUUID4,
   nextMonth, nextHour, publicKeyToAddress
 } from '../index'
 
@@ -72,8 +72,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
   payload.public_keys = [publicKey]
-  const address = publicKeyToAddress(publicKey)
-  payload.iss = makeDIDFromAddress(address)
+  payload.iss = makeDIDFromPublicKey(publicKey)
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
@@ -135,7 +134,7 @@ export function decryptPrivateKey(privateKey: string,
  * @param  {Number} expiresAt an integer in the same format as
  * `new Date().getTime()`, milliseconds since the Unix epoch
  * @param {String} transitPublicKey the public key provide by the app
- * in its authentication request with which secrets will be encrypted 
+ * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @return {String} signed and encoded authentication response token
  */
@@ -179,7 +178,8 @@ export function makeAuthResponse(privateKey: string,
     jti: makeUUID4(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
-    iss: makeDIDFromAddress(address),
+    iss: makeDIDFromPublicKey(publicKey),
+    identity_address: address,
     private_key: privateKeyPayload,
     public_keys: [publicKey],
     profile,

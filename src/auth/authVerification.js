@@ -1,6 +1,6 @@
 // @flow
 import { decodeToken, TokenVerifier } from 'jsontokens'
-import { getAddressFromDID, publicKeyToAddress,
+import { getPublicKeyFromDID, getAddressFromDID,
   isSameOriginAbsoluteUrl, fetchAppManifest } from '../index'
 
 /**
@@ -46,11 +46,11 @@ export function doSignaturesMatchPublicKeys(token: string) {
 export function doPublicKeysMatchIssuer(token: string) {
   const payload = decodeToken(token).payload
   const publicKeys = payload.public_keys
-  const addressFromIssuer = getAddressFromDID(payload.iss)
+  const issuerPublicKey = getPublicKeyFromDID(payload.iss)
 
   if (publicKeys.length === 1) {
-    const addressFromPublicKeys = publicKeyToAddress(publicKeys[0])
-    if (addressFromPublicKeys === addressFromIssuer) {
+    if (publicKeys[0] === issuerPublicKey) {
+      console.log(`${publicKeys[0]} issuer: ${issuerPublicKey}`)
       return true
     }
   } else {

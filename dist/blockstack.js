@@ -367,8 +367,7 @@ function makeAuthRequest() {
   /* Convert the private key to a public key to an issuer */
   var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(transitPrivateKey);
   payload.public_keys = [publicKey];
-  var address = (0, _index.publicKeyToAddress)(publicKey);
-  payload.iss = (0, _index.makeDIDFromAddress)(address);
+  payload.iss = (0, _index.makeDIDFromPublicKey)(publicKey);
 
   /* Sign and return the token */
   var tokenSigner = new _jsontokens.TokenSigner('ES256k', transitPrivateKey);
@@ -428,7 +427,7 @@ function decryptPrivateKey(privateKey, hexedEncrypted) {
  * @param  {Number} expiresAt an integer in the same format as
  * `new Date().getTime()`, milliseconds since the Unix epoch
  * @param {String} transitPublicKey the public key provide by the app
- * in its authentication request with which secrets will be encrypted 
+ * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @return {String} signed and encoded authentication response token
  */
@@ -473,7 +472,8 @@ function makeAuthResponse(privateKey) {
     jti: (0, _index.makeUUID4)(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
-    iss: (0, _index.makeDIDFromAddress)(address),
+    iss: (0, _index.makeDIDFromPublicKey)(publicKey),
+    identity_address: address,
     private_key: privateKeyPayload,
     public_keys: [publicKey],
     profile: profile,
@@ -813,11 +813,11 @@ function doSignaturesMatchPublicKeys(token) {
 function doPublicKeysMatchIssuer(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
   var publicKeys = payload.public_keys;
-  var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
+  var issuerPublicKey = (0, _index.getPublicKeyFromDID)(payload.iss);
 
   if (publicKeys.length === 1) {
-    var addressFromPublicKeys = (0, _index.publicKeyToAddress)(publicKeys[0]);
-    if (addressFromPublicKeys === addressFromIssuer) {
+    if (publicKeys[0] === issuerPublicKey) {
+      console.log(publicKeys[0] + ' issuer: ' + issuerPublicKey);
       return true;
     }
   } else {
@@ -1243,66 +1243,62 @@ exports.config = config;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.makeDIDFromAddress = makeDIDFromAddress;
 exports.makeDIDFromPublicKey = makeDIDFromPublicKey;
 exports.getDIDType = getDIDType;
+exports.getPublicKeyFromDID = getPublicKeyFromDID;
 exports.getAddressFromDID = getAddressFromDID;
 
 var _errors = require('./errors');
 
-function makeDIDFromAddress(address) {
-  return 'did:btc-addr:' + address;
-}
+var _keys = require('./keys');
+
+var DID_STACK_V1 = 'stack:v1';
 
 function makeDIDFromPublicKey(publicKey) {
-  return 'did:ecdsa-pub:' + publicKey;
+  return 'did:stack:v1:' + publicKey;
 }
 
 function getDIDType(decentralizedID) {
   var didParts = decentralizedID.split(':');
 
-  if (didParts.length !== 3) {
-    throw new _errors.InvalidDIDError('Decentralized IDs must have 3 parts');
+  if (didParts.length !== 3 && didParts.length !== 4) {
+    throw new _errors.InvalidDIDError('Decentralized IDs must have 3 or 4 parts');
   }
 
   if (didParts[0].toLowerCase() !== 'did') {
     throw new _errors.InvalidDIDError('Decentralized IDs must start with "did"');
   }
 
-  return didParts[1].toLowerCase();
+  if (didParts.length === 3) {
+    return didParts[1].toLowerCase();
+  } else {
+    // supports did types such as did:stack:v1:<publicKey>
+    return didParts[1].toLowerCase() + didParts[2].toLowerCase();
+  }
+}
+
+function getPublicKeyFromDID(decentralizedID) {
+  var didType = getDIDType(decentralizedID);
+  if (didType === DID_STACK_V1) {
+    var publicKey = decentralizedID.split(':')[3];
+    return publicKey;
+  } else {
+    throw new _errors.InvalidDIDError('getPublicKeyFromDID only supports ' + DID_STACK_V1 + ' DIDs');
+  }
 }
 
 function getAddressFromDID(decentralizedID) {
   var didType = getDIDType(decentralizedID);
   if (didType === 'btc-addr') {
     return decentralizedID.split(':')[2];
+  } else if (didType === DID_STACK_V1) {
+    var publicKey = getPublicKeyFromDID(decentralizedID);
+    return (0, _keys.publicKeyToAddress)(publicKey);
   } else {
-    return null;
+    return new _errors.InvalidDIDError('getAddressFromDID does not support the ' + didType + ' DID type');
   }
 }
-
-/*
-export function getPublicKeyOrAddressFromDID(decentralizedID) {
-  const didParts = decentralizedID.split(':')
-
-  if (didParts.length !== 3) {
-    throw new InvalidDIDError('Decentralized IDs must have 3 parts')
-  }
-
-  if (didParts[0].toLowerCase() !== 'did') {
-    throw new InvalidDIDError('Decentralized IDs must start with "did"')
-  }
-
-  if (didParts[1].toLowerCase() === 'ecdsa-pub') {
-    return didParts[2]
-  } else if (didParts[1].toLowerCase() === 'btc-addr') {
-    return didParts[2]
-  } else {
-    throw new InvalidDIDError('Decentralized ID format not supported')
-  }
-}
-*/
-},{"./errors":11}],10:[function(require,module,exports){
+},{"./errors":11,"./keys":13}],10:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -1720,12 +1716,6 @@ Object.keys(_storage).forEach(function (key) {
 
 var _dids = require('./dids');
 
-Object.defineProperty(exports, 'makeDIDFromAddress', {
-  enumerable: true,
-  get: function get() {
-    return _dids.makeDIDFromAddress;
-  }
-});
 Object.defineProperty(exports, 'makeDIDFromPublicKey', {
   enumerable: true,
   get: function get() {
@@ -7157,7 +7147,7 @@ function containsValidProofStatement(searchText) {
 
   searchText = searchText.toLowerCase();
 
-  if (name.split('.').length !== 2) {
+  if (name.split('.').length < 2) {
     throw new Error('Please provide the fully qualified Blockstack name.');
   }
 
@@ -7340,7 +7330,7 @@ function makeLegacyAuthToken(challengeText, signerKeyHex) {
   }
 }
 
-function makeV1GaiaAuthToken(hubInfo, signerKeyHex) {
+function makeV1GaiaAuthToken(hubInfo, signerKeyHex, hubUrl) {
   var challengeText = hubInfo.challenge_text;
   var handlesV1Auth = hubInfo.latest_auth_version && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1;
   var iss = (0, _index.getPublicKeyFromPrivate)(signerKeyHex);
@@ -7351,7 +7341,7 @@ function makeV1GaiaAuthToken(hubInfo, signerKeyHex) {
 
   var salt = _crypto2.default.randomBytes(16).toString('hex');
   var payload = { gaiaChallenge: challengeText,
-    iss: iss, salt: salt };
+    hubUrl: hubUrl, iss: iss, salt: salt };
   var token = new _jsontokens.TokenSigner('ES256K', signerKeyHex).sign(payload);
   return 'v1:' + token;
 }
@@ -7363,7 +7353,7 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
     return response.json();
   }).then(function (hubInfo) {
     var readURL = hubInfo.read_url_prefix;
-    var token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex);
+    var token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl);
     var address = (0, _index.hexStringToECPair)(challengeSignerHex + (challengeSignerHex.length === 64 ? '01' : '')).getAddress();
     return { url_prefix: readURL,
       address: address,
@@ -7975,7 +7965,7 @@ function hexStringToECPair(skHex) {
 }
 
 function ecPairToHexString(secretKey) {
-  var ecPointHex = secretKey.d.toHex();
+  var ecPointHex = secretKey.d.toBuffer(32).toString('hex');
   if (secretKey.compressed) {
     return ecPointHex + '01';
   } else {
