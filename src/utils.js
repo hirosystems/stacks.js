@@ -91,7 +91,7 @@ export function hexStringToECPair(skHex: string) {
 }
 
 export function ecPairToHexString(secretKey: ECPair) {
-  const ecPointHex = secretKey.d.toHex()
+  const ecPointHex = secretKey.d.toBuffer(32).toString('hex')
   if (secretKey.compressed) {
     return `${ecPointHex}01`
   } else {
