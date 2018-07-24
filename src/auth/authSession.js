@@ -17,10 +17,10 @@ import 'cross-fetch'
  * @private
  */
 export function makeCoreSessionRequest(appDomain: string,
-  appMethods: Array<string>,
-  appPrivateKey: string,
-  blockchainID: ?string = null,
-  thisDevice: ?string = null) {
+                                       appMethods: Array<string>,
+                                       appPrivateKey: string,
+                                       blockchainID: ?string = null,
+                                       thisDevice: ?string = null) {
   if (thisDevice === null) {
     thisDevice = '.default'
   }
@@ -64,9 +64,9 @@ export function makeCoreSessionRequest(appDomain: string,
  * @private
  */
 export function sendCoreSessionRequest(coreHost: string,
-  corePort: number,
-  coreAuthRequest: string,
-  apiPassword: string) {
+                                       corePort: number,
+                                       coreAuthRequest: string,
+                                       apiPassword: string) {
   return new Promise((resolve, reject) => {
     if (!apiPassword) {
       reject('Missing API password')
@@ -82,7 +82,7 @@ export function sendCoreSessionRequest(coreHost: string,
     const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
 
     return fetch(url, options)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           reject('HTTP status not OK')
           throw new Error('HTTP status not OK')
@@ -90,7 +90,7 @@ export function sendCoreSessionRequest(coreHost: string,
         return response.text()
       })
       .then(responseText => JSON.parse(responseText))
-      .then(responseJson => {
+      .then((responseJson) => {
         const token = responseJson.token
         if (!token) {
           reject('Failed to get Core session token')
@@ -99,7 +99,7 @@ export function sendCoreSessionRequest(coreHost: string,
         resolve(token)
         return token
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
         reject('Invalid Core response: not JSON')
       })
@@ -126,12 +126,12 @@ export function sendCoreSessionRequest(coreHost: string,
  * @private
  */
 export function getCoreSession(coreHost: string,
-  corePort: number,
-  apiPassword: string,
-  appPrivateKey: string,
-  blockchainId: ?string = null,
-  authRequest: ?string = null,
-  deviceId: string = '0') {
+                               corePort: number,
+                               apiPassword: string,
+                               appPrivateKey: string,
+                               blockchainId: ?string = null,
+                               authRequest: ?string = null,
+                               deviceId: string = '0') {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }
@@ -159,8 +159,10 @@ export function getCoreSession(coreHost: string,
   const appMethods = payload.scopes
 
   const coreAuthRequest = makeCoreSessionRequest(
-    appDomain, appMethods, appPrivateKey, blockchainId, deviceId)
+    appDomain, appMethods, appPrivateKey, blockchainId, deviceId
+  )
 
   return sendCoreSessionRequest(
-    coreHost, corePort, coreAuthRequest, apiPassword)
+    coreHost, corePort, coreAuthRequest, apiPassword
+  )
 }

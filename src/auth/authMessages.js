@@ -46,11 +46,11 @@ type AuthMetadata = {
  * @return {String} the authentication request
  */
 export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTransitKey(),
-  redirectURI: string = `${window.location.origin}/`,
-  manifestURI: string = `${window.location.origin}/manifest.json`,
-  scopes: Array<String> = DEFAULT_SCOPE,
-  appDomain: string = window.location.origin,
-  expiresAt: number = nextHour().getTime()): string {
+                                redirectURI: string = `${window.location.origin}/`,
+                                manifestURI: string = `${window.location.origin}/manifest.json`,
+                                scopes: Array<String> = DEFAULT_SCOPE,
+                                appDomain: string = window.location.origin,
+                                expiresAt: number = nextHour().getTime()): string {
   /* Create the payload */
   const payload = {
     jti: makeUUID4(),
@@ -91,7 +91,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
  * @private
  */
 export function encryptPrivateKey(publicKey: string,
-  privateKey: string): string | null {
+                                  privateKey: string): string | null {
   const encryptedObj = encryptECIES(publicKey, privateKey)
   const encryptedJSON = JSON.stringify(encryptedObj)
   return (new Buffer(encryptedJSON)).toString('hex')
@@ -106,7 +106,7 @@ export function encryptPrivateKey(publicKey: string,
  * @throws {Error} if unable to decrypt
  */
 export function decryptPrivateKey(privateKey: string,
-  hexedEncrypted: string): string | null {
+                                  hexedEncrypted: string): string | null {
   const unhexedString = new Buffer(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
   const decrypted = decryptECIES(privateKey, encryptedObj)
@@ -140,14 +140,14 @@ export function decryptPrivateKey(privateKey: string,
  * @return {String} signed and encoded authentication response token
  */
 export function makeAuthResponse(privateKey: string,
-  profile: {} = {},
-  username: ?string = null,
-  metadata: AuthMetadata,
-  coreToken: ?string = null,
-  appPrivateKey: ?string = null,
-  expiresAt: number = nextMonth().getTime(),
-  transitPublicKey: ?string = null,
-  hubUrl: ?string = null): string {
+                                 profile: {} = {},
+                                 username: ?string = null,
+                                 metadata: AuthMetadata,
+                                 coreToken: ?string = null,
+                                 appPrivateKey: ?string = null,
+                                 expiresAt: number = nextMonth().getTime(),
+                                 transitPublicKey: ?string = null,
+                                 hubUrl: ?string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)

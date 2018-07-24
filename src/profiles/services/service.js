@@ -4,8 +4,8 @@ import { containsValidProofStatement, containsValidAddressProofStatement } from 
 
 export class Service {
   static validateProof(proof: Object,
-    ownerAddress: string,
-    name: ?string = null) {
+                       ownerAddress: string,
+                       name: ?string = null) {
     let proofUrl
     return Promise.resolve()
       .then(() => {
@@ -26,11 +26,11 @@ export class Service {
           return proof
         }
         const proofText = this.getProofStatement(text)
-        proof.valid = containsValidProofStatement(proofText, name) ||
-          containsValidAddressProofStatement(proofText, ownerAddress)
+        proof.valid = containsValidProofStatement(proofText, name)
+          || containsValidAddressProofStatement(proofText, ownerAddress)
         return proof
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
         proof.valid = false
         return proof

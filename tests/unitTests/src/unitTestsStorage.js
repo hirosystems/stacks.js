@@ -2,24 +2,29 @@ import test from 'tape'
 import FetchMock from 'fetch-mock'
 import proxyquire from 'proxyquire'
 import sinon from 'sinon'
-import { uploadToGaiaHub, getFullReadUrl,
+import { TokenVerifier, decodeToken } from 'jsontokens'
+import {
+  uploadToGaiaHub, getFullReadUrl,
   connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
-  getBucketUrl } from '../../../lib/storage/hub'
+  getBucketUrl
+} from '../../../lib/storage/hub'
 import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
 import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 import { getPublicKeyFromPrivate } from '../../../lib/keys'
-import { TokenVerifier, decodeToken } from 'jsontokens'
 
 class LocalStorage {
   constructor() {
     this.data = {}
   }
+
   setItem(k, v) {
     this.data[k] = v
   }
+
   removeItem(k) {
     delete this.data[k]
   }
+
   getItem(k) {
     return this.data[k]
   }
@@ -87,13 +92,15 @@ export function runStorageTests() {
 
     const nameLookupUrl = 'https://core.blockstack.org/v1/names/yukan.id'
 
-    const nameRecord = { status: 'registered',
+    const nameRecord = {
+      status: 'registered',
       zonefile: '$ORIGIN yukan.id\n$TTL 3600\n_http._tcp URI 10 1 "https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json"\n',
       expire_block: 581432,
       blockchain: 'bitcoin',
       last_txid: 'f7fa811518566b1914a098c3bd61a810aee56390815bd608490b0860ac1b5b4d',
       address: '16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3',
-      zonefile_hash: '98f42e11026d42d394b3424d4d7f0cccd6f376e2' }
+      zonefile_hash: '98f42e11026d42d394b3424d4d7f0cccd6f376e2'
+    }
     const nameRecordContent = JSON.stringify(nameRecord)
     FetchMock.get(nameLookupUrl, nameRecordContent)
 
@@ -315,7 +322,7 @@ export function runStorageTests() {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        getFile(path, decryptOptions).then(readContent => {
+        getFile(path, decryptOptions).then((readContent) => {
           t.equal(readContent, fileContent)
           // put back whatever was inside before
           window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
@@ -366,7 +373,7 @@ export function runStorageTests() {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        getFile(path, decryptOptions).then(readContent => {
+        getFile(path, decryptOptions).then((readContent) => {
           t.equal(readContent, fileContent)
           // put back whatever was inside before
           window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
@@ -402,16 +409,19 @@ export function runStorageTests() {
       (fname, contents) => {
         putFiledContents = contents
         return Promise.resolve(`${readPrefix}/${fname}`)
-      })
+      }
+    )
 
     const getFullReadUrl = sinon.stub().callsFake( // eslint-disable-line no-shadow
-      path => Promise.resolve(`${readPrefix}/${path}`))
+      path => Promise.resolve(`${readPrefix}/${path}`)
+    )
 
     const lookupProfile = sinon.stub().callsFake(
-      username => {
+      (username) => {
         t.equal(username, 'applejacks.id', 'Unexpected user lookup request')
         return Promise.resolve({ apps: { origin: readPrefix } })
-      })
+      }
+    )
 
     const { putFile } = proxyquire('../../../lib/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
@@ -432,40 +442,43 @@ export function runStorageTests() {
         FetchMock.get(urlBadPK, JSON.stringify({
           signature: contentsObj.signature,
           publicKey: badPK,
-          cipherText: contentsObj.cipherText }))
+          cipherText: contentsObj.cipherText
+        }))
         FetchMock.get(urlBadSig, JSON.stringify({
           signature: contentsObj.signature,
           publicKey: contentsObj.publicKey,
-          cipherText: 'potato potato potato' }))
-      }).then(() =>
-        // read and decrypt the file
-        getFile('file.json', decryptOptions).then(readContent => {
+          cipherText: 'potato potato potato'
+        }))
+      }).then(() => getFile('file.json', decryptOptions).then((readContent) => {
+        t.equal(readContent, fileContent)
+      }))
+      .then(() => getFile('file.json', {
+        decrypt: true,
+        verify: true,
+        username: 'applejacks.id',
+        app: 'origin'
+      })
+        .then((readContent) => {
           t.equal(readContent, fileContent)
         }))
-      .then(() =>
-        // read and decrypt the file
-        getFile('file.json', { decrypt: true, verify: true,
-          username: 'applejacks.id', app: 'origin' })
-          .then(readContent => {
-            t.equal(readContent, fileContent)
-          }))
-      .then(() =>
-        getFile('badPK.json', decryptOptions)
-          .then(() => t.true(false, 'Should not successfully decrypt file'))
-          .catch((err) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
-            `Should fail with complaint about mismatch PK: ${err.message}`)))
-      .then(() =>
-        getFile('badPK.json', { decrypt: true, verify: true,
-          username: 'applejacks.id', app: 'origin' })
-          .then(() => t.true(false, 'Should not successfully decrypt file'))
-          .catch((err) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
-            `Should fail with complaint about mismatch PK: ${err.message}`)))
-      .then(() =>
-        getFile('badSig.json', decryptOptions)
-          .then(() => t.true(false, 'Should not successfully decrypt file'))
-          .catch((err) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
-            'Should fail with complaint about bad signature')))
-      .catch((err) => console.log(err.stack))
+      .then(() => getFile('badPK.json', decryptOptions)
+        .then(() => t.true(false, 'Should not successfully decrypt file'))
+        .catch(err => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
+                           `Should fail with complaint about mismatch PK: ${err.message}`)))
+      .then(() => getFile('badPK.json', {
+        decrypt: true,
+        verify: true,
+        username: 'applejacks.id',
+        app: 'origin'
+      })
+        .then(() => t.true(false, 'Should not successfully decrypt file'))
+        .catch(err => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
+                           `Should fail with complaint about mismatch PK: ${err.message}`)))
+      .then(() => getFile('badSig.json', decryptOptions)
+        .then(() => t.true(false, 'Should not successfully decrypt file'))
+        .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
+                           'Should fail with complaint about bad signature')))
+      .catch(err => console.log(err.stack))
       .then(() => {          // put back whatever was inside before
         window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
         t.end()
@@ -508,16 +521,19 @@ export function runStorageTests() {
           t.equal(contents, fileContent)
         }
         return Promise.resolve(pathToReadUrl(fname))
-      })
+      }
+    )
 
     const getFullReadUrl = sinon.stub().callsFake( // eslint-disable-line no-shadow
-      path => Promise.resolve(pathToReadUrl(path)))
+      path => Promise.resolve(pathToReadUrl(path))
+    )
 
     const lookupProfile = sinon.stub().callsFake(
-      username => {
+      (username) => {
         t.equal(username, 'applejacks.id', 'Unexpected user lookup request')
         return Promise.resolve({ apps: { origin: readPrefix } })
-      })
+      }
+    )
 
     const { putFile } = proxyquire('../../../lib/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
@@ -529,10 +545,12 @@ export function runStorageTests() {
 
     const encryptOptions = { encrypt: false, sign: true }
     const decryptOptions = { decrypt: false, verify: true }
-    const multiplayerDecryptOptions = { username: 'applejacks.id',
+    const multiplayerDecryptOptions = {
+      username: 'applejacks.id',
       decrypt: false,
       verify: true,
-      app: 'origin' }
+      app: 'origin'
+    }
     // put and encrypt the file
     putFile(goodPath, fileContent, encryptOptions)
       .then((publicURL) => {
@@ -544,11 +562,12 @@ export function runStorageTests() {
         putFiledContents.forEach(
           ([path, contents]) => {
             FetchMock.get(pathToReadUrl(path),
-              contents)
+                          contents)
             if (path.endsWith('.sig')) {
               sigContents = contents
             }
-          })
+          }
+        )
         const sigObject = JSON.parse(sigContents)
         // bad sig mocks
         FetchMock.get(pathToReadUrl(badSigPath), 'hello world, this is inauthentic.')
@@ -561,47 +580,41 @@ export function runStorageTests() {
         // bad pk mocks
         FetchMock.get(pathToReadUrl(badPKPath), fileContent)
         FetchMock.get(pathToReadUrl(`${badPKPath}.sig`),
-          JSON.stringify({ signature: sigObject.signature,
-            publicKey: badPK }))
+                      JSON.stringify({
+                        signature: sigObject.signature,
+                        publicKey: badPK
+                      }))
       })
-      .then(() =>
-        getFile(goodPath, decryptOptions).then(readContent => {
-          t.equal(readContent, fileContent, 'should read the file')
-        }))
-      .then(() =>
-        getFile(badSigPath, decryptOptions)
-          .then(() => t.fail('Should have failed to read file.'))
-          .catch((err) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
-            'Should fail with complaint about bad signature')))
-      .then(() =>
-        getFile(noSigPath, decryptOptions)
-          .then(() => t.fail('Should have failed to read file.'))
-          .catch((err) => t.ok(err.message.indexOf('obtain signature for file') >= 0,
-            'Should fail with complaint about missing signature')))
-      .then(() =>
-        getFile(badPKPath, decryptOptions)
-          .then(() => t.fail('Should have failed to read file.'))
-          .catch((err) => t.ok(err.message.indexOf('match gaia address') >= 0,
-            'Should fail with complaint about matching addresses')))
-      .then(() =>
-        getFile(goodPath, multiplayerDecryptOptions).then(readContent => {
-          t.equal(readContent, fileContent, 'should read the file')
-        }))
-      .then(() =>
-        getFile(badSigPath, multiplayerDecryptOptions)
-          .then(() => t.fail('Should have failed to read file.'))
-          .catch((err) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
-            'Should fail with complaint about bad signature')))
-      .then(() =>
-        getFile(noSigPath, multiplayerDecryptOptions)
-          .then(() => t.fail('Should have failed to read file.'))
-          .catch((err) => t.ok(err.message.indexOf('obtain signature for file') >= 0,
-            'Should fail with complaint about missing signature')))
-      .then(() =>
-        getFile(badPKPath, multiplayerDecryptOptions)
-          .then(() => t.fail('Should have failed to read file.'))
-          .catch((err) => t.ok(err.message.indexOf('match gaia address') >= 0,
-            'Should fail with complaint about matching addresses')))
+      .then(() => getFile(goodPath, decryptOptions).then((readContent) => {
+        t.equal(readContent, fileContent, 'should read the file')
+      }))
+      .then(() => getFile(badSigPath, decryptOptions)
+        .then(() => t.fail('Should have failed to read file.'))
+        .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
+                           'Should fail with complaint about bad signature')))
+      .then(() => getFile(noSigPath, decryptOptions)
+        .then(() => t.fail('Should have failed to read file.'))
+        .catch(err => t.ok(err.message.indexOf('obtain signature for file') >= 0,
+                           'Should fail with complaint about missing signature')))
+      .then(() => getFile(badPKPath, decryptOptions)
+        .then(() => t.fail('Should have failed to read file.'))
+        .catch(err => t.ok(err.message.indexOf('match gaia address') >= 0,
+                           'Should fail with complaint about matching addresses')))
+      .then(() => getFile(goodPath, multiplayerDecryptOptions).then((readContent) => {
+        t.equal(readContent, fileContent, 'should read the file')
+      }))
+      .then(() => getFile(badSigPath, multiplayerDecryptOptions)
+        .then(() => t.fail('Should have failed to read file.'))
+        .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
+                           'Should fail with complaint about bad signature')))
+      .then(() => getFile(noSigPath, multiplayerDecryptOptions)
+        .then(() => t.fail('Should have failed to read file.'))
+        .catch(err => t.ok(err.message.indexOf('obtain signature for file') >= 0,
+                           'Should fail with complaint about missing signature')))
+      .then(() => getFile(badPKPath, multiplayerDecryptOptions)
+        .then(() => t.fail('Should have failed to read file.'))
+        .catch(err => t.ok(err.message.indexOf('match gaia address') >= 0,
+                           'Should fail with complaint about matching addresses')))
       .catch((err) => {
         console.log(err.stack)
         t.fail('Unexpected error!')
@@ -643,15 +656,17 @@ export function runStorageTests() {
 
   test('fetch404null', (t) => {
     t.plan(2)
-    const config = { address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+    const config = {
+      address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org/hub/',
       token: '',
-      server: 'hub.testblockstack.org' }
+      server: 'hub.testblockstack.org'
+    }
 
     global.window.localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(config))
 
     FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
-      { status: 404 })
+                  { status: 404 })
 
     const optionsNoDecrypt = { decrypt: false }
     getFile('foo.json', optionsNoDecrypt)
@@ -665,28 +680,32 @@ export function runStorageTests() {
   test('uploadToGaiaHub', (t) => {
     t.plan(2)
 
-    const config = { address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+    const config = {
+      address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org',
       token: '',
-      server: 'hub.testblockstack.org' }
+      server: 'hub.testblockstack.org'
+    }
 
     FetchMock.post(`${config.server}/store/${config.address}/foo.json`,
-      JSON.stringify({ publicURL: '${config.url_prefix}/${config.address}/foo.json' }))
+                   JSON.stringify({ publicURL: `${config.url_prefix}/${config.address}/foo.json` }))
 
     uploadToGaiaHub('foo.json', 'foo the bar', config)
       .then((url) => {
         t.ok(url, 'URL returned')
-        t.equal(url, '${config.url_prefix}/${config.address}/foo.json')
+        t.equal(url, `${config.url_prefix}/${config.address}/foo.json`)
       })
   })
 
   test('getFullReadUrl', (t) => {
     t.plan(1)
 
-    const config = { address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+    const config = {
+      address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org',
       token: '',
-      server: 'hub.testblockstack.org' }
+      server: 'hub.testblockstack.org'
+    }
 
     const outUrl = getFullReadUrl('foo.json', config)
     t.equal(`${config.url_prefix}${config.address}/foo.json`, outUrl)
@@ -708,7 +727,7 @@ export function runStorageTests() {
     const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
     FetchMock.get(`${hubServer}/hub_info`,
-      JSON.stringify(hubInfo))
+                  JSON.stringify(hubInfo))
 
     connectToGaiaHub(hubServer, privateKey)
       .then((config) => {

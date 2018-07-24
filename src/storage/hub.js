@@ -3,8 +3,8 @@ import bitcoin from 'bitcoinjs-lib'
 import bigi from 'bigi'
 import crypto from 'crypto'
 
-import { loadUserData } from '../auth/authApp'
 import { TokenSigner } from 'jsontokens'
+import { loadUserData } from '../auth/authApp'
 import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
 import { Logger } from '../logger'
@@ -19,23 +19,25 @@ export type GaiaHubConfig = {
 }
 
 export function uploadToGaiaHub(filename: string, contents: any,
-  hubConfig: GaiaHubConfig,
-  contentType: string = 'application/octet-stream'): Promise<*> {
+                                hubConfig: GaiaHubConfig,
+                                contentType: string = 'application/octet-stream'): Promise<*> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
   return fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`,
-    { method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: `bearer ${hubConfig.token}`
-      },
-      body: contents })
-    .then((response) => response.text())
-    .then((responseText) => JSON.parse(responseText))
-    .then((responseJSON) => responseJSON.publicURL)
+               {
+                 method: 'POST',
+                 headers: {
+                   'Content-Type': contentType,
+                   Authorization: `bearer ${hubConfig.token}`
+                 },
+                 body: contents 
+               })
+    .then(response => response.text())
+    .then(responseText => JSON.parse(responseText))
+    .then(responseJSON => responseJSON.publicURL)
 }
 
 export function getFullReadUrl(filename: string,
-  hubConfig: GaiaHubConfig): string {
+                               hubConfig: GaiaHubConfig): string {
   return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
 }
 
@@ -47,15 +49,16 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
   } catch (err) {
     throw new Error('Failed in parsing legacy challenge text from the gaia hub.')
   }
-  if (parsedChallenge[0] === 'gaiahub' &&
-      parsedChallenge[3] === 'blockstack_storage_please_sign') {
-    const signer = hexStringToECPair(signerKeyHex +
-                                     (signerKeyHex.length === 64 ? '01' : ''))
+  if (parsedChallenge[0] === 'gaiahub'
+      && parsedChallenge[3] === 'blockstack_storage_please_sign') {
+    const signer = hexStringToECPair(signerKeyHex
+                                     + (signerKeyHex.length === 64 ? '01' : ''))
     const digest = bitcoin.crypto.sha256(challengeText)
     const signature = signer.sign(digest).toDER().toString('hex')
     const publickey = getPublicKeyFromPrivate(signerKeyHex)
     const token = Buffer.from(JSON.stringify(
-      { publickey, signature })).toString('base64')
+      { publickey, signature }
+    )).toString('base64')
     return token
   } else {
     throw new Error('Failed to connect to legacy gaia hub. If you operate this hub, please update.')
@@ -64,8 +67,8 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
 
 function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string, hubUrl: string): string {
   const challengeText = hubInfo.challenge_text
-  const handlesV1Auth = (hubInfo.latest_auth_version &&
-                         parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
+  const handlesV1Auth = (hubInfo.latest_auth_version
+                         && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
   const iss = getPublicKeyFromPrivate(signerKeyHex)
 
   if (!handlesV1Auth) {
@@ -73,28 +76,34 @@ function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string, hubUrl: stri
   }
 
   const salt = crypto.randomBytes(16).toString('hex')
-  const payload = { gaiaChallenge: challengeText,
-    hubUrl, iss, salt }
+  const payload = {
+    gaiaChallenge: challengeText,
+    hubUrl,
+    iss,
+    salt 
+  }
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
 }
 
 export function connectToGaiaHub(gaiaHubUrl: string,
-  challengeSignerHex: string): Promise<GaiaHubConfig> {
+                                 challengeSignerHex: string): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   return fetch(`${gaiaHubUrl}/hub_info`)
-    .then((response) => response.json())
+    .then(response => response.json())
     .then((hubInfo) => {
       const readURL = hubInfo.read_url_prefix
       const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl)
-      const address = hexStringToECPair(challengeSignerHex +
-                                        (challengeSignerHex.length === 64 ? '01' : ''))
+      const address = hexStringToECPair(challengeSignerHex
+                                        + (challengeSignerHex.length === 64 ? '01' : ''))
         .getAddress()
-      return { url_prefix: readURL,
+      return {
+        url_prefix: readURL,
         address,
         token,
-        server: gaiaHubUrl }
+        server: gaiaHubUrl 
+      }
     })
 }
 
@@ -112,7 +121,8 @@ export function setLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
     userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
 
     window.localStorage.setItem(
-      BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+      BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
+    )
 
     userData = loadUserData()
   }
@@ -144,8 +154,8 @@ export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise
   }
 
   return fetch(`${gaiaHubUrl}/hub_info`)
-    .then((response) => response.text())
-    .then((responseText) => JSON.parse(responseText))
+    .then(response => response.text())
+    .then(responseText => JSON.parse(responseText))
     .then((responseJSON) => {
       const readURL = responseJSON.read_url_prefix
       const address = challengeSigner.getAddress()

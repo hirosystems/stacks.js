@@ -1,6 +1,6 @@
 /* @flow */
-import { Service } from './service'
 import cheerio from 'cheerio'
+import { Service } from './service'
 
 class Instagram extends Service {
   static getBaseUrls() {

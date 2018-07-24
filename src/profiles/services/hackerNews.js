@@ -1,6 +1,6 @@
 /* @flow */
-import { Service } from './service'
 import cheerio from 'cheerio'
+import { Service } from './service'
 
 class HackerNews extends Service {
   static getBaseUrls() {

@@ -40,8 +40,10 @@ function equalConstTime(b1 : Buffer, b2 : Buffer) {
 function sharedSecretToKeys(sharedSecret : Buffer) {
   // generate mac and encryption key from shared secret
   const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
-  return { encryptionKey: hashedSecret.slice(0, 32),
-    hmacKey: hashedSecret.slice(32) }
+  return {
+    encryptionKey: hashedSecret.slice(0, 32),
+    hmacKey: hashedSecret.slice(32) 
+  }
 }
 
 export function getHexFromBN(bnInput: Object) {
@@ -70,7 +72,7 @@ export function getHexFromBN(bnInput: Object) {
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  */
 export function encryptECIES(publicKey: string, content: string | Buffer) : CipherObject {
-  const isString = (typeof(content) === 'string')
+  const isString = (typeof (content) === 'string')
   const plainText = Buffer.from(content) // always copy to buffer
 
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
@@ -81,23 +83,27 @@ export function encryptECIES(publicKey: string, content: string | Buffer) : Ciph
   const sharedSecretHex = getHexFromBN(sharedSecret)
 
   const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecretHex, 'hex'))
+    new Buffer(sharedSecretHex, 'hex')
+  )
 
   const initializationVector = crypto.randomBytes(16)
 
   const cipherText = aes256CbcEncrypt(
-    initializationVector, sharedKeys.encryptionKey, plainText)
+    initializationVector, sharedKeys.encryptionKey, plainText
+  )
 
   const macData = Buffer.concat([initializationVector,
-    new Buffer(ephemeralPK.encodeCompressed()),
-    cipherText])
+                                 new Buffer(ephemeralPK.encodeCompressed()),
+                                 cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
-  return { iv: initializationVector.toString('hex'),
+  return {
+    iv: initializationVector.toString('hex'),
     ephemeralPK: ephemeralPK.encodeCompressed('hex'),
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
-    wasString: isString }
+    wasString: isString 
+  }
 }
 
 /**
@@ -123,15 +129,16 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-    new Buffer(ephemeralPK.encodeCompressed()),
-    cipherTextBuffer])
+                                 new Buffer(ephemeralPK.encodeCompressed()),
+                                 cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = new Buffer(cipherObject.mac, 'hex')
-  if (! equalConstTime(expectedMac, actualMac)) {
+  if (!equalConstTime(expectedMac, actualMac)) {
     throw new Error('Decryption failed: failure in MAC check')
   }
   const plainText = aes256CbcDecrypt(
-    ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer)
+    ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer
+  )
 
   if (cipherObject.wasString) {
     return plainText.toString()
@@ -171,8 +178,8 @@ export function signECDSA(privateKey: string, content: string | Buffer)
  * @return {Boolean} returns true when signature matches publickey + content, false if not
  */
 export function verifyECDSA(content: string | Buffer,
-  publicKey: string,
-  signature: string) {
+                            publicKey: string,
+                            signature: string) {
   const contentBuffer = Buffer.from(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
   const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()

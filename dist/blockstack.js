@@ -21,11 +21,11 @@ var _queryString2 = _interopRequireDefault(_queryString);
 
 var _jsontokens = require('jsontokens');
 
-var _index = require('./index');
-
 var _customProtocolDetectionBlockstack = require('custom-protocol-detection-blockstack');
 
 var _customProtocolDetectionBlockstack2 = _interopRequireDefault(_customProtocolDetectionBlockstack);
+
+var _index = require('./index');
 
 var _utils = require('../utils');
 
@@ -173,7 +173,7 @@ function isSignInPending() {
  * keys match claimed username
  * @param {String} authResponseToken - the signed authentication response token
  * @param {String} transitKey - the transit private key that corresponds to the transit public key
- * that was provided in the authentication request  
+ * that was provided in the authentication request
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
@@ -289,7 +289,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 var BLOCKSTACK_HANDLER = exports.BLOCKSTACK_HANDLER = 'blockstack';
 var BLOCKSTACK_STORAGE_LABEL = exports.BLOCKSTACK_STORAGE_LABEL = 'blockstack';
-var DEFAULT_BLOCKSTACK_HOST = exports.DEFAULT_BLOCKSTACK_HOST = 'https://blockstack.org/auth';
+var DEFAULT_BLOCKSTACK_HOST = exports.DEFAULT_BLOCKSTACK_HOST = 'https://browser.blockstack.org/auth';
 var DEFAULT_SCOPE = exports.DEFAULT_SCOPE = ['store_write'];
 var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
 var BLOCKSTACK_DEFAULT_GAIA_HUB_URL = exports.BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';
@@ -1351,8 +1351,10 @@ function equalConstTime(b1, b2) {
 function sharedSecretToKeys(sharedSecret) {
   // generate mac and encryption key from shared secret
   var hashedSecret = _crypto2.default.createHash('sha512').update(sharedSecret).digest();
-  return { encryptionKey: hashedSecret.slice(0, 32),
-    hmacKey: hashedSecret.slice(32) };
+  return {
+    encryptionKey: hashedSecret.slice(0, 32),
+    hmacKey: hashedSecret.slice(32)
+  };
 }
 
 function getHexFromBN(bnInput) {
@@ -1400,11 +1402,13 @@ function encryptECIES(publicKey, content) {
   var macData = Buffer.concat([initializationVector, new Buffer(ephemeralPK.encodeCompressed()), cipherText]);
   var mac = hmacSha256(sharedKeys.hmacKey, macData);
 
-  return { iv: initializationVector.toString('hex'),
+  return {
+    iv: initializationVector.toString('hex'),
     ephemeralPK: ephemeralPK.encodeCompressed('hex'),
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
-    wasString: isString };
+    wasString: isString
+  };
 }
 
 /**
@@ -2381,7 +2385,8 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
         // zone file is two words but core's api treats it as one word 'zonefile'
         var _requestBody = { zonefile: zoneFile };
 
-        return fetch(this.blockstackAPIUrl + '/v1/zonefile/', { method: 'POST',
+        return fetch(this.blockstackAPIUrl + '/v1/zonefile/', {
+          method: 'POST',
           body: JSON.stringify(_requestBody),
           headers: {
             'Content-Type': 'application/json'
@@ -2524,8 +2529,10 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
       tx.ins.forEach(function (utxoUsed) {
         var reverseHash = Buffer.from(utxoUsed.hash);
         reverseHash.reverse();
-        excludeSet.push({ tx_hash: reverseHash.toString('hex'),
-          tx_output_n: utxoUsed.index });
+        excludeSet.push({
+          tx_hash: reverseHash.toString('hex'),
+          tx_output_n: utxoUsed.index
+        });
       });
 
       this.excludeUtxoSet = excludeSet;
@@ -2542,10 +2549,12 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
           includeSet = includeSet.concat(_this7.includeUtxoMap[address]);
         }
 
-        includeSet.push({ tx_hash: txHash,
+        includeSet.push({
+          tx_hash: txHash,
           confirmations: 0,
           value: utxoCreated.value,
-          tx_output_n: txOutputN });
+          tx_output_n: txOutputN
+        });
         _this7.includeUtxoMap[address] = includeSet;
       });
     }
@@ -2619,14 +2628,18 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
   _createClass(BitcoindAPI, [{
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
-      var jsonRPC = { jsonrpc: '1.0',
+      var jsonRPC = {
+        jsonrpc: '1.0',
         method: 'sendrawtransaction',
-        params: [transaction] };
+        params: [transaction]
+      };
       var authString = Buffer.from(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password).toString('base64');
       var headers = { Authorization: 'Basic ' + authString };
-      return fetch(this.bitcoindUrl, { method: 'POST',
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
         body: JSON.stringify(jsonRPC),
-        headers: headers }).then(function (resp) {
+        headers: headers
+      }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
         return respObj.result;
@@ -2635,13 +2648,17 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
   }, {
     key: 'getBlockHeight',
     value: function getBlockHeight() {
-      var jsonRPC = { jsonrpc: '1.0',
-        method: 'getblockcount' };
+      var jsonRPC = {
+        jsonrpc: '1.0',
+        method: 'getblockcount'
+      };
       var authString = Buffer.from(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password).toString('base64');
       var headers = { Authorization: 'Basic ' + authString };
-      return fetch(this.bitcoindUrl, { method: 'POST',
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
         body: JSON.stringify(jsonRPC),
-        headers: headers }).then(function (resp) {
+        headers: headers
+      }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
         return respObj.result;
@@ -2652,27 +2669,35 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
     value: function getTransactionInfo(txHash) {
       var _this10 = this;
 
-      var jsonRPC = { jsonrpc: '1.0',
+      var jsonRPC = {
+        jsonrpc: '1.0',
         method: 'gettransaction',
-        params: [txHash] };
+        params: [txHash]
+      };
       var authString = Buffer.from(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password).toString('base64');
       var headers = { Authorization: 'Basic ' + authString };
-      return fetch(this.bitcoindUrl, { method: 'POST',
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
         body: JSON.stringify(jsonRPC),
-        headers: headers }).then(function (resp) {
+        headers: headers
+      }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
         return respObj.result;
       }).then(function (txInfo) {
         return txInfo.blockhash;
       }).then(function (blockhash) {
-        var jsonRPCBlock = { jsonrpc: '1.0',
+        var jsonRPCBlock = {
+          jsonrpc: '1.0',
           method: 'getblockheader',
-          params: [blockhash] };
+          params: [blockhash]
+        };
         headers.Authorization = 'Basic ' + authString;
-        return fetch(_this10.bitcoindUrl, { method: 'POST',
+        return fetch(_this10.bitcoindUrl, {
+          method: 'POST',
           body: JSON.stringify(jsonRPCBlock),
-          headers: headers });
+          headers: headers
+        });
       }).then(function (resp) {
         return resp.json();
       }).then(function (respObj) {
@@ -2684,31 +2709,41 @@ var BitcoindAPI = exports.BitcoindAPI = function (_BitcoinNetwork) {
     value: function getNetworkedUTXOs(address) {
       var _this11 = this;
 
-      var jsonRPCImport = { jsonrpc: '1.0',
+      var jsonRPCImport = {
+        jsonrpc: '1.0',
         method: 'importaddress',
-        params: [address] };
-      var jsonRPCUnspent = { jsonrpc: '1.0',
+        params: [address]
+      };
+      var jsonRPCUnspent = {
+        jsonrpc: '1.0',
         method: 'listunspent',
-        params: [0, 9999999, [address]] };
+        params: [0, 9999999, [address]]
+      };
       var authString = Buffer.from(this.bitcoindCredentials.username + ':' + this.bitcoindCredentials.password).toString('base64');
       var headers = { Authorization: 'Basic ' + authString };
 
-      return fetch(this.bitcoindUrl, { method: 'POST',
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
         body: JSON.stringify(jsonRPCImport),
-        headers: headers }).then(function () {
-        return fetch(_this11.bitcoindUrl, { method: 'POST',
+        headers: headers
+      }).then(function () {
+        return fetch(_this11.bitcoindUrl, {
+          method: 'POST',
           body: JSON.stringify(jsonRPCUnspent),
-          headers: headers });
+          headers: headers
+        });
       }).then(function (resp) {
         return resp.json();
       }).then(function (x) {
         return x.result;
       }).then(function (utxos) {
         return utxos.map(function (x) {
-          return Object({ value: Math.round(x.amount * SATOSHIS_PER_BTC),
+          return Object({
+            value: Math.round(x.amount * SATOSHIS_PER_BTC),
             confirmations: x.confirmations,
             tx_hash: x.txid,
-            tx_output_n: x.vout });
+            tx_output_n: x.vout
+          });
         });
       });
     }
@@ -2735,9 +2770,11 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
     key: 'broadcastTransaction',
     value: function broadcastTransaction(transaction) {
       var jsonData = { tx: transaction };
-      return fetch(this.apiUrl + '/tx/send', { method: 'POST',
+      return fetch(this.apiUrl + '/tx/send', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(jsonData) }).then(function (resp) {
+        body: JSON.stringify(jsonData)
+      }).then(function (resp) {
         return resp.json();
       });
     }
@@ -2775,10 +2812,12 @@ var InsightClient = exports.InsightClient = function (_BitcoinNetwork2) {
         return resp.json();
       }).then(function (utxos) {
         return utxos.map(function (x) {
-          return { value: x.satoshis,
+          return {
+            value: x.satoshis,
             confirmations: x.confirmations,
             tx_hash: x.txid,
-            tx_output_n: x.vout };
+            tx_output_n: x.vout
+          };
         });
       });
     }
@@ -2826,10 +2865,12 @@ var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) 
         return utxoJSON.unspent_outputs;
       }).then(function (utxoList) {
         return utxoList.map(function (utxo) {
-          var utxoOut = { value: utxo.value,
+          var utxoOut = {
+            value: utxo.value,
             tx_output_n: utxo.tx_output_n,
             confirmations: utxo.confirmations,
-            tx_hash: utxo.tx_hash_big_endian };
+            tx_hash: utxo.tx_hash_big_endian
+          };
           return utxoOut;
         });
       });
@@ -2852,8 +2893,10 @@ var BlockchainInfoApi = exports.BlockchainInfoApi = function (_BitcoinNetwork3) 
     value: function broadcastTransaction(transaction) {
       var form = new _formData2.default();
       form.append('tx', transaction);
-      return fetch(this.utxoProviderUrl + '/pushtx?cors=true', { method: 'POST',
-        body: form }).then(function (resp) {
+      return fetch(this.utxoProviderUrl + '/pushtx?cors=true', {
+        method: 'POST',
+        body: form
+      }).then(function (resp) {
         var text = resp.text();
         return text.then(function (respText) {
           if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
@@ -2874,9 +2917,14 @@ var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost
 
 var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://broadcast.blockstack.org', new BlockchainInfoApi());
 
-var network = exports.network = { BlockstackNetwork: BlockstackNetwork, LocalRegtest: LocalRegtest,
-  BlockchainInfoApi: BlockchainInfoApi, BitcoindAPI: BitcoindAPI, InsightClient: InsightClient,
-  defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT } };
+var network = exports.network = {
+  BlockstackNetwork: BlockstackNetwork,
+  LocalRegtest: LocalRegtest,
+  BlockchainInfoApi: BlockchainInfoApi,
+  BitcoindAPI: BitcoindAPI,
+  InsightClient: InsightClient,
+  defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT }
+};
 }).call(this,require("buffer").Buffer)
 },{"./errors":11,"./logger":14,"bitcoinjs-lib":81,"buffer":159,"form-data":333}],16:[function(require,module,exports){
 'use strict';
@@ -3078,8 +3126,16 @@ function addressCanReceiveName(address) {
 }
 
 var safety = exports.safety = {
-  addressCanReceiveName: addressCanReceiveName, isInGracePeriod: isInGracePeriod, ownsName: ownsName, isNameAvailable: isNameAvailable, isNameValid: isNameValid,
-  isNamespaceValid: isNamespaceValid, isNamespaceAvailable: isNamespaceAvailable, revealedNamespace: revealedNamespace, namespaceIsReady: namespaceIsReady, namespaceIsRevealed: namespaceIsRevealed
+  addressCanReceiveName: addressCanReceiveName,
+  isInGracePeriod: isInGracePeriod,
+  ownsName: ownsName,
+  isNameAvailable: isNameAvailable,
+  isNameValid: isNameValid,
+  isNamespaceValid: isNamespaceValid,
+  isNamespaceAvailable: isNamespaceAvailable,
+  revealedNamespace: revealedNamespace,
+  namespaceIsReady: namespaceIsReady,
+  namespaceIsRevealed: namespaceIsRevealed
 };
 },{"../config":8}],18:[function(require,module,exports){
 'use strict';
@@ -3171,13 +3227,13 @@ var _bitcoinjsLib = require('bitcoinjs-lib');
 
 var _bitcoinjsLib2 = _interopRequireDefault(_bitcoinjsLib);
 
-var _utils = require('./utils');
-
-var _config = require('../config');
-
 var _bigi = require('bigi');
 
 var _bigi2 = _interopRequireDefault(_bigi);
+
+var _utils = require('./utils');
+
+var _config = require('../config');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3815,7 +3871,7 @@ function estimateRegister(fullyQualifiedName, registerAddress, paymentAddress) {
 
   var network = _config.config.network;
 
-  var valueHash = undefined;
+  var valueHash = void 0;
   if (includingZonefile) {
     valueHash = dummyZonefileHash;
   }
@@ -3905,7 +3961,7 @@ function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, p
 
   var network = _config.config.network;
 
-  var valueHash = undefined;
+  var valueHash = void 0;
   if (includingZonefile) {
     valueHash = dummyZonefileHash;
   }
@@ -4945,12 +5001,30 @@ function makeBitcoinSpend(destinationAddress, paymentKeyIn, amount) {
 }
 
 var transactions = exports.transactions = {
-  makeRenewal: makeRenewal, makeUpdate: makeUpdate, makePreorder: makePreorder, makeRegister: makeRegister, makeTransfer: makeTransfer, makeRevoke: makeRevoke,
-  makeNamespacePreorder: makeNamespacePreorder, makeNamespaceReveal: makeNamespaceReveal, makeNamespaceReady: makeNamespaceReady, makeBitcoinSpend: makeBitcoinSpend,
-  makeNameImport: makeNameImport, makeAnnounce: makeAnnounce, BlockstackNamespace: _skeletons.BlockstackNamespace,
-  estimatePreorder: estimatePreorder, estimateRegister: estimateRegister, estimateTransfer: estimateTransfer, estimateUpdate: estimateUpdate, estimateRenewal: estimateRenewal,
-  estimateRevoke: estimateRevoke, estimateNamespacePreorder: estimateNamespacePreorder, estimateNamespaceReveal: estimateNamespaceReveal, estimateNamespaceReady: estimateNamespaceReady,
-  estimateNameImport: estimateNameImport, estimateAnnounce: estimateAnnounce
+  makeRenewal: makeRenewal,
+  makeUpdate: makeUpdate,
+  makePreorder: makePreorder,
+  makeRegister: makeRegister,
+  makeTransfer: makeTransfer,
+  makeRevoke: makeRevoke,
+  makeNamespacePreorder: makeNamespacePreorder,
+  makeNamespaceReveal: makeNamespaceReveal,
+  makeNamespaceReady: makeNamespaceReady,
+  makeBitcoinSpend: makeBitcoinSpend,
+  makeNameImport: makeNameImport,
+  makeAnnounce: makeAnnounce,
+  BlockstackNamespace: _skeletons.BlockstackNamespace,
+  estimatePreorder: estimatePreorder,
+  estimateRegister: estimateRegister,
+  estimateTransfer: estimateTransfer,
+  estimateUpdate: estimateUpdate,
+  estimateRenewal: estimateRenewal,
+  estimateRevoke: estimateRevoke,
+  estimateNamespacePreorder: estimateNamespacePreorder,
+  estimateNamespaceReveal: estimateNamespaceReveal,
+  estimateNamespaceReady: estimateNamespaceReady,
+  estimateNameImport: estimateNameImport,
+  estimateAnnounce: estimateAnnounce
 };
 }).call(this,require("buffer").Buffer)
 },{"../config":8,"../errors":11,"./signers":18,"./skeletons":19,"./utils":21,"bitcoinjs-lib":81,"buffer":159}],21:[function(require,module,exports){
@@ -5472,11 +5546,11 @@ exports.CreativeWork = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _profileTokens = require('../profileTokens');
-
 var _schemaInspector = require('schema-inspector');
 
 var _schemaInspector2 = _interopRequireDefault(_schemaInspector);
+
+var _profileTokens = require('../profileTokens');
 
 var _profile = require('../profile');
 
@@ -5526,7 +5600,7 @@ var CreativeWork = exports.CreativeWork = function (_Profile) {
     value: function fromToken(token) {
       var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-      var profile = (0, _profileTokens.extractToken)(token, publicKeyOrAddress);
+      var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
       return new CreativeWork(profile);
     }
   }]);
@@ -6264,14 +6338,12 @@ function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
       var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
 
       callback(profile);
-      return;
     }).catch(function (error) {
       console.warn(error);
     });
   } else {
     console.warn('Token file url not found');
     callback({});
-    return;
   }
 }
 },{"../profileTokens":33,"../profileZoneFiles":34,"./person":29,"zone-file":510}],33:[function(require,module,exports){
@@ -6563,7 +6635,6 @@ function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
         var tokenRecords = responseJson;
         var profile = (0, _profileTokens.extractProfile)(tokenRecords[0].token, publicKeyOrAddress);
         resolve(profile);
-        return;
       }).catch(function (error) {
         _logger.Logger.error('resolveZoneFileToProfile: error fetching token file ' + tokenFileUrl, error);
         reject(error);
@@ -6571,7 +6642,6 @@ function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
     } else {
       _logger.Logger.debug('Token file url not found. Resolving to blank profile.');
       resolve({});
-      return;
     }
   });
 }
@@ -6587,11 +6657,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _service = require('./service');
-
 var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
+
+var _service = require('./service');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6722,11 +6792,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _service = require('./service');
-
 var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
+
+var _service = require('./service');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6851,11 +6921,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _service = require('./service');
-
 var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
+
+var _service = require('./service');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6951,11 +7021,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _service = require('./service');
-
 var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
+
+var _service = require('./service');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7153,7 +7223,7 @@ function containsValidProofStatement(searchText) {
 
   searchText = searchText.toLowerCase();
 
-  if (name.split('.').length !== 2) {
+  if (name.split('.').length < 2) {
     throw new Error('Please provide the fully qualified Blockstack name.');
   }
 
@@ -7207,11 +7277,11 @@ exports.Twitter = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _service = require('./service');
-
 var _cheerio = require('cheerio');
 
 var _cheerio2 = _interopRequireDefault(_cheerio);
+
+var _service = require('./service');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7280,9 +7350,9 @@ var _crypto = require('crypto');
 
 var _crypto2 = _interopRequireDefault(_crypto);
 
-var _authApp = require('../auth/authApp');
-
 var _jsontokens = require('jsontokens');
+
+var _authApp = require('../auth/authApp');
 
 var _index = require('../index');
 
@@ -7298,12 +7368,14 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
 
   _logger.Logger.debug('uploadToGaiaHub: uploading ' + filename + ' to ' + hubConfig.server);
-  return fetch(hubConfig.server + '/store/' + hubConfig.address + '/' + filename, { method: 'POST',
+  return fetch(hubConfig.server + '/store/' + hubConfig.address + '/' + filename, {
+    method: 'POST',
     headers: {
       'Content-Type': contentType,
       Authorization: 'bearer ' + hubConfig.token
     },
-    body: contents }).then(function (response) {
+    body: contents
+  }).then(function (response) {
     return response.text();
   }).then(function (responseText) {
     return JSON.parse(responseText);
@@ -7346,8 +7418,12 @@ function makeV1GaiaAuthToken(hubInfo, signerKeyHex, hubUrl) {
   }
 
   var salt = _crypto2.default.randomBytes(16).toString('hex');
-  var payload = { gaiaChallenge: challengeText,
-    hubUrl: hubUrl, iss: iss, salt: salt };
+  var payload = {
+    gaiaChallenge: challengeText,
+    hubUrl: hubUrl,
+    iss: iss,
+    salt: salt
+  };
   var token = new _jsontokens.TokenSigner('ES256K', signerKeyHex).sign(payload);
   return 'v1:' + token;
 }
@@ -7361,10 +7437,12 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
     var readURL = hubInfo.read_url_prefix;
     var token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl);
     var address = (0, _index.hexStringToECPair)(challengeSignerHex + (challengeSignerHex.length === 64 ? '01' : '')).getAddress();
-    return { url_prefix: readURL,
+    return {
+      url_prefix: readURL,
       address: address,
       token: token,
-      server: gaiaHubUrl };
+      server: gaiaHubUrl
+    };
   });
 }
 
@@ -7827,9 +7905,11 @@ function putFile(path, content, options) {
   } else if (opt.encrypt && opt.sign) {
     var cipherText = encryptContent(content, { publicKey: publicKey });
     var _signatureObject = (0, _encryption.signECDSA)(privateKey, cipherText);
-    var signedCipherObject = { signature: _signatureObject.signature,
+    var signedCipherObject = {
+      signature: _signatureObject.signature,
       publicKey: _signatureObject.publicKey,
-      cipherText: cipherText };
+      cipherText: cipherText
+    };
     content = JSON.stringify(signedCipherObject);
     contentType = 'application/json';
   }
@@ -7887,11 +7967,11 @@ var _url2 = _interopRequireDefault(_url);
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
-var _config = require('./config');
-
 var _bigi = require('bigi');
 
 var _bigi2 = _interopRequireDefault(_bigi);
+
+var _config = require('./config');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7955,8 +8035,10 @@ function isLaterVersion(v1, v2) {
 }
 
 function hexStringToECPair(skHex) {
-  var ecPairOptions = { network: _config.config.network.layer1,
-    compressed: true };
+  var ecPairOptions = {
+    network: _config.config.network.layer1,
+    compressed: true
+  };
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' + 'indicates compressed key, but last byte must be == 1');
@@ -7971,7 +8053,7 @@ function hexStringToECPair(skHex) {
 }
 
 function ecPairToHexString(secretKey) {
-  var ecPointHex = secretKey.d.toHex();
+  var ecPointHex = secretKey.d.toBuffer(32).toString('hex');
   if (secretKey.compressed) {
     return ecPointHex + '01';
   } else {
