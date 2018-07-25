@@ -40,6 +40,8 @@ toc:
   - getFile
   - putFile
   - deleteFile
+  - encryptContent
+  - decryptContent
   - getAppBucketUrl
   - getUserAppFileUrl
   - name: Blockchain

@@ -1,5 +1,5 @@
 /* @flow */
-require('isomorphic-fetch')
+import 'cross-fetch'
 
 import {
   TokenSigner,
@@ -135,7 +135,7 @@ export function decryptPrivateKey(privateKey: string,
  * @param  {Number} expiresAt an integer in the same format as
  * `new Date().getTime()`, milliseconds since the Unix epoch
  * @param {String} transitPublicKey the public key provide by the app
- * in its authentication request with which secrets will be encrypted 
+ * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @param {String} blockstackAPIUrl URL to the API endpoint to use
  * @return {String} signed and encoded authentication response token

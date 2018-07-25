@@ -3,8 +3,6 @@ import test from 'tape-promise/tape'
 import { decodeToken } from 'jsontokens'
 import FetchMock from 'fetch-mock'
 
-global.window = {}
-
 import {
   makeECPrivateKey,
   getPublicKeyFromPrivate,
@@ -30,6 +28,8 @@ import {
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
+
+global.window = {}
 
 export function runAuthTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -57,16 +57,16 @@ export function runAuthTests() {
     const referenceDID = makeDIDFromAddress(address)
     const origin = 'http://localhost:3000'
     t.equal(decodedToken.payload.iss,
-      referenceDID, 'auth request issuer should include the public key')
+            referenceDID, 'auth request issuer should include the public key')
     t.equal(decodedToken.payload.domain_name,
-      origin, 'auth request domain_name should be origin')
+            origin, 'auth request domain_name should be origin')
     t.equal(decodedToken.payload.redirect_uri,
-      'http://localhost:3000/', 'auth request redirects to correct uri')
+            'http://localhost:3000/', 'auth request redirects to correct uri')
     t.equal(decodedToken.payload.manifest_uri,
-      'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
+            'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
 
     t.equal(JSON.stringify(decodedToken.payload.scopes),
-    '["store_write"]', 'auth request scopes should be store_write')
+            '["store_write"]', 'auth request scopes should be store_write')
 
     verifyAuthRequest(authRequest)
       .then((verified) => {
@@ -109,7 +109,7 @@ export function runAuthTests() {
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
 
     t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false,
-          'Signatures should not match the public keys')
+            'Signatures should not match the public keys')
 
     verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
@@ -120,9 +120,9 @@ export function runAuthTests() {
       .then(() => {
         // no op
       },
-      () => {
-        t.pass('invalid auth request rejected')
-      })
+            () => {
+              t.pass('invalid auth request rejected')
+            })
   })
 
   test('invalid auth request - invalid redirect uri', (t) => {
@@ -131,7 +131,7 @@ export function runAuthTests() {
     const invalidAuthRequest = makeAuthRequest(privateKey, 'https://example.com')
 
     t.equal(isRedirectUriValid(invalidAuthRequest), false,
-          'Redirect URI should be invalid since it does not match origin')
+            'Redirect URI should be invalid since it does not match origin')
 
     verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
@@ -142,9 +142,9 @@ export function runAuthTests() {
       .then(() => {
         // no op
       },
-      () => {
-        t.pass('invalid auth request rejected')
-      })
+            () => {
+              t.pass('invalid auth request rejected')
+            })
   })
 
   test('invalid auth request - invalid manifest uri', (t) => {
@@ -153,7 +153,7 @@ export function runAuthTests() {
     const invalidAuthRequest = makeAuthRequest(privateKey, 'http://localhost:3000', 'https://example.com/manifest.json')
 
     t.equal(isManifestUriValid(invalidAuthRequest), false,
-          'Manifest URI should be invalid since it does not match origin')
+            'Manifest URI should be invalid since it does not match origin')
 
     verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
@@ -174,10 +174,10 @@ export function runAuthTests() {
     const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
     t.equal(decodedToken.payload.iss,
-      referenceDID, 'auth response issuer should include the public key')
+            referenceDID, 'auth response issuer should include the public key')
 
     t.equal(JSON.stringify(decodedToken.payload.profile),
-    JSON.stringify(sampleProfiles.ryan), 'auth response profile should equal the reference value')
+            JSON.stringify(sampleProfiles.ryan), 'auth response profile should equal the reference value')
 
     t.equal(decodedToken.payload.username, null, 'auth response username should be null')
 
@@ -185,7 +185,7 @@ export function runAuthTests() {
     // t.equal(verified, true, 'auth response should be verified')
 
     verifyAuthResponse(authResponse, nameLookupURL)
-      .then(verifiedResult => {
+      .then((verifiedResult) => {
         t.true(verifiedResult, 'auth response should be verified')
       })
 
@@ -195,7 +195,7 @@ export function runAuthTests() {
     t.true(doPublicKeysMatchIssuer(authResponse), 'Public keys should match the issuer')
 
     doPublicKeysMatchUsername(authResponse, nameLookupURL)
-      .then(verifiedResult => {
+      .then((verifiedResult) => {
         t.true(verifiedResult, 'Public keys should match the username')
       })
   })
@@ -212,12 +212,12 @@ export function runAuthTests() {
     // console.log(decodeToken(authResponse))
 
     doPublicKeysMatchUsername(authResponse, nameLookupURL)
-      .then(verified => {
+      .then((verified) => {
         t.true(verified, 'Public keys should match the username')
       })
 
     verifyAuthResponse(authResponse, nameLookupURL)
-      .then(verifiedResult => {
+      .then((verifiedResult) => {
         t.true(verifiedResult, 'auth response should be verified')
       })
   })

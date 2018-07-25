@@ -1,8 +1,8 @@
 /* @flow */
 import url from 'url'
 import { ECPair } from 'bitcoinjs-lib'
-import { config } from './config'
 import BigInteger from 'bigi'
+import { config } from './config'
 
 
 export const BLOCKSTACK_HANDLER = 'blockstack'
@@ -74,12 +74,14 @@ export function isLaterVersion(v1: string, v2: string) {
 
 
 export function hexStringToECPair(skHex: string) {
-  const ecPairOptions = { network: config.network.layer1,
-                          compressed: true }
+  const ecPairOptions = {
+    network: config.network.layer1,
+    compressed: true 
+  }
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
-      throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' +
-                      'indicates compressed key, but last byte must be == 1')
+      throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
+                      + 'indicates compressed key, but last byte must be == 1')
     }
     return new ECPair(BigInteger.fromHex(skHex.slice(0, 64)), undefined, ecPairOptions)
   } else if (skHex.length === 64) {

@@ -43,9 +43,9 @@ export function containsValidProofStatement(searchText: string, name: ?string = 
     }
   }
 
-  if (username != null &&
-      searchText.includes('verifymyonename') &&
-      searchText.includes(`+${username}`)) {
+  if (username != null
+      && searchText.includes('verifymyonename')
+      && searchText.includes(`+${username}`)) {
     return true
   }
 

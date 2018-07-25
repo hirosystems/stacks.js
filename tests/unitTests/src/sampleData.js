@@ -32,7 +32,8 @@ export const sampleProfiles = {
   google: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/google.json`)),
   navalLegacy: JSON.parse(fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy.json`)),
   navalLegacyConvert: JSON.parse(
-    fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy-convert.json`))
+    fs.readFileSync(`${TEST_DATA_DIR}/profiles/naval-legacy-convert.json`)
+  )
 }
 
 export const sampleTokenFiles = {
@@ -70,7 +71,7 @@ export const sampleVerifications = {
   },
   larry: {
     facebook: {
-      url: 'https://www.facebook.com/larrysalibra/posts/10100341028448093',
+      url: 'https://www.facebook.com/larry.salibra/posts/10100341028448093',
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/larry.verification.facebook.html`, 'utf8')
     }
   }
@@ -81,7 +82,7 @@ export const sampleAddressBasedVerifications = {
     facebook: {
       url: 'https://www.facebook.com/larrysalibra/posts/10100341028448094',
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/larry.verification.address.facebook.html`,
-        'utf8')
+                            'utf8')
     }
   },
   ken: {
@@ -99,8 +100,8 @@ export const sampleAddressBasedVerifications = {
     },
     instagramRegression: {
       url: 'https://www.instagram.com/p/BYj6UDwgaX7/',
-      body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/` +
-                            'ken.verification.instagram.regression.html', 'utf8')
+      body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/`
+                            + 'ken.verification.instagram.regression.html', 'utf8')
     },
     hackerNews: {
       url: 'https://news.ycombinator.com/user?id=yukanl',
@@ -113,7 +114,7 @@ export const sampleAddressBasedVerifications = {
     linkedInBroken: {
       url: 'https://www.linkedin.com/feed/update/urn:li:activity:6311587377647222784/',
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/ken.verification.linkedinbroken.html`,
-        'utf8')
+                            'utf8')
     }
   }
 }

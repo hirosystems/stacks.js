@@ -1,23 +1,32 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
-import nock from 'nock'
 
 import { network, InsightClient } from '../../../lib/network'
-import { estimateTXBytes, addUTXOsToFund, sumOutputValues,
-         hash160, hash128, decodeB40 } from '../../../lib/operations/utils'
+import {
+  estimateTXBytes, addUTXOsToFund, sumOutputValues,
+  hash160, hash128, decodeB40
+} from '../../../lib/operations/utils'
 
-import { transactions, safety, config } from '../../../lib/'
+import { transactions, safety, config } from '../../../lib'
 
 const testAddresses = [
-  { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
-    address: '1br553PVnK6F5nyBtb4ju1owwBKdsep5c' },
-  { skHex: '744196d67ed78fe39009c71fbfd53e6ecca98353fbfe81ccba21b0703a69be9c01',
-    address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR' },
-  { address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
-    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001' },
-  { address: '16TaQJi78o4A3nKDSzswqZiX3bhecNuNBQ',
-    skHex: '58f7b29ee4a9a8b05855591b8a5405a0647c74c0a539515173adb9a32c964a9a01' }
+  {
+    skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
+    address: '1br553PVnK6F5nyBtb4ju1owwBKdsep5c'
+  },
+  {
+    skHex: '744196d67ed78fe39009c71fbfd53e6ecca98353fbfe81ccba21b0703a69be9c01',
+    address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR'
+  },
+  {
+    address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
+    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001'
+  },
+  {
+    address: '16TaQJi78o4A3nKDSzswqZiX3bhecNuNBQ',
+    skHex: '58f7b29ee4a9a8b05855591b8a5405a0647c74c0a539515173adb9a32c964a9a01'
+  }
 ]
 
 function networkTests() {
@@ -34,17 +43,27 @@ function networkTests() {
     const txhashNotFound = 'txhash-not-found'
 
     FetchMock.get(`https://utxo.tester.com/tx/${txhashNotFound}`,
-                  { body: JSON.stringify(
-                    { message: 'error fetching transaction details',
-                      error: '-5: No information available about transaction' }),
-                    status: 400 })
+                  {
+                    body: JSON.stringify(
+                      {
+                        message: 'error fetching transaction details',
+                        error: '-5: No information available about transaction'
+                      }
+                    ),
+                    status: 400
+                  })
     FetchMock.get(`https://utxo.tester.com/tx/${txhashFound}`,
                   { blockHash })
     FetchMock.get(`https://utxo.tester.com/block/${blockHash}`,
                   { height: 300 })
     FetchMock.get(`https://utxo.tester.com/addr/${testAddresses[0].address}/utxo`,
-                  [{ value: 1, satoshis: 1e8, confirmations: 2,
-                     txid: 'bar', vout: 10 }])
+                  [{
+                    value: 1,
+                    satoshis: 1e8,
+                    confirmations: 2,
+                    txid: 'bar',
+                    vout: 10
+                  }])
 
     FetchMock.get('https://utxo.tester.com/status',
                   { blocks: 500 })
@@ -62,12 +81,14 @@ function networkTests() {
       .catch(() => t.ok(true, 'Should throw exception for not-found transaction.'))
 
     mynet.getTransactionInfo(txhashFound)
-      .then((txInfo) => t.equal(txInfo.block_height, 300, 'Should return txinfo.block_height'))
+      .then(txInfo => t.equal(txInfo.block_height, 300, 'Should return txinfo.block_height'))
       .catch(() => t.ok(false, 'Should not throw exception for a found transaction.'))
 
     mynet.getNetworkedUTXOs(testAddresses[0].address)
       .then((utxos) => {
-        t.deepEqual(utxos, [{ value: 1e8, confirmations: 2, tx_hash: 'bar', tx_output_n: 10 }])
+        t.deepEqual(utxos, [{
+          value: 1e8, confirmations: 2, tx_hash: 'bar', tx_output_n: 10
+        }])
       })
   })
 }
@@ -75,20 +96,20 @@ function networkTests() {
 function utilsTests() {
   test('estimateTXBytes', (t) => {
     t.plan(2)
-    const txHex = '010000000288e68977fab8038af07746e5d687652a44aa15f532509c202749d' +
-        'bad8a418733000000006b483045022100813ef3534b5030b544e5a5bd1db93f85dc89e2' +
-        'a565197a14784edff5564bd65b022008005213c6aa4c7ebe06cfd86bdaf3e662ae58371' +
-        '896a0a841e81106fbe1507401210236b07942707a86ab666bb300b58d295d988ce9c3a3' +
-        '38a0e08380dd98732fd4faffffffff3ba3edfd7a7b12b27ac72c3e67768f617fc81bc38' +
-        '88a51323a9fb8aa4b1e5e4a000000006b483045022100d0c9b1594137186a1dc6c0b3a6' +
-        'cbe08399b57e2b8c953584f2ce20bef5642eb902206b9c88b8d2d311db26601acf3068d' +
-        'd118649ead4a1f93d029a52c0c61cb2cd2901210236b07942707a86ab666bb300b58d29' +
-        '5d988ce9c3a338a0e08380dd98732fd4faffffffff030000000000000000296a2769643' +
-        'f363da95bc8d5203d1c07bd87c564a1e6395826cfdfe87cfd31ffa2a3b8101e3e93096f' +
-        '2b7c150000000000001976a91441577ec99314a293acbc17d8152137cf4862f7f188ace' +
-        '8030000000000001976a9142ebe7b4729185f68c7185c3c6af60fad1b6eeebf88ac00000000'
+    const txHex = '010000000288e68977fab8038af07746e5d687652a44aa15f532509c202749d'
+        + 'bad8a418733000000006b483045022100813ef3534b5030b544e5a5bd1db93f85dc89e2'
+        + 'a565197a14784edff5564bd65b022008005213c6aa4c7ebe06cfd86bdaf3e662ae58371'
+        + '896a0a841e81106fbe1507401210236b07942707a86ab666bb300b58d295d988ce9c3a3'
+        + '38a0e08380dd98732fd4faffffffff3ba3edfd7a7b12b27ac72c3e67768f617fc81bc38'
+        + '88a51323a9fb8aa4b1e5e4a000000006b483045022100d0c9b1594137186a1dc6c0b3a6'
+        + 'cbe08399b57e2b8c953584f2ce20bef5642eb902206b9c88b8d2d311db26601acf3068d'
+        + 'd118649ead4a1f93d029a52c0c61cb2cd2901210236b07942707a86ab666bb300b58d29'
+        + '5d988ce9c3a338a0e08380dd98732fd4faffffffff030000000000000000296a2769643'
+        + 'f363da95bc8d5203d1c07bd87c564a1e6395826cfdfe87cfd31ffa2a3b8101e3e93096f'
+        + '2b7c150000000000001976a91441577ec99314a293acbc17d8152137cf4862f7f188ace'
+        + '8030000000000001976a9142ebe7b4729185f68c7185c3c6af60fad1b6eeebf88ac00000000'
     const tx = btc.Transaction.fromHex(txHex)
-    tx.ins.forEach(x => {
+    tx.ins.forEach((x) => {
       x.script = null
     })
 
@@ -111,7 +132,8 @@ function utilsTests() {
     t.plan(5)
 
     t.equal(hash160(Buffer.from(
-      '99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosq')).toString('hex'),
+      '99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosq'
+    )).toString('hex'),
             '7ea1fa0f2003c31b015a72af9f4a5f104b5c2840')
 
     t.equal(hash160(Buffer.from('1234')).toString('hex'),
@@ -121,17 +143,17 @@ function utilsTests() {
             '83cf8b609de60036a8277bd0e9613575')
 
     t.equal(hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa'))
-    .toString('hex'),
+      .toString('hex'),
             '740ae7f18c939cf5e7c189a2c77a012f')
 
-    t.equal(decodeB40('0123456789abcdefghijklmnopqrstuvwxyz-_.+0123456789abcdefghi' +
-                      'jklmnopqrstuvwxyz-_.+0123456789abcdefghijklmnopqrstuvwxyz-_' +
-                      '.+0123456789abcdefghijklmnopqrstuvwxyz-_.+0123456789abcdefg' +
-                      'hijklmnopqrstuvwxyz-_.+'),
-            '384a516059e707615a1992d3101f6f346df3326d03ea7b673e3754078895db48da2d0' +
-            'fcb1bd89d618b0863bd8bac6db43a2d9cff5cc307310922d3cb8cf9c159d31c6a9c91' +
-            '03197263a4e88f52d1b77dfc610e1b8dc9616ba6c2d0a1b792f0d73784c698c69f34a' +
-            'e5e7900753627a3ac87529035fb1a6cba7ce2e1df590941cf30a44557')
+    t.equal(decodeB40('0123456789abcdefghijklmnopqrstuvwxyz-_.+0123456789abcdefghi'
+                      + 'jklmnopqrstuvwxyz-_.+0123456789abcdefghijklmnopqrstuvwxyz-_'
+                      + '.+0123456789abcdefghijklmnopqrstuvwxyz-_.+0123456789abcdefg'
+                      + 'hijklmnopqrstuvwxyz-_.+'),
+            '384a516059e707615a1992d3101f6f346df3326d03ea7b673e3754078895db48da2d0'
+            + 'fcb1bd89d618b0863bd8bac6db43a2d9cff5cc307310922d3cb8cf9c159d31c6a9c91'
+            + '03197263a4e88f52d1b77dfc610e1b8dc9616ba6c2d0a1b792f0d73784c698c69f34a'
+            + 'e5e7900753627a3ac87529035fb1a6cba7ce2e1df590941cf30a44557')
   })
 
   test('not enough UTXOs to fund', (t) => {
@@ -141,9 +163,11 @@ function utilsTests() {
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
-    const utxos = [{ value: 50000,
+    const utxos = [{
+      value: 50000,
       tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-                    tx_output_n: 0 }]
+      tx_output_n: 0
+    }]
 
     t.throws(() => addUTXOsToFund(txB, utxos, 60000, 10),
              /^NotEnoughFundsError: Not enough UTXOs to fund./,
@@ -158,9 +182,11 @@ function utilsTests() {
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
-    const utxos = [{ value: 50000,
+    const utxos = [{
+      value: 50000,
       tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-                    tx_output_n: 0 }]
+      tx_output_n: 0
+    }]
 
     const change = addUTXOsToFund(txB, utxos, 10000, 10)
 
@@ -176,12 +202,16 @@ function utilsTests() {
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
-    const utxos = [{ value: 50000,
+    const utxos = [{
+      value: 50000,
       tx_hash: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-                    tx_output_n: 0 },
-                   { value: 10000,
+      tx_output_n: 0
+    },
+                   {
+                     value: 10000,
                      tx_hash: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                    tx_output_n: 0 }]
+                     tx_output_n: 0
+                   }]
 
     const change = addUTXOsToFund(txB, utxos, 55000, 10)
 
@@ -213,13 +243,17 @@ function utilsTests() {
 
     const usedTXHash = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const utxoValues = [287825, 287825]
-    const utxoSet1 = [{ value: utxoValues[0],
-                     tx_hash_big_endian: usedTXHash,
-                     tx_output_n: 0 },
-                    { value: utxoValues[1],
-                      tx_hash_big_endian:
+    const utxoSet1 = [{
+      value: utxoValues[0],
+      tx_hash_big_endian: usedTXHash,
+      tx_output_n: 0
+    },
+                      {
+                        value: utxoValues[1],
+                        tx_hash_big_endian:
                       '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                      tx_output_n: 0 }]
+                        tx_output_n: 0
+                      }]
     const utxoSet2 = []
 
     config.network.modifyUTXOSetFrom(txStarterHex)
@@ -242,11 +276,11 @@ function utilsTests() {
         t.equal(utxos1.length, 2)
         t.equal(utxos2.length, 1)
         t.ok(utxos1.find(x => x.tx_hash === txHash && x.value === 11488),
-        'UTXO set should include the new transaction\'s outputs')
+             'UTXO set should include the new transaction\'s outputs')
         t.ok(utxos2.find(x => x.tx_hash === txHash && x.value === 1337),
-        'UTXO set should include the new transaction\'s outputs')
-        t.ok(! utxos1.find(x => x.tx_hash === usedTXHash),
-        'UTXO set shouldn\'t include the transaction\'s spent input')
+             'UTXO set should include the new transaction\'s outputs')
+        t.ok(!utxos1.find(x => x.tx_hash === usedTXHash),
+             'UTXO set shouldn\'t include the transaction\'s spent input')
       })
       .then(() => {
         config.network.resetUTXOs(testAddress1)
@@ -257,12 +291,12 @@ function utilsTests() {
       .then(([utxos1, utxos2]) => {
         t.equal(utxos1.length, 2)
         t.equal(utxos2.length, 0)
-        t.ok(! utxos1.find(x => x.tx_hash === txHash && x.value === 11488),
-        'UTXO set should not include the new transaction\'s outputs after reset')
-        t.ok(! utxos2.find(x => x.tx_hash === txHash && x.value === 1337),
-        'UTXO set should not include the new transaction\'s outputs after reset')
+        t.ok(!utxos1.find(x => x.tx_hash === txHash && x.value === 11488),
+             'UTXO set should not include the new transaction\'s outputs after reset')
+        t.ok(!utxos2.find(x => x.tx_hash === txHash && x.value === 1337),
+             'UTXO set should not include the new transaction\'s outputs after reset')
         t.ok(utxos1.find(x => x.tx_hash === usedTXHash),
-        'UTXO set should include the transaction\'s input after reset')
+             'UTXO set should include the transaction\'s input after reset')
       })
   })
 }
@@ -275,41 +309,57 @@ function transactionTests() {
   const BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
   const NAMESPACE_BURN_ADDR = '1111111111111111111114oLvT2'
 
-  const utxoSet = [{ value: utxoValues[0],
-                   tx_hash_big_endian:
+  const utxoSet = [{
+    value: utxoValues[0],
+    tx_hash_big_endian:
                    '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-                   tx_output_n: 0 },
-                 { value: utxoValues[1],
-                   tx_hash_big_endian:
+    tx_output_n: 0
+  },
+                   {
+                     value: utxoValues[1],
+                     tx_hash_big_endian:
                    '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                   tx_output_n: 0 },
-                 { value: utxoValues[2],
-                   tx_hash_big_endian:
+                     tx_output_n: 0
+                   },
+                   {
+                     value: utxoValues[2],
+                     tx_hash_big_endian:
                    'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                   tx_output_n: 2 }]
+                     tx_output_n: 2
+                   }]
 
 
-  const utxoSet2 = [{ value: 5500,
-                    tx_hash_big_endian:
+  const utxoSet2 = [{
+    value: 5500,
+    tx_hash_big_endian:
                     'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdedffff',
-                    tx_output_n: 0 }]
+    tx_output_n: 0
+  }]
 
-  const namespaceUtxoSet = [{ value: namespaceUtxoValues[0],
-                              tx_hash_big_endian:
+  const namespaceUtxoSet = [{
+    value: namespaceUtxoValues[0],
+    tx_hash_big_endian:
                               '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c',
-                              tx_output_n: 0 },
-                            { value: namespaceUtxoValues[1],
+    tx_output_n: 0
+  },
+                            {
+                              value: namespaceUtxoValues[1],
                               tx_hash_big_endian:
                               '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
-                              tx_output_n: 0 },
-                            { value: namespaceUtxoValues[2],
+                              tx_output_n: 0
+                            },
+                            {
+                              value: namespaceUtxoValues[2],
                               tx_hash_big_endian:
                               'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
-                              tx_output_n: 2 }]
-  const namespaceUtxoSet2 = [{ value: 654321,
-                            tx_hash_big_endian:
+                              tx_output_n: 2
+                            }]
+  const namespaceUtxoSet2 = [{
+    value: 654321,
+    tx_hash_big_endian:
                             'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
-                            tx_output_n: 0 }]
+    tx_output_n: 0
+  }]
 
   function setupMocks() {
     FetchMock.restore()
@@ -339,7 +389,8 @@ function transactionTests() {
     return inputTXArgument.ins.reduce((agg, x) => {
       const inputTX = utxosAll.find(
         y => Buffer.from(y.tx_hash_big_endian, 'hex')
-          .reverse().compare(x.hash) === 0)
+          .reverse().compare(x.hash) === 0
+      )
       if (inputTX) {
         return agg + inputTX.value
       } else {
@@ -357,8 +408,9 @@ function transactionTests() {
                                               testAddresses[3].address,
                                               testAddresses[2].address, 2),
        transactions.makeNamespacePreorder('hello',
-                                           testAddresses[3].address,
-                                           testAddresses[2].skHex)])
+                                          testAddresses[3].address,
+                                          testAddresses[2].skHex)]
+    )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
         const tx = btc.Transaction.fromHex(hexTX)
@@ -369,9 +421,9 @@ function transactionTests() {
         const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
 
         const change = tx.outs[1].value
-        
+
         t.equal(inputVals - change,
-          estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
+                estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
         t.equal(tx.outs[2].value, 6400000000, 'Output should have paid 6400000000 for namespace')
         t.equal(tx.ins.length, 2, 'Should use 2 utxos for the payer')
@@ -400,7 +452,8 @@ function transactionTests() {
                                             testAddresses[2].address),
        transactions.makeNamespaceReveal(ns,
                                         testAddresses[3].address,
-                                        testAddresses[2].skHex)])
+                                        testAddresses[2].skHex)]
+    )
       .then(([estimatedCost, hexTX]) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
@@ -416,7 +469,7 @@ function transactionTests() {
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
-                `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
@@ -427,11 +480,14 @@ function transactionTests() {
 
     Promise.all(
       [transactions.estimateNameImport(
-        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
-        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575'),
+        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv',
+        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575'
+      ),
        transactions.makeNameImport(
-        'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv', 
-        'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575', testAddresses[3].skHex)])
+         'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv',
+         'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575', testAddresses[3].skHex
+       )]
+    )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
         const tx = btc.Transaction.fromHex(hexTX)
@@ -442,10 +498,10 @@ function transactionTests() {
 
         const change = tx.outs[3].value
         t.equal(inputVals - change,
-          estimatedCost, 'Estimated cost should match actual.')
+                estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
-          `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
@@ -457,7 +513,8 @@ function transactionTests() {
     Promise.all(
       [transactions.estimateNamespaceReady('hello'),
        transactions.makeNamespaceReady('hello',
-                                       testAddresses[3].skHex)])
+                                       testAddresses[3].skHex)]
+    )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
         const tx = btc.Transaction.fromHex(hexTX)
@@ -468,7 +525,7 @@ function transactionTests() {
 
         const change = tx.outs[1].value
         t.equal(inputVals - change,
-          estimatedCost, 'Estimated cost should match actual.')
+                estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
@@ -483,7 +540,9 @@ function transactionTests() {
     Promise.all(
       [transactions.estimateAnnounce('53bb740c47435a51b07ecf0b9e086a2ad3c12c1d'),
        transactions.makeAnnounce(
-         '53bb740c47435a51b07ecf0b9e086a2ad3c12c1d', testAddresses[3].skHex)])
+         '53bb740c47435a51b07ecf0b9e086a2ad3c12c1d', testAddresses[3].skHex
+       )]
+    )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
         const tx = btc.Transaction.fromHex(hexTX)
@@ -494,10 +553,10 @@ function transactionTests() {
 
         const change = tx.outs[1].value
         t.equal(inputVals - change,
-          estimatedCost, 'Estimated cost should match actual.')
+                estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
-          `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
@@ -512,7 +571,8 @@ function transactionTests() {
                                      testAddresses[1].address),
        transactions.makePreorder('foo.test',
                                  testAddresses[0].address,
-                                 testAddresses[1].skHex)])
+                                 testAddresses[1].skHex)]
+    )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
         const tx = btc.Transaction.fromHex(hexTX)
@@ -525,7 +585,7 @@ function transactionTests() {
         const change = tx.outs[1].value
 
         t.equal(inputVals - change,
-          estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
+                estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, BURN_ADDR, `Burn address should be ${BURN_ADDR}`)
         t.equal(tx.outs[2].value, BURN_AMT, `Output should have funded name price ${BURN_AMT}`)
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
@@ -545,7 +605,8 @@ function transactionTests() {
                                      testAddresses[1].address, true, 2),
        transactions.makeRegister('foo.test',
                                  testAddresses[0].address,
-                                 testAddresses[1].skHex, 'hello world')])
+                                 testAddresses[1].skHex, 'hello world')]
+    )
       .then(([estimatedCost, hexTX]) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
@@ -572,13 +633,14 @@ function transactionTests() {
 
     Promise.all(
       [transactions.estimateUpdate('foo.test',
-                                     testAddresses[0].address,
-                                     testAddresses[1].address,
-                                     3),
+                                   testAddresses[0].address,
+                                   testAddresses[1].address,
+                                   3),
        transactions.makeUpdate('foo.test',
                                testAddresses[0].skHex,
                                testAddresses[1].skHex,
-                               'hello world')])
+                               'hello world')]
+    )
       .then(([estimatedCost, hexTX]) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
@@ -609,14 +671,15 @@ function transactionTests() {
 
     Promise.all(
       [transactions.estimateTransfer('foo.test',
-                                    testAddresses[2].address,
-                                    testAddresses[0].address,
-                                    testAddresses[1].address,
-                                    3),
+                                     testAddresses[2].address,
+                                     testAddresses[0].address,
+                                     testAddresses[1].address,
+                                     3),
        transactions.makeTransfer('foo.test',
                                  testAddresses[2].address,
                                  testAddresses[0].skHex,
-                                 testAddresses[1].skHex)])
+                                 testAddresses[1].skHex)]
+    )
       .then(([estimatedCost, hexTX]) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
@@ -655,7 +718,8 @@ function transactionTests() {
                                    testAddresses[1].address, 2),
        transactions.makeRevoke('foo.test',
                                testAddresses[0].skHex,
-                               testAddresses[1].skHex)])
+                               testAddresses[1].skHex)]
+    )
       .then(([estimatedCost, hexTX]) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
@@ -671,7 +735,7 @@ function transactionTests() {
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 3, 'Should use both payer utxos')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
-                `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
       })
       .catch((err) => { console.log(err.stack); throw err })
   })
@@ -686,7 +750,7 @@ function transactionTests() {
     transactions.makeBitcoinSpend(testAddresses[2].address,
                                   testAddresses[1].skHex,
                                   TEST1_AMOUNT)
-      .then(hexTX => {
+      .then((hexTX) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
@@ -705,13 +769,14 @@ function transactionTests() {
                                                 testAddresses[1].skHex,
                                                 TEST2_AMOUNT))
       .then(() => t.fail('Should reject with InvalidAmountError if not enough coin to fund fees.'))
-      .catch((err) => t.equal(
+      .catch(err => t.equal(
         err.name, 'InvalidAmountError',
-        'Should reject with InvalidAmountError if not enough coin to fund fees.'))
+        'Should reject with InvalidAmountError if not enough coin to fund fees.'
+      ))
       .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
                                                 testAddresses[1].skHex,
                                                 TEST3_AMOUNT))
-      .then(hexTX => {
+      .then((hexTX) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
@@ -725,7 +790,7 @@ function transactionTests() {
       .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
                                                 testAddresses[1].skHex,
                                                 TEST4_AMOUNT))
-      .then(hexTX => {
+      .then((hexTX) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
@@ -753,7 +818,8 @@ function transactionTests() {
                                 testAddresses[2].address,
                                 testAddresses[0].skHex,
                                 testAddresses[1].skHex,
-                                'hello world')])
+                                'hello world')]
+    )
       .then(([estimatedCost, hexTX]) => {
         const tx = btc.Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
@@ -791,20 +857,20 @@ function transactionTests() {
     const transaction = 'abc'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const confirmations = 6
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
-      {
-        transaction,
-        transactionToWatch,
-        confirmations
-      })
-      .once()
-      .reply(202, {})
+    FetchMock.post('https://broadcast.blockstack.org/v1/broadcast/transaction',
+                   {
+                     body: {
+                       transaction,
+                       transactionToWatch,
+                       confirmations
+                     },
+                     status: 202
+                   })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
-      transactionToWatch).then(() => {
-        t.assert(nock.isDone())
-      })
+                                                          transactionToWatch).then(() => {
+      t.assert(FetchMock.done())
+    })
   })
 
   test(`broadcastTransaction:
@@ -814,20 +880,26 @@ function transactionTests() {
     const transaction = 'abc'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const confirmations = 6
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
-      {
-        transaction,
-        transactionToWatch,
-        confirmations
-      })
-      .once()
-      .reply(500, {})
+    const expectedBody = JSON.stringify({
+      transaction,
+      transactionToWatch,
+      confirmations
+    })
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        result: {},
+        status: 500
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
-      transactionToWatch)
+                                                          transactionToWatch)
       .catch((error) => {
-        t.assert(nock.isDone())
+        t.assert(FetchMock.done())
         t.assert(error.response)
         t.equal(error.code, 'remote_service_error')
       })
@@ -841,19 +913,28 @@ function transactionTests() {
     const transaction = 'abc'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const confirmations = 8
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/transaction',
-      {
-        transaction,
-        transactionToWatch,
-        confirmations
-      })
-      .once()
-      .reply(202, {})
+
+    const expectedBody = JSON.stringify({
+      transaction,
+      transactionToWatch,
+      confirmations
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
-      transactionToWatch, confirmations).then(() => {
-        t.assert(nock.isDone())
+                                                          transactionToWatch, confirmations)
+      .then(() => {
+        t.assert(FetchMock.done())
       })
   })
 
@@ -864,15 +945,22 @@ function transactionTests() {
     + 'dd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e00000000'
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
-    nock.cleanAll()
-    nock('https://blockchain.info').post('/pushtx?cors=true',
-      body => body.includes(transaction)).once()
-      .reply(202, 'transaction submitted')
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://blockchain.info/pushtx?cors=true'
+          && opts
+          && opts.body),
+      response: {
+        body: 'transaction submitted',
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
-    .then(() => {
-      t.assert(nock.isDone())
-    })
+      .then(() => {
+        t.assert(FetchMock.done())
+      })
   })
 
   test('broadcastTransaction: rejects with error when utxo provider has a problem', (t) => {
@@ -882,17 +970,22 @@ function transactionTests() {
     + 'dd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e00000000'
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
-    nock.cleanAll()
-    nock('https://blockchain.info').post('/pushtx?cors=true',
-      body => body.includes(transaction)).once()
-      .reply(500, 'something else')
-
-    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
-    .catch((error) => {
-      t.assert(nock.isDone())
-      t.assert(error.response)
-      t.equal(error.code, 'remote_service_error')
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://blockchain.info/pushtx?cors=true'
+          && opts
+          && opts.body),
+      response: {
+        body: 'something else',
+        status: 500
+      }
     })
+    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
+      .catch((error) => {
+        t.assert(FetchMock.done())
+        t.assert(error.response)
+        t.equal(error.code, 'remote_service_error')
+      })
   })
 
   test('broadcastZoneFile: send via broadcast service with transaction to watch', (t) => {
@@ -901,17 +994,24 @@ function transactionTests() {
     const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/zone-file',
-      {
-        zoneFile,
-        transactionToWatch
-      })
-      .once()
-      .reply(202, {})
+    const expectedBody = JSON.stringify({
+      zoneFile,
+      transactionToWatch
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch).then(() => {
-      t.assert(nock.isDone())
+      t.assert(FetchMock.done())
     })
   })
 
@@ -921,58 +1021,73 @@ function transactionTests() {
     const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const transactionToWatch = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/zone-file',
-      {
-        zoneFile,
-        transactionToWatch
-      })
-      .once()
-      .reply(500, {})
+    const expectedBody = JSON.stringify({
+      zoneFile,
+      transactionToWatch
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 500
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch)
-    .catch((error) => {
-      t.assert(nock.isDone())
-      t.assert(error.response)
-      t.equal(error.code, 'remote_service_error')
-    })
+      .catch((error) => {
+        t.assert(FetchMock.done())
+        t.assert(error.response)
+        t.equal(error.code, 'remote_service_error')
+      })
   })
 
   test('broadcastZoneFile: rejects with error if core endpoint error', (t) => {
     t.plan(3)
     FetchMock.restore()
-    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const expectedBody = JSON.stringify({ zonefile })
 
-    nock.cleanAll()
-    nock('https://core.blockstack.org').post('/v1/zonefile/',
-      {
-        zonefile: zoneFile
-      })
-      .once()
-      .reply(200, { error: 'core indicates an error like this' })
-    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile)
-    .catch((error) => {
-      t.assert(nock.isDone())
-      t.assert(error.response)
-      t.equal(error.code, 'remote_service_error')
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://core.blockstack.org/v1/zonefile/'
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({ error: 'core indicates an error like this' }),
+        status: 200
+      }
     })
+
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile)
+      .catch((error) => {
+        t.assert(FetchMock.done())
+        t.assert(error.response)
+        t.equal(error.code, 'remote_service_error')
+      })
   })
 
   test('broadcastZoneFile: send immediately via core atlas endpoint', (t) => {
     t.plan(1)
     FetchMock.restore()
-    const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
+    const expectedBody = JSON.stringify({ zonefile })
 
-    nock.cleanAll()
-    nock('https://core.blockstack.org').post('/v1/zonefile/',
-      {
-        zonefile: zoneFile
-      })
-      .once()
-      .reply(202, {})
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://core.blockstack.org/v1/zonefile/'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
-    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile).then(() => {
-      t.assert(nock.isDone())
+    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile).then(() => {
+      t.assert(FetchMock.done())
     })
   })
 
@@ -980,13 +1095,12 @@ function transactionTests() {
      zone file not provided`, (t) => {
     t.plan(2)
     FetchMock.restore()
-    nock.cleanAll()
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile()
-    .catch((error) => {
-      t.assert(error)
-      t.equal(error.code, 'missing_parameter')
-    })
+      .catch((error) => {
+        t.assert(error)
+        t.equal(error.code, 'missing_parameter')
+      })
   })
 
   test('broadcastNameRegistration', (t) => {
@@ -996,47 +1110,62 @@ function transactionTests() {
     const preorderTransaction = 'abc'
     const registerTransaction = '123'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/registration',
-      {
-        preorderTransaction,
-        registerTransaction,
-        zoneFile
-      })
-      .once()
-      .reply(202, {})
+    const expectedBody = JSON.stringify({
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 202
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
-      registerTransaction, zoneFile)
-    .then(() => {
-      t.assert(nock.isDone())
-    })
+                                                               registerTransaction, zoneFile)
+      .then(() => {
+        t.assert(FetchMock.done())
+      })
   })
 
   test('broadcastNameRegistration: reject with error if service replies with error', (t) => {
-    t.plan(3)
+    t.plan(4)
     FetchMock.restore()
     const zoneFile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const preorderTransaction = 'abc'
     const registerTransaction = '123'
 
-    nock.cleanAll()
-    nock('https://broadcast.blockstack.org').post('/v1/broadcast/registration',
-      {
-        preorderTransaction,
-        registerTransaction,
-        zoneFile
-      })
-      .once()
-      .reply(500, {})
+    const expectedBody = JSON.stringify({
+      preorderTransaction,
+      registerTransaction,
+      zoneFile
+    })
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+          && opts
+          && opts.body === expectedBody),
+      response: {
+        body: JSON.stringify({}),
+        status: 500
+      }
+    })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
-      registerTransaction, zoneFile)
-    .catch((error) => {
-      t.assert(error)
-      t.assert(error.response)
-      t.equal(error.code, 'remote_service_error')
-    })
+                                                               registerTransaction, zoneFile)
+      .catch((error) => {
+        t.assert(FetchMock.done())
+        t.assert(error)
+        t.assert(error.response)
+        t.equal(error.code, 'remote_service_error')
+      })
   })
 
   test(`broadcastNameRegistration: reject with error
@@ -1046,31 +1175,30 @@ function transactionTests() {
     const registerTransaction = '123'
     t.plan(9)
     FetchMock.restore()
-    nock.cleanAll()
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(undefined,
-      registerTransaction, zoneFile)
-    .catch((error) => {
-      t.assert(error)
-      t.equal(error.code, 'missing_parameter')
-      t.equal(error.parameter, 'preorderTransaction')
-    })
+                                                               registerTransaction, zoneFile)
+      .catch((error) => {
+        t.assert(error)
+        t.equal(error.code, 'missing_parameter')
+        t.equal(error.parameter, 'preorderTransaction')
+      })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
-      undefined, zoneFile)
-    .catch((error) => {
-      t.assert(error)
-      t.equal(error.code, 'missing_parameter')
-      t.equal(error.parameter, 'registerTransaction')
-    })
+                                                               undefined, zoneFile)
+      .catch((error) => {
+        t.assert(error)
+        t.equal(error.code, 'missing_parameter')
+        t.equal(error.parameter, 'registerTransaction')
+      })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
-      registerTransaction, undefined)
-    .catch((error) => {
-      t.assert(error)
-      t.equal(error.code, 'missing_parameter')
-      t.equal(error.parameter, 'zoneFile')
-    })
+                                                               registerTransaction, undefined)
+      .catch((error) => {
+        t.assert(error)
+        t.equal(error.code, 'missing_parameter')
+        t.equal(error.parameter, 'zoneFile')
+      })
   })
 
   test('getNamespaceBurnAddress: pay to namespace creator before year 1', (t) => {
@@ -1080,7 +1208,7 @@ function transactionTests() {
                   { height: 601 })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { version: 2, address: BURN_ADDR, reveal_block: 600 })
-    
+
     network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
       .then((baddr) => {
         t.equal(baddr, BURN_ADDR, 'Pay to namespace creator in year 1')
@@ -1152,8 +1280,8 @@ function safetyTests() {
     Promise.all([safety.ownsName('foo.test', testAddresses[0].address),
                  safety.ownsName('foo.test', testAddresses[1].address)])
       .then(([t0, t1]) => {
-        t.ok(t0, 'Test address ${testAddresses[0].address} should own foo.test')
-        t.ok(!t1, 'Test address ${testAddresses[1].address} should not own foo.test')
+        t.ok(t0, `Test address ${testAddresses[0].address} should own foo.test`)
+        t.ok(!t1, `Test address ${testAddresses[1].address} should not own foo.test`)
       })
   })
 
@@ -1168,26 +1296,26 @@ function safetyTests() {
     FetchMock.getOnce('https://blockchain.info/latestblock?cors=true',
                       { height: 49 })
     safety.isInGracePeriod('foo.test')
-      .then(result => {
+      .then((result) => {
         t.ok(!result, 'name should not be in grace period if it isnt expired')
         FetchMock.getOnce('https://blockchain.info/latestblock?cors=true',
                           { height: 50 })
         return safety.isInGracePeriod('foo.test')
       })
-      .then(result => {
+      .then((result) => {
         t.ok(result, 'name should be in grace period')
         FetchMock.get('https://blockchain.info/latestblock?cors=true',
                       { height: 5050 })
         return safety.isInGracePeriod('foo.test')
       })
-      .then(result => {
+      .then((result) => {
         t.ok(!result, 'grace period should have passed')
         return safety.isInGracePeriod('bar.test')
       })
-      .then(result => {
+      .then((result) => {
         t.ok(!result, 'bar.test isnt registered. not in grace period')
       })
-      .catch((err) => console.error(err.stack))
+      .catch(err => console.error(err.stack))
   })
 
   test('nameAvailable', (t) => {
@@ -1210,30 +1338,44 @@ function safetyTests() {
     t.plan(11)
 
     const shouldFail = [
-      { name: '123456789012345678901234567890.1234567',
-        reason: 'is too long' },
-      { name: '1234567890123456789012345678901234567',
-        reason: 'has no namespace' },
-      { name: '1.2.3',
-        reason: 'is a subdomain' },
-      { name: null,
-        reason: 'is null' },
-      { name: '.43',
-        reason: 'has no name' },
-      { name: '43#43.xyz',
-        reason: 'illegal character' },
-      { name: '43 43.xyz',
-        reason: 'illegal character' }]
-      .map(x =>
-        safety.isNameValid(x.name).then(
-          passed => t.ok(!passed, `${x.name} should fail for: ${x.reason}`)))
+      {
+        name: '123456789012345678901234567890.1234567',
+        reason: 'is too long'
+      },
+      {
+        name: '1234567890123456789012345678901234567',
+        reason: 'has no namespace'
+      },
+      {
+        name: '1.2.3',
+        reason: 'is a subdomain'
+      },
+      {
+        name: null,
+        reason: 'is null'
+      },
+      {
+        name: '.43',
+        reason: 'has no name'
+      },
+      {
+        name: '43#43.xyz',
+        reason: 'illegal character'
+      },
+      {
+        name: '43 43.xyz',
+        reason: 'illegal character'
+      }]
+      .map(x => safety.isNameValid(x.name).then(
+        passed => t.ok(!passed, `${x.name} should fail for: ${x.reason}`)
+      ))
 
     const shouldPass = ['abc123.id', 'abcd123.1',
-                  '123456789012345678901234567890.123456',
-                  'abc_+-123.id']
-      .map(x =>
-        safety.isNameValid(x).then(
-          passed => t.ok(passed, `${x} should pass`)))
+                        '123456789012345678901234567890.123456',
+                        'abc_+-123.id']
+      .map(x => safety.isNameValid(x).then(
+        passed => t.ok(passed, `${x} should pass`)
+      ))
 
     Promise.all(shouldPass)
       .then(() => Promise.all(shouldFail))
@@ -1243,28 +1385,34 @@ function safetyTests() {
     t.plan(8)
 
     const shouldFail = [
-      { namespaceID: '',
-        reason: 'empty string' },
+      {
+        namespaceID: '',
+        reason: 'empty string'
+      },
       {
         namespaceID: '0123456789abcdefghij',
-        reason: 'too long' },
+        reason: 'too long'
+      },
       {
         namespaceID: '01234567.89',
-        reason: 'has a period' },
+        reason: 'has a period'
+      },
       {
         namespaceID: '.123456789',
-        reason: 'starts with a period' },
+        reason: 'starts with a period'
+      },
       {
         namespaceID: 'abcdef#ghi',
-        reason: 'illegal character' }]
-    .map(x => 
-      safety.isNamespaceValid(x.namespaceID).then(
-        passed => t.ok(!passed, `${x.namespaceID} should fail for : ${x.reason}`)))
+        reason: 'illegal character'
+      }]
+      .map(x => safety.isNamespaceValid(x.namespaceID).then(
+        passed => t.ok(!passed, `${x.namespaceID} should fail for : ${x.reason}`)
+      ))
 
     const shouldPass = ['0123456789abcdefghi', 'a-b-c', 'a_b_c']
-      .map(x => 
-        safety.isNamespaceValid(x).then(
-          passed => t.ok(passed, `${x} should pass`)))
+      .map(x => safety.isNamespaceValid(x).then(
+        passed => t.ok(passed, `${x} should pass`)
+      ))
 
     Promise.all(shouldPass)
       .then(() => Promise.all(shouldFail))
@@ -1295,13 +1443,13 @@ function safetyTests() {
     t.plan(4)
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
-                { recipient_address: testAddresses[0].address })
+                  { recipient_address: testAddresses[0].address })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test2',
-                { recipient_address: testAddresses[1].address })
+                  { recipient_address: testAddresses[1].address })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
-                { body: 'Namespace not found', status: 404 })
+                  { body: 'Namespace not found', status: 404 })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test4',
-                { body: 'Some error', status: 400 })
+                  { body: 'Some error', status: 400 })
 
     const errorCheck = safety.revealedNamespace('test3', testAddresses[0].address)
       .then(() => false).catch(() => true)
@@ -1323,10 +1471,10 @@ function safetyTests() {
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test', { ready: true })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test2', { ready: false })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3', 
-                { body: 'Namespace not found', status: 404 })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4', 
-                { body: 'Some other error', status: 400 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
+                  { body: 'Namespace not found', status: 404 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4',
+                  { body: 'Some other error', status: 400 })
 
     const errorCheck = Promise.resolve().then(() => false).catch(() => true)
 
@@ -1347,10 +1495,10 @@ function safetyTests() {
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test', { ready: false })
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test2', { ready: true })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3', 
-                { body: 'Namespace not found', status: 404 })
-    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4', 
-                { body: 'Some other error', status: 400 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test3',
+                  { body: 'Namespace not found', status: 404 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test4',
+                  { body: 'Some other error', status: 400 })
 
     const errorCheck = Promise.resolve().then(() => false).catch(() => true)
 

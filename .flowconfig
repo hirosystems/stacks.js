@@ -1,6 +1,8 @@
 [ignore]
 .*/node_modules/documentation/*
 .*/node_modules/.staging/*
+.*/node_modules/chalk/*
+.*/node_modules/eslint-plugin-jsx-a11y/*
 
 [include]
 
