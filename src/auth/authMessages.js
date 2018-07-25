@@ -137,6 +137,7 @@ export function decryptPrivateKey(privateKey: string,
  * @param {String} transitPublicKey the public key provide by the app
  * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
+ * @param {String} blockstackAPIUrl URL to the API endpoint to use
  * @return {String} signed and encoded authentication response token
  */
 export function makeAuthResponse(privateKey: string,
@@ -147,7 +148,8 @@ export function makeAuthResponse(privateKey: string,
                                  appPrivateKey: ?string = null,
                                  expiresAt: number = nextMonth().getTime(),
                                  transitPublicKey: ?string = null,
-                                 hubUrl: ?string = null): string {
+                                 hubUrl: ?string = null,
+                                 blockstackAPIUrl: ?string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -168,6 +170,7 @@ export function makeAuthResponse(privateKey: string,
       email: metadata.email ? metadata.email : null,
       profile_url: metadata.profileUrl ? metadata.profileUrl : null,
       hubUrl,
+      blockstackAPIUrl,
       version: VERSION
     }
   } else {

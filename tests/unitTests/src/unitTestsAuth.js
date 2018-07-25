@@ -21,7 +21,8 @@ import {
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
   handlePendingSignIn,
-  signUserOut
+  signUserOut,
+  config
 } from '../../../lib'
 
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
@@ -337,6 +338,38 @@ export function runAuthTests() {
     handlePendingSignIn(nameLookupURL, authResponse, transitPrivateKey)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
+      })
+      .catch((err) => {
+        console.log(err.stack)
+        t.fail('Should not error')
+      })
+  })
+
+  test('handlePendingSignIn with authResponseToken, transit key and custom nameLookupUrl', (t) => {
+    t.plan(2)
+
+    const customBlockstackAPIUrl = 'https://test.name.lookups'
+    const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
+    const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const appPrivateKey = makeECPrivateKey()
+    const transitPrivateKey = makeECPrivateKey()
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
+    const metadata = {}
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+                                          metadata, undefined, appPrivateKey, undefined,
+                                          transitPublicKey, undefined, customBlockstackAPIUrl)
+
+    handlePendingSignIn(null, authResponse, transitPrivateKey)
+      .then(() => {
+        t.pass('Should correctly sign in with auth response')
+        t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl, 
+                'Should override global Blockstack API URL')
+
+        config.network.blockstackAPIUrl = oldBlockstackAPIUrl
       })
       .catch((err) => {
         console.log(err.stack)
