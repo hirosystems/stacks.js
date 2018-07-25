@@ -2,7 +2,7 @@
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import {
   getAddressFromDID, publicKeyToAddress,
-  isSameOriginAbsoluteUrl, fetchAppManifest 
+  isSameOriginAbsoluteUrl, fetchAppManifest
 } from '../index'
 
 /**
@@ -246,6 +246,9 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
         return fetchAppManifest(token)
           .then((appManifest) => {
             resolve(appManifest)
+          })
+          .catch((err) => {
+            reject(err)
           })
       } else {
         reject()
