@@ -367,7 +367,7 @@ export function runAuthTests() {
       .then(() => {
         t.pass('Should correctly sign in with auth response')
         t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl, 
-          'Should override global Blockstack API URL')
+                'Should override global Blockstack API URL')
 
         config.network.blockstackAPIUrl = oldBlockstackAPIUrl
       })
