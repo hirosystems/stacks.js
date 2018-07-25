@@ -1,7 +1,6 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
-import nock from 'nock'
 import bigi from 'bigi'
 
 import { network, InsightClient } from '../../../lib/network'
@@ -591,29 +590,28 @@ function transactionTests() {
                                      bigi.fromByteArrayUnsigned('123'),
                                      'hello world!',
                                      testAddresses[4].skHex)])
-    .then(([estimatedCost, hexTX]) => {
-      t.ok(hexTX)
-      const tx = btc.Transaction.fromHex(hexTX)
-      const txLen = hexTX.length / 2
-      const outputVals = sumOutputValues(tx)
-      const inputVals = getInputVals(tx, tokenUtxoSet)
-      const fee = inputVals - outputVals
-      const change = tx.outs[2].value
-      const recipientAddr = btc.address.fromOutputScript(tx.outs[1].script)
-      console.log(outputVals)
-      console.log(inputVals)
-      console.log(fee)
-      console.log(change)
-      console.log(recipientAddr)
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, tokenUtxoSet)
+        const fee = inputVals - outputVals
+        const change = tx.outs[2].value
+        const recipientAddr = btc.address.fromOutputScript(tx.outs[1].script)
+        console.log(outputVals)
+        console.log(inputVals)
+        console.log(fee)
+        console.log(change)
+        console.log(recipientAddr)
 
-      t.equal(inputVals - change,
-        estimatedCost, 'Estimated cost should be equal')
-      t.equal(recipientAddr, testAddresses[1].address, 'Recipient address is correct')
-      t.equal(tx.outs[1].value, 5500, 'Recipient address should have +DUST_MINIMUM')
-      t.equal(tx.ins.length, 2, 'Should use 2 utxos from the payer')
-      t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
-        `Paid fee of ${fee} for tx length ${txLen} should equal 1K satoshi/byte`)
-    })
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should be equal')
+        t.equal(recipientAddr, testAddresses[1].address, 'Recipient address is correct')
+        t.equal(tx.outs[1].value, 5500, 'Recipient address should have +DUST_MINIMUM')
+        t.equal(tx.ins.length, 2, 'Should use 2 utxos from the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx length ${txLen} should equal 1K satoshi/byte`)
+      })
   })
 
   test('build and fund preorder', (t) => {
