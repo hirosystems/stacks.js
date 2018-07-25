@@ -1,6 +1,7 @@
 /* @flow */
 
 import bitcoinjs from 'bitcoinjs-lib'
+import BigInteger from 'bigi'
 
 import { addUTXOsToFund, DUST_MINIMUM,
          estimateTXBytes, sumOutputValues, hash160 } from './utils'
@@ -15,7 +16,6 @@ import { makePreorderSkeleton, makeRegisterSkeleton,
 import { config } from '../config'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
 import { TransactionSigner, PubkeyHashSigner } from './signers'
-import BigInteger from 'bigi'
 
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
@@ -1111,11 +1111,10 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
 
   const txPromise = Promise.all([network.getConsensusHash()])
     .then(([consensusHash]) =>  makeTokenTransferSkeleton(
-        recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
+      recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
 
-  return senderKey.getAddress().then(
-    (senderAddress) =>
-      Promise.all([network.getUTXOs(senderAddress), network.getFeeRate(), txPromise])
+  return senderKey.getAddress().then(senderAddress =>
+    Promise.all([network.getUTXOs(senderAddress), network.getFeeRate(), txPromise])
       .then(([utxos, feeRate, tokenTransferTX]) => {
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
         const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
@@ -1126,7 +1125,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
         }
         return signingPromise.then(() => signingTxB)
       }))
-    .then((signingTxB) => signingTxB.build().toHex())
+    .then(signingTxB => signingTxB.build().toHex())
 }
 
 /**

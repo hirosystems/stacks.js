@@ -148,8 +148,7 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
   burnAddress : string, burn: AmountType,
-  registerAddress: ?string = null
-) {
+  registerAddress: ?string = null) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -291,8 +290,7 @@ export function makeRegisterSkeleton(
 
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
-  burnAddress: string, burn: AmountType, valueHash: ?string = null
-) {
+  burnAddress: string, burn: AmountType, valueHash: ?string = null) {
   /*
     Formats
 
@@ -351,8 +349,7 @@ export function makeRenewalSkeleton(
 
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
-  keepZonefile: boolean = false
-) {
+  keepZonefile: boolean = false) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -397,8 +394,7 @@ export function makeTransferSkeleton(
 
 
 export function makeUpdateSkeleton(
-  fullyQualifiedName: string, consensusHash: string, valueHash: string
-) {
+  fullyQualifiedName: string, consensusHash: string, valueHash: string) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -477,8 +473,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash : string, preorderAddress: string,
-  registerAddress: string, burn: AmountType
-) {
+  registerAddress: string, burn: AmountType) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*
@@ -550,8 +545,7 @@ export function makeNamespacePreorderSkeleton(
 
 
 export function makeNamespaceRevealSkeleton(
-  namespace: BlockstackNamespace, revealAddress: string
-) {
+  namespace: BlockstackNamespace, revealAddress: string) {
   /*
    Format:
    
@@ -582,8 +576,7 @@ export function makeNamespaceRevealSkeleton(
 
 
 export function makeNamespaceReadySkeleton(
-  namespaceID: string
-) {
+  namespaceID: string) {
   /*
    Format:
    
@@ -668,8 +661,8 @@ export function makeAnnounceSkeleton(messageHash: string) {
   return tx.buildIncomplete()
 }
 
-export function makeTokenTransferSkeleton(recipientAddress: string,
-  consensusHash: string, tokenType: string, tokenAmount: BigInteger, scratchArea: string) {
+export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string, 
+  tokenType: string, tokenAmount: BigInteger, scratchArea: string) {  // eslint-disable-line indent
   /*
    Format:
 
@@ -714,4 +707,3 @@ export function makeTokenTransferSkeleton(recipientAddress: string,
 
   return tx.buildIncomplete()
 }
-

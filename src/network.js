@@ -82,7 +82,7 @@ export class BlockstackNetwork {
       })
       .then(resp => resp.json())
       .then(resp => resp.name_price)
-      .then(namePrice => {
+      .then((namePrice) => {
         if (!namePrice) {
           throw new Error(
             `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`)
@@ -108,12 +108,12 @@ export class BlockstackNetwork {
         return resp
       })
       .then(resp => resp.json())
-      .then(namespacePrice => {
+      .then((namespacePrice) => {
         if (!namespacePrice) {
           throw new Error(`Failed to get price for ${namespaceID}`)
         }
-        if (namespacePrice.units === 'BTC' && namePrice.amount < this.DUST_MINIMUM) {
-          namePrice.amount = this.DUST_MINIMUM
+        if (namespacePrice.units === 'BTC' && namespacePrice.amount < this.DUST_MINIMUM) {
+          namespacePrice.amount = this.DUST_MINIMUM
         }
         const result = {
           units: namespacePrice.units,
@@ -222,7 +222,7 @@ export class BlockstackNetwork {
 
   getAccountStatus(address: string, tokenType: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/status`)
-      .then(resp => {
+      .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Account not found')
         } else if (resp.status !== 200) {
@@ -231,14 +231,14 @@ export class BlockstackNetwork {
           return resp.json()
         }
       })
-      .then(accountStatus => 
+      .then((accountStatus) => { 
         // coerce all addresses, and convert credit/debit to biginteger
         Object.assign({}, accountStatus, {
           address: this.coerceAddress(accountStatus.address),
           debit_value: bigi.fromByteArrayUnsigned(String(accountStatus.debit_value)),
           credit_value: bigi.fromByteArrayUnsigned(String(accountStatus.credit_value))
         })
-      )
+      })
   }
         
   /**
