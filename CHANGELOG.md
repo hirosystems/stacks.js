@@ -4,7 +4,7 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [18.0.0]
 
 ### Added
 
@@ -38,6 +38,10 @@ encrypt content for other users.
 - Fixed an issue in `ecPairToHexString` that may result in generation of
   an incorrectly hex string encoding of the private key.
 - Proofs now support subdomains.
+- Updated a number of dependencies to fix know vulnerablities.
+- Switched from isomorphic-fetch to the better maintained cross-fetch
+  which will improve functionality of the library in node environments.
+
 
 ## [17.2.0]
 

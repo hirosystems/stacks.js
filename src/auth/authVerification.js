@@ -1,7 +1,9 @@
 // @flow
 import { decodeToken, TokenVerifier } from 'jsontokens'
-import { getAddressFromDID, publicKeyToAddress,
-  isSameOriginAbsoluteUrl, fetchAppManifest } from '../index'
+import {
+  getAddressFromDID, publicKeyToAddress,
+  isSameOriginAbsoluteUrl, fetchAppManifest
+} from '../index'
 
 /**
  * Checks if the ES256k signature on passed `token` match the claimed public key
@@ -74,7 +76,7 @@ export function doPublicKeysMatchIssuer(token: string) {
  * @private
  */
 export function doPublicKeysMatchUsername(token: string,
-  nameLookupURL: string) {
+                                          nameLookupURL: string) {
   return new Promise((resolve) => {
     const payload = decodeToken(token).payload
 
@@ -100,7 +102,7 @@ export function doPublicKeysMatchUsername(token: string,
       fetch(url)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
-        .then(responseJSON => {
+        .then((responseJSON) => {
           if (responseJSON.hasOwnProperty('address')) {
             const nameOwningAddress = responseJSON.address
             const addressFromIssuer = getAddressFromDID(payload.iss)
@@ -219,7 +221,7 @@ export function verifyAuthRequest(token: string) {
       doPublicKeysMatchIssuer(token),
       isManifestUriValid(token),
       isRedirectUriValid(token)
-    ]).then(values => {
+    ]).then((values) => {
       if (values.every(Boolean)) {
         resolve(true)
       } else {
@@ -239,20 +241,20 @@ export function verifyAuthRequest(token: string) {
  */
 export function verifyAuthRequestAndLoadManifest(token: string) {
   return new Promise((resolve, reject) => verifyAuthRequest(token)
-  .then(valid => {
-    if (valid) {
-      return fetchAppManifest(token)
-      .then(appManifest => {
-        resolve(appManifest)
-      })
-      .catch(err => {
-        reject(err)
-      })
-    } else {
-      reject()
-      return Promise.reject()
-    }
-  }))
+    .then((valid) => {
+      if (valid) {
+        return fetchAppManifest(token)
+          .then((appManifest) => {
+            resolve(appManifest)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      } else {
+        reject()
+        return Promise.reject()
+      }
+    }))
 }
 
 /**
@@ -271,7 +273,7 @@ export function verifyAuthResponse(token: string, nameLookupURL: string) {
       doSignaturesMatchPublicKeys(token),
       doPublicKeysMatchIssuer(token),
       doPublicKeysMatchUsername(token, nameLookupURL)
-    ]).then(values => {
+    ]).then((values) => {
       if (values.every(Boolean)) {
         resolve(true)
       } else {

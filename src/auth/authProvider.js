@@ -41,7 +41,7 @@ export function fetchAppManifest(authRequest) {
         fetch(manifestURI)
           .then(response => response.text())
           .then(responseText => JSON.parse(responseText))
-          .then(responseJSON => {
+          .then((responseJSON) => {
             resolve(responseJSON)
           })
           .catch(e => {

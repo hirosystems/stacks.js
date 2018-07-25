@@ -1,18 +1,22 @@
 /* @flow */
 
-import { getOrSetLocalGaiaHubConnection, getFullReadUrl,
-         connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
-         BLOCKSTACK_GAIA_HUB_LABEL } from './hub'
+import {
+  getOrSetLocalGaiaHubConnection, getFullReadUrl,
+  connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
+  BLOCKSTACK_GAIA_HUB_LABEL 
+} from './hub'
 // export { type GaiaHubConfig } from './hub'
 
-import { encryptECIES, decryptECIES, signECDSA, verifyECDSA } from '../encryption'
+import {
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA 
+} from '../encryption'
 import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 
 import { SignatureVerificationError } from '../errors'
 import { Logger } from '../logger'
-// import fetch from 'isomorphic-fetch'
+// import fetch from 'cross-fetch'
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
@@ -28,9 +32,9 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
  * or rejects with an error
  */
 export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
-  zoneFileLookupURL: ?string = null) {
+                                  zoneFileLookupURL: ?string = null) {
   return lookupProfile(username, zoneFileLookupURL)
-    .then(profile => {
+    .then((profile) => {
       if (profile.hasOwnProperty('apps')) {
         if (profile.apps.hasOwnProperty(appOrigin)) {
           return profile.apps[appOrigin]
@@ -62,7 +66,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
   const defaults = { publicKey: null }
   const opt = Object.assign({}, defaults, options)
-  if (! opt.publicKey) {
+  if (!opt.publicKey) {
     const privateKey = loadUserData().appPrivateKey
     opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
@@ -93,8 +97,8 @@ export function decryptContent(content: string, options?: {privateKey?: ?string}
     return decryptECIES(privateKey, cipherObject)
   } catch (err) {
     if (err instanceof SyntaxError) {
-      throw new Error('Failed to parse encrypted content JSON. The content may not ' +
-                      'be encrypted. If using getFile, try passing { decrypt: false }.')
+      throw new Error('Failed to parse encrypted content JSON. The content may not '
+                      + 'be encrypted. If using getFile, try passing { decrypt: false }.')
     } else {
       throw err
     }
@@ -115,7 +119,7 @@ function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?stri
           .then(gaiaHubConfig => getFullReadUrl('/', gaiaHubConfig))
       }
     })
-    .then(fileUrl => {
+    .then((fileUrl) => {
       const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
       if (!matches) {
         throw new Error('Failed to parse gaia address')
@@ -139,14 +143,14 @@ function getFileContents(path: string, app: string, username: ?string, zoneFileL
           .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
       }
     })
-    .then((readUrl) => new Promise((resolve, reject) => {
+    .then(readUrl => new Promise((resolve, reject) => {
       if (!readUrl) {
         reject(null)
       } else {
         resolve(readUrl)
       }
     }))
-    .then((readUrl) => fetch(readUrl))
+    .then(readUrl => fetch(readUrl))
     .then((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
@@ -157,9 +161,9 @@ function getFileContents(path: string, app: string, username: ?string, zoneFileL
         }
       }
       const contentType = response.headers.get('Content-Type')
-      if (forceText || contentType === null ||
-          contentType.startsWith('text') ||
-          contentType === 'application/json') {
+      if (forceText || contentType === null
+          || contentType.startsWith('text')
+          || contentType === 'application/json') {
         return response.text()
       } else {
         return response.arrayBuffer()
@@ -184,19 +188,20 @@ function getFileSignedUnencrypted(path: string, opt: {
   return Promise.all(
     [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false),
      getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
-                      opt.zoneFileLookupURL, true),
-     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)])
+                     opt.zoneFileLookupURL, true),
+     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)]
+  )
     .then(([fileContents, signatureContents, gaiaAddress]) => {
       if (!fileContents) {
         return fileContents
       }
       if (!gaiaAddress) {
-        throw new SignatureVerificationError('Failed to get gaia address for verification of: ' +
-                                             `${path}`)
+        throw new SignatureVerificationError('Failed to get gaia address for verification of: '
+                                             + `${path}`)
       }
       if (!signatureContents || typeof signatureContents !== 'string') {
-        throw new SignatureVerificationError('Failed to obtain signature for file: ' +
-                                             `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+        throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
       }
       let signature
       let publicKey
@@ -206,21 +211,22 @@ function getFileSignedUnencrypted(path: string, opt: {
         publicKey = sigObject.publicKey
       } catch (err) {
         if (err instanceof SyntaxError) {
-          throw new Error('Failed to parse signature content JSON ' +
-                          `(path: ${path}${SIGNATURE_FILE_SUFFIX})` +
-                          ' The content may be corrupted.')
+          throw new Error('Failed to parse signature content JSON '
+                          + `(path: ${path}${SIGNATURE_FILE_SUFFIX})`
+                          + ' The content may be corrupted.')
         } else {
           throw err
         }
       }
       const signerAddress = publicKeyToAddress(publicKey)
       if (gaiaAddress !== signerAddress) {
-        throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
-                                             ` match gaia address (${gaiaAddress})`)
-      } else if (! verifyECDSA(Buffer.from(fileContents), publicKey, signature)) {
+        throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
+                                             + ` match gaia address (${gaiaAddress})`)
+      } else if (!verifyECDSA(Buffer.from(fileContents), publicKey, signature)) {
         throw new SignatureVerificationError(
-          'Contents do not match ECDSA signature: ' +
-            `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`)
+          'Contents do not match ECDSA signature: '
+            + `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`
+        )
       } else {
         return fileContents
       }
@@ -249,17 +255,17 @@ function handleSignedEncryptedContents(path: string, storedContents: string,
 
   return addressPromise.then((address) => {
     if (!address) {
-      throw new SignatureVerificationError('Failed to get gaia address for verification of: ' +
-                                           `${path}`)
+      throw new SignatureVerificationError('Failed to get gaia address for verification of: '
+                                           + `${path}`)
     }
     let sigObject
     try {
       sigObject = JSON.parse(storedContents)
     } catch (err) {
       if (err instanceof SyntaxError) {
-        throw new Error('Failed to parse encrypted, signed content JSON. The content may not ' +
-                        'be encrypted. If using getFile, try passing' +
-                        ' { verify: false, decrypt: false }.')
+        throw new Error('Failed to parse encrypted, signed content JSON. The content may not '
+                        + 'be encrypted. If using getFile, try passing'
+                        + ' { verify: false, decrypt: false }.')
       } else {
         throw err
       }
@@ -271,14 +277,15 @@ function handleSignedEncryptedContents(path: string, storedContents: string,
 
     if (!signerPublicKey || !cipherText || !signature) {
       throw new SignatureVerificationError(
-        'Failed to get signature verification data from file:' +
-          ` ${path}`)
+        'Failed to get signature verification data from file:'
+          + ` ${path}`
+      )
     } else if (signerAddress !== address) {
-      throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't` +
-                                           ` match gaia address (${address})`)
-    } else if (! verifyECDSA(cipherText, signerPublicKey, signature)) {
-      throw new SignatureVerificationError('Contents do not match ECDSA signature in file:' +
-                                           ` ${path}`)
+      throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
+                                           + ` match gaia address (${address})`)
+    } else if (!verifyECDSA(cipherText, signerPublicKey, signature)) {
+      throw new SignatureVerificationError('Contents do not match ECDSA signature in file:'
+                                           + ` ${path}`)
     } else {
       return decryptContent(cipherText)
     }
@@ -371,7 +378,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
   const opt = Object.assign({}, defaults, options)
 
   let contentType = 'text/plain'
-  if (typeof(content) !== 'string') {
+  if (typeof (content) !== 'string') {
     contentType = 'application/octet-stream'
   }
 
@@ -381,14 +388,14 @@ export function putFile(path: string, content: string | Buffer, options?: {
   let privateKey = ''
   let publicKey = ''
   if (opt.sign) {
-    if (typeof(opt.sign) === 'string') {
+    if (typeof (opt.sign) === 'string') {
       privateKey = opt.sign
     } else {
       privateKey = loadUserData().appPrivateKey
     }
   }
   if (opt.encrypt) {
-    if (typeof(opt.encrypt) === 'string') {
+    if (typeof (opt.encrypt) === 'string') {
       publicKey = opt.encrypt
     } else {
       if (!privateKey) {
@@ -405,11 +412,10 @@ export function putFile(path: string, content: string | Buffer, options?: {
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
     return getOrSetLocalGaiaHubConnection()
-      .then((gaiaHubConfig) =>
-            Promise.all([
-              uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
-              uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                              signatureContent, gaiaHubConfig, 'application/json')]))
+      .then(gaiaHubConfig => Promise.all([
+        uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
+        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                        signatureContent, gaiaHubConfig, 'application/json')]))
       .then(fileUrls => fileUrls[0])
   }
 
@@ -420,14 +426,16 @@ export function putFile(path: string, content: string | Buffer, options?: {
   } else if (opt.encrypt && opt.sign) {
     const cipherText = encryptContent(content, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
-    const signedCipherObject = { signature: signatureObject.signature,
-                                 publicKey: signatureObject.publicKey,
-                                 cipherText }
+    const signedCipherObject = {
+      signature: signatureObject.signature,
+      publicKey: signatureObject.publicKey,
+      cipherText 
+    }
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
   }
   return getOrSetLocalGaiaHubConnection()
-    .then((gaiaHubConfig) => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
+    .then(gaiaHubConfig => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
 }
 
 /**

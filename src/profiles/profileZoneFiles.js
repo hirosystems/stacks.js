@@ -90,13 +90,12 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
 
     if (tokenFileUrl) {
       fetch(tokenFileUrl)
-        .then((response) => response.text())
-        .then((responseText) => JSON.parse(responseText))
+        .then(response => response.text())
+        .then(responseText => JSON.parse(responseText))
         .then((responseJson) => {
           const tokenRecords = responseJson
           const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress)
           resolve(profile)
-          return
         })
         .catch((error) => {
           Logger.error(`resolveZoneFileToProfile: error fetching token file ${tokenFileUrl}`, error)
@@ -105,7 +104,6 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
     } else {
       Logger.debug('Token file url not found. Resolving to blank profile.')
       resolve({})
-      return
     }
   })
 }

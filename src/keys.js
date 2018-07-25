@@ -26,4 +26,3 @@ export function getPublicKeyFromPrivate(privateKey: string) {
   const keyPair = new ECPair(bigi.fromHex(privateKey))
   return keyPair.getPublicKeyBuffer().toString('hex')
 }
-

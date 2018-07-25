@@ -1,6 +1,8 @@
 import ecurve from 'ecurve'
 import { ECPair } from 'bitcoinjs-lib'
-import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens'
+import {
+  decodeToken, SECP256K1Client, TokenSigner, TokenVerifier 
+} from 'jsontokens'
 
 import { nextYear, makeUUID4 } from '../utils'
 
@@ -18,12 +20,12 @@ const secp256k1 = ecurve.getCurveByName('secp256k1')
   * @returns {Object} - the signed profile token
   */
 export function signProfileToken(profile,
-                          privateKey,
-                          subject = null,
-                          issuer = null,
-                          signingAlgorithm = 'ES256K',
-                          issuedAt = new Date(),
-                          expiresAt = nextYear()) {
+                                 privateKey,
+                                 subject = null,
+                                 issuer = null,
+                                 signingAlgorithm = 'ES256K',
+                                 issuedAt = new Date(),
+                                 expiresAt = nextYear()) {
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
