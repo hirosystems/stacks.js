@@ -30,14 +30,14 @@ export function validateProofs(profile: Object,
 
   accounts.forEach((account) => {
     // skip if proof service is not supported
-    if (account.hasOwnProperty('service') &&
-        !profileServices.hasOwnProperty(account.service)) {
+    if (account.hasOwnProperty('service')
+        && !profileServices.hasOwnProperty(account.service)) {
       return
     }
 
-    if (!(account.hasOwnProperty('proofType') &&
-        account.proofType === 'http' &&
-        account.hasOwnProperty('proofUrl'))) {
+    if (!(account.hasOwnProperty('proofType')
+        && account.proofType === 'http'
+        && account.hasOwnProperty('proofUrl'))) {
       return
     }
 
@@ -49,7 +49,7 @@ export function validateProofs(profile: Object,
     }
 
     proofsToValidate.push(profileServices[account.service]
-                          .validateProof(proof, ownerAddress, name))
+      .validateProof(proof, ownerAddress, name))
   })
 
   return Promise.all(proofsToValidate)

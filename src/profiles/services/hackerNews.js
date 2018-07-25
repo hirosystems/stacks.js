@@ -1,6 +1,6 @@
 /* @flow */
-import { Service } from './service'
 import cheerio from 'cheerio'
+import { Service } from './service'
 
 class HackerNews extends Service {
   static getBaseUrls() {
@@ -37,15 +37,15 @@ class HackerNews extends Service {
         if (rows.length > 0) {
           rows.each((idx, row) => {
             const heading = $(row).find('td')
-                                  .first()
-                                  .text()
-                                  .trim()
+              .first()
+              .text()
+              .trim()
 
             if (heading === 'about:') {
               statement = $(row).find('td')
-                                .last()
-                                .text()
-                                .trim()
+                .last()
+                .text()
+                .trim()
             }
           })
         }

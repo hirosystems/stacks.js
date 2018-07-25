@@ -1,9 +1,11 @@
 /* @flow */
 
 import bitcoin from 'bitcoinjs-lib'
-import { decodeB40, hash160, hash128, DUST_MINIMUM } from './utils'
-import { config } from '../config'
 import BigInteger from 'bigi'
+import {
+  decodeB40, hash160, hash128, DUST_MINIMUM 
+} from './utils'
+import { config } from '../config'
 
 // support v1 and v2 price API endpoint return values
 type AmountTypeV1 = number
@@ -14,12 +16,19 @@ type AmountType = AmountTypeV1 | AmountTypeV2
 
 export class BlockstackNamespace {
   namespaceID: string
+
   version: number
+
   lifetime: number
+
   coeff: number
+
   base: number
+
   buckets: Array<number>
+
   nonalphaDiscount: number
+
   noVowelDiscount: number
 
   constructor(namespaceID: string) {
@@ -115,7 +124,7 @@ export class BlockstackNamespace {
     const lifeHex = `00000000${this.lifetime.toString(16)}`.slice(-8)
     const coeffHex = `00${this.coeff.toString(16)}`.slice(-2)
     const baseHex = `00${this.base.toString(16)}`.slice(-2)
-    const bucketHex = this.buckets.map((b) => b.toString(16)).reduce((b1, b2) => b1 + b2, '')
+    const bucketHex = this.buckets.map(b => b.toString(16)).reduce((b1, b2) => b1 + b2, '')
     const discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16)
     const versionHex = `0000${this.version.toString(16)}`.slice(-4)
     const namespaceIDHex = new Buffer(this.namespaceID).toString('hex')
@@ -139,7 +148,8 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
   burnAddress : string, burn: AmountType,
-  registerAddress: ?string = null) {
+  registerAddress: ?string = null
+) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -281,7 +291,8 @@ export function makeRegisterSkeleton(
 
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
-  burnAddress: string, burn: AmountType, valueHash: ?string = null) {
+  burnAddress: string, burn: AmountType, valueHash: ?string = null
+) {
   /*
     Formats
 
@@ -331,7 +342,8 @@ export function makeRenewalSkeleton(
   const registerTX = makeRegisterSkeleton(
     fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex)
   const txB = bitcoin.TransactionBuilder.fromTransaction(
-    registerTX, network.layer1)
+    registerTX, network.layer1
+  )
   txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
   txB.addOutput(burnAddress, burnBTCAmount)
   return txB.buildIncomplete()
@@ -339,7 +351,8 @@ export function makeRenewalSkeleton(
 
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
-  keepZonefile: boolean = false) {
+  keepZonefile: boolean = false
+) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -384,7 +397,8 @@ export function makeTransferSkeleton(
 
 
 export function makeUpdateSkeleton(
-  fullyQualifiedName: string, consensusHash: string, valueHash: string) {
+  fullyQualifiedName: string, consensusHash: string, valueHash: string
+) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -410,7 +424,8 @@ export function makeUpdateSkeleton(
   const consensusBuff = Buffer.from(consensusHash, 'ascii')
 
   const hashedName = hash128(Buffer.concat(
-    [nameBuff, consensusBuff]))
+    [nameBuff, consensusBuff]
+  ))
 
   opRet.write('id+', 0, 3, 'ascii')
   hashedName.copy(opRet, 3)
@@ -462,7 +477,8 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash : string, preorderAddress: string,
-  registerAddress: string, burn: AmountType) {
+  registerAddress: string, burn: AmountType
+) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*
@@ -534,7 +550,8 @@ export function makeNamespacePreorderSkeleton(
 
 
 export function makeNamespaceRevealSkeleton(
-  namespace: BlockstackNamespace, revealAddress: string) {
+  namespace: BlockstackNamespace, revealAddress: string
+) {
   /*
    Format:
    
@@ -565,7 +582,8 @@ export function makeNamespaceRevealSkeleton(
 
 
 export function makeNamespaceReadySkeleton(
-  namespaceID: string) {
+  namespaceID: string
+) {
   /*
    Format:
    
@@ -613,7 +631,8 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
   const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
   const tx = new bitcoin.TransactionBuilder(network.layer1)
   const zonefileHashB58 = bitcoin.address.toBase58Check(
-    new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash)
+    new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash
+  )
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(recipientAddr, DUST_MINIMUM)
@@ -648,7 +667,6 @@ export function makeAnnounceSkeleton(messageHash: string) {
   tx.addOutput(nullOutput, 0)
   return tx.buildIncomplete()
 }
-
 
 export function makeTokenTransferSkeleton(recipientAddress: string,
   consensusHash: string, tokenType: string, tokenAmount: BigInteger, scratchArea: string) {
