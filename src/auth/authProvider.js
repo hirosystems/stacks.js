@@ -44,7 +44,7 @@ export function fetchAppManifest(authRequest) {
           .then((responseJSON) => {
             resolve(responseJSON)
           })
-          .catch(e => {
+          .catch((e) => {
             Logger.debug(e.stack)
             reject('Could not fetch manifest.json')
           })
