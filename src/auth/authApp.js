@@ -159,14 +159,15 @@ export function handlePendingSignIn(nameLookupURL: string = '',
                                     authResponseToken: string = getAuthResponseToken(),
                                     transitKey: string = getTransitKey()) {
   if (!nameLookupURL) {
-    // given in the authResponseToken?
     const tokenPayload = decodeToken(authResponseToken).payload
-    if (!!tokenPayload.blockstackAPIUrl) {
+    if (isLaterVersion(tokenPayload.version, '1.3.0')
+       && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
       // override globally
+      Logger.info(`Overriding ${config.network.blockstackAPIUrl} ` +
+        `with ${tokenPayload.blockstackAPIUrl}`)
       config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
     } 
 
-    // default 
     nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
@@ -206,9 +207,14 @@ export function handlePendingSignIn(nameLookupURL: string = '',
         }
       }
       let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
+      let gaiaAssociationToken
       if (isLaterVersion(tokenPayload.version, '1.2.0')
         && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
         hubUrl = tokenPayload.hubUrl
+      }
+      if (isLaterVersion(tokenPayload.version, '1.3.0')
+        && tokenPayload.associationToken !== null && tokenPayload.associationToken !== undefined) {
+        gaiaAssociationToken = tokenPayload.associationToken
       }
 
       const userData = {
@@ -219,7 +225,8 @@ export function handlePendingSignIn(nameLookupURL: string = '',
         appPrivateKey,
         coreSessionToken,
         authResponseToken,
-        hubUrl
+        hubUrl,
+        gaiaAssociationToken
       }
       const profileURL = tokenPayload.profile_url
       if ((userData.profile === null
