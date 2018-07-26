@@ -167,8 +167,6 @@ export function handlePendingSignIn(nameLookupURL: string = '',
         `with ${tokenPayload.blockstackAPIUrl}`)
       config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
     } 
-
-    nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
     .then((isValid) => {
