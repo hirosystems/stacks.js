@@ -101,8 +101,8 @@ export function connectToGaiaHub(gaiaHubUrl: string,
       if (userData && userData.gaiaAssociationToken) {
         associationToken = userData.gaiaAssociationToken
       }
-    } catch(e) {
-      ;
+    } catch (e) {
+      console.log('No user data')
     }
   }
 
