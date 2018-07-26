@@ -19,7 +19,7 @@ import { encryptECIES, decryptECIES } from '../encryption'
 
 import { Logger } from '../logger'
 
-const VERSION = '1.2.0'
+const VERSION = '1.3.0'
 
 type AuthMetadata = {
   email: ?string,
@@ -138,6 +138,7 @@ export function decryptPrivateKey(privateKey: string,
  * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @param {String} blockstackAPIUrl URL to the API endpoint to use
+ * @param {String} associationToken JWT that binds the app key to the identity key
  * @return {String} signed and encoded authentication response token
  */
 export function makeAuthResponse(privateKey: string,
@@ -149,7 +150,8 @@ export function makeAuthResponse(privateKey: string,
                                  expiresAt: number = nextMonth().getTime(),
                                  transitPublicKey: ?string = null,
                                  hubUrl: ?string = null,
-                                 blockstackAPIUrl: ?string = null): string {
+                                 blockstackAPIUrl: ?string = null,
+                                 associationToken: ?string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -171,6 +173,7 @@ export function makeAuthResponse(privateKey: string,
       profile_url: metadata.profileUrl ? metadata.profileUrl : null,
       hubUrl,
       blockstackAPIUrl,
+      associationToken,
       version: VERSION
     }
   } else {
