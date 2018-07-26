@@ -83,9 +83,17 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
     window.location = httpsURI
   }
 
-  function unsupportedBrowserCallback() { // Safari is unsupported by protocolCheck
-    Logger.warn('can not detect custom protocols on this browser')
-    window.location = protocolURI
+  function unsupportedBrowserCallback() {
+    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
+      // iOS doesn’t do protocols (yet)
+      Logger.warn('platform does not support custom protocols, sending to https')
+      window.location = httpsURI
+    }
+    else {
+      // Safari is unsupported by protocolCheck
+      Logger.warn('can not detect custom protocols on this browser')
+      window.location = protocolURI
+    }
   }
 
   protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
