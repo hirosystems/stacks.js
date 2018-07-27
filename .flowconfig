@@ -4,6 +4,7 @@
 .*/node_modules/chalk/*
 .*/node_modules/eslint-plugin-jsx-a11y/*
 .*/node_modules/npm/node_modules/config-chain/*
+<PROJECT_ROOT>/.git/.*
 [include]
 
 [libs]
