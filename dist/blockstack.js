@@ -305,7 +305,7 @@ exports.encryptPrivateKey = encryptPrivateKey;
 exports.decryptPrivateKey = decryptPrivateKey;
 exports.makeAuthResponse = makeAuthResponse;
 
-require('cross-fetch');
+require('cross-fetch/polyfill');
 
 var _jsontokens = require('jsontokens');
 
@@ -486,7 +486,7 @@ function makeAuthResponse(privateKey) {
   return tokenSigner.sign(payload);
 }
 }).call(this,require("buffer").Buffer)
-},{"../encryption":10,"../index":12,"../logger":14,"./authConstants":2,"buffer":159,"cross-fetch":263,"jsontokens":363}],4:[function(require,module,exports){
+},{"../encryption":10,"../index":12,"../logger":14,"./authConstants":2,"buffer":159,"cross-fetch/polyfill":263,"jsontokens":363}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -542,6 +542,7 @@ function fetchAppManifest(authRequest) {
       var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
       var manifestURI = payload.manifest_uri;
       try {
+        _logger.Logger.debug('Fetching manifest from ' + manifestURI);
         fetch(manifestURI).then(function (response) {
           return response.text();
         }).then(function (responseText) {
@@ -550,11 +551,11 @@ function fetchAppManifest(authRequest) {
           resolve(responseJSON);
         }).catch(function (e) {
           _logger.Logger.debug(e.stack);
-          reject('URI request couldn\'t be completed');
+          reject('Could not fetch manifest.json');
         });
       } catch (e) {
         _logger.Logger.debug(e.stack);
-        reject('URI request couldn\'t be completed');
+        reject('Could not fetch manifest.json');
       }
     }
   });
@@ -594,7 +595,7 @@ exports.getCoreSession = getCoreSession;
 
 var _jsontokens = require('jsontokens');
 
-require('cross-fetch');
+require('cross-fetch/polyfill');
 
 /**
  * Create an authentication token to be sent to the Core API server
@@ -745,7 +746,7 @@ function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
 
   return sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword);
 }
-},{"cross-fetch":263,"jsontokens":363}],6:[function(require,module,exports){
+},{"cross-fetch/polyfill":263,"jsontokens":363}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -998,6 +999,8 @@ function verifyAuthRequestAndLoadManifest(token) {
       if (valid) {
         return (0, _index.fetchAppManifest)(token).then(function (appManifest) {
           resolve(appManifest);
+        }).catch(function (err) {
+          reject(err);
         });
       } else {
         reject();
@@ -7114,7 +7117,7 @@ exports.Service = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-require('cross-fetch');
+require('cross-fetch/polyfill');
 
 var _serviceUtils = require('./serviceUtils');
 
@@ -7206,7 +7209,7 @@ var Service = exports.Service = function () {
 
   return Service;
 }();
-},{"./serviceUtils":42,"cross-fetch":263}],42:[function(require,module,exports){
+},{"./serviceUtils":42,"cross-fetch/polyfill":263}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7534,8 +7537,6 @@ var _profiles = require('../profiles');
 var _errors = require('../errors');
 
 var _logger = require('../logger');
-
-// import fetch from 'cross-fetch'
 
 var SIGNATURE_FILE_SUFFIX = '.sig';
 
@@ -36168,13 +36169,6 @@ arguments[4][166][0].apply(exports,arguments)
 },{"./legacy":262,"cipher-base":257,"create-hash/md5":260,"dup":166,"inherits":357,"ripemd160":426,"safe-buffer":427,"sha.js":432}],262:[function(require,module,exports){
 arguments[4][167][0].apply(exports,arguments)
 },{"cipher-base":257,"dup":167,"inherits":357,"safe-buffer":427}],263:[function(require,module,exports){
-var __root__ = (function (root) {
-function F() { this.fetch = false; }
-F.prototype = root;
-return new F();
-})(typeof self !== 'undefined' ? self : this);
-(function(self) {
-
 (function(self) {
 
   if (self.fetch) {
@@ -36640,14 +36634,6 @@ return new F();
   };
   self.fetch.polyfill = true;
 })(typeof self !== 'undefined' ? self : this);
-}).call(__root__, void(0));
-var fetch = __root__.fetch;
-var Response = fetch.Response = __root__.Response;
-var Request = fetch.Request = __root__.Request;
-var Headers = fetch.Headers = __root__.Headers;
-if (typeof module === 'object' && module.exports) {
-module.exports = fetch;
-}
 
 },{}],264:[function(require,module,exports){
 "use strict";

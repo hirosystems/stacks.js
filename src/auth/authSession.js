@@ -1,6 +1,6 @@
 /* @flow */
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
-import 'cross-fetch'
+import 'cross-fetch/polyfill'
 
 /**
  * Create an authentication token to be sent to the Core API server
