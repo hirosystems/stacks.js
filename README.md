@@ -83,6 +83,8 @@ This repository is maintained by [larry.id](https://explorer.blockstack.org/name
 
     $ npm run test
 
+    We test on the "Active LTS" version of Node.
+
 ### Testing in a browser
 
 _This test will only work with your browser's Cross-Origin Restrictions disabled._
