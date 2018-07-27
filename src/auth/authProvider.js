@@ -37,6 +37,7 @@ export function fetchAppManifest(authRequest) {
       const payload = decodeToken(authRequest).payload
       const manifestURI = payload.manifest_uri
       try {
+        Logger.debug(`Fetching manifest from ${manifestURI}`)
         fetch(manifestURI)
           .then(response => response.text())
           .then(responseText => JSON.parse(responseText))
@@ -45,11 +46,11 @@ export function fetchAppManifest(authRequest) {
           })
           .catch((e) => {
             Logger.debug(e.stack)
-            reject('URI request couldn\'t be completed')
+            reject('Could not fetch manifest.json')
           })
       } catch (e) {
         Logger.debug(e.stack)
-        reject('URI request couldn\'t be completed')
+        reject('Could not fetch manifest.json')
       }
     }
   })
