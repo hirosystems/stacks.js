@@ -49,7 +49,7 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
   const txFee = estimateTXBytes(txB, 0, 0) * feeRate
   const outAmounts = sumOutputValues(txB)
   const change = addUTXOsToFund(txB, utxos, txFee + outAmounts - inAmounts, feeRate)
-  txB.tx.outs[changeIndex].value += change
+  txB.__tx.outs[changeIndex].value += change
   return txB
 }
 
@@ -457,12 +457,13 @@ function makePreorder(fullyQualifiedName: string,
     return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
       .then(([utxos, feeRate, preorderSkeleton]) => {
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+        txB.setVersion(1)
 
         const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
         const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
 
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => paymentKey.signTransaction(signingTxB, i)
           )
@@ -534,7 +535,11 @@ function makeUpdate(fullyQualifiedName: string,
     .then(([ownerAddress, paymentAddress]) => {
       const txPromise = network.getConsensusHash()
         .then(consensusHash => makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash))
-        .then(updateTX => bitcoinjs.TransactionBuilder.fromTransaction(updateTX, network.layer1))
+        .then((updateTX) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(updateTX, network.layer1)
+          txB.setVersion(1)
+          return txB
+        })
 
       return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                           network.getUTXOs(ownerAddress), network.getFeeRate()])
@@ -544,7 +549,7 @@ function makeUpdate(fullyQualifiedName: string,
                                              ownerInput.value)
 
           let signingPromise = Promise.resolve()
-          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
             if (i === ownerInput.index) {
               signingPromise = signingPromise.then(
                 () => ownerKey.signTransaction(signingTxB, i)
@@ -600,6 +605,7 @@ function makeRegister(fullyQualifiedName: string,
   )
 
   const txB = bitcoinjs.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1)
+  txB.setVersion(1)
 
   let paymentKey
   if (typeof paymentKeyIn === 'string') {
@@ -614,7 +620,7 @@ function makeRegister(fullyQualifiedName: string,
         const signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0)
 
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => paymentKey.signTransaction(signingTxB, i)
           )
@@ -669,8 +675,12 @@ function makeTransfer(fullyQualifiedName: string,
         .then(consensusHash => makeTransferSkeleton(
           fullyQualifiedName, consensusHash, destinationAddress, keepZonefile
         ))
-        .then(transferTX => bitcoinjs.TransactionBuilder
-          .fromTransaction(transferTX, network.layer1))
+        .then((transferTX) => {
+          const txB = bitcoinjs.TransactionBuilder
+            .fromTransaction(transferTX, network.layer1)
+          txB.setVersion(1)
+          return txB
+        })
 
       return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                           network.getUTXOs(ownerAddress), network.getFeeRate()])
@@ -680,7 +690,7 @@ function makeTransfer(fullyQualifiedName: string,
                                              ownerInput.value)
 
           let signingPromise = Promise.resolve()
-          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
             if (i === ownerInput.index) {
               signingPromise = signingPromise.then(
                 () => ownerKey.signTransaction(signingTxB, i)
@@ -733,6 +743,8 @@ function makeRevoke(fullyQualifiedName: string,
     .then(([ownerAddress, paymentAddress]) => {
       const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
       const txPromise = bitcoinjs.TransactionBuilder.fromTransaction(revokeTX, network.layer1)
+      txPromise.setVersion(1)
+
 
       return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                           network.getUTXOs(ownerAddress), network.getFeeRate()])
@@ -742,7 +754,7 @@ function makeRevoke(fullyQualifiedName: string,
                                              ownerInput.value)
 
           let signingPromise = Promise.resolve()
-          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
             if (i === ownerInput.index) {
               signingPromise = signingPromise.then(
                 () => ownerKey.signTransaction(signingTxB, i)
@@ -815,13 +827,17 @@ function makeRenewal(fullyQualifiedName: string,
           fullyQualifiedName, destinationAddress, ownerAddress,
           burnAddress, namePrice, valueHash
         ))
-        .then(tx => bitcoinjs.TransactionBuilder.fromTransaction(tx, network.layer1))
+        .then((tx) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(tx, network.layer1)
+          txB.setVersion(1)
+          return txB
+        })
 
       return Promise.all([txPromise, network.getUTXOs(paymentAddress),
                           network.getUTXOs(ownerAddress), network.getFeeRate()])
         .then(([txB, payerUtxos, ownerUtxos, feeRate]) => {
           const ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false)
-          const ownerOutput = txB.tx.outs[2]
+          const ownerOutput = txB.__tx.outs[2]
           const ownerOutputAddr = bitcoinjs.address.fromOutputScript(
             ownerOutput.script, network.layer1
           )
@@ -835,7 +851,7 @@ function makeRenewal(fullyQualifiedName: string,
           const signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate,
                                              ownerInput.value)
           let signingPromise = Promise.resolve()
-          for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+          for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
             if (i === ownerInput.index) {
               signingPromise = signingPromise.then(
                 () => ownerKey.signTransaction(signingTxB, i)
@@ -889,12 +905,13 @@ function makeNamespacePreorder(namespaceID: string,
     return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
       .then(([utxos, feeRate, preorderSkeleton]) => {
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+        txB.setVersion(1)
 
         const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
         const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
 
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => paymentKey.signTransaction(signingTxB, i)
           )
@@ -942,10 +959,11 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
       .then(([utxos, feeRate]) => {
         const txB = bitcoinjs.TransactionBuilder
           .fromTransaction(namespaceRevealTX, network.layer1)
+        txB.setVersion(1)
         const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0)
 
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => paymentKey.signTransaction(signingTxB, i)
           )
@@ -984,9 +1002,10 @@ function makeNamespaceReady(namespaceID: string,
     revealAddress => Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
       .then(([utxos, feeRate]) => {
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
+        txB.setVersion(1)
         const signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0)
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => revealKey.signTransaction(signingTxB, i)
           )
@@ -1030,7 +1049,7 @@ function makeNameImport(name: string,
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
         const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => importerKey.signTransaction(signingTxB, i)
           )
@@ -1072,7 +1091,7 @@ function makeAnnounce(messageHash: string,
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(announceTX, network.layer1)
         const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => senderKey.signTransaction(signingTxB, i)
           )
@@ -1201,11 +1220,11 @@ function makeBitcoinSpend(destinationAddress: string,
         }
 
         // we need to manually set the output values now
-        txB.tx.outs[destinationIndex].value = outputAmount
+        txB.__tx.outs[destinationIndex].value = outputAmount
 
         // ready to sign.
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < txB.tx.ins.length; i++) {
+        for (let i = 0; i < txB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => paymentKey.signTransaction(txB, i)
           )

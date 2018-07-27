@@ -11,7 +11,8 @@ export {
 } from './keys'
 export {
   nextYear, nextMonth, nextHour, makeUUID4, updateQueryStringParameter,
-  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString
+  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString,
+  ecPairToAddress
 } from './utils'
 
 export { 
