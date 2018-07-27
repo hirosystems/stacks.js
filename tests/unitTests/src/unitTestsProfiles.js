@@ -48,7 +48,7 @@ function testTokening(filename, profile) {
 
     // this will throw an error if one is involid
     tokenRecords.map(tokenRecord => verifyProfileToken(tokenRecord.token, publicKey))
-    
+
     t.equal(tokensVerified, true, 'All tokens should be valid')
   })
 
@@ -110,8 +110,8 @@ function testZoneFile() {
 }
 function testSchemas() {
   const keyPair = new ECPair.makeRandom({ rng: getEntropy })
-  const privateKey = keyPair.d.toBuffer(32).toString('hex')
-  const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+  const privateKey = keyPair.privateKey.toString('hex')
+  const publicKey = keyPair.publicKey.toString('hex')
 
   test('Profile', (t) => {
     t.plan(5)

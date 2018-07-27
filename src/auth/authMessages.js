@@ -1,5 +1,5 @@
 /* @flow */
-import 'cross-fetch'
+import 'cross-fetch/polyfill'
 
 import {
   TokenSigner,
