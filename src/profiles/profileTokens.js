@@ -1,12 +1,9 @@
-import ecurve from 'ecurve'
 import { ECPair } from 'bitcoinjs-lib'
 import {
-  decodeToken, SECP256K1Client, TokenSigner, TokenVerifier 
+  decodeToken, SECP256K1Client, TokenSigner, TokenVerifier
 } from 'jsontokens'
 
-import { nextYear, makeUUID4 } from '../utils'
-
-const secp256k1 = ecurve.getCurveByName('secp256k1')
+import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
 
 /**
   * Signs a profile token
@@ -57,7 +54,7 @@ export function signProfileToken(profile,
 /**
   * Wraps a token for a profile token file
   * @param {String} token - the token to be wrapped
-  * @returns {Object} - including `token` and `decodedToken` 
+  * @returns {Object} - including `token` and `decodedToken`
   */
 export function wrapProfileToken(token) {
   return {
@@ -104,11 +101,10 @@ export function verifyProfileToken(token, publicKeyOrAddress) {
   const issuerPublicKey = payload.issuer.publicKey
   const publicKeyBuffer = new Buffer(issuerPublicKey, 'hex')
 
-  const Q = ecurve.Point.decodeFrom(secp256k1, publicKeyBuffer)
-  const compressedKeyPair = new ECPair(null, Q, { compressed: true })
-  const compressedAddress = compressedKeyPair.getAddress()
-  const uncompressedKeyPair = new ECPair(null, Q, { compressed: false })
-  const uncompressedAddress = uncompressedKeyPair.getAddress()
+  const compressedKeyPair =  ECPair.fromPublicKey(publicKeyBuffer, { compressed: true })
+  const compressedAddress = ecPairToAddress(compressedKeyPair)
+  const uncompressedKeyPair = ECPair.fromPublicKey(publicKeyBuffer, { compressed: false })
+  const uncompressedAddress = ecPairToAddress(uncompressedKeyPair)
 
   if (publicKeyOrAddress === issuerPublicKey) {
     // pass
