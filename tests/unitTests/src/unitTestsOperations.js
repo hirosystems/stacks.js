@@ -191,7 +191,7 @@ function utilsTests() {
     const change = addUTXOsToFund(txB, utxos, 10000, 10)
 
     t.equal(change, 38520) // gots to pay the fee!
-    t.equal(txB.tx.ins[0].hash.toString('hex'),
+    t.equal(txB.__tx.ins[0].hash.toString('hex'),
             Buffer.from(utxos[0].tx_hash, 'hex').reverse().toString('hex'))
   })
 
@@ -215,10 +215,10 @@ function utilsTests() {
 
     const change = addUTXOsToFund(txB, utxos, 55000, 10)
 
-    t.ok(change <= 5000, `${txB.tx.outs[1].value} should be less than 5k`)
-    t.equal(txB.tx.ins[0].hash.toString('hex'),
+    t.ok(change <= 5000, `${txB.__tx.outs[1].value} should be less than 5k`)
+    t.equal(txB.__tx.ins[0].hash.toString('hex'),
             Buffer.from(utxos[0].tx_hash, 'hex').reverse().toString('hex'))
-    t.equal(txB.tx.ins[1].hash.toString('hex'),
+    t.equal(txB.__tx.ins[1].hash.toString('hex'),
             Buffer.from(utxos[1].tx_hash, 'hex').reverse().toString('hex'))
   })
 
