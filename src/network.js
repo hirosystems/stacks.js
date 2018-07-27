@@ -480,7 +480,7 @@ export class BlockstackNetwork {
       reverseHash.reverse()
       excludeSet.push({
         tx_hash: reverseHash.toString('hex'),
-        tx_output_n: utxoUsed.index 
+        tx_output_n: utxoUsed.index
       })
     })
 
@@ -488,7 +488,15 @@ export class BlockstackNetwork {
 
     const txHash = tx.getHash().reverse().toString('hex')
     tx.outs.forEach((utxoCreated, txOutputN) => {
-      if (bitcoinjs.script.classifyOutput(utxoCreated.script) === 'nulldata') {
+      const isNullData = function isNullData(script) {
+        try {
+          bitcoinjs.payments.embed({ output: script }, { validate: true })
+          return true
+        } catch (_) {
+          return false
+        }
+      }
+      if (isNullData(utxoCreated.script)) {
         return
       }
       const address = bitcoinjs.address.fromOutputScript(
@@ -504,7 +512,7 @@ export class BlockstackNetwork {
         tx_hash: txHash,
         confirmations: 0,
         value: utxoCreated.value,
-        tx_output_n: txOutputN 
+        tx_output_n: txOutputN
       })
       this.includeUtxoMap[address] = includeSet
     })
@@ -560,7 +568,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const jsonRPC = {
       jsonrpc: '1.0',
       method: 'sendrawtransaction',
-      params: [transaction] 
+      params: [transaction]
     }
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
@@ -568,7 +576,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     return fetch(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPC),
-      headers 
+      headers
     })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
@@ -577,7 +585,7 @@ export class BitcoindAPI extends BitcoinNetwork {
   getBlockHeight() {
     const jsonRPC = {
       jsonrpc: '1.0',
-      method: 'getblockcount' 
+      method: 'getblockcount'
     }
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
@@ -585,7 +593,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     return fetch(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPC),
-      headers 
+      headers
     })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
@@ -595,7 +603,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const jsonRPC = {
       jsonrpc: '1.0',
       method: 'gettransaction',
-      params: [txHash] 
+      params: [txHash]
     }
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
@@ -603,7 +611,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     return fetch(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPC),
-      headers 
+      headers
     })
       .then(resp => resp.json())
       .then(respObj => respObj.result)
@@ -612,13 +620,13 @@ export class BitcoindAPI extends BitcoinNetwork {
         const jsonRPCBlock = {
           jsonrpc: '1.0',
           method: 'getblockheader',
-          params: [blockhash] 
+          params: [blockhash]
         }
         headers.Authorization = `Basic ${authString}`
         return fetch(this.bitcoindUrl, {
           method: 'POST',
           body: JSON.stringify(jsonRPCBlock),
-          headers 
+          headers
         })
       })
       .then(resp => resp.json())
@@ -629,12 +637,12 @@ export class BitcoindAPI extends BitcoinNetwork {
     const jsonRPCImport = {
       jsonrpc: '1.0',
       method: 'importaddress',
-      params: [address] 
+      params: [address]
     }
     const jsonRPCUnspent = {
       jsonrpc: '1.0',
       method: 'listunspent',
-      params: [0, 9999999, [address]] 
+      params: [0, 9999999, [address]]
     }
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
@@ -643,12 +651,12 @@ export class BitcoindAPI extends BitcoinNetwork {
     return fetch(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPCImport),
-      headers 
+      headers
     })
       .then(() => fetch(this.bitcoindUrl, {
         method: 'POST',
         body: JSON.stringify(jsonRPCUnspent),
-        headers 
+        headers
       }))
       .then(resp => resp.json())
       .then(x => x.result)
@@ -657,7 +665,7 @@ export class BitcoindAPI extends BitcoinNetwork {
           value: Math.round(x.amount * SATOSHIS_PER_BTC),
           confirmations: x.confirmations,
           tx_hash: x.txid,
-          tx_output_n: x.vout 
+          tx_output_n: x.vout
         })
       ))
   }
@@ -677,7 +685,7 @@ export class InsightClient extends BitcoinNetwork {
                  {
                    method: 'POST',
                    headers: { 'Content-Type': 'application/json' },
-                   body: JSON.stringify(jsonData) 
+                   body: JSON.stringify(jsonData)
                  })
       .then(resp => resp.json())
   }
@@ -709,7 +717,7 @@ export class InsightClient extends BitcoinNetwork {
           value: x.satoshis,
           confirmations: x.confirmations,
           tx_hash: x.txid,
-          tx_output_n: x.vout 
+          tx_output_n: x.vout
         })
       ))
   }
@@ -748,7 +756,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
             value: utxo.value,
             tx_output_n: utxo.tx_output_n,
             confirmations: utxo.confirmations,
-            tx_hash: utxo.tx_hash_big_endian 
+            tx_hash: utxo.tx_hash_big_endian
           }
           return utxoOut
         }
@@ -773,7 +781,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
     return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
                  {
                    method: 'POST',
-                   body: form 
+                   body: form
                  })
       .then((resp) => {
         const text = resp.text()
@@ -813,5 +821,5 @@ export const network = {
   BlockchainInfoApi,
   BitcoindAPI,
   InsightClient,
-  defaults: { LOCAL_REGTEST, MAINNET_DEFAULT } 
+  defaults: { LOCAL_REGTEST, MAINNET_DEFAULT }
 }

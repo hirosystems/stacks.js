@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "18.0.1",
+  "version": "18.0.2",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "scripts": {
@@ -106,7 +106,7 @@
   "dependencies": {
     "ajv": "^4.11.5",
     "bigi": "^1.4.2",
-    "bitcoinjs-lib": "^3.3.0",
+    "bitcoinjs-lib": "^4",
     "cheerio": "^0.22.0",
     "cross-fetch": "^2.2.2",
     "custom-protocol-detection-blockstack": "1.1.4",
@@ -126,7 +126,7 @@
     "zone-file": "^0.2.2"
   },
   "engines": {
-    "node": ">=6",
+    "node": ">=8",
     "npm": ">=6"
   },
   "nyc": {

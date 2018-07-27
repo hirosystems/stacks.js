@@ -1,6 +1,6 @@
 /* @flow */
 import bitcoinjs from 'bitcoinjs-lib'
-import { hexStringToECPair } from '../utils'
+import { hexStringToECPair, ecPairToAddress } from '../utils'
 
 export interface TransactionSigner {
   /**
@@ -41,7 +41,7 @@ export class PubkeyHashSigner implements TransactionSigner {
 
   getAddress(): Promise<string> {
     return Promise.resolve()
-      .then(() => this.ecPair.getAddress())
+      .then(() => ecPairToAddress(this.ecPair))
   }
 
   signTransaction(transaction: bitcoinjs.TransactionBuilder, inputIndex: number) : Promise<void> {
