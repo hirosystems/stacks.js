@@ -1138,7 +1138,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
         const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
         const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
         let signingPromise = Promise.resolve()
-        for (let i = 0; i < signingTxB.tx.ins.length; i++) {
+        for (let i = 0; i < signingTxB.__tx.ins.length; i++) {
           signingPromise = signingPromise.then(
             () => senderKey.signTransaction(signingTxB, i))
         }
