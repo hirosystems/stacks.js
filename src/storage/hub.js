@@ -1,10 +1,10 @@
 /* @flow */
 import bitcoin from 'bitcoinjs-lib'
-import bigi from 'bigi'
 import crypto from 'crypto'
 
 import { TokenSigner } from 'jsontokens'
 import { loadUserData } from '../auth/authApp'
+import { ecPairToAddress } from '../utils'
 import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
 import { Logger } from '../logger'
@@ -29,7 +29,7 @@ export function uploadToGaiaHub(filename: string, contents: any,
                    'Content-Type': contentType,
                    Authorization: `bearer ${hubConfig.token}`
                  },
-                 body: contents 
+                 body: contents
                })
     .then(response => response.text())
     .then(responseText => JSON.parse(responseText))
@@ -80,7 +80,7 @@ function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string, hubUrl: stri
     gaiaChallenge: challengeText,
     hubUrl,
     iss,
-    salt 
+    salt
   }
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
@@ -95,14 +95,13 @@ export function connectToGaiaHub(gaiaHubUrl: string,
     .then((hubInfo) => {
       const readURL = hubInfo.read_url_prefix
       const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl)
-      const address = hexStringToECPair(challengeSignerHex
-                                        + (challengeSignerHex.length === 64 ? '01' : ''))
-        .getAddress()
+      const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
+                                        + (challengeSignerHex.length === 64 ? '01' : '')))
       return {
         url_prefix: readURL,
         address,
         token,
-        server: gaiaHubUrl 
+        server: gaiaHubUrl
       }
     })
 }
@@ -148,7 +147,7 @@ export function getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
 export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
   let challengeSigner
   try {
-    challengeSigner = new bitcoin.ECPair(bigi.fromHex(appPrivateKey))
+    challengeSigner = bitcoin.ECPair.fromPrivateKey(new Buffer(appPrivateKey, 'hex'))
   } catch (e) {
     return Promise.reject(e)
   }
@@ -158,7 +157,7 @@ export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise
     .then(responseText => JSON.parse(responseText))
     .then((responseJSON) => {
       const readURL = responseJSON.read_url_prefix
-      const address = challengeSigner.getAddress()
+      const address = ecPairToAddress(challengeSigner)
       const bucketUrl = `${readURL}${address}/`
       return bucketUrl
     })

@@ -2,7 +2,7 @@ import test from 'tape-promise/tape'
 import { SECP256K1Client } from 'jsontokens'
 import {
   getEntropy, makeECPrivateKey, publicKeyToAddress, isSameOriginAbsoluteUrl,
-  ecPairToHexString, hexStringToECPair
+  ecPairToHexString, hexStringToECPair, ecPairToAddress
 } from '../../../lib'
 
 export function runUtilsTests() {
@@ -32,7 +32,7 @@ export function runUtilsTests() {
     const computedECPair = hexStringToECPair(privateKey)
     t.equal(privateKey, ecPairToHexString(computedECPair), 'Should return same hex string')
 
-    t.equal(expectedAddress, computedECPair.getAddress(), 'Should parse to correct address')
+    t.equal(expectedAddress, ecPairToAddress(computedECPair), 'Should parse to correct address')
   })
 
   test('isSameOriginAbsoluteUrl', (t) => {
