@@ -101,8 +101,8 @@ export function connectToGaiaHub(gaiaHubUrl: string,
       if (userData && userData.gaiaAssociationToken) {
         associationToken = userData.gaiaAssociationToken
       }
-    } catch(e) {
-      ;
+    } catch (e) {
+      console.log('No association token in user data')
     }
   }
 
@@ -113,9 +113,8 @@ export function connectToGaiaHub(gaiaHubUrl: string,
     .then((hubInfo) => {
       const readURL = hubInfo.read_url_prefix
       const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
-      const address = hexStringToECPair(challengeSignerHex
-                                        + (challengeSignerHex.length === 64 ? '01' : ''))
-        .getAddress()
+      const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
+                                        + (challengeSignerHex.length === 64 ? '01' : '')))
       return {
         url_prefix: readURL,
         address,
