@@ -166,6 +166,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
       Logger.info(`Overriding ${config.network.blockstackAPIUrl} ` +
         `with ${tokenPayload.blockstackAPIUrl}`)
       config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
+      nameLookupURL = `${tokenPayload.blockstackAPIUrl}/v1/names`
     } 
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
