@@ -88,8 +88,7 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
       // iOS doesn’t do protocols (yet)
       Logger.warn('platform does not support custom protocols, sending to https')
       window.location = httpsURI
-    }
-    else {
+    } else {
       // Safari is unsupported by protocolCheck
       Logger.warn('can not detect custom protocols on this browser')
       window.location = protocolURI
