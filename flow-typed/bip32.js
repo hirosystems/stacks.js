@@ -13,25 +13,19 @@ declare module 'bip32' {
       str: string,
       networks: ?(Array<Network> | Network)
     ): BIP32;
+    static fromSeed(seed: Buffer, network?: ?Network): BIP32;
+    getPublicKeyBuffer(): Buffer;
     derive(index: number): BIP32;
     deriveHardened(index: number): BIP32;
     derivePath(path: string): BIP32;
     toBase58(): string;
-    constructor(keyPair: ECPair, chainCode: Buffer): void;
-
-    static fromBase58(
-      base: string,
-      network?: ?(Network | Array<Network>)
-    ): BIP32;
-    static fromSeedHex(seed: string, network?: ?Network): BIP32;
-    static fromSeedBuffer(seed: Buffer, network?: ?Network): BIP32;
-    getPublicKeyBuffer(): Buffer;
-
     sign(): ECSignature;
     verify(hash: Buffer, signature: ECSignature): Buffer;
     neutered(): BIP32;
     isNeutered(): boolean;
-    constructor(keyPair: ECPair, chainCode: Buffer): void;
     static HIGHEST_BIT: number;
+    constructor(keyPair: ECPair, chainCode: Buffer): void;
   }
+
+  declare export default typeof BIP32;
 }

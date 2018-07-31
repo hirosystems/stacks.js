@@ -2,8 +2,8 @@
 import crypto, { randomBytes } from 'crypto'
 import bitcoin, { ECPair } from 'bitcoinjs-lib'
 import bip39 from 'bip39'
-import type BIP32 from 'bip32'
 import bip32 from 'bip32'
+import type BIP32 from 'bip32'
 import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption'
 
@@ -166,7 +166,7 @@ export class BlockstackWallet {
    * characters long to denote an uncompressed bitcoin address, or 66
    * characters long for a compressed bitcoin address.
    */
-  getBitcoinPrivateKey(addressIndex: number): BIP32 {
+  getBitcoinPrivateKey(addressIndex: number): string {
     return getNodePrivateKey(this.getBitcoinNode(addressIndex))
   }
 
