@@ -64,13 +64,13 @@ export function getHexFromBN(bnInput: Object) {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @private
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
+ *  @private
  */
 export function encryptECIES(publicKey: string, content: string | Buffer) : CipherObject {
   const isString = (typeof (content) === 'string')
@@ -109,7 +109,6 @@ export function encryptECIES(publicKey: string, content: string | Buffer) : Ciph
 
 /**
  * Decrypt content encrypted using ECIES
- * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
@@ -117,6 +116,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer) : Ciph
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext
  * @throws {Error} if unable to decrypt
+ * @private
  */
 export function decryptECIES(privateKey: string, cipherObject: CipherObject): Buffer | string {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
@@ -150,11 +150,13 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
 
 /**
  * Sign content using ECDSA
+ * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} content - content to sign
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
+ * @private
  */
 export function signECDSA(privateKey: string, content: string | Buffer)
 : {publicKey: string, signature: string } {
@@ -177,6 +179,7 @@ export function signECDSA(privateKey: string, content: string | Buffer)
  * @param {String} publicKey - secp256k1 private key hex string
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @private
  */
 export function verifyECDSA(content: string | Buffer,
                             publicKey: string,
@@ -193,6 +196,7 @@ export function verifyECDSA(content: string | Buffer,
  * @param {string} phrase - Raw mnemonic phrase
  * @param {string} password - Password to encrypt mnemonic with
  * @return {Promise<Buffer>} The encrypted phrase
+ * @private
  */
 export function encryptMnemonic(phrase: string, password: string) {
   return Promise.resolve().then(() => {
@@ -283,6 +287,7 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
  * @param {Buffer} dataBuffer - The encrypted key
  * @param {String} password - Password for data
  * @return {Promise<Buffer>} Decrypted seed
+ * @private
  */
 function decryptLegacy(dataBuffer: Buffer, password: string) {
   return new Promise((resolve, reject) => {
@@ -307,6 +312,7 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
  * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
  * @param {string} password - Password for data
  * @return {Promise<Buffer>} the raw mnemonic phrase
+ * @private
  */
 export function decryptMnemonic(data: (string | Buffer), password: string) {
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from((data: any), 'hex')

@@ -431,6 +431,7 @@ function decryptPrivateKey(privateKey, hexedEncrypted) {
  * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @return {String} signed and encoded authentication response token
+ * @private
  */
 function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -1393,13 +1394,13 @@ function getHexFromBN(bnInput) {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @private
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
+ *  @private
  */
 function encryptECIES(publicKey, content) {
   var isString = typeof content === 'string';
@@ -1432,7 +1433,6 @@ function encryptECIES(publicKey, content) {
 
 /**
  * Decrypt content encrypted using ECIES
- * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
@@ -1440,6 +1440,7 @@ function encryptECIES(publicKey, content) {
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext
  * @throws {Error} if unable to decrypt
+ * @private
  */
 function decryptECIES(privateKey, cipherObject) {
   var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
@@ -1469,11 +1470,13 @@ function decryptECIES(privateKey, cipherObject) {
 
 /**
  * Sign content using ECDSA
+ * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} content - content to sign
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
+ * @private
  */
 function signECDSA(privateKey, content) {
   var contentBuffer = Buffer.from(content);
@@ -1495,6 +1498,7 @@ function signECDSA(privateKey, content) {
  * @param {String} publicKey - secp256k1 private key hex string
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @private
  */
 function verifyECDSA(content, publicKey, signature) {
   var contentBuffer = Buffer.from(content);
@@ -1509,6 +1513,7 @@ function verifyECDSA(content, publicKey, signature) {
  * @param {string} phrase - Raw mnemonic phrase
  * @param {string} password - Password to encrypt mnemonic with
  * @return {Promise<Buffer>} The encrypted phrase
+ * @private
  */
 function encryptMnemonic(phrase, password) {
   return Promise.resolve().then(function () {
@@ -1601,6 +1606,7 @@ function decryptMnemonicBuffer(dataBuffer, password) {
  * @param {Buffer} dataBuffer - The encrypted key
  * @param {String} password - Password for data
  * @return {Promise<Buffer>} Decrypted seed
+ * @private
  */
 function decryptLegacy(dataBuffer, password) {
   return new Promise(function (resolve, reject) {
@@ -1622,6 +1628,7 @@ function decryptLegacy(dataBuffer, password) {
  * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
  * @param {string} password - Password for data
  * @return {Promise<Buffer>} the raw mnemonic phrase
+ * @private
  */
 function decryptMnemonic(data, password) {
   var dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex');
@@ -8357,6 +8364,7 @@ function getNodePublicKey(node) {
  *  paths for a standard blockstack client wallet. This includes paths
  *  for bitcoin payment address, blockstack identity addresses, blockstack
  *  application specific addresses.
+ *  @private
  */
 
 var BlockstackWallet = exports.BlockstackWallet = function () {

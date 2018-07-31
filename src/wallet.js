@@ -50,6 +50,7 @@ function getNodePublicKey(node: BIP32): string {
  *  paths for a standard blockstack client wallet. This includes paths
  *  for bitcoin payment address, blockstack identity addresses, blockstack
  *  application specific addresses.
+ *  @private
  */
 export class BlockstackWallet {
   rootNode: BIP32
