@@ -6,11 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
-## Added
+### Added
 - The `BlockstackWallet` class in `blockstack.js` supports generating
   private keys and addresses within the hierarchical derivation scheme
   used by the Blockstack Browser and supported by the Blockstack
   ecosystem.
+
+### Changed
+- Resolve unsupported protocol error by redirecting
+  to hosted authenticator on iOS
 
 ## [18.0.2] - 2018-07-27
 
