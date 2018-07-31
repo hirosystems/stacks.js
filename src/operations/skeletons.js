@@ -1,9 +1,11 @@
 /* @flow */
 
 import bitcoin from 'bitcoinjs-lib'
-import { decodeB40, hash160, hash128, DUST_MINIMUM } from './utils'
-import { config } from '../config'
 import BigInteger from 'bigi'
+import {
+  decodeB40, hash160, hash128, DUST_MINIMUM
+} from './utils'
+import { config } from '../config'
 
 // support v1 and v2 price API endpoint return values
 type AmountTypeV1 = number
@@ -14,12 +16,19 @@ type AmountType = AmountTypeV1 | AmountTypeV2
 
 export class BlockstackNamespace {
   namespaceID: string
+
   version: number
+
   lifetime: number
+
   coeff: number
+
   base: number
+
   buckets: Array<number>
+
   nonalphaDiscount: number
+
   noVowelDiscount: number
 
   constructor(namespaceID: string) {
@@ -55,7 +64,7 @@ export class BlockstackNamespace {
     }
   }
 
-  setVersion(version: number) { 
+  setVersion(version: number) {
     if (version < 0 || version > 2 ** 16 - 1) {
       throw new Error('Invalid version: must be a 16-bit number')
     }
@@ -68,7 +77,7 @@ export class BlockstackNamespace {
     }
     this.lifetime = lifetime
   }
-    
+
   setCoeff(coeff: number) {
     if (coeff < 0 || coeff > 255) {
       throw new Error('Invalid coeff: must be an 8-bit number')
@@ -96,7 +105,7 @@ export class BlockstackNamespace {
 
     this.buckets = buckets.slice(0)
   }
- 
+
   setNonalphaDiscount(nonalphaDiscount: number) {
     if (nonalphaDiscount < 0 || nonalphaDiscount > 15) {
       throw new Error('Invalid nonalphaDiscount: must be a 4-bit number')
@@ -115,13 +124,13 @@ export class BlockstackNamespace {
     const lifeHex = `00000000${this.lifetime.toString(16)}`.slice(-8)
     const coeffHex = `00${this.coeff.toString(16)}`.slice(-2)
     const baseHex = `00${this.base.toString(16)}`.slice(-2)
-    const bucketHex = this.buckets.map((b) => b.toString(16)).reduce((b1, b2) => b1 + b2, '')
+    const bucketHex = this.buckets.map(b => b.toString(16)).reduce((b1, b2) => b1 + b2, '')
     const discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16)
     const versionHex = `0000${this.version.toString(16)}`.slice(-4)
     const namespaceIDHex = new Buffer(this.namespaceID).toString('hex')
 
     return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex
-  } 
+  }
 }
 
 function asAmountV2(amount: AmountType): AmountTypeV2 {
@@ -137,7 +146,8 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
   burnAddress : string, burn: AmountType,
-  registerAddress: ?string = null) {
+  registerAddress: ?string = null
+) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -170,7 +180,8 @@ export function makePreorderSkeleton(
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -185,7 +196,8 @@ export function makePreorderSkeleton(
 
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
-  valueHash: ?string = null) {
+  valueHash: ?string = null
+) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -207,7 +219,7 @@ export function makeRegisterSkeleton(
 
 
     With zonefile hash, and pay with BTC:
-    
+
     0    2  3                                  39                  59
     |----|--|----------------------------------|-------------------|
     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
@@ -230,7 +242,8 @@ export function makeRegisterSkeleton(
   }
 
   const opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload])
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -242,7 +255,8 @@ export function makeRegisterSkeleton(
 
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
-  burnAddress: string, burn: AmountType, valueHash: ?string = null) {
+  burnAddress: string, burn: AmountType, valueHash: ?string = null
+) {
   /*
     Formats
 
@@ -254,7 +268,7 @@ export function makeRenewalSkeleton(
 
 
     With zonefile hash, and pay with BTC:
-    
+
     0    2  3                                  39                  59
     |----|--|----------------------------------|-------------------|
     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
@@ -263,11 +277,13 @@ export function makeRenewalSkeleton(
   const burnAmount = asAmountV2(burn)
   const network = config.network
   const burnBTCAmount = parseInt(burnAmount.amount.toHex(), 16)
-  
+
   const registerTX = makeRegisterSkeleton(
-    fullyQualifiedName, nextOwnerAddress, valueHash)
+    fullyQualifiedName, nextOwnerAddress, valueHash
+  )
   const txB = bitcoin.TransactionBuilder.fromTransaction(
-    registerTX, network.layer1)
+    registerTX, network.layer1
+  )
   txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
   txB.addOutput(burnAddress, burnBTCAmount)
   return txB.buildIncomplete()
@@ -275,7 +291,8 @@ export function makeRenewalSkeleton(
 
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
-  keepZonefile: boolean = false) {
+  keepZonefile: boolean = false
+) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -285,7 +302,7 @@ export function makeTransferSkeleton(
   // Returns an unsigned serialized transaction.
   /*
     Format
-    
+
     0     2  3    4                   20              36
     |-----|--|----|-------------------|---------------|
     magic op keep  hash128(name.ns_id) consensus hash
@@ -305,7 +322,7 @@ export function makeTransferSkeleton(
   hashed.copy(opRet, 4)
   opRet.write(consensusHash, 20, 16, 'hex')
 
-  const opRetPayload = bitcoin.script.nullData.output.encode(opRet)
+  const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -317,7 +334,8 @@ export function makeTransferSkeleton(
 
 
 export function makeUpdateSkeleton(
-  fullyQualifiedName: string, consensusHash: string, valueHash: string) {
+  fullyQualifiedName: string, consensusHash: string, valueHash: string
+) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -326,7 +344,7 @@ export function makeUpdateSkeleton(
   // Returns an unsigned serialized transaction.
   /*
     Format:
-    
+
     0     2  3                                   19                      39
     |-----|--|-----------------------------------|-----------------------|
     magic op  hash128(name.ns_id,consensus hash) hash160(data)
@@ -339,13 +357,14 @@ export function makeUpdateSkeleton(
   const consensusBuff = Buffer.from(consensusHash, 'ascii')
 
   const hashedName = hash128(Buffer.concat(
-    [nameBuff, consensusBuff]))
+    [nameBuff, consensusBuff]
+  ))
 
   opRet.write('id+', 0, 3, 'ascii')
   hashedName.copy(opRet, 3)
   opRet.write(valueHash, 19, 20, 'hex')
 
-  const opRetPayload = bitcoin.script.nullData.output.encode(opRet)
+  const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -356,7 +375,7 @@ export function makeUpdateSkeleton(
 
 
 export function makeRevokeSkeleton(fullyQualifiedName: string) {
-  // Returns a revoke tx skeleton 
+  // Returns a revoke tx skeleton
   //    with 1 output: 1. the Blockstack revoke OP_RETURN
   //
   // You MUST make the first input a UTXO from the current OWNER
@@ -369,16 +388,17 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
    |----|--|-----------------------------|
    magic op   name.ns_id (37 bytes)
   */
-  
+
   const network = config.network
   const opRet = Buffer.alloc(3)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
-  
+
   opRet.write('id~', 0, 3, 'ascii')
-  
+
   const opReturnBuffer = Buffer.concat([opRet, nameBuff])
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -389,7 +409,8 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash : string, preorderAddress: string,
-  registerAddress: string, burn: AmountType) {
+  registerAddress: string, burn: AmountType
+) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*
@@ -415,7 +436,7 @@ export function makeNamespacePreorderSkeleton(
   const dataBuff = Buffer.concat(dataBuffers)
 
   const hashed = hash160(dataBuff)
-  
+
   const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
   const opReturnBufferLen = 39
 
@@ -424,7 +445,7 @@ export function makeNamespacePreorderSkeleton(
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
@@ -437,10 +458,11 @@ export function makeNamespacePreorderSkeleton(
 
 
 export function makeNamespaceRevealSkeleton(
-  namespace: BlockstackNamespace, revealAddress: string) {
+  namespace: BlockstackNamespace, revealAddress: string
+) {
   /*
    Format:
-   
+
    0     2   3    7     8     9    10   11   12   13   14    15    16    17       18      20     39
    |-----|---|----|-----|-----|----|----|----|----|----|-----|-----|-----|--------|-------|-------|
    magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
@@ -454,7 +476,7 @@ export function makeNamespaceRevealSkeleton(
   opReturnBuffer.write('id&', 0, 3, 'ascii')
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
@@ -465,10 +487,11 @@ export function makeNamespaceRevealSkeleton(
 
 
 export function makeNamespaceReadySkeleton(
-  namespaceID: string) {
+  namespaceID: string
+) {
   /*
    Format:
-   
+
    0     2  3  4           23
    |-----|--|--|------------|
    magic op  .  ns_id
@@ -479,11 +502,11 @@ export function makeNamespaceReadySkeleton(
   opReturnBuffer.write('id!', 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
   const tx = new bitcoin.TransactionBuilder(network.layer1)
 
   tx.addOutput(nullOutput, 0)
-  
+
   return tx.buildIncomplete()
 }
 
@@ -491,7 +514,7 @@ export function makeNamespaceReadySkeleton(
 export function makeNameImportSkeleton(name: string, recipientAddr: string, zonefileHash: string) {
   /*
    Format:
-    
+
     0    2  3                             39
     |----|--|-----------------------------|
     magic op   name.ns_id (37 bytes)
@@ -509,10 +532,12 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
   opReturnBuffer.write('id;', 0, 3, 'ascii')
   opReturnBuffer.write(name, 3, name.length, 'ascii')
 
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+
   const tx = new bitcoin.TransactionBuilder(network.layer1)
   const zonefileHashB58 = bitcoin.address.toBase58Check(
-    new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash)
+    new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash
+  )
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(recipientAddr, DUST_MINIMUM)
@@ -524,7 +549,7 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
 
 export function makeAnnounceSkeleton(messageHash: string) {
   /*
-    Format: 
+    Format:
 
     0    2  3                             23
     |----|--|-----------------------------|
@@ -539,10 +564,10 @@ export function makeAnnounceSkeleton(messageHash: string) {
   opReturnBuffer.write('id#', 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
 
-  const nullOutput = bitcoin.script.nullData.output.encode(opReturnBuffer)
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+
   const tx = new bitcoin.TransactionBuilder(network.layer1)
-  
+
   tx.addOutput(nullOutput, 0)
   return tx.buildIncomplete()
 }
-

@@ -1,5 +1,5 @@
-import { extractToken } from '../profileTokens'
 import inspector from 'schema-inspector'
+import { extractProfile } from '../profileTokens'
 import { Profile } from '../profile'
 
 const schemaDefinition = {
@@ -25,7 +25,7 @@ export class CreativeWork extends Profile {
   }
 
   static fromToken(token, publicKeyOrAddress = null) {
-    const profile = extractToken(token, publicKeyOrAddress)
+    const profile = extractProfile(token, publicKeyOrAddress)
     return new CreativeWork(profile)
   }
 }

@@ -41,8 +41,10 @@ function equalConstTime(b1 : Buffer, b2 : Buffer) {
 function sharedSecretToKeys(sharedSecret : Buffer) {
   // generate mac and encryption key from shared secret
   const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
-  return { encryptionKey: hashedSecret.slice(0, 32),
-           hmacKey: hashedSecret.slice(32) }
+  return {
+    encryptionKey: hashedSecret.slice(0, 32),
+    hmacKey: hashedSecret.slice(32)
+  }
 }
 
 export function getHexFromBN(bnInput: Object) {
@@ -71,7 +73,7 @@ export function getHexFromBN(bnInput: Object) {
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  */
 export function encryptECIES(publicKey: string, content: string | Buffer) : CipherObject {
-  const isString = (typeof(content) === 'string')
+  const isString = (typeof (content) === 'string')
   const plainText = Buffer.from(content) // always copy to buffer
 
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
@@ -82,23 +84,27 @@ export function encryptECIES(publicKey: string, content: string | Buffer) : Ciph
   const sharedSecretHex = getHexFromBN(sharedSecret)
 
   const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecretHex, 'hex'))
+    new Buffer(sharedSecretHex, 'hex')
+  )
 
   const initializationVector = crypto.randomBytes(16)
 
   const cipherText = aes256CbcEncrypt(
-    initializationVector, sharedKeys.encryptionKey, plainText)
+    initializationVector, sharedKeys.encryptionKey, plainText
+  )
 
   const macData = Buffer.concat([initializationVector,
                                  new Buffer(ephemeralPK.encodeCompressed()),
                                  cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
-  return { iv: initializationVector.toString('hex'),
-           ephemeralPK: ephemeralPK.encodeCompressed('hex'),
-           cipherText: cipherText.toString('hex'),
-           mac: mac.toString('hex'),
-           wasString: isString }
+  return {
+    iv: initializationVector.toString('hex'),
+    ephemeralPK: ephemeralPK.encodeCompressed('hex'),
+    cipherText: cipherText.toString('hex'),
+    mac: mac.toString('hex'),
+    wasString: isString
+  }
 }
 
 /**
@@ -128,11 +134,12 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
                                  cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = new Buffer(cipherObject.mac, 'hex')
-  if (! equalConstTime(expectedMac, actualMac)) {
+  if (!equalConstTime(expectedMac, actualMac)) {
     throw new Error('Decryption failed: failure in MAC check')
   }
   const plainText = aes256CbcDecrypt(
-    ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer)
+    ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer
+  )
 
   if (cipherObject.wasString) {
     return plainText.toString()
@@ -301,14 +308,13 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
  * @param {string} password - Password for data
  * @return {Promise<Buffer>} the raw mnemonic phrase
  */
-export function decryptMnemonic(data: string | Buffer, password: string) {
-  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
-  return decryptMnemonicBuffer(dataBuffer, password).catch((err) => {
+export function decryptMnemonic(data: (string | Buffer), password: string) {
+  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from((data: any), 'hex')
+  return decryptMnemonicBuffer((dataBuffer: any), password).catch((err) => {
     // If it was a password error, don't even bother with legacy
     if (err instanceof PasswordError) {
       throw err
     }
-
-    return decryptLegacy(dataBuffer, password)
+    return decryptLegacy((dataBuffer: any), password)
   })
 }

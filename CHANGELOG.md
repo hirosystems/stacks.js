@@ -4,14 +4,29 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [unreleased]
 
-### Added
-
+## Added
 - The `BlockstackWallet` class in `blockstack.js` supports generating
   private keys and addresses within the hierarchical derivation scheme
   used by the Blockstack Browser and supported by the Blockstack
   ecosystem.
+
+## [18.0.2] - 2018-07-27
+
+### Changed
+- Update `bitcoinjs-lib` to version 4.0.0.
+
+## [18.0.1] - 2018-07-27
+
+### Changed
+- Switched from `cross-fetch` to `cross-fetch/polyfill` to fix a bug that caused
+  network requests to fail in node environments
+
+## [18.0.0]
+
+### Added
+
 - Support for `verify` and `sign` keywords in `getFile` and `putFile`
   respectively. This enables support for ECDSA signatures on SHA256
   hashes in the storage operations, and works for encrypted and
@@ -38,7 +53,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cases which resulted in uncaught exception warnings and null
   responses should now behave correctly.
 - `handlePendingSignIn` now takes a second parameter which is the
-  signed authentication response token. Thanks to @muneebm for this!
+   signed authentication response token. Thanks to @muneebm for this!
+- Fixed an issue in `ecPairToHexString` that may result in generation of
+  an incorrectly hex string encoding of the private key.
+- Proofs now support subdomains.
+- Updated a number of dependencies to fix know vulnerablities.
+- Switched from isomorphic-fetch to the better maintained cross-fetch
+  which will improve functionality of the library in node environments.
+
 
 ## [17.2.0]
 

@@ -1,7 +1,9 @@
 import { exec } from 'child_process'
 import test from 'tape'
 
-import { transactions, config, network, hexStringToECPair } from '../../../lib'
+import {
+  transactions, config, network, hexStringToECPair 
+} from '../../../lib'
 import { hash160 } from '../../../lib/operations/utils'
 
 const BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST
@@ -16,7 +18,8 @@ function pExec(cmd) {
           resolve(stdout, stderr)
         }
       })
-    })
+    }
+  )
 }
 
 function initializeBlockstackCore() {
@@ -32,15 +35,15 @@ function initializeBlockstackCore() {
           rm -rf /tmp/.blockstack_int_test`)
           .catch(() => true)
       })
-      .then(() => pExec('docker run --name test-bsk-core -dt ' +
-                        '-p 16268:16268 -p 18332:18332 -p 30001:30001 ' +
-                        '-e BLOCKSTACK_TEST_CLIENT_RPC_PORT=16268 ' +
-                        '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 ' +
-                        '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 ' +
-                        '-e BLOCKSTACK_WEB_TEST_BIND=0.0.0.0 ' +
-                        'quay.io/blockstack/integrationtests:develop ' +
-                        'blockstack-test-scenario --interactive 2 ' +
-                        'blockstack_integration_tests.scenarios.portal_test_env'))
+      .then(() => pExec('docker run --name test-bsk-core -dt '
+                        + '-p 16268:16268 -p 18332:18332 -p 30001:30001 '
+                        + '-e BLOCKSTACK_TEST_CLIENT_RPC_PORT=16268 '
+                        + '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 '
+                        + '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 '
+                        + '-e BLOCKSTACK_WEB_TEST_BIND=0.0.0.0 '
+                        + 'quay.io/blockstack/integrationtests:develop '
+                        + 'blockstack-test-scenario --interactive 2 '
+                        + 'blockstack_integration_tests.scenarios.portal_test_env'))
       .then(() => {
         console.log('Started regtest container, waiting until initialized')
         return pExec('docker logs -f test-bsk-core | grep -q \'Test finished\'')
@@ -48,7 +51,7 @@ function initializeBlockstackCore() {
       .then(() => {
         // try to avoid race with nextBlock()
         console.log('Wait 10 seconds for test server to bind')
-        return new Promise((resolve) => setTimeout(resolve, 10000))
+        return new Promise(resolve => setTimeout(resolve, 10000))
       })
   }
 }
@@ -73,7 +76,7 @@ function nextBlock(numBlocks) {
         }
       })
   } else {
-    return new Promise((resolve) => setTimeout(resolve, 30000))
+    return new Promise(resolve => setTimeout(resolve, 30000))
   }
 }
 
@@ -106,12 +109,12 @@ export function runIntegrationTests() {
 
     const renewalDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
-    const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
-    const zfTest2 = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
-    const renewalZF = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
+    const zfTest = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
+    const zfTest2 = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
+    const renewalZF = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
 
     initializeBlockstackCore()
       .then(() => {
@@ -132,7 +135,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(zfTest))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(myNet.coerceAddress(nameInfo.address), destAddress,
                 `aaron.id should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
@@ -146,7 +149,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(zfTest2))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(nameInfo.zonefile, zfTest2, 'zonefile should be updated')
       })
       .then(() => transactions.makeTransfer('aaron.id', transferDestination, dest, payer))
@@ -157,7 +160,7 @@ export function runIntegrationTests() {
       })
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(myNet.coerceAddress(nameInfo.address), transferDestination,
                 `aaron.id should be owned by ${transferDestination}`)
       })
@@ -171,7 +174,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(renewalZF))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.id`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `aaron.id should be owned by ${renewalDestination}`)
@@ -217,14 +220,14 @@ export function runIntegrationTests() {
     const renewalKey = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d'
     const renewalDestination = hexStringToECPair(renewalKey).getAddress()
 
-    const zfTest = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
-    const zfTest2 = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
-    const renewalZF = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
-    const importZF = '$ORIGIN import.hello\n$TTL 3600\n_http._tcp URI 10 1 ' +
-          `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
+    const zfTest = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
+    const zfTest2 = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/3/profile.json"`
+    const renewalZF = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
+    const importZF = '$ORIGIN import.hello\n$TTL 3600\n_http._tcp URI 10 1 '
+          + `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
 
     initializeBlockstackCore()
       .then(() => {
@@ -258,7 +261,8 @@ export function runIntegrationTests() {
         console.log('NAME_IMPORT import.hello')
         const zfHash = hash160(Buffer.from(importZF)).toString('hex')
         return transactions.makeNameImport(
-          'import.hello', renewalDestination, zfHash, nsReveal)
+          'import.hello', renewalDestination, zfHash, nsReveal
+        )
       })
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
@@ -268,7 +272,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(importZF))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/import.hello`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `import.hello should be owned by ${renewalDestination}`)
         t.equal(nameInfo.zonefile, importZF, 'zonefile should be properly set for import.hello')
@@ -300,7 +304,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(zfTest))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(myNet.coerceAddress(nameInfo.address), destAddress,
                 `aaron.hello should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
@@ -314,7 +318,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(zfTest2))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(nameInfo.zonefile, zfTest2, 'zonefile should be updated')
       })
       .then(() => transactions.makeTransfer('aaron.hello', transferDestination, dest, payer))
@@ -325,7 +329,7 @@ export function runIntegrationTests() {
       })
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(myNet.coerceAddress(nameInfo.address), transferDestination,
                 `aaron.hello should be owned by ${transferDestination}`)
       })
@@ -339,7 +343,7 @@ export function runIntegrationTests() {
       .then(() => myNet.broadcastZoneFile(renewalZF))
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(nameInfo.zonefile, renewalZF, 'zonefile should be updated')
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `aaron.hello should be owned by ${renewalDestination}`)
@@ -352,7 +356,7 @@ export function runIntegrationTests() {
       })
       .then(() => fetch(`${myNet.blockstackAPIUrl}/v1/names/aaron.hello`))
       .then(resp => resp.json())
-      .then(nameInfo => {
+      .then((nameInfo) => {
         t.equal(nameInfo.status, 'revoked', 'Name should be revoked')
       })
       .then(() => transactions.makeBitcoinSpend(btcDestAddress, payer, 500000))

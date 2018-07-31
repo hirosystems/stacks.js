@@ -2,8 +2,8 @@
 // see https://github.com/blockstack/blockstack-core/tree/master/integration_tests
 
 import {
-    getCoreSession,
-    makeAuthRequest
+  getCoreSession,
+  makeAuthRequest
 } from '../../../lib'
 
 const assert = require('assert')
@@ -14,83 +14,83 @@ const appPrivateKey = '99c01d085f7914e4725ffa3160df583c37cc27e1e7fd48f2d6e17d4a9
 const apiPassword = 'blockstack_integration_test_api_password'
 
 const authRequest = makeAuthRequest(clientPrivateKey,
-'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
-['store_read', 'store_write', 'store_admin'], 'www.foo.com')
+                                    'https://www.foo.com/manifest.json', 'https://www.foo.com/login',
+                                    ['store_read', 'store_write', 'store_admin'], 'www.foo.com')
 
 console.log('Log in with a blockchain ID')
 getCoreSession('localhost', 16268, apiPassword, appPrivateKey, 'judecn.id', authRequest)
-.then((session) => {
-  console.log('success!')
-  console.log(session)
+  .then((session) => {
+    console.log('success!')
+    console.log(session)
 
-   // inspect session
-  const token = jsontokens.decodeToken(session)
-  const payload = token.payload
+    // inspect session
+    const token = jsontokens.decodeToken(session)
+    const payload = token.payload
 
-  console.log(JSON.stringify(payload))
+    console.log(JSON.stringify(payload))
 
-  assert(payload.app_domain === 'www.foo.com')
+    assert(payload.app_domain === 'www.foo.com')
 
-  assert(payload.methods[0] === 'store_read')
-  assert(payload.methods[1] === 'store_write')
-  assert(payload.methods[2] === 'store_admin')
-  assert(payload.methods.length === 3)
+    assert(payload.methods[0] === 'store_read')
+    assert(payload.methods[1] === 'store_write')
+    assert(payload.methods[2] === 'store_admin')
+    assert(payload.methods.length === 3)
 
-  assert(payload.app_public_keys.length === 1)
-  assert(payload.app_public_keys[0].public_key
+    assert(payload.app_public_keys.length === 1)
+    assert(payload.app_public_keys[0].public_key
     === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
 
-  assert(payload.blockchain_id === 'judecn.id')
-  return true
-}, (error) => {
-  console.error('failure!')
-  console.error(error.stack)
-  return false
-})
-.then((res) => {
-  if (!res) {
-    throw new Error('Failed to log in with blockchain ID')
-  }
+    assert(payload.blockchain_id === 'judecn.id')
+    return true
+  }, (error) => {
+    console.error('failure!')
+    console.error(error.stack)
+    return false
+  })
+  .then((res) => {
+    if (!res) {
+      throw new Error('Failed to log in with blockchain ID')
+    }
 
-  console.log('Log in without a blockchain ID')
-  // try with no blockchain ID
-  return getCoreSession('localhost', 16268, apiPassword, appPrivateKey, null, authRequest)
-}, (e) => {
-  console.log('failure!')
-  console.log(e.stack)
-})
-.then((session) => {
-  console.log('success!')
-  console.log(session)
+    console.log('Log in without a blockchain ID')
+    // try with no blockchain ID
+    return getCoreSession('localhost', 16268, apiPassword, appPrivateKey, null, authRequest)
+  }, (e) => {
+    console.log('failure!')
+    console.log(e.stack)
+  })
+  .then((session) => {
+    console.log('success!')
+    console.log(session)
 
-  // inspect session
-  const token = jsontokens.decodeToken(session)
-  const payload = token.payload
+    // inspect session
+    const token = jsontokens.decodeToken(session)
+    const payload = token.payload
 
-  console.log(JSON.stringify(payload))
+    console.log(JSON.stringify(payload))
 
-  assert(payload.app_domain === 'www.foo.com')
+    assert(payload.app_domain === 'www.foo.com')
 
-  assert(payload.methods[0] === 'store_read')
-  assert(payload.methods[1] === 'store_write')
-  assert(payload.methods[2] === 'store_admin')
-  assert(payload.methods.length === 3)
+    assert(payload.methods[0] === 'store_read')
+    assert(payload.methods[1] === 'store_write')
+    assert(payload.methods[2] === 'store_admin')
+    assert(payload.methods.length === 3)
 
-  assert(payload.app_public_keys.length === 1)
-  assert(payload.app_public_keys[0].public_key === 
-    jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
+    assert(payload.app_public_keys.length === 1)
+    assert(payload.app_public_keys[0].public_key 
+    === jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey))
 
-  assert(payload.blockchain_id === null)
-  return true
-}, (e) => {
-  console.log('failure!')
-  console.log(e)
-  console.log(e.stack)
-  return false
-})
-.then(() => {
-  process.exit(0)
-}, (e) => {
-  console.log(e.stack)
-  process.exit(1)
-})
+    assert(payload.blockchain_id === null)
+    return true
+  }, (e) => {
+    console.log('failure!')
+    console.log(e)
+    console.log(e.stack)
+    return false
+  })
+  .then(() => {
+    process.exit(0)
+  }, (e) => {
+    console.log(e.stack)
+    process.exit(1)
+  })

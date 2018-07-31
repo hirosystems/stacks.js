@@ -2,19 +2,19 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 17.2.0 | Documentation</title>
+  <title>blockstack 18.0.2 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
   <link href='assets/github.css' type='text/css' rel='stylesheet' />
+  <link href='assets/split.css' type='text/css' rel='stylesheet' />
 </head>
-<body class='documentation'>
-  <div class='max-width-4 mx-auto'>
-    <div class='clearfix md-mxn2'>
-      <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
+<body class='documentation m0'>
+    <div class='flex'>
+      <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>17.2.0</code></div>
+          <div class='mb1'><code>18.0.2</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -225,6 +225,26 @@
               
                 
                 <li><a
+                  href='#encryptcontent'
+                  class="">
+                  encryptContent
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#decryptcontent'
+                  class="">
+                  decryptContent
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#getappbucketurl'
                   class="">
                   getAppBucketUrl
@@ -308,6 +328,36 @@
                   href='#verifyecdsa'
                   class="">
                   verifyECDSA
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#encryptmnemonic'
+                  class="">
+                  encryptMnemonic
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#decryptlegacy'
+                  class="">
+                  decryptLegacy
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#decryptmnemonic'
+                  class="">
+                  decryptMnemonic
                   
                 </a>
                 
@@ -425,21 +475,112 @@
               
                 
                 <li><a
-                  href='#encryptcontent'
-                  class="">
-                  encryptContent
-                  
+                  href='#blockstackwallet'
+                  class=" toggle-sibling">
+                  BlockstackWallet
+                  <span class='icon'>▸</span>
                 </a>
                 
-                </li>
-              
-                
-                <li><a
-                  href='#decryptcontent'
-                  class="">
-                  decryptContent
+                <div class='toggle-target display-none'>
                   
-                </a>
+                  <ul class='list-reset py1-ul pl1'>
+                    <li class='h5'><span>Static members</span></li>
+                    
+                      <li><a
+                        href='#blockstackwalletfromseedbuffer'
+                        class='regular pre-open'>
+                        .fromSeedBuffer
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletfrombase58'
+                        class='regular pre-open'>
+                        .fromBase58
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletfromencryptedmnemonic'
+                        class='regular pre-open'>
+                        .fromEncryptedMnemonic
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletgeneratemnemonic'
+                        class='regular pre-open'>
+                        .generateMnemonic
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletencryptmnemonic'
+                        class='regular pre-open'>
+                        .encryptMnemonic
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletgetaddressfrombitcoinkeychain'
+                        class='regular pre-open'>
+                        .getAddressFromBitcoinKeychain
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletgetlegacyappprivatekey'
+                        class='regular pre-open'>
+                        .getLegacyAppPrivateKey
+                      </a></li>
+                    
+                      <li><a
+                        href='#blockstackwalletgetappprivatekey'
+                        class='regular pre-open'>
+                        .getAppPrivateKey
+                      </a></li>
+                    
+                    </ul>
+                  
+                  
+                    <ul class='list-reset py1-ul pl1'>
+                      <li class='h5'><span>Instance members</span></li>
+                      
+                      <li><a
+                        href='#blockstackwalletgetidentitysalt'
+                        class='regular pre-open'>
+                        #getIdentitySalt
+                      </a></li>
+                      
+                      <li><a
+                        href='#blockstackwalletgetbitcoinaddress'
+                        class='regular pre-open'>
+                        #getBitcoinAddress
+                      </a></li>
+                      
+                      <li><a
+                        href='#blockstackwalletgetbitcoinprivatekey'
+                        class='regular pre-open'>
+                        #getBitcoinPrivateKey
+                      </a></li>
+                      
+                      <li><a
+                        href='#blockstackwalletgetbitcoinpublickeychain'
+                        class='regular pre-open'>
+                        #getBitcoinPublicKeychain
+                      </a></li>
+                      
+                      <li><a
+                        href='#blockstackwalletgetidentitypublickeychain'
+                        class='regular pre-open'>
+                        #getIdentityPublicKeychain
+                      </a></li>
+                      
+                      <li><a
+                        href='#blockstackwalletgetidentitykeypair'
+                        class='regular pre-open'>
+                        #getIdentityKeyPair
+                      </a></li>
+                      
+                    </ul>
+                  
+                  
+                  
+                </div>
                 
                 </li>
               
@@ -450,7 +591,7 @@
           </div>
         </div>
       </div>
-      <div class='fix-margin-3'>
+      <div id='split-right' class='relative overflow-auto height-viewport-100'>
         
           
             <div class='keyline-top-not py2'><section class='py2 clearfix'>
@@ -493,7 +634,7 @@ use <code>generateAndStoreTransitKey</code>, <code>makeAuthRequest</code>,
 and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
 
 
-  <div class='pre p1 fill-light mt0'>redirectToSignIn(redirectURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>): void</div>
+  <div class='pre p1 fill-light mt0'>redirectToSignIn(redirectURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>): void</div>
   
   
 
@@ -510,7 +651,7 @@ and <code>redirectToSignInWithAuthRequest</code> to build your own sign in proce
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>`${window.location.origin}/`</code>)</code>
 	    The location to which the identity provider will redirect the user after
 the user approves sign in.
@@ -521,7 +662,7 @@ the user approves sign in.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>`${window.location.origin}/manifest.json`</code>)</code>
 	    Location of the manifest file.
 
@@ -531,7 +672,7 @@ the user approves sign in.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>
+            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>
             = <code>DEFAULT_SCOPE</code>)</code>
 	    Defaults to requesting write access to
 this app's data store.
@@ -586,7 +727,7 @@ An array of strings indicating which permissions this app is requesting.
   <p>Check if there is a authentication request that hasn't been handled.</p>
 
 
-  <div class='pre p1 fill-light mt0'>isSignInPending(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  <div class='pre p1 fill-light mt0'>isSignInPending(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
   
   
 
@@ -604,7 +745,7 @@ An array of strings indicating which permissions this app is requesting.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         <code>true</code>
  if there is a pending sign in, otherwise 
 <code>false</code>
@@ -644,7 +785,7 @@ An array of strings indicating which permissions this app is requesting.
 to the user data object if the sign in succeeds.</p>
 
 
-  <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, authResponseToken: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transitKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, authResponseToken: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transitKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -661,7 +802,7 @@ to the user data object if the sign in succeeds.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>nameLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>nameLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>&#39;https://core.blockstack.org/v1/names/&#39;</code>)</code>
 	    the endpoint against which to verify public
 keys match claimed username
@@ -672,7 +813,7 @@ keys match claimed username
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>authResponseToken</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>authResponseToken</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>getAuthResponseToken()</code>)</code>
 	    the signed authentication response token
 
@@ -682,7 +823,7 @@ keys match claimed username
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>transitKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>transitKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>getTransitKey()</code>)</code>
 	    the transit private key that corresponds to the transit public key
 that was provided in the authentication request
@@ -699,7 +840,7 @@ that was provided in the authentication request
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the user data object if successful and rejects
 if handling the sign in request fails or there was no pending sign in request.
 
@@ -737,7 +878,7 @@ if handling the sign in request fails or there was no pending sign in request.
   <p>Retrieves the user data object. The user's profile is stored in the key <code>profile</code>.</p>
 
 
-  <div class='pre p1 fill-light mt0'>loadUserData(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>loadUserData(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -755,7 +896,7 @@ if handling the sign in request fails or there was no pending sign in request.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         User data object.
 
       
@@ -792,7 +933,7 @@ if handling the sign in request fails or there was no pending sign in request.
   <p>Check if a user is currently signed in.</p>
 
 
-  <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
   
   
 
@@ -810,7 +951,7 @@ if handling the sign in request fails or there was no pending sign in request.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         <code>true</code>
  if the user is signed in, 
 <code>false</code>
@@ -850,7 +991,7 @@ if handling the sign in request fails or there was no pending sign in request.
   <p>Sign the user out and optionally redirect to given location.</p>
 
 
-  <div class='pre p1 fill-light mt0'>signUserOut(redirectURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
+  <div class='pre p1 fill-light mt0'>signUserOut(redirectURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
   
   
 
@@ -867,7 +1008,7 @@ if handling the sign in request fails or there was no pending sign in request.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirectURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>redirectURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    Location to redirect user to after sign out.
 
@@ -926,7 +1067,7 @@ flow. Typically you'd use <code>redirectToSignIn</code> which takes care of this
 under the hood.</em></p>
 
 
-  <div class='pre p1 fill-light mt0'>makeAuthRequest(transitPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, redirectURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>, appDomain: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, expiresAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  <div class='pre p1 fill-light mt0'>makeAuthRequest(transitPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, redirectURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>, appDomain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, expiresAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
   
   
 
@@ -943,7 +1084,7 @@ under the hood.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>transitPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>transitPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>generateAndStoreTransitKey()</code>)</code>
 	    hex encoded transit
 private key
@@ -954,7 +1095,7 @@ private key
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>`${window.location.origin}/`</code>)</code>
 	    location to redirect user to after sign in approval
 
@@ -964,7 +1105,7 @@ private key
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>`${window.location.origin}/manifest.json`</code>)</code>
 	    location of this app's manifest file
 
@@ -974,7 +1115,7 @@ private key
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>
+            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>
             = <code>DEFAULT_SCOPE</code>)</code>
 	    the permissions this app is requesting
 
@@ -984,7 +1125,7 @@ private key
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>appDomain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>appDomain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>window.location.origin</code>)</code>
 	    the origin of this app
 
@@ -994,7 +1135,7 @@ private key
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
             = <code>nextHour().getTime()</code>)</code>
 	    the time at which this request is no longer valid
 
@@ -1010,7 +1151,7 @@ private key
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
         the authentication request
 
       
@@ -1051,7 +1192,7 @@ protocol handler is not detected. Please note that the protocol handler detectio
 does not work on all browsers.</p>
 
 
-  <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, blockstackIDHost: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
+  <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, blockstackIDHost: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
   
   
 
@@ -1068,7 +1209,7 @@ does not work on all browsers.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>authRequest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>authRequest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>makeAuthRequest()</code>)</code>
 	    the authentication request generated by 
 <code>makeAuthRequest</code>
@@ -1079,7 +1220,7 @@ does not work on all browsers.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>blockstackIDHost</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>blockstackIDHost</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>DEFAULT_BLOCKSTACK_HOST</code>)</code>
 	    the URL to redirect the user to if the blockstack
 protocol handler is not detected
@@ -1133,7 +1274,7 @@ protocol handler is not detected
   <p>Retrieve the authentication token from the URL query</p>
 
 
-  <div class='pre p1 fill-light mt0'>getAuthResponseToken(): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  <div class='pre p1 fill-light mt0'>getAuthResponseToken(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
   
   
 
@@ -1151,7 +1292,7 @@ protocol handler is not detected
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
         the authentication token if it exists otherwise 
 <code>null</code>
 
@@ -1206,7 +1347,7 @@ protocol handler is not detected
 if <code>publicKeyOrAddress</code> is provided.</p>
 
 
-  <div class='pre p1 fill-light mt0'>extractProfile(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>extractProfile(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -1223,7 +1364,7 @@ if <code>publicKeyOrAddress</code> is provided.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the token to be extracted
 
           </div>
@@ -1232,7 +1373,7 @@ if <code>publicKeyOrAddress</code> is provided.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>publicKeyOrAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>publicKeyOrAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    the public key or address of the
 keypair that is thought to have signed the token
@@ -1249,7 +1390,7 @@ keypair that is thought to have signed the token
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         the profile extracted from the encoded token
 
       
@@ -1260,7 +1401,7 @@ keypair that is thought to have signed the token
     <div class='py1 quiet mt1 prose-big'>Throws</div>
     <ul>
       
-        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: if the token isn't signed by the provided 
+        <li><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: if the token isn't signed by the provided 
 <code>publicKeyOrAddress</code>
 </li>
       
@@ -1295,7 +1436,7 @@ keypair that is thought to have signed the token
   <p>Wraps a token for a profile token file</p>
 
 
-  <div class='pre p1 fill-light mt0'>wrapProfileToken(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>wrapProfileToken(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -1312,7 +1453,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the token to be wrapped
 
           </div>
@@ -1327,7 +1468,7 @@ keypair that is thought to have signed the token
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         including 
 <code>token</code>
  and 
@@ -1367,7 +1508,7 @@ keypair that is thought to have signed the token
   <p>Signs a profile token</p>
 
 
-  <div class='pre p1 fill-light mt0'>signProfileToken(profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, subject: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, issuer: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, signingAlgorithm: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, issuedAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>, expiresAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>signProfileToken(profile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, privateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, subject: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, issuer: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, signingAlgorithm: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, issuedAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>, expiresAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -1384,7 +1525,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    the JSON of the profile to be signed
 
           </div>
@@ -1393,7 +1534,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the signing private key
 
           </div>
@@ -1402,7 +1543,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>subject</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>subject</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
             = <code>null</code>)</code>
 	    the entity that the information is about
 
@@ -1412,7 +1553,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>issuer</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>issuer</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
             = <code>null</code>)</code>
 	    the entity that is issuing the token
 
@@ -1422,7 +1563,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>signingAlgorithm</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>signingAlgorithm</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>&#39;ES256K&#39;</code>)</code>
 	    the signing algorithm to use
 
@@ -1432,7 +1573,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>issuedAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>
+            <span class='code bold'>issuedAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>
             = <code>new Date()</code>)</code>
 	    the time of issuance of the token
 
@@ -1442,7 +1583,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>
+            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>
             = <code>nextYear()</code>)</code>
 	    the time of expiration of the token
 
@@ -1458,7 +1599,7 @@ keypair that is thought to have signed the token
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         the signed profile token
 
       
@@ -1495,7 +1636,7 @@ keypair that is thought to have signed the token
   <p>Verifies a profile token</p>
 
 
-  <div class='pre p1 fill-light mt0'>verifyProfileToken(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>verifyProfileToken(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -1512,7 +1653,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the token to be verified
 
           </div>
@@ -1521,7 +1662,7 @@ keypair that is thought to have signed the token
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>publicKeyOrAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>publicKeyOrAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the public key or address of the
 keypair that is thought to have signed the token
 
@@ -1537,7 +1678,7 @@ keypair that is thought to have signed the token
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         the verified, decoded profile token
 
       
@@ -1548,7 +1689,7 @@ keypair that is thought to have signed the token
     <div class='py1 quiet mt1 prose-big'>Throws</div>
     <ul>
       
-        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: throws an error if token verification fails
+        <li><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: throws an error if token verification fails
 </li>
       
     </ul>
@@ -1583,7 +1724,7 @@ keypair that is thought to have signed the token
 Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
 
 
-  <div class='pre p1 fill-light mt0'>validateProofs(profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>validateProofs(profile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1600,7 +1741,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    The JSON of the profile to be validated
 
           </div>
@@ -1609,7 +1750,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>ownerAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>ownerAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The owner bitcoin address to be validated
 
           </div>
@@ -1618,7 +1759,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
             = <code>null</code>)</code>
 	    The Blockstack name to be validated
 
@@ -1634,7 +1775,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to an array of validated proof objects
 
       
@@ -1671,7 +1812,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
   <p>Look up a user profile by blockstack ID</p>
 
 
-  <div class='pre p1 fill-light mt0'>lookupProfile(username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>lookupProfile(username: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1688,7 +1829,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>username</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>username</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    The Blockstack ID of the profile to look up
 
           </div>
@@ -1697,7 +1838,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
             = <code>null</code>)</code>
 	    The URL
 to use for zonefile lookup. If falsey, lookupProfile will use the
@@ -1715,7 +1856,7 @@ blockstack.js getNameInfo function.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to a profile object
 
       
@@ -1773,7 +1914,7 @@ version. These features will be rolled out in future updates.</em></p>
   <p>Retrieves the specified file from the app's data store.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1790,7 +1931,7 @@ version. These features will be rolled out in future updates.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the path to the file to read
 
           </div>
@@ -1799,7 +1940,7 @@ version. These features will be rolled out in future updates.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
             = <code>null</code>)</code>
 	    options object
 
@@ -1819,50 +1960,60 @@ version. These features will be rolled out in future updates.</em></p>
             <tbody class='mt1'>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.decrypt</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-                  
-                    (default <code>true</code>)
-                  </td>
-                  <td class='break-word'><span>try to decrypt the data with the app private key
+  <td class='break-word'><span class='code bold'>options.decrypt</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+  
+    (default <code>true</code>)
+  </td>
+  <td class='break-word'><span>try to decrypt the data with the app private key
 </span></td>
-                </tr>
+</tr>
+
+
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.username</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
-                  </td>
-                  <td class='break-word'><span>the Blockstack ID to lookup for multi-player storage
+  <td class='break-word'><span class='code bold'>options.username</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  </td>
+  <td class='break-word'><span>the Blockstack ID to lookup for multi-player storage
 </span></td>
-                </tr>
+</tr>
+
+
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.verify</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-                  </td>
-                  <td class='break-word'><span>Whether the content should be verified, only to be used
+  <td class='break-word'><span class='code bold'>options.verify</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+  </td>
+  <td class='break-word'><span>Whether the content should be verified, only to be used
 when 
 <code>putFile</code>
  was set to 
 <code>sign = true</code>
 </span></td>
-                </tr>
+</tr>
+
+
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.app</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
-                  </td>
-                  <td class='break-word'><span>the app to lookup for multi-player storage -
+  <td class='break-word'><span class='code bold'>options.app</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  </td>
+  <td class='break-word'><span>the app to lookup for multi-player storage -
 defaults to current origin
 </span></td>
-                </tr>
+</tr>
+
+
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.zoneFileLookupURL</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
-                  
-                    (default <code>null</code>)
-                  </td>
-                  <td class='break-word'><span>The URL
+  <td class='break-word'><span class='code bold'>options.zoneFileLookupURL</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  
+    (default <code>null</code>)
+  </td>
+  <td class='break-word'><span>The URL
 to use for zonefile lookup. If falsey, this will use the
 blockstack.js's getNameInfo function instead.
 </span></td>
-                </tr>
+</tr>
+
+
               
             </tbody>
           </table>
@@ -1877,7 +2028,7 @@ blockstack.js's getNameInfo function instead.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the raw data in the file
 or rejects with an error
 
@@ -1915,7 +2066,7 @@ or rejects with an error
   <p>Stores the data provided in the app's data store to to the file specified.</p>
 
 
-  <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -1932,7 +2083,7 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the path to store the data in
 
           </div>
@@ -1941,7 +2092,7 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
 	    the data to store in the file
 
           </div>
@@ -1950,7 +2101,7 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
             = <code>null</code>)</code>
 	    options object
 
@@ -1970,24 +2121,28 @@ or rejects with an error
             <tbody class='mt1'>
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.encrypt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-                  
-                    (default <code>true</code>)
-                  </td>
-                  <td class='break-word'><span>encrypt the data with the app private key
+  <td class='break-word'><span class='code bold'>options.encrypt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+  
+    (default <code>true</code>)
+  </td>
+  <td class='break-word'><span>encrypt the data with the app private key
 or the provided public key
 </span></td>
-                </tr>
+</tr>
+
+
               
                 <tr>
-                  <td class='break-word'><span class='code bold'>options.sign</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-                  
-                    (default <code>false</code>)
-                  </td>
-                  <td class='break-word'><span>sign the data using ECDSA on SHA256 hashes with
+  <td class='break-word'><span class='code bold'>options.sign</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
+  
+    (default <code>false</code>)
+  </td>
+  <td class='break-word'><span>sign the data using ECDSA on SHA256 hashes with
 the app private key
 </span></td>
-                </tr>
+</tr>
+
+
               
             </tbody>
           </table>
@@ -2002,9 +2157,220 @@ the app private key
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves if the operation succeed and rejects
 if it failed
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='encryptcontent'>
+      encryptContent
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Encrypts the data provided with the app public key.</p>
+
+
+  <div class='pre p1 fill-light mt0'>encryptContent(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+	    data to encrypt
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            = <code>null</code>)</code>
+	    options object
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.publicKey</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  </td>
+  <td class='break-word'><span>the hex string of the ECDSA public
+key to use for encryption. If not provided, will use user's appPrivateKey.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        Stringified ciphertext object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decryptcontent'>
+      decryptContent
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Decrypts data encrypted with <code>encryptContent</code> with the
+transit private key.</p>
+
+
+  <div class='pre p1 fill-light mt0'>decryptContent(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+	    encrypted content.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            = <code>null</code>)</code>
+	    options object
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>options.privateKey</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  </td>
+  <td class='break-word'><span>the hex string of the ECDSA private
+key to use for decryption. If not provided, will use user's appPrivateKey.
+</span></td>
+</tr>
+
+
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>:
+        decrypted content.
 
       
     
@@ -2040,7 +2406,7 @@ if it failed
   <p>Get the app storage bucket URL</p>
 
 
-  <div class='pre p1 fill-light mt0'>getAppBucketUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>getAppBucketUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -2057,7 +2423,7 @@ if it failed
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>gaiaHubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the gaia hub URL
 
           </div>
@@ -2066,7 +2432,7 @@ if it failed
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the app private key used to generate the app address
 
           </div>
@@ -2081,7 +2447,7 @@ if it failed
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         That resolves to the URL of the app index file
 or rejects if it fails
 
@@ -2119,7 +2485,7 @@ or rejects if it fails
   <p>Fetch the public read URL of a user file for the specified app.</p>
 
 
-  <div class='pre p1 fill-light mt0'>getUserAppFileUrl(path: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>getUserAppFileUrl(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, username: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -2136,7 +2502,7 @@ or rejects if it fails
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the path to the file to read
 
           </div>
@@ -2145,7 +2511,7 @@ or rejects if it fails
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>username</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>username</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    The Blockstack ID of the user to look up
 
           </div>
@@ -2154,7 +2520,7 @@ or rejects if it fails
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>appOrigin</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>appOrigin</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    The app origin
 
           </div>
@@ -2163,7 +2529,7 @@ or rejects if it fails
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>zoneFileLookupURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    The URL
 to use for zonefile lookup. If falsey, this will use the
@@ -2181,7 +2547,7 @@ blockstack.js's getNameInfo function instead.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the public read URL of the file
 or rejects with an error
 
@@ -2234,7 +2600,7 @@ or rejects with an error
   <p>Decrypts the hex encrypted private key</p>
 
 
-  <div class='pre p1 fill-light mt0'>decryptPrivateKey(privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, hexedEncrypted: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  <div class='pre p1 fill-light mt0'>decryptPrivateKey(privateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, hexedEncrypted: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
   
   
 
@@ -2251,7 +2617,7 @@ or rejects with an error
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the private key corresponding to the public
 key for which the ciphertext was encrypted
 
@@ -2261,7 +2627,7 @@ key for which the ciphertext was encrypted
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>hexedEncrypted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>hexedEncrypted</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the ciphertext
 
           </div>
@@ -2276,7 +2642,7 @@ key for which the ciphertext was encrypted
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
         the decrypted private key
 
       
@@ -2287,7 +2653,7 @@ key for which the ciphertext was encrypted
     <div class='py1 quiet mt1 prose-big'>Throws</div>
     <ul>
       
-        <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: if unable to decrypt
+        <li><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: if unable to decrypt
 </li>
       
     </ul>
@@ -2323,7 +2689,7 @@ token is sent back to apps which use contents to access the
 resources and data requested by the app.</p>
 
 
-  <div class='pre p1 fill-light mt0'>makeAuthResponse(privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, profile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, username: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, metadata: AuthMetadata, coreToken: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, expiresAt: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>, transitPublicKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, hubUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  <div class='pre p1 fill-light mt0'>makeAuthResponse(privateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, profile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, username: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, metadata: AuthMetadata, coreToken: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, expiresAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>, transitPublicKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, hubUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
   
   
 
@@ -2340,7 +2706,7 @@ resources and data requested by the app.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the identity key of the Blockstack ID generating
 the authentication response
 
@@ -2350,7 +2716,7 @@ the authentication response
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
             = <code>{}</code>)</code>
 	    the profile object for the Blockstack ID
 
@@ -2360,7 +2726,7 @@ the authentication response
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>username</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>username</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    the username of the Blockstack ID if any, otherwise 
 <code>null</code>
@@ -2383,7 +2749,7 @@ response including
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>coreToken</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>coreToken</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    core session token when responding to a legacy auth request
 or 
@@ -2396,7 +2762,7 @@ or
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>appPrivateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    the application private key. This private key is
 unique and specific for every Blockstack ID and application combination.
@@ -2407,7 +2773,7 @@ unique and specific for every Blockstack ID and application combination.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
             = <code>nextMonth().getTime()</code>)</code>
 	    an integer in the same format as
 
@@ -2420,7 +2786,7 @@ unique and specific for every Blockstack ID and application combination.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>transitPublicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>transitPublicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    the public key provide by the app
 in its authentication request with which secrets will be encrypted
@@ -2431,7 +2797,7 @@ in its authentication request with which secrets will be encrypted
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>hubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>hubUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    URL to the write path of the user's Gaia hub
 
@@ -2447,7 +2813,7 @@ in its authentication request with which secrets will be encrypted
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
         signed and encoded authentication response token
 
       
@@ -2484,7 +2850,7 @@ in its authentication request with which secrets will be encrypted
   <p>Checks if the expiration date of the <code>token</code> is before the current time</p>
 
 
-  <div class='pre p1 fill-light mt0'>isExpirationDateValid(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  <div class='pre p1 fill-light mt0'>isExpirationDateValid(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
   
   
 
@@ -2501,7 +2867,7 @@ in its authentication request with which secrets will be encrypted
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    encoded and signed authentication token
 
           </div>
@@ -2516,7 +2882,7 @@ in its authentication request with which secrets will be encrypted
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         <code>true</code>
  if the 
 <code>token</code>
@@ -2561,7 +2927,7 @@ if the
   <p>Makes sure the <code>redirect_uri</code> is a same origin absolute URL.</p>
 
 
-  <div class='pre p1 fill-light mt0'>isRedirectUriValid(token: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  <div class='pre p1 fill-light mt0'>isRedirectUriValid(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
   
   
 
@@ -2578,7 +2944,7 @@ if the
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>token</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    encoded and signed authentication token
 
           </div>
@@ -2593,7 +2959,7 @@ if the
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         <code>true</code>
  if valid, otherwise 
 <code>false</code>
@@ -2632,7 +2998,7 @@ if the
   <p>Sign content using ECDSA</p>
 
 
-  <div class='pre p1 fill-light mt0'>signECDSA(privateKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  <div class='pre p1 fill-light mt0'>signECDSA(privateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
   
   
 
@@ -2649,7 +3015,7 @@ if the
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>privateKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    secp256k1 private key hex string
 
           </div>
@@ -2658,7 +3024,7 @@ if the
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    content to sign
 
           </div>
@@ -2673,7 +3039,7 @@ if the
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         contains:
 signature - Hex encoded DER signature
 public key - Hex encoded private string taken from privateKey
@@ -2712,7 +3078,7 @@ public key - Hex encoded private string taken from privateKey
   <p>Verify content using ECDSA</p>
 
 
-  <div class='pre p1 fill-light mt0'>verifyECDSA(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), publicKey: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, signature: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  <div class='pre p1 fill-light mt0'>verifyECDSA(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), publicKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, signature: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
   
   
 
@@ -2729,7 +3095,7 @@ public key - Hex encoded private string taken from privateKey
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
 	    Content to verify was signed
 
           </div>
@@ -2738,7 +3104,7 @@ public key - Hex encoded private string taken from privateKey
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>publicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>publicKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    secp256k1 private key hex string
 
           </div>
@@ -2747,7 +3113,7 @@ public key - Hex encoded private string taken from privateKey
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>signature</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>signature</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    Hex encoded DER signature
 
           </div>
@@ -2762,8 +3128,242 @@ public key - Hex encoded private string taken from privateKey
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
         returns true when signature matches publickey + content, false if not
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='encryptmnemonic'>
+      encryptMnemonic
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Encrypt a raw mnemonic phrase to be password protected</p>
+
+
+  <div class='pre p1 fill-light mt0'>encryptMnemonic(phrase: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://nodejs.org/api/buffer.html">Buffer</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>phrase</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Raw mnemonic phrase
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>password</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Password to encrypt mnemonic with
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://nodejs.org/api/buffer.html">Buffer</a>></code>:
+        The encrypted phrase
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decryptlegacy'>
+      decryptLegacy
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Decrypt legacy triplesec keys</p>
+
+
+  <div class='pre p1 fill-light mt0'>decryptLegacy(dataBuffer: <a href="https://nodejs.org/api/buffer.html">Buffer</a>, password: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://nodejs.org/api/buffer.html">Buffer</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>dataBuffer</span> <code class='quiet'>(<a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>
+	    The encrypted key
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>password</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Password for data
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://nodejs.org/api/buffer.html">Buffer</a>></code>:
+        Decrypted seed
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='decryptmnemonic'>
+      decryptMnemonic
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Encrypt a raw mnemonic phrase with a password</p>
+
+
+  <div class='pre p1 fill-light mt0'>decryptMnemonic(data: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), password: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://nodejs.org/api/buffer.html">Buffer</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
+	    Buffer or hex-encoded string of the encrypted mnemonic
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>password</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Password for data
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://nodejs.org/api/buffer.html">Buffer</a>></code>:
+        the raw mnemonic phrase
 
       
     
@@ -2800,7 +3400,7 @@ public key - Hex encoded private string taken from privateKey
 transaction until a second transaction has a certain number of confirmations.</p>
 
 
-  <div class='pre p1 fill-light mt0'>broadcastTransaction(transaction: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, transactionToWatch: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, confirmations: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
+  <div class='pre p1 fill-light mt0'>broadcastTransaction(transaction: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, transactionToWatch: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, confirmations: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
   
   
 
@@ -2817,7 +3417,7 @@ transaction until a second transaction has a certain number of confirmations.</p
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>transaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>transaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    the hex-encoded transaction to broadcast
 
           </div>
@@ -2826,7 +3426,7 @@ transaction until a second transaction has a certain number of confirmations.</p
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>transactionToWatch</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            <span class='code bold'>transactionToWatch</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
             = <code>null</code>)</code>
 	    the hex transaction id of the transaction to watch for
 the specified number of confirmations before broadcasting the 
@@ -2838,7 +3438,7 @@ the specified number of confirmations before broadcasting the
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>confirmations</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
+            <span class='code bold'>confirmations</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>
             = <code>6</code>)</code>
 	    the number of confirmations 
 <code>transactionToWatch</code>
@@ -2859,7 +3459,7 @@ before broadcasting
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
         Returns a Promise that resolves to an object with a
 
 <code>transaction_hash</code>
@@ -2906,7 +3506,7 @@ parameter</li>
   <p>Broadcasts a zone file to the Atlas network via the transaction broadcast service.</p>
 
 
-  <div class='pre p1 fill-light mt0'>broadcastZoneFile(zoneFile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transactionToWatch: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
+  <div class='pre p1 fill-light mt0'>broadcastZoneFile(zoneFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transactionToWatch: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
   
   
 
@@ -2923,7 +3523,7 @@ parameter</li>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zoneFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>zoneFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the zone file to be broadcast to the Atlas network
 
           </div>
@@ -2932,7 +3532,7 @@ parameter</li>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>transactionToWatch</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            <span class='code bold'>transactionToWatch</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
             = <code>null</code>)</code>
 	    the hex transaction id of the transaction
 to watch for confirmation before broadcasting the zone file to the Atlas network
@@ -2949,7 +3549,7 @@ to watch for confirmation before broadcasting the zone file to the Atlas network
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
         Returns a Promise that resolves to an object with a
 
 <code>transaction_hash</code>
@@ -3006,7 +3606,7 @@ has an appropriate number of confirmations</li>
 </ul>
 
 
-  <div class='pre p1 fill-light mt0'>broadcastNameRegistration(preorderTransaction: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, registerTransaction: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
+  <div class='pre p1 fill-light mt0'>broadcastNameRegistration(preorderTransaction: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, registerTransaction: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></div>
   
   
 
@@ -3023,7 +3623,7 @@ has an appropriate number of confirmations</li>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>preorderTransaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>preorderTransaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the hex-encoded, signed preorder transaction generated
 using the 
 <code>makePreorder</code>
@@ -3035,7 +3635,7 @@ using the
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>registerTransaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>registerTransaction</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the hex-encoded, signed register transaction generated
 using the 
 <code>makeRegister</code>
@@ -3047,7 +3647,7 @@ using the
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zoneFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>zoneFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the zone file to be broadcast to the Atlas network
 
           </div>
@@ -3062,7 +3662,7 @@ using the
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)></code>:
         Returns a Promise that resolves to an object with a
 
 <code>transaction_hash</code>
@@ -3244,7 +3844,7 @@ parameter</li>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>inputIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>inputIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
 	    the input on the transaction to sign
 
           </div>
@@ -3349,7 +3949,7 @@ parameter</li>
   <p>Estimates cost of a namesapce reveal transaction for a namespace</p>
 
 
-  <div class='pre p1 fill-light mt0'>estimateNamespaceReveal(namespace: BlockstackNamespace, revealAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, paymentAddress: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, paymentUtxos: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>estimateNamespaceReveal(namespace: BlockstackNamespace, revealAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, paymentAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, paymentUtxos: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -3375,7 +3975,7 @@ parameter</li>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>revealAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>revealAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the address to receive the namespace
 (this must have been passed as 'revealAddress' to a prior namespace
 preorder)
@@ -3386,7 +3986,7 @@ preorder)
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>paymentAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>paymentAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the address that pays for this transaction
 
           </div>
@@ -3395,7 +3995,7 @@ preorder)
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>paymentUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            <span class='code bold'>paymentUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
             = <code>1</code>)</code>
 	    the number of UTXOs we expect will be required
 from the payment address
@@ -3412,7 +4012,7 @@ from the payment address
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         a promise which resolves to the satoshi cost to
 fund the reveal.  This includes a 5500 satoshi dust output for the
 preorder.  Even though this is a change output, the payer must have
@@ -3452,7 +4052,7 @@ enough funds to generate this output, so we include it in the cost.
   <p>Estimates the cost of a namespace-ready transaction for a namespace</p>
 
 
-  <div class='pre p1 fill-light mt0'>estimateNamespaceReady(namespaceID: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, revealUtxos: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>estimateNamespaceReady(namespaceID: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, revealUtxos: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -3469,7 +4069,7 @@ enough funds to generate this output, so we include it in the cost.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>namespaceID</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>namespaceID</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the namespace to ready
 
           </div>
@@ -3478,7 +4078,7 @@ enough funds to generate this output, so we include it in the cost.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>revealUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            <span class='code bold'>revealUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
             = <code>1</code>)</code>
 	    the number of UTXOs we expect will
 be required from the reveal address
@@ -3495,7 +4095,7 @@ be required from the reveal address
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         a promise which resolves to the satoshi cost to
 fund this namespacey-ready transaction.
 
@@ -3533,7 +4133,7 @@ fund this namespacey-ready transaction.
   <p>Estimates the cost of a name-import transaction</p>
 
 
-  <div class='pre p1 fill-light mt0'>estimateNameImport(name: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, recipientAddr: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zonefileHash: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, importUtxos: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>estimateNameImport(name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, recipientAddr: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zonefileHash: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, importUtxos: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -3550,7 +4150,7 @@ fund this namespacey-ready transaction.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the fully-qualified name
 
           </div>
@@ -3559,7 +4159,7 @@ fund this namespacey-ready transaction.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>recipientAddr</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>recipientAddr</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the recipient
 
           </div>
@@ -3568,7 +4168,7 @@ fund this namespacey-ready transaction.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>zonefileHash</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>zonefileHash</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the zone file hash
 
           </div>
@@ -3577,7 +4177,7 @@ fund this namespacey-ready transaction.
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>importUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            <span class='code bold'>importUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
             = <code>1</code>)</code>
 	    the number of UTXOs we expect will
 be required from the importer address
@@ -3594,7 +4194,7 @@ be required from the importer address
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         a promise which resolves to the satoshi cost
 to fund this name-import transaction
 
@@ -3632,7 +4232,7 @@ to fund this name-import transaction
   <p>Estimates the cost of an announce transaction</p>
 
 
-  <div class='pre p1 fill-light mt0'>estimateAnnounce(messageHash: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, senderUtxos: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  <div class='pre p1 fill-light mt0'>estimateAnnounce(messageHash: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, senderUtxos: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
   
   
 
@@ -3649,7 +4249,7 @@ to fund this name-import transaction
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>messageHash</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>messageHash</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the hash of the message
 
           </div>
@@ -3658,7 +4258,7 @@ to fund this name-import transaction
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>senderUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            <span class='code bold'>senderUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
             = <code>1</code>)</code>
 	    the number of utxos we expect will
 be required from the importer address
@@ -3675,7 +4275,7 @@ be required from the importer address
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         a promise which resolves to the satoshi cost
 to fund this announce transaction
 
@@ -3702,18 +4302,21 @@ to fund this announce transaction
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='encryptcontent'>
-      encryptContent
+    <h3 class='fl m0' id='blockstackwallet'>
+      BlockstackWallet
     </h3>
     
     
   </div>
   
 
-  <p>Encrypts the data provided with the app public key.</p>
+  <p>The BlockstackWallet class manages the hierarchical derivation
+paths for a standard blockstack client wallet. This includes paths
+for bitcoin payment address, blockstack identity addresses, blockstack
+application specific addresses.</p>
 
 
-  <div class='pre p1 fill-light mt0'>encryptContent(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  <div class='pre p1 fill-light mt0'>new BlockstackWallet(rootNode: BIP32)</div>
   
   
 
@@ -3730,44 +4333,64 @@ to fund this announce transaction
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
-	    data to encrypt
-
+            <span class='code bold'>rootNode</span> <code class='quiet'>(BIP32)</code>
+	    
           </div>
           
         </div>
       
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Static Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='blockstackwalletfromseedbuffer'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fromSeedBuffer(seed)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Initialize a blockstack wallet from a seed buffer</p>
+
+
+  <div class='pre p1 fill-light mt0'>fromSeedBuffer(seed: <a href="https://nodejs.org/api/buffer.html">Buffer</a>): <a href="#blockstackwallet">BlockstackWallet</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-            = <code>null</code>)</code>
-	    options object
+            <span class='code bold'>seed</span> <code class='quiet'>(<a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>
+	    the input seed for initializing the root node
+of the hierarchical wallet
 
           </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-                  <td class='break-word'><span class='code bold'>options.publicKey</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
-                  </td>
-                  <td class='break-word'><span>the hex string of the ECDSA public
-key to use for encryption. If not provided, will use user's appPrivateKey.
-</span></td>
-                </tr>
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -3779,8 +4402,8 @@ key to use for encryption. If not provided, will use user's appPrivateKey.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
-        Stringified ciphertext object
+      <code><a href="#blockstackwallet">BlockstackWallet</a></code>:
+        the constructed wallet
 
       
     
@@ -3797,27 +4420,25 @@ key to use for encryption. If not provided, will use user's appPrivateKey.
   
 </section>
 
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletfrombase58'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fromBase58(keychain)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
 
   
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='decryptcontent'>
-      decryptContent
-    </h3>
-    
-    
-  </div>
-  
 
-  <p>Decrypts data encrypted with <code>encryptContent</code> with the
-transit private key.</p>
+  <p>Initialize a blockstack wallet from a base58 string</p>
 
 
-  <div class='pre p1 fill-light mt0'>decryptContent(content: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)</div>
+  <div class='pre p1 fill-light mt0'>fromBase58(keychain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="#blockstackwallet">BlockstackWallet</a></div>
   
   
 
@@ -3834,44 +4455,11 @@ transit private key.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
-	    encrypted content.
+            <span class='code bold'>keychain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the Base58 string used to initialize
+the root node of the hierarchical wallet
 
           </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-            = <code>null</code>)</code>
-	    options object
-
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-                  <td class='break-word'><span class='code bold'>options.privateKey</span> <code class='quiet'><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
-                  </td>
-                  <td class='break-word'><span>the hex string of the ECDSA private
-key to use for decryption. If not provided, will use user's appPrivateKey.
-</span></td>
-                </tr>
-              
-            </tbody>
-          </table>
           
         </div>
       
@@ -3883,8 +4471,8 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)</code>:
-        decrypted content.
+      <code><a href="#blockstackwallet">BlockstackWallet</a></code>:
+        the constructed wallet
 
       
     
@@ -3895,6 +4483,892 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
   
 
   
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletfromencryptedmnemonic'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>fromEncryptedMnemonic(data, password)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Initialize a blockstack wallet from an encrypted phrase &#x26; password. Throws
+if the password is incorrect. Supports all formats of Blockstack phrases.</p>
+
+
+  <div class='pre p1 fill-light mt0'>fromEncryptedMnemonic(data: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#blockstackwallet">BlockstackWallet</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>data</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The encrypted phrase as a hex-encoded string
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>password</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The plain password
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="#blockstackwallet">BlockstackWallet</a>></code>:
+        the constructed wallet
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgeneratemnemonic'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>generateMnemonic()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Generate a BIP-39 12 word mnemonic</p>
+
+
+  <div class='pre p1 fill-light mt0'>generateMnemonic(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></code>:
+        space-separated 12 word phrase
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletencryptmnemonic'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>encryptMnemonic(mnemonic, password)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Encrypt a mnemonic phrase with a password</p>
+
+
+  <div class='pre p1 fill-light mt0'>encryptMnemonic(mnemonic: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, password: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>mnemonic</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Raw mnemonic phrase
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>password</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    Password to encrypt mnemonic with
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></code>:
+        Hex-encoded encrypted mnemonic
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetaddressfrombitcoinkeychain'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getAddressFromBitcoinKeychain(keychainBase58, addressIndex, chainType)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get a bitcoin address given a base-58 encoded bitcoin node
+(usually called the account node)</p>
+
+
+  <div class='pre p1 fill-light mt0'>getAddressFromBitcoinKeychain(keychainBase58: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, addressIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, chainType: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>keychainBase58</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    base58-encoding of the node
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>addressIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    index of the address to get
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>chainType</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>EXTERNAL_ADDRESS</code>)</code>
+	    either 'EXTERNAL_ADDRESS' (for a
+"receive" address) or 'CHANGE_ADDRESS'
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        the address
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetlegacyappprivatekey'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getLegacyAppPrivateKey(appsNodeKey, salt, appDomain)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get a ECDSA private key hex-string for an application-specific
+address.</p>
+
+
+  <div class='pre p1 fill-light mt0'>getLegacyAppPrivateKey(appsNodeKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, salt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appDomain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appsNodeKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the base58-encoded private key for
+applications node (the 
+<code>appsNodeKey</code>
+ return in getIdentityKeyPair())
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>salt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    a string, used to salt the
+application-specific addresses
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appDomain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the appDomain to generate a key for
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        the private key hex-string. this will be a 64
+character string
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetappprivatekey'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getAppPrivateKey(appsNodeKey, salt, appDomain)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get a ECDSA private key hex-string for an application-specific
+address.</p>
+
+
+  <div class='pre p1 fill-light mt0'>getAppPrivateKey(appsNodeKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, salt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appDomain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appsNodeKey</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the base58-encoded private key for
+applications node (the 
+<code>appsNodeKey</code>
+ return in getIdentityKeyPair())
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>salt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    a string, used to salt the
+application-specific addresses
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>appDomain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the appDomain to generate a key for
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        the private key hex-string. this will be a 64
+character string
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='blockstackwalletgetidentitysalt'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getIdentitySalt()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get a salt for use with creating application specific addresses</p>
+
+
+  <div class='pre p1 fill-light mt0'>getIdentitySalt(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        the salt
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetbitcoinaddress'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getBitcoinAddress(addressIndex)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get a bitcoin receive address at a given index</p>
+
+
+  <div class='pre p1 fill-light mt0'>getBitcoinAddress(addressIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>addressIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    the index of the address
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        address
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetbitcoinprivatekey'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getBitcoinPrivateKey(addressIndex)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get the private key hex-string for a given bitcoin receive address</p>
+
+
+  <div class='pre p1 fill-light mt0'>getBitcoinPrivateKey(addressIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>addressIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    the index of the address
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        the hex-string. this will be either 64
+characters long to denote an uncompressed bitcoin address, or 66
+characters long for a compressed bitcoin address.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetbitcoinpublickeychain'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getBitcoinPublicKeychain()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get the root node for the bitcoin public keychain</p>
+
+
+  <div class='pre p1 fill-light mt0'>getBitcoinPublicKeychain(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        base58-encoding of the public node
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetidentitypublickeychain'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getIdentityPublicKeychain()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get the root node for the identity public keychain</p>
+
+
+  <div class='pre p1 fill-light mt0'>getIdentityPublicKeychain(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        base58-encoding of the public node
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstackwalletgetidentitykeypair'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getIdentityKeyPair(addressIndex, alwaysUncompressed)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Get the keypair information for a given identity index. This
+information is used to obtain the private key for an identity address
+and derive application specific keys for that address.</p>
+
+
+  <div class='pre p1 fill-light mt0'>getIdentityKeyPair(addressIndex: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, alwaysUncompressed: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>addressIndex</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+	    the identity index
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>alwaysUncompressed</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>
+            = <code>false</code>)</code>
+	    if true, always return a
+private-key hex string corresponding to the uncompressed address
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        an IdentityKeyPair type object with keys:
+.key {String} - the private key hex-string
+.keyID {String} - the public key hex-string
+.address {String} - the identity address
+.appsNodeKey {String} - the base-58 encoding of the applications node
+.salt {String} - the salt used for creating app-specific addresses
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
 
   
 
@@ -3905,8 +5379,8 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
         
       </div>
     </div>
-  </div>
   <script src='assets/anchor.js'></script>
+  <script src='assets/split.js'></script>
   <script src='assets/site.js'></script>
 </body>
 </html>

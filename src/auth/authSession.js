@@ -1,6 +1,6 @@
 /* @flow */
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
-import fetch from 'isomorphic-fetch'
+import 'cross-fetch/polyfill'
 
 /**
  * Create an authentication token to be sent to the Core API server
@@ -82,27 +82,27 @@ export function sendCoreSessionRequest(coreHost: string,
     const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
 
     return fetch(url, options)
-    .then(response => {
-      if (!response.ok) {
-        reject('HTTP status not OK')
-        return null
-      }
-      return response.text()
-    })
-    .then(responseText => JSON.parse(responseText))
-    .then(responseJson => {
-      const token = responseJson.token
-      if (!token) {
-        reject('Failed to get Core session token')
-        return null
-      }
-      resolve(token)
-      return token
-    })
-    .catch(error => {
-      console.error(error)
-      reject('Invalid Core response: not JSON')
-    })
+      .then((response) => {
+        if (!response.ok) {
+          reject('HTTP status not OK')
+          throw new Error('HTTP status not OK')
+        }
+        return response.text()
+      })
+      .then(responseText => JSON.parse(responseText))
+      .then((responseJson) => {
+        const token = responseJson.token
+        if (!token) {
+          reject('Failed to get Core session token')
+          return null
+        }
+        resolve(token)
+        return token
+      })
+      .catch((error) => {
+        console.error(error)
+        reject('Invalid Core response: not JSON')
+      })
   })
 }
 
@@ -159,8 +159,10 @@ export function getCoreSession(coreHost: string,
   const appMethods = payload.scopes
 
   const coreAuthRequest = makeCoreSessionRequest(
-      appDomain, appMethods, appPrivateKey, blockchainId, deviceId)
+    appDomain, appMethods, appPrivateKey, blockchainId, deviceId
+  )
 
   return sendCoreSessionRequest(
-      coreHost, corePort, coreAuthRequest, apiPassword)
+    coreHost, corePort, coreAuthRequest, apiPassword
+  )
 }
