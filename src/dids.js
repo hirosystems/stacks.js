@@ -10,7 +10,7 @@ export function makeDIDFromPublicKey(publicKey) {
 
 export function getDIDType(decentralizedID) {
   const didParts = decentralizedID.split(':')
-
+  
   if (didParts.length !== 3) {
     throw new InvalidDIDError('Decentralized IDs must have 3 parts')
   }
@@ -24,6 +24,7 @@ export function getDIDType(decentralizedID) {
 
 export function getAddressFromDID(decentralizedID) {
   const didType = getDIDType(decentralizedID)
+  
   if (didType === 'btc-addr') {
     return decentralizedID.split(':')[2]
   } else {
