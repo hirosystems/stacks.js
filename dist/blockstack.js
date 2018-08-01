@@ -108,9 +108,15 @@ function redirectToSignInWithAuthRequest() {
   }
 
   function unsupportedBrowserCallback() {
-    // Safari is unsupported by protocolCheck
-    _logger.Logger.warn('can not detect custom protocols on this browser');
-    window.location = protocolURI;
+    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
+      // iOS doesn’t do protocols (yet)
+      _logger.Logger.warn('platform does not support custom protocols, sending to https');
+      window.location = httpsURI;
+    } else {
+      // Safari is unsupported by protocolCheck
+      _logger.Logger.warn('can not detect custom protocols on this browser');
+      window.location = protocolURI;
+    }
   }
 
   (0, _customProtocolDetectionBlockstack2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
@@ -1273,6 +1279,7 @@ function getDIDType(decentralizedID) {
 
 function getAddressFromDID(decentralizedID) {
   var didType = getDIDType(decentralizedID);
+
   if (didType === 'btc-addr') {
     return decentralizedID.split(':')[2];
   } else {
@@ -8019,6 +8026,7 @@ function updateQueryStringParameter(uri, key, value) {
  * @returns {bool} iff v1 >= v2
  * @private
  */
+
 function isLaterVersion(v1, v2) {
   var v1tuple = v1.split('.').map(function (x) {
     return parseInt(x, 10);
@@ -8043,6 +8051,7 @@ function hexStringToECPair(skHex) {
     network: _config.config.network.layer1,
     compressed: true
   };
+
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' + 'indicates compressed key, but last byte must be == 1');
