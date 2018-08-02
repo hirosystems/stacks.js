@@ -134,8 +134,7 @@ function redirectToSignInWithAuthRequest() {
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `generateAndStoreTransitKey`, `makeAuthRequest`,
- * and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
  *
  * @param {String} [redirectURI=`${window.location.origin}/`]
  * The location to which the identity provider will redirect the user after
@@ -406,6 +405,8 @@ function encryptPrivateKey(publicKey, privateKey) {
  * @param  {String} hexedEncrypted the ciphertext
  * @return {String}  the decrypted private key
  * @throws {Error} if unable to decrypt
+ *
+ * @private
  */
 function decryptPrivateKey(privateKey, hexedEncrypted) {
   var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
@@ -439,6 +440,7 @@ function decryptPrivateKey(privateKey, hexedEncrypted) {
  * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @return {String} signed and encoded authentication response token
+ * @private
  */
 function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -924,6 +926,8 @@ function isIssuanceDateValid(token) {
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if the `token` has not yet expired, `false`
  * if the `token` has expired
+ *
+ * @private
  */
 function isExpirationDateValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
@@ -957,6 +961,7 @@ function isManifestUriValid(token) {
  * Makes sure the `redirect_uri` is a same origin absolute URL.
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if valid, otherwise `false`
+ * @private 
  */
 function isRedirectUriValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
@@ -1467,6 +1472,7 @@ function decryptECIES(privateKey, cipherObject) {
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
+ * @private
  */
 function signECDSA(privateKey, content) {
   var contentBuffer = Buffer.from(content);
@@ -1488,6 +1494,7 @@ function signECDSA(privateKey, content) {
  * @param {String} publicKey - secp256k1 private key hex string
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @private
  */
 function verifyECDSA(content, publicKey, signature) {
   var contentBuffer = Buffer.from(content);
@@ -2303,6 +2310,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
     *   with the transaction broadcast service
     * * `MissingParameterError` if you call the function without a required
     *   parameter
+    * @private
     */
 
   }, {
@@ -2359,6 +2367,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
+     *  @private
      */
 
   }, {
@@ -2442,6 +2451,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
+     *  @private
      */
 
   }, {
@@ -3181,6 +3191,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * Class representing a transaction signer for pubkeyhash addresses
  * (a.k.a. single-sig addresses)
+ * @private
  */
 var PubkeyHashSigner = exports.PubkeyHashSigner = function () {
   function PubkeyHashSigner(ecPair) {
@@ -4075,6 +4086,7 @@ function estimateNamespacePreorder(namespaceID, revealAddress, paymentAddress) {
  *    fund the reveal.  This includes a 5500 satoshi dust output for the
  *    preorder.  Even though this is a change output, the payer must have
  *    enough funds to generate this output, so we include it in the cost.
+ * @private
  */
 function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
   var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
@@ -4097,6 +4109,7 @@ function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
  *  be required from the reveal address
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this namespacey-ready transaction.
+ * @private
  */
 function estimateNamespaceReady(namespaceID) {
   var revealUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -4120,6 +4133,7 @@ function estimateNamespaceReady(namespaceID) {
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this name-import transaction
+ * @private
  */
 function estimateNameImport(name, recipientAddr, zonefileHash) {
   var importUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
@@ -4141,6 +4155,7 @@ function estimateNameImport(name, recipientAddr, zonefileHash) {
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this announce transaction
+ * @private
  */
 function estimateAnnounce(messageHash) {
   var senderUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -11782,7 +11797,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      "/Users/moxiegirl/repos/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -11803,12 +11818,11 @@ module.exports={
   },
   "_requiredBy": [
     "/",
-    "/bitcoinjs-lib",
     "/ecurve"
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/moxiegirl/repos/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -36468,7 +36482,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/larry/git/blockstack.js"
+      "/Users/moxiegirl/repos/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -36492,7 +36506,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/moxiegirl/repos/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -44810,7 +44824,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/larry/git/blockstack.js"
+      "/Users/moxiegirl/repos/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -44833,11 +44847,12 @@ module.exports={
     "/",
     "/browserify/browserify-sign",
     "/browserify/create-ecdh",
-    "/jsontokens"
+    "/jsontokens",
+    "/tiny-secp256k1"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/moxiegirl/repos/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -56836,7 +56851,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/larry/git/blockstack.js"
+      "/Users/moxiegirl/repos/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -56860,7 +56875,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/moxiegirl/repos/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
