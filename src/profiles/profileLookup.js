@@ -24,13 +24,13 @@ export function lookupProfile(username: string, zoneFileLookupURL: ?string = nul
     lookupPromise = config.network.getNameInfo(username)
   }
   return lookupPromise
-    .then(responseJSON => {
+    .then((responseJSON) => {
       if (responseJSON.hasOwnProperty('zonefile')
           && responseJSON.hasOwnProperty('address')) {
         return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address)
       } else {
-        throw new Error('Invalid zonefile lookup response: did not contain `address`' +
-                        ' or `zonefile` field')
+        throw new Error('Invalid zonefile lookup response: did not contain `address`'
+                        + ' or `zonefile` field')
       }
     })
 }

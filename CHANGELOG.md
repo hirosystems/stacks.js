@@ -4,7 +4,24 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [18.0.3] - 2018-08-01
+
+### Changed
+- Resolve unsupported protocol error by redirecting
+  to hosted authenticator on iOS
+
+## [18.0.2] - 2018-07-27
+
+### Changed
+- Update `bitcoinjs-lib` to version 4.0.0.
+
+## [18.0.1] - 2018-07-27
+
+### Changed
+- Switched from `cross-fetch` to `cross-fetch/polyfill` to fix a bug that caused
+  network requests to fail in node environments
+
+## [18.0.0]
 
 ### Added
 
@@ -17,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in the `transactions` functions (e.g., makePreorder).
 - `putFile` can now optionally take the public key for which you want
 to encrypt the file. Thanks to @bodymindarts for this!
+- `handlePendingSignIn` now accepts `transitKey` as an optional 3rd parameter. This
+enables support for more complex sign in flows.
 
 ### Changed
 - The gaia hub connection functions now use a JWT for authentication,
@@ -33,6 +52,13 @@ encrypt content for other users.
   responses should now behave correctly.
 - `handlePendingSignIn` now takes a second parameter which is the
    signed authentication response token. Thanks to @muneebm for this!
+- Fixed an issue in `ecPairToHexString` that may result in generation of
+  an incorrectly hex string encoding of the private key.
+- Proofs now support subdomains.
+- Updated a number of dependencies to fix know vulnerablities.
+- Switched from isomorphic-fetch to the better maintained cross-fetch
+  which will improve functionality of the library in node environments.
+
 
 ## [17.2.0]
 

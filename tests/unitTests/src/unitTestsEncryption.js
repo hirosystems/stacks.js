@@ -1,11 +1,10 @@
 import test from 'tape-promise/tape'
 
+import elliptic from 'elliptic'
 import {
- encryptECIES, decryptECIES, getHexFromBN, signECDSA, verifyECDSA
+  encryptECIES, decryptECIES, getHexFromBN, signECDSA, verifyECDSA
 } from '../../../lib/encryption'
 import { ERROR_CODES } from '../../../lib/errors'
-
-import elliptic from 'elliptic'
 
 
 export function runEncryptionTests() {
@@ -88,7 +87,7 @@ export function runEncryptionTests() {
     const ecurve = new elliptic.ec('secp256k1')
 
     const evilHexes = ['ba40f85b152bea8c3812da187bcfcfb0dc6e15f9e27cb073633b1c787b19472f',
-                     'e346010f923f768138152d0bad063999ff1da5361a81e6e6f9106241692a0076']
+                       'e346010f923f768138152d0bad063999ff1da5361a81e6e6f9106241692a0076']
     const results = evilHexes.map((hex) => {
       const ephemeralSK = ecurve.keyFromPrivate(hex)
       const ephemeralPK = ephemeralSK.getPublic()
@@ -96,7 +95,7 @@ export function runEncryptionTests() {
       return getHexFromBN(sharedSecret).length === 64
     })
 
-    t.true(results.every((x) => x), 'Evil hexes must all generate 64-len hex strings')
+    t.true(results.every(x => x), 'Evil hexes must all generate 64-len hex strings')
   })
 
   test('proper error message when decrypting unencrypted object', (t) => {

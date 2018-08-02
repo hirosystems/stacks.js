@@ -15,14 +15,17 @@ Object.freeze(ERROR_CODES)
 
 type ErrorType = {
   code: string,
-	parameter?: string,
-	message: string
+  parameter?: string,
+  message: string
 }
 
 export class BlockstackError extends Error {
   message: string
+
   code: string
+
   parameter: ?string
+
   constructor(error: ErrorType) {
     let { message } = error
     let bugMessage = `Error Code: ${error.code}`
@@ -35,9 +38,9 @@ export class BlockstackError extends Error {
     if (stack) {
       bugMessage += `\nStack Trace:\n${stack}`
     }
-    message += '\nIf you believe this exception is caused by a bug in blockstack.js' +
-      ', please file a bug report: https://community.blockstack.org/bugs?' +
-      `9ndd2=Bug&4ud0i=${encodeURIComponent(bugMessage)}`
+    message += '\nIf you believe this exception is caused by a bug in blockstack.js'
+      + ', please file a bug report: https://community.blockstack.org/bugs?'
+      + `9ndd2=Bug&4ud0i=${encodeURIComponent(bugMessage)}`
     super(message)
     this.code = error.code
     this.parameter = error.parameter ? error.parameter : null
@@ -81,6 +84,7 @@ export class InvalidDIDError extends BlockstackError {
 
 export class NotEnoughFundsError extends BlockstackError {
   leftToFund: number
+
   constructor(leftToFund: number) {
     const message = `Not enough UTXOs to fund. Left to fund: ${leftToFund}`
     super({ code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message })
@@ -92,10 +96,12 @@ export class NotEnoughFundsError extends BlockstackError {
 
 export class InvalidAmountError extends BlockstackError {
   fees: number
+
   specifiedAmount: number
+
   constructor(fees: number, specifiedAmount: number) {
-    const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},` +
-          ` specified spend is  ${specifiedAmount}`
+    const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},`
+          + ` specified spend is  ${specifiedAmount}`
     super({ code: ERROR_CODES.INVALID_AMOUNT_ERROR, message })
     this.specifiedAmount = specifiedAmount
     this.fees = fees
