@@ -2,6 +2,7 @@
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import protocolCheck from 'custom-protocol-detection-blockstack'
+import isMobile from 'is-mobile'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID, makeECPrivateKey } from '../index'
@@ -73,6 +74,14 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
                                                 DEFAULT_BLOCKSTACK_HOST) {
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
+
+  // If they're on a mobile device, always redirect them to HTTPS site
+  if (isMobile()) {
+    Logger.info('detected mobile device, sending to https')
+    window.location = httpsURI
+    return
+  }
+
   function successCallback() {
     Logger.info('protocol handler detected')
     // protocolCheck should open the link for us
@@ -84,15 +93,9 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   }
 
   function unsupportedBrowserCallback() {
-    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
-      // iOS doesn’t do protocols (yet)
-      Logger.warn('platform does not support custom protocols, sending to https')
-      window.location = httpsURI
-    } else {
-      // Safari is unsupported by protocolCheck
-      Logger.warn('can not detect custom protocols on this browser')
-      window.location = protocolURI
-    }
+    // Safari is unsupported by protocolCheck
+    Logger.warn('can not detect custom protocols on this browser')
+    window.location = protocolURI
   }
 
   protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
