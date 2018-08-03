@@ -172,6 +172,9 @@ export function makeAuthResponse(privateKey: string,
     }
   } else {
     Logger.info('blockstack.js: generating legacy auth response')
+    additionalProperties = {
+      version: ''
+    }
   }
 
   /* Create the payload */
