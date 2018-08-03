@@ -27,10 +27,11 @@ const DEFAULT_PROFILE = {
 }
 
 /**
- * Generates a ECDSA keypair and stores the hex value of the private key in
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * and stores the hex value of the private key in
  * local storage.
  * @return {String} the hex encoded private key
- * @private
  */
 export function generateAndStoreTransitKey() {
   const transitKey = makeECPrivateKey()
@@ -108,7 +109,8 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ * use `generateAndStoreTransitKey`, `makeAuthRequest`,
+ * and `redirectToSignInWithAuthRequest` to build your own sign in process.
  *
  * @param {String} [redirectURI=`${window.location.origin}/`]
  * The location to which the identity provider will redirect the user after
