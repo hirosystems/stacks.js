@@ -104,6 +104,7 @@ export function encryptPrivateKey(publicKey: string,
  * @param  {String} hexedEncrypted the ciphertext
  * @return {String}  the decrypted private key
  * @throws {Error} if unable to decrypt
+ * @private
  */
 export function decryptPrivateKey(privateKey: string,
                                   hexedEncrypted: string): string | null {
@@ -138,6 +139,7 @@ export function decryptPrivateKey(privateKey: string,
  * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @return {String} signed and encoded authentication response token
+ * @private
  */
 export function makeAuthResponse(privateKey: string,
                                  profile: {} = {},

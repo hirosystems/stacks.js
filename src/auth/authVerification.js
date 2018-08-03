@@ -155,6 +155,7 @@ export function isIssuanceDateValid(token: string) {
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if the `token` has not yet expired, `false`
  * if the `token` has expired
+ * @private
  */
 export function isExpirationDateValid(token: string) {
   const payload = decodeToken(token).payload
@@ -188,6 +189,7 @@ export function isManifestUriValid(token: string) {
  * Makes sure the `redirect_uri` is a same origin absolute URL.
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if valid, otherwise `false`
+ * @private
  */
 export function isRedirectUriValid(token: string) {
   const payload = decodeToken(token).payload
