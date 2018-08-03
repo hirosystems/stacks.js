@@ -275,6 +275,16 @@
               
                 
                 <li><a
+                  href='#'
+                  class="">
+                  
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#decryptprivatekey'
                   class="">
                   decryptPrivateKey
@@ -489,7 +499,8 @@ browser to approve the sign in request.</p>
 <p>Most applications should use this
 method for sign in unless they require more fine grained control over how the
 authentication request is generated. If your app falls into this category,
-use <code>makeAuthRequest</code> and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
+use <code>generateAndStoreTransitKey</code>, <code>makeAuthRequest</code>,
+and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
 
 
   <div class='pre p1 fill-light mt0'>redirectToSignIn(redirectURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>): void</div>
@@ -2439,6 +2450,64 @@ or rejects with an error
   
 </section>
 </div>
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id=''>
+      
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Generates a ECDSA keypair to
+use as the ephemeral app transit private key
+and stores the hex value of the private key in
+local storage.</p>
+
+
+  <div class='pre p1 fill-light mt0'></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        the hex encoded private key
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
           
         
           

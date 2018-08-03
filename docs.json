@@ -266,7 +266,7 @@
             },
             {
               "type": "inlineCode",
-              "value": "makeAuthRequest",
+              "value": "generateAndStoreTransitKey",
               "position": {
                 "start": {
                   "line": 10,
@@ -275,27 +275,63 @@
                 },
                 "end": {
                   "line": 10,
-                  "column": 22,
-                  "offset": 436
+                  "column": 33,
+                  "offset": 447
                 },
                 "indent": []
               }
             },
             {
               "type": "text",
-              "value": " and ",
+              "value": ", ",
               "position": {
                 "start": {
                   "line": 10,
-                  "column": 22,
-                  "offset": 436
+                  "column": 33,
+                  "offset": 447
                 },
                 "end": {
                   "line": 10,
-                  "column": 27,
-                  "offset": 441
+                  "column": 35,
+                  "offset": 449
                 },
                 "indent": []
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "makeAuthRequest",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 35,
+                  "offset": 449
+                },
+                "end": {
+                  "line": 10,
+                  "column": 52,
+                  "offset": 466
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": ",\nand ",
+              "position": {
+                "start": {
+                  "line": 10,
+                  "column": 52,
+                  "offset": 466
+                },
+                "end": {
+                  "line": 11,
+                  "column": 5,
+                  "offset": 472
+                },
+                "indent": [
+                  1
+                ]
               }
             },
             {
@@ -303,14 +339,14 @@
               "value": "redirectToSignInWithAuthRequest",
               "position": {
                 "start": {
-                  "line": 10,
-                  "column": 27,
-                  "offset": 441
+                  "line": 11,
+                  "column": 5,
+                  "offset": 472
                 },
                 "end": {
-                  "line": 10,
-                  "column": 60,
-                  "offset": 474
+                  "line": 11,
+                  "column": 38,
+                  "offset": 505
                 },
                 "indent": []
               }
@@ -320,14 +356,14 @@
               "value": " to build your own sign in process.",
               "position": {
                 "start": {
-                  "line": 10,
-                  "column": 60,
-                  "offset": 474
+                  "line": 11,
+                  "column": 38,
+                  "offset": 505
                 },
                 "end": {
-                  "line": 10,
-                  "column": 95,
-                  "offset": 509
+                  "line": 11,
+                  "column": 73,
+                  "offset": 540
                 },
                 "indent": []
               }
@@ -340,11 +376,12 @@
               "offset": 228
             },
             "end": {
-              "line": 10,
-              "column": 95,
-              "offset": 509
+              "line": 11,
+              "column": 73,
+              "offset": 540
             },
             "indent": [
+              1,
               1,
               1,
               1
@@ -359,9 +396,9 @@
           "offset": 0
         },
         "end": {
-          "line": 10,
-          "column": 95,
-          "offset": 509
+          "line": 11,
+          "column": 73,
+          "offset": 540
         }
       }
     },
@@ -369,7 +406,7 @@
       {
         "title": "param",
         "description": "The location to which the identity provider will redirect the user after\nthe user approves sign in.",
-        "lineNumber": 12,
+        "lineNumber": 13,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -383,7 +420,7 @@
       {
         "title": "param",
         "description": "Location of the manifest file.",
-        "lineNumber": 15,
+        "lineNumber": 16,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -397,7 +434,7 @@
       {
         "title": "param",
         "description": "Defaults to requesting write access to\nthis app's data store.\nAn array of strings indicating which permissions this app is requesting.",
-        "lineNumber": 17,
+        "lineNumber": 18,
         "type": {
           "type": "OptionalType",
           "expression": {
@@ -411,7 +448,7 @@
       {
         "title": "return",
         "description": null,
-        "lineNumber": 20,
+        "lineNumber": 21,
         "type": {
           "type": "NameExpression",
           "name": "void"
@@ -420,26 +457,26 @@
     ],
     "loc": {
       "start": {
-        "line": 101,
+        "line": 102,
         "column": 0
       },
       "end": {
-        "line": 122,
+        "line": 124,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 123,
+          "line": 125,
           "column": 0
         },
         "end": {
-          "line": 130,
+          "line": 132,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -447,7 +484,7 @@
       {
         "title": "param",
         "name": "redirectURI",
-        "lineNumber": 12,
+        "lineNumber": 13,
         "description": {
           "type": "root",
           "children": [
@@ -513,7 +550,7 @@
       {
         "title": "param",
         "name": "manifestURI",
-        "lineNumber": 15,
+        "lineNumber": 16,
         "description": {
           "type": "root",
           "children": [
@@ -575,7 +612,7 @@
       {
         "title": "param",
         "name": "scopes",
-        "lineNumber": 17,
+        "lineNumber": 18,
         "description": {
           "type": "root",
           "children": [
@@ -753,26 +790,26 @@
     ],
     "loc": {
       "start": {
-        "line": 141,
+        "line": 143,
         "column": 0
       },
       "end": {
-        "line": 144,
+        "line": 146,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 145,
+          "line": 147,
           "column": 0
         },
         "end": {
-          "line": 147,
+          "line": 149,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1027,26 +1064,26 @@
     ],
     "loc": {
       "start": {
-        "line": 150,
+        "line": 152,
         "column": 0
       },
       "end": {
-        "line": 161,
+        "line": 163,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 162,
+          "line": 164,
           "column": 0
         },
         "end": {
-          "line": 250,
+          "line": 252,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1432,26 +1469,26 @@
     ],
     "loc": {
       "start": {
-        "line": 252,
+        "line": 254,
         "column": 0
       },
       "end": {
-        "line": 255,
+        "line": 257,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 256,
+          "line": 258,
           "column": 0
         },
         "end": {
-          "line": 258,
+          "line": 260,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1604,26 +1641,26 @@
     ],
     "loc": {
       "start": {
-        "line": 51,
+        "line": 52,
         "column": 0
       },
       "end": {
-        "line": 54,
+        "line": 55,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 55,
+          "line": 56,
           "column": 0
         },
         "end": {
-          "line": 57,
+          "line": 58,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -1841,26 +1878,26 @@
     ],
     "loc": {
       "start": {
-        "line": 260,
+        "line": 262,
         "column": 0
       },
       "end": {
-        "line": 264,
+        "line": 266,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 265,
+          "line": 267,
           "column": 0
         },
         "end": {
-          "line": 272,
+          "line": 274,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -2272,7 +2309,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -2944,26 +2981,26 @@
     ],
     "loc": {
       "start": {
-        "line": 59,
+        "line": 60,
         "column": 0
       },
       "end": {
-        "line": 70,
+        "line": 71,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 71,
+          "line": 72,
           "column": 0
         },
         "end": {
-          "line": 99,
+          "line": 100,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3226,26 +3263,26 @@
     ],
     "loc": {
       "start": {
-        "line": 132,
+        "line": 134,
         "column": 0
       },
       "end": {
-        "line": 135,
+        "line": 137,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 136,
+          "line": 138,
           "column": 0
         },
         "end": {
-          "line": 139,
+          "line": 141,
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -3626,7 +3663,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4012,7 +4049,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -4367,7 +4404,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5001,7 +5038,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -5397,7 +5434,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -5778,7 +5815,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/larry/git/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -6408,7 +6445,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7162,7 +7199,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -7718,7 +7755,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8180,7 +8217,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8581,7 +8618,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -8924,7 +8961,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/storage/index.js"
+      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -9346,6 +9383,179 @@
           "children": [
             {
               "type": "text",
+              "value": "Generates a ECDSA keypair to\nuse as the ephemeral app transit private key\nand stores the hex value of the private key in\nlocal storage.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 4,
+                  "column": 15,
+                  "offset": 135
+                },
+                "indent": [
+                  1,
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 4,
+              "column": 15,
+              "offset": 135
+            },
+            "indent": [
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 15,
+          "offset": 135
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "return",
+        "description": "the hex encoded private key",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 29,
+        "column": 0
+      },
+      "end": {
+        "line": 35,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 24,
+          "column": 0
+        },
+        "end": {
+          "line": 27,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the hex encoded private key",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 28,
+                      "offset": 27
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 28,
+                  "offset": 27
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 28,
+              "offset": 27
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [],
+    "namespace": ""
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Decrypts the hex encrypted private key",
               "position": {
                 "start": {
@@ -9451,7 +9661,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -9905,7 +10115,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authMessages.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authMessages.js"
     },
     "augments": [],
     "examples": [],
@@ -10821,7 +11031,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -11222,7 +11432,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/auth/authVerification.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/authVerification.js"
     },
     "augments": [],
     "examples": [],
@@ -11510,7 +11720,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/encryption.js"
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
     },
     "augments": [],
     "examples": [],
@@ -11850,7 +12060,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/encryption.js"
+      "file": "/Users/larry/git/blockstack.js/src/encryption.js"
     },
     "augments": [],
     "examples": [],
@@ -12267,7 +12477,7 @@
           "column": 3
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -13048,7 +13258,7 @@
           "column": 3
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -13932,7 +14142,7 @@
           "column": 3
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/network.js"
+      "file": "/Users/larry/git/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -14602,7 +14812,7 @@
           "column": 26
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/signers.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
     },
     "augments": [],
     "examples": [],
@@ -14714,7 +14924,7 @@
           "column": 32
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/signers.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
     },
     "augments": [],
     "examples": [],
@@ -14895,7 +15105,7 @@
           "column": 96
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/signers.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
     },
     "augments": [],
     "examples": [],
@@ -15122,7 +15332,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/signers.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/signers.js"
     },
     "augments": [],
     "examples": [],
@@ -15284,7 +15494,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -15740,7 +15950,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -16084,7 +16294,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
@@ -16530,7 +16740,7 @@
           "column": 1
         }
       },
-      "file": "/Users/moxiegirl/repos/blockstack.js/src/operations/txbuild.js"
+      "file": "/Users/larry/git/blockstack.js/src/operations/txbuild.js"
     },
     "augments": [],
     "examples": [],
