@@ -2,7 +2,6 @@
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import protocolCheck from 'custom-protocol-detection-blockstack'
-import isMobile from 'is-mobile'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID, makeECPrivateKey } from '../index'
@@ -75,9 +74,9 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
-  // If they're on a mobile device, always redirect them to HTTPS site
-  if (isMobile()) {
-    Logger.info('detected mobile device, sending to https')
+  // If they're on a mobile OS, always redirect them to HTTPS site
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    Logger.info('detected mobile OS, sending to https')
     window.location = httpsURI
     return
   }

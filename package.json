@@ -114,7 +114,6 @@
     "elliptic": "^6.4.0",
     "es6-promise": "^4.2.4",
     "form-data": "^2.3.2",
-    "is-mobile": "^1.0.0",
     "jsontokens": "^0.7.8",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
