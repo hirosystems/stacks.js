@@ -59,6 +59,10 @@ export class BlockstackWallet {
     this.rootNode = rootNode
   }
 
+  toBase58(): string {
+    return this.rootNode.toBase58()
+  }
+
   /**
    * Initialize a blockstack wallet from a seed buffer
    * @param {Buffer} seed - the input seed for initializing the root node
