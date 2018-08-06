@@ -92,9 +92,9 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   }
 
   function unsupportedBrowserCallback() {
-    // Safari is unsupported by protocolCheck
-    Logger.warn('can not detect custom protocols on this browser')
-    window.location = protocolURI
+    // Safari, Opera & others are unsupported by protocolCheck
+    Logger.warn('can not detect custom protocols on this browser, sending to https')
+    window.location = httpsURI
   }
 
   protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
