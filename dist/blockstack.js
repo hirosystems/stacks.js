@@ -97,6 +97,14 @@ function redirectToSignInWithAuthRequest() {
 
   var protocolURI = _utils.BLOCKSTACK_HANDLER + ':' + authRequest;
   var httpsURI = blockstackIDHost + '?authRequest=' + authRequest;
+
+  // If they're on a mobile OS, always redirect them to HTTPS site
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    _logger.Logger.info('detected mobile OS, sending to https');
+    window.location = httpsURI;
+    return;
+  }
+
   function successCallback() {
     _logger.Logger.info('protocol handler detected');
     // protocolCheck should open the link for us
@@ -108,15 +116,9 @@ function redirectToSignInWithAuthRequest() {
   }
 
   function unsupportedBrowserCallback() {
-    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
-      // iOS doesn’t do protocols (yet)
-      _logger.Logger.warn('platform does not support custom protocols, sending to https');
-      window.location = httpsURI;
-    } else {
-      // Safari is unsupported by protocolCheck
-      _logger.Logger.warn('can not detect custom protocols on this browser');
-      window.location = protocolURI;
-    }
+    // Safari is unsupported by protocolCheck
+    _logger.Logger.warn('can not detect custom protocols on this browser');
+    window.location = protocolURI;
   }
 
   (0, _customProtocolDetectionBlockstack2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
