@@ -102,7 +102,7 @@ export function connectToGaiaHub(gaiaHubUrl: string,
         associationToken = userData.gaiaAssociationToken
       }
     } catch (e) {
-      console.log('No association token in user data')
+      associationToken = undefined
     }
   }
 

@@ -172,11 +172,13 @@ export function handlePendingSignIn(nameLookupURL: string = '',
     if (isLaterVersion(tokenPayload.version, '1.3.0')
        && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
       // override globally
-      Logger.info(`Overriding ${config.network.blockstackAPIUrl} ` +
-        `with ${tokenPayload.blockstackAPIUrl}`)
+      Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
+        + `with ${tokenPayload.blockstackAPIUrl}`)
       config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
       nameLookupURL = `${tokenPayload.blockstackAPIUrl}/v1/names`
     } 
+
+    nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
     .then((isValid) => {
