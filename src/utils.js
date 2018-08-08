@@ -3,7 +3,6 @@ import url from 'url'
 import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 
-
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
  * Time
@@ -56,6 +55,7 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  * @returns {bool} iff v1 >= v2
  * @private
  */
+
 export function isLaterVersion(v1: string, v2: string) {
   const v1tuple = v1.split('.').map(x => parseInt(x, 10))
   const v2tuple = v2.split('.').map(x => parseInt(x, 10))
@@ -71,12 +71,12 @@ export function isLaterVersion(v1: string, v2: string) {
   return true
 }
 
-
 export function hexStringToECPair(skHex: string) {
   const ecPairOptions = {
     network: config.network.layer1,
     compressed: true
   }
+  
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually '

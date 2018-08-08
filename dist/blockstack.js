@@ -97,6 +97,14 @@ function redirectToSignInWithAuthRequest() {
 
   var protocolURI = _utils.BLOCKSTACK_HANDLER + ':' + authRequest;
   var httpsURI = blockstackIDHost + '?authRequest=' + authRequest;
+
+  // If they're on a mobile OS, always redirect them to HTTPS site
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    _logger.Logger.info('detected mobile OS, sending to https');
+    window.location = httpsURI;
+    return;
+  }
+
   function successCallback() {
     _logger.Logger.info('protocol handler detected');
     // protocolCheck should open the link for us
@@ -1273,6 +1281,7 @@ function getDIDType(decentralizedID) {
 
 function getAddressFromDID(decentralizedID) {
   var didType = getDIDType(decentralizedID);
+
   if (didType === 'btc-addr') {
     return decentralizedID.split(':')[2];
   } else {
@@ -8019,6 +8028,7 @@ function updateQueryStringParameter(uri, key, value) {
  * @returns {bool} iff v1 >= v2
  * @private
  */
+
 function isLaterVersion(v1, v2) {
   var v1tuple = v1.split('.').map(function (x) {
     return parseInt(x, 10);
@@ -8043,6 +8053,7 @@ function hexStringToECPair(skHex) {
     network: _config.config.network.layer1,
     compressed: true
   };
+
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' + 'indicates compressed key, but last byte must be == 1');
