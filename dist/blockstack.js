@@ -7537,6 +7537,7 @@ exports.getFile = getFile;
 exports.putFile = putFile;
 exports.getAppBucketUrl = getAppBucketUrl;
 exports.deleteFile = deleteFile;
+exports.listFiles = listFiles;
 
 var _hub = require('./hub');
 
@@ -7953,6 +7954,82 @@ function getAppBucketUrl(gaiaHubUrl, appPrivateKey) {
  */
 function deleteFile(path) {
   Promise.reject(new Error('Delete of ' + path + ' not supported by gaia hubs'));
+}
+
+/**
+ * Loop over the list of files in a Gaia hub, and run a callback on each entry.
+ * Not meant to be called by external clients.
+ * @param {GaiaHubConfig} hubConfig - the Gaia hub config
+ * @param {String | null} page - the page ID
+ * @param {number} callCount - the loop count
+ * @param {number} fileCount - the number of files listed so far
+ * @param {function} callback - the callback to invoke on each file.  If it returns a falsey
+ *  value, then the loop stops.  If it returns a truthy value, the loop continues.
+ * @returns {Promise} that resolves to the number of files listed.
+ * @private
+ */
+function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
+  if (callCount > 65536) {
+    // this is ridiculously huge, and probably indicates
+    // a faulty Gaia hub anyway (e.g. on that serves endless data)
+    throw new Error('Too many entries to list');
+  }
+
+  var httpStatus = void 0;
+  var pageRequest = JSON.stringify({ page: page });
+
+  var fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': '' + pageRequest.length,
+      Authorization: 'bearer ' + hubConfig.token
+    },
+    body: pageRequest
+  };
+
+  return fetch(hubConfig.server + '/list-files/' + hubConfig.address, fetchOptions).then(function (response) {
+    httpStatus = response.status;
+    if (httpStatus >= 400) {
+      throw new Error('listFiles failed with HTTP status ' + httpStatus);
+    }
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    var entries = responseJSON.entries;
+    var nextPage = responseJSON.page;
+    if (entries === null || entries === undefined) {
+      // indicates a misbehaving Gaia hub or a misbehaving driver
+      // (i.e. the data is malformed)
+      throw new Error('Bad listFiles response: no entries');
+    }
+    for (var i = 0; i < entries.length; i++) {
+      var rc = callback(entries[i]);
+      if (!rc) {
+        // callback indicates that we're done
+        return Promise.resolve(fileCount + i);
+      }
+    }
+    if (nextPage && entries.length > 0) {
+      // keep going -- have more entries
+      return listFilesLoop(hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback);
+    } else {
+      // no more entries -- end of data
+      return Promise.resolve(fileCount);
+    }
+  });
+}
+
+/**
+ * List the set of files in this application's Gaia storage bucket.
+ * @param {function} callback - a callback to invoke on each named file
+ * @return {Promise} that resolves to the number of files listed
+ */
+function listFiles(callback) {
+  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+    return listFilesLoop(gaiaHubConfig, null, 0, 0, callback);
+  });
 }
 
 exports.connectToGaiaHub = _hub.connectToGaiaHub;
@@ -11782,7 +11859,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      "/home/jude/Desktop/research/git/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -11803,12 +11880,11 @@ module.exports={
   },
   "_requiredBy": [
     "/",
-    "/bitcoinjs-lib",
     "/ecurve"
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/home/jude/Desktop/research/git/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -36468,7 +36544,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/larry/git/blockstack.js"
+      "/home/jude/Desktop/research/git/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -36492,7 +36568,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/home/jude/Desktop/research/git/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -44810,7 +44886,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/larry/git/blockstack.js"
+      "/home/jude/Desktop/research/git/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -44833,11 +44909,12 @@ module.exports={
     "/",
     "/browserify/browserify-sign",
     "/browserify/create-ecdh",
-    "/jsontokens"
+    "/jsontokens",
+    "/tiny-secp256k1"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/home/jude/Desktop/research/git/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -56836,7 +56913,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/larry/git/blockstack.js"
+      "/home/jude/Desktop/research/git/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -56860,7 +56937,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/home/jude/Desktop/research/git/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
