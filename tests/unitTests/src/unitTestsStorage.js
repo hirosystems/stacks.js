@@ -826,10 +826,10 @@ export function runStorageTests() {
       files.push(name)
       return true
     })
-    .then((count) => {
-      t.equal(files.length, 1, 'Got one file back')
-      t.equal(files[0], 'file.json', 'Got the right file back')
-      t.equal(count, 1, 'Count matches number of files')
-    })
+      .then((count) => {
+        t.equal(files.length, 1, 'Got one file back')
+        t.equal(files[0], 'file.json', 'Got the right file back')
+        t.equal(count, 1, 'Count matches number of files')
+      })
   })
 }
