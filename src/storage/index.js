@@ -484,16 +484,18 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
 
   let httpStatus
   const pageRequest = JSON.stringify({ page })
-  return fetch(`${hubConfig.server}/list-files/${hubConfig.address}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': `${pageRequest.length}`,
-        Authorization: `bearer ${hubConfig.token}`
-      },
-      body: pageRequest
-    })
+
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': `${pageRequest.length}`,
+      Authorization: `bearer ${hubConfig.token}`
+    },
+    body: pageRequest
+  }
+
+  return fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     .then((response) => {
       httpStatus = response.status
       if (httpStatus >= 400) {
@@ -501,7 +503,7 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
       }
       return response.text()
     })
-    .then((responseText) => JSON.parse(responseText))
+    .then(responseText => JSON.parse(responseText))
     .then((responseJSON) => {
       const entries = responseJSON.entries
       const nextPage = responseJSON.page
@@ -519,8 +521,9 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
       }
       if (nextPage && entries.length > 0) {
         // keep going -- have more entries
-        return listFilesLoop(hubConfig, nextPage, callCount + 1,
-            fileCount + entries.length, callback)
+        return listFilesLoop(
+          hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+        )
       } else {
         // no more entries -- end of data
         return Promise.resolve(fileCount)
@@ -535,7 +538,7 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
  */
 export function listFiles(callback: (name: string) => boolean) : Promise<number> {
   return getOrSetLocalGaiaHubConnection()
-    .then((gaiaHubConfig) => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
+    .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
