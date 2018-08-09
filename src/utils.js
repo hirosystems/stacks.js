@@ -1,9 +1,7 @@
 /* @flow */
 import url from 'url'
-import { ECPair } from 'bitcoinjs-lib'
+import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
-import BigInteger from 'bigi'
-
 
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
@@ -57,6 +55,7 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  * @returns {bool} iff v1 >= v2
  * @private
  */
+
 export function isLaterVersion(v1: string, v2: string) {
   const v1tuple = v1.split('.').map(x => parseInt(x, 10))
   const v2tuple = v2.split('.').map(x => parseInt(x, 10))
@@ -72,31 +71,37 @@ export function isLaterVersion(v1: string, v2: string) {
   return true
 }
 
-
 export function hexStringToECPair(skHex: string) {
-  const ecPairOptions = { network: config.network.layer1,
-                          compressed: true }
+  const ecPairOptions = {
+    network: config.network.layer1,
+    compressed: true
+  }
+  
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
-      throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' +
-                      'indicates compressed key, but last byte must be == 1')
+      throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
+                      + 'indicates compressed key, but last byte must be == 1')
     }
-    return new ECPair(BigInteger.fromHex(skHex.slice(0, 64)), undefined, ecPairOptions)
+    return ECPair.fromPrivateKey(new Buffer(skHex.slice(0, 64), 'hex'), ecPairOptions)
   } else if (skHex.length === 64) {
     ecPairOptions.compressed = false
-    return new ECPair(BigInteger.fromHex(skHex), undefined, ecPairOptions)
+    return ECPair.fromPrivateKey(new Buffer(skHex, 'hex'), ecPairOptions)
   } else {
     throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.')
   }
 }
 
 export function ecPairToHexString(secretKey: ECPair) {
-  const ecPointHex = secretKey.d.toBuffer(32).toString('hex')
+  const ecPointHex = secretKey.privateKey.toString('hex')
   if (secretKey.compressed) {
     return `${ecPointHex}01`
   } else {
     return ecPointHex
   }
+}
+
+export function ecPairToAddress(keyPair: ECPair) {
+  return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
 }
 
 /**
@@ -134,7 +139,7 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
     scheme: parsedUri1.protocol === parsedUri2.protocol,
     hostname: parsedUri1.hostname === parsedUri2.hostname,
     port: port1 === port2,
-    absolute: (uri1.includes('http://') || uri1.includes('https://')) 
+    absolute: (uri1.includes('http://') || uri1.includes('https://'))
     && (uri2.includes('http://') || uri2.includes('https://'))
   }
 

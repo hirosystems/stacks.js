@@ -47,8 +47,8 @@ function testTokening(filename, profile) {
     const tokensVerified = true
 
     // this will throw an error if one is involid
-    tokenRecords.map((tokenRecord) => verifyProfileToken(tokenRecord.token, publicKey))
-    
+    tokenRecords.map(tokenRecord => verifyProfileToken(tokenRecord.token, publicKey))
+
     t.equal(tokensVerified, true, 'All tokens should be valid')
   })
 
@@ -59,7 +59,7 @@ function testTokening(filename, profile) {
     // console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile),
-    JSON.stringify(profile), 'Profile should equal the reference')
+            JSON.stringify(profile), 'Profile should equal the reference')
   })
 
   test('makeProfileZoneFile', (t) => {
@@ -105,13 +105,13 @@ function testZoneFile() {
     t.ok(zoneFile, 'Zone file should have been created for hosted profile')
     t.ok(zoneFile.includes(`"${fileUrl}"`), 'Zone file should include quoted entire profile url')
     t.notOk(zoneFile.includes(`"${incorrectFileUrl}"`),
-    'Zone file should not include quoted profile url without protocol')
+            'Zone file should not include quoted profile url without protocol')
   })
 }
 function testSchemas() {
   const keyPair = new ECPair.makeRandom({ rng: getEntropy })
-  const privateKey = keyPair.d.toBuffer(32).toString('hex')
-  const publicKey = keyPair.getPublicKeyBuffer().toString('hex')
+  const privateKey = keyPair.privateKey.toString('hex')
+  const publicKey = keyPair.publicKey.toString('hex')
 
   test('Profile', (t) => {
     t.plan(5)
@@ -207,7 +207,7 @@ function testSchemas() {
     resolveZoneFileToPerson(zoneFile, ownerAddress, (profile) => {
       t.ok(profile, 'Profile was extracted')
       t.equal(profile.name,
-        'Ryan Shea', 'The profile was recovered with the expected value of the name field')
+              'Ryan Shea', 'The profile was recovered with the expected value of the name field')
     })
   })
 
@@ -230,13 +230,13 @@ function testSchemas() {
       .then((profile) => {
         t.ok(profile, 'zonefile resolves to profile with zoneFileLookupUrl specified')
         t.equal(profile.name,
-          'Ryan Shea', 'The profile was recovered with the expected value of the name field')
+                'Ryan Shea', 'The profile was recovered with the expected value of the name field')
       })
       .then(() => lookupProfile(name))
       .then((profile) => {
         t.ok(profile, 'zonefile resolves to profile with default behavior')
         t.equal(profile.name,
-          'Ryan Shea', 'The profile was recovered with the expected value of the name field')
+                'Ryan Shea', 'The profile was recovered with the expected value of the name field')
       })
   })
 }
