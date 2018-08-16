@@ -57,6 +57,14 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  */
 
 export function isLaterVersion(v1: string, v2: string) {
+  if (v1 === undefined) {
+    v1 = '0.0.0'
+  }
+
+  if (v2 === undefined) {
+    v2 = '0.0.0'
+  }
+
   const v1tuple = v1.split('.').map(x => parseInt(x, 10))
   const v2tuple = v2.split('.').map(x => parseInt(x, 10))
 
@@ -76,7 +84,7 @@ export function hexStringToECPair(skHex: string) {
     network: config.network.layer1,
     compressed: true
   }
-  
+
   if (skHex.length === 66) {
     if (skHex.slice(64) !== '01') {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
