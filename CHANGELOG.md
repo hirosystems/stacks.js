@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [18.0.3] - 2018-08-01
 
+### Added
+- The `BlockstackWallet` class in `blockstack.js` supports generating
+  private keys and addresses within the hierarchical derivation scheme
+  used by the Blockstack Browser and supported by the Blockstack
+  ecosystem.
+
 ### Changed
 - Resolve unsupported protocol error by redirecting
   to hosted authenticator on iOS
@@ -39,9 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `TransactionSigner` interface to allow for different signing agents
   in the `transactions` functions (e.g., makePreorder).
 - `putFile` can now optionally take the public key for which you want
-to encrypt the file. Thanks to @bodymindarts for this!
-- `handlePendingSignIn` now accepts `transitKey` as an optional 3rd parameter. This
-enables support for more complex sign in flows.
+  to encrypt the file. Thanks to @bodymindarts for this!
+- `handlePendingSignIn` now accepts `transitKey` as an optional 3rd parameter.
+  This enables support for more complex sign in flows.
 
 ### Changed
 - The gaia hub connection functions now use a JWT for authentication,
@@ -51,7 +57,7 @@ enables support for more complex sign in flows.
   gaia authentication provides a very specific challenge text matching
   the normal gaia hub challenge text.
 - `encryptContent` now takes a public key instead of a private key to
-encrypt content for other users.
+  encrypt content for other users.
 - The validateProofs() method now handles errors in proof-checking
   more seamlessly, properly catching failed promises. Previous error
   cases which resulted in uncaught exception warnings and null

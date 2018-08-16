@@ -80,6 +80,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.5",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "blue-tape": "^1.0.0",
@@ -106,6 +107,8 @@
   "dependencies": {
     "ajv": "^4.11.5",
     "bigi": "^1.4.2",
+    "bip32": "^1.0.2",
+    "bip39": "^2.5.0",
     "bitcoinjs-lib": "^4",
     "cheerio": "^0.22.0",
     "cross-fetch": "^2.2.2",
@@ -121,6 +124,7 @@
     "ripemd160": "^2.0.1",
     "schema-inspector": "^1.6.4",
     "sprintf-js": "^1.0.3",
+    "triplesec": "^3.0.26",
     "uuid": "^3.2.1",
     "validator": "^7.0.0",
     "zone-file": "^0.2.2"
