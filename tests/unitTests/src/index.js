@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import { runAuthTests }         from './unitTestsAuth'
 import { runProfilesUnitTests } from './unitTestsProfiles'
 import { runProofsUnitTests }   from './unitTestsProofs'
@@ -5,6 +6,7 @@ import { runUtilsTests }        from './unitTestsUtils'
 import { runEncryptionTests }   from './unitTestsEncryption'
 import { runStorageTests }      from './unitTestsStorage'
 import { runOperationsTests }   from './unitTestsOperations'
+import { runWalletTests }       from './unitTestsWallet'
 import { runErrorsTests }       from './unitTestsErrors'
 
 // Utils tests
@@ -27,6 +29,8 @@ runStorageTests()
 
 // Operations Tests
 runOperationsTests()
+
+runWalletTests()
 
 // Errors Tests
 runErrorsTests()
