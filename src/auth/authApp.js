@@ -74,6 +74,14 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
                                                 DEFAULT_BLOCKSTACK_HOST) {
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
+
+  // If they're on a mobile OS, always redirect them to HTTPS site
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    Logger.info('detected mobile OS, sending to https')
+    window.location = httpsURI
+    return
+  }
+
   function successCallback() {
     Logger.info('protocol handler detected')
     // protocolCheck should open the link for us
@@ -85,15 +93,9 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   }
 
   function unsupportedBrowserCallback() {
-    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
-      // iOS doesn’t do protocols (yet)
-      Logger.warn('platform does not support custom protocols, sending to https')
-      window.location = httpsURI
-    } else {
-      // Safari is unsupported by protocolCheck
-      Logger.warn('can not detect custom protocols on this browser')
-      window.location = protocolURI
-    }
+    // Safari is unsupported by protocolCheck
+    Logger.warn('can not detect custom protocols on this browser')
+    window.location = protocolURI
   }
 
   protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
