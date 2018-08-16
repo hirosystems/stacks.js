@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   private keys and addresses within the hierarchical derivation scheme
   used by the Blockstack Browser and supported by the Blockstack
   ecosystem.
+- A `listFiles` function allows an application to list files in its
+  Gaia storage bucket.
 
 ### Changed
 - Fixed a bug in version checking during the authentication process
