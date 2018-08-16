@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased]
 
+### Added
+- The `BlockstackWallet` class in `blockstack.js` supports generating
+  private keys and addresses within the hierarchical derivation scheme
+  used by the Blockstack Browser and supported by the Blockstack
+  ecosystem.
+
 ### Changed
 - Fixed a bug in version checking during the authentication process
   that manifested itself when signing in with apps using very old versions
@@ -18,12 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to hosted authenticator on all mobile devices
 
 ## [18.0.3] - 2018-08-01
-
-### Added
-- The `BlockstackWallet` class in `blockstack.js` supports generating
-  private keys and addresses within the hierarchical derivation scheme
-  used by the Blockstack Browser and supported by the Blockstack
-  ecosystem.
 
 ### Changed
 - Resolve unsupported protocol error by redirecting
