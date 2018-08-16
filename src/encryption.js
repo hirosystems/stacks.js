@@ -42,7 +42,7 @@ function sharedSecretToKeys(sharedSecret : Buffer) {
   const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
   return {
     encryptionKey: hashedSecret.slice(0, 32),
-    hmacKey: hashedSecret.slice(32) 
+    hmacKey: hashedSecret.slice(32)
   }
 }
 
@@ -102,7 +102,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer) : Ciph
     ephemeralPK: ephemeralPK.encodeCompressed('hex'),
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
-    wasString: isString 
+    wasString: isString
   }
 }
 
@@ -154,6 +154,7 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
+ * @private
  */
 export function signECDSA(privateKey: string, content: string | Buffer)
 : {publicKey: string, signature: string } {
@@ -176,6 +177,7 @@ export function signECDSA(privateKey: string, content: string | Buffer)
  * @param {String} publicKey - secp256k1 private key hex string
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @private
  */
 export function verifyECDSA(content: string | Buffer,
                             publicKey: string,
