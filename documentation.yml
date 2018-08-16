@@ -11,6 +11,7 @@ toc:
   - isUserSignedIn
   - signUserOut
   - makeAuthRequest
+  - generateAndStoreTransitKey
   - redirectToSignInWithAuthRequest
   - getAuthResponseToken
   - verifyAuthResponse
@@ -44,9 +45,3 @@ toc:
   - decryptContent
   - getAppBucketUrl
   - getUserAppFileUrl
-  - name: Blockchain
-    description: |
-      Generate and broadcast Blockstack blockchain transactions.
-  - broadcastTransaction
-  - broadcastNameRegistration
-  - broadcastZoneFile
