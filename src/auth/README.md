@@ -1,21 +1,4 @@
-# Blockstack Authentication
-
-Blockstack Authentication provides single sign on and authentication without third parties or remote servers.
-
-* [Overview](#overview)
-* [Quickstart](#quickstart)
-* [API Reference](http://blockstack.github.io/blockstack.js/index.html#authentication)
-* [User flow](#user-flow)
-* [Manifest file](#manifest-file)
-* [Key pairs](#key-pairs)
-* [Scopes](#scopes)
-* [Authentication tokens](#authentication-tokens)
-* [`blockstack:` custom protocol handler](#blockstack-custom-protocol-handler)
-* [Adding Blockstack Authentication to your app](#adding-blockstack-authentication-to-your-app)
-
-## Overview
-
-Blockstack Authentication is a bearer token-based authentication system. From an app user's perspective, it functions similar to legacy third-party authentication techniques that they're familiar with. For an app developer, the flow is a bit different from the typical client-server flow of centralized sign in services (e.g., OAuth). Rather, with Blockstack, the authentication flow happens entirely client-side.
+Blockstack Authentication provides single sign on and authentication without third parties or remote servers. Blockstack Authentication is a bearer token-based authentication system. From an app user's perspective, it functions similar to legacy third-party authentication techniques that they're familiar with. For an app developer, the flow is a bit different from the typical client-server flow of centralized sign in services (e.g., OAuth). Rather, with Blockstack, the authentication flow happens entirely client-side.
 
 ## Quickstart
 
@@ -144,7 +127,7 @@ The identity address private key is derived from the user's keychain phrase and 
 
 ### App private key
 
-The app private key is an app-specific private key that is generated from the user's identity address private key using the `domain_name` as input. It is deterministic in that for a given Blockstack ID and `domain_name`, the same private key will be generated each time. The app private key is securely shared with the app on each authentication, encrypted by the Blockstack browser with the transit public key.  
+The app private key is an app-specific private key that is generated from the user's identity address private key using the `domain_name` as input. It is deterministic in that for a given Blockstack ID and `domain_name`, the same private key will be generated each time. The app private key is securely shared with the app on each authentication, encrypted by the Blockstack browser with the transit public key.
 
 The app private key serves three functions.
 * It is used to create the credentials that give an app access to the gaia hub storage bucket for that specific app.
@@ -233,7 +216,7 @@ The way you can add Blockstack Authentication to you app depends on whether your
 
 This method is appropriate for decentralized client-side apps where the user's zone of trust - the parts of the app that the user is trusting - begins and ends with the code running on their own computer. In apps like these, any code the app interacts with that's not on their own computer such as external servers does not need to know who she is.
 
-[Blockstack.js](https://github.com/blockstack/blockstack.js) provides API methods that help you to implement Blockstack Authentication in your client-side app.  
+[Blockstack.js](https://github.com/blockstack/blockstack.js) provides API methods that help you to implement Blockstack Authentication in your client-side app.
 
 #### Standard flow
 The preferred way to implement authentication in these apps is to use the standard flow. This flow hides much of the process behind a few easy function calls and makes it very fast to get up and running.

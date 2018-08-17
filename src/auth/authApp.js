@@ -111,8 +111,7 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `generateAndStoreTransitKey`, `makeAuthRequest`,
- * and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
  *
  * @param {String} [redirectURI=`${window.location.origin}/`]
  * The location to which the identity provider will redirect the user after

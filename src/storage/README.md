@@ -1,11 +1,11 @@
-# Blockstack Storage
+> **Notes**:
 
-_Note: Blockstack Gaia Storage APIs and on-disk format will change in
+> 1) Blockstack Gaia Storage APIs and on-disk format will change in
 upcoming pre-releases breaking backward compatibility. File encryption is currently
-opt-in on a file by file basis._
+opt-in on a file by file basis.
 
-_Certain storage features such as and collections are not implemented in the current
-version. These features will be rolled out in future updates._
+>2) Certain storage features such as and collections are not implemented in the current
+version. These features will be rolled out in future updates.
 
 ## Creating a file
 
@@ -29,8 +29,8 @@ version. These features will be rolled out in future updates._
 ## Creating an encrypted file
 
 ```JavaScript
- let options = { 
-   encrypt: true 
+ let options = {
+   encrypt: true
  }
 
  blockstack.putFile("/message.txt", "Secret hello!", options)
@@ -42,8 +42,8 @@ version. These features will be rolled out in future updates._
 ## Reading an encrypted file
 
 ```JavaScript
- let options = { 
-   decrypt: true 
+ let options = {
+   decrypt: true
  }
 
  blockstack.getFile("/message.txt", options)
@@ -54,11 +54,11 @@ version. These features will be rolled out in future updates._
 ```
 
 ## Reading another user's unencrypted file
-In order for files to be publicly readable, the app must request 
+In order for files to be publicly readable, the app must request
 the `publish_data` scope during authentication.
 
 ```JavaScript
- let options = { 
+ let options = {
    user: 'ryan.id', // the Blockstack ID of the user for which to lookup the file
    app: 'http://BlockstackApp.com' // origin of the app this file is stored for
  }
