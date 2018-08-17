@@ -4,8 +4,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateAndStoreTransitKey = generateAndStoreTransitKey;
 exports.getTransitKey = getTransitKey;
+exports.generateAndStoreTransitKey = generateAndStoreTransitKey;
 exports.isUserSignedIn = isUserSignedIn;
 exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
 exports.redirectToSignIn = redirectToSignIn;
@@ -50,24 +50,25 @@ var DEFAULT_PROFILE = {
   '@context': 'http://schema.org'
 
   /**
-   * Generates a ECDSA keypair and stores the hex value of the private key in
-   * local storage.
+   * Fetches the hex value of the transit private key from local storage.
    * @return {String} the hex encoded private key
    * @private
    */
-};function generateAndStoreTransitKey() {
-  var transitKey = (0, _index2.makeECPrivateKey)();
-  localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
+};function getTransitKey() {
+  var transitKey = localStorage.getItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL);
   return transitKey;
 }
 
 /**
- * Fetches the hex value of the transit private key from local storage.
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * and stores the hex value of the private key in
+ * local storage.
  * @return {String} the hex encoded private key
- * @private
  */
-function getTransitKey() {
-  var transitKey = localStorage.getItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL);
+function generateAndStoreTransitKey() {
+  var transitKey = (0, _index2.makeECPrivateKey)();
+  localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
 }
 
@@ -961,7 +962,7 @@ function isManifestUriValid(token) {
  * Makes sure the `redirect_uri` is a same origin absolute URL.
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if valid, otherwise `false`
- * @private 
+ * @private
  */
 function isRedirectUriValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
@@ -2367,7 +2368,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
-     *  @private
+     * @private
      */
 
   }, {
@@ -2451,7 +2452,11 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
+    <<<<<<< HEAD
+     * @private
+    =======
      *  @private
+    >>>>>>> e63017c... Updates to the build
      */
 
   }, {
