@@ -294,6 +294,7 @@ export class BlockstackNetwork {
   *   with the transaction broadcast service
   * * `MissingParameterError` if you call the function without a required
   *   parameter
+  * @private
   */
   broadcastTransaction(transaction: string,
                        transactionToWatch: ?string = null,
@@ -346,6 +347,7 @@ export class BlockstackNetwork {
    *   with the transaction broadcast service
    * * `MissingParameterError` if you call the function without a required
    *   parameter
+   * @private
    */
   broadcastZoneFile(zoneFile: string,
                     transactionToWatch: ?string = null) {
@@ -428,6 +430,7 @@ export class BlockstackNetwork {
    *   with the transaction broadcast service
    * * `MissingParameterError` if you call the function without a required
    *   parameter
+   * @private
    */
   broadcastNameRegistration(preorderTransaction: string,
                             registerTransaction: string,

@@ -16,7 +16,9 @@ export {
   ecPairToAddress
 } from './utils'
 
-export { 
+export { BlockstackWallet, IdentityKeyPair } from './wallet'
+
+export {
   transactions, safety, TransactionSigner,
   PubkeyHashSigner, addUTXOsToFund, estimateTXBytes
 } from './operations'
@@ -26,3 +28,5 @@ export { network } from './network'
 export { decodeToken } from 'jsontokens'
 
 export { config } from './config'
+
+export { encryptMnemonic, decryptMnemonic } from './encryption'

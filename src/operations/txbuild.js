@@ -306,6 +306,7 @@ function estimateNamespacePreorder(namespaceID: string,
  *    fund the reveal.  This includes a 5500 satoshi dust output for the
  *    preorder.  Even though this is a change output, the payer must have
  *    enough funds to generate this output, so we include it in the cost.
+ * @private
  */
 function estimateNamespaceReveal(namespace: BlockstackNamespace,
                                  revealAddress: string,
@@ -330,6 +331,7 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
  *  be required from the reveal address
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this namespacey-ready transaction.
+ * @private
  */
 function estimateNamespaceReady(namespaceID: string,
                                 revealUtxos: number = 1) : Promise<number> {
@@ -353,6 +355,7 @@ function estimateNamespaceReady(namespaceID: string,
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this name-import transaction
+ * @private
  */
 function estimateNameImport(name: string,
                             recipientAddr: string,
@@ -376,6 +379,7 @@ function estimateNameImport(name: string,
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this announce transaction
+ * @private
  */
 function estimateAnnounce(messageHash: string,
                           senderUtxos: number = 1) : Promise<number> {

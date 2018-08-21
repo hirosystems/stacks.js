@@ -104,6 +104,7 @@ export function encryptPrivateKey(publicKey: string,
  * @param  {String} hexedEncrypted the ciphertext
  * @return {String}  the decrypted private key
  * @throws {Error} if unable to decrypt
+ * @private
  */
 export function decryptPrivateKey(privateKey: string,
                                   hexedEncrypted: string): string | null {
@@ -140,6 +141,7 @@ export function decryptPrivateKey(privateKey: string,
  * @param {String} blockstackAPIUrl URL to the API endpoint to use
  * @param {String} associationToken JWT that binds the app key to the identity key
  * @return {String} signed and encoded authentication response token
+ * @private
  */
 export function makeAuthResponse(privateKey: string,
                                  profile: {} = {},
