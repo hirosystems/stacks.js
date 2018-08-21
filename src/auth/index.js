@@ -1,4 +1,8 @@
 export {
+  AppConfig
+} from './appConfig'
+
+export {
   isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
   getAuthResponseToken, isSignInPending,
   handlePendingSignIn, loadUserData, signUserOut,
