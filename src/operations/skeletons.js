@@ -253,10 +253,9 @@ export function makeRegisterSkeleton(
   */
 
   let payload
-  const network = config.network
 
   if (!!burnTokenAmountHex && !valueHash) {
-    // empty value hash 
+    // empty value hash
     valueHash = '0000000000000000000000000000000000000000'
   }
 
@@ -371,7 +370,6 @@ export function makeTransferSkeleton(
     output 0: transfer code
     output 1: new owner
   */
-  const network = config.network
   const opRet = Buffer.alloc(36)
   let keepChar = '~'
   if (keepZonefile) {
@@ -416,7 +414,6 @@ export function makeUpdateSkeleton(
     output 0: update code
   */
 
-  const network = config.network
   const opRet = Buffer.alloc(39)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
@@ -457,7 +454,6 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
    output 0: the revoke code
   */
 
-  const network = config.network
   const opRet = Buffer.alloc(3)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
@@ -559,7 +555,6 @@ export function makeNamespaceRevealSkeleton(
    output 0: namespace reveal code
    output 1: reveal address
   */
-  const network = config.network
   const hexPayload = namespace.toHexPayload()
 
   const opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2)
@@ -587,7 +582,6 @@ export function makeNamespaceReadySkeleton(
 
    output 0: namespace ready code
    */
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
@@ -651,7 +645,6 @@ export function makeAnnounceSkeleton(messageHash: string) {
     throw new Error('Invalid message hash: must be 20 bytes hex-encoded')
   }
 
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
   opReturnBuffer.write('id#', 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex')
