@@ -674,7 +674,6 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
     throw new Error('Invalid scratch area: must be no more than 34 bytes')
   }
 
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(46 + scratchArea.length)
 
   const tokenTypeHex = new Buffer(tokenType).toString('hex')
