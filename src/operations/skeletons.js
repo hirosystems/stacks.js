@@ -233,7 +233,6 @@ export function makeRegisterSkeleton(
   */
 
   let payload
-  const network = config.network
   if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
@@ -314,7 +313,6 @@ export function makeTransferSkeleton(
     magic op keep  hash128(name.ns_id) consensus hash
              data?
   */
-  const network = config.network
   const opRet = Buffer.alloc(36)
   let keepChar = '~'
   if (keepZonefile) {
@@ -356,7 +354,6 @@ export function makeUpdateSkeleton(
     magic op  hash128(name.ns_id,consensus hash) hash160(data)
   */
 
-  const network = config.network
   const opRet = Buffer.alloc(39)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
@@ -395,7 +392,6 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
    magic op   name.ns_id (37 bytes)
   */
 
-  const network = config.network
   const opRet = Buffer.alloc(3)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
@@ -475,7 +471,6 @@ export function makeNamespaceRevealSkeleton(
                                                   bucket exponents        no-vowel
                                                                           discounts
   */
-  const network = config.network
   const hexPayload = namespace.toHexPayload()
 
   const opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2)
@@ -503,7 +498,6 @@ export function makeNamespaceReadySkeleton(
    magic op  .  ns_id
 
    */
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
@@ -565,7 +559,6 @@ export function makeAnnounceSkeleton(messageHash: string) {
     throw new Error('Invalid message hash: must be 20 bytes hex-encoded')
   }
 
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
   opReturnBuffer.write('id#', 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
