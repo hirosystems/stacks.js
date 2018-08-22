@@ -144,6 +144,11 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
   }
 }
 
+function makeTXbuilder() {
+  const txb = new bitcoin.TransactionBuilder(config.network.layer1)
+  txb.setVersion(1)
+  return txb
+}
 
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
@@ -189,7 +194,7 @@ export function makePreorderSkeleton(
   if (burnAmount.units !== 'BTC') {
     const burnHex = burnAmount.amount.toHex()
     if (burnHex.length > 16) {
-      // exceeds 2**64; can't fit 
+      // exceeds 2**64; can't fit
       throw new Error(`Cannot preorder '${fullyQualifiedName}': cannot fit price into 8 bytes`)
     }
     const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
@@ -199,7 +204,7 @@ export function makePreorderSkeleton(
   }
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
@@ -278,7 +283,7 @@ export function makeRegisterSkeleton(
 
   const opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload])
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(ownerAddress, DUST_MINIMUM)
@@ -309,7 +314,7 @@ export function makeRenewalSkeleton(
    With renewal payment in a token:
    (for register, tokens burned is not included)
    (for renew, tokens burned is the number of tokens to burn)
-    
+
    0    2  3                                  39                  59                            67
    |----|--|----------------------------------|-------------------|------------------------------|
    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (big-endian)
@@ -382,7 +387,7 @@ export function makeTransferSkeleton(
 
   const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(opRetPayload, 0)
   tx.addOutput(newOwner, DUST_MINIMUM)
@@ -427,7 +432,7 @@ export function makeUpdateSkeleton(
 
   const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(opRetPayload, 0)
 
@@ -461,7 +466,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
   const opReturnBuffer = Buffer.concat([opRet, nameBuff])
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
 
@@ -530,7 +535,7 @@ export function makeNamespacePreorderSkeleton(
   }
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
@@ -562,7 +567,7 @@ export function makeNamespaceRevealSkeleton(
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(revealAddress, DUST_MINIMUM)
@@ -588,7 +593,7 @@ export function makeNamespaceReadySkeleton(
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
 
@@ -619,7 +624,7 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
   const zonefileHashB58 = bitcoin.address.toBase58Check(
     new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash
   )
@@ -652,14 +657,15 @@ export function makeAnnounceSkeleton(messageHash: string) {
   opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   return tx.buildIncomplete()
 }
 
-export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string, 
-  tokenType: string, tokenAmount: BigInteger, scratchArea: string) {  // eslint-disable-line indent
+export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string,
+                                          tokenType: string, tokenAmount: BigInteger,
+                                          scratchArea: string) {
   /*
    Format:
 
@@ -677,17 +683,17 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
 
   const network = config.network
   const opReturnBuffer = Buffer.alloc(46 + scratchArea.length)
-  
+
   const tokenTypeHex = new Buffer(tokenType).toString('hex')
   const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
-  
+
   const tokenValueHex = tokenAmount.toHex()
 
   if (tokenValueHex.length > 16) {
-    // exceeds 2**64; can't fit 
+    // exceeds 2**64; can't fit
     throw new Error(`Cannot send tokens: cannot fit ${tokenAmount.toString()} into 8 bytes`)
   }
-  
+
   const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
 
   opReturnBuffer.write('id$', 0, 3, 'ascii')
@@ -697,7 +703,7 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
   opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(recipientAddress, DUST_MINIMUM)
