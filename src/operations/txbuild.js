@@ -56,9 +56,9 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
 function returnTransactionHex(txB: bitcoinjs.TransactionBuilder,
                               buildIncomplete?: boolean = false) {
   if (buildIncomplete) {
-    return txB.build().toHex()
-  } else {
     return txB.buildIncomplete().toHex()
+  } else {
+    return txB.build().toHex()
   }
 }
 
