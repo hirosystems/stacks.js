@@ -17,6 +17,8 @@ import { lookupProfile } from '../profiles'
 import { SignatureVerificationError } from '../errors'
 import { Logger } from '../logger'
 
+import type { Blockstack } from '../api'
+
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
 /**
@@ -56,17 +58,21 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 
 /**
  * Encrypts the data provided with the app public key.
+ * @param {Blockstack} caller - the instance calling this method
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPrivateKey.
  * @return {String} Stringified ciphertext object
+ * @private
  */
-export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
+export function encryptContentImpl(caller: Blockstack,
+                                   content: string | Buffer,
+                                   options?: {publicKey?: string}) {
   const defaults = { publicKey: null }
   const opt = Object.assign({}, defaults, options)
   if (!opt.publicKey) {
-    const privateKey = loadUserData().appPrivateKey
+    const privateKey = caller.loadUserData().appPrivateKey
     opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
 
@@ -77,18 +83,22 @@ export function encryptContent(content: string | Buffer, options?: {publicKey?: 
 /**
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
+ * @param {Blockstack} caller - the instance calling this method
  * @param {String|Buffer} content - encrypted content.
  * @param {Object} [options=null] - options object
  * @param {String} options.privateKey - the hex string of the ECDSA private
  * key to use for decryption. If not provided, will use user's appPrivateKey.
  * @return {String|Buffer} decrypted content.
+ * @private
  */
-export function decryptContent(content: string, options?: {privateKey?: ?string}) {
+export function decryptContentImpl(caller: Blockstack,
+                                   content: string,
+                                   options?: {privateKey?: ?string}) {
   const defaults = { privateKey: null }
   const opt = Object.assign({}, defaults, options)
   let privateKey = opt.privateKey
   if (!privateKey) {
-    privateKey = loadUserData().appPrivateKey
+    privateKey = caller.loadUserData().appPrivateKey
   }
 
   try {

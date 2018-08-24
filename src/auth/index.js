@@ -3,13 +3,12 @@ export {
 } from './appConfig'
 
 export {
-  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
-  getAuthResponseToken, isSignInPending,
-  handlePendingSignIn, loadUserData, signUserOut,
-  generateAndStoreTransitKey, getTransitKey
+  isUserSignedIn,
+  signUserOut,
+  getTransitKey
 } from './authApp'
 export {
-  makeAuthRequest, makeAuthResponse
+  makeAuthResponse
 } from './authMessages'
 export {
   getAuthRequestFromURL, fetchAppManifest, redirectUserToApp

@@ -21,7 +21,9 @@ import {
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
   handlePendingSignIn,
-  signUserOut
+  signUserOut,
+  Blockstack,
+  AppConfig
 } from '../../../lib'
 
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
@@ -38,13 +40,10 @@ export function runAuthTests() {
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(15)
 
-    global.window.location = {
-      origin: 'http://localhost:3000',
-      hostname: 'localhost',
-      host: 'localhost:3000',
-      href: 'http://localhost:3000/signin'
-    }
-    const authRequest = makeAuthRequest(privateKey)
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
+
+    const authRequest = blockstack.makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
     console.log(authRequest)
 
@@ -104,7 +103,10 @@ export function runAuthTests() {
   test('invalid auth request - signature not verified', (t) => {
     t.plan(3)
 
-    const authRequest = makeAuthRequest(privateKey, 'http://localhost:3000')
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
+
+    const authRequest = blockstack.makeAuthRequest(privateKey)
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
 
     t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false,
@@ -126,9 +128,12 @@ export function runAuthTests() {
 
   test('invalid auth request - invalid redirect uri', (t) => {
     t.plan(3)
+    const appConfig = new AppConfig('http://localhost:3000')
+    appConfig.redirectURI = () => 'https://example.com' // monkey patch for test
+    const blockstack = new Blockstack(appConfig)
 
-    const invalidAuthRequest = makeAuthRequest(privateKey, 'https://example.com')
-
+    const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
+    console.log(invalidAuthRequest)
     t.equal(isRedirectUriValid(invalidAuthRequest), false,
             'Redirect URI should be invalid since it does not match origin')
 
@@ -149,7 +154,10 @@ export function runAuthTests() {
   test('invalid auth request - invalid manifest uri', (t) => {
     t.plan(2)
 
-    const invalidAuthRequest = makeAuthRequest(privateKey, 'http://localhost:3000', 'https://example.com/manifest.json')
+    const appConfig = new AppConfig('http://localhost:3000')
+    appConfig.manifestURI = () => 'https://example.com/manifest.json' // monkey patch for test
+    const blockstack = new Blockstack(appConfig)
+    const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
 
     t.equal(isManifestUriValid(invalidAuthRequest), false,
             'Manifest URI should be invalid since it does not match origin')

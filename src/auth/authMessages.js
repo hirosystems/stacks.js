@@ -7,15 +7,14 @@ import {
 } from 'jsontokens'
 
 import {
-  makeDIDFromAddress, generateAndStoreTransitKey, makeUUID4,
-  nextMonth, nextHour, publicKeyToAddress
+  makeDIDFromAddress, makeUUID4,
+  nextMonth, nextHour, publicKeyToAddress,
+  makeECPrivateKey
 } from '../index'
 
-import {
-  DEFAULT_SCOPE
-} from './authConstants'
-
 import { encryptECIES, decryptECIES } from '../encryption'
+
+import type { BlockstackSession } from '../session'
 
 import { Logger } from '../logger'
 
@@ -24,6 +23,18 @@ const VERSION = '1.2.0'
 type AuthMetadata = {
   email: ?string,
   profileUrl: ?string
+}
+
+/**
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * @param {BlockstackSession} session - session object in which key will be stored
+ * @return {String} the hex encoded private key
+ * @private
+ */
+export function generateTransitKey() {
+  const transitKey = makeECPrivateKey()
+  return transitKey
 }
 
 /**
@@ -36,21 +47,21 @@ type AuthMetadata = {
  * flow. Typically you'd use `redirectToSignIn` which takes care of this
  * under the hood.*
  *
- * @param  {String} [transitPrivateKey=generateAndStoreTransitKey()] - hex encoded transit
- *   private key
+ * @param  {String} transitPrivateKey - hex encoded transit private key
  * @param {String} redirectURI - location to redirect user to after sign in approval
  * @param {String} manifestURI - location of this app's manifest file
  * @param {Array<String>} scopes - the permissions this app is requesting
  * @param {String} appDomain - the origin of this app
  * @param {Number} expiresAt - the time at which this request is no longer valid
  * @return {String} the authentication request
+ * @private
  */
-export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTransitKey(),
-                                redirectURI: string = `${window.location.origin}/`,
-                                manifestURI: string = `${window.location.origin}/manifest.json`,
-                                scopes: Array<String> = DEFAULT_SCOPE,
-                                appDomain: string = window.location.origin,
-                                expiresAt: number = nextHour().getTime()): string {
+export function makeAuthRequestImpl(transitPrivateKey: string,
+                                    redirectURI: string,
+                                    manifestURI: string,
+                                    scopes: Array<String>,
+                                    appDomain: string = window.location.origin,
+                                    expiresAt: number): string {
   /* Create the payload */
   const payload = {
     jti: makeUUID4(),

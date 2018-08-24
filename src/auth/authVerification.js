@@ -2,8 +2,12 @@
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import {
   getAddressFromDID, publicKeyToAddress,
-  isSameOriginAbsoluteUrl, fetchAppManifest
+  isSameOriginAbsoluteUrl
 } from '../index'
+
+import {
+  fetchAppManifest
+} from '.'
 
 /**
  * Checks if the ES256k signature on passed `token` match the claimed public key

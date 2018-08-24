@@ -19,7 +19,7 @@ export class AppConfig {
 
   constructor(appDomain: string,
               scopes: Array<string> = DEFAULT_SCOPE.slice(),
-              redirectPath: string = '/redirect',
+              redirectPath: string = '/',
               manifestPath: string = '/manifest.json',
               coreNode: ?string = null) {
     this.appDomain = appDomain
@@ -32,5 +32,13 @@ export class AppConfig {
     } else {
       this.coreNode = coreNode
     }
+  }
+
+  redirectURI() : string {
+    return `${this.appDomain}${this.redirectPath}`
+  }
+
+  manifestURI() : string {
+    return `${this.appDomain}${this.manifestPath}`
   }
 }

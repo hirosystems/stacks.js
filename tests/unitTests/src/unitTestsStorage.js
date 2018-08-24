@@ -12,6 +12,8 @@ import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
 import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 import { getPublicKeyFromPrivate } from '../../../lib/keys'
 
+import { Blockstack, AppConfig } from '../../../lib'
+
 class LocalStorage {
   constructor() {
     this.data = {}
@@ -228,28 +230,29 @@ export function runStorageTests() {
   test('encrypt & decrypt content', (t) => {
     t.plan(2)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const userData = JSON.stringify({ appPrivateKey: privateKey })
-    // save any previous content
-    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
-    // simulate fake user signed in
-    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, userData)
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
+    blockstack.session.userData = {
+      appPrivateKey: privateKey
+    } // manually set private key for testing
+
     const content = 'yellowsubmarine'
-    const ciphertext = encryptContent(content)
+    const ciphertext = blockstack.encryptContent(content)
     t.ok(ciphertext)
-    const deciphered = decryptContent(ciphertext)
+    const deciphered = blockstack.decryptContent(ciphertext)
     t.equal(content, deciphered)
-    // put back whatever was inside before
-    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
   })
 
   test('encrypt & decrypt content -- specify key', (t) => {
     t.plan(2)
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
     const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const content = 'we-all-live-in-a-yellow-submarine'
-    const ciphertext = encryptContent(content, { publicKey })
+    const ciphertext = blockstack.encryptContent(content, { publicKey })
     t.ok(ciphertext)
-    const deciphered = decryptContent(ciphertext, { privateKey })
+    const deciphered = blockstack.decryptContent(ciphertext, { privateKey })
     t.equal(content, deciphered)
   })
 
@@ -284,12 +287,9 @@ export function runStorageTests() {
 
   test('putFile & getFile encrypted, not signed', (t) => {
     t.plan(2)
-    // save any previous content
-    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
+
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const userData = JSON.stringify({ appPrivateKey: privateKey })
-    // simulate fake user signed in
-    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, userData)
 
     const path = 'file.json'
     const gaiaHubConfig = {
@@ -325,7 +325,6 @@ export function runStorageTests() {
         getFile(path, decryptOptions).then((readContent) => {
           t.equal(readContent, fileContent)
           // put back whatever was inside before
-          window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
         })
       })
   })

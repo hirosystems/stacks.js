@@ -4,13 +4,13 @@ import type { GaiaHubConfig } from './storage/hub'
 
 const SESSION_VERSION = '1.0.0'
 
-type BlockstackSessionOptions = {
-  appPrivateKey: ?string,
-  username: string,
-  identityAddress: string,
-  coreNode: ?string,
-  hubUrl: string,
-  appConfig: ?AppConfig
+export type BlockstackSessionOptions = {
+  appPrivateKey?: string,
+  username?: string,
+  identityAddress?: string,
+  coreNode?: string,
+  hubUrl?: string,
+  appConfig?: AppConfig
 }
 
 export class BlockstackSession {
@@ -29,6 +29,10 @@ export class BlockstackSession {
   transitKey: ?string
 
   identityAddress: ?string
+
+  // using this in place of
+  // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+  userData: ?any
 
 
   /**
