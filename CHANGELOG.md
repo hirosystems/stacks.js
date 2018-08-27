@@ -25,8 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   code. First, coerce address now correctly coerces P2SH
   addresses. Second, bitcoinjs-lib recently switched to defaulting to
   version 2 transactions, which breaks our interoperability with a handful
-  of other libraries. Finally, with comes a little bit of refactoring, to
-  reduce the repeated code in the transaction libraries.
+  of other libraries. Finally, with this comes a little bit of refactoring,
+  to reduce the repeated code in the transaction libraries.
 
 ## [18.0.4] - 2018-08-06
 
