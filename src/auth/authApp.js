@@ -27,18 +27,6 @@ const DEFAULT_PROFILE = {
 }
 
 /**
- * Generates a ECDSA keypair and stores the hex value of the private key in
- * local storage.
- * @return {String} the hex encoded private key
- * @private
- */
-export function generateAndStoreTransitKey() {
-  const transitKey = makeECPrivateKey()
-  localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
-  return transitKey
-}
-
-/**
  * Fetches the hex value of the transit private key from local storage.
  * @return {String} the hex encoded private key
  * @private
@@ -46,6 +34,19 @@ export function generateAndStoreTransitKey() {
 export function getTransitKey() : string {
   const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
   return ((transitKey: any): string)
+}
+
+/**
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * and stores the hex value of the private key in
+ * local storage.
+ * @return {String} the hex encoded private key
+ */
+export function generateAndStoreTransitKey() {
+  const transitKey = makeECPrivateKey()
+  localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
+  return transitKey
 }
 
 /**
@@ -73,6 +74,14 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
                                                 DEFAULT_BLOCKSTACK_HOST) {
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
+
+  // If they're on a mobile OS, always redirect them to HTTPS site
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    Logger.info('detected mobile OS, sending to https')
+    window.location = httpsURI
+    return
+  }
+
   function successCallback() {
     Logger.info('protocol handler detected')
     // protocolCheck should open the link for us
@@ -84,15 +93,9 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   }
 
   function unsupportedBrowserCallback() {
-    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
-      // iOS doesn’t do protocols (yet)
-      Logger.warn('platform does not support custom protocols, sending to https')
-      window.location = httpsURI
-    } else {
-      // Safari is unsupported by protocolCheck
-      Logger.warn('can not detect custom protocols on this browser')
-      window.location = protocolURI
-    }
+    // Safari is unsupported by protocolCheck
+    Logger.warn('can not detect custom protocols on this browser')
+    window.location = protocolURI
   }
 
   protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)

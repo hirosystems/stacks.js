@@ -4,8 +4,8 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.generateAndStoreTransitKey = generateAndStoreTransitKey;
 exports.getTransitKey = getTransitKey;
+exports.generateAndStoreTransitKey = generateAndStoreTransitKey;
 exports.isUserSignedIn = isUserSignedIn;
 exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
 exports.redirectToSignIn = redirectToSignIn;
@@ -50,24 +50,25 @@ var DEFAULT_PROFILE = {
   '@context': 'http://schema.org'
 
   /**
-   * Generates a ECDSA keypair and stores the hex value of the private key in
-   * local storage.
+   * Fetches the hex value of the transit private key from local storage.
    * @return {String} the hex encoded private key
    * @private
    */
-};function generateAndStoreTransitKey() {
-  var transitKey = (0, _index2.makeECPrivateKey)();
-  localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
+};function getTransitKey() {
+  var transitKey = localStorage.getItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL);
   return transitKey;
 }
 
 /**
- * Fetches the hex value of the transit private key from local storage.
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * and stores the hex value of the private key in
+ * local storage.
  * @return {String} the hex encoded private key
- * @private
  */
-function getTransitKey() {
-  var transitKey = localStorage.getItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL);
+function generateAndStoreTransitKey() {
+  var transitKey = (0, _index2.makeECPrivateKey)();
+  localStorage.setItem(_authConstants.BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey);
   return transitKey;
 }
 
@@ -97,6 +98,14 @@ function redirectToSignInWithAuthRequest() {
 
   var protocolURI = _utils.BLOCKSTACK_HANDLER + ':' + authRequest;
   var httpsURI = blockstackIDHost + '?authRequest=' + authRequest;
+
+  // If they're on a mobile OS, always redirect them to HTTPS site
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    _logger.Logger.info('detected mobile OS, sending to https');
+    window.location = httpsURI;
+    return;
+  }
+
   function successCallback() {
     _logger.Logger.info('protocol handler detected');
     // protocolCheck should open the link for us
@@ -108,15 +117,9 @@ function redirectToSignInWithAuthRequest() {
   }
 
   function unsupportedBrowserCallback() {
-    if (/iPad|iPhone|iPod/.test(navigator.platform)) {
-      // iOS doesn’t do protocols (yet)
-      _logger.Logger.warn('platform does not support custom protocols, sending to https');
-      window.location = httpsURI;
-    } else {
-      // Safari is unsupported by protocolCheck
-      _logger.Logger.warn('can not detect custom protocols on this browser');
-      window.location = protocolURI;
-    }
+    // Safari is unsupported by protocolCheck
+    _logger.Logger.warn('can not detect custom protocols on this browser');
+    window.location = protocolURI;
   }
 
   (0, _customProtocolDetectionBlockstack2.default)(protocolURI, failCallback, successCallback, unsupportedBrowserCallback);
@@ -287,7 +290,7 @@ function signUserOut() {
     window.location = redirectURL;
   }
 }
-},{"../errors":11,"../index":12,"../logger":14,"../profiles":22,"../storage":45,"../utils":46,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":281,"jsontokens":367,"query-string":426}],2:[function(require,module,exports){
+},{"../errors":11,"../index":12,"../logger":14,"../profiles":22,"../storage":45,"../utils":46,"./authConstants":2,"./authMessages":3,"./index":7,"custom-protocol-detection-blockstack":292,"jsontokens":384,"query-string":450}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -404,6 +407,7 @@ function encryptPrivateKey(publicKey, privateKey) {
  * @param  {String} hexedEncrypted the ciphertext
  * @return {String}  the decrypted private key
  * @throws {Error} if unable to decrypt
+ * @private
  */
 function decryptPrivateKey(privateKey, hexedEncrypted) {
   var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
@@ -437,6 +441,7 @@ function decryptPrivateKey(privateKey, hexedEncrypted) {
  * in its authentication request with which secrets will be encrypted
  * @param {String} hubUrl URL to the write path of the user's Gaia hub
  * @return {String} signed and encoded authentication response token
+ * @private
  */
 function makeAuthResponse(privateKey) {
   var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -492,7 +497,7 @@ function makeAuthResponse(privateKey) {
   return tokenSigner.sign(payload);
 }
 }).call(this,require("buffer").Buffer)
-},{"../encryption":10,"../index":12,"../logger":14,"./authConstants":2,"buffer":168,"cross-fetch/polyfill":272,"jsontokens":367}],4:[function(require,module,exports){
+},{"../encryption":10,"../index":12,"../logger":14,"./authConstants":2,"buffer":179,"cross-fetch/polyfill":283,"jsontokens":384}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -589,7 +594,7 @@ function redirectUserToApp(authRequest, authResponse) {
   }
   window.location = redirectURI;
 }
-},{"../index":12,"../logger":14,"../utils":46,"jsontokens":367,"query-string":426}],5:[function(require,module,exports){
+},{"../index":12,"../logger":14,"../utils":46,"jsontokens":384,"query-string":450}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -752,7 +757,7 @@ function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
 
   return sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword);
 }
-},{"cross-fetch/polyfill":272,"jsontokens":367}],6:[function(require,module,exports){
+},{"cross-fetch/polyfill":283,"jsontokens":384}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -922,6 +927,7 @@ function isIssuanceDateValid(token) {
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if the `token` has not yet expired, `false`
  * if the `token` has expired
+ * @private
  */
 function isExpirationDateValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
@@ -955,6 +961,7 @@ function isManifestUriValid(token) {
  * Makes sure the `redirect_uri` is a same origin absolute URL.
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if valid, otherwise `false`
+ * @private
  */
 function isRedirectUriValid(token) {
   var payload = (0, _jsontokens.decodeToken)(token).payload;
@@ -1035,7 +1042,7 @@ function verifyAuthResponse(token, nameLookupURL) {
     });
   });
 }
-},{"../index":12,"jsontokens":367}],7:[function(require,module,exports){
+},{"../index":12,"jsontokens":384}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1320,6 +1327,8 @@ exports.encryptECIES = encryptECIES;
 exports.decryptECIES = decryptECIES;
 exports.signECDSA = signECDSA;
 exports.verifyECDSA = verifyECDSA;
+exports.encryptMnemonic = encryptMnemonic;
+exports.decryptMnemonic = decryptMnemonic;
 
 var _elliptic = require('elliptic');
 
@@ -1327,11 +1336,25 @@ var _crypto = require('crypto');
 
 var _crypto2 = _interopRequireDefault(_crypto);
 
+var _bip = require('bip39');
+
+var _bip2 = _interopRequireDefault(_bip);
+
+var _triplesec = require('triplesec');
+
+var _triplesec2 = _interopRequireDefault(_triplesec);
+
 var _errors = require('./errors');
 
 var _keys = require('./keys');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ecurve = new _elliptic.ec('secp256k1');
 
@@ -1386,13 +1409,13 @@ function getHexFromBN(bnInput) {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @private
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
  * @return {Object} Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
+ *  @private
  */
 function encryptECIES(publicKey, content) {
   var isString = typeof content === 'string';
@@ -1425,7 +1448,6 @@ function encryptECIES(publicKey, content) {
 
 /**
  * Decrypt content encrypted using ECIES
- * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
@@ -1433,6 +1455,7 @@ function encryptECIES(publicKey, content) {
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  * @return {Buffer} plaintext
  * @throws {FailedDecryptionError} if unable to decrypt
+ * @private
  */
 function decryptECIES(privateKey, cipherObject) {
   var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
@@ -1469,11 +1492,13 @@ function decryptECIES(privateKey, cipherObject) {
 
 /**
  * Sign content using ECDSA
+ * @private
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} content - content to sign
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
+ * @private
  */
 function signECDSA(privateKey, content) {
   var contentBuffer = Buffer.from(content);
@@ -1495,6 +1520,7 @@ function signECDSA(privateKey, content) {
  * @param {String} publicKey - secp256k1 private key hex string
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @private
  */
 function verifyECDSA(content, publicKey, signature) {
   var contentBuffer = Buffer.from(content);
@@ -1503,8 +1529,141 @@ function verifyECDSA(content, publicKey, signature) {
 
   return ecPublic.verify(contentHash, signature);
 }
+
+/**
+ * Encrypt a raw mnemonic phrase to be password protected
+ * @param {string} phrase - Raw mnemonic phrase
+ * @param {string} password - Password to encrypt mnemonic with
+ * @return {Promise<Buffer>} The encrypted phrase
+ * @private
+ */
+function encryptMnemonic(phrase, password) {
+  return Promise.resolve().then(function () {
+    // must be bip39 mnemonic
+    if (!_bip2.default.validateMnemonic(phrase)) {
+      throw new Error('Not a valid bip39 nmemonic');
+    }
+
+    // normalize plaintext to fixed length byte string
+    var plaintextNormalized = Buffer.from(_bip2.default.mnemonicToEntropy(phrase).toString('hex'), 'hex');
+
+    // AES-128-CBC with SHA256 HMAC
+    var salt = _crypto2.default.randomBytes(16);
+    var keysAndIV = _crypto2.default.pbkdf2Sync(password, salt, 100000, 48, 'sha512');
+    var encKey = keysAndIV.slice(0, 16);
+    var macKey = keysAndIV.slice(16, 32);
+    var iv = keysAndIV.slice(32, 48);
+
+    var cipher = _crypto2.default.createCipheriv('aes-128-cbc', encKey, iv);
+    var cipherText = cipher.update(plaintextNormalized).toString('hex');
+    cipherText += cipher.final().toString('hex');
+
+    var hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')]);
+
+    var hmac = _crypto2.default.createHmac('sha256', macKey);
+    hmac.write(hmacPayload);
+    var hmacDigest = hmac.digest();
+
+    var payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')]);
+    return payload;
+  });
+}
+
+// Used to distinguish bad password during decrypt vs invalid format
+
+var PasswordError = function (_Error) {
+  _inherits(PasswordError, _Error);
+
+  function PasswordError() {
+    _classCallCheck(this, PasswordError);
+
+    return _possibleConstructorReturn(this, (PasswordError.__proto__ || Object.getPrototypeOf(PasswordError)).apply(this, arguments));
+  }
+
+  return PasswordError;
+}(Error);
+
+function decryptMnemonicBuffer(dataBuffer, password) {
+  return Promise.resolve().then(function () {
+    var salt = dataBuffer.slice(0, 16);
+    var hmacSig = dataBuffer.slice(16, 48); // 32 bytes
+    var cipherText = dataBuffer.slice(48);
+    var hmacPayload = Buffer.concat([salt, cipherText]);
+
+    var keysAndIV = _crypto2.default.pbkdf2Sync(password, salt, 100000, 48, 'sha512');
+    var encKey = keysAndIV.slice(0, 16);
+    var macKey = keysAndIV.slice(16, 32);
+    var iv = keysAndIV.slice(32, 48);
+
+    var decipher = _crypto2.default.createDecipheriv('aes-128-cbc', encKey, iv);
+    var plaintext = decipher.update(cipherText).toString('hex');
+    plaintext += decipher.final().toString('hex');
+
+    var hmac = _crypto2.default.createHmac('sha256', macKey);
+    hmac.write(hmacPayload);
+    var hmacDigest = hmac.digest();
+
+    // hash both hmacSig and hmacDigest so string comparison time
+    // is uncorrelated to the ciphertext
+    var hmacSigHash = _crypto2.default.createHash('sha256').update(hmacSig).digest().toString('hex');
+
+    var hmacDigestHash = _crypto2.default.createHash('sha256').update(hmacDigest).digest().toString('hex');
+
+    if (hmacSigHash !== hmacDigestHash) {
+      // not authentic
+      throw new PasswordError('Wrong password (HMAC mismatch)');
+    }
+
+    var mnemonic = _bip2.default.entropyToMnemonic(plaintext);
+    if (!_bip2.default.validateMnemonic(mnemonic)) {
+      throw new PasswordError('Wrong password (invalid plaintext)');
+    }
+
+    return mnemonic;
+  });
+}
+
+/**
+ * Decrypt legacy triplesec keys
+ * @param {Buffer} dataBuffer - The encrypted key
+ * @param {String} password - Password for data
+ * @return {Promise<Buffer>} Decrypted seed
+ * @private
+ */
+function decryptLegacy(dataBuffer, password) {
+  return new Promise(function (resolve, reject) {
+    _triplesec2.default.decrypt({
+      key: Buffer.from(password),
+      data: dataBuffer
+    }, function (err, plaintextBuffer) {
+      if (!err) {
+        resolve(plaintextBuffer);
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+
+/**
+ * Encrypt a raw mnemonic phrase with a password
+ * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
+ * @param {string} password - Password for data
+ * @return {Promise<Buffer>} the raw mnemonic phrase
+ * @private
+ */
+function decryptMnemonic(data, password) {
+  var dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex');
+  return decryptMnemonicBuffer(dataBuffer, password).catch(function (err) {
+    // If it was a password error, don't even bother with legacy
+    if (err instanceof PasswordError) {
+      throw err;
+    }
+    return decryptLegacy(dataBuffer, password);
+  });
+}
 }).call(this,require("buffer").Buffer)
-},{"./errors":11,"./keys":13,"buffer":168,"crypto":177,"elliptic":295}],11:[function(require,module,exports){
+},{"./errors":11,"./keys":13,"bip39":74,"buffer":179,"crypto":188,"elliptic":306,"triplesec":478}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1886,6 +2045,21 @@ Object.defineProperty(exports, 'ecPairToAddress', {
   }
 });
 
+var _wallet = require('./wallet');
+
+Object.defineProperty(exports, 'BlockstackWallet', {
+  enumerable: true,
+  get: function get() {
+    return _wallet.BlockstackWallet;
+  }
+});
+Object.defineProperty(exports, 'IdentityKeyPair', {
+  enumerable: true,
+  get: function get() {
+    return _wallet.IdentityKeyPair;
+  }
+});
+
 var _operations = require('./operations');
 
 Object.defineProperty(exports, 'transactions', {
@@ -1927,7 +2101,22 @@ Object.defineProperty(exports, 'config', {
     return _config.config;
   }
 });
-},{"./auth":7,"./config":8,"./dids":9,"./keys":13,"./network":15,"./operations":16,"./profiles":22,"./storage":45,"./utils":46,"jsontokens":367}],13:[function(require,module,exports){
+
+var _encryption = require('./encryption');
+
+Object.defineProperty(exports, 'encryptMnemonic', {
+  enumerable: true,
+  get: function get() {
+    return _encryption.encryptMnemonic;
+  }
+});
+Object.defineProperty(exports, 'decryptMnemonic', {
+  enumerable: true,
+  get: function get() {
+    return _encryption.decryptMnemonic;
+  }
+});
+},{"./auth":7,"./config":8,"./dids":9,"./encryption":10,"./keys":13,"./network":15,"./operations":16,"./profiles":22,"./storage":45,"./utils":46,"./wallet":47,"jsontokens":384}],13:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -1956,18 +2145,18 @@ function makeECPrivateKey() {
 }
 
 function publicKeyToAddress(publicKey) {
-  var publicKeyBuffer = new Buffer(publicKey, 'hex');
+  var publicKeyBuffer = Buffer.from(publicKey, 'hex');
   var publicKeyHash160 = _bitcoinjsLib.crypto.hash160(publicKeyBuffer);
   var address = _bitcoinjsLib.address.toBase58Check(publicKeyHash160, 0x00);
   return address;
 }
 
 function getPublicKeyFromPrivate(privateKey) {
-  var keyPair = _bitcoinjsLib.ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'));
+  var keyPair = _bitcoinjsLib.ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'));
   return keyPair.publicKey.toString('hex');
 }
 }).call(this,require("buffer").Buffer)
-},{"bitcoinjs-lib":81,"buffer":168,"crypto":177}],14:[function(require,module,exports){
+},{"bitcoinjs-lib":92,"buffer":179,"crypto":188}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2342,6 +2531,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
     *   with the transaction broadcast service
     * * `MissingParameterError` if you call the function without a required
     *   parameter
+    * @private
     */
 
   }, {
@@ -2398,6 +2588,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
+     * @private
      */
 
   }, {
@@ -2481,6 +2672,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
+     * @private
      */
 
   }, {
@@ -2986,7 +3178,7 @@ var network = exports.network = {
   defaults: { LOCAL_REGTEST: LOCAL_REGTEST, MAINNET_DEFAULT: MAINNET_DEFAULT }
 };
 }).call(this,require("buffer").Buffer)
-},{"./errors":11,"./logger":14,"bitcoinjs-lib":81,"buffer":168,"form-data":337}],16:[function(require,module,exports){
+},{"./errors":11,"./logger":14,"bitcoinjs-lib":92,"buffer":179,"form-data":348}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3220,6 +3412,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * Class representing a transaction signer for pubkeyhash addresses
  * (a.k.a. single-sig addresses)
+ * @private
  */
 var PubkeyHashSigner = exports.PubkeyHashSigner = function () {
   function PubkeyHashSigner(ecPair) {
@@ -3260,7 +3453,7 @@ var PubkeyHashSigner = exports.PubkeyHashSigner = function () {
 
   return PubkeyHashSigner;
 }();
-},{"../utils":46,"bitcoinjs-lib":81}],19:[function(require,module,exports){
+},{"../utils":46,"bitcoinjs-lib":92}],19:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -3810,7 +4003,7 @@ function makeAnnounceSkeleton(messageHash) {
   return tx.buildIncomplete();
 }
 }).call(this,require("buffer").Buffer)
-},{"../config":8,"./utils":21,"bigi":68,"bitcoinjs-lib":81,"buffer":168}],20:[function(require,module,exports){
+},{"../config":8,"./utils":21,"bigi":70,"bitcoinjs-lib":92,"buffer":179}],20:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -4114,6 +4307,7 @@ function estimateNamespacePreorder(namespaceID, revealAddress, paymentAddress) {
  *    fund the reveal.  This includes a 5500 satoshi dust output for the
  *    preorder.  Even though this is a change output, the payer must have
  *    enough funds to generate this output, so we include it in the cost.
+ * @private
  */
 function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
   var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
@@ -4136,6 +4330,7 @@ function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
  *  be required from the reveal address
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this namespacey-ready transaction.
+ * @private
  */
 function estimateNamespaceReady(namespaceID) {
   var revealUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -4159,6 +4354,7 @@ function estimateNamespaceReady(namespaceID) {
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this name-import transaction
+ * @private
  */
 function estimateNameImport(name, recipientAddr, zonefileHash) {
   var importUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
@@ -4180,6 +4376,7 @@ function estimateNameImport(name, recipientAddr, zonefileHash) {
  *  be required from the importer address
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this announce transaction
+ * @private
  */
 function estimateAnnounce(messageHash) {
   var senderUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
@@ -5094,7 +5291,7 @@ var transactions = exports.transactions = {
   estimateAnnounce: estimateAnnounce
 };
 }).call(this,require("buffer").Buffer)
-},{"../config":8,"../errors":11,"./signers":18,"./skeletons":19,"./utils":21,"bitcoinjs-lib":81,"buffer":168}],21:[function(require,module,exports){
+},{"../config":8,"../errors":11,"./signers":18,"./skeletons":19,"./utils":21,"bitcoinjs-lib":92,"buffer":179}],21:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -5288,7 +5485,7 @@ function addUTXOsToFund(txBuilderIn, utxos, amountToFund, feeRate) {
   }
 }
 }).call(this,require("buffer").Buffer)
-},{"../errors":11,"bigi":68,"bitcoinjs-lib":81,"buffer":168,"ripemd160":430}],22:[function(require,module,exports){
+},{"../errors":11,"bigi":70,"bitcoinjs-lib":92,"buffer":179,"ripemd160":456}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5500,7 +5697,7 @@ var Profile = exports.Profile = function () {
 
   return Profile;
 }();
-},{"./profileProofs":25,"./profileTokens":33,"./profileZoneFiles":34,"schema-inspector":432}],24:[function(require,module,exports){
+},{"./profileProofs":25,"./profileTokens":33,"./profileZoneFiles":34,"schema-inspector":458}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5674,7 +5871,7 @@ var CreativeWork = exports.CreativeWork = function (_Profile) {
 
   return CreativeWork;
 }(_profile.Profile);
-},{"../profile":23,"../profileTokens":33,"schema-inspector":432}],27:[function(require,module,exports){
+},{"../profile":23,"../profileTokens":33,"schema-inspector":458}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5796,7 +5993,7 @@ var Organization = exports.Organization = function (_Profile) {
 
   return Organization;
 }(_profile.Profile);
-},{"../profile":23,"../profileTokens":33,"schema-inspector":432}],29:[function(require,module,exports){
+},{"../profile":23,"../profileTokens":33,"schema-inspector":458}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6028,7 +6225,7 @@ var Person = exports.Person = function (_Profile) {
 
   return Person;
 }(_profile.Profile);
-},{"../profile":23,"../profileTokens":33,"./personLegacy":30,"./personUtils":31,"schema-inspector":432}],30:[function(require,module,exports){
+},{"../profile":23,"../profileTokens":33,"./personLegacy":30,"./personUtils":31,"schema-inspector":458}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6413,7 +6610,7 @@ function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
     callback({});
   }
 }
-},{"../profileTokens":33,"../profileZoneFiles":34,"./person":29,"zone-file":515}],33:[function(require,module,exports){
+},{"../profileTokens":33,"../profileZoneFiles":34,"./person":29,"zone-file":566}],33:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -6585,7 +6782,7 @@ function extractProfile(token) {
   return profile;
 }
 }).call(this,require("buffer").Buffer)
-},{"../utils":46,"bitcoinjs-lib":81,"buffer":168,"jsontokens":367}],34:[function(require,module,exports){
+},{"../utils":46,"bitcoinjs-lib":92,"buffer":179,"jsontokens":384}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6703,7 +6900,7 @@ function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
     }
   });
 }
-},{"../logger":14,"./index":22,"./profileTokens":33,"zone-file":515}],35:[function(require,module,exports){
+},{"../logger":14,"./index":22,"./profileTokens":33,"zone-file":566}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6780,7 +6977,7 @@ var Facebook = function (_Service) {
 }(_service.Service);
 
 exports.Facebook = Facebook;
-},{"./service":41,"cheerio":256}],36:[function(require,module,exports){
+},{"./service":41,"cheerio":267}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6924,7 +7121,7 @@ var HackerNews = function (_Service) {
 }(_service.Service);
 
 exports.HackerNews = HackerNews;
-},{"./service":41,"cheerio":256}],38:[function(require,module,exports){
+},{"./service":41,"cheerio":267}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7067,7 +7264,7 @@ var Instagram = function (_Service) {
 }(_service.Service);
 
 exports.Instagram = Instagram;
-},{"./service":41,"cheerio":256}],40:[function(require,module,exports){
+},{"./service":41,"cheerio":267}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7162,7 +7359,7 @@ var LinkedIn = function (_Service) {
 }(_service.Service);
 
 exports.LinkedIn = LinkedIn;
-},{"./service":41,"cheerio":256}],41:[function(require,module,exports){
+},{"./service":41,"cheerio":267}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7264,7 +7461,7 @@ var Service = exports.Service = function () {
 
   return Service;
 }();
-},{"./serviceUtils":42,"cross-fetch/polyfill":272}],42:[function(require,module,exports){
+},{"./serviceUtils":42,"cross-fetch/polyfill":283}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7381,7 +7578,7 @@ var Twitter = function (_Service) {
 }(_service.Service);
 
 exports.Twitter = Twitter;
-},{"./service":41,"cheerio":256}],44:[function(require,module,exports){
+},{"./service":41,"cheerio":267}],44:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -7557,7 +7754,7 @@ function getBucketUrl(gaiaHubUrl, appPrivateKey) {
   });
 }
 }).call(this,require("buffer").Buffer)
-},{"../auth/authApp":1,"../auth/authConstants":2,"../index":12,"../logger":14,"../utils":46,"bitcoinjs-lib":81,"buffer":168,"crypto":177,"jsontokens":367}],45:[function(require,module,exports){
+},{"../auth/authApp":1,"../auth/authConstants":2,"../index":12,"../logger":14,"../utils":46,"bitcoinjs-lib":92,"buffer":179,"crypto":188,"jsontokens":384}],45:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -7576,6 +7773,7 @@ exports.getFile = getFile;
 exports.putFile = putFile;
 exports.getAppBucketUrl = getAppBucketUrl;
 exports.deleteFile = deleteFile;
+exports.listFiles = listFiles;
 
 var _hub = require('./hub');
 
@@ -7994,11 +8192,88 @@ function deleteFile(path) {
   Promise.reject(new Error('Delete of ' + path + ' not supported by gaia hubs'));
 }
 
+/**
+ * Loop over the list of files in a Gaia hub, and run a callback on each entry.
+ * Not meant to be called by external clients.
+ * @param {GaiaHubConfig} hubConfig - the Gaia hub config
+ * @param {String | null} page - the page ID
+ * @param {number} callCount - the loop count
+ * @param {number} fileCount - the number of files listed so far
+ * @param {function} callback - the callback to invoke on each file.  If it returns a falsey
+ *  value, then the loop stops.  If it returns a truthy value, the loop continues.
+ * @returns {Promise} that resolves to the number of files listed.
+ * @private
+ */
+function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
+  if (callCount > 65536) {
+    // this is ridiculously huge, and probably indicates
+    // a faulty Gaia hub anyway (e.g. on that serves endless data)
+    throw new Error('Too many entries to list');
+  }
+
+  var httpStatus = void 0;
+  var pageRequest = JSON.stringify({ page: page });
+
+  var fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': '' + pageRequest.length,
+      Authorization: 'bearer ' + hubConfig.token
+    },
+    body: pageRequest
+  };
+
+  return fetch(hubConfig.server + '/list-files/' + hubConfig.address, fetchOptions).then(function (response) {
+    httpStatus = response.status;
+    if (httpStatus >= 400) {
+      throw new Error('listFiles failed with HTTP status ' + httpStatus);
+    }
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    var entries = responseJSON.entries;
+    var nextPage = responseJSON.page;
+    if (entries === null || entries === undefined) {
+      // indicates a misbehaving Gaia hub or a misbehaving driver
+      // (i.e. the data is malformed)
+      throw new Error('Bad listFiles response: no entries');
+    }
+    for (var i = 0; i < entries.length; i++) {
+      var rc = callback(entries[i]);
+      if (!rc) {
+        // callback indicates that we're done
+        return Promise.resolve(fileCount + i);
+      }
+    }
+    if (nextPage && entries.length > 0) {
+      // keep going -- have more entries
+      return listFilesLoop(hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback);
+    } else {
+      // no more entries -- end of data
+      return Promise.resolve(fileCount);
+    }
+  });
+}
+
+/**
+ * List the set of files in this application's Gaia storage bucket.
+ * @param {function} callback - a callback to invoke on each named file that
+ * returns `true` to continue the listing operation or `false` to end it
+ * @return {Promise} that resolves to the number of files listed
+ */
+function listFiles(callback) {
+  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+    return listFilesLoop(gaiaHubConfig, null, 0, 0, callback);
+  });
+}
+
 exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
 exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
 }).call(this,require("buffer").Buffer)
-},{"../auth":7,"../encryption":10,"../errors":11,"../keys":13,"../logger":14,"../profiles":22,"./hub":44,"buffer":168}],46:[function(require,module,exports){
+},{"../auth":7,"../encryption":10,"../errors":11,"../keys":13,"../logger":14,"../profiles":22,"./hub":44,"buffer":179}],46:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8069,6 +8344,14 @@ function updateQueryStringParameter(uri, key, value) {
  */
 
 function isLaterVersion(v1, v2) {
+  if (v1 === undefined) {
+    v1 = '0.0.0';
+  }
+
+  if (v2 === undefined) {
+    v2 = '0.0.0';
+  }
+
   var v1tuple = v1.split('.').map(function (x) {
     return parseInt(x, 10);
   });
@@ -8160,7 +8443,428 @@ function isSameOriginAbsoluteUrl(uri1, uri2) {
   return match.scheme && match.hostname && match.port && match.absolute;
 }
 }).call(this,require("buffer").Buffer)
-},{"./config":8,"bitcoinjs-lib":81,"buffer":168,"url":245}],47:[function(require,module,exports){
+},{"./config":8,"bitcoinjs-lib":92,"buffer":179,"url":256}],47:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BlockstackWallet = undefined;
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _crypto = require('crypto');
+
+var _crypto2 = _interopRequireDefault(_crypto);
+
+var _bitcoinjsLib = require('bitcoinjs-lib');
+
+var _bitcoinjsLib2 = _interopRequireDefault(_bitcoinjsLib);
+
+var _bip = require('bip39');
+
+var _bip2 = _interopRequireDefault(_bip);
+
+var _bip3 = require('bip32');
+
+var _bip4 = _interopRequireDefault(_bip3);
+
+var _utils = require('./utils');
+
+var _encryption = require('./encryption');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var APPS_NODE_INDEX = 0;
+var IDENTITY_KEYCHAIN = 888;
+var BLOCKSTACK_ON_BITCOIN = 0;
+
+var BITCOIN_BIP_44_PURPOSE = 44;
+var BITCOIN_COIN_TYPE = 0;
+var BITCOIN_ACCOUNT_INDEX = 0;
+
+var EXTERNAL_ADDRESS = 'EXTERNAL_ADDRESS';
+var CHANGE_ADDRESS = 'CHANGE_ADDRESS';
+
+function hashCode(string) {
+  var hash = 0;
+  if (string.length === 0) return hash;
+  for (var i = 0; i < string.length; i++) {
+    var character = string.charCodeAt(i);
+    hash = (hash << 5) - hash + character;
+    hash &= hash;
+  }
+  return hash & 0x7fffffff;
+}
+
+function getNodePrivateKey(node) {
+  return (0, _utils.ecPairToHexString)(_bitcoinjsLib.ECPair.fromPrivateKey(node.privateKey));
+}
+
+function getNodePublicKey(node) {
+  return node.publicKey.toString('hex');
+}
+
+/**
+ * The BlockstackWallet class manages the hierarchical derivation
+ *  paths for a standard blockstack client wallet. This includes paths
+ *  for bitcoin payment address, blockstack identity addresses, blockstack
+ *  application specific addresses.
+ *  @private
+ */
+
+var BlockstackWallet = exports.BlockstackWallet = function () {
+  function BlockstackWallet(rootNode) {
+    _classCallCheck(this, BlockstackWallet);
+
+    this.rootNode = rootNode;
+  }
+
+  _createClass(BlockstackWallet, [{
+    key: 'toBase58',
+    value: function toBase58() {
+      return this.rootNode.toBase58();
+    }
+
+    /**
+     * Initialize a blockstack wallet from a seed buffer
+     * @param {Buffer} seed - the input seed for initializing the root node
+     *  of the hierarchical wallet
+     * @return {BlockstackWallet} the constructed wallet
+     */
+
+  }, {
+    key: 'getIdentityPrivateKeychain',
+    value: function getIdentityPrivateKeychain() {
+      return this.rootNode.deriveHardened(IDENTITY_KEYCHAIN).deriveHardened(BLOCKSTACK_ON_BITCOIN);
+    }
+  }, {
+    key: 'getBitcoinPrivateKeychain',
+    value: function getBitcoinPrivateKeychain() {
+      return this.rootNode.deriveHardened(BITCOIN_BIP_44_PURPOSE).deriveHardened(BITCOIN_COIN_TYPE).deriveHardened(BITCOIN_ACCOUNT_INDEX);
+    }
+  }, {
+    key: 'getBitcoinNode',
+    value: function getBitcoinNode(addressIndex) {
+      var chainType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : EXTERNAL_ADDRESS;
+
+      return BlockstackWallet.getNodeFromBitcoinKeychain(this.getBitcoinPrivateKeychain().toBase58(), addressIndex, chainType);
+    }
+  }, {
+    key: 'getIdentityAddressNode',
+    value: function getIdentityAddressNode(identityIndex) {
+      var identityPrivateKeychain = this.getIdentityPrivateKeychain();
+      return identityPrivateKeychain.deriveHardened(identityIndex);
+    }
+  }, {
+    key: 'getIdentitySalt',
+
+
+    /**
+     * Get a salt for use with creating application specific addresses
+     * @return {String} the salt
+     */
+    value: function getIdentitySalt() {
+      var identityPrivateKeychain = this.getIdentityPrivateKeychain();
+      var publicKeyHex = getNodePublicKey(identityPrivateKeychain);
+      return _crypto2.default.createHash('sha256').update(publicKeyHex).digest('hex');
+    }
+
+    /**
+     * Get a bitcoin receive address at a given index
+     * @param {number} addressIndex - the index of the address
+     * @return {String} address
+     */
+
+  }, {
+    key: 'getBitcoinAddress',
+    value: function getBitcoinAddress(addressIndex) {
+      return BlockstackWallet.getAddressFromBIP32Node(this.getBitcoinNode(addressIndex));
+    }
+
+    /**
+     * Get the private key hex-string for a given bitcoin receive address
+     * @param {number} addressIndex - the index of the address
+     * @return {String} the hex-string. this will be either 64
+     * characters long to denote an uncompressed bitcoin address, or 66
+     * characters long for a compressed bitcoin address.
+     */
+
+  }, {
+    key: 'getBitcoinPrivateKey',
+    value: function getBitcoinPrivateKey(addressIndex) {
+      return getNodePrivateKey(this.getBitcoinNode(addressIndex));
+    }
+
+    /**
+     * Get the root node for the bitcoin public keychain
+     * @return {String} base58-encoding of the public node
+     */
+
+  }, {
+    key: 'getBitcoinPublicKeychain',
+    value: function getBitcoinPublicKeychain() {
+      return this.getBitcoinPrivateKeychain().neutered();
+    }
+
+    /**
+     * Get the root node for the identity public keychain
+     * @return {String} base58-encoding of the public node
+     */
+
+  }, {
+    key: 'getIdentityPublicKeychain',
+    value: function getIdentityPublicKeychain() {
+      return this.getIdentityPrivateKeychain().neutered();
+    }
+  }, {
+    key: 'getIdentityKeyPair',
+
+
+    /**
+     * Get the keypair information for a given identity index. This
+     * information is used to obtain the private key for an identity address
+     * and derive application specific keys for that address.
+     * @param {number} addressIndex - the identity index
+     * @param {boolean} alwaysUncompressed - if true, always return a
+     *   private-key hex string corresponding to the uncompressed address
+     * @return {Object} an IdentityKeyPair type object with keys:
+     *   .key {String} - the private key hex-string
+     *   .keyID {String} - the public key hex-string
+     *   .address {String} - the identity address
+     *   .appsNodeKey {String} - the base-58 encoding of the applications node
+     *   .salt {String} - the salt used for creating app-specific addresses
+     */
+    value: function getIdentityKeyPair(addressIndex) {
+      var alwaysUncompressed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      var identityNode = this.getIdentityAddressNode(addressIndex);
+
+      var address = BlockstackWallet.getAddressFromBIP32Node(identityNode);
+      var identityKey = getNodePrivateKey(identityNode);
+      if (alwaysUncompressed && identityKey.length === 66) {
+        identityKey = identityKey.slice(0, 64);
+      }
+
+      var identityKeyID = getNodePublicKey(identityNode);
+      var appsNodeKey = BlockstackWallet.getAppsNode(identityNode).toBase58();
+      var salt = this.getIdentitySalt();
+      var keyPair = {
+        key: identityKey,
+        keyID: identityKeyID,
+        address: address,
+        appsNodeKey: appsNodeKey,
+        salt: salt
+      };
+      return keyPair;
+    }
+  }], [{
+    key: 'fromSeedBuffer',
+    value: function fromSeedBuffer(seed) {
+      return new BlockstackWallet(_bip4.default.fromSeed(seed));
+    }
+
+    /**
+     * Initialize a blockstack wallet from a base58 string
+     * @param {string} keychain - the Base58 string used to initialize
+     *  the root node of the hierarchical wallet
+     * @return {BlockstackWallet} the constructed wallet
+     */
+
+  }, {
+    key: 'fromBase58',
+    value: function fromBase58(keychain) {
+      return new BlockstackWallet(_bip4.default.fromBase58(keychain));
+    }
+
+    /**
+     * Initialize a blockstack wallet from an encrypted phrase & password. Throws
+     * if the password is incorrect. Supports all formats of Blockstack phrases.
+     * @param {string} data - The encrypted phrase as a hex-encoded string
+     * @param {string} password - The plain password
+     * @return {Promise<BlockstackWallet>} the constructed wallet
+     */
+
+  }, {
+    key: 'fromEncryptedMnemonic',
+    value: function fromEncryptedMnemonic(data, password) {
+      return (0, _encryption.decryptMnemonic)(data, password).then(function (mnemonic) {
+        var seed = _bip2.default.mnemonicToSeed(mnemonic);
+        return new BlockstackWallet(_bip4.default.fromSeed(seed));
+      }).catch(function (err) {
+        if (err.message && err.message.startsWith('bad header;')) {
+          throw new Error('Incorrect password');
+        } else {
+          throw err;
+        }
+      });
+    }
+
+    /**
+     * Generate a BIP-39 12 word mnemonic
+     * @return {Promise<string>} space-separated 12 word phrase
+     */
+
+  }, {
+    key: 'generateMnemonic',
+    value: function generateMnemonic() {
+      return _bip2.default.generateMnemonic(128, _crypto.randomBytes);
+    }
+
+    /**
+     * Encrypt a mnemonic phrase with a password
+     * @param {string} mnemonic - Raw mnemonic phrase
+     * @param {string} password - Password to encrypt mnemonic with
+     * @return {Promise<string>} Hex-encoded encrypted mnemonic
+     */
+
+  }, {
+    key: 'encryptMnemonic',
+    value: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(mnemonic, password) {
+        var encryptedBuffer;
+        return _regenerator2.default.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return (0, _encryption.encryptMnemonic)(mnemonic, password);
+
+              case 2:
+                encryptedBuffer = _context.sent;
+                return _context.abrupt('return', encryptedBuffer.toString('hex'));
+
+              case 4:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function encryptMnemonic(_x3, _x4) {
+        return _ref.apply(this, arguments);
+      }
+
+      return encryptMnemonic;
+    }()
+  }, {
+    key: 'getAppsNode',
+    value: function getAppsNode(identityNode) {
+      return identityNode.deriveHardened(APPS_NODE_INDEX);
+    }
+  }, {
+    key: 'getNodeFromBitcoinKeychain',
+    value: function getNodeFromBitcoinKeychain(keychainBase58, addressIndex) {
+      var chainType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : EXTERNAL_ADDRESS;
+
+      var chain = void 0;
+      if (chainType === EXTERNAL_ADDRESS) {
+        chain = 0;
+      } else if (chainType === CHANGE_ADDRESS) {
+        chain = 1;
+      } else {
+        throw new Error('Invalid chain type');
+      }
+      var keychain = _bip4.default.fromBase58(keychainBase58);
+
+      return keychain.derive(chain).derive(addressIndex);
+    }
+
+    /**
+     * Get a bitcoin address given a base-58 encoded bitcoin node
+     * (usually called the account node)
+     * @param {String} keychainBase58 - base58-encoding of the node
+     * @param {number} addressIndex - index of the address to get
+     * @param {String} chainType - either 'EXTERNAL_ADDRESS' (for a
+     * "receive" address) or 'CHANGE_ADDRESS'
+     * @return {String} the address
+     */
+
+  }, {
+    key: 'getAddressFromBitcoinKeychain',
+    value: function getAddressFromBitcoinKeychain(keychainBase58, addressIndex) {
+      var chainType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : EXTERNAL_ADDRESS;
+
+      return BlockstackWallet.getAddressFromBIP32Node(BlockstackWallet.getNodeFromBitcoinKeychain(keychainBase58, addressIndex, chainType));
+    }
+
+    /**
+     * Get a ECDSA private key hex-string for an application-specific
+     *  address.
+     * @param {String} appsNodeKey - the base58-encoded private key for
+     * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+     * @param {String} salt - a string, used to salt the
+     * application-specific addresses
+     * @param {String} appDomain - the appDomain to generate a key for
+     * @return {String} the private key hex-string. this will be a 64
+     * character string
+     */
+
+  }, {
+    key: 'getLegacyAppPrivateKey',
+    value: function getLegacyAppPrivateKey(appsNodeKey, salt, appDomain) {
+      var hash = _crypto2.default.createHash('sha256').update('' + appDomain + salt).digest('hex');
+      var appIndex = hashCode(hash);
+      var appNode = _bip4.default.fromBase58(appsNodeKey).deriveHardened(appIndex);
+      return getNodePrivateKey(appNode).slice(0, 64);
+    }
+  }, {
+    key: 'getAddressFromBIP32Node',
+    value: function getAddressFromBIP32Node(node) {
+      return _bitcoinjsLib2.default.payments.p2pkh({ pubkey: node.publicKey }).address;
+    }
+
+    /**
+     * Get a ECDSA private key hex-string for an application-specific
+     *  address.
+     * @param {String} appsNodeKey - the base58-encoded private key for
+     * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+     * @param {String} salt - a string, used to salt the
+     * application-specific addresses
+     * @param {String} appDomain - the appDomain to generate a key for
+     * @return {String} the private key hex-string. this will be a 64
+     * character string
+     */
+
+  }, {
+    key: 'getAppPrivateKey',
+    value: function getAppPrivateKey(appsNodeKey, salt, appDomain) {
+      var hash = _crypto2.default.createHash('sha256').update('' + appDomain + salt).digest('hex');
+      var appIndexHexes = [];
+      // note: there's hardcoded numbers here, precisely because I want this
+      //   code to be very specific to the derivation paths we expect.
+      if (hash.length !== 64) {
+        throw new Error('Unexpected app-domain hash length of ' + hash.length);
+      }
+      for (var i = 0; i < 11; i++) {
+        // split the hash into 3-byte chunks
+        // because child nodes can only be up to 2^31,
+        // and we shouldn't deal in partial bytes.
+        appIndexHexes.push(hash.slice(i * 6, i * 6 + 6));
+      }
+      var appNode = _bip4.default.fromBase58(appsNodeKey);
+      appIndexHexes.forEach(function (hex) {
+        if (hex.length > 6) {
+          throw new Error('Invalid hex string length');
+        }
+        appNode = appNode.deriveHardened(parseInt(hex, 16));
+      });
+      return getNodePrivateKey(appNode).slice(0, 64);
+    }
+  }]);
+
+  return BlockstackWallet;
+}();
+},{"./encryption":10,"./utils":46,"babel-runtime/regenerator":62,"bip32":73,"bip39":74,"bitcoinjs-lib":92,"crypto":188}],48:[function(require,module,exports){
 var asn1 = exports;
 
 asn1.bignum = require('bn.js');
@@ -8171,7 +8875,7 @@ asn1.constants = require('./asn1/constants');
 asn1.decoders = require('./asn1/decoders');
 asn1.encoders = require('./asn1/encoders');
 
-},{"./asn1/api":48,"./asn1/base":50,"./asn1/constants":54,"./asn1/decoders":56,"./asn1/encoders":59,"bn.js":119}],48:[function(require,module,exports){
+},{"./asn1/api":49,"./asn1/base":51,"./asn1/constants":55,"./asn1/decoders":57,"./asn1/encoders":60,"bn.js":130}],49:[function(require,module,exports){
 var asn1 = require('../asn1');
 var inherits = require('inherits');
 
@@ -8234,7 +8938,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":47,"inherits":361,"vm":251}],49:[function(require,module,exports){
+},{"../asn1":48,"inherits":378,"vm":262}],50:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -8352,7 +9056,7 @@ EncoderBuffer.prototype.join = function join(out, offset) {
   return out;
 };
 
-},{"../base":50,"buffer":168,"inherits":361}],50:[function(require,module,exports){
+},{"../base":51,"buffer":179,"inherits":378}],51:[function(require,module,exports){
 var base = exports;
 
 base.Reporter = require('./reporter').Reporter;
@@ -8360,7 +9064,7 @@ base.DecoderBuffer = require('./buffer').DecoderBuffer;
 base.EncoderBuffer = require('./buffer').EncoderBuffer;
 base.Node = require('./node');
 
-},{"./buffer":49,"./node":51,"./reporter":52}],51:[function(require,module,exports){
+},{"./buffer":50,"./node":52,"./reporter":53}],52:[function(require,module,exports){
 var Reporter = require('../base').Reporter;
 var EncoderBuffer = require('../base').EncoderBuffer;
 var DecoderBuffer = require('../base').DecoderBuffer;
@@ -8996,7 +9700,7 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
   return /^[A-Za-z0-9 '\(\)\+,\-\.\/:=\?]*$/.test(str);
 };
 
-},{"../base":50,"minimalistic-assert":421}],52:[function(require,module,exports){
+},{"../base":51,"minimalistic-assert":438}],53:[function(require,module,exports){
 var inherits = require('inherits');
 
 function Reporter(options) {
@@ -9119,7 +9823,7 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
   return this;
 };
 
-},{"inherits":361}],53:[function(require,module,exports){
+},{"inherits":378}],54:[function(require,module,exports){
 var constants = require('../constants');
 
 exports.tagClass = {
@@ -9163,7 +9867,7 @@ exports.tag = {
 };
 exports.tagByName = constants._reverse(exports.tag);
 
-},{"../constants":54}],54:[function(require,module,exports){
+},{"../constants":55}],55:[function(require,module,exports){
 var constants = exports;
 
 // Helper
@@ -9184,7 +9888,7 @@ constants._reverse = function reverse(map) {
 
 constants.der = require('./der');
 
-},{"./der":53}],55:[function(require,module,exports){
+},{"./der":54}],56:[function(require,module,exports){
 var inherits = require('inherits');
 
 var asn1 = require('../../asn1');
@@ -9510,13 +10214,13 @@ function derDecodeLen(buf, primitive, fail) {
   return len;
 }
 
-},{"../../asn1":47,"inherits":361}],56:[function(require,module,exports){
+},{"../../asn1":48,"inherits":378}],57:[function(require,module,exports){
 var decoders = exports;
 
 decoders.der = require('./der');
 decoders.pem = require('./pem');
 
-},{"./der":55,"./pem":57}],57:[function(require,module,exports){
+},{"./der":56,"./pem":58}],58:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -9567,7 +10271,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"./der":55,"buffer":168,"inherits":361}],58:[function(require,module,exports){
+},{"./der":56,"buffer":179,"inherits":378}],59:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -9864,13 +10568,13 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":47,"buffer":168,"inherits":361}],59:[function(require,module,exports){
+},{"../../asn1":48,"buffer":179,"inherits":378}],60:[function(require,module,exports){
 var encoders = exports;
 
 encoders.der = require('./der');
 encoders.pem = require('./pem');
 
-},{"./der":58,"./pem":60}],60:[function(require,module,exports){
+},{"./der":59,"./pem":61}],61:[function(require,module,exports){
 var inherits = require('inherits');
 
 var DEREncoder = require('./der');
@@ -9893,7 +10597,10 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"./der":58,"inherits":361}],61:[function(require,module,exports){
+},{"./der":59,"inherits":378}],62:[function(require,module,exports){
+module.exports = require("regenerator-runtime");
+
+},{"regenerator-runtime":454}],63:[function(require,module,exports){
 // base-x encoding
 // Forked from https://github.com/cryptocoinjs/bs58
 // Originally written by Mike Hearn for BitcoinJ
@@ -9987,7 +10694,7 @@ module.exports = function base (ALPHABET) {
   }
 }
 
-},{"safe-buffer":431}],62:[function(require,module,exports){
+},{"safe-buffer":457}],64:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -10026,7 +10733,7 @@ base64url.toBuffer = toBuffer;
 exports.default = base64url;
 
 }).call(this,require("buffer").Buffer)
-},{"./pad-string":63,"buffer":168}],63:[function(require,module,exports){
+},{"./pad-string":65,"buffer":179}],65:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -10050,11 +10757,11 @@ function padString(input) {
 exports.default = padString;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168}],64:[function(require,module,exports){
+},{"buffer":179}],66:[function(require,module,exports){
 module.exports = require('./dist/base64url').default;
 module.exports.default = module.exports;
 
-},{"./dist/base64url":62}],65:[function(require,module,exports){
+},{"./dist/base64url":64}],67:[function(require,module,exports){
 'use strict'
 var ALPHABET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'
 
@@ -10203,7 +10910,7 @@ module.exports = {
   fromWords: fromWords
 }
 
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 // (public) Constructor
 function BigInteger(a, b, c) {
   if (!(this instanceof BigInteger))
@@ -11714,7 +12421,7 @@ BigInteger.valueOf = nbv
 
 module.exports = BigInteger
 
-},{"../package.json":69}],67:[function(require,module,exports){
+},{"../package.json":71}],69:[function(require,module,exports){
 (function (Buffer){
 // FIXME: Kind of a weird way to throw exceptions, consider removing
 var assert = require('assert')
@@ -11809,14 +12516,14 @@ BigInteger.prototype.toHex = function(size) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./bigi":66,"assert":136,"buffer":168}],68:[function(require,module,exports){
+},{"./bigi":68,"assert":147,"buffer":179}],70:[function(require,module,exports){
 var BigInteger = require('./bigi')
 
 //addons
 require('./convert')
 
 module.exports = BigInteger
-},{"./bigi":66,"./convert":67}],69:[function(require,module,exports){
+},{"./bigi":68,"./convert":69}],71:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -11842,7 +12549,6 @@ module.exports={
   },
   "_requiredBy": [
     "/",
-    "/bitcoinjs-lib",
     "/ecurve"
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
@@ -11907,7 +12613,7 @@ module.exports={
   "version": "1.4.2"
 }
 
-},{}],70:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 let createHash = require('create-hash')
 let createHmac = require('create-hmac')
 
@@ -11923,7 +12629,7 @@ function hmacSHA512 (key, data) {
 
 module.exports = { hash160, hmacSHA512 }
 
-},{"create-hash":268,"create-hmac":270}],71:[function(require,module,exports){
+},{"create-hash":279,"create-hmac":281}],73:[function(require,module,exports){
 let Buffer = require('safe-buffer').Buffer
 let bs58check = require('bs58check')
 let crypto = require('./crypto')
@@ -12226,7 +12932,16578 @@ module.exports = {
   fromSeed
 }
 
-},{"./crypto":70,"bs58check":254,"safe-buffer":431,"tiny-secp256k1":443,"typeforce":446,"wif":514}],72:[function(require,module,exports){
+},{"./crypto":72,"bs58check":265,"safe-buffer":457,"tiny-secp256k1":469,"typeforce":496,"wif":565}],74:[function(require,module,exports){
+var Buffer = require('safe-buffer').Buffer
+var createHash = require('create-hash')
+var pbkdf2 = require('pbkdf2').pbkdf2Sync
+var randomBytes = require('randombytes')
+
+// use unorm until String.prototype.normalize gets better browser support
+var unorm = require('unorm')
+
+var CHINESE_SIMPLIFIED_WORDLIST = require('./wordlists/chinese_simplified.json')
+var CHINESE_TRADITIONAL_WORDLIST = require('./wordlists/chinese_traditional.json')
+var ENGLISH_WORDLIST = require('./wordlists/english.json')
+var FRENCH_WORDLIST = require('./wordlists/french.json')
+var ITALIAN_WORDLIST = require('./wordlists/italian.json')
+var JAPANESE_WORDLIST = require('./wordlists/japanese.json')
+var KOREAN_WORDLIST = require('./wordlists/korean.json')
+var SPANISH_WORDLIST = require('./wordlists/spanish.json')
+var DEFAULT_WORDLIST = ENGLISH_WORDLIST
+
+var INVALID_MNEMONIC = 'Invalid mnemonic'
+var INVALID_ENTROPY = 'Invalid entropy'
+var INVALID_CHECKSUM = 'Invalid mnemonic checksum'
+
+function lpad (str, padString, length) {
+  while (str.length < length) str = padString + str
+  return str
+}
+
+function binaryToByte (bin) {
+  return parseInt(bin, 2)
+}
+
+function bytesToBinary (bytes) {
+  return bytes.map(function (x) {
+    return lpad(x.toString(2), '0', 8)
+  }).join('')
+}
+
+function deriveChecksumBits (entropyBuffer) {
+  var ENT = entropyBuffer.length * 8
+  var CS = ENT / 32
+  var hash = createHash('sha256').update(entropyBuffer).digest()
+
+  return bytesToBinary([].slice.call(hash)).slice(0, CS)
+}
+
+function salt (password) {
+  return 'mnemonic' + (password || '')
+}
+
+function mnemonicToSeed (mnemonic, password) {
+  var mnemonicBuffer = Buffer.from(unorm.nfkd(mnemonic), 'utf8')
+  var saltBuffer = Buffer.from(salt(unorm.nfkd(password)), 'utf8')
+
+  return pbkdf2(mnemonicBuffer, saltBuffer, 2048, 64, 'sha512')
+}
+
+function mnemonicToSeedHex (mnemonic, password) {
+  return mnemonicToSeed(mnemonic, password).toString('hex')
+}
+
+function mnemonicToEntropy (mnemonic, wordlist) {
+  wordlist = wordlist || DEFAULT_WORDLIST
+
+  var words = unorm.nfkd(mnemonic).split(' ')
+  if (words.length % 3 !== 0) throw new Error(INVALID_MNEMONIC)
+
+  // convert word indices to 11 bit binary strings
+  var bits = words.map(function (word) {
+    var index = wordlist.indexOf(word)
+    if (index === -1) throw new Error(INVALID_MNEMONIC)
+
+    return lpad(index.toString(2), '0', 11)
+  }).join('')
+
+  // split the binary string into ENT/CS
+  var dividerIndex = Math.floor(bits.length / 33) * 32
+  var entropyBits = bits.slice(0, dividerIndex)
+  var checksumBits = bits.slice(dividerIndex)
+
+  // calculate the checksum and compare
+  var entropyBytes = entropyBits.match(/(.{1,8})/g).map(binaryToByte)
+  if (entropyBytes.length < 16) throw new Error(INVALID_ENTROPY)
+  if (entropyBytes.length > 32) throw new Error(INVALID_ENTROPY)
+  if (entropyBytes.length % 4 !== 0) throw new Error(INVALID_ENTROPY)
+
+  var entropy = Buffer.from(entropyBytes)
+  var newChecksum = deriveChecksumBits(entropy)
+  if (newChecksum !== checksumBits) throw new Error(INVALID_CHECKSUM)
+
+  return entropy.toString('hex')
+}
+
+function entropyToMnemonic (entropy, wordlist) {
+  if (!Buffer.isBuffer(entropy)) entropy = Buffer.from(entropy, 'hex')
+  wordlist = wordlist || DEFAULT_WORDLIST
+
+  // 128 <= ENT <= 256
+  if (entropy.length < 16) throw new TypeError(INVALID_ENTROPY)
+  if (entropy.length > 32) throw new TypeError(INVALID_ENTROPY)
+  if (entropy.length % 4 !== 0) throw new TypeError(INVALID_ENTROPY)
+
+  var entropyBits = bytesToBinary([].slice.call(entropy))
+  var checksumBits = deriveChecksumBits(entropy)
+
+  var bits = entropyBits + checksumBits
+  var chunks = bits.match(/(.{1,11})/g)
+  var words = chunks.map(function (binary) {
+    var index = binaryToByte(binary)
+    return wordlist[index]
+  })
+
+  return wordlist === JAPANESE_WORDLIST ? words.join('\u3000') : words.join(' ')
+}
+
+function generateMnemonic (strength, rng, wordlist) {
+  strength = strength || 128
+  if (strength % 32 !== 0) throw new TypeError(INVALID_ENTROPY)
+  rng = rng || randomBytes
+
+  return entropyToMnemonic(rng(strength / 8), wordlist)
+}
+
+function validateMnemonic (mnemonic, wordlist) {
+  try {
+    mnemonicToEntropy(mnemonic, wordlist)
+  } catch (e) {
+    return false
+  }
+
+  return true
+}
+
+module.exports = {
+  mnemonicToSeed: mnemonicToSeed,
+  mnemonicToSeedHex: mnemonicToSeedHex,
+  mnemonicToEntropy: mnemonicToEntropy,
+  entropyToMnemonic: entropyToMnemonic,
+  generateMnemonic: generateMnemonic,
+  validateMnemonic: validateMnemonic,
+  wordlists: {
+    EN: ENGLISH_WORDLIST,
+    JA: JAPANESE_WORDLIST,
+
+    chinese_simplified: CHINESE_SIMPLIFIED_WORDLIST,
+    chinese_traditional: CHINESE_TRADITIONAL_WORDLIST,
+    english: ENGLISH_WORDLIST,
+    french: FRENCH_WORDLIST,
+    italian: ITALIAN_WORDLIST,
+    japanese: JAPANESE_WORDLIST,
+    korean: KOREAN_WORDLIST,
+    spanish: SPANISH_WORDLIST
+  }
+}
+
+},{"./wordlists/chinese_simplified.json":75,"./wordlists/chinese_traditional.json":76,"./wordlists/english.json":77,"./wordlists/french.json":78,"./wordlists/italian.json":79,"./wordlists/japanese.json":80,"./wordlists/korean.json":81,"./wordlists/spanish.json":82,"create-hash":279,"pbkdf2":444,"randombytes":453,"safe-buffer":457,"unorm":498}],75:[function(require,module,exports){
+module.exports=[
+  "的",
+  "一",
+  "是",
+  "在",
+  "不",
+  "了",
+  "有",
+  "和",
+  "人",
+  "这",
+  "中",
+  "大",
+  "为",
+  "上",
+  "个",
+  "国",
+  "我",
+  "以",
+  "要",
+  "他",
+  "时",
+  "来",
+  "用",
+  "们",
+  "生",
+  "到",
+  "作",
+  "地",
+  "于",
+  "出",
+  "就",
+  "分",
+  "对",
+  "成",
+  "会",
+  "可",
+  "主",
+  "发",
+  "年",
+  "动",
+  "同",
+  "工",
+  "也",
+  "能",
+  "下",
+  "过",
+  "子",
+  "说",
+  "产",
+  "种",
+  "面",
+  "而",
+  "方",
+  "后",
+  "多",
+  "定",
+  "行",
+  "学",
+  "法",
+  "所",
+  "民",
+  "得",
+  "经",
+  "十",
+  "三",
+  "之",
+  "进",
+  "着",
+  "等",
+  "部",
+  "度",
+  "家",
+  "电",
+  "力",
+  "里",
+  "如",
+  "水",
+  "化",
+  "高",
+  "自",
+  "二",
+  "理",
+  "起",
+  "小",
+  "物",
+  "现",
+  "实",
+  "加",
+  "量",
+  "都",
+  "两",
+  "体",
+  "制",
+  "机",
+  "当",
+  "使",
+  "点",
+  "从",
+  "业",
+  "本",
+  "去",
+  "把",
+  "性",
+  "好",
+  "应",
+  "开",
+  "它",
+  "合",
+  "还",
+  "因",
+  "由",
+  "其",
+  "些",
+  "然",
+  "前",
+  "外",
+  "天",
+  "政",
+  "四",
+  "日",
+  "那",
+  "社",
+  "义",
+  "事",
+  "平",
+  "形",
+  "相",
+  "全",
+  "表",
+  "间",
+  "样",
+  "与",
+  "关",
+  "各",
+  "重",
+  "新",
+  "线",
+  "内",
+  "数",
+  "正",
+  "心",
+  "反",
+  "你",
+  "明",
+  "看",
+  "原",
+  "又",
+  "么",
+  "利",
+  "比",
+  "或",
+  "但",
+  "质",
+  "气",
+  "第",
+  "向",
+  "道",
+  "命",
+  "此",
+  "变",
+  "条",
+  "只",
+  "没",
+  "结",
+  "解",
+  "问",
+  "意",
+  "建",
+  "月",
+  "公",
+  "无",
+  "系",
+  "军",
+  "很",
+  "情",
+  "者",
+  "最",
+  "立",
+  "代",
+  "想",
+  "已",
+  "通",
+  "并",
+  "提",
+  "直",
+  "题",
+  "党",
+  "程",
+  "展",
+  "五",
+  "果",
+  "料",
+  "象",
+  "员",
+  "革",
+  "位",
+  "入",
+  "常",
+  "文",
+  "总",
+  "次",
+  "品",
+  "式",
+  "活",
+  "设",
+  "及",
+  "管",
+  "特",
+  "件",
+  "长",
+  "求",
+  "老",
+  "头",
+  "基",
+  "资",
+  "边",
+  "流",
+  "路",
+  "级",
+  "少",
+  "图",
+  "山",
+  "统",
+  "接",
+  "知",
+  "较",
+  "将",
+  "组",
+  "见",
+  "计",
+  "别",
+  "她",
+  "手",
+  "角",
+  "期",
+  "根",
+  "论",
+  "运",
+  "农",
+  "指",
+  "几",
+  "九",
+  "区",
+  "强",
+  "放",
+  "决",
+  "西",
+  "被",
+  "干",
+  "做",
+  "必",
+  "战",
+  "先",
+  "回",
+  "则",
+  "任",
+  "取",
+  "据",
+  "处",
+  "队",
+  "南",
+  "给",
+  "色",
+  "光",
+  "门",
+  "即",
+  "保",
+  "治",
+  "北",
+  "造",
+  "百",
+  "规",
+  "热",
+  "领",
+  "七",
+  "海",
+  "口",
+  "东",
+  "导",
+  "器",
+  "压",
+  "志",
+  "世",
+  "金",
+  "增",
+  "争",
+  "济",
+  "阶",
+  "油",
+  "思",
+  "术",
+  "极",
+  "交",
+  "受",
+  "联",
+  "什",
+  "认",
+  "六",
+  "共",
+  "权",
+  "收",
+  "证",
+  "改",
+  "清",
+  "美",
+  "再",
+  "采",
+  "转",
+  "更",
+  "单",
+  "风",
+  "切",
+  "打",
+  "白",
+  "教",
+  "速",
+  "花",
+  "带",
+  "安",
+  "场",
+  "身",
+  "车",
+  "例",
+  "真",
+  "务",
+  "具",
+  "万",
+  "每",
+  "目",
+  "至",
+  "达",
+  "走",
+  "积",
+  "示",
+  "议",
+  "声",
+  "报",
+  "斗",
+  "完",
+  "类",
+  "八",
+  "离",
+  "华",
+  "名",
+  "确",
+  "才",
+  "科",
+  "张",
+  "信",
+  "马",
+  "节",
+  "话",
+  "米",
+  "整",
+  "空",
+  "元",
+  "况",
+  "今",
+  "集",
+  "温",
+  "传",
+  "土",
+  "许",
+  "步",
+  "群",
+  "广",
+  "石",
+  "记",
+  "需",
+  "段",
+  "研",
+  "界",
+  "拉",
+  "林",
+  "律",
+  "叫",
+  "且",
+  "究",
+  "观",
+  "越",
+  "织",
+  "装",
+  "影",
+  "算",
+  "低",
+  "持",
+  "音",
+  "众",
+  "书",
+  "布",
+  "复",
+  "容",
+  "儿",
+  "须",
+  "际",
+  "商",
+  "非",
+  "验",
+  "连",
+  "断",
+  "深",
+  "难",
+  "近",
+  "矿",
+  "千",
+  "周",
+  "委",
+  "素",
+  "技",
+  "备",
+  "半",
+  "办",
+  "青",
+  "省",
+  "列",
+  "习",
+  "响",
+  "约",
+  "支",
+  "般",
+  "史",
+  "感",
+  "劳",
+  "便",
+  "团",
+  "往",
+  "酸",
+  "历",
+  "市",
+  "克",
+  "何",
+  "除",
+  "消",
+  "构",
+  "府",
+  "称",
+  "太",
+  "准",
+  "精",
+  "值",
+  "号",
+  "率",
+  "族",
+  "维",
+  "划",
+  "选",
+  "标",
+  "写",
+  "存",
+  "候",
+  "毛",
+  "亲",
+  "快",
+  "效",
+  "斯",
+  "院",
+  "查",
+  "江",
+  "型",
+  "眼",
+  "王",
+  "按",
+  "格",
+  "养",
+  "易",
+  "置",
+  "派",
+  "层",
+  "片",
+  "始",
+  "却",
+  "专",
+  "状",
+  "育",
+  "厂",
+  "京",
+  "识",
+  "适",
+  "属",
+  "圆",
+  "包",
+  "火",
+  "住",
+  "调",
+  "满",
+  "县",
+  "局",
+  "照",
+  "参",
+  "红",
+  "细",
+  "引",
+  "听",
+  "该",
+  "铁",
+  "价",
+  "严",
+  "首",
+  "底",
+  "液",
+  "官",
+  "德",
+  "随",
+  "病",
+  "苏",
+  "失",
+  "尔",
+  "死",
+  "讲",
+  "配",
+  "女",
+  "黄",
+  "推",
+  "显",
+  "谈",
+  "罪",
+  "神",
+  "艺",
+  "呢",
+  "席",
+  "含",
+  "企",
+  "望",
+  "密",
+  "批",
+  "营",
+  "项",
+  "防",
+  "举",
+  "球",
+  "英",
+  "氧",
+  "势",
+  "告",
+  "李",
+  "台",
+  "落",
+  "木",
+  "帮",
+  "轮",
+  "破",
+  "亚",
+  "师",
+  "围",
+  "注",
+  "远",
+  "字",
+  "材",
+  "排",
+  "供",
+  "河",
+  "态",
+  "封",
+  "另",
+  "施",
+  "减",
+  "树",
+  "溶",
+  "怎",
+  "止",
+  "案",
+  "言",
+  "士",
+  "均",
+  "武",
+  "固",
+  "叶",
+  "鱼",
+  "波",
+  "视",
+  "仅",
+  "费",
+  "紧",
+  "爱",
+  "左",
+  "章",
+  "早",
+  "朝",
+  "害",
+  "续",
+  "轻",
+  "服",
+  "试",
+  "食",
+  "充",
+  "兵",
+  "源",
+  "判",
+  "护",
+  "司",
+  "足",
+  "某",
+  "练",
+  "差",
+  "致",
+  "板",
+  "田",
+  "降",
+  "黑",
+  "犯",
+  "负",
+  "击",
+  "范",
+  "继",
+  "兴",
+  "似",
+  "余",
+  "坚",
+  "曲",
+  "输",
+  "修",
+  "故",
+  "城",
+  "夫",
+  "够",
+  "送",
+  "笔",
+  "船",
+  "占",
+  "右",
+  "财",
+  "吃",
+  "富",
+  "春",
+  "职",
+  "觉",
+  "汉",
+  "画",
+  "功",
+  "巴",
+  "跟",
+  "虽",
+  "杂",
+  "飞",
+  "检",
+  "吸",
+  "助",
+  "升",
+  "阳",
+  "互",
+  "初",
+  "创",
+  "抗",
+  "考",
+  "投",
+  "坏",
+  "策",
+  "古",
+  "径",
+  "换",
+  "未",
+  "跑",
+  "留",
+  "钢",
+  "曾",
+  "端",
+  "责",
+  "站",
+  "简",
+  "述",
+  "钱",
+  "副",
+  "尽",
+  "帝",
+  "射",
+  "草",
+  "冲",
+  "承",
+  "独",
+  "令",
+  "限",
+  "阿",
+  "宣",
+  "环",
+  "双",
+  "请",
+  "超",
+  "微",
+  "让",
+  "控",
+  "州",
+  "良",
+  "轴",
+  "找",
+  "否",
+  "纪",
+  "益",
+  "依",
+  "优",
+  "顶",
+  "础",
+  "载",
+  "倒",
+  "房",
+  "突",
+  "坐",
+  "粉",
+  "敌",
+  "略",
+  "客",
+  "袁",
+  "冷",
+  "胜",
+  "绝",
+  "析",
+  "块",
+  "剂",
+  "测",
+  "丝",
+  "协",
+  "诉",
+  "念",
+  "陈",
+  "仍",
+  "罗",
+  "盐",
+  "友",
+  "洋",
+  "错",
+  "苦",
+  "夜",
+  "刑",
+  "移",
+  "频",
+  "逐",
+  "靠",
+  "混",
+  "母",
+  "短",
+  "皮",
+  "终",
+  "聚",
+  "汽",
+  "村",
+  "云",
+  "哪",
+  "既",
+  "距",
+  "卫",
+  "停",
+  "烈",
+  "央",
+  "察",
+  "烧",
+  "迅",
+  "境",
+  "若",
+  "印",
+  "洲",
+  "刻",
+  "括",
+  "激",
+  "孔",
+  "搞",
+  "甚",
+  "室",
+  "待",
+  "核",
+  "校",
+  "散",
+  "侵",
+  "吧",
+  "甲",
+  "游",
+  "久",
+  "菜",
+  "味",
+  "旧",
+  "模",
+  "湖",
+  "货",
+  "损",
+  "预",
+  "阻",
+  "毫",
+  "普",
+  "稳",
+  "乙",
+  "妈",
+  "植",
+  "息",
+  "扩",
+  "银",
+  "语",
+  "挥",
+  "酒",
+  "守",
+  "拿",
+  "序",
+  "纸",
+  "医",
+  "缺",
+  "雨",
+  "吗",
+  "针",
+  "刘",
+  "啊",
+  "急",
+  "唱",
+  "误",
+  "训",
+  "愿",
+  "审",
+  "附",
+  "获",
+  "茶",
+  "鲜",
+  "粮",
+  "斤",
+  "孩",
+  "脱",
+  "硫",
+  "肥",
+  "善",
+  "龙",
+  "演",
+  "父",
+  "渐",
+  "血",
+  "欢",
+  "械",
+  "掌",
+  "歌",
+  "沙",
+  "刚",
+  "攻",
+  "谓",
+  "盾",
+  "讨",
+  "晚",
+  "粒",
+  "乱",
+  "燃",
+  "矛",
+  "乎",
+  "杀",
+  "药",
+  "宁",
+  "鲁",
+  "贵",
+  "钟",
+  "煤",
+  "读",
+  "班",
+  "伯",
+  "香",
+  "介",
+  "迫",
+  "句",
+  "丰",
+  "培",
+  "握",
+  "兰",
+  "担",
+  "弦",
+  "蛋",
+  "沉",
+  "假",
+  "穿",
+  "执",
+  "答",
+  "乐",
+  "谁",
+  "顺",
+  "烟",
+  "缩",
+  "征",
+  "脸",
+  "喜",
+  "松",
+  "脚",
+  "困",
+  "异",
+  "免",
+  "背",
+  "星",
+  "福",
+  "买",
+  "染",
+  "井",
+  "概",
+  "慢",
+  "怕",
+  "磁",
+  "倍",
+  "祖",
+  "皇",
+  "促",
+  "静",
+  "补",
+  "评",
+  "翻",
+  "肉",
+  "践",
+  "尼",
+  "衣",
+  "宽",
+  "扬",
+  "棉",
+  "希",
+  "伤",
+  "操",
+  "垂",
+  "秋",
+  "宜",
+  "氢",
+  "套",
+  "督",
+  "振",
+  "架",
+  "亮",
+  "末",
+  "宪",
+  "庆",
+  "编",
+  "牛",
+  "触",
+  "映",
+  "雷",
+  "销",
+  "诗",
+  "座",
+  "居",
+  "抓",
+  "裂",
+  "胞",
+  "呼",
+  "娘",
+  "景",
+  "威",
+  "绿",
+  "晶",
+  "厚",
+  "盟",
+  "衡",
+  "鸡",
+  "孙",
+  "延",
+  "危",
+  "胶",
+  "屋",
+  "乡",
+  "临",
+  "陆",
+  "顾",
+  "掉",
+  "呀",
+  "灯",
+  "岁",
+  "措",
+  "束",
+  "耐",
+  "剧",
+  "玉",
+  "赵",
+  "跳",
+  "哥",
+  "季",
+  "课",
+  "凯",
+  "胡",
+  "额",
+  "款",
+  "绍",
+  "卷",
+  "齐",
+  "伟",
+  "蒸",
+  "殖",
+  "永",
+  "宗",
+  "苗",
+  "川",
+  "炉",
+  "岩",
+  "弱",
+  "零",
+  "杨",
+  "奏",
+  "沿",
+  "露",
+  "杆",
+  "探",
+  "滑",
+  "镇",
+  "饭",
+  "浓",
+  "航",
+  "怀",
+  "赶",
+  "库",
+  "夺",
+  "伊",
+  "灵",
+  "税",
+  "途",
+  "灭",
+  "赛",
+  "归",
+  "召",
+  "鼓",
+  "播",
+  "盘",
+  "裁",
+  "险",
+  "康",
+  "唯",
+  "录",
+  "菌",
+  "纯",
+  "借",
+  "糖",
+  "盖",
+  "横",
+  "符",
+  "私",
+  "努",
+  "堂",
+  "域",
+  "枪",
+  "润",
+  "幅",
+  "哈",
+  "竟",
+  "熟",
+  "虫",
+  "泽",
+  "脑",
+  "壤",
+  "碳",
+  "欧",
+  "遍",
+  "侧",
+  "寨",
+  "敢",
+  "彻",
+  "虑",
+  "斜",
+  "薄",
+  "庭",
+  "纳",
+  "弹",
+  "饲",
+  "伸",
+  "折",
+  "麦",
+  "湿",
+  "暗",
+  "荷",
+  "瓦",
+  "塞",
+  "床",
+  "筑",
+  "恶",
+  "户",
+  "访",
+  "塔",
+  "奇",
+  "透",
+  "梁",
+  "刀",
+  "旋",
+  "迹",
+  "卡",
+  "氯",
+  "遇",
+  "份",
+  "毒",
+  "泥",
+  "退",
+  "洗",
+  "摆",
+  "灰",
+  "彩",
+  "卖",
+  "耗",
+  "夏",
+  "择",
+  "忙",
+  "铜",
+  "献",
+  "硬",
+  "予",
+  "繁",
+  "圈",
+  "雪",
+  "函",
+  "亦",
+  "抽",
+  "篇",
+  "阵",
+  "阴",
+  "丁",
+  "尺",
+  "追",
+  "堆",
+  "雄",
+  "迎",
+  "泛",
+  "爸",
+  "楼",
+  "避",
+  "谋",
+  "吨",
+  "野",
+  "猪",
+  "旗",
+  "累",
+  "偏",
+  "典",
+  "馆",
+  "索",
+  "秦",
+  "脂",
+  "潮",
+  "爷",
+  "豆",
+  "忽",
+  "托",
+  "惊",
+  "塑",
+  "遗",
+  "愈",
+  "朱",
+  "替",
+  "纤",
+  "粗",
+  "倾",
+  "尚",
+  "痛",
+  "楚",
+  "谢",
+  "奋",
+  "购",
+  "磨",
+  "君",
+  "池",
+  "旁",
+  "碎",
+  "骨",
+  "监",
+  "捕",
+  "弟",
+  "暴",
+  "割",
+  "贯",
+  "殊",
+  "释",
+  "词",
+  "亡",
+  "壁",
+  "顿",
+  "宝",
+  "午",
+  "尘",
+  "闻",
+  "揭",
+  "炮",
+  "残",
+  "冬",
+  "桥",
+  "妇",
+  "警",
+  "综",
+  "招",
+  "吴",
+  "付",
+  "浮",
+  "遭",
+  "徐",
+  "您",
+  "摇",
+  "谷",
+  "赞",
+  "箱",
+  "隔",
+  "订",
+  "男",
+  "吹",
+  "园",
+  "纷",
+  "唐",
+  "败",
+  "宋",
+  "玻",
+  "巨",
+  "耕",
+  "坦",
+  "荣",
+  "闭",
+  "湾",
+  "键",
+  "凡",
+  "驻",
+  "锅",
+  "救",
+  "恩",
+  "剥",
+  "凝",
+  "碱",
+  "齿",
+  "截",
+  "炼",
+  "麻",
+  "纺",
+  "禁",
+  "废",
+  "盛",
+  "版",
+  "缓",
+  "净",
+  "睛",
+  "昌",
+  "婚",
+  "涉",
+  "筒",
+  "嘴",
+  "插",
+  "岸",
+  "朗",
+  "庄",
+  "街",
+  "藏",
+  "姑",
+  "贸",
+  "腐",
+  "奴",
+  "啦",
+  "惯",
+  "乘",
+  "伙",
+  "恢",
+  "匀",
+  "纱",
+  "扎",
+  "辩",
+  "耳",
+  "彪",
+  "臣",
+  "亿",
+  "璃",
+  "抵",
+  "脉",
+  "秀",
+  "萨",
+  "俄",
+  "网",
+  "舞",
+  "店",
+  "喷",
+  "纵",
+  "寸",
+  "汗",
+  "挂",
+  "洪",
+  "贺",
+  "闪",
+  "柬",
+  "爆",
+  "烯",
+  "津",
+  "稻",
+  "墙",
+  "软",
+  "勇",
+  "像",
+  "滚",
+  "厘",
+  "蒙",
+  "芳",
+  "肯",
+  "坡",
+  "柱",
+  "荡",
+  "腿",
+  "仪",
+  "旅",
+  "尾",
+  "轧",
+  "冰",
+  "贡",
+  "登",
+  "黎",
+  "削",
+  "钻",
+  "勒",
+  "逃",
+  "障",
+  "氨",
+  "郭",
+  "峰",
+  "币",
+  "港",
+  "伏",
+  "轨",
+  "亩",
+  "毕",
+  "擦",
+  "莫",
+  "刺",
+  "浪",
+  "秘",
+  "援",
+  "株",
+  "健",
+  "售",
+  "股",
+  "岛",
+  "甘",
+  "泡",
+  "睡",
+  "童",
+  "铸",
+  "汤",
+  "阀",
+  "休",
+  "汇",
+  "舍",
+  "牧",
+  "绕",
+  "炸",
+  "哲",
+  "磷",
+  "绩",
+  "朋",
+  "淡",
+  "尖",
+  "启",
+  "陷",
+  "柴",
+  "呈",
+  "徒",
+  "颜",
+  "泪",
+  "稍",
+  "忘",
+  "泵",
+  "蓝",
+  "拖",
+  "洞",
+  "授",
+  "镜",
+  "辛",
+  "壮",
+  "锋",
+  "贫",
+  "虚",
+  "弯",
+  "摩",
+  "泰",
+  "幼",
+  "廷",
+  "尊",
+  "窗",
+  "纲",
+  "弄",
+  "隶",
+  "疑",
+  "氏",
+  "宫",
+  "姐",
+  "震",
+  "瑞",
+  "怪",
+  "尤",
+  "琴",
+  "循",
+  "描",
+  "膜",
+  "违",
+  "夹",
+  "腰",
+  "缘",
+  "珠",
+  "穷",
+  "森",
+  "枝",
+  "竹",
+  "沟",
+  "催",
+  "绳",
+  "忆",
+  "邦",
+  "剩",
+  "幸",
+  "浆",
+  "栏",
+  "拥",
+  "牙",
+  "贮",
+  "礼",
+  "滤",
+  "钠",
+  "纹",
+  "罢",
+  "拍",
+  "咱",
+  "喊",
+  "袖",
+  "埃",
+  "勤",
+  "罚",
+  "焦",
+  "潜",
+  "伍",
+  "墨",
+  "欲",
+  "缝",
+  "姓",
+  "刊",
+  "饱",
+  "仿",
+  "奖",
+  "铝",
+  "鬼",
+  "丽",
+  "跨",
+  "默",
+  "挖",
+  "链",
+  "扫",
+  "喝",
+  "袋",
+  "炭",
+  "污",
+  "幕",
+  "诸",
+  "弧",
+  "励",
+  "梅",
+  "奶",
+  "洁",
+  "灾",
+  "舟",
+  "鉴",
+  "苯",
+  "讼",
+  "抱",
+  "毁",
+  "懂",
+  "寒",
+  "智",
+  "埔",
+  "寄",
+  "届",
+  "跃",
+  "渡",
+  "挑",
+  "丹",
+  "艰",
+  "贝",
+  "碰",
+  "拔",
+  "爹",
+  "戴",
+  "码",
+  "梦",
+  "芽",
+  "熔",
+  "赤",
+  "渔",
+  "哭",
+  "敬",
+  "颗",
+  "奔",
+  "铅",
+  "仲",
+  "虎",
+  "稀",
+  "妹",
+  "乏",
+  "珍",
+  "申",
+  "桌",
+  "遵",
+  "允",
+  "隆",
+  "螺",
+  "仓",
+  "魏",
+  "锐",
+  "晓",
+  "氮",
+  "兼",
+  "隐",
+  "碍",
+  "赫",
+  "拨",
+  "忠",
+  "肃",
+  "缸",
+  "牵",
+  "抢",
+  "博",
+  "巧",
+  "壳",
+  "兄",
+  "杜",
+  "讯",
+  "诚",
+  "碧",
+  "祥",
+  "柯",
+  "页",
+  "巡",
+  "矩",
+  "悲",
+  "灌",
+  "龄",
+  "伦",
+  "票",
+  "寻",
+  "桂",
+  "铺",
+  "圣",
+  "恐",
+  "恰",
+  "郑",
+  "趣",
+  "抬",
+  "荒",
+  "腾",
+  "贴",
+  "柔",
+  "滴",
+  "猛",
+  "阔",
+  "辆",
+  "妻",
+  "填",
+  "撤",
+  "储",
+  "签",
+  "闹",
+  "扰",
+  "紫",
+  "砂",
+  "递",
+  "戏",
+  "吊",
+  "陶",
+  "伐",
+  "喂",
+  "疗",
+  "瓶",
+  "婆",
+  "抚",
+  "臂",
+  "摸",
+  "忍",
+  "虾",
+  "蜡",
+  "邻",
+  "胸",
+  "巩",
+  "挤",
+  "偶",
+  "弃",
+  "槽",
+  "劲",
+  "乳",
+  "邓",
+  "吉",
+  "仁",
+  "烂",
+  "砖",
+  "租",
+  "乌",
+  "舰",
+  "伴",
+  "瓜",
+  "浅",
+  "丙",
+  "暂",
+  "燥",
+  "橡",
+  "柳",
+  "迷",
+  "暖",
+  "牌",
+  "秧",
+  "胆",
+  "详",
+  "簧",
+  "踏",
+  "瓷",
+  "谱",
+  "呆",
+  "宾",
+  "糊",
+  "洛",
+  "辉",
+  "愤",
+  "竞",
+  "隙",
+  "怒",
+  "粘",
+  "乃",
+  "绪",
+  "肩",
+  "籍",
+  "敏",
+  "涂",
+  "熙",
+  "皆",
+  "侦",
+  "悬",
+  "掘",
+  "享",
+  "纠",
+  "醒",
+  "狂",
+  "锁",
+  "淀",
+  "恨",
+  "牲",
+  "霸",
+  "爬",
+  "赏",
+  "逆",
+  "玩",
+  "陵",
+  "祝",
+  "秒",
+  "浙",
+  "貌",
+  "役",
+  "彼",
+  "悉",
+  "鸭",
+  "趋",
+  "凤",
+  "晨",
+  "畜",
+  "辈",
+  "秩",
+  "卵",
+  "署",
+  "梯",
+  "炎",
+  "滩",
+  "棋",
+  "驱",
+  "筛",
+  "峡",
+  "冒",
+  "啥",
+  "寿",
+  "译",
+  "浸",
+  "泉",
+  "帽",
+  "迟",
+  "硅",
+  "疆",
+  "贷",
+  "漏",
+  "稿",
+  "冠",
+  "嫩",
+  "胁",
+  "芯",
+  "牢",
+  "叛",
+  "蚀",
+  "奥",
+  "鸣",
+  "岭",
+  "羊",
+  "凭",
+  "串",
+  "塘",
+  "绘",
+  "酵",
+  "融",
+  "盆",
+  "锡",
+  "庙",
+  "筹",
+  "冻",
+  "辅",
+  "摄",
+  "袭",
+  "筋",
+  "拒",
+  "僚",
+  "旱",
+  "钾",
+  "鸟",
+  "漆",
+  "沈",
+  "眉",
+  "疏",
+  "添",
+  "棒",
+  "穗",
+  "硝",
+  "韩",
+  "逼",
+  "扭",
+  "侨",
+  "凉",
+  "挺",
+  "碗",
+  "栽",
+  "炒",
+  "杯",
+  "患",
+  "馏",
+  "劝",
+  "豪",
+  "辽",
+  "勃",
+  "鸿",
+  "旦",
+  "吏",
+  "拜",
+  "狗",
+  "埋",
+  "辊",
+  "掩",
+  "饮",
+  "搬",
+  "骂",
+  "辞",
+  "勾",
+  "扣",
+  "估",
+  "蒋",
+  "绒",
+  "雾",
+  "丈",
+  "朵",
+  "姆",
+  "拟",
+  "宇",
+  "辑",
+  "陕",
+  "雕",
+  "偿",
+  "蓄",
+  "崇",
+  "剪",
+  "倡",
+  "厅",
+  "咬",
+  "驶",
+  "薯",
+  "刷",
+  "斥",
+  "番",
+  "赋",
+  "奉",
+  "佛",
+  "浇",
+  "漫",
+  "曼",
+  "扇",
+  "钙",
+  "桃",
+  "扶",
+  "仔",
+  "返",
+  "俗",
+  "亏",
+  "腔",
+  "鞋",
+  "棱",
+  "覆",
+  "框",
+  "悄",
+  "叔",
+  "撞",
+  "骗",
+  "勘",
+  "旺",
+  "沸",
+  "孤",
+  "吐",
+  "孟",
+  "渠",
+  "屈",
+  "疾",
+  "妙",
+  "惜",
+  "仰",
+  "狠",
+  "胀",
+  "谐",
+  "抛",
+  "霉",
+  "桑",
+  "岗",
+  "嘛",
+  "衰",
+  "盗",
+  "渗",
+  "脏",
+  "赖",
+  "涌",
+  "甜",
+  "曹",
+  "阅",
+  "肌",
+  "哩",
+  "厉",
+  "烃",
+  "纬",
+  "毅",
+  "昨",
+  "伪",
+  "症",
+  "煮",
+  "叹",
+  "钉",
+  "搭",
+  "茎",
+  "笼",
+  "酷",
+  "偷",
+  "弓",
+  "锥",
+  "恒",
+  "杰",
+  "坑",
+  "鼻",
+  "翼",
+  "纶",
+  "叙",
+  "狱",
+  "逮",
+  "罐",
+  "络",
+  "棚",
+  "抑",
+  "膨",
+  "蔬",
+  "寺",
+  "骤",
+  "穆",
+  "冶",
+  "枯",
+  "册",
+  "尸",
+  "凸",
+  "绅",
+  "坯",
+  "牺",
+  "焰",
+  "轰",
+  "欣",
+  "晋",
+  "瘦",
+  "御",
+  "锭",
+  "锦",
+  "丧",
+  "旬",
+  "锻",
+  "垄",
+  "搜",
+  "扑",
+  "邀",
+  "亭",
+  "酯",
+  "迈",
+  "舒",
+  "脆",
+  "酶",
+  "闲",
+  "忧",
+  "酚",
+  "顽",
+  "羽",
+  "涨",
+  "卸",
+  "仗",
+  "陪",
+  "辟",
+  "惩",
+  "杭",
+  "姚",
+  "肚",
+  "捉",
+  "飘",
+  "漂",
+  "昆",
+  "欺",
+  "吾",
+  "郎",
+  "烷",
+  "汁",
+  "呵",
+  "饰",
+  "萧",
+  "雅",
+  "邮",
+  "迁",
+  "燕",
+  "撒",
+  "姻",
+  "赴",
+  "宴",
+  "烦",
+  "债",
+  "帐",
+  "斑",
+  "铃",
+  "旨",
+  "醇",
+  "董",
+  "饼",
+  "雏",
+  "姿",
+  "拌",
+  "傅",
+  "腹",
+  "妥",
+  "揉",
+  "贤",
+  "拆",
+  "歪",
+  "葡",
+  "胺",
+  "丢",
+  "浩",
+  "徽",
+  "昂",
+  "垫",
+  "挡",
+  "览",
+  "贪",
+  "慰",
+  "缴",
+  "汪",
+  "慌",
+  "冯",
+  "诺",
+  "姜",
+  "谊",
+  "凶",
+  "劣",
+  "诬",
+  "耀",
+  "昏",
+  "躺",
+  "盈",
+  "骑",
+  "乔",
+  "溪",
+  "丛",
+  "卢",
+  "抹",
+  "闷",
+  "咨",
+  "刮",
+  "驾",
+  "缆",
+  "悟",
+  "摘",
+  "铒",
+  "掷",
+  "颇",
+  "幻",
+  "柄",
+  "惠",
+  "惨",
+  "佳",
+  "仇",
+  "腊",
+  "窝",
+  "涤",
+  "剑",
+  "瞧",
+  "堡",
+  "泼",
+  "葱",
+  "罩",
+  "霍",
+  "捞",
+  "胎",
+  "苍",
+  "滨",
+  "俩",
+  "捅",
+  "湘",
+  "砍",
+  "霞",
+  "邵",
+  "萄",
+  "疯",
+  "淮",
+  "遂",
+  "熊",
+  "粪",
+  "烘",
+  "宿",
+  "档",
+  "戈",
+  "驳",
+  "嫂",
+  "裕",
+  "徙",
+  "箭",
+  "捐",
+  "肠",
+  "撑",
+  "晒",
+  "辨",
+  "殿",
+  "莲",
+  "摊",
+  "搅",
+  "酱",
+  "屏",
+  "疫",
+  "哀",
+  "蔡",
+  "堵",
+  "沫",
+  "皱",
+  "畅",
+  "叠",
+  "阁",
+  "莱",
+  "敲",
+  "辖",
+  "钩",
+  "痕",
+  "坝",
+  "巷",
+  "饿",
+  "祸",
+  "丘",
+  "玄",
+  "溜",
+  "曰",
+  "逻",
+  "彭",
+  "尝",
+  "卿",
+  "妨",
+  "艇",
+  "吞",
+  "韦",
+  "怨",
+  "矮",
+  "歇"
+]
+
+},{}],76:[function(require,module,exports){
+module.exports=[
+  "的",
+  "一",
+  "是",
+  "在",
+  "不",
+  "了",
+  "有",
+  "和",
+  "人",
+  "這",
+  "中",
+  "大",
+  "為",
+  "上",
+  "個",
+  "國",
+  "我",
+  "以",
+  "要",
+  "他",
+  "時",
+  "來",
+  "用",
+  "們",
+  "生",
+  "到",
+  "作",
+  "地",
+  "於",
+  "出",
+  "就",
+  "分",
+  "對",
+  "成",
+  "會",
+  "可",
+  "主",
+  "發",
+  "年",
+  "動",
+  "同",
+  "工",
+  "也",
+  "能",
+  "下",
+  "過",
+  "子",
+  "說",
+  "產",
+  "種",
+  "面",
+  "而",
+  "方",
+  "後",
+  "多",
+  "定",
+  "行",
+  "學",
+  "法",
+  "所",
+  "民",
+  "得",
+  "經",
+  "十",
+  "三",
+  "之",
+  "進",
+  "著",
+  "等",
+  "部",
+  "度",
+  "家",
+  "電",
+  "力",
+  "裡",
+  "如",
+  "水",
+  "化",
+  "高",
+  "自",
+  "二",
+  "理",
+  "起",
+  "小",
+  "物",
+  "現",
+  "實",
+  "加",
+  "量",
+  "都",
+  "兩",
+  "體",
+  "制",
+  "機",
+  "當",
+  "使",
+  "點",
+  "從",
+  "業",
+  "本",
+  "去",
+  "把",
+  "性",
+  "好",
+  "應",
+  "開",
+  "它",
+  "合",
+  "還",
+  "因",
+  "由",
+  "其",
+  "些",
+  "然",
+  "前",
+  "外",
+  "天",
+  "政",
+  "四",
+  "日",
+  "那",
+  "社",
+  "義",
+  "事",
+  "平",
+  "形",
+  "相",
+  "全",
+  "表",
+  "間",
+  "樣",
+  "與",
+  "關",
+  "各",
+  "重",
+  "新",
+  "線",
+  "內",
+  "數",
+  "正",
+  "心",
+  "反",
+  "你",
+  "明",
+  "看",
+  "原",
+  "又",
+  "麼",
+  "利",
+  "比",
+  "或",
+  "但",
+  "質",
+  "氣",
+  "第",
+  "向",
+  "道",
+  "命",
+  "此",
+  "變",
+  "條",
+  "只",
+  "沒",
+  "結",
+  "解",
+  "問",
+  "意",
+  "建",
+  "月",
+  "公",
+  "無",
+  "系",
+  "軍",
+  "很",
+  "情",
+  "者",
+  "最",
+  "立",
+  "代",
+  "想",
+  "已",
+  "通",
+  "並",
+  "提",
+  "直",
+  "題",
+  "黨",
+  "程",
+  "展",
+  "五",
+  "果",
+  "料",
+  "象",
+  "員",
+  "革",
+  "位",
+  "入",
+  "常",
+  "文",
+  "總",
+  "次",
+  "品",
+  "式",
+  "活",
+  "設",
+  "及",
+  "管",
+  "特",
+  "件",
+  "長",
+  "求",
+  "老",
+  "頭",
+  "基",
+  "資",
+  "邊",
+  "流",
+  "路",
+  "級",
+  "少",
+  "圖",
+  "山",
+  "統",
+  "接",
+  "知",
+  "較",
+  "將",
+  "組",
+  "見",
+  "計",
+  "別",
+  "她",
+  "手",
+  "角",
+  "期",
+  "根",
+  "論",
+  "運",
+  "農",
+  "指",
+  "幾",
+  "九",
+  "區",
+  "強",
+  "放",
+  "決",
+  "西",
+  "被",
+  "幹",
+  "做",
+  "必",
+  "戰",
+  "先",
+  "回",
+  "則",
+  "任",
+  "取",
+  "據",
+  "處",
+  "隊",
+  "南",
+  "給",
+  "色",
+  "光",
+  "門",
+  "即",
+  "保",
+  "治",
+  "北",
+  "造",
+  "百",
+  "規",
+  "熱",
+  "領",
+  "七",
+  "海",
+  "口",
+  "東",
+  "導",
+  "器",
+  "壓",
+  "志",
+  "世",
+  "金",
+  "增",
+  "爭",
+  "濟",
+  "階",
+  "油",
+  "思",
+  "術",
+  "極",
+  "交",
+  "受",
+  "聯",
+  "什",
+  "認",
+  "六",
+  "共",
+  "權",
+  "收",
+  "證",
+  "改",
+  "清",
+  "美",
+  "再",
+  "採",
+  "轉",
+  "更",
+  "單",
+  "風",
+  "切",
+  "打",
+  "白",
+  "教",
+  "速",
+  "花",
+  "帶",
+  "安",
+  "場",
+  "身",
+  "車",
+  "例",
+  "真",
+  "務",
+  "具",
+  "萬",
+  "每",
+  "目",
+  "至",
+  "達",
+  "走",
+  "積",
+  "示",
+  "議",
+  "聲",
+  "報",
+  "鬥",
+  "完",
+  "類",
+  "八",
+  "離",
+  "華",
+  "名",
+  "確",
+  "才",
+  "科",
+  "張",
+  "信",
+  "馬",
+  "節",
+  "話",
+  "米",
+  "整",
+  "空",
+  "元",
+  "況",
+  "今",
+  "集",
+  "溫",
+  "傳",
+  "土",
+  "許",
+  "步",
+  "群",
+  "廣",
+  "石",
+  "記",
+  "需",
+  "段",
+  "研",
+  "界",
+  "拉",
+  "林",
+  "律",
+  "叫",
+  "且",
+  "究",
+  "觀",
+  "越",
+  "織",
+  "裝",
+  "影",
+  "算",
+  "低",
+  "持",
+  "音",
+  "眾",
+  "書",
+  "布",
+  "复",
+  "容",
+  "兒",
+  "須",
+  "際",
+  "商",
+  "非",
+  "驗",
+  "連",
+  "斷",
+  "深",
+  "難",
+  "近",
+  "礦",
+  "千",
+  "週",
+  "委",
+  "素",
+  "技",
+  "備",
+  "半",
+  "辦",
+  "青",
+  "省",
+  "列",
+  "習",
+  "響",
+  "約",
+  "支",
+  "般",
+  "史",
+  "感",
+  "勞",
+  "便",
+  "團",
+  "往",
+  "酸",
+  "歷",
+  "市",
+  "克",
+  "何",
+  "除",
+  "消",
+  "構",
+  "府",
+  "稱",
+  "太",
+  "準",
+  "精",
+  "值",
+  "號",
+  "率",
+  "族",
+  "維",
+  "劃",
+  "選",
+  "標",
+  "寫",
+  "存",
+  "候",
+  "毛",
+  "親",
+  "快",
+  "效",
+  "斯",
+  "院",
+  "查",
+  "江",
+  "型",
+  "眼",
+  "王",
+  "按",
+  "格",
+  "養",
+  "易",
+  "置",
+  "派",
+  "層",
+  "片",
+  "始",
+  "卻",
+  "專",
+  "狀",
+  "育",
+  "廠",
+  "京",
+  "識",
+  "適",
+  "屬",
+  "圓",
+  "包",
+  "火",
+  "住",
+  "調",
+  "滿",
+  "縣",
+  "局",
+  "照",
+  "參",
+  "紅",
+  "細",
+  "引",
+  "聽",
+  "該",
+  "鐵",
+  "價",
+  "嚴",
+  "首",
+  "底",
+  "液",
+  "官",
+  "德",
+  "隨",
+  "病",
+  "蘇",
+  "失",
+  "爾",
+  "死",
+  "講",
+  "配",
+  "女",
+  "黃",
+  "推",
+  "顯",
+  "談",
+  "罪",
+  "神",
+  "藝",
+  "呢",
+  "席",
+  "含",
+  "企",
+  "望",
+  "密",
+  "批",
+  "營",
+  "項",
+  "防",
+  "舉",
+  "球",
+  "英",
+  "氧",
+  "勢",
+  "告",
+  "李",
+  "台",
+  "落",
+  "木",
+  "幫",
+  "輪",
+  "破",
+  "亞",
+  "師",
+  "圍",
+  "注",
+  "遠",
+  "字",
+  "材",
+  "排",
+  "供",
+  "河",
+  "態",
+  "封",
+  "另",
+  "施",
+  "減",
+  "樹",
+  "溶",
+  "怎",
+  "止",
+  "案",
+  "言",
+  "士",
+  "均",
+  "武",
+  "固",
+  "葉",
+  "魚",
+  "波",
+  "視",
+  "僅",
+  "費",
+  "緊",
+  "愛",
+  "左",
+  "章",
+  "早",
+  "朝",
+  "害",
+  "續",
+  "輕",
+  "服",
+  "試",
+  "食",
+  "充",
+  "兵",
+  "源",
+  "判",
+  "護",
+  "司",
+  "足",
+  "某",
+  "練",
+  "差",
+  "致",
+  "板",
+  "田",
+  "降",
+  "黑",
+  "犯",
+  "負",
+  "擊",
+  "范",
+  "繼",
+  "興",
+  "似",
+  "餘",
+  "堅",
+  "曲",
+  "輸",
+  "修",
+  "故",
+  "城",
+  "夫",
+  "夠",
+  "送",
+  "筆",
+  "船",
+  "佔",
+  "右",
+  "財",
+  "吃",
+  "富",
+  "春",
+  "職",
+  "覺",
+  "漢",
+  "畫",
+  "功",
+  "巴",
+  "跟",
+  "雖",
+  "雜",
+  "飛",
+  "檢",
+  "吸",
+  "助",
+  "昇",
+  "陽",
+  "互",
+  "初",
+  "創",
+  "抗",
+  "考",
+  "投",
+  "壞",
+  "策",
+  "古",
+  "徑",
+  "換",
+  "未",
+  "跑",
+  "留",
+  "鋼",
+  "曾",
+  "端",
+  "責",
+  "站",
+  "簡",
+  "述",
+  "錢",
+  "副",
+  "盡",
+  "帝",
+  "射",
+  "草",
+  "衝",
+  "承",
+  "獨",
+  "令",
+  "限",
+  "阿",
+  "宣",
+  "環",
+  "雙",
+  "請",
+  "超",
+  "微",
+  "讓",
+  "控",
+  "州",
+  "良",
+  "軸",
+  "找",
+  "否",
+  "紀",
+  "益",
+  "依",
+  "優",
+  "頂",
+  "礎",
+  "載",
+  "倒",
+  "房",
+  "突",
+  "坐",
+  "粉",
+  "敵",
+  "略",
+  "客",
+  "袁",
+  "冷",
+  "勝",
+  "絕",
+  "析",
+  "塊",
+  "劑",
+  "測",
+  "絲",
+  "協",
+  "訴",
+  "念",
+  "陳",
+  "仍",
+  "羅",
+  "鹽",
+  "友",
+  "洋",
+  "錯",
+  "苦",
+  "夜",
+  "刑",
+  "移",
+  "頻",
+  "逐",
+  "靠",
+  "混",
+  "母",
+  "短",
+  "皮",
+  "終",
+  "聚",
+  "汽",
+  "村",
+  "雲",
+  "哪",
+  "既",
+  "距",
+  "衛",
+  "停",
+  "烈",
+  "央",
+  "察",
+  "燒",
+  "迅",
+  "境",
+  "若",
+  "印",
+  "洲",
+  "刻",
+  "括",
+  "激",
+  "孔",
+  "搞",
+  "甚",
+  "室",
+  "待",
+  "核",
+  "校",
+  "散",
+  "侵",
+  "吧",
+  "甲",
+  "遊",
+  "久",
+  "菜",
+  "味",
+  "舊",
+  "模",
+  "湖",
+  "貨",
+  "損",
+  "預",
+  "阻",
+  "毫",
+  "普",
+  "穩",
+  "乙",
+  "媽",
+  "植",
+  "息",
+  "擴",
+  "銀",
+  "語",
+  "揮",
+  "酒",
+  "守",
+  "拿",
+  "序",
+  "紙",
+  "醫",
+  "缺",
+  "雨",
+  "嗎",
+  "針",
+  "劉",
+  "啊",
+  "急",
+  "唱",
+  "誤",
+  "訓",
+  "願",
+  "審",
+  "附",
+  "獲",
+  "茶",
+  "鮮",
+  "糧",
+  "斤",
+  "孩",
+  "脫",
+  "硫",
+  "肥",
+  "善",
+  "龍",
+  "演",
+  "父",
+  "漸",
+  "血",
+  "歡",
+  "械",
+  "掌",
+  "歌",
+  "沙",
+  "剛",
+  "攻",
+  "謂",
+  "盾",
+  "討",
+  "晚",
+  "粒",
+  "亂",
+  "燃",
+  "矛",
+  "乎",
+  "殺",
+  "藥",
+  "寧",
+  "魯",
+  "貴",
+  "鐘",
+  "煤",
+  "讀",
+  "班",
+  "伯",
+  "香",
+  "介",
+  "迫",
+  "句",
+  "豐",
+  "培",
+  "握",
+  "蘭",
+  "擔",
+  "弦",
+  "蛋",
+  "沉",
+  "假",
+  "穿",
+  "執",
+  "答",
+  "樂",
+  "誰",
+  "順",
+  "煙",
+  "縮",
+  "徵",
+  "臉",
+  "喜",
+  "松",
+  "腳",
+  "困",
+  "異",
+  "免",
+  "背",
+  "星",
+  "福",
+  "買",
+  "染",
+  "井",
+  "概",
+  "慢",
+  "怕",
+  "磁",
+  "倍",
+  "祖",
+  "皇",
+  "促",
+  "靜",
+  "補",
+  "評",
+  "翻",
+  "肉",
+  "踐",
+  "尼",
+  "衣",
+  "寬",
+  "揚",
+  "棉",
+  "希",
+  "傷",
+  "操",
+  "垂",
+  "秋",
+  "宜",
+  "氫",
+  "套",
+  "督",
+  "振",
+  "架",
+  "亮",
+  "末",
+  "憲",
+  "慶",
+  "編",
+  "牛",
+  "觸",
+  "映",
+  "雷",
+  "銷",
+  "詩",
+  "座",
+  "居",
+  "抓",
+  "裂",
+  "胞",
+  "呼",
+  "娘",
+  "景",
+  "威",
+  "綠",
+  "晶",
+  "厚",
+  "盟",
+  "衡",
+  "雞",
+  "孫",
+  "延",
+  "危",
+  "膠",
+  "屋",
+  "鄉",
+  "臨",
+  "陸",
+  "顧",
+  "掉",
+  "呀",
+  "燈",
+  "歲",
+  "措",
+  "束",
+  "耐",
+  "劇",
+  "玉",
+  "趙",
+  "跳",
+  "哥",
+  "季",
+  "課",
+  "凱",
+  "胡",
+  "額",
+  "款",
+  "紹",
+  "卷",
+  "齊",
+  "偉",
+  "蒸",
+  "殖",
+  "永",
+  "宗",
+  "苗",
+  "川",
+  "爐",
+  "岩",
+  "弱",
+  "零",
+  "楊",
+  "奏",
+  "沿",
+  "露",
+  "桿",
+  "探",
+  "滑",
+  "鎮",
+  "飯",
+  "濃",
+  "航",
+  "懷",
+  "趕",
+  "庫",
+  "奪",
+  "伊",
+  "靈",
+  "稅",
+  "途",
+  "滅",
+  "賽",
+  "歸",
+  "召",
+  "鼓",
+  "播",
+  "盤",
+  "裁",
+  "險",
+  "康",
+  "唯",
+  "錄",
+  "菌",
+  "純",
+  "借",
+  "糖",
+  "蓋",
+  "橫",
+  "符",
+  "私",
+  "努",
+  "堂",
+  "域",
+  "槍",
+  "潤",
+  "幅",
+  "哈",
+  "竟",
+  "熟",
+  "蟲",
+  "澤",
+  "腦",
+  "壤",
+  "碳",
+  "歐",
+  "遍",
+  "側",
+  "寨",
+  "敢",
+  "徹",
+  "慮",
+  "斜",
+  "薄",
+  "庭",
+  "納",
+  "彈",
+  "飼",
+  "伸",
+  "折",
+  "麥",
+  "濕",
+  "暗",
+  "荷",
+  "瓦",
+  "塞",
+  "床",
+  "築",
+  "惡",
+  "戶",
+  "訪",
+  "塔",
+  "奇",
+  "透",
+  "梁",
+  "刀",
+  "旋",
+  "跡",
+  "卡",
+  "氯",
+  "遇",
+  "份",
+  "毒",
+  "泥",
+  "退",
+  "洗",
+  "擺",
+  "灰",
+  "彩",
+  "賣",
+  "耗",
+  "夏",
+  "擇",
+  "忙",
+  "銅",
+  "獻",
+  "硬",
+  "予",
+  "繁",
+  "圈",
+  "雪",
+  "函",
+  "亦",
+  "抽",
+  "篇",
+  "陣",
+  "陰",
+  "丁",
+  "尺",
+  "追",
+  "堆",
+  "雄",
+  "迎",
+  "泛",
+  "爸",
+  "樓",
+  "避",
+  "謀",
+  "噸",
+  "野",
+  "豬",
+  "旗",
+  "累",
+  "偏",
+  "典",
+  "館",
+  "索",
+  "秦",
+  "脂",
+  "潮",
+  "爺",
+  "豆",
+  "忽",
+  "托",
+  "驚",
+  "塑",
+  "遺",
+  "愈",
+  "朱",
+  "替",
+  "纖",
+  "粗",
+  "傾",
+  "尚",
+  "痛",
+  "楚",
+  "謝",
+  "奮",
+  "購",
+  "磨",
+  "君",
+  "池",
+  "旁",
+  "碎",
+  "骨",
+  "監",
+  "捕",
+  "弟",
+  "暴",
+  "割",
+  "貫",
+  "殊",
+  "釋",
+  "詞",
+  "亡",
+  "壁",
+  "頓",
+  "寶",
+  "午",
+  "塵",
+  "聞",
+  "揭",
+  "炮",
+  "殘",
+  "冬",
+  "橋",
+  "婦",
+  "警",
+  "綜",
+  "招",
+  "吳",
+  "付",
+  "浮",
+  "遭",
+  "徐",
+  "您",
+  "搖",
+  "谷",
+  "贊",
+  "箱",
+  "隔",
+  "訂",
+  "男",
+  "吹",
+  "園",
+  "紛",
+  "唐",
+  "敗",
+  "宋",
+  "玻",
+  "巨",
+  "耕",
+  "坦",
+  "榮",
+  "閉",
+  "灣",
+  "鍵",
+  "凡",
+  "駐",
+  "鍋",
+  "救",
+  "恩",
+  "剝",
+  "凝",
+  "鹼",
+  "齒",
+  "截",
+  "煉",
+  "麻",
+  "紡",
+  "禁",
+  "廢",
+  "盛",
+  "版",
+  "緩",
+  "淨",
+  "睛",
+  "昌",
+  "婚",
+  "涉",
+  "筒",
+  "嘴",
+  "插",
+  "岸",
+  "朗",
+  "莊",
+  "街",
+  "藏",
+  "姑",
+  "貿",
+  "腐",
+  "奴",
+  "啦",
+  "慣",
+  "乘",
+  "夥",
+  "恢",
+  "勻",
+  "紗",
+  "扎",
+  "辯",
+  "耳",
+  "彪",
+  "臣",
+  "億",
+  "璃",
+  "抵",
+  "脈",
+  "秀",
+  "薩",
+  "俄",
+  "網",
+  "舞",
+  "店",
+  "噴",
+  "縱",
+  "寸",
+  "汗",
+  "掛",
+  "洪",
+  "賀",
+  "閃",
+  "柬",
+  "爆",
+  "烯",
+  "津",
+  "稻",
+  "牆",
+  "軟",
+  "勇",
+  "像",
+  "滾",
+  "厘",
+  "蒙",
+  "芳",
+  "肯",
+  "坡",
+  "柱",
+  "盪",
+  "腿",
+  "儀",
+  "旅",
+  "尾",
+  "軋",
+  "冰",
+  "貢",
+  "登",
+  "黎",
+  "削",
+  "鑽",
+  "勒",
+  "逃",
+  "障",
+  "氨",
+  "郭",
+  "峰",
+  "幣",
+  "港",
+  "伏",
+  "軌",
+  "畝",
+  "畢",
+  "擦",
+  "莫",
+  "刺",
+  "浪",
+  "秘",
+  "援",
+  "株",
+  "健",
+  "售",
+  "股",
+  "島",
+  "甘",
+  "泡",
+  "睡",
+  "童",
+  "鑄",
+  "湯",
+  "閥",
+  "休",
+  "匯",
+  "舍",
+  "牧",
+  "繞",
+  "炸",
+  "哲",
+  "磷",
+  "績",
+  "朋",
+  "淡",
+  "尖",
+  "啟",
+  "陷",
+  "柴",
+  "呈",
+  "徒",
+  "顏",
+  "淚",
+  "稍",
+  "忘",
+  "泵",
+  "藍",
+  "拖",
+  "洞",
+  "授",
+  "鏡",
+  "辛",
+  "壯",
+  "鋒",
+  "貧",
+  "虛",
+  "彎",
+  "摩",
+  "泰",
+  "幼",
+  "廷",
+  "尊",
+  "窗",
+  "綱",
+  "弄",
+  "隸",
+  "疑",
+  "氏",
+  "宮",
+  "姐",
+  "震",
+  "瑞",
+  "怪",
+  "尤",
+  "琴",
+  "循",
+  "描",
+  "膜",
+  "違",
+  "夾",
+  "腰",
+  "緣",
+  "珠",
+  "窮",
+  "森",
+  "枝",
+  "竹",
+  "溝",
+  "催",
+  "繩",
+  "憶",
+  "邦",
+  "剩",
+  "幸",
+  "漿",
+  "欄",
+  "擁",
+  "牙",
+  "貯",
+  "禮",
+  "濾",
+  "鈉",
+  "紋",
+  "罷",
+  "拍",
+  "咱",
+  "喊",
+  "袖",
+  "埃",
+  "勤",
+  "罰",
+  "焦",
+  "潛",
+  "伍",
+  "墨",
+  "欲",
+  "縫",
+  "姓",
+  "刊",
+  "飽",
+  "仿",
+  "獎",
+  "鋁",
+  "鬼",
+  "麗",
+  "跨",
+  "默",
+  "挖",
+  "鏈",
+  "掃",
+  "喝",
+  "袋",
+  "炭",
+  "污",
+  "幕",
+  "諸",
+  "弧",
+  "勵",
+  "梅",
+  "奶",
+  "潔",
+  "災",
+  "舟",
+  "鑑",
+  "苯",
+  "訟",
+  "抱",
+  "毀",
+  "懂",
+  "寒",
+  "智",
+  "埔",
+  "寄",
+  "屆",
+  "躍",
+  "渡",
+  "挑",
+  "丹",
+  "艱",
+  "貝",
+  "碰",
+  "拔",
+  "爹",
+  "戴",
+  "碼",
+  "夢",
+  "芽",
+  "熔",
+  "赤",
+  "漁",
+  "哭",
+  "敬",
+  "顆",
+  "奔",
+  "鉛",
+  "仲",
+  "虎",
+  "稀",
+  "妹",
+  "乏",
+  "珍",
+  "申",
+  "桌",
+  "遵",
+  "允",
+  "隆",
+  "螺",
+  "倉",
+  "魏",
+  "銳",
+  "曉",
+  "氮",
+  "兼",
+  "隱",
+  "礙",
+  "赫",
+  "撥",
+  "忠",
+  "肅",
+  "缸",
+  "牽",
+  "搶",
+  "博",
+  "巧",
+  "殼",
+  "兄",
+  "杜",
+  "訊",
+  "誠",
+  "碧",
+  "祥",
+  "柯",
+  "頁",
+  "巡",
+  "矩",
+  "悲",
+  "灌",
+  "齡",
+  "倫",
+  "票",
+  "尋",
+  "桂",
+  "鋪",
+  "聖",
+  "恐",
+  "恰",
+  "鄭",
+  "趣",
+  "抬",
+  "荒",
+  "騰",
+  "貼",
+  "柔",
+  "滴",
+  "猛",
+  "闊",
+  "輛",
+  "妻",
+  "填",
+  "撤",
+  "儲",
+  "簽",
+  "鬧",
+  "擾",
+  "紫",
+  "砂",
+  "遞",
+  "戲",
+  "吊",
+  "陶",
+  "伐",
+  "餵",
+  "療",
+  "瓶",
+  "婆",
+  "撫",
+  "臂",
+  "摸",
+  "忍",
+  "蝦",
+  "蠟",
+  "鄰",
+  "胸",
+  "鞏",
+  "擠",
+  "偶",
+  "棄",
+  "槽",
+  "勁",
+  "乳",
+  "鄧",
+  "吉",
+  "仁",
+  "爛",
+  "磚",
+  "租",
+  "烏",
+  "艦",
+  "伴",
+  "瓜",
+  "淺",
+  "丙",
+  "暫",
+  "燥",
+  "橡",
+  "柳",
+  "迷",
+  "暖",
+  "牌",
+  "秧",
+  "膽",
+  "詳",
+  "簧",
+  "踏",
+  "瓷",
+  "譜",
+  "呆",
+  "賓",
+  "糊",
+  "洛",
+  "輝",
+  "憤",
+  "競",
+  "隙",
+  "怒",
+  "粘",
+  "乃",
+  "緒",
+  "肩",
+  "籍",
+  "敏",
+  "塗",
+  "熙",
+  "皆",
+  "偵",
+  "懸",
+  "掘",
+  "享",
+  "糾",
+  "醒",
+  "狂",
+  "鎖",
+  "淀",
+  "恨",
+  "牲",
+  "霸",
+  "爬",
+  "賞",
+  "逆",
+  "玩",
+  "陵",
+  "祝",
+  "秒",
+  "浙",
+  "貌",
+  "役",
+  "彼",
+  "悉",
+  "鴨",
+  "趨",
+  "鳳",
+  "晨",
+  "畜",
+  "輩",
+  "秩",
+  "卵",
+  "署",
+  "梯",
+  "炎",
+  "灘",
+  "棋",
+  "驅",
+  "篩",
+  "峽",
+  "冒",
+  "啥",
+  "壽",
+  "譯",
+  "浸",
+  "泉",
+  "帽",
+  "遲",
+  "矽",
+  "疆",
+  "貸",
+  "漏",
+  "稿",
+  "冠",
+  "嫩",
+  "脅",
+  "芯",
+  "牢",
+  "叛",
+  "蝕",
+  "奧",
+  "鳴",
+  "嶺",
+  "羊",
+  "憑",
+  "串",
+  "塘",
+  "繪",
+  "酵",
+  "融",
+  "盆",
+  "錫",
+  "廟",
+  "籌",
+  "凍",
+  "輔",
+  "攝",
+  "襲",
+  "筋",
+  "拒",
+  "僚",
+  "旱",
+  "鉀",
+  "鳥",
+  "漆",
+  "沈",
+  "眉",
+  "疏",
+  "添",
+  "棒",
+  "穗",
+  "硝",
+  "韓",
+  "逼",
+  "扭",
+  "僑",
+  "涼",
+  "挺",
+  "碗",
+  "栽",
+  "炒",
+  "杯",
+  "患",
+  "餾",
+  "勸",
+  "豪",
+  "遼",
+  "勃",
+  "鴻",
+  "旦",
+  "吏",
+  "拜",
+  "狗",
+  "埋",
+  "輥",
+  "掩",
+  "飲",
+  "搬",
+  "罵",
+  "辭",
+  "勾",
+  "扣",
+  "估",
+  "蔣",
+  "絨",
+  "霧",
+  "丈",
+  "朵",
+  "姆",
+  "擬",
+  "宇",
+  "輯",
+  "陝",
+  "雕",
+  "償",
+  "蓄",
+  "崇",
+  "剪",
+  "倡",
+  "廳",
+  "咬",
+  "駛",
+  "薯",
+  "刷",
+  "斥",
+  "番",
+  "賦",
+  "奉",
+  "佛",
+  "澆",
+  "漫",
+  "曼",
+  "扇",
+  "鈣",
+  "桃",
+  "扶",
+  "仔",
+  "返",
+  "俗",
+  "虧",
+  "腔",
+  "鞋",
+  "棱",
+  "覆",
+  "框",
+  "悄",
+  "叔",
+  "撞",
+  "騙",
+  "勘",
+  "旺",
+  "沸",
+  "孤",
+  "吐",
+  "孟",
+  "渠",
+  "屈",
+  "疾",
+  "妙",
+  "惜",
+  "仰",
+  "狠",
+  "脹",
+  "諧",
+  "拋",
+  "黴",
+  "桑",
+  "崗",
+  "嘛",
+  "衰",
+  "盜",
+  "滲",
+  "臟",
+  "賴",
+  "湧",
+  "甜",
+  "曹",
+  "閱",
+  "肌",
+  "哩",
+  "厲",
+  "烴",
+  "緯",
+  "毅",
+  "昨",
+  "偽",
+  "症",
+  "煮",
+  "嘆",
+  "釘",
+  "搭",
+  "莖",
+  "籠",
+  "酷",
+  "偷",
+  "弓",
+  "錐",
+  "恆",
+  "傑",
+  "坑",
+  "鼻",
+  "翼",
+  "綸",
+  "敘",
+  "獄",
+  "逮",
+  "罐",
+  "絡",
+  "棚",
+  "抑",
+  "膨",
+  "蔬",
+  "寺",
+  "驟",
+  "穆",
+  "冶",
+  "枯",
+  "冊",
+  "屍",
+  "凸",
+  "紳",
+  "坯",
+  "犧",
+  "焰",
+  "轟",
+  "欣",
+  "晉",
+  "瘦",
+  "禦",
+  "錠",
+  "錦",
+  "喪",
+  "旬",
+  "鍛",
+  "壟",
+  "搜",
+  "撲",
+  "邀",
+  "亭",
+  "酯",
+  "邁",
+  "舒",
+  "脆",
+  "酶",
+  "閒",
+  "憂",
+  "酚",
+  "頑",
+  "羽",
+  "漲",
+  "卸",
+  "仗",
+  "陪",
+  "闢",
+  "懲",
+  "杭",
+  "姚",
+  "肚",
+  "捉",
+  "飄",
+  "漂",
+  "昆",
+  "欺",
+  "吾",
+  "郎",
+  "烷",
+  "汁",
+  "呵",
+  "飾",
+  "蕭",
+  "雅",
+  "郵",
+  "遷",
+  "燕",
+  "撒",
+  "姻",
+  "赴",
+  "宴",
+  "煩",
+  "債",
+  "帳",
+  "斑",
+  "鈴",
+  "旨",
+  "醇",
+  "董",
+  "餅",
+  "雛",
+  "姿",
+  "拌",
+  "傅",
+  "腹",
+  "妥",
+  "揉",
+  "賢",
+  "拆",
+  "歪",
+  "葡",
+  "胺",
+  "丟",
+  "浩",
+  "徽",
+  "昂",
+  "墊",
+  "擋",
+  "覽",
+  "貪",
+  "慰",
+  "繳",
+  "汪",
+  "慌",
+  "馮",
+  "諾",
+  "姜",
+  "誼",
+  "兇",
+  "劣",
+  "誣",
+  "耀",
+  "昏",
+  "躺",
+  "盈",
+  "騎",
+  "喬",
+  "溪",
+  "叢",
+  "盧",
+  "抹",
+  "悶",
+  "諮",
+  "刮",
+  "駕",
+  "纜",
+  "悟",
+  "摘",
+  "鉺",
+  "擲",
+  "頗",
+  "幻",
+  "柄",
+  "惠",
+  "慘",
+  "佳",
+  "仇",
+  "臘",
+  "窩",
+  "滌",
+  "劍",
+  "瞧",
+  "堡",
+  "潑",
+  "蔥",
+  "罩",
+  "霍",
+  "撈",
+  "胎",
+  "蒼",
+  "濱",
+  "倆",
+  "捅",
+  "湘",
+  "砍",
+  "霞",
+  "邵",
+  "萄",
+  "瘋",
+  "淮",
+  "遂",
+  "熊",
+  "糞",
+  "烘",
+  "宿",
+  "檔",
+  "戈",
+  "駁",
+  "嫂",
+  "裕",
+  "徙",
+  "箭",
+  "捐",
+  "腸",
+  "撐",
+  "曬",
+  "辨",
+  "殿",
+  "蓮",
+  "攤",
+  "攪",
+  "醬",
+  "屏",
+  "疫",
+  "哀",
+  "蔡",
+  "堵",
+  "沫",
+  "皺",
+  "暢",
+  "疊",
+  "閣",
+  "萊",
+  "敲",
+  "轄",
+  "鉤",
+  "痕",
+  "壩",
+  "巷",
+  "餓",
+  "禍",
+  "丘",
+  "玄",
+  "溜",
+  "曰",
+  "邏",
+  "彭",
+  "嘗",
+  "卿",
+  "妨",
+  "艇",
+  "吞",
+  "韋",
+  "怨",
+  "矮",
+  "歇"
+]
+
+},{}],77:[function(require,module,exports){
+module.exports=[
+  "abandon",
+  "ability",
+  "able",
+  "about",
+  "above",
+  "absent",
+  "absorb",
+  "abstract",
+  "absurd",
+  "abuse",
+  "access",
+  "accident",
+  "account",
+  "accuse",
+  "achieve",
+  "acid",
+  "acoustic",
+  "acquire",
+  "across",
+  "act",
+  "action",
+  "actor",
+  "actress",
+  "actual",
+  "adapt",
+  "add",
+  "addict",
+  "address",
+  "adjust",
+  "admit",
+  "adult",
+  "advance",
+  "advice",
+  "aerobic",
+  "affair",
+  "afford",
+  "afraid",
+  "again",
+  "age",
+  "agent",
+  "agree",
+  "ahead",
+  "aim",
+  "air",
+  "airport",
+  "aisle",
+  "alarm",
+  "album",
+  "alcohol",
+  "alert",
+  "alien",
+  "all",
+  "alley",
+  "allow",
+  "almost",
+  "alone",
+  "alpha",
+  "already",
+  "also",
+  "alter",
+  "always",
+  "amateur",
+  "amazing",
+  "among",
+  "amount",
+  "amused",
+  "analyst",
+  "anchor",
+  "ancient",
+  "anger",
+  "angle",
+  "angry",
+  "animal",
+  "ankle",
+  "announce",
+  "annual",
+  "another",
+  "answer",
+  "antenna",
+  "antique",
+  "anxiety",
+  "any",
+  "apart",
+  "apology",
+  "appear",
+  "apple",
+  "approve",
+  "april",
+  "arch",
+  "arctic",
+  "area",
+  "arena",
+  "argue",
+  "arm",
+  "armed",
+  "armor",
+  "army",
+  "around",
+  "arrange",
+  "arrest",
+  "arrive",
+  "arrow",
+  "art",
+  "artefact",
+  "artist",
+  "artwork",
+  "ask",
+  "aspect",
+  "assault",
+  "asset",
+  "assist",
+  "assume",
+  "asthma",
+  "athlete",
+  "atom",
+  "attack",
+  "attend",
+  "attitude",
+  "attract",
+  "auction",
+  "audit",
+  "august",
+  "aunt",
+  "author",
+  "auto",
+  "autumn",
+  "average",
+  "avocado",
+  "avoid",
+  "awake",
+  "aware",
+  "away",
+  "awesome",
+  "awful",
+  "awkward",
+  "axis",
+  "baby",
+  "bachelor",
+  "bacon",
+  "badge",
+  "bag",
+  "balance",
+  "balcony",
+  "ball",
+  "bamboo",
+  "banana",
+  "banner",
+  "bar",
+  "barely",
+  "bargain",
+  "barrel",
+  "base",
+  "basic",
+  "basket",
+  "battle",
+  "beach",
+  "bean",
+  "beauty",
+  "because",
+  "become",
+  "beef",
+  "before",
+  "begin",
+  "behave",
+  "behind",
+  "believe",
+  "below",
+  "belt",
+  "bench",
+  "benefit",
+  "best",
+  "betray",
+  "better",
+  "between",
+  "beyond",
+  "bicycle",
+  "bid",
+  "bike",
+  "bind",
+  "biology",
+  "bird",
+  "birth",
+  "bitter",
+  "black",
+  "blade",
+  "blame",
+  "blanket",
+  "blast",
+  "bleak",
+  "bless",
+  "blind",
+  "blood",
+  "blossom",
+  "blouse",
+  "blue",
+  "blur",
+  "blush",
+  "board",
+  "boat",
+  "body",
+  "boil",
+  "bomb",
+  "bone",
+  "bonus",
+  "book",
+  "boost",
+  "border",
+  "boring",
+  "borrow",
+  "boss",
+  "bottom",
+  "bounce",
+  "box",
+  "boy",
+  "bracket",
+  "brain",
+  "brand",
+  "brass",
+  "brave",
+  "bread",
+  "breeze",
+  "brick",
+  "bridge",
+  "brief",
+  "bright",
+  "bring",
+  "brisk",
+  "broccoli",
+  "broken",
+  "bronze",
+  "broom",
+  "brother",
+  "brown",
+  "brush",
+  "bubble",
+  "buddy",
+  "budget",
+  "buffalo",
+  "build",
+  "bulb",
+  "bulk",
+  "bullet",
+  "bundle",
+  "bunker",
+  "burden",
+  "burger",
+  "burst",
+  "bus",
+  "business",
+  "busy",
+  "butter",
+  "buyer",
+  "buzz",
+  "cabbage",
+  "cabin",
+  "cable",
+  "cactus",
+  "cage",
+  "cake",
+  "call",
+  "calm",
+  "camera",
+  "camp",
+  "can",
+  "canal",
+  "cancel",
+  "candy",
+  "cannon",
+  "canoe",
+  "canvas",
+  "canyon",
+  "capable",
+  "capital",
+  "captain",
+  "car",
+  "carbon",
+  "card",
+  "cargo",
+  "carpet",
+  "carry",
+  "cart",
+  "case",
+  "cash",
+  "casino",
+  "castle",
+  "casual",
+  "cat",
+  "catalog",
+  "catch",
+  "category",
+  "cattle",
+  "caught",
+  "cause",
+  "caution",
+  "cave",
+  "ceiling",
+  "celery",
+  "cement",
+  "census",
+  "century",
+  "cereal",
+  "certain",
+  "chair",
+  "chalk",
+  "champion",
+  "change",
+  "chaos",
+  "chapter",
+  "charge",
+  "chase",
+  "chat",
+  "cheap",
+  "check",
+  "cheese",
+  "chef",
+  "cherry",
+  "chest",
+  "chicken",
+  "chief",
+  "child",
+  "chimney",
+  "choice",
+  "choose",
+  "chronic",
+  "chuckle",
+  "chunk",
+  "churn",
+  "cigar",
+  "cinnamon",
+  "circle",
+  "citizen",
+  "city",
+  "civil",
+  "claim",
+  "clap",
+  "clarify",
+  "claw",
+  "clay",
+  "clean",
+  "clerk",
+  "clever",
+  "click",
+  "client",
+  "cliff",
+  "climb",
+  "clinic",
+  "clip",
+  "clock",
+  "clog",
+  "close",
+  "cloth",
+  "cloud",
+  "clown",
+  "club",
+  "clump",
+  "cluster",
+  "clutch",
+  "coach",
+  "coast",
+  "coconut",
+  "code",
+  "coffee",
+  "coil",
+  "coin",
+  "collect",
+  "color",
+  "column",
+  "combine",
+  "come",
+  "comfort",
+  "comic",
+  "common",
+  "company",
+  "concert",
+  "conduct",
+  "confirm",
+  "congress",
+  "connect",
+  "consider",
+  "control",
+  "convince",
+  "cook",
+  "cool",
+  "copper",
+  "copy",
+  "coral",
+  "core",
+  "corn",
+  "correct",
+  "cost",
+  "cotton",
+  "couch",
+  "country",
+  "couple",
+  "course",
+  "cousin",
+  "cover",
+  "coyote",
+  "crack",
+  "cradle",
+  "craft",
+  "cram",
+  "crane",
+  "crash",
+  "crater",
+  "crawl",
+  "crazy",
+  "cream",
+  "credit",
+  "creek",
+  "crew",
+  "cricket",
+  "crime",
+  "crisp",
+  "critic",
+  "crop",
+  "cross",
+  "crouch",
+  "crowd",
+  "crucial",
+  "cruel",
+  "cruise",
+  "crumble",
+  "crunch",
+  "crush",
+  "cry",
+  "crystal",
+  "cube",
+  "culture",
+  "cup",
+  "cupboard",
+  "curious",
+  "current",
+  "curtain",
+  "curve",
+  "cushion",
+  "custom",
+  "cute",
+  "cycle",
+  "dad",
+  "damage",
+  "damp",
+  "dance",
+  "danger",
+  "daring",
+  "dash",
+  "daughter",
+  "dawn",
+  "day",
+  "deal",
+  "debate",
+  "debris",
+  "decade",
+  "december",
+  "decide",
+  "decline",
+  "decorate",
+  "decrease",
+  "deer",
+  "defense",
+  "define",
+  "defy",
+  "degree",
+  "delay",
+  "deliver",
+  "demand",
+  "demise",
+  "denial",
+  "dentist",
+  "deny",
+  "depart",
+  "depend",
+  "deposit",
+  "depth",
+  "deputy",
+  "derive",
+  "describe",
+  "desert",
+  "design",
+  "desk",
+  "despair",
+  "destroy",
+  "detail",
+  "detect",
+  "develop",
+  "device",
+  "devote",
+  "diagram",
+  "dial",
+  "diamond",
+  "diary",
+  "dice",
+  "diesel",
+  "diet",
+  "differ",
+  "digital",
+  "dignity",
+  "dilemma",
+  "dinner",
+  "dinosaur",
+  "direct",
+  "dirt",
+  "disagree",
+  "discover",
+  "disease",
+  "dish",
+  "dismiss",
+  "disorder",
+  "display",
+  "distance",
+  "divert",
+  "divide",
+  "divorce",
+  "dizzy",
+  "doctor",
+  "document",
+  "dog",
+  "doll",
+  "dolphin",
+  "domain",
+  "donate",
+  "donkey",
+  "donor",
+  "door",
+  "dose",
+  "double",
+  "dove",
+  "draft",
+  "dragon",
+  "drama",
+  "drastic",
+  "draw",
+  "dream",
+  "dress",
+  "drift",
+  "drill",
+  "drink",
+  "drip",
+  "drive",
+  "drop",
+  "drum",
+  "dry",
+  "duck",
+  "dumb",
+  "dune",
+  "during",
+  "dust",
+  "dutch",
+  "duty",
+  "dwarf",
+  "dynamic",
+  "eager",
+  "eagle",
+  "early",
+  "earn",
+  "earth",
+  "easily",
+  "east",
+  "easy",
+  "echo",
+  "ecology",
+  "economy",
+  "edge",
+  "edit",
+  "educate",
+  "effort",
+  "egg",
+  "eight",
+  "either",
+  "elbow",
+  "elder",
+  "electric",
+  "elegant",
+  "element",
+  "elephant",
+  "elevator",
+  "elite",
+  "else",
+  "embark",
+  "embody",
+  "embrace",
+  "emerge",
+  "emotion",
+  "employ",
+  "empower",
+  "empty",
+  "enable",
+  "enact",
+  "end",
+  "endless",
+  "endorse",
+  "enemy",
+  "energy",
+  "enforce",
+  "engage",
+  "engine",
+  "enhance",
+  "enjoy",
+  "enlist",
+  "enough",
+  "enrich",
+  "enroll",
+  "ensure",
+  "enter",
+  "entire",
+  "entry",
+  "envelope",
+  "episode",
+  "equal",
+  "equip",
+  "era",
+  "erase",
+  "erode",
+  "erosion",
+  "error",
+  "erupt",
+  "escape",
+  "essay",
+  "essence",
+  "estate",
+  "eternal",
+  "ethics",
+  "evidence",
+  "evil",
+  "evoke",
+  "evolve",
+  "exact",
+  "example",
+  "excess",
+  "exchange",
+  "excite",
+  "exclude",
+  "excuse",
+  "execute",
+  "exercise",
+  "exhaust",
+  "exhibit",
+  "exile",
+  "exist",
+  "exit",
+  "exotic",
+  "expand",
+  "expect",
+  "expire",
+  "explain",
+  "expose",
+  "express",
+  "extend",
+  "extra",
+  "eye",
+  "eyebrow",
+  "fabric",
+  "face",
+  "faculty",
+  "fade",
+  "faint",
+  "faith",
+  "fall",
+  "false",
+  "fame",
+  "family",
+  "famous",
+  "fan",
+  "fancy",
+  "fantasy",
+  "farm",
+  "fashion",
+  "fat",
+  "fatal",
+  "father",
+  "fatigue",
+  "fault",
+  "favorite",
+  "feature",
+  "february",
+  "federal",
+  "fee",
+  "feed",
+  "feel",
+  "female",
+  "fence",
+  "festival",
+  "fetch",
+  "fever",
+  "few",
+  "fiber",
+  "fiction",
+  "field",
+  "figure",
+  "file",
+  "film",
+  "filter",
+  "final",
+  "find",
+  "fine",
+  "finger",
+  "finish",
+  "fire",
+  "firm",
+  "first",
+  "fiscal",
+  "fish",
+  "fit",
+  "fitness",
+  "fix",
+  "flag",
+  "flame",
+  "flash",
+  "flat",
+  "flavor",
+  "flee",
+  "flight",
+  "flip",
+  "float",
+  "flock",
+  "floor",
+  "flower",
+  "fluid",
+  "flush",
+  "fly",
+  "foam",
+  "focus",
+  "fog",
+  "foil",
+  "fold",
+  "follow",
+  "food",
+  "foot",
+  "force",
+  "forest",
+  "forget",
+  "fork",
+  "fortune",
+  "forum",
+  "forward",
+  "fossil",
+  "foster",
+  "found",
+  "fox",
+  "fragile",
+  "frame",
+  "frequent",
+  "fresh",
+  "friend",
+  "fringe",
+  "frog",
+  "front",
+  "frost",
+  "frown",
+  "frozen",
+  "fruit",
+  "fuel",
+  "fun",
+  "funny",
+  "furnace",
+  "fury",
+  "future",
+  "gadget",
+  "gain",
+  "galaxy",
+  "gallery",
+  "game",
+  "gap",
+  "garage",
+  "garbage",
+  "garden",
+  "garlic",
+  "garment",
+  "gas",
+  "gasp",
+  "gate",
+  "gather",
+  "gauge",
+  "gaze",
+  "general",
+  "genius",
+  "genre",
+  "gentle",
+  "genuine",
+  "gesture",
+  "ghost",
+  "giant",
+  "gift",
+  "giggle",
+  "ginger",
+  "giraffe",
+  "girl",
+  "give",
+  "glad",
+  "glance",
+  "glare",
+  "glass",
+  "glide",
+  "glimpse",
+  "globe",
+  "gloom",
+  "glory",
+  "glove",
+  "glow",
+  "glue",
+  "goat",
+  "goddess",
+  "gold",
+  "good",
+  "goose",
+  "gorilla",
+  "gospel",
+  "gossip",
+  "govern",
+  "gown",
+  "grab",
+  "grace",
+  "grain",
+  "grant",
+  "grape",
+  "grass",
+  "gravity",
+  "great",
+  "green",
+  "grid",
+  "grief",
+  "grit",
+  "grocery",
+  "group",
+  "grow",
+  "grunt",
+  "guard",
+  "guess",
+  "guide",
+  "guilt",
+  "guitar",
+  "gun",
+  "gym",
+  "habit",
+  "hair",
+  "half",
+  "hammer",
+  "hamster",
+  "hand",
+  "happy",
+  "harbor",
+  "hard",
+  "harsh",
+  "harvest",
+  "hat",
+  "have",
+  "hawk",
+  "hazard",
+  "head",
+  "health",
+  "heart",
+  "heavy",
+  "hedgehog",
+  "height",
+  "hello",
+  "helmet",
+  "help",
+  "hen",
+  "hero",
+  "hidden",
+  "high",
+  "hill",
+  "hint",
+  "hip",
+  "hire",
+  "history",
+  "hobby",
+  "hockey",
+  "hold",
+  "hole",
+  "holiday",
+  "hollow",
+  "home",
+  "honey",
+  "hood",
+  "hope",
+  "horn",
+  "horror",
+  "horse",
+  "hospital",
+  "host",
+  "hotel",
+  "hour",
+  "hover",
+  "hub",
+  "huge",
+  "human",
+  "humble",
+  "humor",
+  "hundred",
+  "hungry",
+  "hunt",
+  "hurdle",
+  "hurry",
+  "hurt",
+  "husband",
+  "hybrid",
+  "ice",
+  "icon",
+  "idea",
+  "identify",
+  "idle",
+  "ignore",
+  "ill",
+  "illegal",
+  "illness",
+  "image",
+  "imitate",
+  "immense",
+  "immune",
+  "impact",
+  "impose",
+  "improve",
+  "impulse",
+  "inch",
+  "include",
+  "income",
+  "increase",
+  "index",
+  "indicate",
+  "indoor",
+  "industry",
+  "infant",
+  "inflict",
+  "inform",
+  "inhale",
+  "inherit",
+  "initial",
+  "inject",
+  "injury",
+  "inmate",
+  "inner",
+  "innocent",
+  "input",
+  "inquiry",
+  "insane",
+  "insect",
+  "inside",
+  "inspire",
+  "install",
+  "intact",
+  "interest",
+  "into",
+  "invest",
+  "invite",
+  "involve",
+  "iron",
+  "island",
+  "isolate",
+  "issue",
+  "item",
+  "ivory",
+  "jacket",
+  "jaguar",
+  "jar",
+  "jazz",
+  "jealous",
+  "jeans",
+  "jelly",
+  "jewel",
+  "job",
+  "join",
+  "joke",
+  "journey",
+  "joy",
+  "judge",
+  "juice",
+  "jump",
+  "jungle",
+  "junior",
+  "junk",
+  "just",
+  "kangaroo",
+  "keen",
+  "keep",
+  "ketchup",
+  "key",
+  "kick",
+  "kid",
+  "kidney",
+  "kind",
+  "kingdom",
+  "kiss",
+  "kit",
+  "kitchen",
+  "kite",
+  "kitten",
+  "kiwi",
+  "knee",
+  "knife",
+  "knock",
+  "know",
+  "lab",
+  "label",
+  "labor",
+  "ladder",
+  "lady",
+  "lake",
+  "lamp",
+  "language",
+  "laptop",
+  "large",
+  "later",
+  "latin",
+  "laugh",
+  "laundry",
+  "lava",
+  "law",
+  "lawn",
+  "lawsuit",
+  "layer",
+  "lazy",
+  "leader",
+  "leaf",
+  "learn",
+  "leave",
+  "lecture",
+  "left",
+  "leg",
+  "legal",
+  "legend",
+  "leisure",
+  "lemon",
+  "lend",
+  "length",
+  "lens",
+  "leopard",
+  "lesson",
+  "letter",
+  "level",
+  "liar",
+  "liberty",
+  "library",
+  "license",
+  "life",
+  "lift",
+  "light",
+  "like",
+  "limb",
+  "limit",
+  "link",
+  "lion",
+  "liquid",
+  "list",
+  "little",
+  "live",
+  "lizard",
+  "load",
+  "loan",
+  "lobster",
+  "local",
+  "lock",
+  "logic",
+  "lonely",
+  "long",
+  "loop",
+  "lottery",
+  "loud",
+  "lounge",
+  "love",
+  "loyal",
+  "lucky",
+  "luggage",
+  "lumber",
+  "lunar",
+  "lunch",
+  "luxury",
+  "lyrics",
+  "machine",
+  "mad",
+  "magic",
+  "magnet",
+  "maid",
+  "mail",
+  "main",
+  "major",
+  "make",
+  "mammal",
+  "man",
+  "manage",
+  "mandate",
+  "mango",
+  "mansion",
+  "manual",
+  "maple",
+  "marble",
+  "march",
+  "margin",
+  "marine",
+  "market",
+  "marriage",
+  "mask",
+  "mass",
+  "master",
+  "match",
+  "material",
+  "math",
+  "matrix",
+  "matter",
+  "maximum",
+  "maze",
+  "meadow",
+  "mean",
+  "measure",
+  "meat",
+  "mechanic",
+  "medal",
+  "media",
+  "melody",
+  "melt",
+  "member",
+  "memory",
+  "mention",
+  "menu",
+  "mercy",
+  "merge",
+  "merit",
+  "merry",
+  "mesh",
+  "message",
+  "metal",
+  "method",
+  "middle",
+  "midnight",
+  "milk",
+  "million",
+  "mimic",
+  "mind",
+  "minimum",
+  "minor",
+  "minute",
+  "miracle",
+  "mirror",
+  "misery",
+  "miss",
+  "mistake",
+  "mix",
+  "mixed",
+  "mixture",
+  "mobile",
+  "model",
+  "modify",
+  "mom",
+  "moment",
+  "monitor",
+  "monkey",
+  "monster",
+  "month",
+  "moon",
+  "moral",
+  "more",
+  "morning",
+  "mosquito",
+  "mother",
+  "motion",
+  "motor",
+  "mountain",
+  "mouse",
+  "move",
+  "movie",
+  "much",
+  "muffin",
+  "mule",
+  "multiply",
+  "muscle",
+  "museum",
+  "mushroom",
+  "music",
+  "must",
+  "mutual",
+  "myself",
+  "mystery",
+  "myth",
+  "naive",
+  "name",
+  "napkin",
+  "narrow",
+  "nasty",
+  "nation",
+  "nature",
+  "near",
+  "neck",
+  "need",
+  "negative",
+  "neglect",
+  "neither",
+  "nephew",
+  "nerve",
+  "nest",
+  "net",
+  "network",
+  "neutral",
+  "never",
+  "news",
+  "next",
+  "nice",
+  "night",
+  "noble",
+  "noise",
+  "nominee",
+  "noodle",
+  "normal",
+  "north",
+  "nose",
+  "notable",
+  "note",
+  "nothing",
+  "notice",
+  "novel",
+  "now",
+  "nuclear",
+  "number",
+  "nurse",
+  "nut",
+  "oak",
+  "obey",
+  "object",
+  "oblige",
+  "obscure",
+  "observe",
+  "obtain",
+  "obvious",
+  "occur",
+  "ocean",
+  "october",
+  "odor",
+  "off",
+  "offer",
+  "office",
+  "often",
+  "oil",
+  "okay",
+  "old",
+  "olive",
+  "olympic",
+  "omit",
+  "once",
+  "one",
+  "onion",
+  "online",
+  "only",
+  "open",
+  "opera",
+  "opinion",
+  "oppose",
+  "option",
+  "orange",
+  "orbit",
+  "orchard",
+  "order",
+  "ordinary",
+  "organ",
+  "orient",
+  "original",
+  "orphan",
+  "ostrich",
+  "other",
+  "outdoor",
+  "outer",
+  "output",
+  "outside",
+  "oval",
+  "oven",
+  "over",
+  "own",
+  "owner",
+  "oxygen",
+  "oyster",
+  "ozone",
+  "pact",
+  "paddle",
+  "page",
+  "pair",
+  "palace",
+  "palm",
+  "panda",
+  "panel",
+  "panic",
+  "panther",
+  "paper",
+  "parade",
+  "parent",
+  "park",
+  "parrot",
+  "party",
+  "pass",
+  "patch",
+  "path",
+  "patient",
+  "patrol",
+  "pattern",
+  "pause",
+  "pave",
+  "payment",
+  "peace",
+  "peanut",
+  "pear",
+  "peasant",
+  "pelican",
+  "pen",
+  "penalty",
+  "pencil",
+  "people",
+  "pepper",
+  "perfect",
+  "permit",
+  "person",
+  "pet",
+  "phone",
+  "photo",
+  "phrase",
+  "physical",
+  "piano",
+  "picnic",
+  "picture",
+  "piece",
+  "pig",
+  "pigeon",
+  "pill",
+  "pilot",
+  "pink",
+  "pioneer",
+  "pipe",
+  "pistol",
+  "pitch",
+  "pizza",
+  "place",
+  "planet",
+  "plastic",
+  "plate",
+  "play",
+  "please",
+  "pledge",
+  "pluck",
+  "plug",
+  "plunge",
+  "poem",
+  "poet",
+  "point",
+  "polar",
+  "pole",
+  "police",
+  "pond",
+  "pony",
+  "pool",
+  "popular",
+  "portion",
+  "position",
+  "possible",
+  "post",
+  "potato",
+  "pottery",
+  "poverty",
+  "powder",
+  "power",
+  "practice",
+  "praise",
+  "predict",
+  "prefer",
+  "prepare",
+  "present",
+  "pretty",
+  "prevent",
+  "price",
+  "pride",
+  "primary",
+  "print",
+  "priority",
+  "prison",
+  "private",
+  "prize",
+  "problem",
+  "process",
+  "produce",
+  "profit",
+  "program",
+  "project",
+  "promote",
+  "proof",
+  "property",
+  "prosper",
+  "protect",
+  "proud",
+  "provide",
+  "public",
+  "pudding",
+  "pull",
+  "pulp",
+  "pulse",
+  "pumpkin",
+  "punch",
+  "pupil",
+  "puppy",
+  "purchase",
+  "purity",
+  "purpose",
+  "purse",
+  "push",
+  "put",
+  "puzzle",
+  "pyramid",
+  "quality",
+  "quantum",
+  "quarter",
+  "question",
+  "quick",
+  "quit",
+  "quiz",
+  "quote",
+  "rabbit",
+  "raccoon",
+  "race",
+  "rack",
+  "radar",
+  "radio",
+  "rail",
+  "rain",
+  "raise",
+  "rally",
+  "ramp",
+  "ranch",
+  "random",
+  "range",
+  "rapid",
+  "rare",
+  "rate",
+  "rather",
+  "raven",
+  "raw",
+  "razor",
+  "ready",
+  "real",
+  "reason",
+  "rebel",
+  "rebuild",
+  "recall",
+  "receive",
+  "recipe",
+  "record",
+  "recycle",
+  "reduce",
+  "reflect",
+  "reform",
+  "refuse",
+  "region",
+  "regret",
+  "regular",
+  "reject",
+  "relax",
+  "release",
+  "relief",
+  "rely",
+  "remain",
+  "remember",
+  "remind",
+  "remove",
+  "render",
+  "renew",
+  "rent",
+  "reopen",
+  "repair",
+  "repeat",
+  "replace",
+  "report",
+  "require",
+  "rescue",
+  "resemble",
+  "resist",
+  "resource",
+  "response",
+  "result",
+  "retire",
+  "retreat",
+  "return",
+  "reunion",
+  "reveal",
+  "review",
+  "reward",
+  "rhythm",
+  "rib",
+  "ribbon",
+  "rice",
+  "rich",
+  "ride",
+  "ridge",
+  "rifle",
+  "right",
+  "rigid",
+  "ring",
+  "riot",
+  "ripple",
+  "risk",
+  "ritual",
+  "rival",
+  "river",
+  "road",
+  "roast",
+  "robot",
+  "robust",
+  "rocket",
+  "romance",
+  "roof",
+  "rookie",
+  "room",
+  "rose",
+  "rotate",
+  "rough",
+  "round",
+  "route",
+  "royal",
+  "rubber",
+  "rude",
+  "rug",
+  "rule",
+  "run",
+  "runway",
+  "rural",
+  "sad",
+  "saddle",
+  "sadness",
+  "safe",
+  "sail",
+  "salad",
+  "salmon",
+  "salon",
+  "salt",
+  "salute",
+  "same",
+  "sample",
+  "sand",
+  "satisfy",
+  "satoshi",
+  "sauce",
+  "sausage",
+  "save",
+  "say",
+  "scale",
+  "scan",
+  "scare",
+  "scatter",
+  "scene",
+  "scheme",
+  "school",
+  "science",
+  "scissors",
+  "scorpion",
+  "scout",
+  "scrap",
+  "screen",
+  "script",
+  "scrub",
+  "sea",
+  "search",
+  "season",
+  "seat",
+  "second",
+  "secret",
+  "section",
+  "security",
+  "seed",
+  "seek",
+  "segment",
+  "select",
+  "sell",
+  "seminar",
+  "senior",
+  "sense",
+  "sentence",
+  "series",
+  "service",
+  "session",
+  "settle",
+  "setup",
+  "seven",
+  "shadow",
+  "shaft",
+  "shallow",
+  "share",
+  "shed",
+  "shell",
+  "sheriff",
+  "shield",
+  "shift",
+  "shine",
+  "ship",
+  "shiver",
+  "shock",
+  "shoe",
+  "shoot",
+  "shop",
+  "short",
+  "shoulder",
+  "shove",
+  "shrimp",
+  "shrug",
+  "shuffle",
+  "shy",
+  "sibling",
+  "sick",
+  "side",
+  "siege",
+  "sight",
+  "sign",
+  "silent",
+  "silk",
+  "silly",
+  "silver",
+  "similar",
+  "simple",
+  "since",
+  "sing",
+  "siren",
+  "sister",
+  "situate",
+  "six",
+  "size",
+  "skate",
+  "sketch",
+  "ski",
+  "skill",
+  "skin",
+  "skirt",
+  "skull",
+  "slab",
+  "slam",
+  "sleep",
+  "slender",
+  "slice",
+  "slide",
+  "slight",
+  "slim",
+  "slogan",
+  "slot",
+  "slow",
+  "slush",
+  "small",
+  "smart",
+  "smile",
+  "smoke",
+  "smooth",
+  "snack",
+  "snake",
+  "snap",
+  "sniff",
+  "snow",
+  "soap",
+  "soccer",
+  "social",
+  "sock",
+  "soda",
+  "soft",
+  "solar",
+  "soldier",
+  "solid",
+  "solution",
+  "solve",
+  "someone",
+  "song",
+  "soon",
+  "sorry",
+  "sort",
+  "soul",
+  "sound",
+  "soup",
+  "source",
+  "south",
+  "space",
+  "spare",
+  "spatial",
+  "spawn",
+  "speak",
+  "special",
+  "speed",
+  "spell",
+  "spend",
+  "sphere",
+  "spice",
+  "spider",
+  "spike",
+  "spin",
+  "spirit",
+  "split",
+  "spoil",
+  "sponsor",
+  "spoon",
+  "sport",
+  "spot",
+  "spray",
+  "spread",
+  "spring",
+  "spy",
+  "square",
+  "squeeze",
+  "squirrel",
+  "stable",
+  "stadium",
+  "staff",
+  "stage",
+  "stairs",
+  "stamp",
+  "stand",
+  "start",
+  "state",
+  "stay",
+  "steak",
+  "steel",
+  "stem",
+  "step",
+  "stereo",
+  "stick",
+  "still",
+  "sting",
+  "stock",
+  "stomach",
+  "stone",
+  "stool",
+  "story",
+  "stove",
+  "strategy",
+  "street",
+  "strike",
+  "strong",
+  "struggle",
+  "student",
+  "stuff",
+  "stumble",
+  "style",
+  "subject",
+  "submit",
+  "subway",
+  "success",
+  "such",
+  "sudden",
+  "suffer",
+  "sugar",
+  "suggest",
+  "suit",
+  "summer",
+  "sun",
+  "sunny",
+  "sunset",
+  "super",
+  "supply",
+  "supreme",
+  "sure",
+  "surface",
+  "surge",
+  "surprise",
+  "surround",
+  "survey",
+  "suspect",
+  "sustain",
+  "swallow",
+  "swamp",
+  "swap",
+  "swarm",
+  "swear",
+  "sweet",
+  "swift",
+  "swim",
+  "swing",
+  "switch",
+  "sword",
+  "symbol",
+  "symptom",
+  "syrup",
+  "system",
+  "table",
+  "tackle",
+  "tag",
+  "tail",
+  "talent",
+  "talk",
+  "tank",
+  "tape",
+  "target",
+  "task",
+  "taste",
+  "tattoo",
+  "taxi",
+  "teach",
+  "team",
+  "tell",
+  "ten",
+  "tenant",
+  "tennis",
+  "tent",
+  "term",
+  "test",
+  "text",
+  "thank",
+  "that",
+  "theme",
+  "then",
+  "theory",
+  "there",
+  "they",
+  "thing",
+  "this",
+  "thought",
+  "three",
+  "thrive",
+  "throw",
+  "thumb",
+  "thunder",
+  "ticket",
+  "tide",
+  "tiger",
+  "tilt",
+  "timber",
+  "time",
+  "tiny",
+  "tip",
+  "tired",
+  "tissue",
+  "title",
+  "toast",
+  "tobacco",
+  "today",
+  "toddler",
+  "toe",
+  "together",
+  "toilet",
+  "token",
+  "tomato",
+  "tomorrow",
+  "tone",
+  "tongue",
+  "tonight",
+  "tool",
+  "tooth",
+  "top",
+  "topic",
+  "topple",
+  "torch",
+  "tornado",
+  "tortoise",
+  "toss",
+  "total",
+  "tourist",
+  "toward",
+  "tower",
+  "town",
+  "toy",
+  "track",
+  "trade",
+  "traffic",
+  "tragic",
+  "train",
+  "transfer",
+  "trap",
+  "trash",
+  "travel",
+  "tray",
+  "treat",
+  "tree",
+  "trend",
+  "trial",
+  "tribe",
+  "trick",
+  "trigger",
+  "trim",
+  "trip",
+  "trophy",
+  "trouble",
+  "truck",
+  "true",
+  "truly",
+  "trumpet",
+  "trust",
+  "truth",
+  "try",
+  "tube",
+  "tuition",
+  "tumble",
+  "tuna",
+  "tunnel",
+  "turkey",
+  "turn",
+  "turtle",
+  "twelve",
+  "twenty",
+  "twice",
+  "twin",
+  "twist",
+  "two",
+  "type",
+  "typical",
+  "ugly",
+  "umbrella",
+  "unable",
+  "unaware",
+  "uncle",
+  "uncover",
+  "under",
+  "undo",
+  "unfair",
+  "unfold",
+  "unhappy",
+  "uniform",
+  "unique",
+  "unit",
+  "universe",
+  "unknown",
+  "unlock",
+  "until",
+  "unusual",
+  "unveil",
+  "update",
+  "upgrade",
+  "uphold",
+  "upon",
+  "upper",
+  "upset",
+  "urban",
+  "urge",
+  "usage",
+  "use",
+  "used",
+  "useful",
+  "useless",
+  "usual",
+  "utility",
+  "vacant",
+  "vacuum",
+  "vague",
+  "valid",
+  "valley",
+  "valve",
+  "van",
+  "vanish",
+  "vapor",
+  "various",
+  "vast",
+  "vault",
+  "vehicle",
+  "velvet",
+  "vendor",
+  "venture",
+  "venue",
+  "verb",
+  "verify",
+  "version",
+  "very",
+  "vessel",
+  "veteran",
+  "viable",
+  "vibrant",
+  "vicious",
+  "victory",
+  "video",
+  "view",
+  "village",
+  "vintage",
+  "violin",
+  "virtual",
+  "virus",
+  "visa",
+  "visit",
+  "visual",
+  "vital",
+  "vivid",
+  "vocal",
+  "voice",
+  "void",
+  "volcano",
+  "volume",
+  "vote",
+  "voyage",
+  "wage",
+  "wagon",
+  "wait",
+  "walk",
+  "wall",
+  "walnut",
+  "want",
+  "warfare",
+  "warm",
+  "warrior",
+  "wash",
+  "wasp",
+  "waste",
+  "water",
+  "wave",
+  "way",
+  "wealth",
+  "weapon",
+  "wear",
+  "weasel",
+  "weather",
+  "web",
+  "wedding",
+  "weekend",
+  "weird",
+  "welcome",
+  "west",
+  "wet",
+  "whale",
+  "what",
+  "wheat",
+  "wheel",
+  "when",
+  "where",
+  "whip",
+  "whisper",
+  "wide",
+  "width",
+  "wife",
+  "wild",
+  "will",
+  "win",
+  "window",
+  "wine",
+  "wing",
+  "wink",
+  "winner",
+  "winter",
+  "wire",
+  "wisdom",
+  "wise",
+  "wish",
+  "witness",
+  "wolf",
+  "woman",
+  "wonder",
+  "wood",
+  "wool",
+  "word",
+  "work",
+  "world",
+  "worry",
+  "worth",
+  "wrap",
+  "wreck",
+  "wrestle",
+  "wrist",
+  "write",
+  "wrong",
+  "yard",
+  "year",
+  "yellow",
+  "you",
+  "young",
+  "youth",
+  "zebra",
+  "zero",
+  "zone",
+  "zoo"
+]
+
+},{}],78:[function(require,module,exports){
+module.exports=[
+  "abaisser",
+  "abandon",
+  "abdiquer",
+  "abeille",
+  "abolir",
+  "aborder",
+  "aboutir",
+  "aboyer",
+  "abrasif",
+  "abreuver",
+  "abriter",
+  "abroger",
+  "abrupt",
+  "absence",
+  "absolu",
+  "absurde",
+  "abusif",
+  "abyssal",
+  "académie",
+  "acajou",
+  "acarien",
+  "accabler",
+  "accepter",
+  "acclamer",
+  "accolade",
+  "accroche",
+  "accuser",
+  "acerbe",
+  "achat",
+  "acheter",
+  "aciduler",
+  "acier",
+  "acompte",
+  "acquérir",
+  "acronyme",
+  "acteur",
+  "actif",
+  "actuel",
+  "adepte",
+  "adéquat",
+  "adhésif",
+  "adjectif",
+  "adjuger",
+  "admettre",
+  "admirer",
+  "adopter",
+  "adorer",
+  "adoucir",
+  "adresse",
+  "adroit",
+  "adulte",
+  "adverbe",
+  "aérer",
+  "aéronef",
+  "affaire",
+  "affecter",
+  "affiche",
+  "affreux",
+  "affubler",
+  "agacer",
+  "agencer",
+  "agile",
+  "agiter",
+  "agrafer",
+  "agréable",
+  "agrume",
+  "aider",
+  "aiguille",
+  "ailier",
+  "aimable",
+  "aisance",
+  "ajouter",
+  "ajuster",
+  "alarmer",
+  "alchimie",
+  "alerte",
+  "algèbre",
+  "algue",
+  "aliéner",
+  "aliment",
+  "alléger",
+  "alliage",
+  "allouer",
+  "allumer",
+  "alourdir",
+  "alpaga",
+  "altesse",
+  "alvéole",
+  "amateur",
+  "ambigu",
+  "ambre",
+  "aménager",
+  "amertume",
+  "amidon",
+  "amiral",
+  "amorcer",
+  "amour",
+  "amovible",
+  "amphibie",
+  "ampleur",
+  "amusant",
+  "analyse",
+  "anaphore",
+  "anarchie",
+  "anatomie",
+  "ancien",
+  "anéantir",
+  "angle",
+  "angoisse",
+  "anguleux",
+  "animal",
+  "annexer",
+  "annonce",
+  "annuel",
+  "anodin",
+  "anomalie",
+  "anonyme",
+  "anormal",
+  "antenne",
+  "antidote",
+  "anxieux",
+  "apaiser",
+  "apéritif",
+  "aplanir",
+  "apologie",
+  "appareil",
+  "appeler",
+  "apporter",
+  "appuyer",
+  "aquarium",
+  "aqueduc",
+  "arbitre",
+  "arbuste",
+  "ardeur",
+  "ardoise",
+  "argent",
+  "arlequin",
+  "armature",
+  "armement",
+  "armoire",
+  "armure",
+  "arpenter",
+  "arracher",
+  "arriver",
+  "arroser",
+  "arsenic",
+  "artériel",
+  "article",
+  "aspect",
+  "asphalte",
+  "aspirer",
+  "assaut",
+  "asservir",
+  "assiette",
+  "associer",
+  "assurer",
+  "asticot",
+  "astre",
+  "astuce",
+  "atelier",
+  "atome",
+  "atrium",
+  "atroce",
+  "attaque",
+  "attentif",
+  "attirer",
+  "attraper",
+  "aubaine",
+  "auberge",
+  "audace",
+  "audible",
+  "augurer",
+  "aurore",
+  "automne",
+  "autruche",
+  "avaler",
+  "avancer",
+  "avarice",
+  "avenir",
+  "averse",
+  "aveugle",
+  "aviateur",
+  "avide",
+  "avion",
+  "aviser",
+  "avoine",
+  "avouer",
+  "avril",
+  "axial",
+  "axiome",
+  "badge",
+  "bafouer",
+  "bagage",
+  "baguette",
+  "baignade",
+  "balancer",
+  "balcon",
+  "baleine",
+  "balisage",
+  "bambin",
+  "bancaire",
+  "bandage",
+  "banlieue",
+  "bannière",
+  "banquier",
+  "barbier",
+  "baril",
+  "baron",
+  "barque",
+  "barrage",
+  "bassin",
+  "bastion",
+  "bataille",
+  "bateau",
+  "batterie",
+  "baudrier",
+  "bavarder",
+  "belette",
+  "bélier",
+  "belote",
+  "bénéfice",
+  "berceau",
+  "berger",
+  "berline",
+  "bermuda",
+  "besace",
+  "besogne",
+  "bétail",
+  "beurre",
+  "biberon",
+  "bicycle",
+  "bidule",
+  "bijou",
+  "bilan",
+  "bilingue",
+  "billard",
+  "binaire",
+  "biologie",
+  "biopsie",
+  "biotype",
+  "biscuit",
+  "bison",
+  "bistouri",
+  "bitume",
+  "bizarre",
+  "blafard",
+  "blague",
+  "blanchir",
+  "blessant",
+  "blinder",
+  "blond",
+  "bloquer",
+  "blouson",
+  "bobard",
+  "bobine",
+  "boire",
+  "boiser",
+  "bolide",
+  "bonbon",
+  "bondir",
+  "bonheur",
+  "bonifier",
+  "bonus",
+  "bordure",
+  "borne",
+  "botte",
+  "boucle",
+  "boueux",
+  "bougie",
+  "boulon",
+  "bouquin",
+  "bourse",
+  "boussole",
+  "boutique",
+  "boxeur",
+  "branche",
+  "brasier",
+  "brave",
+  "brebis",
+  "brèche",
+  "breuvage",
+  "bricoler",
+  "brigade",
+  "brillant",
+  "brioche",
+  "brique",
+  "brochure",
+  "broder",
+  "bronzer",
+  "brousse",
+  "broyeur",
+  "brume",
+  "brusque",
+  "brutal",
+  "bruyant",
+  "buffle",
+  "buisson",
+  "bulletin",
+  "bureau",
+  "burin",
+  "bustier",
+  "butiner",
+  "butoir",
+  "buvable",
+  "buvette",
+  "cabanon",
+  "cabine",
+  "cachette",
+  "cadeau",
+  "cadre",
+  "caféine",
+  "caillou",
+  "caisson",
+  "calculer",
+  "calepin",
+  "calibre",
+  "calmer",
+  "calomnie",
+  "calvaire",
+  "camarade",
+  "caméra",
+  "camion",
+  "campagne",
+  "canal",
+  "caneton",
+  "canon",
+  "cantine",
+  "canular",
+  "capable",
+  "caporal",
+  "caprice",
+  "capsule",
+  "capter",
+  "capuche",
+  "carabine",
+  "carbone",
+  "caresser",
+  "caribou",
+  "carnage",
+  "carotte",
+  "carreau",
+  "carton",
+  "cascade",
+  "casier",
+  "casque",
+  "cassure",
+  "causer",
+  "caution",
+  "cavalier",
+  "caverne",
+  "caviar",
+  "cédille",
+  "ceinture",
+  "céleste",
+  "cellule",
+  "cendrier",
+  "censurer",
+  "central",
+  "cercle",
+  "cérébral",
+  "cerise",
+  "cerner",
+  "cerveau",
+  "cesser",
+  "chagrin",
+  "chaise",
+  "chaleur",
+  "chambre",
+  "chance",
+  "chapitre",
+  "charbon",
+  "chasseur",
+  "chaton",
+  "chausson",
+  "chavirer",
+  "chemise",
+  "chenille",
+  "chéquier",
+  "chercher",
+  "cheval",
+  "chien",
+  "chiffre",
+  "chignon",
+  "chimère",
+  "chiot",
+  "chlorure",
+  "chocolat",
+  "choisir",
+  "chose",
+  "chouette",
+  "chrome",
+  "chute",
+  "cigare",
+  "cigogne",
+  "cimenter",
+  "cinéma",
+  "cintrer",
+  "circuler",
+  "cirer",
+  "cirque",
+  "citerne",
+  "citoyen",
+  "citron",
+  "civil",
+  "clairon",
+  "clameur",
+  "claquer",
+  "classe",
+  "clavier",
+  "client",
+  "cligner",
+  "climat",
+  "clivage",
+  "cloche",
+  "clonage",
+  "cloporte",
+  "cobalt",
+  "cobra",
+  "cocasse",
+  "cocotier",
+  "coder",
+  "codifier",
+  "coffre",
+  "cogner",
+  "cohésion",
+  "coiffer",
+  "coincer",
+  "colère",
+  "colibri",
+  "colline",
+  "colmater",
+  "colonel",
+  "combat",
+  "comédie",
+  "commande",
+  "compact",
+  "concert",
+  "conduire",
+  "confier",
+  "congeler",
+  "connoter",
+  "consonne",
+  "contact",
+  "convexe",
+  "copain",
+  "copie",
+  "corail",
+  "corbeau",
+  "cordage",
+  "corniche",
+  "corpus",
+  "correct",
+  "cortège",
+  "cosmique",
+  "costume",
+  "coton",
+  "coude",
+  "coupure",
+  "courage",
+  "couteau",
+  "couvrir",
+  "coyote",
+  "crabe",
+  "crainte",
+  "cravate",
+  "crayon",
+  "créature",
+  "créditer",
+  "crémeux",
+  "creuser",
+  "crevette",
+  "cribler",
+  "crier",
+  "cristal",
+  "critère",
+  "croire",
+  "croquer",
+  "crotale",
+  "crucial",
+  "cruel",
+  "crypter",
+  "cubique",
+  "cueillir",
+  "cuillère",
+  "cuisine",
+  "cuivre",
+  "culminer",
+  "cultiver",
+  "cumuler",
+  "cupide",
+  "curatif",
+  "curseur",
+  "cyanure",
+  "cycle",
+  "cylindre",
+  "cynique",
+  "daigner",
+  "damier",
+  "danger",
+  "danseur",
+  "dauphin",
+  "débattre",
+  "débiter",
+  "déborder",
+  "débrider",
+  "débutant",
+  "décaler",
+  "décembre",
+  "déchirer",
+  "décider",
+  "déclarer",
+  "décorer",
+  "décrire",
+  "décupler",
+  "dédale",
+  "déductif",
+  "déesse",
+  "défensif",
+  "défiler",
+  "défrayer",
+  "dégager",
+  "dégivrer",
+  "déglutir",
+  "dégrafer",
+  "déjeuner",
+  "délice",
+  "déloger",
+  "demander",
+  "demeurer",
+  "démolir",
+  "dénicher",
+  "dénouer",
+  "dentelle",
+  "dénuder",
+  "départ",
+  "dépenser",
+  "déphaser",
+  "déplacer",
+  "déposer",
+  "déranger",
+  "dérober",
+  "désastre",
+  "descente",
+  "désert",
+  "désigner",
+  "désobéir",
+  "dessiner",
+  "destrier",
+  "détacher",
+  "détester",
+  "détourer",
+  "détresse",
+  "devancer",
+  "devenir",
+  "deviner",
+  "devoir",
+  "diable",
+  "dialogue",
+  "diamant",
+  "dicter",
+  "différer",
+  "digérer",
+  "digital",
+  "digne",
+  "diluer",
+  "dimanche",
+  "diminuer",
+  "dioxyde",
+  "directif",
+  "diriger",
+  "discuter",
+  "disposer",
+  "dissiper",
+  "distance",
+  "divertir",
+  "diviser",
+  "docile",
+  "docteur",
+  "dogme",
+  "doigt",
+  "domaine",
+  "domicile",
+  "dompter",
+  "donateur",
+  "donjon",
+  "donner",
+  "dopamine",
+  "dortoir",
+  "dorure",
+  "dosage",
+  "doseur",
+  "dossier",
+  "dotation",
+  "douanier",
+  "double",
+  "douceur",
+  "douter",
+  "doyen",
+  "dragon",
+  "draper",
+  "dresser",
+  "dribbler",
+  "droiture",
+  "duperie",
+  "duplexe",
+  "durable",
+  "durcir",
+  "dynastie",
+  "éblouir",
+  "écarter",
+  "écharpe",
+  "échelle",
+  "éclairer",
+  "éclipse",
+  "éclore",
+  "écluse",
+  "école",
+  "économie",
+  "écorce",
+  "écouter",
+  "écraser",
+  "écrémer",
+  "écrivain",
+  "écrou",
+  "écume",
+  "écureuil",
+  "édifier",
+  "éduquer",
+  "effacer",
+  "effectif",
+  "effigie",
+  "effort",
+  "effrayer",
+  "effusion",
+  "égaliser",
+  "égarer",
+  "éjecter",
+  "élaborer",
+  "élargir",
+  "électron",
+  "élégant",
+  "éléphant",
+  "élève",
+  "éligible",
+  "élitisme",
+  "éloge",
+  "élucider",
+  "éluder",
+  "emballer",
+  "embellir",
+  "embryon",
+  "émeraude",
+  "émission",
+  "emmener",
+  "émotion",
+  "émouvoir",
+  "empereur",
+  "employer",
+  "emporter",
+  "emprise",
+  "émulsion",
+  "encadrer",
+  "enchère",
+  "enclave",
+  "encoche",
+  "endiguer",
+  "endosser",
+  "endroit",
+  "enduire",
+  "énergie",
+  "enfance",
+  "enfermer",
+  "enfouir",
+  "engager",
+  "engin",
+  "englober",
+  "énigme",
+  "enjamber",
+  "enjeu",
+  "enlever",
+  "ennemi",
+  "ennuyeux",
+  "enrichir",
+  "enrobage",
+  "enseigne",
+  "entasser",
+  "entendre",
+  "entier",
+  "entourer",
+  "entraver",
+  "énumérer",
+  "envahir",
+  "enviable",
+  "envoyer",
+  "enzyme",
+  "éolien",
+  "épaissir",
+  "épargne",
+  "épatant",
+  "épaule",
+  "épicerie",
+  "épidémie",
+  "épier",
+  "épilogue",
+  "épine",
+  "épisode",
+  "épitaphe",
+  "époque",
+  "épreuve",
+  "éprouver",
+  "épuisant",
+  "équerre",
+  "équipe",
+  "ériger",
+  "érosion",
+  "erreur",
+  "éruption",
+  "escalier",
+  "espadon",
+  "espèce",
+  "espiègle",
+  "espoir",
+  "esprit",
+  "esquiver",
+  "essayer",
+  "essence",
+  "essieu",
+  "essorer",
+  "estime",
+  "estomac",
+  "estrade",
+  "étagère",
+  "étaler",
+  "étanche",
+  "étatique",
+  "éteindre",
+  "étendoir",
+  "éternel",
+  "éthanol",
+  "éthique",
+  "ethnie",
+  "étirer",
+  "étoffer",
+  "étoile",
+  "étonnant",
+  "étourdir",
+  "étrange",
+  "étroit",
+  "étude",
+  "euphorie",
+  "évaluer",
+  "évasion",
+  "éventail",
+  "évidence",
+  "éviter",
+  "évolutif",
+  "évoquer",
+  "exact",
+  "exagérer",
+  "exaucer",
+  "exceller",
+  "excitant",
+  "exclusif",
+  "excuse",
+  "exécuter",
+  "exemple",
+  "exercer",
+  "exhaler",
+  "exhorter",
+  "exigence",
+  "exiler",
+  "exister",
+  "exotique",
+  "expédier",
+  "explorer",
+  "exposer",
+  "exprimer",
+  "exquis",
+  "extensif",
+  "extraire",
+  "exulter",
+  "fable",
+  "fabuleux",
+  "facette",
+  "facile",
+  "facture",
+  "faiblir",
+  "falaise",
+  "fameux",
+  "famille",
+  "farceur",
+  "farfelu",
+  "farine",
+  "farouche",
+  "fasciner",
+  "fatal",
+  "fatigue",
+  "faucon",
+  "fautif",
+  "faveur",
+  "favori",
+  "fébrile",
+  "féconder",
+  "fédérer",
+  "félin",
+  "femme",
+  "fémur",
+  "fendoir",
+  "féodal",
+  "fermer",
+  "féroce",
+  "ferveur",
+  "festival",
+  "feuille",
+  "feutre",
+  "février",
+  "fiasco",
+  "ficeler",
+  "fictif",
+  "fidèle",
+  "figure",
+  "filature",
+  "filetage",
+  "filière",
+  "filleul",
+  "filmer",
+  "filou",
+  "filtrer",
+  "financer",
+  "finir",
+  "fiole",
+  "firme",
+  "fissure",
+  "fixer",
+  "flairer",
+  "flamme",
+  "flasque",
+  "flatteur",
+  "fléau",
+  "flèche",
+  "fleur",
+  "flexion",
+  "flocon",
+  "flore",
+  "fluctuer",
+  "fluide",
+  "fluvial",
+  "folie",
+  "fonderie",
+  "fongible",
+  "fontaine",
+  "forcer",
+  "forgeron",
+  "formuler",
+  "fortune",
+  "fossile",
+  "foudre",
+  "fougère",
+  "fouiller",
+  "foulure",
+  "fourmi",
+  "fragile",
+  "fraise",
+  "franchir",
+  "frapper",
+  "frayeur",
+  "frégate",
+  "freiner",
+  "frelon",
+  "frémir",
+  "frénésie",
+  "frère",
+  "friable",
+  "friction",
+  "frisson",
+  "frivole",
+  "froid",
+  "fromage",
+  "frontal",
+  "frotter",
+  "fruit",
+  "fugitif",
+  "fuite",
+  "fureur",
+  "furieux",
+  "furtif",
+  "fusion",
+  "futur",
+  "gagner",
+  "galaxie",
+  "galerie",
+  "gambader",
+  "garantir",
+  "gardien",
+  "garnir",
+  "garrigue",
+  "gazelle",
+  "gazon",
+  "géant",
+  "gélatine",
+  "gélule",
+  "gendarme",
+  "général",
+  "génie",
+  "genou",
+  "gentil",
+  "géologie",
+  "géomètre",
+  "géranium",
+  "germe",
+  "gestuel",
+  "geyser",
+  "gibier",
+  "gicler",
+  "girafe",
+  "givre",
+  "glace",
+  "glaive",
+  "glisser",
+  "globe",
+  "gloire",
+  "glorieux",
+  "golfeur",
+  "gomme",
+  "gonfler",
+  "gorge",
+  "gorille",
+  "goudron",
+  "gouffre",
+  "goulot",
+  "goupille",
+  "gourmand",
+  "goutte",
+  "graduel",
+  "graffiti",
+  "graine",
+  "grand",
+  "grappin",
+  "gratuit",
+  "gravir",
+  "grenat",
+  "griffure",
+  "griller",
+  "grimper",
+  "grogner",
+  "gronder",
+  "grotte",
+  "groupe",
+  "gruger",
+  "grutier",
+  "gruyère",
+  "guépard",
+  "guerrier",
+  "guide",
+  "guimauve",
+  "guitare",
+  "gustatif",
+  "gymnaste",
+  "gyrostat",
+  "habitude",
+  "hachoir",
+  "halte",
+  "hameau",
+  "hangar",
+  "hanneton",
+  "haricot",
+  "harmonie",
+  "harpon",
+  "hasard",
+  "hélium",
+  "hématome",
+  "herbe",
+  "hérisson",
+  "hermine",
+  "héron",
+  "hésiter",
+  "heureux",
+  "hiberner",
+  "hibou",
+  "hilarant",
+  "histoire",
+  "hiver",
+  "homard",
+  "hommage",
+  "homogène",
+  "honneur",
+  "honorer",
+  "honteux",
+  "horde",
+  "horizon",
+  "horloge",
+  "hormone",
+  "horrible",
+  "houleux",
+  "housse",
+  "hublot",
+  "huileux",
+  "humain",
+  "humble",
+  "humide",
+  "humour",
+  "hurler",
+  "hydromel",
+  "hygiène",
+  "hymne",
+  "hypnose",
+  "idylle",
+  "ignorer",
+  "iguane",
+  "illicite",
+  "illusion",
+  "image",
+  "imbiber",
+  "imiter",
+  "immense",
+  "immobile",
+  "immuable",
+  "impact",
+  "impérial",
+  "implorer",
+  "imposer",
+  "imprimer",
+  "imputer",
+  "incarner",
+  "incendie",
+  "incident",
+  "incliner",
+  "incolore",
+  "indexer",
+  "indice",
+  "inductif",
+  "inédit",
+  "ineptie",
+  "inexact",
+  "infini",
+  "infliger",
+  "informer",
+  "infusion",
+  "ingérer",
+  "inhaler",
+  "inhiber",
+  "injecter",
+  "injure",
+  "innocent",
+  "inoculer",
+  "inonder",
+  "inscrire",
+  "insecte",
+  "insigne",
+  "insolite",
+  "inspirer",
+  "instinct",
+  "insulter",
+  "intact",
+  "intense",
+  "intime",
+  "intrigue",
+  "intuitif",
+  "inutile",
+  "invasion",
+  "inventer",
+  "inviter",
+  "invoquer",
+  "ironique",
+  "irradier",
+  "irréel",
+  "irriter",
+  "isoler",
+  "ivoire",
+  "ivresse",
+  "jaguar",
+  "jaillir",
+  "jambe",
+  "janvier",
+  "jardin",
+  "jauger",
+  "jaune",
+  "javelot",
+  "jetable",
+  "jeton",
+  "jeudi",
+  "jeunesse",
+  "joindre",
+  "joncher",
+  "jongler",
+  "joueur",
+  "jouissif",
+  "journal",
+  "jovial",
+  "joyau",
+  "joyeux",
+  "jubiler",
+  "jugement",
+  "junior",
+  "jupon",
+  "juriste",
+  "justice",
+  "juteux",
+  "juvénile",
+  "kayak",
+  "kimono",
+  "kiosque",
+  "label",
+  "labial",
+  "labourer",
+  "lacérer",
+  "lactose",
+  "lagune",
+  "laine",
+  "laisser",
+  "laitier",
+  "lambeau",
+  "lamelle",
+  "lampe",
+  "lanceur",
+  "langage",
+  "lanterne",
+  "lapin",
+  "largeur",
+  "larme",
+  "laurier",
+  "lavabo",
+  "lavoir",
+  "lecture",
+  "légal",
+  "léger",
+  "légume",
+  "lessive",
+  "lettre",
+  "levier",
+  "lexique",
+  "lézard",
+  "liasse",
+  "libérer",
+  "libre",
+  "licence",
+  "licorne",
+  "liège",
+  "lièvre",
+  "ligature",
+  "ligoter",
+  "ligue",
+  "limer",
+  "limite",
+  "limonade",
+  "limpide",
+  "linéaire",
+  "lingot",
+  "lionceau",
+  "liquide",
+  "lisière",
+  "lister",
+  "lithium",
+  "litige",
+  "littoral",
+  "livreur",
+  "logique",
+  "lointain",
+  "loisir",
+  "lombric",
+  "loterie",
+  "louer",
+  "lourd",
+  "loutre",
+  "louve",
+  "loyal",
+  "lubie",
+  "lucide",
+  "lucratif",
+  "lueur",
+  "lugubre",
+  "luisant",
+  "lumière",
+  "lunaire",
+  "lundi",
+  "luron",
+  "lutter",
+  "luxueux",
+  "machine",
+  "magasin",
+  "magenta",
+  "magique",
+  "maigre",
+  "maillon",
+  "maintien",
+  "mairie",
+  "maison",
+  "majorer",
+  "malaxer",
+  "maléfice",
+  "malheur",
+  "malice",
+  "mallette",
+  "mammouth",
+  "mandater",
+  "maniable",
+  "manquant",
+  "manteau",
+  "manuel",
+  "marathon",
+  "marbre",
+  "marchand",
+  "mardi",
+  "maritime",
+  "marqueur",
+  "marron",
+  "marteler",
+  "mascotte",
+  "massif",
+  "matériel",
+  "matière",
+  "matraque",
+  "maudire",
+  "maussade",
+  "mauve",
+  "maximal",
+  "méchant",
+  "méconnu",
+  "médaille",
+  "médecin",
+  "méditer",
+  "méduse",
+  "meilleur",
+  "mélange",
+  "mélodie",
+  "membre",
+  "mémoire",
+  "menacer",
+  "mener",
+  "menhir",
+  "mensonge",
+  "mentor",
+  "mercredi",
+  "mérite",
+  "merle",
+  "messager",
+  "mesure",
+  "métal",
+  "météore",
+  "méthode",
+  "métier",
+  "meuble",
+  "miauler",
+  "microbe",
+  "miette",
+  "mignon",
+  "migrer",
+  "milieu",
+  "million",
+  "mimique",
+  "mince",
+  "minéral",
+  "minimal",
+  "minorer",
+  "minute",
+  "miracle",
+  "miroiter",
+  "missile",
+  "mixte",
+  "mobile",
+  "moderne",
+  "moelleux",
+  "mondial",
+  "moniteur",
+  "monnaie",
+  "monotone",
+  "monstre",
+  "montagne",
+  "monument",
+  "moqueur",
+  "morceau",
+  "morsure",
+  "mortier",
+  "moteur",
+  "motif",
+  "mouche",
+  "moufle",
+  "moulin",
+  "mousson",
+  "mouton",
+  "mouvant",
+  "multiple",
+  "munition",
+  "muraille",
+  "murène",
+  "murmure",
+  "muscle",
+  "muséum",
+  "musicien",
+  "mutation",
+  "muter",
+  "mutuel",
+  "myriade",
+  "myrtille",
+  "mystère",
+  "mythique",
+  "nageur",
+  "nappe",
+  "narquois",
+  "narrer",
+  "natation",
+  "nation",
+  "nature",
+  "naufrage",
+  "nautique",
+  "navire",
+  "nébuleux",
+  "nectar",
+  "néfaste",
+  "négation",
+  "négliger",
+  "négocier",
+  "neige",
+  "nerveux",
+  "nettoyer",
+  "neurone",
+  "neutron",
+  "neveu",
+  "niche",
+  "nickel",
+  "nitrate",
+  "niveau",
+  "noble",
+  "nocif",
+  "nocturne",
+  "noirceur",
+  "noisette",
+  "nomade",
+  "nombreux",
+  "nommer",
+  "normatif",
+  "notable",
+  "notifier",
+  "notoire",
+  "nourrir",
+  "nouveau",
+  "novateur",
+  "novembre",
+  "novice",
+  "nuage",
+  "nuancer",
+  "nuire",
+  "nuisible",
+  "numéro",
+  "nuptial",
+  "nuque",
+  "nutritif",
+  "obéir",
+  "objectif",
+  "obliger",
+  "obscur",
+  "observer",
+  "obstacle",
+  "obtenir",
+  "obturer",
+  "occasion",
+  "occuper",
+  "océan",
+  "octobre",
+  "octroyer",
+  "octupler",
+  "oculaire",
+  "odeur",
+  "odorant",
+  "offenser",
+  "officier",
+  "offrir",
+  "ogive",
+  "oiseau",
+  "oisillon",
+  "olfactif",
+  "olivier",
+  "ombrage",
+  "omettre",
+  "onctueux",
+  "onduler",
+  "onéreux",
+  "onirique",
+  "opale",
+  "opaque",
+  "opérer",
+  "opinion",
+  "opportun",
+  "opprimer",
+  "opter",
+  "optique",
+  "orageux",
+  "orange",
+  "orbite",
+  "ordonner",
+  "oreille",
+  "organe",
+  "orgueil",
+  "orifice",
+  "ornement",
+  "orque",
+  "ortie",
+  "osciller",
+  "osmose",
+  "ossature",
+  "otarie",
+  "ouragan",
+  "ourson",
+  "outil",
+  "outrager",
+  "ouvrage",
+  "ovation",
+  "oxyde",
+  "oxygène",
+  "ozone",
+  "paisible",
+  "palace",
+  "palmarès",
+  "palourde",
+  "palper",
+  "panache",
+  "panda",
+  "pangolin",
+  "paniquer",
+  "panneau",
+  "panorama",
+  "pantalon",
+  "papaye",
+  "papier",
+  "papoter",
+  "papyrus",
+  "paradoxe",
+  "parcelle",
+  "paresse",
+  "parfumer",
+  "parler",
+  "parole",
+  "parrain",
+  "parsemer",
+  "partager",
+  "parure",
+  "parvenir",
+  "passion",
+  "pastèque",
+  "paternel",
+  "patience",
+  "patron",
+  "pavillon",
+  "pavoiser",
+  "payer",
+  "paysage",
+  "peigne",
+  "peintre",
+  "pelage",
+  "pélican",
+  "pelle",
+  "pelouse",
+  "peluche",
+  "pendule",
+  "pénétrer",
+  "pénible",
+  "pensif",
+  "pénurie",
+  "pépite",
+  "péplum",
+  "perdrix",
+  "perforer",
+  "période",
+  "permuter",
+  "perplexe",
+  "persil",
+  "perte",
+  "peser",
+  "pétale",
+  "petit",
+  "pétrir",
+  "peuple",
+  "pharaon",
+  "phobie",
+  "phoque",
+  "photon",
+  "phrase",
+  "physique",
+  "piano",
+  "pictural",
+  "pièce",
+  "pierre",
+  "pieuvre",
+  "pilote",
+  "pinceau",
+  "pipette",
+  "piquer",
+  "pirogue",
+  "piscine",
+  "piston",
+  "pivoter",
+  "pixel",
+  "pizza",
+  "placard",
+  "plafond",
+  "plaisir",
+  "planer",
+  "plaque",
+  "plastron",
+  "plateau",
+  "pleurer",
+  "plexus",
+  "pliage",
+  "plomb",
+  "plonger",
+  "pluie",
+  "plumage",
+  "pochette",
+  "poésie",
+  "poète",
+  "pointe",
+  "poirier",
+  "poisson",
+  "poivre",
+  "polaire",
+  "policier",
+  "pollen",
+  "polygone",
+  "pommade",
+  "pompier",
+  "ponctuel",
+  "pondérer",
+  "poney",
+  "portique",
+  "position",
+  "posséder",
+  "posture",
+  "potager",
+  "poteau",
+  "potion",
+  "pouce",
+  "poulain",
+  "poumon",
+  "pourpre",
+  "poussin",
+  "pouvoir",
+  "prairie",
+  "pratique",
+  "précieux",
+  "prédire",
+  "préfixe",
+  "prélude",
+  "prénom",
+  "présence",
+  "prétexte",
+  "prévoir",
+  "primitif",
+  "prince",
+  "prison",
+  "priver",
+  "problème",
+  "procéder",
+  "prodige",
+  "profond",
+  "progrès",
+  "proie",
+  "projeter",
+  "prologue",
+  "promener",
+  "propre",
+  "prospère",
+  "protéger",
+  "prouesse",
+  "proverbe",
+  "prudence",
+  "pruneau",
+  "psychose",
+  "public",
+  "puceron",
+  "puiser",
+  "pulpe",
+  "pulsar",
+  "punaise",
+  "punitif",
+  "pupitre",
+  "purifier",
+  "puzzle",
+  "pyramide",
+  "quasar",
+  "querelle",
+  "question",
+  "quiétude",
+  "quitter",
+  "quotient",
+  "racine",
+  "raconter",
+  "radieux",
+  "ragondin",
+  "raideur",
+  "raisin",
+  "ralentir",
+  "rallonge",
+  "ramasser",
+  "rapide",
+  "rasage",
+  "ratisser",
+  "ravager",
+  "ravin",
+  "rayonner",
+  "réactif",
+  "réagir",
+  "réaliser",
+  "réanimer",
+  "recevoir",
+  "réciter",
+  "réclamer",
+  "récolter",
+  "recruter",
+  "reculer",
+  "recycler",
+  "rédiger",
+  "redouter",
+  "refaire",
+  "réflexe",
+  "réformer",
+  "refrain",
+  "refuge",
+  "régalien",
+  "région",
+  "réglage",
+  "régulier",
+  "réitérer",
+  "rejeter",
+  "rejouer",
+  "relatif",
+  "relever",
+  "relief",
+  "remarque",
+  "remède",
+  "remise",
+  "remonter",
+  "remplir",
+  "remuer",
+  "renard",
+  "renfort",
+  "renifler",
+  "renoncer",
+  "rentrer",
+  "renvoi",
+  "replier",
+  "reporter",
+  "reprise",
+  "reptile",
+  "requin",
+  "réserve",
+  "résineux",
+  "résoudre",
+  "respect",
+  "rester",
+  "résultat",
+  "rétablir",
+  "retenir",
+  "réticule",
+  "retomber",
+  "retracer",
+  "réunion",
+  "réussir",
+  "revanche",
+  "revivre",
+  "révolte",
+  "révulsif",
+  "richesse",
+  "rideau",
+  "rieur",
+  "rigide",
+  "rigoler",
+  "rincer",
+  "riposter",
+  "risible",
+  "risque",
+  "rituel",
+  "rival",
+  "rivière",
+  "rocheux",
+  "romance",
+  "rompre",
+  "ronce",
+  "rondin",
+  "roseau",
+  "rosier",
+  "rotatif",
+  "rotor",
+  "rotule",
+  "rouge",
+  "rouille",
+  "rouleau",
+  "routine",
+  "royaume",
+  "ruban",
+  "rubis",
+  "ruche",
+  "ruelle",
+  "rugueux",
+  "ruiner",
+  "ruisseau",
+  "ruser",
+  "rustique",
+  "rythme",
+  "sabler",
+  "saboter",
+  "sabre",
+  "sacoche",
+  "safari",
+  "sagesse",
+  "saisir",
+  "salade",
+  "salive",
+  "salon",
+  "saluer",
+  "samedi",
+  "sanction",
+  "sanglier",
+  "sarcasme",
+  "sardine",
+  "saturer",
+  "saugrenu",
+  "saumon",
+  "sauter",
+  "sauvage",
+  "savant",
+  "savonner",
+  "scalpel",
+  "scandale",
+  "scélérat",
+  "scénario",
+  "sceptre",
+  "schéma",
+  "science",
+  "scinder",
+  "score",
+  "scrutin",
+  "sculpter",
+  "séance",
+  "sécable",
+  "sécher",
+  "secouer",
+  "sécréter",
+  "sédatif",
+  "séduire",
+  "seigneur",
+  "séjour",
+  "sélectif",
+  "semaine",
+  "sembler",
+  "semence",
+  "séminal",
+  "sénateur",
+  "sensible",
+  "sentence",
+  "séparer",
+  "séquence",
+  "serein",
+  "sergent",
+  "sérieux",
+  "serrure",
+  "sérum",
+  "service",
+  "sésame",
+  "sévir",
+  "sevrage",
+  "sextuple",
+  "sidéral",
+  "siècle",
+  "siéger",
+  "siffler",
+  "sigle",
+  "signal",
+  "silence",
+  "silicium",
+  "simple",
+  "sincère",
+  "sinistre",
+  "siphon",
+  "sirop",
+  "sismique",
+  "situer",
+  "skier",
+  "social",
+  "socle",
+  "sodium",
+  "soigneux",
+  "soldat",
+  "soleil",
+  "solitude",
+  "soluble",
+  "sombre",
+  "sommeil",
+  "somnoler",
+  "sonde",
+  "songeur",
+  "sonnette",
+  "sonore",
+  "sorcier",
+  "sortir",
+  "sosie",
+  "sottise",
+  "soucieux",
+  "soudure",
+  "souffle",
+  "soulever",
+  "soupape",
+  "source",
+  "soutirer",
+  "souvenir",
+  "spacieux",
+  "spatial",
+  "spécial",
+  "sphère",
+  "spiral",
+  "stable",
+  "station",
+  "sternum",
+  "stimulus",
+  "stipuler",
+  "strict",
+  "studieux",
+  "stupeur",
+  "styliste",
+  "sublime",
+  "substrat",
+  "subtil",
+  "subvenir",
+  "succès",
+  "sucre",
+  "suffixe",
+  "suggérer",
+  "suiveur",
+  "sulfate",
+  "superbe",
+  "supplier",
+  "surface",
+  "suricate",
+  "surmener",
+  "surprise",
+  "sursaut",
+  "survie",
+  "suspect",
+  "syllabe",
+  "symbole",
+  "symétrie",
+  "synapse",
+  "syntaxe",
+  "système",
+  "tabac",
+  "tablier",
+  "tactile",
+  "tailler",
+  "talent",
+  "talisman",
+  "talonner",
+  "tambour",
+  "tamiser",
+  "tangible",
+  "tapis",
+  "taquiner",
+  "tarder",
+  "tarif",
+  "tartine",
+  "tasse",
+  "tatami",
+  "tatouage",
+  "taupe",
+  "taureau",
+  "taxer",
+  "témoin",
+  "temporel",
+  "tenaille",
+  "tendre",
+  "teneur",
+  "tenir",
+  "tension",
+  "terminer",
+  "terne",
+  "terrible",
+  "tétine",
+  "texte",
+  "thème",
+  "théorie",
+  "thérapie",
+  "thorax",
+  "tibia",
+  "tiède",
+  "timide",
+  "tirelire",
+  "tiroir",
+  "tissu",
+  "titane",
+  "titre",
+  "tituber",
+  "toboggan",
+  "tolérant",
+  "tomate",
+  "tonique",
+  "tonneau",
+  "toponyme",
+  "torche",
+  "tordre",
+  "tornade",
+  "torpille",
+  "torrent",
+  "torse",
+  "tortue",
+  "totem",
+  "toucher",
+  "tournage",
+  "tousser",
+  "toxine",
+  "traction",
+  "trafic",
+  "tragique",
+  "trahir",
+  "train",
+  "trancher",
+  "travail",
+  "trèfle",
+  "tremper",
+  "trésor",
+  "treuil",
+  "triage",
+  "tribunal",
+  "tricoter",
+  "trilogie",
+  "triomphe",
+  "tripler",
+  "triturer",
+  "trivial",
+  "trombone",
+  "tronc",
+  "tropical",
+  "troupeau",
+  "tuile",
+  "tulipe",
+  "tumulte",
+  "tunnel",
+  "turbine",
+  "tuteur",
+  "tutoyer",
+  "tuyau",
+  "tympan",
+  "typhon",
+  "typique",
+  "tyran",
+  "ubuesque",
+  "ultime",
+  "ultrason",
+  "unanime",
+  "unifier",
+  "union",
+  "unique",
+  "unitaire",
+  "univers",
+  "uranium",
+  "urbain",
+  "urticant",
+  "usage",
+  "usine",
+  "usuel",
+  "usure",
+  "utile",
+  "utopie",
+  "vacarme",
+  "vaccin",
+  "vagabond",
+  "vague",
+  "vaillant",
+  "vaincre",
+  "vaisseau",
+  "valable",
+  "valise",
+  "vallon",
+  "valve",
+  "vampire",
+  "vanille",
+  "vapeur",
+  "varier",
+  "vaseux",
+  "vassal",
+  "vaste",
+  "vecteur",
+  "vedette",
+  "végétal",
+  "véhicule",
+  "veinard",
+  "véloce",
+  "vendredi",
+  "vénérer",
+  "venger",
+  "venimeux",
+  "ventouse",
+  "verdure",
+  "vérin",
+  "vernir",
+  "verrou",
+  "verser",
+  "vertu",
+  "veston",
+  "vétéran",
+  "vétuste",
+  "vexant",
+  "vexer",
+  "viaduc",
+  "viande",
+  "victoire",
+  "vidange",
+  "vidéo",
+  "vignette",
+  "vigueur",
+  "vilain",
+  "village",
+  "vinaigre",
+  "violon",
+  "vipère",
+  "virement",
+  "virtuose",
+  "virus",
+  "visage",
+  "viseur",
+  "vision",
+  "visqueux",
+  "visuel",
+  "vital",
+  "vitesse",
+  "viticole",
+  "vitrine",
+  "vivace",
+  "vivipare",
+  "vocation",
+  "voguer",
+  "voile",
+  "voisin",
+  "voiture",
+  "volaille",
+  "volcan",
+  "voltiger",
+  "volume",
+  "vorace",
+  "vortex",
+  "voter",
+  "vouloir",
+  "voyage",
+  "voyelle",
+  "wagon",
+  "xénon",
+  "yacht",
+  "zèbre",
+  "zénith",
+  "zeste",
+  "zoologie"
+]
+
+},{}],79:[function(require,module,exports){
+module.exports=[
+  "abaco",
+  "abbaglio",
+  "abbinato",
+  "abete",
+  "abisso",
+  "abolire",
+  "abrasivo",
+  "abrogato",
+  "accadere",
+  "accenno",
+  "accusato",
+  "acetone",
+  "achille",
+  "acido",
+  "acqua",
+  "acre",
+  "acrilico",
+  "acrobata",
+  "acuto",
+  "adagio",
+  "addebito",
+  "addome",
+  "adeguato",
+  "aderire",
+  "adipe",
+  "adottare",
+  "adulare",
+  "affabile",
+  "affetto",
+  "affisso",
+  "affranto",
+  "aforisma",
+  "afoso",
+  "africano",
+  "agave",
+  "agente",
+  "agevole",
+  "aggancio",
+  "agire",
+  "agitare",
+  "agonismo",
+  "agricolo",
+  "agrumeto",
+  "aguzzo",
+  "alabarda",
+  "alato",
+  "albatro",
+  "alberato",
+  "albo",
+  "albume",
+  "alce",
+  "alcolico",
+  "alettone",
+  "alfa",
+  "algebra",
+  "aliante",
+  "alibi",
+  "alimento",
+  "allagato",
+  "allegro",
+  "allievo",
+  "allodola",
+  "allusivo",
+  "almeno",
+  "alogeno",
+  "alpaca",
+  "alpestre",
+  "altalena",
+  "alterno",
+  "alticcio",
+  "altrove",
+  "alunno",
+  "alveolo",
+  "alzare",
+  "amalgama",
+  "amanita",
+  "amarena",
+  "ambito",
+  "ambrato",
+  "ameba",
+  "america",
+  "ametista",
+  "amico",
+  "ammasso",
+  "ammenda",
+  "ammirare",
+  "ammonito",
+  "amore",
+  "ampio",
+  "ampliare",
+  "amuleto",
+  "anacardo",
+  "anagrafe",
+  "analista",
+  "anarchia",
+  "anatra",
+  "anca",
+  "ancella",
+  "ancora",
+  "andare",
+  "andrea",
+  "anello",
+  "angelo",
+  "angolare",
+  "angusto",
+  "anima",
+  "annegare",
+  "annidato",
+  "anno",
+  "annuncio",
+  "anonimo",
+  "anticipo",
+  "anzi",
+  "apatico",
+  "apertura",
+  "apode",
+  "apparire",
+  "appetito",
+  "appoggio",
+  "approdo",
+  "appunto",
+  "aprile",
+  "arabica",
+  "arachide",
+  "aragosta",
+  "araldica",
+  "arancio",
+  "aratura",
+  "arazzo",
+  "arbitro",
+  "archivio",
+  "ardito",
+  "arenile",
+  "argento",
+  "argine",
+  "arguto",
+  "aria",
+  "armonia",
+  "arnese",
+  "arredato",
+  "arringa",
+  "arrosto",
+  "arsenico",
+  "arso",
+  "artefice",
+  "arzillo",
+  "asciutto",
+  "ascolto",
+  "asepsi",
+  "asettico",
+  "asfalto",
+  "asino",
+  "asola",
+  "aspirato",
+  "aspro",
+  "assaggio",
+  "asse",
+  "assoluto",
+  "assurdo",
+  "asta",
+  "astenuto",
+  "astice",
+  "astratto",
+  "atavico",
+  "ateismo",
+  "atomico",
+  "atono",
+  "attesa",
+  "attivare",
+  "attorno",
+  "attrito",
+  "attuale",
+  "ausilio",
+  "austria",
+  "autista",
+  "autonomo",
+  "autunno",
+  "avanzato",
+  "avere",
+  "avvenire",
+  "avviso",
+  "avvolgere",
+  "azione",
+  "azoto",
+  "azzimo",
+  "azzurro",
+  "babele",
+  "baccano",
+  "bacino",
+  "baco",
+  "badessa",
+  "badilata",
+  "bagnato",
+  "baita",
+  "balcone",
+  "baldo",
+  "balena",
+  "ballata",
+  "balzano",
+  "bambino",
+  "bandire",
+  "baraonda",
+  "barbaro",
+  "barca",
+  "baritono",
+  "barlume",
+  "barocco",
+  "basilico",
+  "basso",
+  "batosta",
+  "battuto",
+  "baule",
+  "bava",
+  "bavosa",
+  "becco",
+  "beffa",
+  "belgio",
+  "belva",
+  "benda",
+  "benevole",
+  "benigno",
+  "benzina",
+  "bere",
+  "berlina",
+  "beta",
+  "bibita",
+  "bici",
+  "bidone",
+  "bifido",
+  "biga",
+  "bilancia",
+  "bimbo",
+  "binocolo",
+  "biologo",
+  "bipede",
+  "bipolare",
+  "birbante",
+  "birra",
+  "biscotto",
+  "bisesto",
+  "bisnonno",
+  "bisonte",
+  "bisturi",
+  "bizzarro",
+  "blando",
+  "blatta",
+  "bollito",
+  "bonifico",
+  "bordo",
+  "bosco",
+  "botanico",
+  "bottino",
+  "bozzolo",
+  "braccio",
+  "bradipo",
+  "brama",
+  "branca",
+  "bravura",
+  "bretella",
+  "brevetto",
+  "brezza",
+  "briglia",
+  "brillante",
+  "brindare",
+  "broccolo",
+  "brodo",
+  "bronzina",
+  "brullo",
+  "bruno",
+  "bubbone",
+  "buca",
+  "budino",
+  "buffone",
+  "buio",
+  "bulbo",
+  "buono",
+  "burlone",
+  "burrasca",
+  "bussola",
+  "busta",
+  "cadetto",
+  "caduco",
+  "calamaro",
+  "calcolo",
+  "calesse",
+  "calibro",
+  "calmo",
+  "caloria",
+  "cambusa",
+  "camerata",
+  "camicia",
+  "cammino",
+  "camola",
+  "campale",
+  "canapa",
+  "candela",
+  "cane",
+  "canino",
+  "canotto",
+  "cantina",
+  "capace",
+  "capello",
+  "capitolo",
+  "capogiro",
+  "cappero",
+  "capra",
+  "capsula",
+  "carapace",
+  "carcassa",
+  "cardo",
+  "carisma",
+  "carovana",
+  "carretto",
+  "cartolina",
+  "casaccio",
+  "cascata",
+  "caserma",
+  "caso",
+  "cassone",
+  "castello",
+  "casuale",
+  "catasta",
+  "catena",
+  "catrame",
+  "cauto",
+  "cavillo",
+  "cedibile",
+  "cedrata",
+  "cefalo",
+  "celebre",
+  "cellulare",
+  "cena",
+  "cenone",
+  "centesimo",
+  "ceramica",
+  "cercare",
+  "certo",
+  "cerume",
+  "cervello",
+  "cesoia",
+  "cespo",
+  "ceto",
+  "chela",
+  "chiaro",
+  "chicca",
+  "chiedere",
+  "chimera",
+  "china",
+  "chirurgo",
+  "chitarra",
+  "ciao",
+  "ciclismo",
+  "cifrare",
+  "cigno",
+  "cilindro",
+  "ciottolo",
+  "circa",
+  "cirrosi",
+  "citrico",
+  "cittadino",
+  "ciuffo",
+  "civetta",
+  "civile",
+  "classico",
+  "clinica",
+  "cloro",
+  "cocco",
+  "codardo",
+  "codice",
+  "coerente",
+  "cognome",
+  "collare",
+  "colmato",
+  "colore",
+  "colposo",
+  "coltivato",
+  "colza",
+  "coma",
+  "cometa",
+  "commando",
+  "comodo",
+  "computer",
+  "comune",
+  "conciso",
+  "condurre",
+  "conferma",
+  "congelare",
+  "coniuge",
+  "connesso",
+  "conoscere",
+  "consumo",
+  "continuo",
+  "convegno",
+  "coperto",
+  "copione",
+  "coppia",
+  "copricapo",
+  "corazza",
+  "cordata",
+  "coricato",
+  "cornice",
+  "corolla",
+  "corpo",
+  "corredo",
+  "corsia",
+  "cortese",
+  "cosmico",
+  "costante",
+  "cottura",
+  "covato",
+  "cratere",
+  "cravatta",
+  "creato",
+  "credere",
+  "cremoso",
+  "crescita",
+  "creta",
+  "criceto",
+  "crinale",
+  "crisi",
+  "critico",
+  "croce",
+  "cronaca",
+  "crostata",
+  "cruciale",
+  "crusca",
+  "cucire",
+  "cuculo",
+  "cugino",
+  "cullato",
+  "cupola",
+  "curatore",
+  "cursore",
+  "curvo",
+  "cuscino",
+  "custode",
+  "dado",
+  "daino",
+  "dalmata",
+  "damerino",
+  "daniela",
+  "dannoso",
+  "danzare",
+  "datato",
+  "davanti",
+  "davvero",
+  "debutto",
+  "decennio",
+  "deciso",
+  "declino",
+  "decollo",
+  "decreto",
+  "dedicato",
+  "definito",
+  "deforme",
+  "degno",
+  "delegare",
+  "delfino",
+  "delirio",
+  "delta",
+  "demenza",
+  "denotato",
+  "dentro",
+  "deposito",
+  "derapata",
+  "derivare",
+  "deroga",
+  "descritto",
+  "deserto",
+  "desiderio",
+  "desumere",
+  "detersivo",
+  "devoto",
+  "diametro",
+  "dicembre",
+  "diedro",
+  "difeso",
+  "diffuso",
+  "digerire",
+  "digitale",
+  "diluvio",
+  "dinamico",
+  "dinnanzi",
+  "dipinto",
+  "diploma",
+  "dipolo",
+  "diradare",
+  "dire",
+  "dirotto",
+  "dirupo",
+  "disagio",
+  "discreto",
+  "disfare",
+  "disgelo",
+  "disposto",
+  "distanza",
+  "disumano",
+  "dito",
+  "divano",
+  "divelto",
+  "dividere",
+  "divorato",
+  "doblone",
+  "docente",
+  "doganale",
+  "dogma",
+  "dolce",
+  "domato",
+  "domenica",
+  "dominare",
+  "dondolo",
+  "dono",
+  "dormire",
+  "dote",
+  "dottore",
+  "dovuto",
+  "dozzina",
+  "drago",
+  "druido",
+  "dubbio",
+  "dubitare",
+  "ducale",
+  "duna",
+  "duomo",
+  "duplice",
+  "duraturo",
+  "ebano",
+  "eccesso",
+  "ecco",
+  "eclissi",
+  "economia",
+  "edera",
+  "edicola",
+  "edile",
+  "editoria",
+  "educare",
+  "egemonia",
+  "egli",
+  "egoismo",
+  "egregio",
+  "elaborato",
+  "elargire",
+  "elegante",
+  "elencato",
+  "eletto",
+  "elevare",
+  "elfico",
+  "elica",
+  "elmo",
+  "elsa",
+  "eluso",
+  "emanato",
+  "emblema",
+  "emesso",
+  "emiro",
+  "emotivo",
+  "emozione",
+  "empirico",
+  "emulo",
+  "endemico",
+  "enduro",
+  "energia",
+  "enfasi",
+  "enoteca",
+  "entrare",
+  "enzima",
+  "epatite",
+  "epilogo",
+  "episodio",
+  "epocale",
+  "eppure",
+  "equatore",
+  "erario",
+  "erba",
+  "erboso",
+  "erede",
+  "eremita",
+  "erigere",
+  "ermetico",
+  "eroe",
+  "erosivo",
+  "errante",
+  "esagono",
+  "esame",
+  "esanime",
+  "esaudire",
+  "esca",
+  "esempio",
+  "esercito",
+  "esibito",
+  "esigente",
+  "esistere",
+  "esito",
+  "esofago",
+  "esortato",
+  "esoso",
+  "espanso",
+  "espresso",
+  "essenza",
+  "esso",
+  "esteso",
+  "estimare",
+  "estonia",
+  "estroso",
+  "esultare",
+  "etilico",
+  "etnico",
+  "etrusco",
+  "etto",
+  "euclideo",
+  "europa",
+  "evaso",
+  "evidenza",
+  "evitato",
+  "evoluto",
+  "evviva",
+  "fabbrica",
+  "faccenda",
+  "fachiro",
+  "falco",
+  "famiglia",
+  "fanale",
+  "fanfara",
+  "fango",
+  "fantasma",
+  "fare",
+  "farfalla",
+  "farinoso",
+  "farmaco",
+  "fascia",
+  "fastoso",
+  "fasullo",
+  "faticare",
+  "fato",
+  "favoloso",
+  "febbre",
+  "fecola",
+  "fede",
+  "fegato",
+  "felpa",
+  "feltro",
+  "femmina",
+  "fendere",
+  "fenomeno",
+  "fermento",
+  "ferro",
+  "fertile",
+  "fessura",
+  "festivo",
+  "fetta",
+  "feudo",
+  "fiaba",
+  "fiducia",
+  "fifa",
+  "figurato",
+  "filo",
+  "finanza",
+  "finestra",
+  "finire",
+  "fiore",
+  "fiscale",
+  "fisico",
+  "fiume",
+  "flacone",
+  "flamenco",
+  "flebo",
+  "flemma",
+  "florido",
+  "fluente",
+  "fluoro",
+  "fobico",
+  "focaccia",
+  "focoso",
+  "foderato",
+  "foglio",
+  "folata",
+  "folclore",
+  "folgore",
+  "fondente",
+  "fonetico",
+  "fonia",
+  "fontana",
+  "forbito",
+  "forchetta",
+  "foresta",
+  "formica",
+  "fornaio",
+  "foro",
+  "fortezza",
+  "forzare",
+  "fosfato",
+  "fosso",
+  "fracasso",
+  "frana",
+  "frassino",
+  "fratello",
+  "freccetta",
+  "frenata",
+  "fresco",
+  "frigo",
+  "frollino",
+  "fronde",
+  "frugale",
+  "frutta",
+  "fucilata",
+  "fucsia",
+  "fuggente",
+  "fulmine",
+  "fulvo",
+  "fumante",
+  "fumetto",
+  "fumoso",
+  "fune",
+  "funzione",
+  "fuoco",
+  "furbo",
+  "furgone",
+  "furore",
+  "fuso",
+  "futile",
+  "gabbiano",
+  "gaffe",
+  "galateo",
+  "gallina",
+  "galoppo",
+  "gambero",
+  "gamma",
+  "garanzia",
+  "garbo",
+  "garofano",
+  "garzone",
+  "gasdotto",
+  "gasolio",
+  "gastrico",
+  "gatto",
+  "gaudio",
+  "gazebo",
+  "gazzella",
+  "geco",
+  "gelatina",
+  "gelso",
+  "gemello",
+  "gemmato",
+  "gene",
+  "genitore",
+  "gennaio",
+  "genotipo",
+  "gergo",
+  "ghepardo",
+  "ghiaccio",
+  "ghisa",
+  "giallo",
+  "gilda",
+  "ginepro",
+  "giocare",
+  "gioiello",
+  "giorno",
+  "giove",
+  "girato",
+  "girone",
+  "gittata",
+  "giudizio",
+  "giurato",
+  "giusto",
+  "globulo",
+  "glutine",
+  "gnomo",
+  "gobba",
+  "golf",
+  "gomito",
+  "gommone",
+  "gonfio",
+  "gonna",
+  "governo",
+  "gracile",
+  "grado",
+  "grafico",
+  "grammo",
+  "grande",
+  "grattare",
+  "gravoso",
+  "grazia",
+  "greca",
+  "gregge",
+  "grifone",
+  "grigio",
+  "grinza",
+  "grotta",
+  "gruppo",
+  "guadagno",
+  "guaio",
+  "guanto",
+  "guardare",
+  "gufo",
+  "guidare",
+  "ibernato",
+  "icona",
+  "identico",
+  "idillio",
+  "idolo",
+  "idra",
+  "idrico",
+  "idrogeno",
+  "igiene",
+  "ignaro",
+  "ignorato",
+  "ilare",
+  "illeso",
+  "illogico",
+  "illudere",
+  "imballo",
+  "imbevuto",
+  "imbocco",
+  "imbuto",
+  "immane",
+  "immerso",
+  "immolato",
+  "impacco",
+  "impeto",
+  "impiego",
+  "importo",
+  "impronta",
+  "inalare",
+  "inarcare",
+  "inattivo",
+  "incanto",
+  "incendio",
+  "inchino",
+  "incisivo",
+  "incluso",
+  "incontro",
+  "incrocio",
+  "incubo",
+  "indagine",
+  "india",
+  "indole",
+  "inedito",
+  "infatti",
+  "infilare",
+  "inflitto",
+  "ingaggio",
+  "ingegno",
+  "inglese",
+  "ingordo",
+  "ingrosso",
+  "innesco",
+  "inodore",
+  "inoltrare",
+  "inondato",
+  "insano",
+  "insetto",
+  "insieme",
+  "insonnia",
+  "insulina",
+  "intasato",
+  "intero",
+  "intonaco",
+  "intuito",
+  "inumidire",
+  "invalido",
+  "invece",
+  "invito",
+  "iperbole",
+  "ipnotico",
+  "ipotesi",
+  "ippica",
+  "iride",
+  "irlanda",
+  "ironico",
+  "irrigato",
+  "irrorare",
+  "isolato",
+  "isotopo",
+  "isterico",
+  "istituto",
+  "istrice",
+  "italia",
+  "iterare",
+  "labbro",
+  "labirinto",
+  "lacca",
+  "lacerato",
+  "lacrima",
+  "lacuna",
+  "laddove",
+  "lago",
+  "lampo",
+  "lancetta",
+  "lanterna",
+  "lardoso",
+  "larga",
+  "laringe",
+  "lastra",
+  "latenza",
+  "latino",
+  "lattuga",
+  "lavagna",
+  "lavoro",
+  "legale",
+  "leggero",
+  "lembo",
+  "lentezza",
+  "lenza",
+  "leone",
+  "lepre",
+  "lesivo",
+  "lessato",
+  "lesto",
+  "letterale",
+  "leva",
+  "levigato",
+  "libero",
+  "lido",
+  "lievito",
+  "lilla",
+  "limatura",
+  "limitare",
+  "limpido",
+  "lineare",
+  "lingua",
+  "liquido",
+  "lira",
+  "lirica",
+  "lisca",
+  "lite",
+  "litigio",
+  "livrea",
+  "locanda",
+  "lode",
+  "logica",
+  "lombare",
+  "londra",
+  "longevo",
+  "loquace",
+  "lorenzo",
+  "loto",
+  "lotteria",
+  "luce",
+  "lucidato",
+  "lumaca",
+  "luminoso",
+  "lungo",
+  "lupo",
+  "luppolo",
+  "lusinga",
+  "lusso",
+  "lutto",
+  "macabro",
+  "macchina",
+  "macero",
+  "macinato",
+  "madama",
+  "magico",
+  "maglia",
+  "magnete",
+  "magro",
+  "maiolica",
+  "malafede",
+  "malgrado",
+  "malinteso",
+  "malsano",
+  "malto",
+  "malumore",
+  "mana",
+  "mancia",
+  "mandorla",
+  "mangiare",
+  "manifesto",
+  "mannaro",
+  "manovra",
+  "mansarda",
+  "mantide",
+  "manubrio",
+  "mappa",
+  "maratona",
+  "marcire",
+  "maretta",
+  "marmo",
+  "marsupio",
+  "maschera",
+  "massaia",
+  "mastino",
+  "materasso",
+  "matricola",
+  "mattone",
+  "maturo",
+  "mazurca",
+  "meandro",
+  "meccanico",
+  "mecenate",
+  "medesimo",
+  "meditare",
+  "mega",
+  "melassa",
+  "melis",
+  "melodia",
+  "meninge",
+  "meno",
+  "mensola",
+  "mercurio",
+  "merenda",
+  "merlo",
+  "meschino",
+  "mese",
+  "messere",
+  "mestolo",
+  "metallo",
+  "metodo",
+  "mettere",
+  "miagolare",
+  "mica",
+  "micelio",
+  "michele",
+  "microbo",
+  "midollo",
+  "miele",
+  "migliore",
+  "milano",
+  "milite",
+  "mimosa",
+  "minerale",
+  "mini",
+  "minore",
+  "mirino",
+  "mirtillo",
+  "miscela",
+  "missiva",
+  "misto",
+  "misurare",
+  "mitezza",
+  "mitigare",
+  "mitra",
+  "mittente",
+  "mnemonico",
+  "modello",
+  "modifica",
+  "modulo",
+  "mogano",
+  "mogio",
+  "mole",
+  "molosso",
+  "monastero",
+  "monco",
+  "mondina",
+  "monetario",
+  "monile",
+  "monotono",
+  "monsone",
+  "montato",
+  "monviso",
+  "mora",
+  "mordere",
+  "morsicato",
+  "mostro",
+  "motivato",
+  "motosega",
+  "motto",
+  "movenza",
+  "movimento",
+  "mozzo",
+  "mucca",
+  "mucosa",
+  "muffa",
+  "mughetto",
+  "mugnaio",
+  "mulatto",
+  "mulinello",
+  "multiplo",
+  "mummia",
+  "munto",
+  "muovere",
+  "murale",
+  "musa",
+  "muscolo",
+  "musica",
+  "mutevole",
+  "muto",
+  "nababbo",
+  "nafta",
+  "nanometro",
+  "narciso",
+  "narice",
+  "narrato",
+  "nascere",
+  "nastrare",
+  "naturale",
+  "nautica",
+  "naviglio",
+  "nebulosa",
+  "necrosi",
+  "negativo",
+  "negozio",
+  "nemmeno",
+  "neofita",
+  "neretto",
+  "nervo",
+  "nessuno",
+  "nettuno",
+  "neutrale",
+  "neve",
+  "nevrotico",
+  "nicchia",
+  "ninfa",
+  "nitido",
+  "nobile",
+  "nocivo",
+  "nodo",
+  "nome",
+  "nomina",
+  "nordico",
+  "normale",
+  "norvegese",
+  "nostrano",
+  "notare",
+  "notizia",
+  "notturno",
+  "novella",
+  "nucleo",
+  "nulla",
+  "numero",
+  "nuovo",
+  "nutrire",
+  "nuvola",
+  "nuziale",
+  "oasi",
+  "obbedire",
+  "obbligo",
+  "obelisco",
+  "oblio",
+  "obolo",
+  "obsoleto",
+  "occasione",
+  "occhio",
+  "occidente",
+  "occorrere",
+  "occultare",
+  "ocra",
+  "oculato",
+  "odierno",
+  "odorare",
+  "offerta",
+  "offrire",
+  "offuscato",
+  "oggetto",
+  "oggi",
+  "ognuno",
+  "olandese",
+  "olfatto",
+  "oliato",
+  "oliva",
+  "ologramma",
+  "oltre",
+  "omaggio",
+  "ombelico",
+  "ombra",
+  "omega",
+  "omissione",
+  "ondoso",
+  "onere",
+  "onice",
+  "onnivoro",
+  "onorevole",
+  "onta",
+  "operato",
+  "opinione",
+  "opposto",
+  "oracolo",
+  "orafo",
+  "ordine",
+  "orecchino",
+  "orefice",
+  "orfano",
+  "organico",
+  "origine",
+  "orizzonte",
+  "orma",
+  "ormeggio",
+  "ornativo",
+  "orologio",
+  "orrendo",
+  "orribile",
+  "ortensia",
+  "ortica",
+  "orzata",
+  "orzo",
+  "osare",
+  "oscurare",
+  "osmosi",
+  "ospedale",
+  "ospite",
+  "ossa",
+  "ossidare",
+  "ostacolo",
+  "oste",
+  "otite",
+  "otre",
+  "ottagono",
+  "ottimo",
+  "ottobre",
+  "ovale",
+  "ovest",
+  "ovino",
+  "oviparo",
+  "ovocito",
+  "ovunque",
+  "ovviare",
+  "ozio",
+  "pacchetto",
+  "pace",
+  "pacifico",
+  "padella",
+  "padrone",
+  "paese",
+  "paga",
+  "pagina",
+  "palazzina",
+  "palesare",
+  "pallido",
+  "palo",
+  "palude",
+  "pandoro",
+  "pannello",
+  "paolo",
+  "paonazzo",
+  "paprica",
+  "parabola",
+  "parcella",
+  "parere",
+  "pargolo",
+  "pari",
+  "parlato",
+  "parola",
+  "partire",
+  "parvenza",
+  "parziale",
+  "passivo",
+  "pasticca",
+  "patacca",
+  "patologia",
+  "pattume",
+  "pavone",
+  "peccato",
+  "pedalare",
+  "pedonale",
+  "peggio",
+  "peloso",
+  "penare",
+  "pendice",
+  "penisola",
+  "pennuto",
+  "penombra",
+  "pensare",
+  "pentola",
+  "pepe",
+  "pepita",
+  "perbene",
+  "percorso",
+  "perdonato",
+  "perforare",
+  "pergamena",
+  "periodo",
+  "permesso",
+  "perno",
+  "perplesso",
+  "persuaso",
+  "pertugio",
+  "pervaso",
+  "pesatore",
+  "pesista",
+  "peso",
+  "pestifero",
+  "petalo",
+  "pettine",
+  "petulante",
+  "pezzo",
+  "piacere",
+  "pianta",
+  "piattino",
+  "piccino",
+  "picozza",
+  "piega",
+  "pietra",
+  "piffero",
+  "pigiama",
+  "pigolio",
+  "pigro",
+  "pila",
+  "pilifero",
+  "pillola",
+  "pilota",
+  "pimpante",
+  "pineta",
+  "pinna",
+  "pinolo",
+  "pioggia",
+  "piombo",
+  "piramide",
+  "piretico",
+  "pirite",
+  "pirolisi",
+  "pitone",
+  "pizzico",
+  "placebo",
+  "planare",
+  "plasma",
+  "platano",
+  "plenario",
+  "pochezza",
+  "poderoso",
+  "podismo",
+  "poesia",
+  "poggiare",
+  "polenta",
+  "poligono",
+  "pollice",
+  "polmonite",
+  "polpetta",
+  "polso",
+  "poltrona",
+  "polvere",
+  "pomice",
+  "pomodoro",
+  "ponte",
+  "popoloso",
+  "porfido",
+  "poroso",
+  "porpora",
+  "porre",
+  "portata",
+  "posa",
+  "positivo",
+  "possesso",
+  "postulato",
+  "potassio",
+  "potere",
+  "pranzo",
+  "prassi",
+  "pratica",
+  "precluso",
+  "predica",
+  "prefisso",
+  "pregiato",
+  "prelievo",
+  "premere",
+  "prenotare",
+  "preparato",
+  "presenza",
+  "pretesto",
+  "prevalso",
+  "prima",
+  "principe",
+  "privato",
+  "problema",
+  "procura",
+  "produrre",
+  "profumo",
+  "progetto",
+  "prolunga",
+  "promessa",
+  "pronome",
+  "proposta",
+  "proroga",
+  "proteso",
+  "prova",
+  "prudente",
+  "prugna",
+  "prurito",
+  "psiche",
+  "pubblico",
+  "pudica",
+  "pugilato",
+  "pugno",
+  "pulce",
+  "pulito",
+  "pulsante",
+  "puntare",
+  "pupazzo",
+  "pupilla",
+  "puro",
+  "quadro",
+  "qualcosa",
+  "quasi",
+  "querela",
+  "quota",
+  "raccolto",
+  "raddoppio",
+  "radicale",
+  "radunato",
+  "raffica",
+  "ragazzo",
+  "ragione",
+  "ragno",
+  "ramarro",
+  "ramingo",
+  "ramo",
+  "randagio",
+  "rantolare",
+  "rapato",
+  "rapina",
+  "rappreso",
+  "rasatura",
+  "raschiato",
+  "rasente",
+  "rassegna",
+  "rastrello",
+  "rata",
+  "ravveduto",
+  "reale",
+  "recepire",
+  "recinto",
+  "recluta",
+  "recondito",
+  "recupero",
+  "reddito",
+  "redimere",
+  "regalato",
+  "registro",
+  "regola",
+  "regresso",
+  "relazione",
+  "remare",
+  "remoto",
+  "renna",
+  "replica",
+  "reprimere",
+  "reputare",
+  "resa",
+  "residente",
+  "responso",
+  "restauro",
+  "rete",
+  "retina",
+  "retorica",
+  "rettifica",
+  "revocato",
+  "riassunto",
+  "ribadire",
+  "ribelle",
+  "ribrezzo",
+  "ricarica",
+  "ricco",
+  "ricevere",
+  "riciclato",
+  "ricordo",
+  "ricreduto",
+  "ridicolo",
+  "ridurre",
+  "rifasare",
+  "riflesso",
+  "riforma",
+  "rifugio",
+  "rigare",
+  "rigettato",
+  "righello",
+  "rilassato",
+  "rilevato",
+  "rimanere",
+  "rimbalzo",
+  "rimedio",
+  "rimorchio",
+  "rinascita",
+  "rincaro",
+  "rinforzo",
+  "rinnovo",
+  "rinomato",
+  "rinsavito",
+  "rintocco",
+  "rinuncia",
+  "rinvenire",
+  "riparato",
+  "ripetuto",
+  "ripieno",
+  "riportare",
+  "ripresa",
+  "ripulire",
+  "risata",
+  "rischio",
+  "riserva",
+  "risibile",
+  "riso",
+  "rispetto",
+  "ristoro",
+  "risultato",
+  "risvolto",
+  "ritardo",
+  "ritegno",
+  "ritmico",
+  "ritrovo",
+  "riunione",
+  "riva",
+  "riverso",
+  "rivincita",
+  "rivolto",
+  "rizoma",
+  "roba",
+  "robotico",
+  "robusto",
+  "roccia",
+  "roco",
+  "rodaggio",
+  "rodere",
+  "roditore",
+  "rogito",
+  "rollio",
+  "romantico",
+  "rompere",
+  "ronzio",
+  "rosolare",
+  "rospo",
+  "rotante",
+  "rotondo",
+  "rotula",
+  "rovescio",
+  "rubizzo",
+  "rubrica",
+  "ruga",
+  "rullino",
+  "rumine",
+  "rumoroso",
+  "ruolo",
+  "rupe",
+  "russare",
+  "rustico",
+  "sabato",
+  "sabbiare",
+  "sabotato",
+  "sagoma",
+  "salasso",
+  "saldatura",
+  "salgemma",
+  "salivare",
+  "salmone",
+  "salone",
+  "saltare",
+  "saluto",
+  "salvo",
+  "sapere",
+  "sapido",
+  "saporito",
+  "saraceno",
+  "sarcasmo",
+  "sarto",
+  "sassoso",
+  "satellite",
+  "satira",
+  "satollo",
+  "saturno",
+  "savana",
+  "savio",
+  "saziato",
+  "sbadiglio",
+  "sbalzo",
+  "sbancato",
+  "sbarra",
+  "sbattere",
+  "sbavare",
+  "sbendare",
+  "sbirciare",
+  "sbloccato",
+  "sbocciato",
+  "sbrinare",
+  "sbruffone",
+  "sbuffare",
+  "scabroso",
+  "scadenza",
+  "scala",
+  "scambiare",
+  "scandalo",
+  "scapola",
+  "scarso",
+  "scatenare",
+  "scavato",
+  "scelto",
+  "scenico",
+  "scettro",
+  "scheda",
+  "schiena",
+  "sciarpa",
+  "scienza",
+  "scindere",
+  "scippo",
+  "sciroppo",
+  "scivolo",
+  "sclerare",
+  "scodella",
+  "scolpito",
+  "scomparto",
+  "sconforto",
+  "scoprire",
+  "scorta",
+  "scossone",
+  "scozzese",
+  "scriba",
+  "scrollare",
+  "scrutinio",
+  "scuderia",
+  "scultore",
+  "scuola",
+  "scuro",
+  "scusare",
+  "sdebitare",
+  "sdoganare",
+  "seccatura",
+  "secondo",
+  "sedano",
+  "seggiola",
+  "segnalato",
+  "segregato",
+  "seguito",
+  "selciato",
+  "selettivo",
+  "sella",
+  "selvaggio",
+  "semaforo",
+  "sembrare",
+  "seme",
+  "seminato",
+  "sempre",
+  "senso",
+  "sentire",
+  "sepolto",
+  "sequenza",
+  "serata",
+  "serbato",
+  "sereno",
+  "serio",
+  "serpente",
+  "serraglio",
+  "servire",
+  "sestina",
+  "setola",
+  "settimana",
+  "sfacelo",
+  "sfaldare",
+  "sfamato",
+  "sfarzoso",
+  "sfaticato",
+  "sfera",
+  "sfida",
+  "sfilato",
+  "sfinge",
+  "sfocato",
+  "sfoderare",
+  "sfogo",
+  "sfoltire",
+  "sforzato",
+  "sfratto",
+  "sfruttato",
+  "sfuggito",
+  "sfumare",
+  "sfuso",
+  "sgabello",
+  "sgarbato",
+  "sgonfiare",
+  "sgorbio",
+  "sgrassato",
+  "sguardo",
+  "sibilo",
+  "siccome",
+  "sierra",
+  "sigla",
+  "signore",
+  "silenzio",
+  "sillaba",
+  "simbolo",
+  "simpatico",
+  "simulato",
+  "sinfonia",
+  "singolo",
+  "sinistro",
+  "sino",
+  "sintesi",
+  "sinusoide",
+  "sipario",
+  "sisma",
+  "sistole",
+  "situato",
+  "slitta",
+  "slogatura",
+  "sloveno",
+  "smarrito",
+  "smemorato",
+  "smentito",
+  "smeraldo",
+  "smilzo",
+  "smontare",
+  "smottato",
+  "smussato",
+  "snellire",
+  "snervato",
+  "snodo",
+  "sobbalzo",
+  "sobrio",
+  "soccorso",
+  "sociale",
+  "sodale",
+  "soffitto",
+  "sogno",
+  "soldato",
+  "solenne",
+  "solido",
+  "sollazzo",
+  "solo",
+  "solubile",
+  "solvente",
+  "somatico",
+  "somma",
+  "sonda",
+  "sonetto",
+  "sonnifero",
+  "sopire",
+  "soppeso",
+  "sopra",
+  "sorgere",
+  "sorpasso",
+  "sorriso",
+  "sorso",
+  "sorteggio",
+  "sorvolato",
+  "sospiro",
+  "sosta",
+  "sottile",
+  "spada",
+  "spalla",
+  "spargere",
+  "spatola",
+  "spavento",
+  "spazzola",
+  "specie",
+  "spedire",
+  "spegnere",
+  "spelatura",
+  "speranza",
+  "spessore",
+  "spettrale",
+  "spezzato",
+  "spia",
+  "spigoloso",
+  "spillato",
+  "spinoso",
+  "spirale",
+  "splendido",
+  "sportivo",
+  "sposo",
+  "spranga",
+  "sprecare",
+  "spronato",
+  "spruzzo",
+  "spuntino",
+  "squillo",
+  "sradicare",
+  "srotolato",
+  "stabile",
+  "stacco",
+  "staffa",
+  "stagnare",
+  "stampato",
+  "stantio",
+  "starnuto",
+  "stasera",
+  "statuto",
+  "stelo",
+  "steppa",
+  "sterzo",
+  "stiletto",
+  "stima",
+  "stirpe",
+  "stivale",
+  "stizzoso",
+  "stonato",
+  "storico",
+  "strappo",
+  "stregato",
+  "stridulo",
+  "strozzare",
+  "strutto",
+  "stuccare",
+  "stufo",
+  "stupendo",
+  "subentro",
+  "succoso",
+  "sudore",
+  "suggerito",
+  "sugo",
+  "sultano",
+  "suonare",
+  "superbo",
+  "supporto",
+  "surgelato",
+  "surrogato",
+  "sussurro",
+  "sutura",
+  "svagare",
+  "svedese",
+  "sveglio",
+  "svelare",
+  "svenuto",
+  "svezia",
+  "sviluppo",
+  "svista",
+  "svizzera",
+  "svolta",
+  "svuotare",
+  "tabacco",
+  "tabulato",
+  "tacciare",
+  "taciturno",
+  "tale",
+  "talismano",
+  "tampone",
+  "tannino",
+  "tara",
+  "tardivo",
+  "targato",
+  "tariffa",
+  "tarpare",
+  "tartaruga",
+  "tasto",
+  "tattico",
+  "taverna",
+  "tavolata",
+  "tazza",
+  "teca",
+  "tecnico",
+  "telefono",
+  "temerario",
+  "tempo",
+  "temuto",
+  "tendone",
+  "tenero",
+  "tensione",
+  "tentacolo",
+  "teorema",
+  "terme",
+  "terrazzo",
+  "terzetto",
+  "tesi",
+  "tesserato",
+  "testato",
+  "tetro",
+  "tettoia",
+  "tifare",
+  "tigella",
+  "timbro",
+  "tinto",
+  "tipico",
+  "tipografo",
+  "tiraggio",
+  "tiro",
+  "titanio",
+  "titolo",
+  "titubante",
+  "tizio",
+  "tizzone",
+  "toccare",
+  "tollerare",
+  "tolto",
+  "tombola",
+  "tomo",
+  "tonfo",
+  "tonsilla",
+  "topazio",
+  "topologia",
+  "toppa",
+  "torba",
+  "tornare",
+  "torrone",
+  "tortora",
+  "toscano",
+  "tossire",
+  "tostatura",
+  "totano",
+  "trabocco",
+  "trachea",
+  "trafila",
+  "tragedia",
+  "tralcio",
+  "tramonto",
+  "transito",
+  "trapano",
+  "trarre",
+  "trasloco",
+  "trattato",
+  "trave",
+  "treccia",
+  "tremolio",
+  "trespolo",
+  "tributo",
+  "tricheco",
+  "trifoglio",
+  "trillo",
+  "trincea",
+  "trio",
+  "tristezza",
+  "triturato",
+  "trivella",
+  "tromba",
+  "trono",
+  "troppo",
+  "trottola",
+  "trovare",
+  "truccato",
+  "tubatura",
+  "tuffato",
+  "tulipano",
+  "tumulto",
+  "tunisia",
+  "turbare",
+  "turchino",
+  "tuta",
+  "tutela",
+  "ubicato",
+  "uccello",
+  "uccisore",
+  "udire",
+  "uditivo",
+  "uffa",
+  "ufficio",
+  "uguale",
+  "ulisse",
+  "ultimato",
+  "umano",
+  "umile",
+  "umorismo",
+  "uncinetto",
+  "ungere",
+  "ungherese",
+  "unicorno",
+  "unificato",
+  "unisono",
+  "unitario",
+  "unte",
+  "uovo",
+  "upupa",
+  "uragano",
+  "urgenza",
+  "urlo",
+  "usanza",
+  "usato",
+  "uscito",
+  "usignolo",
+  "usuraio",
+  "utensile",
+  "utilizzo",
+  "utopia",
+  "vacante",
+  "vaccinato",
+  "vagabondo",
+  "vagliato",
+  "valanga",
+  "valgo",
+  "valico",
+  "valletta",
+  "valoroso",
+  "valutare",
+  "valvola",
+  "vampata",
+  "vangare",
+  "vanitoso",
+  "vano",
+  "vantaggio",
+  "vanvera",
+  "vapore",
+  "varano",
+  "varcato",
+  "variante",
+  "vasca",
+  "vedetta",
+  "vedova",
+  "veduto",
+  "vegetale",
+  "veicolo",
+  "velcro",
+  "velina",
+  "velluto",
+  "veloce",
+  "venato",
+  "vendemmia",
+  "vento",
+  "verace",
+  "verbale",
+  "vergogna",
+  "verifica",
+  "vero",
+  "verruca",
+  "verticale",
+  "vescica",
+  "vessillo",
+  "vestale",
+  "veterano",
+  "vetrina",
+  "vetusto",
+  "viandante",
+  "vibrante",
+  "vicenda",
+  "vichingo",
+  "vicinanza",
+  "vidimare",
+  "vigilia",
+  "vigneto",
+  "vigore",
+  "vile",
+  "villano",
+  "vimini",
+  "vincitore",
+  "viola",
+  "vipera",
+  "virgola",
+  "virologo",
+  "virulento",
+  "viscoso",
+  "visione",
+  "vispo",
+  "vissuto",
+  "visura",
+  "vita",
+  "vitello",
+  "vittima",
+  "vivanda",
+  "vivido",
+  "viziare",
+  "voce",
+  "voga",
+  "volatile",
+  "volere",
+  "volpe",
+  "voragine",
+  "vulcano",
+  "zampogna",
+  "zanna",
+  "zappato",
+  "zattera",
+  "zavorra",
+  "zefiro",
+  "zelante",
+  "zelo",
+  "zenzero",
+  "zerbino",
+  "zibetto",
+  "zinco",
+  "zircone",
+  "zitto",
+  "zolla",
+  "zotico",
+  "zucchero",
+  "zufolo",
+  "zulu",
+  "zuppa"
+]
+
+},{}],80:[function(require,module,exports){
+module.exports=[
+  "あいこくしん",
+  "あいさつ",
+  "あいだ",
+  "あおぞら",
+  "あかちゃん",
+  "あきる",
+  "あけがた",
+  "あける",
+  "あこがれる",
+  "あさい",
+  "あさひ",
+  "あしあと",
+  "あじわう",
+  "あずかる",
+  "あずき",
+  "あそぶ",
+  "あたえる",
+  "あたためる",
+  "あたりまえ",
+  "あたる",
+  "あつい",
+  "あつかう",
+  "あっしゅく",
+  "あつまり",
+  "あつめる",
+  "あてな",
+  "あてはまる",
+  "あひる",
+  "あぶら",
+  "あぶる",
+  "あふれる",
+  "あまい",
+  "あまど",
+  "あまやかす",
+  "あまり",
+  "あみもの",
+  "あめりか",
+  "あやまる",
+  "あゆむ",
+  "あらいぐま",
+  "あらし",
+  "あらすじ",
+  "あらためる",
+  "あらゆる",
+  "あらわす",
+  "ありがとう",
+  "あわせる",
+  "あわてる",
+  "あんい",
+  "あんがい",
+  "あんこ",
+  "あんぜん",
+  "あんてい",
+  "あんない",
+  "あんまり",
+  "いいだす",
+  "いおん",
+  "いがい",
+  "いがく",
+  "いきおい",
+  "いきなり",
+  "いきもの",
+  "いきる",
+  "いくじ",
+  "いくぶん",
+  "いけばな",
+  "いけん",
+  "いこう",
+  "いこく",
+  "いこつ",
+  "いさましい",
+  "いさん",
+  "いしき",
+  "いじゅう",
+  "いじょう",
+  "いじわる",
+  "いずみ",
+  "いずれ",
+  "いせい",
+  "いせえび",
+  "いせかい",
+  "いせき",
+  "いぜん",
+  "いそうろう",
+  "いそがしい",
+  "いだい",
+  "いだく",
+  "いたずら",
+  "いたみ",
+  "いたりあ",
+  "いちおう",
+  "いちじ",
+  "いちど",
+  "いちば",
+  "いちぶ",
+  "いちりゅう",
+  "いつか",
+  "いっしゅん",
+  "いっせい",
+  "いっそう",
+  "いったん",
+  "いっち",
+  "いってい",
+  "いっぽう",
+  "いてざ",
+  "いてん",
+  "いどう",
+  "いとこ",
+  "いない",
+  "いなか",
+  "いねむり",
+  "いのち",
+  "いのる",
+  "いはつ",
+  "いばる",
+  "いはん",
+  "いびき",
+  "いひん",
+  "いふく",
+  "いへん",
+  "いほう",
+  "いみん",
+  "いもうと",
+  "いもたれ",
+  "いもり",
+  "いやがる",
+  "いやす",
+  "いよかん",
+  "いよく",
+  "いらい",
+  "いらすと",
+  "いりぐち",
+  "いりょう",
+  "いれい",
+  "いれもの",
+  "いれる",
+  "いろえんぴつ",
+  "いわい",
+  "いわう",
+  "いわかん",
+  "いわば",
+  "いわゆる",
+  "いんげんまめ",
+  "いんさつ",
+  "いんしょう",
+  "いんよう",
+  "うえき",
+  "うえる",
+  "うおざ",
+  "うがい",
+  "うかぶ",
+  "うかべる",
+  "うきわ",
+  "うくらいな",
+  "うくれれ",
+  "うけたまわる",
+  "うけつけ",
+  "うけとる",
+  "うけもつ",
+  "うける",
+  "うごかす",
+  "うごく",
+  "うこん",
+  "うさぎ",
+  "うしなう",
+  "うしろがみ",
+  "うすい",
+  "うすぎ",
+  "うすぐらい",
+  "うすめる",
+  "うせつ",
+  "うちあわせ",
+  "うちがわ",
+  "うちき",
+  "うちゅう",
+  "うっかり",
+  "うつくしい",
+  "うったえる",
+  "うつる",
+  "うどん",
+  "うなぎ",
+  "うなじ",
+  "うなずく",
+  "うなる",
+  "うねる",
+  "うのう",
+  "うぶげ",
+  "うぶごえ",
+  "うまれる",
+  "うめる",
+  "うもう",
+  "うやまう",
+  "うよく",
+  "うらがえす",
+  "うらぐち",
+  "うらない",
+  "うりあげ",
+  "うりきれ",
+  "うるさい",
+  "うれしい",
+  "うれゆき",
+  "うれる",
+  "うろこ",
+  "うわき",
+  "うわさ",
+  "うんこう",
+  "うんちん",
+  "うんてん",
+  "うんどう",
+  "えいえん",
+  "えいが",
+  "えいきょう",
+  "えいご",
+  "えいせい",
+  "えいぶん",
+  "えいよう",
+  "えいわ",
+  "えおり",
+  "えがお",
+  "えがく",
+  "えきたい",
+  "えくせる",
+  "えしゃく",
+  "えすて",
+  "えつらん",
+  "えのぐ",
+  "えほうまき",
+  "えほん",
+  "えまき",
+  "えもじ",
+  "えもの",
+  "えらい",
+  "えらぶ",
+  "えりあ",
+  "えんえん",
+  "えんかい",
+  "えんぎ",
+  "えんげき",
+  "えんしゅう",
+  "えんぜつ",
+  "えんそく",
+  "えんちょう",
+  "えんとつ",
+  "おいかける",
+  "おいこす",
+  "おいしい",
+  "おいつく",
+  "おうえん",
+  "おうさま",
+  "おうじ",
+  "おうせつ",
+  "おうたい",
+  "おうふく",
+  "おうべい",
+  "おうよう",
+  "おえる",
+  "おおい",
+  "おおう",
+  "おおどおり",
+  "おおや",
+  "おおよそ",
+  "おかえり",
+  "おかず",
+  "おがむ",
+  "おかわり",
+  "おぎなう",
+  "おきる",
+  "おくさま",
+  "おくじょう",
+  "おくりがな",
+  "おくる",
+  "おくれる",
+  "おこす",
+  "おこなう",
+  "おこる",
+  "おさえる",
+  "おさない",
+  "おさめる",
+  "おしいれ",
+  "おしえる",
+  "おじぎ",
+  "おじさん",
+  "おしゃれ",
+  "おそらく",
+  "おそわる",
+  "おたがい",
+  "おたく",
+  "おだやか",
+  "おちつく",
+  "おっと",
+  "おつり",
+  "おでかけ",
+  "おとしもの",
+  "おとなしい",
+  "おどり",
+  "おどろかす",
+  "おばさん",
+  "おまいり",
+  "おめでとう",
+  "おもいで",
+  "おもう",
+  "おもたい",
+  "おもちゃ",
+  "おやつ",
+  "おやゆび",
+  "およぼす",
+  "おらんだ",
+  "おろす",
+  "おんがく",
+  "おんけい",
+  "おんしゃ",
+  "おんせん",
+  "おんだん",
+  "おんちゅう",
+  "おんどけい",
+  "かあつ",
+  "かいが",
+  "がいき",
+  "がいけん",
+  "がいこう",
+  "かいさつ",
+  "かいしゃ",
+  "かいすいよく",
+  "かいぜん",
+  "かいぞうど",
+  "かいつう",
+  "かいてん",
+  "かいとう",
+  "かいふく",
+  "がいへき",
+  "かいほう",
+  "かいよう",
+  "がいらい",
+  "かいわ",
+  "かえる",
+  "かおり",
+  "かかえる",
+  "かがく",
+  "かがし",
+  "かがみ",
+  "かくご",
+  "かくとく",
+  "かざる",
+  "がぞう",
+  "かたい",
+  "かたち",
+  "がちょう",
+  "がっきゅう",
+  "がっこう",
+  "がっさん",
+  "がっしょう",
+  "かなざわし",
+  "かのう",
+  "がはく",
+  "かぶか",
+  "かほう",
+  "かほご",
+  "かまう",
+  "かまぼこ",
+  "かめれおん",
+  "かゆい",
+  "かようび",
+  "からい",
+  "かるい",
+  "かろう",
+  "かわく",
+  "かわら",
+  "がんか",
+  "かんけい",
+  "かんこう",
+  "かんしゃ",
+  "かんそう",
+  "かんたん",
+  "かんち",
+  "がんばる",
+  "きあい",
+  "きあつ",
+  "きいろ",
+  "ぎいん",
+  "きうい",
+  "きうん",
+  "きえる",
+  "きおう",
+  "きおく",
+  "きおち",
+  "きおん",
+  "きかい",
+  "きかく",
+  "きかんしゃ",
+  "ききて",
+  "きくばり",
+  "きくらげ",
+  "きけんせい",
+  "きこう",
+  "きこえる",
+  "きこく",
+  "きさい",
+  "きさく",
+  "きさま",
+  "きさらぎ",
+  "ぎじかがく",
+  "ぎしき",
+  "ぎじたいけん",
+  "ぎじにってい",
+  "ぎじゅつしゃ",
+  "きすう",
+  "きせい",
+  "きせき",
+  "きせつ",
+  "きそう",
+  "きぞく",
+  "きぞん",
+  "きたえる",
+  "きちょう",
+  "きつえん",
+  "ぎっちり",
+  "きつつき",
+  "きつね",
+  "きてい",
+  "きどう",
+  "きどく",
+  "きない",
+  "きなが",
+  "きなこ",
+  "きぬごし",
+  "きねん",
+  "きのう",
+  "きのした",
+  "きはく",
+  "きびしい",
+  "きひん",
+  "きふく",
+  "きぶん",
+  "きぼう",
+  "きほん",
+  "きまる",
+  "きみつ",
+  "きむずかしい",
+  "きめる",
+  "きもだめし",
+  "きもち",
+  "きもの",
+  "きゃく",
+  "きやく",
+  "ぎゅうにく",
+  "きよう",
+  "きょうりゅう",
+  "きらい",
+  "きらく",
+  "きりん",
+  "きれい",
+  "きれつ",
+  "きろく",
+  "ぎろん",
+  "きわめる",
+  "ぎんいろ",
+  "きんかくじ",
+  "きんじょ",
+  "きんようび",
+  "ぐあい",
+  "くいず",
+  "くうかん",
+  "くうき",
+  "くうぐん",
+  "くうこう",
+  "ぐうせい",
+  "くうそう",
+  "ぐうたら",
+  "くうふく",
+  "くうぼ",
+  "くかん",
+  "くきょう",
+  "くげん",
+  "ぐこう",
+  "くさい",
+  "くさき",
+  "くさばな",
+  "くさる",
+  "くしゃみ",
+  "くしょう",
+  "くすのき",
+  "くすりゆび",
+  "くせげ",
+  "くせん",
+  "ぐたいてき",
+  "くださる",
+  "くたびれる",
+  "くちこみ",
+  "くちさき",
+  "くつした",
+  "ぐっすり",
+  "くつろぐ",
+  "くとうてん",
+  "くどく",
+  "くなん",
+  "くねくね",
+  "くのう",
+  "くふう",
+  "くみあわせ",
+  "くみたてる",
+  "くめる",
+  "くやくしょ",
+  "くらす",
+  "くらべる",
+  "くるま",
+  "くれる",
+  "くろう",
+  "くわしい",
+  "ぐんかん",
+  "ぐんしょく",
+  "ぐんたい",
+  "ぐんて",
+  "けあな",
+  "けいかく",
+  "けいけん",
+  "けいこ",
+  "けいさつ",
+  "げいじゅつ",
+  "けいたい",
+  "げいのうじん",
+  "けいれき",
+  "けいろ",
+  "けおとす",
+  "けおりもの",
+  "げきか",
+  "げきげん",
+  "げきだん",
+  "げきちん",
+  "げきとつ",
+  "げきは",
+  "げきやく",
+  "げこう",
+  "げこくじょう",
+  "げざい",
+  "けさき",
+  "げざん",
+  "けしき",
+  "けしごむ",
+  "けしょう",
+  "げすと",
+  "けたば",
+  "けちゃっぷ",
+  "けちらす",
+  "けつあつ",
+  "けつい",
+  "けつえき",
+  "けっこん",
+  "けつじょ",
+  "けっせき",
+  "けってい",
+  "けつまつ",
+  "げつようび",
+  "げつれい",
+  "けつろん",
+  "げどく",
+  "けとばす",
+  "けとる",
+  "けなげ",
+  "けなす",
+  "けなみ",
+  "けぬき",
+  "げねつ",
+  "けねん",
+  "けはい",
+  "げひん",
+  "けぶかい",
+  "げぼく",
+  "けまり",
+  "けみかる",
+  "けむし",
+  "けむり",
+  "けもの",
+  "けらい",
+  "けろけろ",
+  "けわしい",
+  "けんい",
+  "けんえつ",
+  "けんお",
+  "けんか",
+  "げんき",
+  "けんげん",
+  "けんこう",
+  "けんさく",
+  "けんしゅう",
+  "けんすう",
+  "げんそう",
+  "けんちく",
+  "けんてい",
+  "けんとう",
+  "けんない",
+  "けんにん",
+  "げんぶつ",
+  "けんま",
+  "けんみん",
+  "けんめい",
+  "けんらん",
+  "けんり",
+  "こあくま",
+  "こいぬ",
+  "こいびと",
+  "ごうい",
+  "こうえん",
+  "こうおん",
+  "こうかん",
+  "ごうきゅう",
+  "ごうけい",
+  "こうこう",
+  "こうさい",
+  "こうじ",
+  "こうすい",
+  "ごうせい",
+  "こうそく",
+  "こうたい",
+  "こうちゃ",
+  "こうつう",
+  "こうてい",
+  "こうどう",
+  "こうない",
+  "こうはい",
+  "ごうほう",
+  "ごうまん",
+  "こうもく",
+  "こうりつ",
+  "こえる",
+  "こおり",
+  "ごかい",
+  "ごがつ",
+  "ごかん",
+  "こくご",
+  "こくさい",
+  "こくとう",
+  "こくない",
+  "こくはく",
+  "こぐま",
+  "こけい",
+  "こける",
+  "ここのか",
+  "こころ",
+  "こさめ",
+  "こしつ",
+  "こすう",
+  "こせい",
+  "こせき",
+  "こぜん",
+  "こそだて",
+  "こたい",
+  "こたえる",
+  "こたつ",
+  "こちょう",
+  "こっか",
+  "こつこつ",
+  "こつばん",
+  "こつぶ",
+  "こてい",
+  "こてん",
+  "ことがら",
+  "ことし",
+  "ことば",
+  "ことり",
+  "こなごな",
+  "こねこね",
+  "このまま",
+  "このみ",
+  "このよ",
+  "ごはん",
+  "こひつじ",
+  "こふう",
+  "こふん",
+  "こぼれる",
+  "ごまあぶら",
+  "こまかい",
+  "ごますり",
+  "こまつな",
+  "こまる",
+  "こむぎこ",
+  "こもじ",
+  "こもち",
+  "こもの",
+  "こもん",
+  "こやく",
+  "こやま",
+  "こゆう",
+  "こゆび",
+  "こよい",
+  "こよう",
+  "こりる",
+  "これくしょん",
+  "ころっけ",
+  "こわもて",
+  "こわれる",
+  "こんいん",
+  "こんかい",
+  "こんき",
+  "こんしゅう",
+  "こんすい",
+  "こんだて",
+  "こんとん",
+  "こんなん",
+  "こんびに",
+  "こんぽん",
+  "こんまけ",
+  "こんや",
+  "こんれい",
+  "こんわく",
+  "ざいえき",
+  "さいかい",
+  "さいきん",
+  "ざいげん",
+  "ざいこ",
+  "さいしょ",
+  "さいせい",
+  "ざいたく",
+  "ざいちゅう",
+  "さいてき",
+  "ざいりょう",
+  "さうな",
+  "さかいし",
+  "さがす",
+  "さかな",
+  "さかみち",
+  "さがる",
+  "さぎょう",
+  "さくし",
+  "さくひん",
+  "さくら",
+  "さこく",
+  "さこつ",
+  "さずかる",
+  "ざせき",
+  "さたん",
+  "さつえい",
+  "ざつおん",
+  "ざっか",
+  "ざつがく",
+  "さっきょく",
+  "ざっし",
+  "さつじん",
+  "ざっそう",
+  "さつたば",
+  "さつまいも",
+  "さてい",
+  "さといも",
+  "さとう",
+  "さとおや",
+  "さとし",
+  "さとる",
+  "さのう",
+  "さばく",
+  "さびしい",
+  "さべつ",
+  "さほう",
+  "さほど",
+  "さます",
+  "さみしい",
+  "さみだれ",
+  "さむけ",
+  "さめる",
+  "さやえんどう",
+  "さゆう",
+  "さよう",
+  "さよく",
+  "さらだ",
+  "ざるそば",
+  "さわやか",
+  "さわる",
+  "さんいん",
+  "さんか",
+  "さんきゃく",
+  "さんこう",
+  "さんさい",
+  "ざんしょ",
+  "さんすう",
+  "さんせい",
+  "さんそ",
+  "さんち",
+  "さんま",
+  "さんみ",
+  "さんらん",
+  "しあい",
+  "しあげ",
+  "しあさって",
+  "しあわせ",
+  "しいく",
+  "しいん",
+  "しうち",
+  "しえい",
+  "しおけ",
+  "しかい",
+  "しかく",
+  "じかん",
+  "しごと",
+  "しすう",
+  "じだい",
+  "したうけ",
+  "したぎ",
+  "したて",
+  "したみ",
+  "しちょう",
+  "しちりん",
+  "しっかり",
+  "しつじ",
+  "しつもん",
+  "してい",
+  "してき",
+  "してつ",
+  "じてん",
+  "じどう",
+  "しなぎれ",
+  "しなもの",
+  "しなん",
+  "しねま",
+  "しねん",
+  "しのぐ",
+  "しのぶ",
+  "しはい",
+  "しばかり",
+  "しはつ",
+  "しはらい",
+  "しはん",
+  "しひょう",
+  "しふく",
+  "じぶん",
+  "しへい",
+  "しほう",
+  "しほん",
+  "しまう",
+  "しまる",
+  "しみん",
+  "しむける",
+  "じむしょ",
+  "しめい",
+  "しめる",
+  "しもん",
+  "しゃいん",
+  "しゃうん",
+  "しゃおん",
+  "じゃがいも",
+  "しやくしょ",
+  "しゃくほう",
+  "しゃけん",
+  "しゃこ",
+  "しゃざい",
+  "しゃしん",
+  "しゃせん",
+  "しゃそう",
+  "しゃたい",
+  "しゃちょう",
+  "しゃっきん",
+  "じゃま",
+  "しゃりん",
+  "しゃれい",
+  "じゆう",
+  "じゅうしょ",
+  "しゅくはく",
+  "じゅしん",
+  "しゅっせき",
+  "しゅみ",
+  "しゅらば",
+  "じゅんばん",
+  "しょうかい",
+  "しょくたく",
+  "しょっけん",
+  "しょどう",
+  "しょもつ",
+  "しらせる",
+  "しらべる",
+  "しんか",
+  "しんこう",
+  "じんじゃ",
+  "しんせいじ",
+  "しんちく",
+  "しんりん",
+  "すあげ",
+  "すあし",
+  "すあな",
+  "ずあん",
+  "すいえい",
+  "すいか",
+  "すいとう",
+  "ずいぶん",
+  "すいようび",
+  "すうがく",
+  "すうじつ",
+  "すうせん",
+  "すおどり",
+  "すきま",
+  "すくう",
+  "すくない",
+  "すける",
+  "すごい",
+  "すこし",
+  "ずさん",
+  "すずしい",
+  "すすむ",
+  "すすめる",
+  "すっかり",
+  "ずっしり",
+  "ずっと",
+  "すてき",
+  "すてる",
+  "すねる",
+  "すのこ",
+  "すはだ",
+  "すばらしい",
+  "ずひょう",
+  "ずぶぬれ",
+  "すぶり",
+  "すふれ",
+  "すべて",
+  "すべる",
+  "ずほう",
+  "すぼん",
+  "すまい",
+  "すめし",
+  "すもう",
+  "すやき",
+  "すらすら",
+  "するめ",
+  "すれちがう",
+  "すろっと",
+  "すわる",
+  "すんぜん",
+  "すんぽう",
+  "せあぶら",
+  "せいかつ",
+  "せいげん",
+  "せいじ",
+  "せいよう",
+  "せおう",
+  "せかいかん",
+  "せきにん",
+  "せきむ",
+  "せきゆ",
+  "せきらんうん",
+  "せけん",
+  "せこう",
+  "せすじ",
+  "せたい",
+  "せたけ",
+  "せっかく",
+  "せっきゃく",
+  "ぜっく",
+  "せっけん",
+  "せっこつ",
+  "せっさたくま",
+  "せつぞく",
+  "せつだん",
+  "せつでん",
+  "せっぱん",
+  "せつび",
+  "せつぶん",
+  "せつめい",
+  "せつりつ",
+  "せなか",
+  "せのび",
+  "せはば",
+  "せびろ",
+  "せぼね",
+  "せまい",
+  "せまる",
+  "せめる",
+  "せもたれ",
+  "せりふ",
+  "ぜんあく",
+  "せんい",
+  "せんえい",
+  "せんか",
+  "せんきょ",
+  "せんく",
+  "せんげん",
+  "ぜんご",
+  "せんさい",
+  "せんしゅ",
+  "せんすい",
+  "せんせい",
+  "せんぞ",
+  "せんたく",
+  "せんちょう",
+  "せんてい",
+  "せんとう",
+  "せんぬき",
+  "せんねん",
+  "せんぱい",
+  "ぜんぶ",
+  "ぜんぽう",
+  "せんむ",
+  "せんめんじょ",
+  "せんもん",
+  "せんやく",
+  "せんゆう",
+  "せんよう",
+  "ぜんら",
+  "ぜんりゃく",
+  "せんれい",
+  "せんろ",
+  "そあく",
+  "そいとげる",
+  "そいね",
+  "そうがんきょう",
+  "そうき",
+  "そうご",
+  "そうしん",
+  "そうだん",
+  "そうなん",
+  "そうび",
+  "そうめん",
+  "そうり",
+  "そえもの",
+  "そえん",
+  "そがい",
+  "そげき",
+  "そこう",
+  "そこそこ",
+  "そざい",
+  "そしな",
+  "そせい",
+  "そせん",
+  "そそぐ",
+  "そだてる",
+  "そつう",
+  "そつえん",
+  "そっかん",
+  "そつぎょう",
+  "そっけつ",
+  "そっこう",
+  "そっせん",
+  "そっと",
+  "そとがわ",
+  "そとづら",
+  "そなえる",
+  "そなた",
+  "そふぼ",
+  "そぼく",
+  "そぼろ",
+  "そまつ",
+  "そまる",
+  "そむく",
+  "そむりえ",
+  "そめる",
+  "そもそも",
+  "そよかぜ",
+  "そらまめ",
+  "そろう",
+  "そんかい",
+  "そんけい",
+  "そんざい",
+  "そんしつ",
+  "そんぞく",
+  "そんちょう",
+  "ぞんび",
+  "ぞんぶん",
+  "そんみん",
+  "たあい",
+  "たいいん",
+  "たいうん",
+  "たいえき",
+  "たいおう",
+  "だいがく",
+  "たいき",
+  "たいぐう",
+  "たいけん",
+  "たいこ",
+  "たいざい",
+  "だいじょうぶ",
+  "だいすき",
+  "たいせつ",
+  "たいそう",
+  "だいたい",
+  "たいちょう",
+  "たいてい",
+  "だいどころ",
+  "たいない",
+  "たいねつ",
+  "たいのう",
+  "たいはん",
+  "だいひょう",
+  "たいふう",
+  "たいへん",
+  "たいほ",
+  "たいまつばな",
+  "たいみんぐ",
+  "たいむ",
+  "たいめん",
+  "たいやき",
+  "たいよう",
+  "たいら",
+  "たいりょく",
+  "たいる",
+  "たいわん",
+  "たうえ",
+  "たえる",
+  "たおす",
+  "たおる",
+  "たおれる",
+  "たかい",
+  "たかね",
+  "たきび",
+  "たくさん",
+  "たこく",
+  "たこやき",
+  "たさい",
+  "たしざん",
+  "だじゃれ",
+  "たすける",
+  "たずさわる",
+  "たそがれ",
+  "たたかう",
+  "たたく",
+  "ただしい",
+  "たたみ",
+  "たちばな",
+  "だっかい",
+  "だっきゃく",
+  "だっこ",
+  "だっしゅつ",
+  "だったい",
+  "たてる",
+  "たとえる",
+  "たなばた",
+  "たにん",
+  "たぬき",
+  "たのしみ",
+  "たはつ",
+  "たぶん",
+  "たべる",
+  "たぼう",
+  "たまご",
+  "たまる",
+  "だむる",
+  "ためいき",
+  "ためす",
+  "ためる",
+  "たもつ",
+  "たやすい",
+  "たよる",
+  "たらす",
+  "たりきほんがん",
+  "たりょう",
+  "たりる",
+  "たると",
+  "たれる",
+  "たれんと",
+  "たろっと",
+  "たわむれる",
+  "だんあつ",
+  "たんい",
+  "たんおん",
+  "たんか",
+  "たんき",
+  "たんけん",
+  "たんご",
+  "たんさん",
+  "たんじょうび",
+  "だんせい",
+  "たんそく",
+  "たんたい",
+  "だんち",
+  "たんてい",
+  "たんとう",
+  "だんな",
+  "たんにん",
+  "だんねつ",
+  "たんのう",
+  "たんぴん",
+  "だんぼう",
+  "たんまつ",
+  "たんめい",
+  "だんれつ",
+  "だんろ",
+  "だんわ",
+  "ちあい",
+  "ちあん",
+  "ちいき",
+  "ちいさい",
+  "ちえん",
+  "ちかい",
+  "ちから",
+  "ちきゅう",
+  "ちきん",
+  "ちけいず",
+  "ちけん",
+  "ちこく",
+  "ちさい",
+  "ちしき",
+  "ちしりょう",
+  "ちせい",
+  "ちそう",
+  "ちたい",
+  "ちたん",
+  "ちちおや",
+  "ちつじょ",
+  "ちてき",
+  "ちてん",
+  "ちぬき",
+  "ちぬり",
+  "ちのう",
+  "ちひょう",
+  "ちへいせん",
+  "ちほう",
+  "ちまた",
+  "ちみつ",
+  "ちみどろ",
+  "ちめいど",
+  "ちゃんこなべ",
+  "ちゅうい",
+  "ちゆりょく",
+  "ちょうし",
+  "ちょさくけん",
+  "ちらし",
+  "ちらみ",
+  "ちりがみ",
+  "ちりょう",
+  "ちるど",
+  "ちわわ",
+  "ちんたい",
+  "ちんもく",
+  "ついか",
+  "ついたち",
+  "つうか",
+  "つうじょう",
+  "つうはん",
+  "つうわ",
+  "つかう",
+  "つかれる",
+  "つくね",
+  "つくる",
+  "つけね",
+  "つける",
+  "つごう",
+  "つたえる",
+  "つづく",
+  "つつじ",
+  "つつむ",
+  "つとめる",
+  "つながる",
+  "つなみ",
+  "つねづね",
+  "つのる",
+  "つぶす",
+  "つまらない",
+  "つまる",
+  "つみき",
+  "つめたい",
+  "つもり",
+  "つもる",
+  "つよい",
+  "つるぼ",
+  "つるみく",
+  "つわもの",
+  "つわり",
+  "てあし",
+  "てあて",
+  "てあみ",
+  "ていおん",
+  "ていか",
+  "ていき",
+  "ていけい",
+  "ていこく",
+  "ていさつ",
+  "ていし",
+  "ていせい",
+  "ていたい",
+  "ていど",
+  "ていねい",
+  "ていひょう",
+  "ていへん",
+  "ていぼう",
+  "てうち",
+  "ておくれ",
+  "てきとう",
+  "てくび",
+  "でこぼこ",
+  "てさぎょう",
+  "てさげ",
+  "てすり",
+  "てそう",
+  "てちがい",
+  "てちょう",
+  "てつがく",
+  "てつづき",
+  "でっぱ",
+  "てつぼう",
+  "てつや",
+  "でぬかえ",
+  "てぬき",
+  "てぬぐい",
+  "てのひら",
+  "てはい",
+  "てぶくろ",
+  "てふだ",
+  "てほどき",
+  "てほん",
+  "てまえ",
+  "てまきずし",
+  "てみじか",
+  "てみやげ",
+  "てらす",
+  "てれび",
+  "てわけ",
+  "てわたし",
+  "でんあつ",
+  "てんいん",
+  "てんかい",
+  "てんき",
+  "てんぐ",
+  "てんけん",
+  "てんごく",
+  "てんさい",
+  "てんし",
+  "てんすう",
+  "でんち",
+  "てんてき",
+  "てんとう",
+  "てんない",
+  "てんぷら",
+  "てんぼうだい",
+  "てんめつ",
+  "てんらんかい",
+  "でんりょく",
+  "でんわ",
+  "どあい",
+  "といれ",
+  "どうかん",
+  "とうきゅう",
+  "どうぐ",
+  "とうし",
+  "とうむぎ",
+  "とおい",
+  "とおか",
+  "とおく",
+  "とおす",
+  "とおる",
+  "とかい",
+  "とかす",
+  "ときおり",
+  "ときどき",
+  "とくい",
+  "とくしゅう",
+  "とくてん",
+  "とくに",
+  "とくべつ",
+  "とけい",
+  "とける",
+  "とこや",
+  "とさか",
+  "としょかん",
+  "とそう",
+  "とたん",
+  "とちゅう",
+  "とっきゅう",
+  "とっくん",
+  "とつぜん",
+  "とつにゅう",
+  "とどける",
+  "ととのえる",
+  "とない",
+  "となえる",
+  "となり",
+  "とのさま",
+  "とばす",
+  "どぶがわ",
+  "とほう",
+  "とまる",
+  "とめる",
+  "ともだち",
+  "ともる",
+  "どようび",
+  "とらえる",
+  "とんかつ",
+  "どんぶり",
+  "ないかく",
+  "ないこう",
+  "ないしょ",
+  "ないす",
+  "ないせん",
+  "ないそう",
+  "なおす",
+  "ながい",
+  "なくす",
+  "なげる",
+  "なこうど",
+  "なさけ",
+  "なたでここ",
+  "なっとう",
+  "なつやすみ",
+  "ななおし",
+  "なにごと",
+  "なにもの",
+  "なにわ",
+  "なのか",
+  "なふだ",
+  "なまいき",
+  "なまえ",
+  "なまみ",
+  "なみだ",
+  "なめらか",
+  "なめる",
+  "なやむ",
+  "ならう",
+  "ならび",
+  "ならぶ",
+  "なれる",
+  "なわとび",
+  "なわばり",
+  "にあう",
+  "にいがた",
+  "にうけ",
+  "におい",
+  "にかい",
+  "にがて",
+  "にきび",
+  "にくしみ",
+  "にくまん",
+  "にげる",
+  "にさんかたんそ",
+  "にしき",
+  "にせもの",
+  "にちじょう",
+  "にちようび",
+  "にっか",
+  "にっき",
+  "にっけい",
+  "にっこう",
+  "にっさん",
+  "にっしょく",
+  "にっすう",
+  "にっせき",
+  "にってい",
+  "になう",
+  "にほん",
+  "にまめ",
+  "にもつ",
+  "にやり",
+  "にゅういん",
+  "にりんしゃ",
+  "にわとり",
+  "にんい",
+  "にんか",
+  "にんき",
+  "にんげん",
+  "にんしき",
+  "にんずう",
+  "にんそう",
+  "にんたい",
+  "にんち",
+  "にんてい",
+  "にんにく",
+  "にんぷ",
+  "にんまり",
+  "にんむ",
+  "にんめい",
+  "にんよう",
+  "ぬいくぎ",
+  "ぬかす",
+  "ぬぐいとる",
+  "ぬぐう",
+  "ぬくもり",
+  "ぬすむ",
+  "ぬまえび",
+  "ぬめり",
+  "ぬらす",
+  "ぬんちゃく",
+  "ねあげ",
+  "ねいき",
+  "ねいる",
+  "ねいろ",
+  "ねぐせ",
+  "ねくたい",
+  "ねくら",
+  "ねこぜ",
+  "ねこむ",
+  "ねさげ",
+  "ねすごす",
+  "ねそべる",
+  "ねだん",
+  "ねつい",
+  "ねっしん",
+  "ねつぞう",
+  "ねったいぎょ",
+  "ねぶそく",
+  "ねふだ",
+  "ねぼう",
+  "ねほりはほり",
+  "ねまき",
+  "ねまわし",
+  "ねみみ",
+  "ねむい",
+  "ねむたい",
+  "ねもと",
+  "ねらう",
+  "ねわざ",
+  "ねんいり",
+  "ねんおし",
+  "ねんかん",
+  "ねんきん",
+  "ねんぐ",
+  "ねんざ",
+  "ねんし",
+  "ねんちゃく",
+  "ねんど",
+  "ねんぴ",
+  "ねんぶつ",
+  "ねんまつ",
+  "ねんりょう",
+  "ねんれい",
+  "のいず",
+  "のおづま",
+  "のがす",
+  "のきなみ",
+  "のこぎり",
+  "のこす",
+  "のこる",
+  "のせる",
+  "のぞく",
+  "のぞむ",
+  "のたまう",
+  "のちほど",
+  "のっく",
+  "のばす",
+  "のはら",
+  "のべる",
+  "のぼる",
+  "のみもの",
+  "のやま",
+  "のらいぬ",
+  "のらねこ",
+  "のりもの",
+  "のりゆき",
+  "のれん",
+  "のんき",
+  "ばあい",
+  "はあく",
+  "ばあさん",
+  "ばいか",
+  "ばいく",
+  "はいけん",
+  "はいご",
+  "はいしん",
+  "はいすい",
+  "はいせん",
+  "はいそう",
+  "はいち",
+  "ばいばい",
+  "はいれつ",
+  "はえる",
+  "はおる",
+  "はかい",
+  "ばかり",
+  "はかる",
+  "はくしゅ",
+  "はけん",
+  "はこぶ",
+  "はさみ",
+  "はさん",
+  "はしご",
+  "ばしょ",
+  "はしる",
+  "はせる",
+  "ぱそこん",
+  "はそん",
+  "はたん",
+  "はちみつ",
+  "はつおん",
+  "はっかく",
+  "はづき",
+  "はっきり",
+  "はっくつ",
+  "はっけん",
+  "はっこう",
+  "はっさん",
+  "はっしん",
+  "はったつ",
+  "はっちゅう",
+  "はってん",
+  "はっぴょう",
+  "はっぽう",
+  "はなす",
+  "はなび",
+  "はにかむ",
+  "はぶらし",
+  "はみがき",
+  "はむかう",
+  "はめつ",
+  "はやい",
+  "はやし",
+  "はらう",
+  "はろうぃん",
+  "はわい",
+  "はんい",
+  "はんえい",
+  "はんおん",
+  "はんかく",
+  "はんきょう",
+  "ばんぐみ",
+  "はんこ",
+  "はんしゃ",
+  "はんすう",
+  "はんだん",
+  "ぱんち",
+  "ぱんつ",
+  "はんてい",
+  "はんとし",
+  "はんのう",
+  "はんぱ",
+  "はんぶん",
+  "はんぺん",
+  "はんぼうき",
+  "はんめい",
+  "はんらん",
+  "はんろん",
+  "ひいき",
+  "ひうん",
+  "ひえる",
+  "ひかく",
+  "ひかり",
+  "ひかる",
+  "ひかん",
+  "ひくい",
+  "ひけつ",
+  "ひこうき",
+  "ひこく",
+  "ひさい",
+  "ひさしぶり",
+  "ひさん",
+  "びじゅつかん",
+  "ひしょ",
+  "ひそか",
+  "ひそむ",
+  "ひたむき",
+  "ひだり",
+  "ひたる",
+  "ひつぎ",
+  "ひっこし",
+  "ひっし",
+  "ひつじゅひん",
+  "ひっす",
+  "ひつぜん",
+  "ぴったり",
+  "ぴっちり",
+  "ひつよう",
+  "ひてい",
+  "ひとごみ",
+  "ひなまつり",
+  "ひなん",
+  "ひねる",
+  "ひはん",
+  "ひびく",
+  "ひひょう",
+  "ひほう",
+  "ひまわり",
+  "ひまん",
+  "ひみつ",
+  "ひめい",
+  "ひめじし",
+  "ひやけ",
+  "ひやす",
+  "ひよう",
+  "びょうき",
+  "ひらがな",
+  "ひらく",
+  "ひりつ",
+  "ひりょう",
+  "ひるま",
+  "ひるやすみ",
+  "ひれい",
+  "ひろい",
+  "ひろう",
+  "ひろき",
+  "ひろゆき",
+  "ひんかく",
+  "ひんけつ",
+  "ひんこん",
+  "ひんしゅ",
+  "ひんそう",
+  "ぴんち",
+  "ひんぱん",
+  "びんぼう",
+  "ふあん",
+  "ふいうち",
+  "ふうけい",
+  "ふうせん",
+  "ぷうたろう",
+  "ふうとう",
+  "ふうふ",
+  "ふえる",
+  "ふおん",
+  "ふかい",
+  "ふきん",
+  "ふくざつ",
+  "ふくぶくろ",
+  "ふこう",
+  "ふさい",
+  "ふしぎ",
+  "ふじみ",
+  "ふすま",
+  "ふせい",
+  "ふせぐ",
+  "ふそく",
+  "ぶたにく",
+  "ふたん",
+  "ふちょう",
+  "ふつう",
+  "ふつか",
+  "ふっかつ",
+  "ふっき",
+  "ふっこく",
+  "ぶどう",
+  "ふとる",
+  "ふとん",
+  "ふのう",
+  "ふはい",
+  "ふひょう",
+  "ふへん",
+  "ふまん",
+  "ふみん",
+  "ふめつ",
+  "ふめん",
+  "ふよう",
+  "ふりこ",
+  "ふりる",
+  "ふるい",
+  "ふんいき",
+  "ぶんがく",
+  "ぶんぐ",
+  "ふんしつ",
+  "ぶんせき",
+  "ふんそう",
+  "ぶんぽう",
+  "へいあん",
+  "へいおん",
+  "へいがい",
+  "へいき",
+  "へいげん",
+  "へいこう",
+  "へいさ",
+  "へいしゃ",
+  "へいせつ",
+  "へいそ",
+  "へいたく",
+  "へいてん",
+  "へいねつ",
+  "へいわ",
+  "へきが",
+  "へこむ",
+  "べにいろ",
+  "べにしょうが",
+  "へらす",
+  "へんかん",
+  "べんきょう",
+  "べんごし",
+  "へんさい",
+  "へんたい",
+  "べんり",
+  "ほあん",
+  "ほいく",
+  "ぼうぎょ",
+  "ほうこく",
+  "ほうそう",
+  "ほうほう",
+  "ほうもん",
+  "ほうりつ",
+  "ほえる",
+  "ほおん",
+  "ほかん",
+  "ほきょう",
+  "ぼきん",
+  "ほくろ",
+  "ほけつ",
+  "ほけん",
+  "ほこう",
+  "ほこる",
+  "ほしい",
+  "ほしつ",
+  "ほしゅ",
+  "ほしょう",
+  "ほせい",
+  "ほそい",
+  "ほそく",
+  "ほたて",
+  "ほたる",
+  "ぽちぶくろ",
+  "ほっきょく",
+  "ほっさ",
+  "ほったん",
+  "ほとんど",
+  "ほめる",
+  "ほんい",
+  "ほんき",
+  "ほんけ",
+  "ほんしつ",
+  "ほんやく",
+  "まいにち",
+  "まかい",
+  "まかせる",
+  "まがる",
+  "まける",
+  "まこと",
+  "まさつ",
+  "まじめ",
+  "ますく",
+  "まぜる",
+  "まつり",
+  "まとめ",
+  "まなぶ",
+  "まぬけ",
+  "まねく",
+  "まほう",
+  "まもる",
+  "まゆげ",
+  "まよう",
+  "まろやか",
+  "まわす",
+  "まわり",
+  "まわる",
+  "まんが",
+  "まんきつ",
+  "まんぞく",
+  "まんなか",
+  "みいら",
+  "みうち",
+  "みえる",
+  "みがく",
+  "みかた",
+  "みかん",
+  "みけん",
+  "みこん",
+  "みじかい",
+  "みすい",
+  "みすえる",
+  "みせる",
+  "みっか",
+  "みつかる",
+  "みつける",
+  "みてい",
+  "みとめる",
+  "みなと",
+  "みなみかさい",
+  "みねらる",
+  "みのう",
+  "みのがす",
+  "みほん",
+  "みもと",
+  "みやげ",
+  "みらい",
+  "みりょく",
+  "みわく",
+  "みんか",
+  "みんぞく",
+  "むいか",
+  "むえき",
+  "むえん",
+  "むかい",
+  "むかう",
+  "むかえ",
+  "むかし",
+  "むぎちゃ",
+  "むける",
+  "むげん",
+  "むさぼる",
+  "むしあつい",
+  "むしば",
+  "むじゅん",
+  "むしろ",
+  "むすう",
+  "むすこ",
+  "むすぶ",
+  "むすめ",
+  "むせる",
+  "むせん",
+  "むちゅう",
+  "むなしい",
+  "むのう",
+  "むやみ",
+  "むよう",
+  "むらさき",
+  "むりょう",
+  "むろん",
+  "めいあん",
+  "めいうん",
+  "めいえん",
+  "めいかく",
+  "めいきょく",
+  "めいさい",
+  "めいし",
+  "めいそう",
+  "めいぶつ",
+  "めいれい",
+  "めいわく",
+  "めぐまれる",
+  "めざす",
+  "めした",
+  "めずらしい",
+  "めだつ",
+  "めまい",
+  "めやす",
+  "めんきょ",
+  "めんせき",
+  "めんどう",
+  "もうしあげる",
+  "もうどうけん",
+  "もえる",
+  "もくし",
+  "もくてき",
+  "もくようび",
+  "もちろん",
+  "もどる",
+  "もらう",
+  "もんく",
+  "もんだい",
+  "やおや",
+  "やける",
+  "やさい",
+  "やさしい",
+  "やすい",
+  "やすたろう",
+  "やすみ",
+  "やせる",
+  "やそう",
+  "やたい",
+  "やちん",
+  "やっと",
+  "やっぱり",
+  "やぶる",
+  "やめる",
+  "ややこしい",
+  "やよい",
+  "やわらかい",
+  "ゆうき",
+  "ゆうびんきょく",
+  "ゆうべ",
+  "ゆうめい",
+  "ゆけつ",
+  "ゆしゅつ",
+  "ゆせん",
+  "ゆそう",
+  "ゆたか",
+  "ゆちゃく",
+  "ゆでる",
+  "ゆにゅう",
+  "ゆびわ",
+  "ゆらい",
+  "ゆれる",
+  "ようい",
+  "ようか",
+  "ようきゅう",
+  "ようじ",
+  "ようす",
+  "ようちえん",
+  "よかぜ",
+  "よかん",
+  "よきん",
+  "よくせい",
+  "よくぼう",
+  "よけい",
+  "よごれる",
+  "よさん",
+  "よしゅう",
+  "よそう",
+  "よそく",
+  "よっか",
+  "よてい",
+  "よどがわく",
+  "よねつ",
+  "よやく",
+  "よゆう",
+  "よろこぶ",
+  "よろしい",
+  "らいう",
+  "らくがき",
+  "らくご",
+  "らくさつ",
+  "らくだ",
+  "らしんばん",
+  "らせん",
+  "らぞく",
+  "らたい",
+  "らっか",
+  "られつ",
+  "りえき",
+  "りかい",
+  "りきさく",
+  "りきせつ",
+  "りくぐん",
+  "りくつ",
+  "りけん",
+  "りこう",
+  "りせい",
+  "りそう",
+  "りそく",
+  "りてん",
+  "りねん",
+  "りゆう",
+  "りゅうがく",
+  "りよう",
+  "りょうり",
+  "りょかん",
+  "りょくちゃ",
+  "りょこう",
+  "りりく",
+  "りれき",
+  "りろん",
+  "りんご",
+  "るいけい",
+  "るいさい",
+  "るいじ",
+  "るいせき",
+  "るすばん",
+  "るりがわら",
+  "れいかん",
+  "れいぎ",
+  "れいせい",
+  "れいぞうこ",
+  "れいとう",
+  "れいぼう",
+  "れきし",
+  "れきだい",
+  "れんあい",
+  "れんけい",
+  "れんこん",
+  "れんさい",
+  "れんしゅう",
+  "れんぞく",
+  "れんらく",
+  "ろうか",
+  "ろうご",
+  "ろうじん",
+  "ろうそく",
+  "ろくが",
+  "ろこつ",
+  "ろじうら",
+  "ろしゅつ",
+  "ろせん",
+  "ろてん",
+  "ろめん",
+  "ろれつ",
+  "ろんぎ",
+  "ろんぱ",
+  "ろんぶん",
+  "ろんり",
+  "わかす",
+  "わかめ",
+  "わかやま",
+  "わかれる",
+  "わしつ",
+  "わじまし",
+  "わすれもの",
+  "わらう",
+  "われる"
+]
+
+},{}],81:[function(require,module,exports){
+module.exports=[
+  "가격",
+  "가끔",
+  "가난",
+  "가능",
+  "가득",
+  "가르침",
+  "가뭄",
+  "가방",
+  "가상",
+  "가슴",
+  "가운데",
+  "가을",
+  "가이드",
+  "가입",
+  "가장",
+  "가정",
+  "가족",
+  "가죽",
+  "각오",
+  "각자",
+  "간격",
+  "간부",
+  "간섭",
+  "간장",
+  "간접",
+  "간판",
+  "갈등",
+  "갈비",
+  "갈색",
+  "갈증",
+  "감각",
+  "감기",
+  "감소",
+  "감수성",
+  "감자",
+  "감정",
+  "갑자기",
+  "강남",
+  "강당",
+  "강도",
+  "강력히",
+  "강변",
+  "강북",
+  "강사",
+  "강수량",
+  "강아지",
+  "강원도",
+  "강의",
+  "강제",
+  "강조",
+  "같이",
+  "개구리",
+  "개나리",
+  "개방",
+  "개별",
+  "개선",
+  "개성",
+  "개인",
+  "객관적",
+  "거실",
+  "거액",
+  "거울",
+  "거짓",
+  "거품",
+  "걱정",
+  "건강",
+  "건물",
+  "건설",
+  "건조",
+  "건축",
+  "걸음",
+  "검사",
+  "검토",
+  "게시판",
+  "게임",
+  "겨울",
+  "견해",
+  "결과",
+  "결국",
+  "결론",
+  "결석",
+  "결승",
+  "결심",
+  "결정",
+  "결혼",
+  "경계",
+  "경고",
+  "경기",
+  "경력",
+  "경복궁",
+  "경비",
+  "경상도",
+  "경영",
+  "경우",
+  "경쟁",
+  "경제",
+  "경주",
+  "경찰",
+  "경치",
+  "경향",
+  "경험",
+  "계곡",
+  "계단",
+  "계란",
+  "계산",
+  "계속",
+  "계약",
+  "계절",
+  "계층",
+  "계획",
+  "고객",
+  "고구려",
+  "고궁",
+  "고급",
+  "고등학생",
+  "고무신",
+  "고민",
+  "고양이",
+  "고장",
+  "고전",
+  "고집",
+  "고춧가루",
+  "고통",
+  "고향",
+  "곡식",
+  "골목",
+  "골짜기",
+  "골프",
+  "공간",
+  "공개",
+  "공격",
+  "공군",
+  "공급",
+  "공기",
+  "공동",
+  "공무원",
+  "공부",
+  "공사",
+  "공식",
+  "공업",
+  "공연",
+  "공원",
+  "공장",
+  "공짜",
+  "공책",
+  "공통",
+  "공포",
+  "공항",
+  "공휴일",
+  "과목",
+  "과일",
+  "과장",
+  "과정",
+  "과학",
+  "관객",
+  "관계",
+  "관광",
+  "관념",
+  "관람",
+  "관련",
+  "관리",
+  "관습",
+  "관심",
+  "관점",
+  "관찰",
+  "광경",
+  "광고",
+  "광장",
+  "광주",
+  "괴로움",
+  "굉장히",
+  "교과서",
+  "교문",
+  "교복",
+  "교실",
+  "교양",
+  "교육",
+  "교장",
+  "교직",
+  "교통",
+  "교환",
+  "교훈",
+  "구경",
+  "구름",
+  "구멍",
+  "구별",
+  "구분",
+  "구석",
+  "구성",
+  "구속",
+  "구역",
+  "구입",
+  "구청",
+  "구체적",
+  "국가",
+  "국기",
+  "국내",
+  "국립",
+  "국물",
+  "국민",
+  "국수",
+  "국어",
+  "국왕",
+  "국적",
+  "국제",
+  "국회",
+  "군대",
+  "군사",
+  "군인",
+  "궁극적",
+  "권리",
+  "권위",
+  "권투",
+  "귀국",
+  "귀신",
+  "규정",
+  "규칙",
+  "균형",
+  "그날",
+  "그냥",
+  "그늘",
+  "그러나",
+  "그룹",
+  "그릇",
+  "그림",
+  "그제서야",
+  "그토록",
+  "극복",
+  "극히",
+  "근거",
+  "근교",
+  "근래",
+  "근로",
+  "근무",
+  "근본",
+  "근원",
+  "근육",
+  "근처",
+  "글씨",
+  "글자",
+  "금강산",
+  "금고",
+  "금년",
+  "금메달",
+  "금액",
+  "금연",
+  "금요일",
+  "금지",
+  "긍정적",
+  "기간",
+  "기관",
+  "기념",
+  "기능",
+  "기독교",
+  "기둥",
+  "기록",
+  "기름",
+  "기법",
+  "기본",
+  "기분",
+  "기쁨",
+  "기숙사",
+  "기술",
+  "기억",
+  "기업",
+  "기온",
+  "기운",
+  "기원",
+  "기적",
+  "기준",
+  "기침",
+  "기혼",
+  "기획",
+  "긴급",
+  "긴장",
+  "길이",
+  "김밥",
+  "김치",
+  "김포공항",
+  "깍두기",
+  "깜빡",
+  "깨달음",
+  "깨소금",
+  "껍질",
+  "꼭대기",
+  "꽃잎",
+  "나들이",
+  "나란히",
+  "나머지",
+  "나물",
+  "나침반",
+  "나흘",
+  "낙엽",
+  "난방",
+  "날개",
+  "날씨",
+  "날짜",
+  "남녀",
+  "남대문",
+  "남매",
+  "남산",
+  "남자",
+  "남편",
+  "남학생",
+  "낭비",
+  "낱말",
+  "내년",
+  "내용",
+  "내일",
+  "냄비",
+  "냄새",
+  "냇물",
+  "냉동",
+  "냉면",
+  "냉방",
+  "냉장고",
+  "넥타이",
+  "넷째",
+  "노동",
+  "노란색",
+  "노력",
+  "노인",
+  "녹음",
+  "녹차",
+  "녹화",
+  "논리",
+  "논문",
+  "논쟁",
+  "놀이",
+  "농구",
+  "농담",
+  "농민",
+  "농부",
+  "농업",
+  "농장",
+  "농촌",
+  "높이",
+  "눈동자",
+  "눈물",
+  "눈썹",
+  "뉴욕",
+  "느낌",
+  "늑대",
+  "능동적",
+  "능력",
+  "다방",
+  "다양성",
+  "다음",
+  "다이어트",
+  "다행",
+  "단계",
+  "단골",
+  "단독",
+  "단맛",
+  "단순",
+  "단어",
+  "단위",
+  "단점",
+  "단체",
+  "단추",
+  "단편",
+  "단풍",
+  "달걀",
+  "달러",
+  "달력",
+  "달리",
+  "닭고기",
+  "담당",
+  "담배",
+  "담요",
+  "담임",
+  "답변",
+  "답장",
+  "당근",
+  "당분간",
+  "당연히",
+  "당장",
+  "대규모",
+  "대낮",
+  "대단히",
+  "대답",
+  "대도시",
+  "대략",
+  "대량",
+  "대륙",
+  "대문",
+  "대부분",
+  "대신",
+  "대응",
+  "대장",
+  "대전",
+  "대접",
+  "대중",
+  "대책",
+  "대출",
+  "대충",
+  "대통령",
+  "대학",
+  "대한민국",
+  "대합실",
+  "대형",
+  "덩어리",
+  "데이트",
+  "도대체",
+  "도덕",
+  "도둑",
+  "도망",
+  "도서관",
+  "도심",
+  "도움",
+  "도입",
+  "도자기",
+  "도저히",
+  "도전",
+  "도중",
+  "도착",
+  "독감",
+  "독립",
+  "독서",
+  "독일",
+  "독창적",
+  "동화책",
+  "뒷모습",
+  "뒷산",
+  "딸아이",
+  "마누라",
+  "마늘",
+  "마당",
+  "마라톤",
+  "마련",
+  "마무리",
+  "마사지",
+  "마약",
+  "마요네즈",
+  "마을",
+  "마음",
+  "마이크",
+  "마중",
+  "마지막",
+  "마찬가지",
+  "마찰",
+  "마흔",
+  "막걸리",
+  "막내",
+  "막상",
+  "만남",
+  "만두",
+  "만세",
+  "만약",
+  "만일",
+  "만점",
+  "만족",
+  "만화",
+  "많이",
+  "말기",
+  "말씀",
+  "말투",
+  "맘대로",
+  "망원경",
+  "매년",
+  "매달",
+  "매력",
+  "매번",
+  "매스컴",
+  "매일",
+  "매장",
+  "맥주",
+  "먹이",
+  "먼저",
+  "먼지",
+  "멀리",
+  "메일",
+  "며느리",
+  "며칠",
+  "면담",
+  "멸치",
+  "명단",
+  "명령",
+  "명예",
+  "명의",
+  "명절",
+  "명칭",
+  "명함",
+  "모금",
+  "모니터",
+  "모델",
+  "모든",
+  "모범",
+  "모습",
+  "모양",
+  "모임",
+  "모조리",
+  "모집",
+  "모퉁이",
+  "목걸이",
+  "목록",
+  "목사",
+  "목소리",
+  "목숨",
+  "목적",
+  "목표",
+  "몰래",
+  "몸매",
+  "몸무게",
+  "몸살",
+  "몸속",
+  "몸짓",
+  "몸통",
+  "몹시",
+  "무관심",
+  "무궁화",
+  "무더위",
+  "무덤",
+  "무릎",
+  "무슨",
+  "무엇",
+  "무역",
+  "무용",
+  "무조건",
+  "무지개",
+  "무척",
+  "문구",
+  "문득",
+  "문법",
+  "문서",
+  "문제",
+  "문학",
+  "문화",
+  "물가",
+  "물건",
+  "물결",
+  "물고기",
+  "물론",
+  "물리학",
+  "물음",
+  "물질",
+  "물체",
+  "미국",
+  "미디어",
+  "미사일",
+  "미술",
+  "미역",
+  "미용실",
+  "미움",
+  "미인",
+  "미팅",
+  "미혼",
+  "민간",
+  "민족",
+  "민주",
+  "믿음",
+  "밀가루",
+  "밀리미터",
+  "밑바닥",
+  "바가지",
+  "바구니",
+  "바나나",
+  "바늘",
+  "바닥",
+  "바닷가",
+  "바람",
+  "바이러스",
+  "바탕",
+  "박물관",
+  "박사",
+  "박수",
+  "반대",
+  "반드시",
+  "반말",
+  "반발",
+  "반성",
+  "반응",
+  "반장",
+  "반죽",
+  "반지",
+  "반찬",
+  "받침",
+  "발가락",
+  "발걸음",
+  "발견",
+  "발달",
+  "발레",
+  "발목",
+  "발바닥",
+  "발생",
+  "발음",
+  "발자국",
+  "발전",
+  "발톱",
+  "발표",
+  "밤하늘",
+  "밥그릇",
+  "밥맛",
+  "밥상",
+  "밥솥",
+  "방금",
+  "방면",
+  "방문",
+  "방바닥",
+  "방법",
+  "방송",
+  "방식",
+  "방안",
+  "방울",
+  "방지",
+  "방학",
+  "방해",
+  "방향",
+  "배경",
+  "배꼽",
+  "배달",
+  "배드민턴",
+  "백두산",
+  "백색",
+  "백성",
+  "백인",
+  "백제",
+  "백화점",
+  "버릇",
+  "버섯",
+  "버튼",
+  "번개",
+  "번역",
+  "번지",
+  "번호",
+  "벌금",
+  "벌레",
+  "벌써",
+  "범위",
+  "범인",
+  "범죄",
+  "법률",
+  "법원",
+  "법적",
+  "법칙",
+  "베이징",
+  "벨트",
+  "변경",
+  "변동",
+  "변명",
+  "변신",
+  "변호사",
+  "변화",
+  "별도",
+  "별명",
+  "별일",
+  "병실",
+  "병아리",
+  "병원",
+  "보관",
+  "보너스",
+  "보라색",
+  "보람",
+  "보름",
+  "보상",
+  "보안",
+  "보자기",
+  "보장",
+  "보전",
+  "보존",
+  "보통",
+  "보편적",
+  "보험",
+  "복도",
+  "복사",
+  "복숭아",
+  "복습",
+  "볶음",
+  "본격적",
+  "본래",
+  "본부",
+  "본사",
+  "본성",
+  "본인",
+  "본질",
+  "볼펜",
+  "봉사",
+  "봉지",
+  "봉투",
+  "부근",
+  "부끄러움",
+  "부담",
+  "부동산",
+  "부문",
+  "부분",
+  "부산",
+  "부상",
+  "부엌",
+  "부인",
+  "부작용",
+  "부장",
+  "부정",
+  "부족",
+  "부지런히",
+  "부친",
+  "부탁",
+  "부품",
+  "부회장",
+  "북부",
+  "북한",
+  "분노",
+  "분량",
+  "분리",
+  "분명",
+  "분석",
+  "분야",
+  "분위기",
+  "분필",
+  "분홍색",
+  "불고기",
+  "불과",
+  "불교",
+  "불꽃",
+  "불만",
+  "불법",
+  "불빛",
+  "불안",
+  "불이익",
+  "불행",
+  "브랜드",
+  "비극",
+  "비난",
+  "비닐",
+  "비둘기",
+  "비디오",
+  "비로소",
+  "비만",
+  "비명",
+  "비밀",
+  "비바람",
+  "비빔밥",
+  "비상",
+  "비용",
+  "비율",
+  "비중",
+  "비타민",
+  "비판",
+  "빌딩",
+  "빗물",
+  "빗방울",
+  "빗줄기",
+  "빛깔",
+  "빨간색",
+  "빨래",
+  "빨리",
+  "사건",
+  "사계절",
+  "사나이",
+  "사냥",
+  "사람",
+  "사랑",
+  "사립",
+  "사모님",
+  "사물",
+  "사방",
+  "사상",
+  "사생활",
+  "사설",
+  "사슴",
+  "사실",
+  "사업",
+  "사용",
+  "사월",
+  "사장",
+  "사전",
+  "사진",
+  "사촌",
+  "사춘기",
+  "사탕",
+  "사투리",
+  "사흘",
+  "산길",
+  "산부인과",
+  "산업",
+  "산책",
+  "살림",
+  "살인",
+  "살짝",
+  "삼계탕",
+  "삼국",
+  "삼십",
+  "삼월",
+  "삼촌",
+  "상관",
+  "상금",
+  "상대",
+  "상류",
+  "상반기",
+  "상상",
+  "상식",
+  "상업",
+  "상인",
+  "상자",
+  "상점",
+  "상처",
+  "상추",
+  "상태",
+  "상표",
+  "상품",
+  "상황",
+  "새벽",
+  "색깔",
+  "색연필",
+  "생각",
+  "생명",
+  "생물",
+  "생방송",
+  "생산",
+  "생선",
+  "생신",
+  "생일",
+  "생활",
+  "서랍",
+  "서른",
+  "서명",
+  "서민",
+  "서비스",
+  "서양",
+  "서울",
+  "서적",
+  "서점",
+  "서쪽",
+  "서클",
+  "석사",
+  "석유",
+  "선거",
+  "선물",
+  "선배",
+  "선생",
+  "선수",
+  "선원",
+  "선장",
+  "선전",
+  "선택",
+  "선풍기",
+  "설거지",
+  "설날",
+  "설렁탕",
+  "설명",
+  "설문",
+  "설사",
+  "설악산",
+  "설치",
+  "설탕",
+  "섭씨",
+  "성공",
+  "성당",
+  "성명",
+  "성별",
+  "성인",
+  "성장",
+  "성적",
+  "성질",
+  "성함",
+  "세금",
+  "세미나",
+  "세상",
+  "세월",
+  "세종대왕",
+  "세탁",
+  "센터",
+  "센티미터",
+  "셋째",
+  "소규모",
+  "소극적",
+  "소금",
+  "소나기",
+  "소년",
+  "소득",
+  "소망",
+  "소문",
+  "소설",
+  "소속",
+  "소아과",
+  "소용",
+  "소원",
+  "소음",
+  "소중히",
+  "소지품",
+  "소질",
+  "소풍",
+  "소형",
+  "속담",
+  "속도",
+  "속옷",
+  "손가락",
+  "손길",
+  "손녀",
+  "손님",
+  "손등",
+  "손목",
+  "손뼉",
+  "손실",
+  "손질",
+  "손톱",
+  "손해",
+  "솔직히",
+  "솜씨",
+  "송아지",
+  "송이",
+  "송편",
+  "쇠고기",
+  "쇼핑",
+  "수건",
+  "수년",
+  "수단",
+  "수돗물",
+  "수동적",
+  "수면",
+  "수명",
+  "수박",
+  "수상",
+  "수석",
+  "수술",
+  "수시로",
+  "수업",
+  "수염",
+  "수영",
+  "수입",
+  "수준",
+  "수집",
+  "수출",
+  "수컷",
+  "수필",
+  "수학",
+  "수험생",
+  "수화기",
+  "숙녀",
+  "숙소",
+  "숙제",
+  "순간",
+  "순서",
+  "순수",
+  "순식간",
+  "순위",
+  "숟가락",
+  "술병",
+  "술집",
+  "숫자",
+  "스님",
+  "스물",
+  "스스로",
+  "스승",
+  "스웨터",
+  "스위치",
+  "스케이트",
+  "스튜디오",
+  "스트레스",
+  "스포츠",
+  "슬쩍",
+  "슬픔",
+  "습관",
+  "습기",
+  "승객",
+  "승리",
+  "승부",
+  "승용차",
+  "승진",
+  "시각",
+  "시간",
+  "시골",
+  "시금치",
+  "시나리오",
+  "시댁",
+  "시리즈",
+  "시멘트",
+  "시민",
+  "시부모",
+  "시선",
+  "시설",
+  "시스템",
+  "시아버지",
+  "시어머니",
+  "시월",
+  "시인",
+  "시일",
+  "시작",
+  "시장",
+  "시절",
+  "시점",
+  "시중",
+  "시즌",
+  "시집",
+  "시청",
+  "시합",
+  "시험",
+  "식구",
+  "식기",
+  "식당",
+  "식량",
+  "식료품",
+  "식물",
+  "식빵",
+  "식사",
+  "식생활",
+  "식초",
+  "식탁",
+  "식품",
+  "신고",
+  "신규",
+  "신념",
+  "신문",
+  "신발",
+  "신비",
+  "신사",
+  "신세",
+  "신용",
+  "신제품",
+  "신청",
+  "신체",
+  "신화",
+  "실감",
+  "실내",
+  "실력",
+  "실례",
+  "실망",
+  "실수",
+  "실습",
+  "실시",
+  "실장",
+  "실정",
+  "실질적",
+  "실천",
+  "실체",
+  "실컷",
+  "실태",
+  "실패",
+  "실험",
+  "실현",
+  "심리",
+  "심부름",
+  "심사",
+  "심장",
+  "심정",
+  "심판",
+  "쌍둥이",
+  "씨름",
+  "씨앗",
+  "아가씨",
+  "아나운서",
+  "아드님",
+  "아들",
+  "아쉬움",
+  "아스팔트",
+  "아시아",
+  "아울러",
+  "아저씨",
+  "아줌마",
+  "아직",
+  "아침",
+  "아파트",
+  "아프리카",
+  "아픔",
+  "아홉",
+  "아흔",
+  "악기",
+  "악몽",
+  "악수",
+  "안개",
+  "안경",
+  "안과",
+  "안내",
+  "안녕",
+  "안동",
+  "안방",
+  "안부",
+  "안주",
+  "알루미늄",
+  "알코올",
+  "암시",
+  "암컷",
+  "압력",
+  "앞날",
+  "앞문",
+  "애인",
+  "애정",
+  "액수",
+  "앨범",
+  "야간",
+  "야단",
+  "야옹",
+  "약간",
+  "약국",
+  "약속",
+  "약수",
+  "약점",
+  "약품",
+  "약혼녀",
+  "양념",
+  "양력",
+  "양말",
+  "양배추",
+  "양주",
+  "양파",
+  "어둠",
+  "어려움",
+  "어른",
+  "어젯밤",
+  "어쨌든",
+  "어쩌다가",
+  "어쩐지",
+  "언니",
+  "언덕",
+  "언론",
+  "언어",
+  "얼굴",
+  "얼른",
+  "얼음",
+  "얼핏",
+  "엄마",
+  "업무",
+  "업종",
+  "업체",
+  "엉덩이",
+  "엉망",
+  "엉터리",
+  "엊그제",
+  "에너지",
+  "에어컨",
+  "엔진",
+  "여건",
+  "여고생",
+  "여관",
+  "여군",
+  "여권",
+  "여대생",
+  "여덟",
+  "여동생",
+  "여든",
+  "여론",
+  "여름",
+  "여섯",
+  "여성",
+  "여왕",
+  "여인",
+  "여전히",
+  "여직원",
+  "여학생",
+  "여행",
+  "역사",
+  "역시",
+  "역할",
+  "연결",
+  "연구",
+  "연극",
+  "연기",
+  "연락",
+  "연설",
+  "연세",
+  "연속",
+  "연습",
+  "연애",
+  "연예인",
+  "연인",
+  "연장",
+  "연주",
+  "연출",
+  "연필",
+  "연합",
+  "연휴",
+  "열기",
+  "열매",
+  "열쇠",
+  "열심히",
+  "열정",
+  "열차",
+  "열흘",
+  "염려",
+  "엽서",
+  "영국",
+  "영남",
+  "영상",
+  "영양",
+  "영역",
+  "영웅",
+  "영원히",
+  "영하",
+  "영향",
+  "영혼",
+  "영화",
+  "옆구리",
+  "옆방",
+  "옆집",
+  "예감",
+  "예금",
+  "예방",
+  "예산",
+  "예상",
+  "예선",
+  "예술",
+  "예습",
+  "예식장",
+  "예약",
+  "예전",
+  "예절",
+  "예정",
+  "예컨대",
+  "옛날",
+  "오늘",
+  "오락",
+  "오랫동안",
+  "오렌지",
+  "오로지",
+  "오른발",
+  "오븐",
+  "오십",
+  "오염",
+  "오월",
+  "오전",
+  "오직",
+  "오징어",
+  "오페라",
+  "오피스텔",
+  "오히려",
+  "옥상",
+  "옥수수",
+  "온갖",
+  "온라인",
+  "온몸",
+  "온종일",
+  "온통",
+  "올가을",
+  "올림픽",
+  "올해",
+  "옷차림",
+  "와이셔츠",
+  "와인",
+  "완성",
+  "완전",
+  "왕비",
+  "왕자",
+  "왜냐하면",
+  "왠지",
+  "외갓집",
+  "외국",
+  "외로움",
+  "외삼촌",
+  "외출",
+  "외침",
+  "외할머니",
+  "왼발",
+  "왼손",
+  "왼쪽",
+  "요금",
+  "요일",
+  "요즘",
+  "요청",
+  "용기",
+  "용서",
+  "용어",
+  "우산",
+  "우선",
+  "우승",
+  "우연히",
+  "우정",
+  "우체국",
+  "우편",
+  "운동",
+  "운명",
+  "운반",
+  "운전",
+  "운행",
+  "울산",
+  "울음",
+  "움직임",
+  "웃어른",
+  "웃음",
+  "워낙",
+  "원고",
+  "원래",
+  "원서",
+  "원숭이",
+  "원인",
+  "원장",
+  "원피스",
+  "월급",
+  "월드컵",
+  "월세",
+  "월요일",
+  "웨이터",
+  "위반",
+  "위법",
+  "위성",
+  "위원",
+  "위험",
+  "위협",
+  "윗사람",
+  "유난히",
+  "유럽",
+  "유명",
+  "유물",
+  "유산",
+  "유적",
+  "유치원",
+  "유학",
+  "유행",
+  "유형",
+  "육군",
+  "육상",
+  "육십",
+  "육체",
+  "은행",
+  "음력",
+  "음료",
+  "음반",
+  "음성",
+  "음식",
+  "음악",
+  "음주",
+  "의견",
+  "의논",
+  "의문",
+  "의복",
+  "의식",
+  "의심",
+  "의외로",
+  "의욕",
+  "의원",
+  "의학",
+  "이것",
+  "이곳",
+  "이념",
+  "이놈",
+  "이달",
+  "이대로",
+  "이동",
+  "이렇게",
+  "이력서",
+  "이론적",
+  "이름",
+  "이민",
+  "이발소",
+  "이별",
+  "이불",
+  "이빨",
+  "이상",
+  "이성",
+  "이슬",
+  "이야기",
+  "이용",
+  "이웃",
+  "이월",
+  "이윽고",
+  "이익",
+  "이전",
+  "이중",
+  "이튿날",
+  "이틀",
+  "이혼",
+  "인간",
+  "인격",
+  "인공",
+  "인구",
+  "인근",
+  "인기",
+  "인도",
+  "인류",
+  "인물",
+  "인생",
+  "인쇄",
+  "인연",
+  "인원",
+  "인재",
+  "인종",
+  "인천",
+  "인체",
+  "인터넷",
+  "인하",
+  "인형",
+  "일곱",
+  "일기",
+  "일단",
+  "일대",
+  "일등",
+  "일반",
+  "일본",
+  "일부",
+  "일상",
+  "일생",
+  "일손",
+  "일요일",
+  "일월",
+  "일정",
+  "일종",
+  "일주일",
+  "일찍",
+  "일체",
+  "일치",
+  "일행",
+  "일회용",
+  "임금",
+  "임무",
+  "입대",
+  "입력",
+  "입맛",
+  "입사",
+  "입술",
+  "입시",
+  "입원",
+  "입장",
+  "입학",
+  "자가용",
+  "자격",
+  "자극",
+  "자동",
+  "자랑",
+  "자부심",
+  "자식",
+  "자신",
+  "자연",
+  "자원",
+  "자율",
+  "자전거",
+  "자정",
+  "자존심",
+  "자판",
+  "작가",
+  "작년",
+  "작성",
+  "작업",
+  "작용",
+  "작은딸",
+  "작품",
+  "잔디",
+  "잔뜩",
+  "잔치",
+  "잘못",
+  "잠깐",
+  "잠수함",
+  "잠시",
+  "잠옷",
+  "잠자리",
+  "잡지",
+  "장관",
+  "장군",
+  "장기간",
+  "장래",
+  "장례",
+  "장르",
+  "장마",
+  "장면",
+  "장모",
+  "장미",
+  "장비",
+  "장사",
+  "장소",
+  "장식",
+  "장애인",
+  "장인",
+  "장점",
+  "장차",
+  "장학금",
+  "재능",
+  "재빨리",
+  "재산",
+  "재생",
+  "재작년",
+  "재정",
+  "재채기",
+  "재판",
+  "재학",
+  "재활용",
+  "저것",
+  "저고리",
+  "저곳",
+  "저녁",
+  "저런",
+  "저렇게",
+  "저번",
+  "저울",
+  "저절로",
+  "저축",
+  "적극",
+  "적당히",
+  "적성",
+  "적용",
+  "적응",
+  "전개",
+  "전공",
+  "전기",
+  "전달",
+  "전라도",
+  "전망",
+  "전문",
+  "전반",
+  "전부",
+  "전세",
+  "전시",
+  "전용",
+  "전자",
+  "전쟁",
+  "전주",
+  "전철",
+  "전체",
+  "전통",
+  "전혀",
+  "전후",
+  "절대",
+  "절망",
+  "절반",
+  "절약",
+  "절차",
+  "점검",
+  "점수",
+  "점심",
+  "점원",
+  "점점",
+  "점차",
+  "접근",
+  "접시",
+  "접촉",
+  "젓가락",
+  "정거장",
+  "정도",
+  "정류장",
+  "정리",
+  "정말",
+  "정면",
+  "정문",
+  "정반대",
+  "정보",
+  "정부",
+  "정비",
+  "정상",
+  "정성",
+  "정오",
+  "정원",
+  "정장",
+  "정지",
+  "정치",
+  "정확히",
+  "제공",
+  "제과점",
+  "제대로",
+  "제목",
+  "제발",
+  "제법",
+  "제삿날",
+  "제안",
+  "제일",
+  "제작",
+  "제주도",
+  "제출",
+  "제품",
+  "제한",
+  "조각",
+  "조건",
+  "조금",
+  "조깅",
+  "조명",
+  "조미료",
+  "조상",
+  "조선",
+  "조용히",
+  "조절",
+  "조정",
+  "조직",
+  "존댓말",
+  "존재",
+  "졸업",
+  "졸음",
+  "종교",
+  "종로",
+  "종류",
+  "종소리",
+  "종업원",
+  "종종",
+  "종합",
+  "좌석",
+  "죄인",
+  "주관적",
+  "주름",
+  "주말",
+  "주머니",
+  "주먹",
+  "주문",
+  "주민",
+  "주방",
+  "주변",
+  "주식",
+  "주인",
+  "주일",
+  "주장",
+  "주전자",
+  "주택",
+  "준비",
+  "줄거리",
+  "줄기",
+  "줄무늬",
+  "중간",
+  "중계방송",
+  "중국",
+  "중년",
+  "중단",
+  "중독",
+  "중반",
+  "중부",
+  "중세",
+  "중소기업",
+  "중순",
+  "중앙",
+  "중요",
+  "중학교",
+  "즉석",
+  "즉시",
+  "즐거움",
+  "증가",
+  "증거",
+  "증권",
+  "증상",
+  "증세",
+  "지각",
+  "지갑",
+  "지경",
+  "지극히",
+  "지금",
+  "지급",
+  "지능",
+  "지름길",
+  "지리산",
+  "지방",
+  "지붕",
+  "지식",
+  "지역",
+  "지우개",
+  "지원",
+  "지적",
+  "지점",
+  "지진",
+  "지출",
+  "직선",
+  "직업",
+  "직원",
+  "직장",
+  "진급",
+  "진동",
+  "진로",
+  "진료",
+  "진리",
+  "진짜",
+  "진찰",
+  "진출",
+  "진통",
+  "진행",
+  "질문",
+  "질병",
+  "질서",
+  "짐작",
+  "집단",
+  "집안",
+  "집중",
+  "짜증",
+  "찌꺼기",
+  "차남",
+  "차라리",
+  "차량",
+  "차림",
+  "차별",
+  "차선",
+  "차츰",
+  "착각",
+  "찬물",
+  "찬성",
+  "참가",
+  "참기름",
+  "참새",
+  "참석",
+  "참여",
+  "참외",
+  "참조",
+  "찻잔",
+  "창가",
+  "창고",
+  "창구",
+  "창문",
+  "창밖",
+  "창작",
+  "창조",
+  "채널",
+  "채점",
+  "책가방",
+  "책방",
+  "책상",
+  "책임",
+  "챔피언",
+  "처벌",
+  "처음",
+  "천국",
+  "천둥",
+  "천장",
+  "천재",
+  "천천히",
+  "철도",
+  "철저히",
+  "철학",
+  "첫날",
+  "첫째",
+  "청년",
+  "청바지",
+  "청소",
+  "청춘",
+  "체계",
+  "체력",
+  "체온",
+  "체육",
+  "체중",
+  "체험",
+  "초등학생",
+  "초반",
+  "초밥",
+  "초상화",
+  "초순",
+  "초여름",
+  "초원",
+  "초저녁",
+  "초점",
+  "초청",
+  "초콜릿",
+  "촛불",
+  "총각",
+  "총리",
+  "총장",
+  "촬영",
+  "최근",
+  "최상",
+  "최선",
+  "최신",
+  "최악",
+  "최종",
+  "추석",
+  "추억",
+  "추진",
+  "추천",
+  "추측",
+  "축구",
+  "축소",
+  "축제",
+  "축하",
+  "출근",
+  "출발",
+  "출산",
+  "출신",
+  "출연",
+  "출입",
+  "출장",
+  "출판",
+  "충격",
+  "충고",
+  "충돌",
+  "충분히",
+  "충청도",
+  "취업",
+  "취직",
+  "취향",
+  "치약",
+  "친구",
+  "친척",
+  "칠십",
+  "칠월",
+  "칠판",
+  "침대",
+  "침묵",
+  "침실",
+  "칫솔",
+  "칭찬",
+  "카메라",
+  "카운터",
+  "칼국수",
+  "캐릭터",
+  "캠퍼스",
+  "캠페인",
+  "커튼",
+  "컨디션",
+  "컬러",
+  "컴퓨터",
+  "코끼리",
+  "코미디",
+  "콘서트",
+  "콜라",
+  "콤플렉스",
+  "콩나물",
+  "쾌감",
+  "쿠데타",
+  "크림",
+  "큰길",
+  "큰딸",
+  "큰소리",
+  "큰아들",
+  "큰어머니",
+  "큰일",
+  "큰절",
+  "클래식",
+  "클럽",
+  "킬로",
+  "타입",
+  "타자기",
+  "탁구",
+  "탁자",
+  "탄생",
+  "태권도",
+  "태양",
+  "태풍",
+  "택시",
+  "탤런트",
+  "터널",
+  "터미널",
+  "테니스",
+  "테스트",
+  "테이블",
+  "텔레비전",
+  "토론",
+  "토마토",
+  "토요일",
+  "통계",
+  "통과",
+  "통로",
+  "통신",
+  "통역",
+  "통일",
+  "통장",
+  "통제",
+  "통증",
+  "통합",
+  "통화",
+  "퇴근",
+  "퇴원",
+  "퇴직금",
+  "튀김",
+  "트럭",
+  "특급",
+  "특별",
+  "특성",
+  "특수",
+  "특징",
+  "특히",
+  "튼튼히",
+  "티셔츠",
+  "파란색",
+  "파일",
+  "파출소",
+  "판결",
+  "판단",
+  "판매",
+  "판사",
+  "팔십",
+  "팔월",
+  "팝송",
+  "패션",
+  "팩스",
+  "팩시밀리",
+  "팬티",
+  "퍼센트",
+  "페인트",
+  "편견",
+  "편의",
+  "편지",
+  "편히",
+  "평가",
+  "평균",
+  "평생",
+  "평소",
+  "평양",
+  "평일",
+  "평화",
+  "포스터",
+  "포인트",
+  "포장",
+  "포함",
+  "표면",
+  "표정",
+  "표준",
+  "표현",
+  "품목",
+  "품질",
+  "풍경",
+  "풍속",
+  "풍습",
+  "프랑스",
+  "프린터",
+  "플라스틱",
+  "피곤",
+  "피망",
+  "피아노",
+  "필름",
+  "필수",
+  "필요",
+  "필자",
+  "필통",
+  "핑계",
+  "하느님",
+  "하늘",
+  "하드웨어",
+  "하룻밤",
+  "하반기",
+  "하숙집",
+  "하순",
+  "하여튼",
+  "하지만",
+  "하천",
+  "하품",
+  "하필",
+  "학과",
+  "학교",
+  "학급",
+  "학기",
+  "학년",
+  "학력",
+  "학번",
+  "학부모",
+  "학비",
+  "학생",
+  "학술",
+  "학습",
+  "학용품",
+  "학원",
+  "학위",
+  "학자",
+  "학점",
+  "한계",
+  "한글",
+  "한꺼번에",
+  "한낮",
+  "한눈",
+  "한동안",
+  "한때",
+  "한라산",
+  "한마디",
+  "한문",
+  "한번",
+  "한복",
+  "한식",
+  "한여름",
+  "한쪽",
+  "할머니",
+  "할아버지",
+  "할인",
+  "함께",
+  "함부로",
+  "합격",
+  "합리적",
+  "항공",
+  "항구",
+  "항상",
+  "항의",
+  "해결",
+  "해군",
+  "해답",
+  "해당",
+  "해물",
+  "해석",
+  "해설",
+  "해수욕장",
+  "해안",
+  "핵심",
+  "핸드백",
+  "햄버거",
+  "햇볕",
+  "햇살",
+  "행동",
+  "행복",
+  "행사",
+  "행운",
+  "행위",
+  "향기",
+  "향상",
+  "향수",
+  "허락",
+  "허용",
+  "헬기",
+  "현관",
+  "현금",
+  "현대",
+  "현상",
+  "현실",
+  "현장",
+  "현재",
+  "현지",
+  "혈액",
+  "협력",
+  "형부",
+  "형사",
+  "형수",
+  "형식",
+  "형제",
+  "형태",
+  "형편",
+  "혜택",
+  "호기심",
+  "호남",
+  "호랑이",
+  "호박",
+  "호텔",
+  "호흡",
+  "혹시",
+  "홀로",
+  "홈페이지",
+  "홍보",
+  "홍수",
+  "홍차",
+  "화면",
+  "화분",
+  "화살",
+  "화요일",
+  "화장",
+  "화학",
+  "확보",
+  "확인",
+  "확장",
+  "확정",
+  "환갑",
+  "환경",
+  "환영",
+  "환율",
+  "환자",
+  "활기",
+  "활동",
+  "활발히",
+  "활용",
+  "활짝",
+  "회견",
+  "회관",
+  "회복",
+  "회색",
+  "회원",
+  "회장",
+  "회전",
+  "횟수",
+  "횡단보도",
+  "효율적",
+  "후반",
+  "후춧가루",
+  "훈련",
+  "훨씬",
+  "휴식",
+  "휴일",
+  "흉내",
+  "흐름",
+  "흑백",
+  "흑인",
+  "흔적",
+  "흔히",
+  "흥미",
+  "흥분",
+  "희곡",
+  "희망",
+  "희생",
+  "흰색",
+  "힘껏"
+]
+
+},{}],82:[function(require,module,exports){
+module.exports=[
+  "ábaco",
+  "abdomen",
+  "abeja",
+  "abierto",
+  "abogado",
+  "abono",
+  "aborto",
+  "abrazo",
+  "abrir",
+  "abuelo",
+  "abuso",
+  "acabar",
+  "academia",
+  "acceso",
+  "acción",
+  "aceite",
+  "acelga",
+  "acento",
+  "aceptar",
+  "ácido",
+  "aclarar",
+  "acné",
+  "acoger",
+  "acoso",
+  "activo",
+  "acto",
+  "actriz",
+  "actuar",
+  "acudir",
+  "acuerdo",
+  "acusar",
+  "adicto",
+  "admitir",
+  "adoptar",
+  "adorno",
+  "aduana",
+  "adulto",
+  "aéreo",
+  "afectar",
+  "afición",
+  "afinar",
+  "afirmar",
+  "ágil",
+  "agitar",
+  "agonía",
+  "agosto",
+  "agotar",
+  "agregar",
+  "agrio",
+  "agua",
+  "agudo",
+  "águila",
+  "aguja",
+  "ahogo",
+  "ahorro",
+  "aire",
+  "aislar",
+  "ajedrez",
+  "ajeno",
+  "ajuste",
+  "alacrán",
+  "alambre",
+  "alarma",
+  "alba",
+  "álbum",
+  "alcalde",
+  "aldea",
+  "alegre",
+  "alejar",
+  "alerta",
+  "aleta",
+  "alfiler",
+  "alga",
+  "algodón",
+  "aliado",
+  "aliento",
+  "alivio",
+  "alma",
+  "almeja",
+  "almíbar",
+  "altar",
+  "alteza",
+  "altivo",
+  "alto",
+  "altura",
+  "alumno",
+  "alzar",
+  "amable",
+  "amante",
+  "amapola",
+  "amargo",
+  "amasar",
+  "ámbar",
+  "ámbito",
+  "ameno",
+  "amigo",
+  "amistad",
+  "amor",
+  "amparo",
+  "amplio",
+  "ancho",
+  "anciano",
+  "ancla",
+  "andar",
+  "andén",
+  "anemia",
+  "ángulo",
+  "anillo",
+  "ánimo",
+  "anís",
+  "anotar",
+  "antena",
+  "antiguo",
+  "antojo",
+  "anual",
+  "anular",
+  "anuncio",
+  "añadir",
+  "añejo",
+  "año",
+  "apagar",
+  "aparato",
+  "apetito",
+  "apio",
+  "aplicar",
+  "apodo",
+  "aporte",
+  "apoyo",
+  "aprender",
+  "aprobar",
+  "apuesta",
+  "apuro",
+  "arado",
+  "araña",
+  "arar",
+  "árbitro",
+  "árbol",
+  "arbusto",
+  "archivo",
+  "arco",
+  "arder",
+  "ardilla",
+  "arduo",
+  "área",
+  "árido",
+  "aries",
+  "armonía",
+  "arnés",
+  "aroma",
+  "arpa",
+  "arpón",
+  "arreglo",
+  "arroz",
+  "arruga",
+  "arte",
+  "artista",
+  "asa",
+  "asado",
+  "asalto",
+  "ascenso",
+  "asegurar",
+  "aseo",
+  "asesor",
+  "asiento",
+  "asilo",
+  "asistir",
+  "asno",
+  "asombro",
+  "áspero",
+  "astilla",
+  "astro",
+  "astuto",
+  "asumir",
+  "asunto",
+  "atajo",
+  "ataque",
+  "atar",
+  "atento",
+  "ateo",
+  "ático",
+  "atleta",
+  "átomo",
+  "atraer",
+  "atroz",
+  "atún",
+  "audaz",
+  "audio",
+  "auge",
+  "aula",
+  "aumento",
+  "ausente",
+  "autor",
+  "aval",
+  "avance",
+  "avaro",
+  "ave",
+  "avellana",
+  "avena",
+  "avestruz",
+  "avión",
+  "aviso",
+  "ayer",
+  "ayuda",
+  "ayuno",
+  "azafrán",
+  "azar",
+  "azote",
+  "azúcar",
+  "azufre",
+  "azul",
+  "baba",
+  "babor",
+  "bache",
+  "bahía",
+  "baile",
+  "bajar",
+  "balanza",
+  "balcón",
+  "balde",
+  "bambú",
+  "banco",
+  "banda",
+  "baño",
+  "barba",
+  "barco",
+  "barniz",
+  "barro",
+  "báscula",
+  "bastón",
+  "basura",
+  "batalla",
+  "batería",
+  "batir",
+  "batuta",
+  "baúl",
+  "bazar",
+  "bebé",
+  "bebida",
+  "bello",
+  "besar",
+  "beso",
+  "bestia",
+  "bicho",
+  "bien",
+  "bingo",
+  "blanco",
+  "bloque",
+  "blusa",
+  "boa",
+  "bobina",
+  "bobo",
+  "boca",
+  "bocina",
+  "boda",
+  "bodega",
+  "boina",
+  "bola",
+  "bolero",
+  "bolsa",
+  "bomba",
+  "bondad",
+  "bonito",
+  "bono",
+  "bonsái",
+  "borde",
+  "borrar",
+  "bosque",
+  "bote",
+  "botín",
+  "bóveda",
+  "bozal",
+  "bravo",
+  "brazo",
+  "brecha",
+  "breve",
+  "brillo",
+  "brinco",
+  "brisa",
+  "broca",
+  "broma",
+  "bronce",
+  "brote",
+  "bruja",
+  "brusco",
+  "bruto",
+  "buceo",
+  "bucle",
+  "bueno",
+  "buey",
+  "bufanda",
+  "bufón",
+  "búho",
+  "buitre",
+  "bulto",
+  "burbuja",
+  "burla",
+  "burro",
+  "buscar",
+  "butaca",
+  "buzón",
+  "caballo",
+  "cabeza",
+  "cabina",
+  "cabra",
+  "cacao",
+  "cadáver",
+  "cadena",
+  "caer",
+  "café",
+  "caída",
+  "caimán",
+  "caja",
+  "cajón",
+  "cal",
+  "calamar",
+  "calcio",
+  "caldo",
+  "calidad",
+  "calle",
+  "calma",
+  "calor",
+  "calvo",
+  "cama",
+  "cambio",
+  "camello",
+  "camino",
+  "campo",
+  "cáncer",
+  "candil",
+  "canela",
+  "canguro",
+  "canica",
+  "canto",
+  "caña",
+  "cañón",
+  "caoba",
+  "caos",
+  "capaz",
+  "capitán",
+  "capote",
+  "captar",
+  "capucha",
+  "cara",
+  "carbón",
+  "cárcel",
+  "careta",
+  "carga",
+  "cariño",
+  "carne",
+  "carpeta",
+  "carro",
+  "carta",
+  "casa",
+  "casco",
+  "casero",
+  "caspa",
+  "castor",
+  "catorce",
+  "catre",
+  "caudal",
+  "causa",
+  "cazo",
+  "cebolla",
+  "ceder",
+  "cedro",
+  "celda",
+  "célebre",
+  "celoso",
+  "célula",
+  "cemento",
+  "ceniza",
+  "centro",
+  "cerca",
+  "cerdo",
+  "cereza",
+  "cero",
+  "cerrar",
+  "certeza",
+  "césped",
+  "cetro",
+  "chacal",
+  "chaleco",
+  "champú",
+  "chancla",
+  "chapa",
+  "charla",
+  "chico",
+  "chiste",
+  "chivo",
+  "choque",
+  "choza",
+  "chuleta",
+  "chupar",
+  "ciclón",
+  "ciego",
+  "cielo",
+  "cien",
+  "cierto",
+  "cifra",
+  "cigarro",
+  "cima",
+  "cinco",
+  "cine",
+  "cinta",
+  "ciprés",
+  "circo",
+  "ciruela",
+  "cisne",
+  "cita",
+  "ciudad",
+  "clamor",
+  "clan",
+  "claro",
+  "clase",
+  "clave",
+  "cliente",
+  "clima",
+  "clínica",
+  "cobre",
+  "cocción",
+  "cochino",
+  "cocina",
+  "coco",
+  "código",
+  "codo",
+  "cofre",
+  "coger",
+  "cohete",
+  "cojín",
+  "cojo",
+  "cola",
+  "colcha",
+  "colegio",
+  "colgar",
+  "colina",
+  "collar",
+  "colmo",
+  "columna",
+  "combate",
+  "comer",
+  "comida",
+  "cómodo",
+  "compra",
+  "conde",
+  "conejo",
+  "conga",
+  "conocer",
+  "consejo",
+  "contar",
+  "copa",
+  "copia",
+  "corazón",
+  "corbata",
+  "corcho",
+  "cordón",
+  "corona",
+  "correr",
+  "coser",
+  "cosmos",
+  "costa",
+  "cráneo",
+  "cráter",
+  "crear",
+  "crecer",
+  "creído",
+  "crema",
+  "cría",
+  "crimen",
+  "cripta",
+  "crisis",
+  "cromo",
+  "crónica",
+  "croqueta",
+  "crudo",
+  "cruz",
+  "cuadro",
+  "cuarto",
+  "cuatro",
+  "cubo",
+  "cubrir",
+  "cuchara",
+  "cuello",
+  "cuento",
+  "cuerda",
+  "cuesta",
+  "cueva",
+  "cuidar",
+  "culebra",
+  "culpa",
+  "culto",
+  "cumbre",
+  "cumplir",
+  "cuna",
+  "cuneta",
+  "cuota",
+  "cupón",
+  "cúpula",
+  "curar",
+  "curioso",
+  "curso",
+  "curva",
+  "cutis",
+  "dama",
+  "danza",
+  "dar",
+  "dardo",
+  "dátil",
+  "deber",
+  "débil",
+  "década",
+  "decir",
+  "dedo",
+  "defensa",
+  "definir",
+  "dejar",
+  "delfín",
+  "delgado",
+  "delito",
+  "demora",
+  "denso",
+  "dental",
+  "deporte",
+  "derecho",
+  "derrota",
+  "desayuno",
+  "deseo",
+  "desfile",
+  "desnudo",
+  "destino",
+  "desvío",
+  "detalle",
+  "detener",
+  "deuda",
+  "día",
+  "diablo",
+  "diadema",
+  "diamante",
+  "diana",
+  "diario",
+  "dibujo",
+  "dictar",
+  "diente",
+  "dieta",
+  "diez",
+  "difícil",
+  "digno",
+  "dilema",
+  "diluir",
+  "dinero",
+  "directo",
+  "dirigir",
+  "disco",
+  "diseño",
+  "disfraz",
+  "diva",
+  "divino",
+  "doble",
+  "doce",
+  "dolor",
+  "domingo",
+  "don",
+  "donar",
+  "dorado",
+  "dormir",
+  "dorso",
+  "dos",
+  "dosis",
+  "dragón",
+  "droga",
+  "ducha",
+  "duda",
+  "duelo",
+  "dueño",
+  "dulce",
+  "dúo",
+  "duque",
+  "durar",
+  "dureza",
+  "duro",
+  "ébano",
+  "ebrio",
+  "echar",
+  "eco",
+  "ecuador",
+  "edad",
+  "edición",
+  "edificio",
+  "editor",
+  "educar",
+  "efecto",
+  "eficaz",
+  "eje",
+  "ejemplo",
+  "elefante",
+  "elegir",
+  "elemento",
+  "elevar",
+  "elipse",
+  "élite",
+  "elixir",
+  "elogio",
+  "eludir",
+  "embudo",
+  "emitir",
+  "emoción",
+  "empate",
+  "empeño",
+  "empleo",
+  "empresa",
+  "enano",
+  "encargo",
+  "enchufe",
+  "encía",
+  "enemigo",
+  "enero",
+  "enfado",
+  "enfermo",
+  "engaño",
+  "enigma",
+  "enlace",
+  "enorme",
+  "enredo",
+  "ensayo",
+  "enseñar",
+  "entero",
+  "entrar",
+  "envase",
+  "envío",
+  "época",
+  "equipo",
+  "erizo",
+  "escala",
+  "escena",
+  "escolar",
+  "escribir",
+  "escudo",
+  "esencia",
+  "esfera",
+  "esfuerzo",
+  "espada",
+  "espejo",
+  "espía",
+  "esposa",
+  "espuma",
+  "esquí",
+  "estar",
+  "este",
+  "estilo",
+  "estufa",
+  "etapa",
+  "eterno",
+  "ética",
+  "etnia",
+  "evadir",
+  "evaluar",
+  "evento",
+  "evitar",
+  "exacto",
+  "examen",
+  "exceso",
+  "excusa",
+  "exento",
+  "exigir",
+  "exilio",
+  "existir",
+  "éxito",
+  "experto",
+  "explicar",
+  "exponer",
+  "extremo",
+  "fábrica",
+  "fábula",
+  "fachada",
+  "fácil",
+  "factor",
+  "faena",
+  "faja",
+  "falda",
+  "fallo",
+  "falso",
+  "faltar",
+  "fama",
+  "familia",
+  "famoso",
+  "faraón",
+  "farmacia",
+  "farol",
+  "farsa",
+  "fase",
+  "fatiga",
+  "fauna",
+  "favor",
+  "fax",
+  "febrero",
+  "fecha",
+  "feliz",
+  "feo",
+  "feria",
+  "feroz",
+  "fértil",
+  "fervor",
+  "festín",
+  "fiable",
+  "fianza",
+  "fiar",
+  "fibra",
+  "ficción",
+  "ficha",
+  "fideo",
+  "fiebre",
+  "fiel",
+  "fiera",
+  "fiesta",
+  "figura",
+  "fijar",
+  "fijo",
+  "fila",
+  "filete",
+  "filial",
+  "filtro",
+  "fin",
+  "finca",
+  "fingir",
+  "finito",
+  "firma",
+  "flaco",
+  "flauta",
+  "flecha",
+  "flor",
+  "flota",
+  "fluir",
+  "flujo",
+  "flúor",
+  "fobia",
+  "foca",
+  "fogata",
+  "fogón",
+  "folio",
+  "folleto",
+  "fondo",
+  "forma",
+  "forro",
+  "fortuna",
+  "forzar",
+  "fosa",
+  "foto",
+  "fracaso",
+  "frágil",
+  "franja",
+  "frase",
+  "fraude",
+  "freír",
+  "freno",
+  "fresa",
+  "frío",
+  "frito",
+  "fruta",
+  "fuego",
+  "fuente",
+  "fuerza",
+  "fuga",
+  "fumar",
+  "función",
+  "funda",
+  "furgón",
+  "furia",
+  "fusil",
+  "fútbol",
+  "futuro",
+  "gacela",
+  "gafas",
+  "gaita",
+  "gajo",
+  "gala",
+  "galería",
+  "gallo",
+  "gamba",
+  "ganar",
+  "gancho",
+  "ganga",
+  "ganso",
+  "garaje",
+  "garza",
+  "gasolina",
+  "gastar",
+  "gato",
+  "gavilán",
+  "gemelo",
+  "gemir",
+  "gen",
+  "género",
+  "genio",
+  "gente",
+  "geranio",
+  "gerente",
+  "germen",
+  "gesto",
+  "gigante",
+  "gimnasio",
+  "girar",
+  "giro",
+  "glaciar",
+  "globo",
+  "gloria",
+  "gol",
+  "golfo",
+  "goloso",
+  "golpe",
+  "goma",
+  "gordo",
+  "gorila",
+  "gorra",
+  "gota",
+  "goteo",
+  "gozar",
+  "grada",
+  "gráfico",
+  "grano",
+  "grasa",
+  "gratis",
+  "grave",
+  "grieta",
+  "grillo",
+  "gripe",
+  "gris",
+  "grito",
+  "grosor",
+  "grúa",
+  "grueso",
+  "grumo",
+  "grupo",
+  "guante",
+  "guapo",
+  "guardia",
+  "guerra",
+  "guía",
+  "guiño",
+  "guion",
+  "guiso",
+  "guitarra",
+  "gusano",
+  "gustar",
+  "haber",
+  "hábil",
+  "hablar",
+  "hacer",
+  "hacha",
+  "hada",
+  "hallar",
+  "hamaca",
+  "harina",
+  "haz",
+  "hazaña",
+  "hebilla",
+  "hebra",
+  "hecho",
+  "helado",
+  "helio",
+  "hembra",
+  "herir",
+  "hermano",
+  "héroe",
+  "hervir",
+  "hielo",
+  "hierro",
+  "hígado",
+  "higiene",
+  "hijo",
+  "himno",
+  "historia",
+  "hocico",
+  "hogar",
+  "hoguera",
+  "hoja",
+  "hombre",
+  "hongo",
+  "honor",
+  "honra",
+  "hora",
+  "hormiga",
+  "horno",
+  "hostil",
+  "hoyo",
+  "hueco",
+  "huelga",
+  "huerta",
+  "hueso",
+  "huevo",
+  "huida",
+  "huir",
+  "humano",
+  "húmedo",
+  "humilde",
+  "humo",
+  "hundir",
+  "huracán",
+  "hurto",
+  "icono",
+  "ideal",
+  "idioma",
+  "ídolo",
+  "iglesia",
+  "iglú",
+  "igual",
+  "ilegal",
+  "ilusión",
+  "imagen",
+  "imán",
+  "imitar",
+  "impar",
+  "imperio",
+  "imponer",
+  "impulso",
+  "incapaz",
+  "índice",
+  "inerte",
+  "infiel",
+  "informe",
+  "ingenio",
+  "inicio",
+  "inmenso",
+  "inmune",
+  "innato",
+  "insecto",
+  "instante",
+  "interés",
+  "íntimo",
+  "intuir",
+  "inútil",
+  "invierno",
+  "ira",
+  "iris",
+  "ironía",
+  "isla",
+  "islote",
+  "jabalí",
+  "jabón",
+  "jamón",
+  "jarabe",
+  "jardín",
+  "jarra",
+  "jaula",
+  "jazmín",
+  "jefe",
+  "jeringa",
+  "jinete",
+  "jornada",
+  "joroba",
+  "joven",
+  "joya",
+  "juerga",
+  "jueves",
+  "juez",
+  "jugador",
+  "jugo",
+  "juguete",
+  "juicio",
+  "junco",
+  "jungla",
+  "junio",
+  "juntar",
+  "júpiter",
+  "jurar",
+  "justo",
+  "juvenil",
+  "juzgar",
+  "kilo",
+  "koala",
+  "labio",
+  "lacio",
+  "lacra",
+  "lado",
+  "ladrón",
+  "lagarto",
+  "lágrima",
+  "laguna",
+  "laico",
+  "lamer",
+  "lámina",
+  "lámpara",
+  "lana",
+  "lancha",
+  "langosta",
+  "lanza",
+  "lápiz",
+  "largo",
+  "larva",
+  "lástima",
+  "lata",
+  "látex",
+  "latir",
+  "laurel",
+  "lavar",
+  "lazo",
+  "leal",
+  "lección",
+  "leche",
+  "lector",
+  "leer",
+  "legión",
+  "legumbre",
+  "lejano",
+  "lengua",
+  "lento",
+  "leña",
+  "león",
+  "leopardo",
+  "lesión",
+  "letal",
+  "letra",
+  "leve",
+  "leyenda",
+  "libertad",
+  "libro",
+  "licor",
+  "líder",
+  "lidiar",
+  "lienzo",
+  "liga",
+  "ligero",
+  "lima",
+  "límite",
+  "limón",
+  "limpio",
+  "lince",
+  "lindo",
+  "línea",
+  "lingote",
+  "lino",
+  "linterna",
+  "líquido",
+  "liso",
+  "lista",
+  "litera",
+  "litio",
+  "litro",
+  "llaga",
+  "llama",
+  "llanto",
+  "llave",
+  "llegar",
+  "llenar",
+  "llevar",
+  "llorar",
+  "llover",
+  "lluvia",
+  "lobo",
+  "loción",
+  "loco",
+  "locura",
+  "lógica",
+  "logro",
+  "lombriz",
+  "lomo",
+  "lonja",
+  "lote",
+  "lucha",
+  "lucir",
+  "lugar",
+  "lujo",
+  "luna",
+  "lunes",
+  "lupa",
+  "lustro",
+  "luto",
+  "luz",
+  "maceta",
+  "macho",
+  "madera",
+  "madre",
+  "maduro",
+  "maestro",
+  "mafia",
+  "magia",
+  "mago",
+  "maíz",
+  "maldad",
+  "maleta",
+  "malla",
+  "malo",
+  "mamá",
+  "mambo",
+  "mamut",
+  "manco",
+  "mando",
+  "manejar",
+  "manga",
+  "maniquí",
+  "manjar",
+  "mano",
+  "manso",
+  "manta",
+  "mañana",
+  "mapa",
+  "máquina",
+  "mar",
+  "marco",
+  "marea",
+  "marfil",
+  "margen",
+  "marido",
+  "mármol",
+  "marrón",
+  "martes",
+  "marzo",
+  "masa",
+  "máscara",
+  "masivo",
+  "matar",
+  "materia",
+  "matiz",
+  "matriz",
+  "máximo",
+  "mayor",
+  "mazorca",
+  "mecha",
+  "medalla",
+  "medio",
+  "médula",
+  "mejilla",
+  "mejor",
+  "melena",
+  "melón",
+  "memoria",
+  "menor",
+  "mensaje",
+  "mente",
+  "menú",
+  "mercado",
+  "merengue",
+  "mérito",
+  "mes",
+  "mesón",
+  "meta",
+  "meter",
+  "método",
+  "metro",
+  "mezcla",
+  "miedo",
+  "miel",
+  "miembro",
+  "miga",
+  "mil",
+  "milagro",
+  "militar",
+  "millón",
+  "mimo",
+  "mina",
+  "minero",
+  "mínimo",
+  "minuto",
+  "miope",
+  "mirar",
+  "misa",
+  "miseria",
+  "misil",
+  "mismo",
+  "mitad",
+  "mito",
+  "mochila",
+  "moción",
+  "moda",
+  "modelo",
+  "moho",
+  "mojar",
+  "molde",
+  "moler",
+  "molino",
+  "momento",
+  "momia",
+  "monarca",
+  "moneda",
+  "monja",
+  "monto",
+  "moño",
+  "morada",
+  "morder",
+  "moreno",
+  "morir",
+  "morro",
+  "morsa",
+  "mortal",
+  "mosca",
+  "mostrar",
+  "motivo",
+  "mover",
+  "móvil",
+  "mozo",
+  "mucho",
+  "mudar",
+  "mueble",
+  "muela",
+  "muerte",
+  "muestra",
+  "mugre",
+  "mujer",
+  "mula",
+  "muleta",
+  "multa",
+  "mundo",
+  "muñeca",
+  "mural",
+  "muro",
+  "músculo",
+  "museo",
+  "musgo",
+  "música",
+  "muslo",
+  "nácar",
+  "nación",
+  "nadar",
+  "naipe",
+  "naranja",
+  "nariz",
+  "narrar",
+  "nasal",
+  "natal",
+  "nativo",
+  "natural",
+  "náusea",
+  "naval",
+  "nave",
+  "navidad",
+  "necio",
+  "néctar",
+  "negar",
+  "negocio",
+  "negro",
+  "neón",
+  "nervio",
+  "neto",
+  "neutro",
+  "nevar",
+  "nevera",
+  "nicho",
+  "nido",
+  "niebla",
+  "nieto",
+  "niñez",
+  "niño",
+  "nítido",
+  "nivel",
+  "nobleza",
+  "noche",
+  "nómina",
+  "noria",
+  "norma",
+  "norte",
+  "nota",
+  "noticia",
+  "novato",
+  "novela",
+  "novio",
+  "nube",
+  "nuca",
+  "núcleo",
+  "nudillo",
+  "nudo",
+  "nuera",
+  "nueve",
+  "nuez",
+  "nulo",
+  "número",
+  "nutria",
+  "oasis",
+  "obeso",
+  "obispo",
+  "objeto",
+  "obra",
+  "obrero",
+  "observar",
+  "obtener",
+  "obvio",
+  "oca",
+  "ocaso",
+  "océano",
+  "ochenta",
+  "ocho",
+  "ocio",
+  "ocre",
+  "octavo",
+  "octubre",
+  "oculto",
+  "ocupar",
+  "ocurrir",
+  "odiar",
+  "odio",
+  "odisea",
+  "oeste",
+  "ofensa",
+  "oferta",
+  "oficio",
+  "ofrecer",
+  "ogro",
+  "oído",
+  "oír",
+  "ojo",
+  "ola",
+  "oleada",
+  "olfato",
+  "olivo",
+  "olla",
+  "olmo",
+  "olor",
+  "olvido",
+  "ombligo",
+  "onda",
+  "onza",
+  "opaco",
+  "opción",
+  "ópera",
+  "opinar",
+  "oponer",
+  "optar",
+  "óptica",
+  "opuesto",
+  "oración",
+  "orador",
+  "oral",
+  "órbita",
+  "orca",
+  "orden",
+  "oreja",
+  "órgano",
+  "orgía",
+  "orgullo",
+  "oriente",
+  "origen",
+  "orilla",
+  "oro",
+  "orquesta",
+  "oruga",
+  "osadía",
+  "oscuro",
+  "osezno",
+  "oso",
+  "ostra",
+  "otoño",
+  "otro",
+  "oveja",
+  "óvulo",
+  "óxido",
+  "oxígeno",
+  "oyente",
+  "ozono",
+  "pacto",
+  "padre",
+  "paella",
+  "página",
+  "pago",
+  "país",
+  "pájaro",
+  "palabra",
+  "palco",
+  "paleta",
+  "pálido",
+  "palma",
+  "paloma",
+  "palpar",
+  "pan",
+  "panal",
+  "pánico",
+  "pantera",
+  "pañuelo",
+  "papá",
+  "papel",
+  "papilla",
+  "paquete",
+  "parar",
+  "parcela",
+  "pared",
+  "parir",
+  "paro",
+  "párpado",
+  "parque",
+  "párrafo",
+  "parte",
+  "pasar",
+  "paseo",
+  "pasión",
+  "paso",
+  "pasta",
+  "pata",
+  "patio",
+  "patria",
+  "pausa",
+  "pauta",
+  "pavo",
+  "payaso",
+  "peatón",
+  "pecado",
+  "pecera",
+  "pecho",
+  "pedal",
+  "pedir",
+  "pegar",
+  "peine",
+  "pelar",
+  "peldaño",
+  "pelea",
+  "peligro",
+  "pellejo",
+  "pelo",
+  "peluca",
+  "pena",
+  "pensar",
+  "peñón",
+  "peón",
+  "peor",
+  "pepino",
+  "pequeño",
+  "pera",
+  "percha",
+  "perder",
+  "pereza",
+  "perfil",
+  "perico",
+  "perla",
+  "permiso",
+  "perro",
+  "persona",
+  "pesa",
+  "pesca",
+  "pésimo",
+  "pestaña",
+  "pétalo",
+  "petróleo",
+  "pez",
+  "pezuña",
+  "picar",
+  "pichón",
+  "pie",
+  "piedra",
+  "pierna",
+  "pieza",
+  "pijama",
+  "pilar",
+  "piloto",
+  "pimienta",
+  "pino",
+  "pintor",
+  "pinza",
+  "piña",
+  "piojo",
+  "pipa",
+  "pirata",
+  "pisar",
+  "piscina",
+  "piso",
+  "pista",
+  "pitón",
+  "pizca",
+  "placa",
+  "plan",
+  "plata",
+  "playa",
+  "plaza",
+  "pleito",
+  "pleno",
+  "plomo",
+  "pluma",
+  "plural",
+  "pobre",
+  "poco",
+  "poder",
+  "podio",
+  "poema",
+  "poesía",
+  "poeta",
+  "polen",
+  "policía",
+  "pollo",
+  "polvo",
+  "pomada",
+  "pomelo",
+  "pomo",
+  "pompa",
+  "poner",
+  "porción",
+  "portal",
+  "posada",
+  "poseer",
+  "posible",
+  "poste",
+  "potencia",
+  "potro",
+  "pozo",
+  "prado",
+  "precoz",
+  "pregunta",
+  "premio",
+  "prensa",
+  "preso",
+  "previo",
+  "primo",
+  "príncipe",
+  "prisión",
+  "privar",
+  "proa",
+  "probar",
+  "proceso",
+  "producto",
+  "proeza",
+  "profesor",
+  "programa",
+  "prole",
+  "promesa",
+  "pronto",
+  "propio",
+  "próximo",
+  "prueba",
+  "público",
+  "puchero",
+  "pudor",
+  "pueblo",
+  "puerta",
+  "puesto",
+  "pulga",
+  "pulir",
+  "pulmón",
+  "pulpo",
+  "pulso",
+  "puma",
+  "punto",
+  "puñal",
+  "puño",
+  "pupa",
+  "pupila",
+  "puré",
+  "quedar",
+  "queja",
+  "quemar",
+  "querer",
+  "queso",
+  "quieto",
+  "química",
+  "quince",
+  "quitar",
+  "rábano",
+  "rabia",
+  "rabo",
+  "ración",
+  "radical",
+  "raíz",
+  "rama",
+  "rampa",
+  "rancho",
+  "rango",
+  "rapaz",
+  "rápido",
+  "rapto",
+  "rasgo",
+  "raspa",
+  "rato",
+  "rayo",
+  "raza",
+  "razón",
+  "reacción",
+  "realidad",
+  "rebaño",
+  "rebote",
+  "recaer",
+  "receta",
+  "rechazo",
+  "recoger",
+  "recreo",
+  "recto",
+  "recurso",
+  "red",
+  "redondo",
+  "reducir",
+  "reflejo",
+  "reforma",
+  "refrán",
+  "refugio",
+  "regalo",
+  "regir",
+  "regla",
+  "regreso",
+  "rehén",
+  "reino",
+  "reír",
+  "reja",
+  "relato",
+  "relevo",
+  "relieve",
+  "relleno",
+  "reloj",
+  "remar",
+  "remedio",
+  "remo",
+  "rencor",
+  "rendir",
+  "renta",
+  "reparto",
+  "repetir",
+  "reposo",
+  "reptil",
+  "res",
+  "rescate",
+  "resina",
+  "respeto",
+  "resto",
+  "resumen",
+  "retiro",
+  "retorno",
+  "retrato",
+  "reunir",
+  "revés",
+  "revista",
+  "rey",
+  "rezar",
+  "rico",
+  "riego",
+  "rienda",
+  "riesgo",
+  "rifa",
+  "rígido",
+  "rigor",
+  "rincón",
+  "riñón",
+  "río",
+  "riqueza",
+  "risa",
+  "ritmo",
+  "rito",
+  "rizo",
+  "roble",
+  "roce",
+  "rociar",
+  "rodar",
+  "rodeo",
+  "rodilla",
+  "roer",
+  "rojizo",
+  "rojo",
+  "romero",
+  "romper",
+  "ron",
+  "ronco",
+  "ronda",
+  "ropa",
+  "ropero",
+  "rosa",
+  "rosca",
+  "rostro",
+  "rotar",
+  "rubí",
+  "rubor",
+  "rudo",
+  "rueda",
+  "rugir",
+  "ruido",
+  "ruina",
+  "ruleta",
+  "rulo",
+  "rumbo",
+  "rumor",
+  "ruptura",
+  "ruta",
+  "rutina",
+  "sábado",
+  "saber",
+  "sabio",
+  "sable",
+  "sacar",
+  "sagaz",
+  "sagrado",
+  "sala",
+  "saldo",
+  "salero",
+  "salir",
+  "salmón",
+  "salón",
+  "salsa",
+  "salto",
+  "salud",
+  "salvar",
+  "samba",
+  "sanción",
+  "sandía",
+  "sanear",
+  "sangre",
+  "sanidad",
+  "sano",
+  "santo",
+  "sapo",
+  "saque",
+  "sardina",
+  "sartén",
+  "sastre",
+  "satán",
+  "sauna",
+  "saxofón",
+  "sección",
+  "seco",
+  "secreto",
+  "secta",
+  "sed",
+  "seguir",
+  "seis",
+  "sello",
+  "selva",
+  "semana",
+  "semilla",
+  "senda",
+  "sensor",
+  "señal",
+  "señor",
+  "separar",
+  "sepia",
+  "sequía",
+  "ser",
+  "serie",
+  "sermón",
+  "servir",
+  "sesenta",
+  "sesión",
+  "seta",
+  "setenta",
+  "severo",
+  "sexo",
+  "sexto",
+  "sidra",
+  "siesta",
+  "siete",
+  "siglo",
+  "signo",
+  "sílaba",
+  "silbar",
+  "silencio",
+  "silla",
+  "símbolo",
+  "simio",
+  "sirena",
+  "sistema",
+  "sitio",
+  "situar",
+  "sobre",
+  "socio",
+  "sodio",
+  "sol",
+  "solapa",
+  "soldado",
+  "soledad",
+  "sólido",
+  "soltar",
+  "solución",
+  "sombra",
+  "sondeo",
+  "sonido",
+  "sonoro",
+  "sonrisa",
+  "sopa",
+  "soplar",
+  "soporte",
+  "sordo",
+  "sorpresa",
+  "sorteo",
+  "sostén",
+  "sótano",
+  "suave",
+  "subir",
+  "suceso",
+  "sudor",
+  "suegra",
+  "suelo",
+  "sueño",
+  "suerte",
+  "sufrir",
+  "sujeto",
+  "sultán",
+  "sumar",
+  "superar",
+  "suplir",
+  "suponer",
+  "supremo",
+  "sur",
+  "surco",
+  "sureño",
+  "surgir",
+  "susto",
+  "sutil",
+  "tabaco",
+  "tabique",
+  "tabla",
+  "tabú",
+  "taco",
+  "tacto",
+  "tajo",
+  "talar",
+  "talco",
+  "talento",
+  "talla",
+  "talón",
+  "tamaño",
+  "tambor",
+  "tango",
+  "tanque",
+  "tapa",
+  "tapete",
+  "tapia",
+  "tapón",
+  "taquilla",
+  "tarde",
+  "tarea",
+  "tarifa",
+  "tarjeta",
+  "tarot",
+  "tarro",
+  "tarta",
+  "tatuaje",
+  "tauro",
+  "taza",
+  "tazón",
+  "teatro",
+  "techo",
+  "tecla",
+  "técnica",
+  "tejado",
+  "tejer",
+  "tejido",
+  "tela",
+  "teléfono",
+  "tema",
+  "temor",
+  "templo",
+  "tenaz",
+  "tender",
+  "tener",
+  "tenis",
+  "tenso",
+  "teoría",
+  "terapia",
+  "terco",
+  "término",
+  "ternura",
+  "terror",
+  "tesis",
+  "tesoro",
+  "testigo",
+  "tetera",
+  "texto",
+  "tez",
+  "tibio",
+  "tiburón",
+  "tiempo",
+  "tienda",
+  "tierra",
+  "tieso",
+  "tigre",
+  "tijera",
+  "tilde",
+  "timbre",
+  "tímido",
+  "timo",
+  "tinta",
+  "tío",
+  "típico",
+  "tipo",
+  "tira",
+  "tirón",
+  "titán",
+  "títere",
+  "título",
+  "tiza",
+  "toalla",
+  "tobillo",
+  "tocar",
+  "tocino",
+  "todo",
+  "toga",
+  "toldo",
+  "tomar",
+  "tono",
+  "tonto",
+  "topar",
+  "tope",
+  "toque",
+  "tórax",
+  "torero",
+  "tormenta",
+  "torneo",
+  "toro",
+  "torpedo",
+  "torre",
+  "torso",
+  "tortuga",
+  "tos",
+  "tosco",
+  "toser",
+  "tóxico",
+  "trabajo",
+  "tractor",
+  "traer",
+  "tráfico",
+  "trago",
+  "traje",
+  "tramo",
+  "trance",
+  "trato",
+  "trauma",
+  "trazar",
+  "trébol",
+  "tregua",
+  "treinta",
+  "tren",
+  "trepar",
+  "tres",
+  "tribu",
+  "trigo",
+  "tripa",
+  "triste",
+  "triunfo",
+  "trofeo",
+  "trompa",
+  "tronco",
+  "tropa",
+  "trote",
+  "trozo",
+  "truco",
+  "trueno",
+  "trufa",
+  "tubería",
+  "tubo",
+  "tuerto",
+  "tumba",
+  "tumor",
+  "túnel",
+  "túnica",
+  "turbina",
+  "turismo",
+  "turno",
+  "tutor",
+  "ubicar",
+  "úlcera",
+  "umbral",
+  "unidad",
+  "unir",
+  "universo",
+  "uno",
+  "untar",
+  "uña",
+  "urbano",
+  "urbe",
+  "urgente",
+  "urna",
+  "usar",
+  "usuario",
+  "útil",
+  "utopía",
+  "uva",
+  "vaca",
+  "vacío",
+  "vacuna",
+  "vagar",
+  "vago",
+  "vaina",
+  "vajilla",
+  "vale",
+  "válido",
+  "valle",
+  "valor",
+  "válvula",
+  "vampiro",
+  "vara",
+  "variar",
+  "varón",
+  "vaso",
+  "vecino",
+  "vector",
+  "vehículo",
+  "veinte",
+  "vejez",
+  "vela",
+  "velero",
+  "veloz",
+  "vena",
+  "vencer",
+  "venda",
+  "veneno",
+  "vengar",
+  "venir",
+  "venta",
+  "venus",
+  "ver",
+  "verano",
+  "verbo",
+  "verde",
+  "vereda",
+  "verja",
+  "verso",
+  "verter",
+  "vía",
+  "viaje",
+  "vibrar",
+  "vicio",
+  "víctima",
+  "vida",
+  "vídeo",
+  "vidrio",
+  "viejo",
+  "viernes",
+  "vigor",
+  "vil",
+  "villa",
+  "vinagre",
+  "vino",
+  "viñedo",
+  "violín",
+  "viral",
+  "virgo",
+  "virtud",
+  "visor",
+  "víspera",
+  "vista",
+  "vitamina",
+  "viudo",
+  "vivaz",
+  "vivero",
+  "vivir",
+  "vivo",
+  "volcán",
+  "volumen",
+  "volver",
+  "voraz",
+  "votar",
+  "voto",
+  "voz",
+  "vuelo",
+  "vulgar",
+  "yacer",
+  "yate",
+  "yegua",
+  "yema",
+  "yerno",
+  "yeso",
+  "yodo",
+  "yoga",
+  "yogur",
+  "zafiro",
+  "zanja",
+  "zapato",
+  "zarza",
+  "zona",
+  "zorro",
+  "zumo",
+  "zurdo"
+]
+
+},{}],83:[function(require,module,exports){
 // Reference https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki
 // Format: 0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S]
 // NOTE: SIGHASH byte ignored AND restricted, truncate before use
@@ -12341,7 +29618,7 @@ module.exports = {
   encode: encode
 }
 
-},{"safe-buffer":431}],73:[function(require,module,exports){
+},{"safe-buffer":457}],84:[function(require,module,exports){
 module.exports={
   "OP_FALSE": 0,
   "OP_0": 0,
@@ -12476,7 +29753,7 @@ module.exports={
   "OP_INVALIDOPCODE": 255
 }
 
-},{}],74:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 var OPS = require('./index.json')
 
 var map = {}
@@ -12487,7 +29764,7 @@ for (var op in OPS) {
 
 module.exports = map
 
-},{"./index.json":73}],75:[function(require,module,exports){
+},{"./index.json":84}],86:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer
 const bech32 = require('bech32')
 const bs58check = require('bs58check')
@@ -12586,7 +29863,7 @@ module.exports = {
   toOutputScript: toOutputScript
 }
 
-},{"./networks":82,"./payments":84,"./script":92,"./types":118,"bech32":65,"bs58check":254,"safe-buffer":431,"typeforce":446}],76:[function(require,module,exports){
+},{"./networks":93,"./payments":95,"./script":103,"./types":129,"bech32":67,"bs58check":265,"safe-buffer":457,"typeforce":496}],87:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer
 const bcrypto = require('./crypto')
 const fastMerkleRoot = require('merkle-lib/fastRoot')
@@ -12765,7 +30042,7 @@ Block.prototype.checkProofOfWork = function () {
 
 module.exports = Block
 
-},{"./crypto":79,"./transaction":116,"./types":118,"merkle-lib/fastRoot":420,"safe-buffer":431,"typeforce":446,"varuint-bitcoin":513}],77:[function(require,module,exports){
+},{"./crypto":90,"./transaction":127,"./types":129,"merkle-lib/fastRoot":437,"safe-buffer":457,"typeforce":496,"varuint-bitcoin":564}],88:[function(require,module,exports){
 // https://github.com/feross/buffer/blob/master/index.js#L1127
 function verifuint (value, max) {
   if (typeof value !== 'number') throw new Error('cannot write a non-number as a number')
@@ -12796,7 +30073,7 @@ module.exports = {
   writeUInt64LE: writeUInt64LE
 }
 
-},{}],78:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 const decompile = require('./script').decompile
 const multisig = require('./templates/multisig')
 const nullData = require('./templates/nulldata')
@@ -12868,7 +30145,7 @@ module.exports = {
   types: types
 }
 
-},{"./script":92,"./templates/multisig":95,"./templates/nulldata":98,"./templates/pubkey":99,"./templates/pubkeyhash":102,"./templates/scripthash":105,"./templates/witnesscommitment":108,"./templates/witnesspubkeyhash":110,"./templates/witnessscripthash":113}],79:[function(require,module,exports){
+},{"./script":103,"./templates/multisig":106,"./templates/nulldata":109,"./templates/pubkey":110,"./templates/pubkeyhash":113,"./templates/scripthash":116,"./templates/witnesscommitment":119,"./templates/witnesspubkeyhash":121,"./templates/witnessscripthash":124}],90:[function(require,module,exports){
 const createHash = require('create-hash')
 
 function ripemd160 (buffer) {
@@ -12899,7 +30176,7 @@ module.exports = {
   sha256: sha256
 }
 
-},{"create-hash":268}],80:[function(require,module,exports){
+},{"create-hash":279}],91:[function(require,module,exports){
 const ecc = require('tiny-secp256k1')
 const randomBytes = require('randombytes')
 const typeforce = require('typeforce')
@@ -13010,7 +30287,7 @@ module.exports = {
   fromWIF
 }
 
-},{"./networks":82,"./types":118,"randombytes":429,"tiny-secp256k1":443,"typeforce":446,"wif":514}],81:[function(require,module,exports){
+},{"./networks":93,"./types":129,"randombytes":453,"tiny-secp256k1":469,"typeforce":496,"wif":565}],92:[function(require,module,exports){
 const script = require('./script')
 
 module.exports = {
@@ -13028,7 +30305,7 @@ module.exports = {
   script: script
 }
 
-},{"./address":75,"./block":76,"./crypto":79,"./ecpair":80,"./networks":82,"./payments":84,"./script":92,"./transaction":116,"./transaction_builder":117,"bip32":71,"bitcoin-ops":73}],82:[function(require,module,exports){
+},{"./address":86,"./block":87,"./crypto":90,"./ecpair":91,"./networks":93,"./payments":95,"./script":103,"./transaction":127,"./transaction_builder":128,"bip32":73,"bitcoin-ops":84}],93:[function(require,module,exports){
 // https://en.bitcoin.it/wiki/List_of_address_prefixes
 // Dogecoin BIP32 is a proposed standard: https://bitcointalk.org/index.php?topic=409731
 
@@ -13057,7 +30334,7 @@ module.exports = {
   }
 }
 
-},{}],83:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 const lazy = require('./lazy')
 const typef = require('typeforce')
 const OPS = require('bitcoin-ops')
@@ -13115,7 +30392,7 @@ function p2data (a, opts) {
 
 module.exports = p2data
 
-},{"../networks":82,"../script":92,"./lazy":85,"bitcoin-ops":73,"typeforce":446}],84:[function(require,module,exports){
+},{"../networks":93,"../script":103,"./lazy":96,"bitcoin-ops":84,"typeforce":496}],95:[function(require,module,exports){
 const embed = require('./embed')
 const p2ms = require('./p2ms')
 const p2pk = require('./p2pk')
@@ -13129,7 +30406,7 @@ module.exports = { embed, p2ms, p2pk, p2pkh, p2sh, p2wpkh, p2wsh }
 // TODO
 // witness commitment
 
-},{"./embed":83,"./p2ms":86,"./p2pk":87,"./p2pkh":88,"./p2sh":89,"./p2wpkh":90,"./p2wsh":91}],85:[function(require,module,exports){
+},{"./embed":94,"./p2ms":97,"./p2pk":98,"./p2pkh":99,"./p2sh":100,"./p2wpkh":101,"./p2wsh":102}],96:[function(require,module,exports){
 function prop (object, name, f) {
   Object.defineProperty(object, name, {
     configurable: true,
@@ -13161,7 +30438,7 @@ function value (f) {
 
 module.exports = { prop, value }
 
-},{}],86:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 const lazy = require('./lazy')
 const typef = require('typeforce')
 const OPS = require('bitcoin-ops')
@@ -13303,7 +30580,7 @@ function p2ms (a, opts) {
 
 module.exports = p2ms
 
-},{"../networks":82,"../script":92,"./lazy":85,"bitcoin-ops":73,"tiny-secp256k1":443,"typeforce":446}],87:[function(require,module,exports){
+},{"../networks":93,"../script":103,"./lazy":96,"bitcoin-ops":84,"tiny-secp256k1":469,"typeforce":496}],98:[function(require,module,exports){
 let lazy = require('./lazy')
 let typef = require('typeforce')
 let OPS = require('bitcoin-ops')
@@ -13388,7 +30665,7 @@ function p2pk (a, opts) {
 
 module.exports = p2pk
 
-},{"../networks":82,"../script":92,"./lazy":85,"bitcoin-ops":73,"tiny-secp256k1":443,"typeforce":446}],88:[function(require,module,exports){
+},{"../networks":93,"../script":103,"./lazy":96,"bitcoin-ops":84,"tiny-secp256k1":469,"typeforce":496}],99:[function(require,module,exports){
 (function (Buffer){
 const lazy = require('./lazy')
 const typef = require('typeforce')
@@ -13528,7 +30805,7 @@ function p2pkh (a, opts) {
 module.exports = p2pkh
 
 }).call(this,require("buffer").Buffer)
-},{"../crypto":79,"../networks":82,"../script":92,"./lazy":85,"bitcoin-ops":73,"bs58check":254,"buffer":168,"tiny-secp256k1":443,"typeforce":446}],89:[function(require,module,exports){
+},{"../crypto":90,"../networks":93,"../script":103,"./lazy":96,"bitcoin-ops":84,"bs58check":265,"buffer":179,"tiny-secp256k1":469,"typeforce":496}],100:[function(require,module,exports){
 (function (Buffer){
 const lazy = require('./lazy')
 const typef = require('typeforce')
@@ -13719,7 +30996,7 @@ function p2sh (a, opts) {
 module.exports = p2sh
 
 }).call(this,require("buffer").Buffer)
-},{"../crypto":79,"../networks":82,"../script":92,"./lazy":85,"bitcoin-ops":73,"bs58check":254,"buffer":168,"typeforce":446}],90:[function(require,module,exports){
+},{"../crypto":90,"../networks":93,"../script":103,"./lazy":96,"bitcoin-ops":84,"bs58check":265,"buffer":179,"typeforce":496}],101:[function(require,module,exports){
 (function (Buffer){
 const lazy = require('./lazy')
 const typef = require('typeforce')
@@ -13859,7 +31136,7 @@ function p2wpkh (a, opts) {
 module.exports = p2wpkh
 
 }).call(this,require("buffer").Buffer)
-},{"../crypto":79,"../networks":82,"../script":92,"./lazy":85,"bech32":65,"bitcoin-ops":73,"buffer":168,"tiny-secp256k1":443,"typeforce":446}],91:[function(require,module,exports){
+},{"../crypto":90,"../networks":93,"../script":103,"./lazy":96,"bech32":67,"bitcoin-ops":84,"buffer":179,"tiny-secp256k1":469,"typeforce":496}],102:[function(require,module,exports){
 (function (Buffer){
 const lazy = require('./lazy')
 const typef = require('typeforce')
@@ -14039,7 +31316,7 @@ function p2wsh (a, opts) {
 module.exports = p2wsh
 
 }).call(this,require("buffer").Buffer)
-},{"../crypto":79,"../networks":82,"../script":92,"./lazy":85,"bech32":65,"bitcoin-ops":73,"buffer":168,"typeforce":446}],92:[function(require,module,exports){
+},{"../crypto":90,"../networks":93,"../script":103,"./lazy":96,"bech32":67,"bitcoin-ops":84,"buffer":179,"typeforce":496}],103:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer
 const bip66 = require('bip66')
 const ecc = require('tiny-secp256k1')
@@ -14246,7 +31523,7 @@ module.exports = {
   isDefinedHashType: isDefinedHashType
 }
 
-},{"./script_number":93,"./script_signature":94,"./types":118,"bip66":72,"bitcoin-ops":73,"bitcoin-ops/map":74,"pushdata-bitcoin":425,"safe-buffer":431,"tiny-secp256k1":443,"typeforce":446}],93:[function(require,module,exports){
+},{"./script_number":104,"./script_signature":105,"./types":129,"bip66":83,"bitcoin-ops":84,"bitcoin-ops/map":85,"pushdata-bitcoin":449,"safe-buffer":457,"tiny-secp256k1":469,"typeforce":496}],104:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer
 
 function decode (buffer, maxLength, minimal) {
@@ -14315,7 +31592,7 @@ module.exports = {
   encode: encode
 }
 
-},{"safe-buffer":431}],94:[function(require,module,exports){
+},{"safe-buffer":457}],105:[function(require,module,exports){
 const bip66 = require('bip66')
 const Buffer = require('safe-buffer').Buffer
 const typeforce = require('typeforce')
@@ -14381,13 +31658,13 @@ module.exports = {
   encode: encode
 }
 
-},{"./types":118,"bip66":72,"safe-buffer":431,"typeforce":446}],95:[function(require,module,exports){
+},{"./types":129,"bip66":83,"safe-buffer":457,"typeforce":496}],106:[function(require,module,exports){
 module.exports = {
   input: require('./input'),
   output: require('./output')
 }
 
-},{"./input":96,"./output":97}],96:[function(require,module,exports){
+},{"./input":107,"./output":108}],107:[function(require,module,exports){
 // OP_0 [signatures ...]
 
 const bscript = require('../../script')
@@ -14412,7 +31689,7 @@ check.toJSON = function () { return 'multisig input' }
 
 module.exports = { check }
 
-},{"../../script":92,"bitcoin-ops":73}],97:[function(require,module,exports){
+},{"../../script":103,"bitcoin-ops":84}],108:[function(require,module,exports){
 // m [pubKeys ...] n OP_CHECKMULTISIG
 
 const bscript = require('../../script')
@@ -14443,7 +31720,7 @@ check.toJSON = function () { return 'multi-sig output' }
 
 module.exports = { check }
 
-},{"../../script":92,"../../types":118,"bitcoin-ops":73}],98:[function(require,module,exports){
+},{"../../script":103,"../../types":129,"bitcoin-ops":84}],109:[function(require,module,exports){
 // OP_RETURN {data}
 
 const bscript = require('../script')
@@ -14459,9 +31736,9 @@ check.toJSON = function () { return 'null data output' }
 
 module.exports = { output: { check: check } }
 
-},{"../script":92,"bitcoin-ops":73}],99:[function(require,module,exports){
-arguments[4][95][0].apply(exports,arguments)
-},{"./input":100,"./output":101,"dup":95}],100:[function(require,module,exports){
+},{"../script":103,"bitcoin-ops":84}],110:[function(require,module,exports){
+arguments[4][106][0].apply(exports,arguments)
+},{"./input":111,"./output":112,"dup":106}],111:[function(require,module,exports){
 // {signature}
 
 const bscript = require('../../script')
@@ -14478,7 +31755,7 @@ module.exports = {
   check: check
 }
 
-},{"../../script":92}],101:[function(require,module,exports){
+},{"../../script":103}],112:[function(require,module,exports){
 // {pubKey} OP_CHECKSIG
 
 const bscript = require('../../script')
@@ -14495,9 +31772,9 @@ check.toJSON = function () { return 'pubKey output' }
 
 module.exports = { check }
 
-},{"../../script":92,"bitcoin-ops":73}],102:[function(require,module,exports){
-arguments[4][95][0].apply(exports,arguments)
-},{"./input":103,"./output":104,"dup":95}],103:[function(require,module,exports){
+},{"../../script":103,"bitcoin-ops":84}],113:[function(require,module,exports){
+arguments[4][106][0].apply(exports,arguments)
+},{"./input":114,"./output":115,"dup":106}],114:[function(require,module,exports){
 // {signature} {pubKey}
 
 const bscript = require('../../script')
@@ -14513,7 +31790,7 @@ check.toJSON = function () { return 'pubKeyHash input' }
 
 module.exports = { check }
 
-},{"../../script":92}],104:[function(require,module,exports){
+},{"../../script":103}],115:[function(require,module,exports){
 // OP_DUP OP_HASH160 {pubKeyHash} OP_EQUALVERIFY OP_CHECKSIG
 
 const bscript = require('../../script')
@@ -14533,9 +31810,9 @@ check.toJSON = function () { return 'pubKeyHash output' }
 
 module.exports = { check }
 
-},{"../../script":92,"bitcoin-ops":73}],105:[function(require,module,exports){
-arguments[4][95][0].apply(exports,arguments)
-},{"./input":106,"./output":107,"dup":95}],106:[function(require,module,exports){
+},{"../../script":103,"bitcoin-ops":84}],116:[function(require,module,exports){
+arguments[4][106][0].apply(exports,arguments)
+},{"./input":117,"./output":118,"dup":106}],117:[function(require,module,exports){
 // <scriptSig> {serialized scriptPubKey script}
 
 const Buffer = require('safe-buffer').Buffer
@@ -14585,7 +31862,7 @@ check.toJSON = function () { return 'scriptHash input' }
 
 module.exports = { check }
 
-},{"../../script":92,"../multisig/":95,"../pubkey/":99,"../pubkeyhash/":102,"../witnesspubkeyhash/output":112,"../witnessscripthash/output":115,"safe-buffer":431}],107:[function(require,module,exports){
+},{"../../script":103,"../multisig/":106,"../pubkey/":110,"../pubkeyhash/":113,"../witnesspubkeyhash/output":123,"../witnessscripthash/output":126,"safe-buffer":457}],118:[function(require,module,exports){
 // OP_HASH160 {scriptHash} OP_EQUAL
 
 const bscript = require('../../script')
@@ -14603,12 +31880,12 @@ check.toJSON = function () { return 'scriptHash output' }
 
 module.exports = { check }
 
-},{"../../script":92,"bitcoin-ops":73}],108:[function(require,module,exports){
+},{"../../script":103,"bitcoin-ops":84}],119:[function(require,module,exports){
 module.exports = {
   output: require('./output')
 }
 
-},{"./output":109}],109:[function(require,module,exports){
+},{"./output":120}],120:[function(require,module,exports){
 // OP_RETURN {aa21a9ed} {commitment}
 
 const Buffer = require('safe-buffer').Buffer
@@ -14652,9 +31929,9 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":92,"../../types":118,"bitcoin-ops":73,"safe-buffer":431,"typeforce":446}],110:[function(require,module,exports){
-arguments[4][95][0].apply(exports,arguments)
-},{"./input":111,"./output":112,"dup":95}],111:[function(require,module,exports){
+},{"../../script":103,"../../types":129,"bitcoin-ops":84,"safe-buffer":457,"typeforce":496}],121:[function(require,module,exports){
+arguments[4][106][0].apply(exports,arguments)
+},{"./input":122,"./output":123,"dup":106}],122:[function(require,module,exports){
 // {signature} {pubKey}
 
 const bscript = require('../../script')
@@ -14674,7 +31951,7 @@ check.toJSON = function () { return 'witnessPubKeyHash input' }
 
 module.exports = { check }
 
-},{"../../script":92}],112:[function(require,module,exports){
+},{"../../script":103}],123:[function(require,module,exports){
 // OP_0 {pubKeyHash}
 
 const bscript = require('../../script')
@@ -14693,9 +31970,9 @@ module.exports = {
   check
 }
 
-},{"../../script":92,"bitcoin-ops":73}],113:[function(require,module,exports){
-arguments[4][95][0].apply(exports,arguments)
-},{"./input":114,"./output":115,"dup":95}],114:[function(require,module,exports){
+},{"../../script":103,"bitcoin-ops":84}],124:[function(require,module,exports){
+arguments[4][106][0].apply(exports,arguments)
+},{"./input":125,"./output":126,"dup":106}],125:[function(require,module,exports){
 (function (Buffer){
 // <scriptSig> {serialized scriptPubKey script}
 
@@ -14738,7 +32015,7 @@ check.toJSON = function () { return 'witnessScriptHash input' }
 module.exports = { check }
 
 }).call(this,{"isBuffer":require("../../../../browserify/node_modules/is-buffer/index.js")})
-},{"../../../../browserify/node_modules/is-buffer/index.js":193,"../../script":92,"../../types":118,"../multisig/":95,"../pubkey/":99,"../pubkeyhash/":102,"typeforce":446}],115:[function(require,module,exports){
+},{"../../../../browserify/node_modules/is-buffer/index.js":204,"../../script":103,"../../types":129,"../multisig/":106,"../pubkey/":110,"../pubkeyhash/":113,"typeforce":496}],126:[function(require,module,exports){
 // OP_0 {scriptHash}
 
 const bscript = require('../../script')
@@ -14755,7 +32032,7 @@ check.toJSON = function () { return 'Witness scriptHash output' }
 
 module.exports = { check }
 
-},{"../../script":92,"bitcoin-ops":73}],116:[function(require,module,exports){
+},{"../../script":103,"bitcoin-ops":84}],127:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer
 const bcrypto = require('./crypto')
 const bscript = require('./script')
@@ -15249,7 +32526,7 @@ Transaction.prototype.setWitness = function (index, witness) {
 
 module.exports = Transaction
 
-},{"./bufferutils":77,"./crypto":79,"./script":92,"./types":118,"bitcoin-ops":73,"safe-buffer":431,"typeforce":446,"varuint-bitcoin":513}],117:[function(require,module,exports){
+},{"./bufferutils":88,"./crypto":90,"./script":103,"./types":129,"bitcoin-ops":84,"safe-buffer":457,"typeforce":496,"varuint-bitcoin":564}],128:[function(require,module,exports){
 const Buffer = require('safe-buffer').Buffer
 const baddress = require('./address')
 const bcrypto = require('./crypto')
@@ -15998,7 +33275,7 @@ TransactionBuilder.prototype.__overMaximumFees = function (bytes) {
 
 module.exports = TransactionBuilder
 
-},{"./address":75,"./classify":78,"./crypto":79,"./ecpair":80,"./networks":82,"./payments":84,"./script":92,"./transaction":116,"./types":118,"bitcoin-ops":73,"safe-buffer":431,"typeforce":446}],118:[function(require,module,exports){
+},{"./address":86,"./classify":89,"./crypto":90,"./ecpair":91,"./networks":93,"./payments":95,"./script":103,"./transaction":127,"./types":129,"bitcoin-ops":84,"safe-buffer":457,"typeforce":496}],129:[function(require,module,exports){
 const typeforce = require('typeforce')
 
 const UINT31_MAX = Math.pow(2, 31) - 1
@@ -16049,7 +33326,7 @@ for (var typeName in typeforce) {
 
 module.exports = types
 
-},{"typeforce":446}],119:[function(require,module,exports){
+},{"typeforce":496}],130:[function(require,module,exports){
 (function (module, exports) {
   'use strict';
 
@@ -19478,7 +36755,7 @@ module.exports = types
   };
 })(typeof module === 'undefined' || module, this);
 
-},{"buffer":140}],120:[function(require,module,exports){
+},{"buffer":151}],131:[function(require,module,exports){
 module.exports = {
 	trueFunc: function trueFunc(){
 		return true;
@@ -19487,7 +36764,7 @@ module.exports = {
 		return false;
 	}
 };
-},{}],121:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 var r;
 
 module.exports = function rand(len) {
@@ -19554,15 +36831,15 @@ if (typeof self === 'object') {
   }
 }
 
-},{"crypto":140}],122:[function(require,module,exports){
-arguments[4][47][0].apply(exports,arguments)
-},{"./asn1/api":123,"./asn1/base":125,"./asn1/constants":129,"./asn1/decoders":131,"./asn1/encoders":134,"bn.js":138,"dup":47}],123:[function(require,module,exports){
+},{"crypto":151}],133:[function(require,module,exports){
 arguments[4][48][0].apply(exports,arguments)
-},{"../asn1":122,"dup":48,"inherits":192,"vm":251}],124:[function(require,module,exports){
+},{"./asn1/api":134,"./asn1/base":136,"./asn1/constants":140,"./asn1/decoders":142,"./asn1/encoders":145,"bn.js":149,"dup":48}],134:[function(require,module,exports){
 arguments[4][49][0].apply(exports,arguments)
-},{"../base":125,"buffer":168,"dup":49,"inherits":192}],125:[function(require,module,exports){
+},{"../asn1":133,"dup":49,"inherits":203,"vm":262}],135:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
-},{"./buffer":124,"./node":126,"./reporter":127,"dup":50}],126:[function(require,module,exports){
+},{"../base":136,"buffer":179,"dup":50,"inherits":203}],136:[function(require,module,exports){
+arguments[4][51][0].apply(exports,arguments)
+},{"./buffer":135,"./node":137,"./reporter":138,"dup":51}],137:[function(require,module,exports){
 var Reporter = require('../base').Reporter;
 var EncoderBuffer = require('../base').EncoderBuffer;
 var DecoderBuffer = require('../base').DecoderBuffer;
@@ -20198,25 +37475,25 @@ Node.prototype._isPrintstr = function isPrintstr(str) {
   return /^[A-Za-z0-9 '\(\)\+,\-\.\/:=\?]*$/.test(str);
 };
 
-},{"../base":125,"minimalistic-assert":196}],127:[function(require,module,exports){
-arguments[4][52][0].apply(exports,arguments)
-},{"dup":52,"inherits":192}],128:[function(require,module,exports){
+},{"../base":136,"minimalistic-assert":207}],138:[function(require,module,exports){
 arguments[4][53][0].apply(exports,arguments)
-},{"../constants":129,"dup":53}],129:[function(require,module,exports){
+},{"dup":53,"inherits":203}],139:[function(require,module,exports){
 arguments[4][54][0].apply(exports,arguments)
-},{"./der":128,"dup":54}],130:[function(require,module,exports){
+},{"../constants":140,"dup":54}],140:[function(require,module,exports){
 arguments[4][55][0].apply(exports,arguments)
-},{"../../asn1":122,"dup":55,"inherits":192}],131:[function(require,module,exports){
+},{"./der":139,"dup":55}],141:[function(require,module,exports){
 arguments[4][56][0].apply(exports,arguments)
-},{"./der":130,"./pem":132,"dup":56}],132:[function(require,module,exports){
+},{"../../asn1":133,"dup":56,"inherits":203}],142:[function(require,module,exports){
 arguments[4][57][0].apply(exports,arguments)
-},{"./der":130,"buffer":168,"dup":57,"inherits":192}],133:[function(require,module,exports){
+},{"./der":141,"./pem":143,"dup":57}],143:[function(require,module,exports){
 arguments[4][58][0].apply(exports,arguments)
-},{"../../asn1":122,"buffer":168,"dup":58,"inherits":192}],134:[function(require,module,exports){
+},{"./der":141,"buffer":179,"dup":58,"inherits":203}],144:[function(require,module,exports){
 arguments[4][59][0].apply(exports,arguments)
-},{"./der":133,"./pem":135,"dup":59}],135:[function(require,module,exports){
+},{"../../asn1":133,"buffer":179,"dup":59,"inherits":203}],145:[function(require,module,exports){
 arguments[4][60][0].apply(exports,arguments)
-},{"./der":133,"dup":60,"inherits":192}],136:[function(require,module,exports){
+},{"./der":144,"./pem":146,"dup":60}],146:[function(require,module,exports){
+arguments[4][61][0].apply(exports,arguments)
+},{"./der":144,"dup":61,"inherits":203}],147:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -20710,7 +37987,7 @@ var objectKeys = Object.keys || function (obj) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"util/":250}],137:[function(require,module,exports){
+},{"util/":261}],148:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -20826,13 +38103,13 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],138:[function(require,module,exports){
-arguments[4][119][0].apply(exports,arguments)
-},{"buffer":140,"dup":119}],139:[function(require,module,exports){
-arguments[4][121][0].apply(exports,arguments)
-},{"crypto":140,"dup":121}],140:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
+arguments[4][130][0].apply(exports,arguments)
+},{"buffer":151,"dup":130}],150:[function(require,module,exports){
+arguments[4][132][0].apply(exports,arguments)
+},{"crypto":151,"dup":132}],151:[function(require,module,exports){
 
-},{}],141:[function(require,module,exports){
+},{}],152:[function(require,module,exports){
 // based on the aes implimentation in triple sec
 // https://github.com/keybase/triplesec
 // which is in turn based on the one from crypto-js
@@ -21062,7 +38339,7 @@ AES.prototype.scrub = function () {
 
 module.exports.AES = AES
 
-},{"safe-buffer":431}],142:[function(require,module,exports){
+},{"safe-buffer":457}],153:[function(require,module,exports){
 var aes = require('./aes')
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('cipher-base')
@@ -21156,7 +38433,7 @@ StreamCipher.prototype.setAAD = function setAAD (buf) {
 
 module.exports = StreamCipher
 
-},{"./aes":141,"./ghash":146,"buffer-xor":167,"cipher-base":169,"inherits":192,"safe-buffer":431}],143:[function(require,module,exports){
+},{"./aes":152,"./ghash":157,"buffer-xor":178,"cipher-base":180,"inherits":203,"safe-buffer":457}],154:[function(require,module,exports){
 var ciphers = require('./encrypter')
 var deciphers = require('./decrypter')
 var modes = require('./modes/list.json')
@@ -21171,7 +38448,7 @@ exports.createDecipher = exports.Decipher = deciphers.createDecipher
 exports.createDecipheriv = exports.Decipheriv = deciphers.createDecipheriv
 exports.listCiphers = exports.getCiphers = getCiphers
 
-},{"./decrypter":144,"./encrypter":145,"./modes/list.json":154}],144:[function(require,module,exports){
+},{"./decrypter":155,"./encrypter":156,"./modes/list.json":165}],155:[function(require,module,exports){
 var AuthCipher = require('./authCipher')
 var Buffer = require('safe-buffer').Buffer
 var MODES = require('./modes')
@@ -21294,7 +38571,7 @@ function createDecipher (suite, password) {
 exports.createDecipher = createDecipher
 exports.createDecipheriv = createDecipheriv
 
-},{"./aes":141,"./authCipher":142,"./modes":153,"./streamCipher":156,"cipher-base":169,"evp_bytestokey":189,"inherits":192,"safe-buffer":431}],145:[function(require,module,exports){
+},{"./aes":152,"./authCipher":153,"./modes":164,"./streamCipher":167,"cipher-base":180,"evp_bytestokey":200,"inherits":203,"safe-buffer":457}],156:[function(require,module,exports){
 var MODES = require('./modes')
 var AuthCipher = require('./authCipher')
 var Buffer = require('safe-buffer').Buffer
@@ -21410,7 +38687,7 @@ function createCipher (suite, password) {
 exports.createCipheriv = createCipheriv
 exports.createCipher = createCipher
 
-},{"./aes":141,"./authCipher":142,"./modes":153,"./streamCipher":156,"cipher-base":169,"evp_bytestokey":189,"inherits":192,"safe-buffer":431}],146:[function(require,module,exports){
+},{"./aes":152,"./authCipher":153,"./modes":164,"./streamCipher":167,"cipher-base":180,"evp_bytestokey":200,"inherits":203,"safe-buffer":457}],157:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var ZEROES = Buffer.alloc(16, 0)
 
@@ -21501,7 +38778,7 @@ GHASH.prototype.final = function (abl, bl) {
 
 module.exports = GHASH
 
-},{"safe-buffer":431}],147:[function(require,module,exports){
+},{"safe-buffer":457}],158:[function(require,module,exports){
 var xor = require('buffer-xor')
 
 exports.encrypt = function (self, block) {
@@ -21520,7 +38797,7 @@ exports.decrypt = function (self, block) {
   return xor(out, pad)
 }
 
-},{"buffer-xor":167}],148:[function(require,module,exports){
+},{"buffer-xor":178}],159:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var xor = require('buffer-xor')
 
@@ -21555,7 +38832,7 @@ exports.encrypt = function (self, data, decrypt) {
   return out
 }
 
-},{"buffer-xor":167,"safe-buffer":431}],149:[function(require,module,exports){
+},{"buffer-xor":178,"safe-buffer":457}],160:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 function encryptByte (self, byteParam, decrypt) {
@@ -21599,7 +38876,7 @@ exports.encrypt = function (self, chunk, decrypt) {
   return out
 }
 
-},{"safe-buffer":431}],150:[function(require,module,exports){
+},{"safe-buffer":457}],161:[function(require,module,exports){
 (function (Buffer){
 function encryptByte (self, byteParam, decrypt) {
   var pad = self._cipher.encryptBlock(self._prev)
@@ -21626,7 +38903,7 @@ exports.encrypt = function (self, chunk, decrypt) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168}],151:[function(require,module,exports){
+},{"buffer":179}],162:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -21673,7 +38950,7 @@ exports.encrypt = function (self, chunk) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"buffer-xor":167}],152:[function(require,module,exports){
+},{"buffer":179,"buffer-xor":178}],163:[function(require,module,exports){
 exports.encrypt = function (self, block) {
   return self._cipher.encryptBlock(block)
 }
@@ -21682,7 +38959,7 @@ exports.decrypt = function (self, block) {
   return self._cipher.decryptBlock(block)
 }
 
-},{}],153:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 var modeModules = {
   ECB: require('./ecb'),
   CBC: require('./cbc'),
@@ -21702,7 +38979,7 @@ for (var key in modes) {
 
 module.exports = modes
 
-},{"./cbc":147,"./cfb":148,"./cfb1":149,"./cfb8":150,"./ctr":151,"./ecb":152,"./list.json":154,"./ofb":155}],154:[function(require,module,exports){
+},{"./cbc":158,"./cfb":159,"./cfb1":160,"./cfb8":161,"./ctr":162,"./ecb":163,"./list.json":165,"./ofb":166}],165:[function(require,module,exports){
 module.exports={
   "aes-128-ecb": {
     "cipher": "AES",
@@ -21895,7 +39172,7 @@ module.exports={
   }
 }
 
-},{}],155:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 (function (Buffer){
 var xor = require('buffer-xor')
 
@@ -21915,7 +39192,7 @@ exports.encrypt = function (self, chunk) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"buffer-xor":167}],156:[function(require,module,exports){
+},{"buffer":179,"buffer-xor":178}],167:[function(require,module,exports){
 var aes = require('./aes')
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('cipher-base')
@@ -21944,7 +39221,7 @@ StreamCipher.prototype._final = function () {
 
 module.exports = StreamCipher
 
-},{"./aes":141,"cipher-base":169,"inherits":192,"safe-buffer":431}],157:[function(require,module,exports){
+},{"./aes":152,"cipher-base":180,"inherits":203,"safe-buffer":457}],168:[function(require,module,exports){
 var ebtk = require('evp_bytestokey')
 var aes = require('browserify-aes/browser')
 var DES = require('browserify-des')
@@ -22019,7 +39296,7 @@ function getCiphers () {
 }
 exports.listCiphers = exports.getCiphers = getCiphers
 
-},{"browserify-aes/browser":143,"browserify-aes/modes":153,"browserify-des":158,"browserify-des/modes":159,"evp_bytestokey":189}],158:[function(require,module,exports){
+},{"browserify-aes/browser":154,"browserify-aes/modes":164,"browserify-des":169,"browserify-des/modes":170,"evp_bytestokey":200}],169:[function(require,module,exports){
 (function (Buffer){
 var CipherBase = require('cipher-base')
 var des = require('des.js')
@@ -22066,7 +39343,7 @@ DES.prototype._final = function () {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"cipher-base":169,"des.js":178,"inherits":192}],159:[function(require,module,exports){
+},{"buffer":179,"cipher-base":180,"des.js":189,"inherits":203}],170:[function(require,module,exports){
 exports['des-ecb'] = {
   key: 8,
   iv: 0
@@ -22092,7 +39369,7 @@ exports['des-ede'] = {
   iv: 0
 }
 
-},{}],160:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 var randomBytes = require('randombytes');
@@ -22136,10 +39413,10 @@ function getr(priv) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":138,"buffer":168,"randombytes":219}],161:[function(require,module,exports){
+},{"bn.js":149,"buffer":179,"randombytes":230}],172:[function(require,module,exports){
 module.exports = require('./browser/algorithms.json')
 
-},{"./browser/algorithms.json":162}],162:[function(require,module,exports){
+},{"./browser/algorithms.json":173}],173:[function(require,module,exports){
 module.exports={
   "sha224WithRSAEncryption": {
     "sign": "rsa",
@@ -22293,7 +39570,7 @@ module.exports={
   }
 }
 
-},{}],163:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 module.exports={
   "1.3.132.0.10": "secp256k1",
   "1.3.132.0.33": "p224",
@@ -22303,7 +39580,7 @@ module.exports={
   "1.3.132.0.35": "p521"
 }
 
-},{}],164:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 (function (Buffer){
 var createHash = require('create-hash')
 var stream = require('stream')
@@ -22398,7 +39675,7 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./algorithms.json":162,"./sign":165,"./verify":166,"buffer":168,"create-hash":172,"inherits":192,"stream":243}],165:[function(require,module,exports){
+},{"./algorithms.json":173,"./sign":176,"./verify":177,"buffer":179,"create-hash":183,"inherits":203,"stream":254}],176:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var createHmac = require('create-hmac')
@@ -22547,7 +39824,7 @@ module.exports.getKey = getKey
 module.exports.makeKey = makeKey
 
 }).call(this,require("buffer").Buffer)
-},{"./curves.json":163,"bn.js":138,"browserify-rsa":160,"buffer":168,"create-hmac":175,"elliptic":295,"parse-asn1":201}],166:[function(require,module,exports){
+},{"./curves.json":174,"bn.js":149,"browserify-rsa":171,"buffer":179,"create-hmac":186,"elliptic":306,"parse-asn1":212}],177:[function(require,module,exports){
 (function (Buffer){
 // much of this based on https://github.com/indutny/self-signed/blob/gh-pages/lib/rsa.js
 var BN = require('bn.js')
@@ -22634,7 +39911,7 @@ function checkValue (b, q) {
 module.exports = verify
 
 }).call(this,require("buffer").Buffer)
-},{"./curves.json":163,"bn.js":138,"buffer":168,"elliptic":295,"parse-asn1":201}],167:[function(require,module,exports){
+},{"./curves.json":174,"bn.js":149,"buffer":179,"elliptic":306,"parse-asn1":212}],178:[function(require,module,exports){
 (function (Buffer){
 module.exports = function xor (a, b) {
   var length = Math.min(a.length, b.length)
@@ -22648,7 +39925,7 @@ module.exports = function xor (a, b) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168}],168:[function(require,module,exports){
+},{"buffer":179}],179:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -24441,7 +41718,7 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":137,"ieee754":190,"isarray":194}],169:[function(require,module,exports){
+},{"base64-js":148,"ieee754":201,"isarray":205}],180:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('stream').Transform
 var StringDecoder = require('string_decoder').StringDecoder
@@ -24542,7 +41819,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 
 module.exports = CipherBase
 
-},{"inherits":192,"safe-buffer":431,"stream":243,"string_decoder":244}],170:[function(require,module,exports){
+},{"inherits":203,"safe-buffer":457,"stream":254,"string_decoder":255}],181:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -24653,7 +41930,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":193}],171:[function(require,module,exports){
+},{"../../is-buffer/index.js":204}],182:[function(require,module,exports){
 (function (Buffer){
 var elliptic = require('elliptic');
 var BN = require('bn.js');
@@ -24779,7 +42056,7 @@ function formatReturnValue(bn, enc, len) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":138,"buffer":168,"elliptic":295}],172:[function(require,module,exports){
+},{"bn.js":149,"buffer":179,"elliptic":306}],183:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var inherits = require('inherits')
@@ -24835,7 +42112,7 @@ module.exports = function createHash (alg) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./md5":174,"buffer":168,"cipher-base":169,"inherits":192,"ripemd160":234,"sha.js":236}],173:[function(require,module,exports){
+},{"./md5":185,"buffer":179,"cipher-base":180,"inherits":203,"ripemd160":245,"sha.js":247}],184:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var intSize = 4
@@ -24869,7 +42146,7 @@ module.exports = function hash (buf, fn) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168}],174:[function(require,module,exports){
+},{"buffer":179}],185:[function(require,module,exports){
 'use strict'
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
@@ -25022,7 +42299,7 @@ module.exports = function md5 (buf) {
   return makeHash(buf, core_md5)
 }
 
-},{"./make-hash":173}],175:[function(require,module,exports){
+},{"./make-hash":184}],186:[function(require,module,exports){
 'use strict'
 var inherits = require('inherits')
 var Legacy = require('./legacy')
@@ -25086,7 +42363,7 @@ module.exports = function createHmac (alg, key) {
   return new Hmac(alg, key)
 }
 
-},{"./legacy":176,"cipher-base":169,"create-hash/md5":174,"inherits":192,"ripemd160":234,"safe-buffer":431,"sha.js":236}],176:[function(require,module,exports){
+},{"./legacy":187,"cipher-base":180,"create-hash/md5":185,"inherits":203,"ripemd160":245,"safe-buffer":457,"sha.js":247}],187:[function(require,module,exports){
 'use strict'
 var inherits = require('inherits')
 var Buffer = require('safe-buffer').Buffer
@@ -25134,7 +42411,7 @@ Hmac.prototype._final = function () {
 }
 module.exports = Hmac
 
-},{"cipher-base":169,"inherits":192,"safe-buffer":431}],177:[function(require,module,exports){
+},{"cipher-base":180,"inherits":203,"safe-buffer":457}],188:[function(require,module,exports){
 'use strict'
 
 exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = require('randombytes')
@@ -25228,7 +42505,7 @@ exports.constants = {
   'POINT_CONVERSION_HYBRID': 6
 }
 
-},{"browserify-cipher":157,"browserify-sign":164,"browserify-sign/algos":161,"create-ecdh":171,"create-hash":172,"create-hmac":175,"diffie-hellman":184,"pbkdf2":202,"public-encrypt":209,"randombytes":219}],178:[function(require,module,exports){
+},{"browserify-cipher":168,"browserify-sign":175,"browserify-sign/algos":172,"create-ecdh":182,"create-hash":183,"create-hmac":186,"diffie-hellman":195,"pbkdf2":213,"public-encrypt":220,"randombytes":230}],189:[function(require,module,exports){
 'use strict';
 
 exports.utils = require('./des/utils');
@@ -25237,7 +42514,7 @@ exports.DES = require('./des/des');
 exports.CBC = require('./des/cbc');
 exports.EDE = require('./des/ede');
 
-},{"./des/cbc":179,"./des/cipher":180,"./des/des":181,"./des/ede":182,"./des/utils":183}],179:[function(require,module,exports){
+},{"./des/cbc":190,"./des/cipher":191,"./des/des":192,"./des/ede":193,"./des/utils":194}],190:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -25304,7 +42581,7 @@ proto._update = function _update(inp, inOff, out, outOff) {
   }
 };
 
-},{"inherits":192,"minimalistic-assert":196}],180:[function(require,module,exports){
+},{"inherits":203,"minimalistic-assert":207}],191:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -25447,7 +42724,7 @@ Cipher.prototype._finalDecrypt = function _finalDecrypt() {
   return this._unpad(out);
 };
 
-},{"minimalistic-assert":196}],181:[function(require,module,exports){
+},{"minimalistic-assert":207}],192:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -25592,7 +42869,7 @@ DES.prototype._decrypt = function _decrypt(state, lStart, rStart, out, off) {
   utils.rip(l, r, out, off);
 };
 
-},{"../des":178,"inherits":192,"minimalistic-assert":196}],182:[function(require,module,exports){
+},{"../des":189,"inherits":203,"minimalistic-assert":207}],193:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -25649,7 +42926,7 @@ EDE.prototype._update = function _update(inp, inOff, out, outOff) {
 EDE.prototype._pad = DES.prototype._pad;
 EDE.prototype._unpad = DES.prototype._unpad;
 
-},{"../des":178,"inherits":192,"minimalistic-assert":196}],183:[function(require,module,exports){
+},{"../des":189,"inherits":203,"minimalistic-assert":207}],194:[function(require,module,exports){
 'use strict';
 
 exports.readUInt32BE = function readUInt32BE(bytes, off) {
@@ -25907,7 +43184,7 @@ exports.padSplit = function padSplit(num, size, group) {
   return out.join(' ');
 };
 
-},{}],184:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 (function (Buffer){
 var generatePrime = require('./lib/generatePrime')
 var primes = require('./lib/primes.json')
@@ -25953,7 +43230,7 @@ exports.DiffieHellmanGroup = exports.createDiffieHellmanGroup = exports.getDiffi
 exports.createDiffieHellman = exports.DiffieHellman = createDiffieHellman
 
 }).call(this,require("buffer").Buffer)
-},{"./lib/dh":185,"./lib/generatePrime":186,"./lib/primes.json":187,"buffer":168}],185:[function(require,module,exports){
+},{"./lib/dh":196,"./lib/generatePrime":197,"./lib/primes.json":198,"buffer":179}],196:[function(require,module,exports){
 (function (Buffer){
 var BN = require('bn.js');
 var MillerRabin = require('miller-rabin');
@@ -26121,7 +43398,7 @@ function formatReturnValue(bn, enc) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./generatePrime":186,"bn.js":138,"buffer":168,"miller-rabin":195,"randombytes":219}],186:[function(require,module,exports){
+},{"./generatePrime":197,"bn.js":149,"buffer":179,"miller-rabin":206,"randombytes":230}],197:[function(require,module,exports){
 var randomBytes = require('randombytes');
 module.exports = findPrime;
 findPrime.simpleSieve = simpleSieve;
@@ -26228,7 +43505,7 @@ function findPrime(bits, gen) {
 
 }
 
-},{"bn.js":138,"miller-rabin":195,"randombytes":219}],187:[function(require,module,exports){
+},{"bn.js":149,"miller-rabin":206,"randombytes":230}],198:[function(require,module,exports){
 module.exports={
     "modp1": {
         "gen": "02",
@@ -26263,7 +43540,7 @@ module.exports={
         "prime": "ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c93402849236c3fab4d27c7026c1d4dcb2602646dec9751e763dba37bdf8ff9406ad9e530ee5db382f413001aeb06a53ed9027d831179727b0865a8918da3edbebcf9b14ed44ce6cbaced4bb1bdb7f1447e6cc254b332051512bd7af426fb8f401378cd2bf5983ca01c64b92ecf032ea15d1721d03f482d7ce6e74fef6d55e702f46980c82b5a84031900b1c9e59e7c97fbec7e8f323a97a7e36cc88be0f1d45b7ff585ac54bd407b22b4154aacc8f6d7ebf48e1d814cc5ed20f8037e0a79715eef29be32806a1d58bb7c5da76f550aa3d8a1fbff0eb19ccb1a313d55cda56c9ec2ef29632387fe8d76e3c0468043e8f663f4860ee12bf2d5b0b7474d6e694f91e6dbe115974a3926f12fee5e438777cb6a932df8cd8bec4d073b931ba3bc832b68d9dd300741fa7bf8afc47ed2576f6936ba424663aab639c5ae4f5683423b4742bf1c978238f16cbe39d652de3fdb8befc848ad922222e04a4037c0713eb57a81a23f0c73473fc646cea306b4bcbc8862f8385ddfa9d4b7fa2c087e879683303ed5bdd3a062b3cf5b3a278a66d2a13f83f44f82ddf310ee074ab6a364597e899a0255dc164f31cc50846851df9ab48195ded7ea1b1d510bd7ee74d73faf36bc31ecfa268359046f4eb879f924009438b481c6cd7889a002ed5ee382bc9190da6fc026e479558e4475677e9aa9e3050e2765694dfc81f56e880b96e7160c980dd98edd3dfffffffffffffffff"
     }
 }
-},{}],188:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -26567,7 +43844,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],189:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var MD5 = require('md5.js')
 
@@ -26614,7 +43891,7 @@ function EVP_BytesToKey (password, salt, keyBits, ivLen) {
 
 module.exports = EVP_BytesToKey
 
-},{"md5.js":417,"safe-buffer":431}],190:[function(require,module,exports){
+},{"md5.js":434,"safe-buffer":457}],201:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -26700,7 +43977,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],191:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -26711,7 +43988,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],192:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -26736,7 +44013,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],193:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -26759,14 +44036,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],194:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],195:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 var bn = require('bn.js');
 var brorand = require('brorand');
 
@@ -26883,7 +44160,7 @@ MillerRabin.prototype.getDivisor = function getDivisor(n, k) {
   return false;
 };
 
-},{"bn.js":138,"brorand":139}],196:[function(require,module,exports){
+},{"bn.js":149,"brorand":150}],207:[function(require,module,exports){
 module.exports = assert;
 
 function assert(val, msg) {
@@ -26896,7 +44173,7 @@ assert.equal = function assertEqual(l, r, msg) {
     throw new Error(msg || ('Assertion failed: ' + l + ' != ' + r));
 };
 
-},{}],197:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.2": "aes-128-cbc",
 "2.16.840.1.101.3.4.1.3": "aes-128-ofb",
@@ -26910,7 +44187,7 @@ module.exports={"2.16.840.1.101.3.4.1.1": "aes-128-ecb",
 "2.16.840.1.101.3.4.1.43": "aes-256-ofb",
 "2.16.840.1.101.3.4.1.44": "aes-256-cfb"
 }
-},{}],198:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 // from https://github.com/indutny/self-signed/blob/gh-pages/lib/asn1.js
 // Fedor, you are amazing.
 'use strict'
@@ -27034,7 +44311,7 @@ exports.signature = asn1.define('signature', function () {
   )
 })
 
-},{"./certificate":199,"asn1.js":122}],199:[function(require,module,exports){
+},{"./certificate":210,"asn1.js":133}],210:[function(require,module,exports){
 // from https://github.com/Rantanen/node-dtls/blob/25a7dc861bda38cfeac93a723500eea4f0ac2e86/Certificate.js
 // thanks to @Rantanen
 
@@ -27124,7 +44401,7 @@ var X509Certificate = asn.define('X509Certificate', function () {
 
 module.exports = X509Certificate
 
-},{"asn1.js":122}],200:[function(require,module,exports){
+},{"asn1.js":133}],211:[function(require,module,exports){
 (function (Buffer){
 // adapted from https://github.com/apatil/pemstrip
 var findProc = /Proc-Type: 4,ENCRYPTED\n\r?DEK-Info: AES-((?:128)|(?:192)|(?:256))-CBC,([0-9A-H]+)\n\r?\n\r?([0-9A-z\n\r\+\/\=]+)\n\r?/m
@@ -27158,7 +44435,7 @@ module.exports = function (okey, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"browserify-aes":143,"buffer":168,"evp_bytestokey":189}],201:[function(require,module,exports){
+},{"browserify-aes":154,"buffer":179,"evp_bytestokey":200}],212:[function(require,module,exports){
 (function (Buffer){
 var asn1 = require('./asn1')
 var aesid = require('./aesid.json')
@@ -27268,13 +44545,13 @@ function decrypt (data, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./aesid.json":197,"./asn1":198,"./fixProc":200,"browserify-aes":143,"buffer":168,"pbkdf2":202}],202:[function(require,module,exports){
+},{"./aesid.json":208,"./asn1":209,"./fixProc":211,"browserify-aes":154,"buffer":179,"pbkdf2":213}],213:[function(require,module,exports){
 
 exports.pbkdf2 = require('./lib/async')
 
 exports.pbkdf2Sync = require('./lib/sync')
 
-},{"./lib/async":203,"./lib/sync":206}],203:[function(require,module,exports){
+},{"./lib/async":214,"./lib/sync":217}],214:[function(require,module,exports){
 (function (process,global){
 var checkParameters = require('./precondition')
 var defaultEncoding = require('./default-encoding')
@@ -27376,7 +44653,7 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./default-encoding":204,"./precondition":205,"./sync":206,"_process":208,"safe-buffer":431}],204:[function(require,module,exports){
+},{"./default-encoding":215,"./precondition":216,"./sync":217,"_process":219,"safe-buffer":457}],215:[function(require,module,exports){
 (function (process){
 var defaultEncoding
 /* istanbul ignore next */
@@ -27390,7 +44667,7 @@ if (process.browser) {
 module.exports = defaultEncoding
 
 }).call(this,require('_process'))
-},{"_process":208}],205:[function(require,module,exports){
+},{"_process":219}],216:[function(require,module,exports){
 var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
 module.exports = function (iterations, keylen) {
   if (typeof iterations !== 'number') {
@@ -27410,7 +44687,7 @@ module.exports = function (iterations, keylen) {
   }
 }
 
-},{}],206:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 var md5 = require('create-hash/md5')
 var rmd160 = require('ripemd160')
 var sha = require('sha.js')
@@ -27513,7 +44790,7 @@ function pbkdf2 (password, salt, iterations, keylen, digest) {
 
 module.exports = pbkdf2
 
-},{"./default-encoding":204,"./precondition":205,"create-hash/md5":174,"ripemd160":234,"safe-buffer":431,"sha.js":236}],207:[function(require,module,exports){
+},{"./default-encoding":215,"./precondition":216,"create-hash/md5":185,"ripemd160":245,"safe-buffer":457,"sha.js":247}],218:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -27560,7 +44837,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":208}],208:[function(require,module,exports){
+},{"_process":219}],219:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -27746,7 +45023,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],209:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 exports.publicEncrypt = require('./publicEncrypt');
 exports.privateDecrypt = require('./privateDecrypt');
 
@@ -27757,7 +45034,7 @@ exports.privateEncrypt = function privateEncrypt(key, buf) {
 exports.publicDecrypt = function publicDecrypt(key, buf) {
   return exports.privateDecrypt(key, buf, true);
 };
-},{"./privateDecrypt":211,"./publicEncrypt":212}],210:[function(require,module,exports){
+},{"./privateDecrypt":222,"./publicEncrypt":223}],221:[function(require,module,exports){
 (function (Buffer){
 var createHash = require('create-hash');
 module.exports = function (seed, len) {
@@ -27776,7 +45053,7 @@ function i2ops(c) {
   return out;
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"create-hash":172}],211:[function(require,module,exports){
+},{"buffer":179,"create-hash":183}],222:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var mgf = require('./mgf');
@@ -27887,7 +45164,7 @@ function compare(a, b){
   return dif;
 }
 }).call(this,require("buffer").Buffer)
-},{"./mgf":210,"./withPublic":213,"./xor":214,"bn.js":138,"browserify-rsa":160,"buffer":168,"create-hash":172,"parse-asn1":201}],212:[function(require,module,exports){
+},{"./mgf":221,"./withPublic":224,"./xor":225,"bn.js":149,"browserify-rsa":171,"buffer":179,"create-hash":183,"parse-asn1":212}],223:[function(require,module,exports){
 (function (Buffer){
 var parseKeys = require('parse-asn1');
 var randomBytes = require('randombytes');
@@ -27985,7 +45262,7 @@ function nonZero(len, crypto) {
   return out;
 }
 }).call(this,require("buffer").Buffer)
-},{"./mgf":210,"./withPublic":213,"./xor":214,"bn.js":138,"browserify-rsa":160,"buffer":168,"create-hash":172,"parse-asn1":201,"randombytes":219}],213:[function(require,module,exports){
+},{"./mgf":221,"./withPublic":224,"./xor":225,"bn.js":149,"browserify-rsa":171,"buffer":179,"create-hash":183,"parse-asn1":212,"randombytes":230}],224:[function(require,module,exports){
 (function (Buffer){
 var bn = require('bn.js');
 function withPublic(paddedMsg, key) {
@@ -27998,7 +45275,7 @@ function withPublic(paddedMsg, key) {
 
 module.exports = withPublic;
 }).call(this,require("buffer").Buffer)
-},{"bn.js":138,"buffer":168}],214:[function(require,module,exports){
+},{"bn.js":149,"buffer":179}],225:[function(require,module,exports){
 module.exports = function xor(a, b) {
   var len = a.length;
   var i = -1;
@@ -28007,7 +45284,7 @@ module.exports = function xor(a, b) {
   }
   return a
 };
-},{}],215:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -28544,7 +45821,7 @@ module.exports = function xor(a, b) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],216:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28630,7 +45907,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],217:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28717,13 +45994,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],218:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":216,"./encode":217}],219:[function(require,module,exports){
+},{"./decode":227,"./encode":228}],230:[function(require,module,exports){
 (function (process,global){
 'use strict'
 
@@ -28765,10 +46042,10 @@ function randomBytes (size, cb) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":208,"safe-buffer":431}],220:[function(require,module,exports){
+},{"_process":219,"safe-buffer":457}],231:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":221}],221:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":232}],232:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28893,7 +46170,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":223,"./_stream_writable":225,"core-util-is":170,"inherits":192,"process-nextick-args":207}],222:[function(require,module,exports){
+},{"./_stream_readable":234,"./_stream_writable":236,"core-util-is":181,"inherits":203,"process-nextick-args":218}],233:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28941,7 +46218,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":224,"core-util-is":170,"inherits":192}],223:[function(require,module,exports){
+},{"./_stream_transform":235,"core-util-is":181,"inherits":203}],234:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -29951,7 +47228,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":221,"./internal/streams/BufferList":226,"./internal/streams/destroy":227,"./internal/streams/stream":228,"_process":208,"core-util-is":170,"events":188,"inherits":192,"isarray":194,"process-nextick-args":207,"safe-buffer":431,"string_decoder/":229,"util":140}],224:[function(require,module,exports){
+},{"./_stream_duplex":232,"./internal/streams/BufferList":237,"./internal/streams/destroy":238,"./internal/streams/stream":239,"_process":219,"core-util-is":181,"events":199,"inherits":203,"isarray":205,"process-nextick-args":218,"safe-buffer":457,"string_decoder/":240,"util":151}],235:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -30166,7 +47443,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":221,"core-util-is":170,"inherits":192}],225:[function(require,module,exports){
+},{"./_stream_duplex":232,"core-util-is":181,"inherits":203}],236:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -30833,7 +48110,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":221,"./internal/streams/destroy":227,"./internal/streams/stream":228,"_process":208,"core-util-is":170,"inherits":192,"process-nextick-args":207,"safe-buffer":431,"util-deprecate":247}],226:[function(require,module,exports){
+},{"./_stream_duplex":232,"./internal/streams/destroy":238,"./internal/streams/stream":239,"_process":219,"core-util-is":181,"inherits":203,"process-nextick-args":218,"safe-buffer":457,"util-deprecate":258}],237:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -30908,7 +48185,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":431}],227:[function(require,module,exports){
+},{"safe-buffer":457}],238:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -30981,10 +48258,10 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":207}],228:[function(require,module,exports){
+},{"process-nextick-args":218}],239:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":188}],229:[function(require,module,exports){
+},{"events":199}],240:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -31257,10 +48534,10 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":431}],230:[function(require,module,exports){
+},{"safe-buffer":457}],241:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":231}],231:[function(require,module,exports){
+},{"./readable":242}],242:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -31269,13 +48546,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":221,"./lib/_stream_passthrough.js":222,"./lib/_stream_readable.js":223,"./lib/_stream_transform.js":224,"./lib/_stream_writable.js":225}],232:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":232,"./lib/_stream_passthrough.js":233,"./lib/_stream_readable.js":234,"./lib/_stream_transform.js":235,"./lib/_stream_writable.js":236}],243:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":231}],233:[function(require,module,exports){
+},{"./readable":242}],244:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":225}],234:[function(require,module,exports){
+},{"./lib/_stream_writable.js":236}],245:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var inherits = require('inherits')
@@ -31570,7 +48847,7 @@ function fn5 (a, b, c, d, e, m, k, s) {
 module.exports = RIPEMD160
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"hash-base":338,"inherits":192}],235:[function(require,module,exports){
+},{"buffer":179,"hash-base":349,"inherits":203}],246:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 // prototype class for hash functions
@@ -31653,7 +48930,7 @@ Hash.prototype._update = function () {
 
 module.exports = Hash
 
-},{"safe-buffer":431}],236:[function(require,module,exports){
+},{"safe-buffer":457}],247:[function(require,module,exports){
 var exports = module.exports = function SHA (algorithm) {
   algorithm = algorithm.toLowerCase()
 
@@ -31670,7 +48947,7 @@ exports.sha256 = require('./sha256')
 exports.sha384 = require('./sha384')
 exports.sha512 = require('./sha512')
 
-},{"./sha":237,"./sha1":238,"./sha224":239,"./sha256":240,"./sha384":241,"./sha512":242}],237:[function(require,module,exports){
+},{"./sha":248,"./sha1":249,"./sha224":250,"./sha256":251,"./sha384":252,"./sha512":253}],248:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-0, as defined
  * in FIPS PUB 180-1
@@ -31766,7 +49043,7 @@ Sha.prototype._hash = function () {
 
 module.exports = Sha
 
-},{"./hash":235,"inherits":192,"safe-buffer":431}],238:[function(require,module,exports){
+},{"./hash":246,"inherits":203,"safe-buffer":457}],249:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -31867,7 +49144,7 @@ Sha1.prototype._hash = function () {
 
 module.exports = Sha1
 
-},{"./hash":235,"inherits":192,"safe-buffer":431}],239:[function(require,module,exports){
+},{"./hash":246,"inherits":203,"safe-buffer":457}],250:[function(require,module,exports){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -31922,7 +49199,7 @@ Sha224.prototype._hash = function () {
 
 module.exports = Sha224
 
-},{"./hash":235,"./sha256":240,"inherits":192,"safe-buffer":431}],240:[function(require,module,exports){
+},{"./hash":246,"./sha256":251,"inherits":203,"safe-buffer":457}],251:[function(require,module,exports){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -32059,7 +49336,7 @@ Sha256.prototype._hash = function () {
 
 module.exports = Sha256
 
-},{"./hash":235,"inherits":192,"safe-buffer":431}],241:[function(require,module,exports){
+},{"./hash":246,"inherits":203,"safe-buffer":457}],252:[function(require,module,exports){
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
 var Hash = require('./hash')
@@ -32118,7 +49395,7 @@ Sha384.prototype._hash = function () {
 
 module.exports = Sha384
 
-},{"./hash":235,"./sha512":242,"inherits":192,"safe-buffer":431}],242:[function(require,module,exports){
+},{"./hash":246,"./sha512":253,"inherits":203,"safe-buffer":457}],253:[function(require,module,exports){
 var inherits = require('inherits')
 var Hash = require('./hash')
 var Buffer = require('safe-buffer').Buffer
@@ -32380,7 +49657,7 @@ Sha512.prototype._hash = function () {
 
 module.exports = Sha512
 
-},{"./hash":235,"inherits":192,"safe-buffer":431}],243:[function(require,module,exports){
+},{"./hash":246,"inherits":203,"safe-buffer":457}],254:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -32509,7 +49786,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":188,"inherits":192,"readable-stream/duplex.js":220,"readable-stream/passthrough.js":230,"readable-stream/readable.js":231,"readable-stream/transform.js":232,"readable-stream/writable.js":233}],244:[function(require,module,exports){
+},{"events":199,"inherits":203,"readable-stream/duplex.js":231,"readable-stream/passthrough.js":241,"readable-stream/readable.js":242,"readable-stream/transform.js":243,"readable-stream/writable.js":244}],255:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -32732,7 +50009,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":168}],245:[function(require,module,exports){
+},{"buffer":179}],256:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -33466,7 +50743,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":246,"punycode":215,"querystring":218}],246:[function(require,module,exports){
+},{"./util":257,"punycode":226,"querystring":229}],257:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -33484,7 +50761,7 @@ module.exports = {
   }
 };
 
-},{}],247:[function(require,module,exports){
+},{}],258:[function(require,module,exports){
 (function (global){
 
 /**
@@ -33555,16 +50832,16 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],248:[function(require,module,exports){
-arguments[4][192][0].apply(exports,arguments)
-},{"dup":192}],249:[function(require,module,exports){
+},{}],259:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],260:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],250:[function(require,module,exports){
+},{}],261:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -34154,7 +51431,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":249,"_process":208,"inherits":248}],251:[function(require,module,exports){
+},{"./support/isBuffer":260,"_process":219,"inherits":259}],262:[function(require,module,exports){
 var indexOf = require('indexof');
 
 var Object_keys = function (obj) {
@@ -34294,13 +51571,13 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{"indexof":191}],252:[function(require,module,exports){
+},{"indexof":202}],263:[function(require,module,exports){
 var basex = require('base-x')
 var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
 module.exports = basex(ALPHABET)
 
-},{"base-x":61}],253:[function(require,module,exports){
+},{"base-x":63}],264:[function(require,module,exports){
 'use strict'
 
 var base58 = require('bs58')
@@ -34352,7 +51629,7 @@ module.exports = function (checksumFn) {
   }
 }
 
-},{"bs58":252,"safe-buffer":255}],254:[function(require,module,exports){
+},{"bs58":263,"safe-buffer":266}],265:[function(require,module,exports){
 'use strict'
 
 var createHash = require('create-hash')
@@ -34366,7 +51643,7 @@ function sha256x2 (buffer) {
 
 module.exports = bs58checkBase(sha256x2)
 
-},{"./base":253,"create-hash":268}],255:[function(require,module,exports){
+},{"./base":264,"create-hash":279}],266:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -34430,7 +51707,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":168}],256:[function(require,module,exports){
+},{"buffer":179}],267:[function(require,module,exports){
 /**
  * Export cheerio (with )
  */
@@ -34443,7 +51720,7 @@ exports = module.exports = require('./lib/cheerio');
 
 exports.version = require('./package.json').version;
 
-},{"./lib/cheerio":262,"./package.json":266}],257:[function(require,module,exports){
+},{"./lib/cheerio":273,"./package.json":277}],268:[function(require,module,exports){
 var $ = require('../static'),
     utils = require('../utils'),
     isTag = utils.isTag,
@@ -34940,7 +52217,7 @@ exports.is = function (selector) {
 };
 
 
-},{"../static":264,"../utils":265,"lodash.assignin":405,"lodash.foreach":410,"lodash.some":416}],258:[function(require,module,exports){
+},{"../static":275,"../utils":276,"lodash.assignin":422,"lodash.foreach":427,"lodash.some":433}],269:[function(require,module,exports){
 var domEach = require('../utils').domEach,
     _ = {
       pick: require('lodash.pick'),
@@ -35063,7 +52340,7 @@ function parse(styles) {
     }, {});
 }
 
-},{"../utils":265,"lodash.pick":413}],259:[function(require,module,exports){
+},{"../utils":276,"lodash.pick":430}],270:[function(require,module,exports){
 // https://github.com/jquery/jquery/blob/2.1.3/src/manipulation/var/rcheckableType.js
 // https://github.com/jquery/jquery/blob/2.1.3/src/serialize.js
 var submittableSelector = 'input,select,textarea,keygen',
@@ -35130,7 +52407,7 @@ exports.serializeArray = function() {
     }).get();
 };
 
-},{"lodash.map":411}],260:[function(require,module,exports){
+},{"lodash.map":428}],271:[function(require,module,exports){
 var parse = require('../parse'),
     $ = require('../static'),
     updateDOM = parse.update,
@@ -35557,7 +52834,7 @@ exports.clone = function() {
   return this._make(cloneDom(this.get(), this.options));
 };
 
-},{"../parse":263,"../static":264,"../utils":265,"lodash.bind":406,"lodash.flatten":409,"lodash.foreach":410}],261:[function(require,module,exports){
+},{"../parse":274,"../static":275,"../utils":276,"lodash.bind":423,"lodash.flatten":426,"lodash.foreach":427}],272:[function(require,module,exports){
 var select = require('css-select'),
     utils = require('../utils'),
     domEach = utils.domEach,
@@ -35988,7 +53265,7 @@ exports.addBack = function(selector) {
   );
 };
 
-},{"../utils":265,"css-select":273,"htmlparser2":359,"lodash.bind":406,"lodash.filter":408,"lodash.foreach":410,"lodash.reduce":414,"lodash.reject":415}],262:[function(require,module,exports){
+},{"../utils":276,"css-select":284,"htmlparser2":370,"lodash.bind":423,"lodash.filter":425,"lodash.foreach":427,"lodash.reduce":431,"lodash.reject":432}],273:[function(require,module,exports){
 /*
   Module dependencies
 */
@@ -36138,7 +53415,7 @@ var isNode = function(obj) {
   return obj.name || obj.type === 'text' || obj.type === 'comment';
 };
 
-},{"./api/attributes":257,"./api/css":258,"./api/forms":259,"./api/manipulation":260,"./api/traversing":261,"./parse":263,"./static":264,"./utils":265,"lodash.assignin":405,"lodash.bind":406,"lodash.defaults":407,"lodash.foreach":410}],263:[function(require,module,exports){
+},{"./api/attributes":268,"./api/css":269,"./api/forms":270,"./api/manipulation":271,"./api/traversing":272,"./parse":274,"./static":275,"./utils":276,"lodash.assignin":422,"lodash.bind":423,"lodash.defaults":424,"lodash.foreach":427}],274:[function(require,module,exports){
 (function (Buffer){
 /*
   Module Dependencies
@@ -36228,7 +53505,7 @@ exports.update = function(arr, parent) {
 // module.exports = $.extend(exports);
 
 }).call(this,{"isBuffer":require("../../browserify/node_modules/is-buffer/index.js")})
-},{"../../browserify/node_modules/is-buffer/index.js":193,"htmlparser2":359}],264:[function(require,module,exports){
+},{"../../browserify/node_modules/is-buffer/index.js":204,"htmlparser2":370}],275:[function(require,module,exports){
 /**
  * Module dependencies
  */
@@ -36417,7 +53694,7 @@ exports.contains = function(container, contained) {
   return false;
 };
 
-},{"./cheerio":262,"./parse":263,"css-select":273,"dom-serializer":282,"lodash.defaults":407,"lodash.merge":412}],265:[function(require,module,exports){
+},{"./cheerio":273,"./parse":274,"css-select":284,"dom-serializer":293,"lodash.defaults":424,"lodash.merge":429}],276:[function(require,module,exports){
 var parse = require('./parse'),
     render = require('dom-serializer');
 
@@ -36502,7 +53779,7 @@ exports.isHtml = function(str) {
   return !!(match && match[1]);
 };
 
-},{"./parse":263,"dom-serializer":282}],266:[function(require,module,exports){
+},{"./parse":274,"dom-serializer":293}],277:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -36599,9 +53876,9 @@ module.exports={
   "version": "0.22.0"
 }
 
-},{}],267:[function(require,module,exports){
-arguments[4][169][0].apply(exports,arguments)
-},{"dup":169,"inherits":361,"safe-buffer":431,"stream":243,"string_decoder":244}],268:[function(require,module,exports){
+},{}],278:[function(require,module,exports){
+arguments[4][180][0].apply(exports,arguments)
+},{"dup":180,"inherits":378,"safe-buffer":457,"stream":254,"string_decoder":255}],279:[function(require,module,exports){
 'use strict'
 var inherits = require('inherits')
 var MD5 = require('md5.js')
@@ -36633,18 +53910,18 @@ module.exports = function createHash (alg) {
   return new Hash(sha(alg))
 }
 
-},{"cipher-base":267,"inherits":361,"md5.js":417,"ripemd160":430,"sha.js":436}],269:[function(require,module,exports){
+},{"cipher-base":278,"inherits":378,"md5.js":434,"ripemd160":456,"sha.js":462}],280:[function(require,module,exports){
 var MD5 = require('md5.js')
 
 module.exports = function (buffer) {
   return new MD5().update(buffer).digest()
 }
 
-},{"md5.js":417}],270:[function(require,module,exports){
-arguments[4][175][0].apply(exports,arguments)
-},{"./legacy":271,"cipher-base":267,"create-hash/md5":269,"dup":175,"inherits":361,"ripemd160":430,"safe-buffer":431,"sha.js":436}],271:[function(require,module,exports){
-arguments[4][176][0].apply(exports,arguments)
-},{"cipher-base":267,"dup":176,"inherits":361,"safe-buffer":431}],272:[function(require,module,exports){
+},{"md5.js":434}],281:[function(require,module,exports){
+arguments[4][186][0].apply(exports,arguments)
+},{"./legacy":282,"cipher-base":278,"create-hash/md5":280,"dup":186,"inherits":378,"ripemd160":456,"safe-buffer":457,"sha.js":462}],282:[function(require,module,exports){
+arguments[4][187][0].apply(exports,arguments)
+},{"cipher-base":278,"dup":187,"inherits":378,"safe-buffer":457}],283:[function(require,module,exports){
 (function(self) {
 
   if (self.fetch) {
@@ -37111,7 +54388,7 @@ arguments[4][176][0].apply(exports,arguments)
   self.fetch.polyfill = true;
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],273:[function(require,module,exports){
+},{}],284:[function(require,module,exports){
 "use strict";
 
 module.exports = CSSselect;
@@ -37172,7 +54449,7 @@ CSSselect.iterate = selectAll;
 CSSselect._compileUnsafe = compileUnsafe;
 CSSselect._compileToken = compileToken;
 
-},{"./lib/compile.js":275,"./lib/pseudos.js":278,"boolbase":120,"domutils":288}],274:[function(require,module,exports){
+},{"./lib/compile.js":286,"./lib/pseudos.js":289,"boolbase":131,"domutils":299}],285:[function(require,module,exports){
 var DomUtils  = require("domutils"),
     hasAttrib = DomUtils.hasAttrib,
     getAttributeValue = DomUtils.getAttributeValue,
@@ -37355,7 +54632,7 @@ module.exports = {
 	rules: attributeRules
 };
 
-},{"boolbase":120,"domutils":288}],275:[function(require,module,exports){
+},{"boolbase":131,"domutils":299}],286:[function(require,module,exports){
 /*
 	compiles a selector to an executable function
 */
@@ -37549,7 +54826,7 @@ filters.matches = function(next, token, options, context){
 	return compileToken(token, opts, context);
 };
 
-},{"./general.js":276,"./procedure.json":277,"./pseudos.js":278,"./sort.js":279,"boolbase":120,"css-what":280,"domutils":288}],276:[function(require,module,exports){
+},{"./general.js":287,"./procedure.json":288,"./pseudos.js":289,"./sort.js":290,"boolbase":131,"css-what":291,"domutils":299}],287:[function(require,module,exports){
 var DomUtils    = require("domutils"),
     isTag       = DomUtils.isTag,
     getParent   = DomUtils.getParent,
@@ -37639,7 +54916,7 @@ module.exports = {
 		return next;
 	}
 };
-},{"./attributes.js":274,"./pseudos.js":278,"domutils":288}],277:[function(require,module,exports){
+},{"./attributes.js":285,"./pseudos.js":289,"domutils":299}],288:[function(require,module,exports){
 module.exports={
   "universal": 50,
   "tag": 30,
@@ -37652,7 +54929,7 @@ module.exports={
   "adjacent": -1
 }
 
-},{}],278:[function(require,module,exports){
+},{}],289:[function(require,module,exports){
 /*
 	pseudo selectors
 
@@ -38047,7 +55324,7 @@ module.exports = {
 	pseudos: pseudos
 };
 
-},{"./attributes.js":274,"boolbase":120,"domutils":288,"nth-check":423}],279:[function(require,module,exports){
+},{"./attributes.js":285,"boolbase":131,"domutils":299,"nth-check":442}],290:[function(require,module,exports){
 module.exports = sortByProcedure;
 
 /*
@@ -38129,7 +55406,7 @@ function getProcedure(token){
 	return proc;
 }
 
-},{"./procedure.json":277}],280:[function(require,module,exports){
+},{"./procedure.json":288}],291:[function(require,module,exports){
 "use strict";
 
 module.exports = parse;
@@ -38398,7 +55675,7 @@ function addToken(subselects, tokens){
 	subselects.push(tokens);
 }
 
-},{}],281:[function(require,module,exports){
+},{}],292:[function(require,module,exports){
 function _registerEvent(target, eventType, cb) {
     if (target.addEventListener) {
         target.addEventListener(eventType, cb);
@@ -38626,7 +55903,7 @@ module.exports = function(uri, failCb, successCb, unsupportedCb) {
     }
 }
 
-},{}],282:[function(require,module,exports){
+},{}],293:[function(require,module,exports){
 /*
   Module dependencies
 */
@@ -38806,7 +56083,7 @@ function renderComment(elem) {
   return '<!--' + elem.data + '-->';
 }
 
-},{"domelementtype":283,"entities":329}],283:[function(require,module,exports){
+},{"domelementtype":294,"entities":340}],294:[function(require,module,exports){
 //Types of elements found in the DOM
 module.exports = {
 	Text: "text", //Text
@@ -38821,7 +56098,7 @@ module.exports = {
 		return elem.type === "tag" || elem.type === "script" || elem.type === "style";
 	}
 };
-},{}],284:[function(require,module,exports){
+},{}],295:[function(require,module,exports){
 //Types of elements found in the DOM
 module.exports = {
 	Text: "text", //Text
@@ -38838,7 +56115,7 @@ module.exports = {
 	}
 };
 
-},{}],285:[function(require,module,exports){
+},{}],296:[function(require,module,exports){
 var ElementType = require("domelementtype");
 
 var re_whitespace = /\s+/g;
@@ -39057,7 +56334,7 @@ DomHandler.prototype.onprocessinginstruction = function(name, data){
 
 module.exports = DomHandler;
 
-},{"./lib/element":286,"./lib/node":287,"domelementtype":284}],286:[function(require,module,exports){
+},{"./lib/element":297,"./lib/node":298,"domelementtype":295}],297:[function(require,module,exports){
 // DOM-Level-1-compliant structure
 var NodePrototype = require('./node');
 var ElementPrototype = module.exports = Object.create(NodePrototype);
@@ -39079,7 +56356,7 @@ Object.keys(domLvl1).forEach(function(key) {
 	});
 });
 
-},{"./node":287}],287:[function(require,module,exports){
+},{"./node":298}],298:[function(require,module,exports){
 // This object will be used as the prototype for Nodes when creating a
 // DOM-Level-1-compliant structure.
 var NodePrototype = module.exports = {
@@ -39125,7 +56402,7 @@ Object.keys(domLvl1).forEach(function(key) {
 	});
 });
 
-},{}],288:[function(require,module,exports){
+},{}],299:[function(require,module,exports){
 var DomUtils = module.exports;
 
 [
@@ -39141,7 +56418,7 @@ var DomUtils = module.exports;
 	});
 });
 
-},{"./lib/helpers":289,"./lib/legacy":290,"./lib/manipulation":291,"./lib/querying":292,"./lib/stringify":293,"./lib/traversal":294}],289:[function(require,module,exports){
+},{"./lib/helpers":300,"./lib/legacy":301,"./lib/manipulation":302,"./lib/querying":303,"./lib/stringify":304,"./lib/traversal":305}],300:[function(require,module,exports){
 // removeSubsets
 // Given an array of nodes, remove any member that is contained by another.
 exports.removeSubsets = function(nodes) {
@@ -39284,7 +56561,7 @@ exports.uniqueSort = function(nodes) {
 	return nodes;
 };
 
-},{}],290:[function(require,module,exports){
+},{}],301:[function(require,module,exports){
 var ElementType = require("domelementtype");
 var isTag = exports.isTag = ElementType.isTag;
 
@@ -39373,7 +56650,7 @@ exports.getElementsByTagType = function(type, element, recurse, limit){
 	return this.filter(Checks.tag_type(type), element, recurse, limit);
 };
 
-},{"domelementtype":284}],291:[function(require,module,exports){
+},{"domelementtype":295}],302:[function(require,module,exports){
 exports.removeElement = function(elem){
 	if(elem.prev) elem.prev.next = elem.next;
 	if(elem.next) elem.next.prev = elem.prev;
@@ -39452,7 +56729,7 @@ exports.prepend = function(elem, prev){
 
 
 
-},{}],292:[function(require,module,exports){
+},{}],303:[function(require,module,exports){
 var isTag = require("domelementtype").isTag;
 
 module.exports = {
@@ -39548,7 +56825,7 @@ function findAll(test, elems){
 	return result;
 }
 
-},{"domelementtype":284}],293:[function(require,module,exports){
+},{"domelementtype":295}],304:[function(require,module,exports){
 var ElementType = require("domelementtype"),
     getOuterHTML = require("dom-serializer"),
     isTag = ElementType.isTag;
@@ -39572,7 +56849,7 @@ function getText(elem){
 	return "";
 }
 
-},{"dom-serializer":282,"domelementtype":284}],294:[function(require,module,exports){
+},{"dom-serializer":293,"domelementtype":295}],305:[function(require,module,exports){
 var getChildren = exports.getChildren = function(elem){
 	return elem.children;
 };
@@ -39598,7 +56875,7 @@ exports.getName = function(elem){
 	return elem.name;
 };
 
-},{}],295:[function(require,module,exports){
+},{}],306:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -39613,7 +56890,7 @@ elliptic.curves = require('./elliptic/curves');
 elliptic.ec = require('./elliptic/ec');
 elliptic.eddsa = require('./elliptic/eddsa');
 
-},{"../package.json":328,"./elliptic/curve":298,"./elliptic/curves":301,"./elliptic/ec":302,"./elliptic/eddsa":305,"./elliptic/utils":309,"brorand":311}],296:[function(require,module,exports){
+},{"../package.json":339,"./elliptic/curve":309,"./elliptic/curves":312,"./elliptic/ec":313,"./elliptic/eddsa":316,"./elliptic/utils":320,"brorand":322}],307:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -39990,7 +57267,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../elliptic":295,"bn.js":310}],297:[function(require,module,exports){
+},{"../../elliptic":306,"bn.js":321}],308:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -40425,7 +57702,7 @@ Point.prototype.eqXToP = function eqXToP(x) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../elliptic":295,"../curve":298,"bn.js":310,"inherits":325}],298:[function(require,module,exports){
+},{"../../elliptic":306,"../curve":309,"bn.js":321,"inherits":336}],309:[function(require,module,exports){
 'use strict';
 
 var curve = exports;
@@ -40435,7 +57712,7 @@ curve.short = require('./short');
 curve.mont = require('./mont');
 curve.edwards = require('./edwards');
 
-},{"./base":296,"./edwards":297,"./mont":299,"./short":300}],299:[function(require,module,exports){
+},{"./base":307,"./edwards":308,"./mont":310,"./short":311}],310:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -40617,7 +57894,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../elliptic":295,"../curve":298,"bn.js":310,"inherits":325}],300:[function(require,module,exports){
+},{"../../elliptic":306,"../curve":309,"bn.js":321,"inherits":336}],311:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -41557,7 +58834,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../elliptic":295,"../curve":298,"bn.js":310,"inherits":325}],301:[function(require,module,exports){
+},{"../../elliptic":306,"../curve":309,"bn.js":321,"inherits":336}],312:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -41764,7 +59041,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":295,"./precomputed/secp256k1":308,"hash.js":312}],302:[function(require,module,exports){
+},{"../elliptic":306,"./precomputed/secp256k1":319,"hash.js":323}],313:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -42006,7 +59283,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../elliptic":295,"./key":303,"./signature":304,"bn.js":310,"hmac-drbg":324}],303:[function(require,module,exports){
+},{"../../elliptic":306,"./key":314,"./signature":315,"bn.js":321,"hmac-drbg":335}],314:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -42127,7 +59404,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"../../elliptic":295,"bn.js":310}],304:[function(require,module,exports){
+},{"../../elliptic":306,"bn.js":321}],315:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -42264,7 +59541,7 @@ Signature.prototype.toDER = function toDER(enc) {
   return utils.encode(res, enc);
 };
 
-},{"../../elliptic":295,"bn.js":310}],305:[function(require,module,exports){
+},{"../../elliptic":306,"bn.js":321}],316:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -42384,7 +59661,7 @@ EDDSA.prototype.isPoint = function isPoint(val) {
   return val instanceof this.pointClass;
 };
 
-},{"../../elliptic":295,"./key":306,"./signature":307,"hash.js":312}],306:[function(require,module,exports){
+},{"../../elliptic":306,"./key":317,"./signature":318,"hash.js":323}],317:[function(require,module,exports){
 'use strict';
 
 var elliptic = require('../../elliptic');
@@ -42482,7 +59759,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 
 module.exports = KeyPair;
 
-},{"../../elliptic":295}],307:[function(require,module,exports){
+},{"../../elliptic":306}],318:[function(require,module,exports){
 'use strict';
 
 var BN = require('bn.js');
@@ -42550,7 +59827,7 @@ Signature.prototype.toHex = function toHex() {
 
 module.exports = Signature;
 
-},{"../../elliptic":295,"bn.js":310}],308:[function(require,module,exports){
+},{"../../elliptic":306,"bn.js":321}],319:[function(require,module,exports){
 module.exports = {
   doubles: {
     step: 4,
@@ -43332,7 +60609,7 @@ module.exports = {
   }
 };
 
-},{}],309:[function(require,module,exports){
+},{}],320:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -43454,11 +60731,11 @@ function intFromLE(bytes) {
 utils.intFromLE = intFromLE;
 
 
-},{"bn.js":310,"minimalistic-assert":326,"minimalistic-crypto-utils":327}],310:[function(require,module,exports){
-arguments[4][119][0].apply(exports,arguments)
-},{"buffer":140,"dup":119}],311:[function(require,module,exports){
-arguments[4][121][0].apply(exports,arguments)
-},{"crypto":140,"dup":121}],312:[function(require,module,exports){
+},{"bn.js":321,"minimalistic-assert":337,"minimalistic-crypto-utils":338}],321:[function(require,module,exports){
+arguments[4][130][0].apply(exports,arguments)
+},{"buffer":151,"dup":130}],322:[function(require,module,exports){
+arguments[4][132][0].apply(exports,arguments)
+},{"crypto":151,"dup":132}],323:[function(require,module,exports){
 var hash = exports;
 
 hash.utils = require('./hash/utils');
@@ -43475,7 +60752,7 @@ hash.sha384 = hash.sha.sha384;
 hash.sha512 = hash.sha.sha512;
 hash.ripemd160 = hash.ripemd.ripemd160;
 
-},{"./hash/common":313,"./hash/hmac":314,"./hash/ripemd":315,"./hash/sha":316,"./hash/utils":323}],313:[function(require,module,exports){
+},{"./hash/common":324,"./hash/hmac":325,"./hash/ripemd":326,"./hash/sha":327,"./hash/utils":334}],324:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -43569,7 +60846,7 @@ BlockHash.prototype._pad = function pad() {
   return res;
 };
 
-},{"./utils":323,"minimalistic-assert":326}],314:[function(require,module,exports){
+},{"./utils":334,"minimalistic-assert":337}],325:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -43618,7 +60895,7 @@ Hmac.prototype.digest = function digest(enc) {
   return this.outer.digest(enc);
 };
 
-},{"./utils":323,"minimalistic-assert":326}],315:[function(require,module,exports){
+},{"./utils":334,"minimalistic-assert":337}],326:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -43766,7 +61043,7 @@ var sh = [
   8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11
 ];
 
-},{"./common":313,"./utils":323}],316:[function(require,module,exports){
+},{"./common":324,"./utils":334}],327:[function(require,module,exports){
 'use strict';
 
 exports.sha1 = require('./sha/1');
@@ -43775,7 +61052,7 @@ exports.sha256 = require('./sha/256');
 exports.sha384 = require('./sha/384');
 exports.sha512 = require('./sha/512');
 
-},{"./sha/1":317,"./sha/224":318,"./sha/256":319,"./sha/384":320,"./sha/512":321}],317:[function(require,module,exports){
+},{"./sha/1":328,"./sha/224":329,"./sha/256":330,"./sha/384":331,"./sha/512":332}],328:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -43851,7 +61128,7 @@ SHA1.prototype._digest = function digest(enc) {
     return utils.split32(this.h, 'big');
 };
 
-},{"../common":313,"../utils":323,"./common":322}],318:[function(require,module,exports){
+},{"../common":324,"../utils":334,"./common":333}],329:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -43883,7 +61160,7 @@ SHA224.prototype._digest = function digest(enc) {
 };
 
 
-},{"../utils":323,"./256":319}],319:[function(require,module,exports){
+},{"../utils":334,"./256":330}],330:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -43990,7 +61267,7 @@ SHA256.prototype._digest = function digest(enc) {
     return utils.split32(this.h, 'big');
 };
 
-},{"../common":313,"../utils":323,"./common":322,"minimalistic-assert":326}],320:[function(require,module,exports){
+},{"../common":324,"../utils":334,"./common":333,"minimalistic-assert":337}],331:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -44027,7 +61304,7 @@ SHA384.prototype._digest = function digest(enc) {
     return utils.split32(this.h.slice(0, 12), 'big');
 };
 
-},{"../utils":323,"./512":321}],321:[function(require,module,exports){
+},{"../utils":334,"./512":332}],332:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -44359,7 +61636,7 @@ function g1_512_lo(xh, xl) {
   return r;
 }
 
-},{"../common":313,"../utils":323,"minimalistic-assert":326}],322:[function(require,module,exports){
+},{"../common":324,"../utils":334,"minimalistic-assert":337}],333:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -44410,7 +61687,7 @@ function g1_256(x) {
 }
 exports.g1_256 = g1_256;
 
-},{"../utils":323}],323:[function(require,module,exports){
+},{"../utils":334}],334:[function(require,module,exports){
 'use strict';
 
 var assert = require('minimalistic-assert');
@@ -44665,7 +61942,7 @@ function shr64_lo(ah, al, num) {
 }
 exports.shr64_lo = shr64_lo;
 
-},{"inherits":325,"minimalistic-assert":326}],324:[function(require,module,exports){
+},{"inherits":336,"minimalistic-assert":337}],335:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -44780,11 +62057,11 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.encode(res, enc);
 };
 
-},{"hash.js":312,"minimalistic-assert":326,"minimalistic-crypto-utils":327}],325:[function(require,module,exports){
-arguments[4][192][0].apply(exports,arguments)
-},{"dup":192}],326:[function(require,module,exports){
-arguments[4][196][0].apply(exports,arguments)
-},{"dup":196}],327:[function(require,module,exports){
+},{"hash.js":323,"minimalistic-assert":337,"minimalistic-crypto-utils":338}],336:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],337:[function(require,module,exports){
+arguments[4][207][0].apply(exports,arguments)
+},{"dup":207}],338:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -44844,7 +62121,7 @@ utils.encode = function encode(arr, enc) {
     return arr;
 };
 
-},{}],328:[function(require,module,exports){
+},{}],339:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -44872,7 +62149,8 @@ module.exports={
     "/",
     "/browserify/browserify-sign",
     "/browserify/create-ecdh",
-    "/jsontokens"
+    "/jsontokens",
+    "/tiny-secp256k1"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
@@ -44938,7 +62216,7 @@ module.exports={
   "version": "6.4.0"
 }
 
-},{}],329:[function(require,module,exports){
+},{}],340:[function(require,module,exports){
 var encode = require("./lib/encode.js"),
     decode = require("./lib/decode.js");
 
@@ -44973,7 +62251,7 @@ exports.decodeHTMLStrict = decode.HTMLStrict;
 
 exports.escape = encode.escape;
 
-},{"./lib/decode.js":330,"./lib/encode.js":332}],330:[function(require,module,exports){
+},{"./lib/decode.js":341,"./lib/encode.js":343}],341:[function(require,module,exports){
 var entityMap = require("../maps/entities.json"),
     legacyMap = require("../maps/legacy.json"),
     xmlMap    = require("../maps/xml.json"),
@@ -45046,7 +62324,7 @@ module.exports = {
 	HTML: decodeHTML,
 	HTMLStrict: decodeHTMLStrict
 };
-},{"../maps/entities.json":334,"../maps/legacy.json":335,"../maps/xml.json":336,"./decode_codepoint.js":331}],331:[function(require,module,exports){
+},{"../maps/entities.json":345,"../maps/legacy.json":346,"../maps/xml.json":347,"./decode_codepoint.js":342}],342:[function(require,module,exports){
 var decodeMap = require("../maps/decode.json");
 
 module.exports = decodeCodePoint;
@@ -45074,7 +62352,7 @@ function decodeCodePoint(codePoint){
 	return output;
 }
 
-},{"../maps/decode.json":333}],332:[function(require,module,exports){
+},{"../maps/decode.json":344}],343:[function(require,module,exports){
 var inverseXML = getInverseObj(require("../maps/xml.json")),
     xmlReplacer = getInverseReplacer(inverseXML);
 
@@ -45149,20 +62427,20 @@ function escapeXML(data){
 
 exports.escape = escapeXML;
 
-},{"../maps/entities.json":334,"../maps/xml.json":336}],333:[function(require,module,exports){
+},{"../maps/entities.json":345,"../maps/xml.json":347}],344:[function(require,module,exports){
 module.exports={"0":65533,"128":8364,"130":8218,"131":402,"132":8222,"133":8230,"134":8224,"135":8225,"136":710,"137":8240,"138":352,"139":8249,"140":338,"142":381,"145":8216,"146":8217,"147":8220,"148":8221,"149":8226,"150":8211,"151":8212,"152":732,"153":8482,"154":353,"155":8250,"156":339,"158":382,"159":376}
-},{}],334:[function(require,module,exports){
+},{}],345:[function(require,module,exports){
 module.exports={"Aacute":"\u00C1","aacute":"\u00E1","Abreve":"\u0102","abreve":"\u0103","ac":"\u223E","acd":"\u223F","acE":"\u223E\u0333","Acirc":"\u00C2","acirc":"\u00E2","acute":"\u00B4","Acy":"\u0410","acy":"\u0430","AElig":"\u00C6","aelig":"\u00E6","af":"\u2061","Afr":"\uD835\uDD04","afr":"\uD835\uDD1E","Agrave":"\u00C0","agrave":"\u00E0","alefsym":"\u2135","aleph":"\u2135","Alpha":"\u0391","alpha":"\u03B1","Amacr":"\u0100","amacr":"\u0101","amalg":"\u2A3F","amp":"&","AMP":"&","andand":"\u2A55","And":"\u2A53","and":"\u2227","andd":"\u2A5C","andslope":"\u2A58","andv":"\u2A5A","ang":"\u2220","ange":"\u29A4","angle":"\u2220","angmsdaa":"\u29A8","angmsdab":"\u29A9","angmsdac":"\u29AA","angmsdad":"\u29AB","angmsdae":"\u29AC","angmsdaf":"\u29AD","angmsdag":"\u29AE","angmsdah":"\u29AF","angmsd":"\u2221","angrt":"\u221F","angrtvb":"\u22BE","angrtvbd":"\u299D","angsph":"\u2222","angst":"\u00C5","angzarr":"\u237C","Aogon":"\u0104","aogon":"\u0105","Aopf":"\uD835\uDD38","aopf":"\uD835\uDD52","apacir":"\u2A6F","ap":"\u2248","apE":"\u2A70","ape":"\u224A","apid":"\u224B","apos":"'","ApplyFunction":"\u2061","approx":"\u2248","approxeq":"\u224A","Aring":"\u00C5","aring":"\u00E5","Ascr":"\uD835\uDC9C","ascr":"\uD835\uDCB6","Assign":"\u2254","ast":"*","asymp":"\u2248","asympeq":"\u224D","Atilde":"\u00C3","atilde":"\u00E3","Auml":"\u00C4","auml":"\u00E4","awconint":"\u2233","awint":"\u2A11","backcong":"\u224C","backepsilon":"\u03F6","backprime":"\u2035","backsim":"\u223D","backsimeq":"\u22CD","Backslash":"\u2216","Barv":"\u2AE7","barvee":"\u22BD","barwed":"\u2305","Barwed":"\u2306","barwedge":"\u2305","bbrk":"\u23B5","bbrktbrk":"\u23B6","bcong":"\u224C","Bcy":"\u0411","bcy":"\u0431","bdquo":"\u201E","becaus":"\u2235","because":"\u2235","Because":"\u2235","bemptyv":"\u29B0","bepsi":"\u03F6","bernou":"\u212C","Bernoullis":"\u212C","Beta":"\u0392","beta":"\u03B2","beth":"\u2136","between":"\u226C","Bfr":"\uD835\uDD05","bfr":"\uD835\uDD1F","bigcap":"\u22C2","bigcirc":"\u25EF","bigcup":"\u22C3","bigodot":"\u2A00","bigoplus":"\u2A01","bigotimes":"\u2A02","bigsqcup":"\u2A06","bigstar":"\u2605","bigtriangledown":"\u25BD","bigtriangleup":"\u25B3","biguplus":"\u2A04","bigvee":"\u22C1","bigwedge":"\u22C0","bkarow":"\u290D","blacklozenge":"\u29EB","blacksquare":"\u25AA","blacktriangle":"\u25B4","blacktriangledown":"\u25BE","blacktriangleleft":"\u25C2","blacktriangleright":"\u25B8","blank":"\u2423","blk12":"\u2592","blk14":"\u2591","blk34":"\u2593","block":"\u2588","bne":"=\u20E5","bnequiv":"\u2261\u20E5","bNot":"\u2AED","bnot":"\u2310","Bopf":"\uD835\uDD39","bopf":"\uD835\uDD53","bot":"\u22A5","bottom":"\u22A5","bowtie":"\u22C8","boxbox":"\u29C9","boxdl":"\u2510","boxdL":"\u2555","boxDl":"\u2556","boxDL":"\u2557","boxdr":"\u250C","boxdR":"\u2552","boxDr":"\u2553","boxDR":"\u2554","boxh":"\u2500","boxH":"\u2550","boxhd":"\u252C","boxHd":"\u2564","boxhD":"\u2565","boxHD":"\u2566","boxhu":"\u2534","boxHu":"\u2567","boxhU":"\u2568","boxHU":"\u2569","boxminus":"\u229F","boxplus":"\u229E","boxtimes":"\u22A0","boxul":"\u2518","boxuL":"\u255B","boxUl":"\u255C","boxUL":"\u255D","boxur":"\u2514","boxuR":"\u2558","boxUr":"\u2559","boxUR":"\u255A","boxv":"\u2502","boxV":"\u2551","boxvh":"\u253C","boxvH":"\u256A","boxVh":"\u256B","boxVH":"\u256C","boxvl":"\u2524","boxvL":"\u2561","boxVl":"\u2562","boxVL":"\u2563","boxvr":"\u251C","boxvR":"\u255E","boxVr":"\u255F","boxVR":"\u2560","bprime":"\u2035","breve":"\u02D8","Breve":"\u02D8","brvbar":"\u00A6","bscr":"\uD835\uDCB7","Bscr":"\u212C","bsemi":"\u204F","bsim":"\u223D","bsime":"\u22CD","bsolb":"\u29C5","bsol":"\\","bsolhsub":"\u27C8","bull":"\u2022","bullet":"\u2022","bump":"\u224E","bumpE":"\u2AAE","bumpe":"\u224F","Bumpeq":"\u224E","bumpeq":"\u224F","Cacute":"\u0106","cacute":"\u0107","capand":"\u2A44","capbrcup":"\u2A49","capcap":"\u2A4B","cap":"\u2229","Cap":"\u22D2","capcup":"\u2A47","capdot":"\u2A40","CapitalDifferentialD":"\u2145","caps":"\u2229\uFE00","caret":"\u2041","caron":"\u02C7","Cayleys":"\u212D","ccaps":"\u2A4D","Ccaron":"\u010C","ccaron":"\u010D","Ccedil":"\u00C7","ccedil":"\u00E7","Ccirc":"\u0108","ccirc":"\u0109","Cconint":"\u2230","ccups":"\u2A4C","ccupssm":"\u2A50","Cdot":"\u010A","cdot":"\u010B","cedil":"\u00B8","Cedilla":"\u00B8","cemptyv":"\u29B2","cent":"\u00A2","centerdot":"\u00B7","CenterDot":"\u00B7","cfr":"\uD835\uDD20","Cfr":"\u212D","CHcy":"\u0427","chcy":"\u0447","check":"\u2713","checkmark":"\u2713","Chi":"\u03A7","chi":"\u03C7","circ":"\u02C6","circeq":"\u2257","circlearrowleft":"\u21BA","circlearrowright":"\u21BB","circledast":"\u229B","circledcirc":"\u229A","circleddash":"\u229D","CircleDot":"\u2299","circledR":"\u00AE","circledS":"\u24C8","CircleMinus":"\u2296","CirclePlus":"\u2295","CircleTimes":"\u2297","cir":"\u25CB","cirE":"\u29C3","cire":"\u2257","cirfnint":"\u2A10","cirmid":"\u2AEF","cirscir":"\u29C2","ClockwiseContourIntegral":"\u2232","CloseCurlyDoubleQuote":"\u201D","CloseCurlyQuote":"\u2019","clubs":"\u2663","clubsuit":"\u2663","colon":":","Colon":"\u2237","Colone":"\u2A74","colone":"\u2254","coloneq":"\u2254","comma":",","commat":"@","comp":"\u2201","compfn":"\u2218","complement":"\u2201","complexes":"\u2102","cong":"\u2245","congdot":"\u2A6D","Congruent":"\u2261","conint":"\u222E","Conint":"\u222F","ContourIntegral":"\u222E","copf":"\uD835\uDD54","Copf":"\u2102","coprod":"\u2210","Coproduct":"\u2210","copy":"\u00A9","COPY":"\u00A9","copysr":"\u2117","CounterClockwiseContourIntegral":"\u2233","crarr":"\u21B5","cross":"\u2717","Cross":"\u2A2F","Cscr":"\uD835\uDC9E","cscr":"\uD835\uDCB8","csub":"\u2ACF","csube":"\u2AD1","csup":"\u2AD0","csupe":"\u2AD2","ctdot":"\u22EF","cudarrl":"\u2938","cudarrr":"\u2935","cuepr":"\u22DE","cuesc":"\u22DF","cularr":"\u21B6","cularrp":"\u293D","cupbrcap":"\u2A48","cupcap":"\u2A46","CupCap":"\u224D","cup":"\u222A","Cup":"\u22D3","cupcup":"\u2A4A","cupdot":"\u228D","cupor":"\u2A45","cups":"\u222A\uFE00","curarr":"\u21B7","curarrm":"\u293C","curlyeqprec":"\u22DE","curlyeqsucc":"\u22DF","curlyvee":"\u22CE","curlywedge":"\u22CF","curren":"\u00A4","curvearrowleft":"\u21B6","curvearrowright":"\u21B7","cuvee":"\u22CE","cuwed":"\u22CF","cwconint":"\u2232","cwint":"\u2231","cylcty":"\u232D","dagger":"\u2020","Dagger":"\u2021","daleth":"\u2138","darr":"\u2193","Darr":"\u21A1","dArr":"\u21D3","dash":"\u2010","Dashv":"\u2AE4","dashv":"\u22A3","dbkarow":"\u290F","dblac":"\u02DD","Dcaron":"\u010E","dcaron":"\u010F","Dcy":"\u0414","dcy":"\u0434","ddagger":"\u2021","ddarr":"\u21CA","DD":"\u2145","dd":"\u2146","DDotrahd":"\u2911","ddotseq":"\u2A77","deg":"\u00B0","Del":"\u2207","Delta":"\u0394","delta":"\u03B4","demptyv":"\u29B1","dfisht":"\u297F","Dfr":"\uD835\uDD07","dfr":"\uD835\uDD21","dHar":"\u2965","dharl":"\u21C3","dharr":"\u21C2","DiacriticalAcute":"\u00B4","DiacriticalDot":"\u02D9","DiacriticalDoubleAcute":"\u02DD","DiacriticalGrave":"`","DiacriticalTilde":"\u02DC","diam":"\u22C4","diamond":"\u22C4","Diamond":"\u22C4","diamondsuit":"\u2666","diams":"\u2666","die":"\u00A8","DifferentialD":"\u2146","digamma":"\u03DD","disin":"\u22F2","div":"\u00F7","divide":"\u00F7","divideontimes":"\u22C7","divonx":"\u22C7","DJcy":"\u0402","djcy":"\u0452","dlcorn":"\u231E","dlcrop":"\u230D","dollar":"$","Dopf":"\uD835\uDD3B","dopf":"\uD835\uDD55","Dot":"\u00A8","dot":"\u02D9","DotDot":"\u20DC","doteq":"\u2250","doteqdot":"\u2251","DotEqual":"\u2250","dotminus":"\u2238","dotplus":"\u2214","dotsquare":"\u22A1","doublebarwedge":"\u2306","DoubleContourIntegral":"\u222F","DoubleDot":"\u00A8","DoubleDownArrow":"\u21D3","DoubleLeftArrow":"\u21D0","DoubleLeftRightArrow":"\u21D4","DoubleLeftTee":"\u2AE4","DoubleLongLeftArrow":"\u27F8","DoubleLongLeftRightArrow":"\u27FA","DoubleLongRightArrow":"\u27F9","DoubleRightArrow":"\u21D2","DoubleRightTee":"\u22A8","DoubleUpArrow":"\u21D1","DoubleUpDownArrow":"\u21D5","DoubleVerticalBar":"\u2225","DownArrowBar":"\u2913","downarrow":"\u2193","DownArrow":"\u2193","Downarrow":"\u21D3","DownArrowUpArrow":"\u21F5","DownBreve":"\u0311","downdownarrows":"\u21CA","downharpoonleft":"\u21C3","downharpoonright":"\u21C2","DownLeftRightVector":"\u2950","DownLeftTeeVector":"\u295E","DownLeftVectorBar":"\u2956","DownLeftVector":"\u21BD","DownRightTeeVector":"\u295F","DownRightVectorBar":"\u2957","DownRightVector":"\u21C1","DownTeeArrow":"\u21A7","DownTee":"\u22A4","drbkarow":"\u2910","drcorn":"\u231F","drcrop":"\u230C","Dscr":"\uD835\uDC9F","dscr":"\uD835\uDCB9","DScy":"\u0405","dscy":"\u0455","dsol":"\u29F6","Dstrok":"\u0110","dstrok":"\u0111","dtdot":"\u22F1","dtri":"\u25BF","dtrif":"\u25BE","duarr":"\u21F5","duhar":"\u296F","dwangle":"\u29A6","DZcy":"\u040F","dzcy":"\u045F","dzigrarr":"\u27FF","Eacute":"\u00C9","eacute":"\u00E9","easter":"\u2A6E","Ecaron":"\u011A","ecaron":"\u011B","Ecirc":"\u00CA","ecirc":"\u00EA","ecir":"\u2256","ecolon":"\u2255","Ecy":"\u042D","ecy":"\u044D","eDDot":"\u2A77","Edot":"\u0116","edot":"\u0117","eDot":"\u2251","ee":"\u2147","efDot":"\u2252","Efr":"\uD835\uDD08","efr":"\uD835\uDD22","eg":"\u2A9A","Egrave":"\u00C8","egrave":"\u00E8","egs":"\u2A96","egsdot":"\u2A98","el":"\u2A99","Element":"\u2208","elinters":"\u23E7","ell":"\u2113","els":"\u2A95","elsdot":"\u2A97","Emacr":"\u0112","emacr":"\u0113","empty":"\u2205","emptyset":"\u2205","EmptySmallSquare":"\u25FB","emptyv":"\u2205","EmptyVerySmallSquare":"\u25AB","emsp13":"\u2004","emsp14":"\u2005","emsp":"\u2003","ENG":"\u014A","eng":"\u014B","ensp":"\u2002","Eogon":"\u0118","eogon":"\u0119","Eopf":"\uD835\uDD3C","eopf":"\uD835\uDD56","epar":"\u22D5","eparsl":"\u29E3","eplus":"\u2A71","epsi":"\u03B5","Epsilon":"\u0395","epsilon":"\u03B5","epsiv":"\u03F5","eqcirc":"\u2256","eqcolon":"\u2255","eqsim":"\u2242","eqslantgtr":"\u2A96","eqslantless":"\u2A95","Equal":"\u2A75","equals":"=","EqualTilde":"\u2242","equest":"\u225F","Equilibrium":"\u21CC","equiv":"\u2261","equivDD":"\u2A78","eqvparsl":"\u29E5","erarr":"\u2971","erDot":"\u2253","escr":"\u212F","Escr":"\u2130","esdot":"\u2250","Esim":"\u2A73","esim":"\u2242","Eta":"\u0397","eta":"\u03B7","ETH":"\u00D0","eth":"\u00F0","Euml":"\u00CB","euml":"\u00EB","euro":"\u20AC","excl":"!","exist":"\u2203","Exists":"\u2203","expectation":"\u2130","exponentiale":"\u2147","ExponentialE":"\u2147","fallingdotseq":"\u2252","Fcy":"\u0424","fcy":"\u0444","female":"\u2640","ffilig":"\uFB03","fflig":"\uFB00","ffllig":"\uFB04","Ffr":"\uD835\uDD09","ffr":"\uD835\uDD23","filig":"\uFB01","FilledSmallSquare":"\u25FC","FilledVerySmallSquare":"\u25AA","fjlig":"fj","flat":"\u266D","fllig":"\uFB02","fltns":"\u25B1","fnof":"\u0192","Fopf":"\uD835\uDD3D","fopf":"\uD835\uDD57","forall":"\u2200","ForAll":"\u2200","fork":"\u22D4","forkv":"\u2AD9","Fouriertrf":"\u2131","fpartint":"\u2A0D","frac12":"\u00BD","frac13":"\u2153","frac14":"\u00BC","frac15":"\u2155","frac16":"\u2159","frac18":"\u215B","frac23":"\u2154","frac25":"\u2156","frac34":"\u00BE","frac35":"\u2157","frac38":"\u215C","frac45":"\u2158","frac56":"\u215A","frac58":"\u215D","frac78":"\u215E","frasl":"\u2044","frown":"\u2322","fscr":"\uD835\uDCBB","Fscr":"\u2131","gacute":"\u01F5","Gamma":"\u0393","gamma":"\u03B3","Gammad":"\u03DC","gammad":"\u03DD","gap":"\u2A86","Gbreve":"\u011E","gbreve":"\u011F","Gcedil":"\u0122","Gcirc":"\u011C","gcirc":"\u011D","Gcy":"\u0413","gcy":"\u0433","Gdot":"\u0120","gdot":"\u0121","ge":"\u2265","gE":"\u2267","gEl":"\u2A8C","gel":"\u22DB","geq":"\u2265","geqq":"\u2267","geqslant":"\u2A7E","gescc":"\u2AA9","ges":"\u2A7E","gesdot":"\u2A80","gesdoto":"\u2A82","gesdotol":"\u2A84","gesl":"\u22DB\uFE00","gesles":"\u2A94","Gfr":"\uD835\uDD0A","gfr":"\uD835\uDD24","gg":"\u226B","Gg":"\u22D9","ggg":"\u22D9","gimel":"\u2137","GJcy":"\u0403","gjcy":"\u0453","gla":"\u2AA5","gl":"\u2277","glE":"\u2A92","glj":"\u2AA4","gnap":"\u2A8A","gnapprox":"\u2A8A","gne":"\u2A88","gnE":"\u2269","gneq":"\u2A88","gneqq":"\u2269","gnsim":"\u22E7","Gopf":"\uD835\uDD3E","gopf":"\uD835\uDD58","grave":"`","GreaterEqual":"\u2265","GreaterEqualLess":"\u22DB","GreaterFullEqual":"\u2267","GreaterGreater":"\u2AA2","GreaterLess":"\u2277","GreaterSlantEqual":"\u2A7E","GreaterTilde":"\u2273","Gscr":"\uD835\uDCA2","gscr":"\u210A","gsim":"\u2273","gsime":"\u2A8E","gsiml":"\u2A90","gtcc":"\u2AA7","gtcir":"\u2A7A","gt":">","GT":">","Gt":"\u226B","gtdot":"\u22D7","gtlPar":"\u2995","gtquest":"\u2A7C","gtrapprox":"\u2A86","gtrarr":"\u2978","gtrdot":"\u22D7","gtreqless":"\u22DB","gtreqqless":"\u2A8C","gtrless":"\u2277","gtrsim":"\u2273","gvertneqq":"\u2269\uFE00","gvnE":"\u2269\uFE00","Hacek":"\u02C7","hairsp":"\u200A","half":"\u00BD","hamilt":"\u210B","HARDcy":"\u042A","hardcy":"\u044A","harrcir":"\u2948","harr":"\u2194","hArr":"\u21D4","harrw":"\u21AD","Hat":"^","hbar":"\u210F","Hcirc":"\u0124","hcirc":"\u0125","hearts":"\u2665","heartsuit":"\u2665","hellip":"\u2026","hercon":"\u22B9","hfr":"\uD835\uDD25","Hfr":"\u210C","HilbertSpace":"\u210B","hksearow":"\u2925","hkswarow":"\u2926","hoarr":"\u21FF","homtht":"\u223B","hookleftarrow":"\u21A9","hookrightarrow":"\u21AA","hopf":"\uD835\uDD59","Hopf":"\u210D","horbar":"\u2015","HorizontalLine":"\u2500","hscr":"\uD835\uDCBD","Hscr":"\u210B","hslash":"\u210F","Hstrok":"\u0126","hstrok":"\u0127","HumpDownHump":"\u224E","HumpEqual":"\u224F","hybull":"\u2043","hyphen":"\u2010","Iacute":"\u00CD","iacute":"\u00ED","ic":"\u2063","Icirc":"\u00CE","icirc":"\u00EE","Icy":"\u0418","icy":"\u0438","Idot":"\u0130","IEcy":"\u0415","iecy":"\u0435","iexcl":"\u00A1","iff":"\u21D4","ifr":"\uD835\uDD26","Ifr":"\u2111","Igrave":"\u00CC","igrave":"\u00EC","ii":"\u2148","iiiint":"\u2A0C","iiint":"\u222D","iinfin":"\u29DC","iiota":"\u2129","IJlig":"\u0132","ijlig":"\u0133","Imacr":"\u012A","imacr":"\u012B","image":"\u2111","ImaginaryI":"\u2148","imagline":"\u2110","imagpart":"\u2111","imath":"\u0131","Im":"\u2111","imof":"\u22B7","imped":"\u01B5","Implies":"\u21D2","incare":"\u2105","in":"\u2208","infin":"\u221E","infintie":"\u29DD","inodot":"\u0131","intcal":"\u22BA","int":"\u222B","Int":"\u222C","integers":"\u2124","Integral":"\u222B","intercal":"\u22BA","Intersection":"\u22C2","intlarhk":"\u2A17","intprod":"\u2A3C","InvisibleComma":"\u2063","InvisibleTimes":"\u2062","IOcy":"\u0401","iocy":"\u0451","Iogon":"\u012E","iogon":"\u012F","Iopf":"\uD835\uDD40","iopf":"\uD835\uDD5A","Iota":"\u0399","iota":"\u03B9","iprod":"\u2A3C","iquest":"\u00BF","iscr":"\uD835\uDCBE","Iscr":"\u2110","isin":"\u2208","isindot":"\u22F5","isinE":"\u22F9","isins":"\u22F4","isinsv":"\u22F3","isinv":"\u2208","it":"\u2062","Itilde":"\u0128","itilde":"\u0129","Iukcy":"\u0406","iukcy":"\u0456","Iuml":"\u00CF","iuml":"\u00EF","Jcirc":"\u0134","jcirc":"\u0135","Jcy":"\u0419","jcy":"\u0439","Jfr":"\uD835\uDD0D","jfr":"\uD835\uDD27","jmath":"\u0237","Jopf":"\uD835\uDD41","jopf":"\uD835\uDD5B","Jscr":"\uD835\uDCA5","jscr":"\uD835\uDCBF","Jsercy":"\u0408","jsercy":"\u0458","Jukcy":"\u0404","jukcy":"\u0454","Kappa":"\u039A","kappa":"\u03BA","kappav":"\u03F0","Kcedil":"\u0136","kcedil":"\u0137","Kcy":"\u041A","kcy":"\u043A","Kfr":"\uD835\uDD0E","kfr":"\uD835\uDD28","kgreen":"\u0138","KHcy":"\u0425","khcy":"\u0445","KJcy":"\u040C","kjcy":"\u045C","Kopf":"\uD835\uDD42","kopf":"\uD835\uDD5C","Kscr":"\uD835\uDCA6","kscr":"\uD835\uDCC0","lAarr":"\u21DA","Lacute":"\u0139","lacute":"\u013A","laemptyv":"\u29B4","lagran":"\u2112","Lambda":"\u039B","lambda":"\u03BB","lang":"\u27E8","Lang":"\u27EA","langd":"\u2991","langle":"\u27E8","lap":"\u2A85","Laplacetrf":"\u2112","laquo":"\u00AB","larrb":"\u21E4","larrbfs":"\u291F","larr":"\u2190","Larr":"\u219E","lArr":"\u21D0","larrfs":"\u291D","larrhk":"\u21A9","larrlp":"\u21AB","larrpl":"\u2939","larrsim":"\u2973","larrtl":"\u21A2","latail":"\u2919","lAtail":"\u291B","lat":"\u2AAB","late":"\u2AAD","lates":"\u2AAD\uFE00","lbarr":"\u290C","lBarr":"\u290E","lbbrk":"\u2772","lbrace":"{","lbrack":"[","lbrke":"\u298B","lbrksld":"\u298F","lbrkslu":"\u298D","Lcaron":"\u013D","lcaron":"\u013E","Lcedil":"\u013B","lcedil":"\u013C","lceil":"\u2308","lcub":"{","Lcy":"\u041B","lcy":"\u043B","ldca":"\u2936","ldquo":"\u201C","ldquor":"\u201E","ldrdhar":"\u2967","ldrushar":"\u294B","ldsh":"\u21B2","le":"\u2264","lE":"\u2266","LeftAngleBracket":"\u27E8","LeftArrowBar":"\u21E4","leftarrow":"\u2190","LeftArrow":"\u2190","Leftarrow":"\u21D0","LeftArrowRightArrow":"\u21C6","leftarrowtail":"\u21A2","LeftCeiling":"\u2308","LeftDoubleBracket":"\u27E6","LeftDownTeeVector":"\u2961","LeftDownVectorBar":"\u2959","LeftDownVector":"\u21C3","LeftFloor":"\u230A","leftharpoondown":"\u21BD","leftharpoonup":"\u21BC","leftleftarrows":"\u21C7","leftrightarrow":"\u2194","LeftRightArrow":"\u2194","Leftrightarrow":"\u21D4","leftrightarrows":"\u21C6","leftrightharpoons":"\u21CB","leftrightsquigarrow":"\u21AD","LeftRightVector":"\u294E","LeftTeeArrow":"\u21A4","LeftTee":"\u22A3","LeftTeeVector":"\u295A","leftthreetimes":"\u22CB","LeftTriangleBar":"\u29CF","LeftTriangle":"\u22B2","LeftTriangleEqual":"\u22B4","LeftUpDownVector":"\u2951","LeftUpTeeVector":"\u2960","LeftUpVectorBar":"\u2958","LeftUpVector":"\u21BF","LeftVectorBar":"\u2952","LeftVector":"\u21BC","lEg":"\u2A8B","leg":"\u22DA","leq":"\u2264","leqq":"\u2266","leqslant":"\u2A7D","lescc":"\u2AA8","les":"\u2A7D","lesdot":"\u2A7F","lesdoto":"\u2A81","lesdotor":"\u2A83","lesg":"\u22DA\uFE00","lesges":"\u2A93","lessapprox":"\u2A85","lessdot":"\u22D6","lesseqgtr":"\u22DA","lesseqqgtr":"\u2A8B","LessEqualGreater":"\u22DA","LessFullEqual":"\u2266","LessGreater":"\u2276","lessgtr":"\u2276","LessLess":"\u2AA1","lesssim":"\u2272","LessSlantEqual":"\u2A7D","LessTilde":"\u2272","lfisht":"\u297C","lfloor":"\u230A","Lfr":"\uD835\uDD0F","lfr":"\uD835\uDD29","lg":"\u2276","lgE":"\u2A91","lHar":"\u2962","lhard":"\u21BD","lharu":"\u21BC","lharul":"\u296A","lhblk":"\u2584","LJcy":"\u0409","ljcy":"\u0459","llarr":"\u21C7","ll":"\u226A","Ll":"\u22D8","llcorner":"\u231E","Lleftarrow":"\u21DA","llhard":"\u296B","lltri":"\u25FA","Lmidot":"\u013F","lmidot":"\u0140","lmoustache":"\u23B0","lmoust":"\u23B0","lnap":"\u2A89","lnapprox":"\u2A89","lne":"\u2A87","lnE":"\u2268","lneq":"\u2A87","lneqq":"\u2268","lnsim":"\u22E6","loang":"\u27EC","loarr":"\u21FD","lobrk":"\u27E6","longleftarrow":"\u27F5","LongLeftArrow":"\u27F5","Longleftarrow":"\u27F8","longleftrightarrow":"\u27F7","LongLeftRightArrow":"\u27F7","Longleftrightarrow":"\u27FA","longmapsto":"\u27FC","longrightarrow":"\u27F6","LongRightArrow":"\u27F6","Longrightarrow":"\u27F9","looparrowleft":"\u21AB","looparrowright":"\u21AC","lopar":"\u2985","Lopf":"\uD835\uDD43","lopf":"\uD835\uDD5D","loplus":"\u2A2D","lotimes":"\u2A34","lowast":"\u2217","lowbar":"_","LowerLeftArrow":"\u2199","LowerRightArrow":"\u2198","loz":"\u25CA","lozenge":"\u25CA","lozf":"\u29EB","lpar":"(","lparlt":"\u2993","lrarr":"\u21C6","lrcorner":"\u231F","lrhar":"\u21CB","lrhard":"\u296D","lrm":"\u200E","lrtri":"\u22BF","lsaquo":"\u2039","lscr":"\uD835\uDCC1","Lscr":"\u2112","lsh":"\u21B0","Lsh":"\u21B0","lsim":"\u2272","lsime":"\u2A8D","lsimg":"\u2A8F","lsqb":"[","lsquo":"\u2018","lsquor":"\u201A","Lstrok":"\u0141","lstrok":"\u0142","ltcc":"\u2AA6","ltcir":"\u2A79","lt":"<","LT":"<","Lt":"\u226A","ltdot":"\u22D6","lthree":"\u22CB","ltimes":"\u22C9","ltlarr":"\u2976","ltquest":"\u2A7B","ltri":"\u25C3","ltrie":"\u22B4","ltrif":"\u25C2","ltrPar":"\u2996","lurdshar":"\u294A","luruhar":"\u2966","lvertneqq":"\u2268\uFE00","lvnE":"\u2268\uFE00","macr":"\u00AF","male":"\u2642","malt":"\u2720","maltese":"\u2720","Map":"\u2905","map":"\u21A6","mapsto":"\u21A6","mapstodown":"\u21A7","mapstoleft":"\u21A4","mapstoup":"\u21A5","marker":"\u25AE","mcomma":"\u2A29","Mcy":"\u041C","mcy":"\u043C","mdash":"\u2014","mDDot":"\u223A","measuredangle":"\u2221","MediumSpace":"\u205F","Mellintrf":"\u2133","Mfr":"\uD835\uDD10","mfr":"\uD835\uDD2A","mho":"\u2127","micro":"\u00B5","midast":"*","midcir":"\u2AF0","mid":"\u2223","middot":"\u00B7","minusb":"\u229F","minus":"\u2212","minusd":"\u2238","minusdu":"\u2A2A","MinusPlus":"\u2213","mlcp":"\u2ADB","mldr":"\u2026","mnplus":"\u2213","models":"\u22A7","Mopf":"\uD835\uDD44","mopf":"\uD835\uDD5E","mp":"\u2213","mscr":"\uD835\uDCC2","Mscr":"\u2133","mstpos":"\u223E","Mu":"\u039C","mu":"\u03BC","multimap":"\u22B8","mumap":"\u22B8","nabla":"\u2207","Nacute":"\u0143","nacute":"\u0144","nang":"\u2220\u20D2","nap":"\u2249","napE":"\u2A70\u0338","napid":"\u224B\u0338","napos":"\u0149","napprox":"\u2249","natural":"\u266E","naturals":"\u2115","natur":"\u266E","nbsp":"\u00A0","nbump":"\u224E\u0338","nbumpe":"\u224F\u0338","ncap":"\u2A43","Ncaron":"\u0147","ncaron":"\u0148","Ncedil":"\u0145","ncedil":"\u0146","ncong":"\u2247","ncongdot":"\u2A6D\u0338","ncup":"\u2A42","Ncy":"\u041D","ncy":"\u043D","ndash":"\u2013","nearhk":"\u2924","nearr":"\u2197","neArr":"\u21D7","nearrow":"\u2197","ne":"\u2260","nedot":"\u2250\u0338","NegativeMediumSpace":"\u200B","NegativeThickSpace":"\u200B","NegativeThinSpace":"\u200B","NegativeVeryThinSpace":"\u200B","nequiv":"\u2262","nesear":"\u2928","nesim":"\u2242\u0338","NestedGreaterGreater":"\u226B","NestedLessLess":"\u226A","NewLine":"\n","nexist":"\u2204","nexists":"\u2204","Nfr":"\uD835\uDD11","nfr":"\uD835\uDD2B","ngE":"\u2267\u0338","nge":"\u2271","ngeq":"\u2271","ngeqq":"\u2267\u0338","ngeqslant":"\u2A7E\u0338","nges":"\u2A7E\u0338","nGg":"\u22D9\u0338","ngsim":"\u2275","nGt":"\u226B\u20D2","ngt":"\u226F","ngtr":"\u226F","nGtv":"\u226B\u0338","nharr":"\u21AE","nhArr":"\u21CE","nhpar":"\u2AF2","ni":"\u220B","nis":"\u22FC","nisd":"\u22FA","niv":"\u220B","NJcy":"\u040A","njcy":"\u045A","nlarr":"\u219A","nlArr":"\u21CD","nldr":"\u2025","nlE":"\u2266\u0338","nle":"\u2270","nleftarrow":"\u219A","nLeftarrow":"\u21CD","nleftrightarrow":"\u21AE","nLeftrightarrow":"\u21CE","nleq":"\u2270","nleqq":"\u2266\u0338","nleqslant":"\u2A7D\u0338","nles":"\u2A7D\u0338","nless":"\u226E","nLl":"\u22D8\u0338","nlsim":"\u2274","nLt":"\u226A\u20D2","nlt":"\u226E","nltri":"\u22EA","nltrie":"\u22EC","nLtv":"\u226A\u0338","nmid":"\u2224","NoBreak":"\u2060","NonBreakingSpace":"\u00A0","nopf":"\uD835\uDD5F","Nopf":"\u2115","Not":"\u2AEC","not":"\u00AC","NotCongruent":"\u2262","NotCupCap":"\u226D","NotDoubleVerticalBar":"\u2226","NotElement":"\u2209","NotEqual":"\u2260","NotEqualTilde":"\u2242\u0338","NotExists":"\u2204","NotGreater":"\u226F","NotGreaterEqual":"\u2271","NotGreaterFullEqual":"\u2267\u0338","NotGreaterGreater":"\u226B\u0338","NotGreaterLess":"\u2279","NotGreaterSlantEqual":"\u2A7E\u0338","NotGreaterTilde":"\u2275","NotHumpDownHump":"\u224E\u0338","NotHumpEqual":"\u224F\u0338","notin":"\u2209","notindot":"\u22F5\u0338","notinE":"\u22F9\u0338","notinva":"\u2209","notinvb":"\u22F7","notinvc":"\u22F6","NotLeftTriangleBar":"\u29CF\u0338","NotLeftTriangle":"\u22EA","NotLeftTriangleEqual":"\u22EC","NotLess":"\u226E","NotLessEqual":"\u2270","NotLessGreater":"\u2278","NotLessLess":"\u226A\u0338","NotLessSlantEqual":"\u2A7D\u0338","NotLessTilde":"\u2274","NotNestedGreaterGreater":"\u2AA2\u0338","NotNestedLessLess":"\u2AA1\u0338","notni":"\u220C","notniva":"\u220C","notnivb":"\u22FE","notnivc":"\u22FD","NotPrecedes":"\u2280","NotPrecedesEqual":"\u2AAF\u0338","NotPrecedesSlantEqual":"\u22E0","NotReverseElement":"\u220C","NotRightTriangleBar":"\u29D0\u0338","NotRightTriangle":"\u22EB","NotRightTriangleEqual":"\u22ED","NotSquareSubset":"\u228F\u0338","NotSquareSubsetEqual":"\u22E2","NotSquareSuperset":"\u2290\u0338","NotSquareSupersetEqual":"\u22E3","NotSubset":"\u2282\u20D2","NotSubsetEqual":"\u2288","NotSucceeds":"\u2281","NotSucceedsEqual":"\u2AB0\u0338","NotSucceedsSlantEqual":"\u22E1","NotSucceedsTilde":"\u227F\u0338","NotSuperset":"\u2283\u20D2","NotSupersetEqual":"\u2289","NotTilde":"\u2241","NotTildeEqual":"\u2244","NotTildeFullEqual":"\u2247","NotTildeTilde":"\u2249","NotVerticalBar":"\u2224","nparallel":"\u2226","npar":"\u2226","nparsl":"\u2AFD\u20E5","npart":"\u2202\u0338","npolint":"\u2A14","npr":"\u2280","nprcue":"\u22E0","nprec":"\u2280","npreceq":"\u2AAF\u0338","npre":"\u2AAF\u0338","nrarrc":"\u2933\u0338","nrarr":"\u219B","nrArr":"\u21CF","nrarrw":"\u219D\u0338","nrightarrow":"\u219B","nRightarrow":"\u21CF","nrtri":"\u22EB","nrtrie":"\u22ED","nsc":"\u2281","nsccue":"\u22E1","nsce":"\u2AB0\u0338","Nscr":"\uD835\uDCA9","nscr":"\uD835\uDCC3","nshortmid":"\u2224","nshortparallel":"\u2226","nsim":"\u2241","nsime":"\u2244","nsimeq":"\u2244","nsmid":"\u2224","nspar":"\u2226","nsqsube":"\u22E2","nsqsupe":"\u22E3","nsub":"\u2284","nsubE":"\u2AC5\u0338","nsube":"\u2288","nsubset":"\u2282\u20D2","nsubseteq":"\u2288","nsubseteqq":"\u2AC5\u0338","nsucc":"\u2281","nsucceq":"\u2AB0\u0338","nsup":"\u2285","nsupE":"\u2AC6\u0338","nsupe":"\u2289","nsupset":"\u2283\u20D2","nsupseteq":"\u2289","nsupseteqq":"\u2AC6\u0338","ntgl":"\u2279","Ntilde":"\u00D1","ntilde":"\u00F1","ntlg":"\u2278","ntriangleleft":"\u22EA","ntrianglelefteq":"\u22EC","ntriangleright":"\u22EB","ntrianglerighteq":"\u22ED","Nu":"\u039D","nu":"\u03BD","num":"#","numero":"\u2116","numsp":"\u2007","nvap":"\u224D\u20D2","nvdash":"\u22AC","nvDash":"\u22AD","nVdash":"\u22AE","nVDash":"\u22AF","nvge":"\u2265\u20D2","nvgt":">\u20D2","nvHarr":"\u2904","nvinfin":"\u29DE","nvlArr":"\u2902","nvle":"\u2264\u20D2","nvlt":"<\u20D2","nvltrie":"\u22B4\u20D2","nvrArr":"\u2903","nvrtrie":"\u22B5\u20D2","nvsim":"\u223C\u20D2","nwarhk":"\u2923","nwarr":"\u2196","nwArr":"\u21D6","nwarrow":"\u2196","nwnear":"\u2927","Oacute":"\u00D3","oacute":"\u00F3","oast":"\u229B","Ocirc":"\u00D4","ocirc":"\u00F4","ocir":"\u229A","Ocy":"\u041E","ocy":"\u043E","odash":"\u229D","Odblac":"\u0150","odblac":"\u0151","odiv":"\u2A38","odot":"\u2299","odsold":"\u29BC","OElig":"\u0152","oelig":"\u0153","ofcir":"\u29BF","Ofr":"\uD835\uDD12","ofr":"\uD835\uDD2C","ogon":"\u02DB","Ograve":"\u00D2","ograve":"\u00F2","ogt":"\u29C1","ohbar":"\u29B5","ohm":"\u03A9","oint":"\u222E","olarr":"\u21BA","olcir":"\u29BE","olcross":"\u29BB","oline":"\u203E","olt":"\u29C0","Omacr":"\u014C","omacr":"\u014D","Omega":"\u03A9","omega":"\u03C9","Omicron":"\u039F","omicron":"\u03BF","omid":"\u29B6","ominus":"\u2296","Oopf":"\uD835\uDD46","oopf":"\uD835\uDD60","opar":"\u29B7","OpenCurlyDoubleQuote":"\u201C","OpenCurlyQuote":"\u2018","operp":"\u29B9","oplus":"\u2295","orarr":"\u21BB","Or":"\u2A54","or":"\u2228","ord":"\u2A5D","order":"\u2134","orderof":"\u2134","ordf":"\u00AA","ordm":"\u00BA","origof":"\u22B6","oror":"\u2A56","orslope":"\u2A57","orv":"\u2A5B","oS":"\u24C8","Oscr":"\uD835\uDCAA","oscr":"\u2134","Oslash":"\u00D8","oslash":"\u00F8","osol":"\u2298","Otilde":"\u00D5","otilde":"\u00F5","otimesas":"\u2A36","Otimes":"\u2A37","otimes":"\u2297","Ouml":"\u00D6","ouml":"\u00F6","ovbar":"\u233D","OverBar":"\u203E","OverBrace":"\u23DE","OverBracket":"\u23B4","OverParenthesis":"\u23DC","para":"\u00B6","parallel":"\u2225","par":"\u2225","parsim":"\u2AF3","parsl":"\u2AFD","part":"\u2202","PartialD":"\u2202","Pcy":"\u041F","pcy":"\u043F","percnt":"%","period":".","permil":"\u2030","perp":"\u22A5","pertenk":"\u2031","Pfr":"\uD835\uDD13","pfr":"\uD835\uDD2D","Phi":"\u03A6","phi":"\u03C6","phiv":"\u03D5","phmmat":"\u2133","phone":"\u260E","Pi":"\u03A0","pi":"\u03C0","pitchfork":"\u22D4","piv":"\u03D6","planck":"\u210F","planckh":"\u210E","plankv":"\u210F","plusacir":"\u2A23","plusb":"\u229E","pluscir":"\u2A22","plus":"+","plusdo":"\u2214","plusdu":"\u2A25","pluse":"\u2A72","PlusMinus":"\u00B1","plusmn":"\u00B1","plussim":"\u2A26","plustwo":"\u2A27","pm":"\u00B1","Poincareplane":"\u210C","pointint":"\u2A15","popf":"\uD835\uDD61","Popf":"\u2119","pound":"\u00A3","prap":"\u2AB7","Pr":"\u2ABB","pr":"\u227A","prcue":"\u227C","precapprox":"\u2AB7","prec":"\u227A","preccurlyeq":"\u227C","Precedes":"\u227A","PrecedesEqual":"\u2AAF","PrecedesSlantEqual":"\u227C","PrecedesTilde":"\u227E","preceq":"\u2AAF","precnapprox":"\u2AB9","precneqq":"\u2AB5","precnsim":"\u22E8","pre":"\u2AAF","prE":"\u2AB3","precsim":"\u227E","prime":"\u2032","Prime":"\u2033","primes":"\u2119","prnap":"\u2AB9","prnE":"\u2AB5","prnsim":"\u22E8","prod":"\u220F","Product":"\u220F","profalar":"\u232E","profline":"\u2312","profsurf":"\u2313","prop":"\u221D","Proportional":"\u221D","Proportion":"\u2237","propto":"\u221D","prsim":"\u227E","prurel":"\u22B0","Pscr":"\uD835\uDCAB","pscr":"\uD835\uDCC5","Psi":"\u03A8","psi":"\u03C8","puncsp":"\u2008","Qfr":"\uD835\uDD14","qfr":"\uD835\uDD2E","qint":"\u2A0C","qopf":"\uD835\uDD62","Qopf":"\u211A","qprime":"\u2057","Qscr":"\uD835\uDCAC","qscr":"\uD835\uDCC6","quaternions":"\u210D","quatint":"\u2A16","quest":"?","questeq":"\u225F","quot":"\"","QUOT":"\"","rAarr":"\u21DB","race":"\u223D\u0331","Racute":"\u0154","racute":"\u0155","radic":"\u221A","raemptyv":"\u29B3","rang":"\u27E9","Rang":"\u27EB","rangd":"\u2992","range":"\u29A5","rangle":"\u27E9","raquo":"\u00BB","rarrap":"\u2975","rarrb":"\u21E5","rarrbfs":"\u2920","rarrc":"\u2933","rarr":"\u2192","Rarr":"\u21A0","rArr":"\u21D2","rarrfs":"\u291E","rarrhk":"\u21AA","rarrlp":"\u21AC","rarrpl":"\u2945","rarrsim":"\u2974","Rarrtl":"\u2916","rarrtl":"\u21A3","rarrw":"\u219D","ratail":"\u291A","rAtail":"\u291C","ratio":"\u2236","rationals":"\u211A","rbarr":"\u290D","rBarr":"\u290F","RBarr":"\u2910","rbbrk":"\u2773","rbrace":"}","rbrack":"]","rbrke":"\u298C","rbrksld":"\u298E","rbrkslu":"\u2990","Rcaron":"\u0158","rcaron":"\u0159","Rcedil":"\u0156","rcedil":"\u0157","rceil":"\u2309","rcub":"}","Rcy":"\u0420","rcy":"\u0440","rdca":"\u2937","rdldhar":"\u2969","rdquo":"\u201D","rdquor":"\u201D","rdsh":"\u21B3","real":"\u211C","realine":"\u211B","realpart":"\u211C","reals":"\u211D","Re":"\u211C","rect":"\u25AD","reg":"\u00AE","REG":"\u00AE","ReverseElement":"\u220B","ReverseEquilibrium":"\u21CB","ReverseUpEquilibrium":"\u296F","rfisht":"\u297D","rfloor":"\u230B","rfr":"\uD835\uDD2F","Rfr":"\u211C","rHar":"\u2964","rhard":"\u21C1","rharu":"\u21C0","rharul":"\u296C","Rho":"\u03A1","rho":"\u03C1","rhov":"\u03F1","RightAngleBracket":"\u27E9","RightArrowBar":"\u21E5","rightarrow":"\u2192","RightArrow":"\u2192","Rightarrow":"\u21D2","RightArrowLeftArrow":"\u21C4","rightarrowtail":"\u21A3","RightCeiling":"\u2309","RightDoubleBracket":"\u27E7","RightDownTeeVector":"\u295D","RightDownVectorBar":"\u2955","RightDownVector":"\u21C2","RightFloor":"\u230B","rightharpoondown":"\u21C1","rightharpoonup":"\u21C0","rightleftarrows":"\u21C4","rightleftharpoons":"\u21CC","rightrightarrows":"\u21C9","rightsquigarrow":"\u219D","RightTeeArrow":"\u21A6","RightTee":"\u22A2","RightTeeVector":"\u295B","rightthreetimes":"\u22CC","RightTriangleBar":"\u29D0","RightTriangle":"\u22B3","RightTriangleEqual":"\u22B5","RightUpDownVector":"\u294F","RightUpTeeVector":"\u295C","RightUpVectorBar":"\u2954","RightUpVector":"\u21BE","RightVectorBar":"\u2953","RightVector":"\u21C0","ring":"\u02DA","risingdotseq":"\u2253","rlarr":"\u21C4","rlhar":"\u21CC","rlm":"\u200F","rmoustache":"\u23B1","rmoust":"\u23B1","rnmid":"\u2AEE","roang":"\u27ED","roarr":"\u21FE","robrk":"\u27E7","ropar":"\u2986","ropf":"\uD835\uDD63","Ropf":"\u211D","roplus":"\u2A2E","rotimes":"\u2A35","RoundImplies":"\u2970","rpar":")","rpargt":"\u2994","rppolint":"\u2A12","rrarr":"\u21C9","Rrightarrow":"\u21DB","rsaquo":"\u203A","rscr":"\uD835\uDCC7","Rscr":"\u211B","rsh":"\u21B1","Rsh":"\u21B1","rsqb":"]","rsquo":"\u2019","rsquor":"\u2019","rthree":"\u22CC","rtimes":"\u22CA","rtri":"\u25B9","rtrie":"\u22B5","rtrif":"\u25B8","rtriltri":"\u29CE","RuleDelayed":"\u29F4","ruluhar":"\u2968","rx":"\u211E","Sacute":"\u015A","sacute":"\u015B","sbquo":"\u201A","scap":"\u2AB8","Scaron":"\u0160","scaron":"\u0161","Sc":"\u2ABC","sc":"\u227B","sccue":"\u227D","sce":"\u2AB0","scE":"\u2AB4","Scedil":"\u015E","scedil":"\u015F","Scirc":"\u015C","scirc":"\u015D","scnap":"\u2ABA","scnE":"\u2AB6","scnsim":"\u22E9","scpolint":"\u2A13","scsim":"\u227F","Scy":"\u0421","scy":"\u0441","sdotb":"\u22A1","sdot":"\u22C5","sdote":"\u2A66","searhk":"\u2925","searr":"\u2198","seArr":"\u21D8","searrow":"\u2198","sect":"\u00A7","semi":";","seswar":"\u2929","setminus":"\u2216","setmn":"\u2216","sext":"\u2736","Sfr":"\uD835\uDD16","sfr":"\uD835\uDD30","sfrown":"\u2322","sharp":"\u266F","SHCHcy":"\u0429","shchcy":"\u0449","SHcy":"\u0428","shcy":"\u0448","ShortDownArrow":"\u2193","ShortLeftArrow":"\u2190","shortmid":"\u2223","shortparallel":"\u2225","ShortRightArrow":"\u2192","ShortUpArrow":"\u2191","shy":"\u00AD","Sigma":"\u03A3","sigma":"\u03C3","sigmaf":"\u03C2","sigmav":"\u03C2","sim":"\u223C","simdot":"\u2A6A","sime":"\u2243","simeq":"\u2243","simg":"\u2A9E","simgE":"\u2AA0","siml":"\u2A9D","simlE":"\u2A9F","simne":"\u2246","simplus":"\u2A24","simrarr":"\u2972","slarr":"\u2190","SmallCircle":"\u2218","smallsetminus":"\u2216","smashp":"\u2A33","smeparsl":"\u29E4","smid":"\u2223","smile":"\u2323","smt":"\u2AAA","smte":"\u2AAC","smtes":"\u2AAC\uFE00","SOFTcy":"\u042C","softcy":"\u044C","solbar":"\u233F","solb":"\u29C4","sol":"/","Sopf":"\uD835\uDD4A","sopf":"\uD835\uDD64","spades":"\u2660","spadesuit":"\u2660","spar":"\u2225","sqcap":"\u2293","sqcaps":"\u2293\uFE00","sqcup":"\u2294","sqcups":"\u2294\uFE00","Sqrt":"\u221A","sqsub":"\u228F","sqsube":"\u2291","sqsubset":"\u228F","sqsubseteq":"\u2291","sqsup":"\u2290","sqsupe":"\u2292","sqsupset":"\u2290","sqsupseteq":"\u2292","square":"\u25A1","Square":"\u25A1","SquareIntersection":"\u2293","SquareSubset":"\u228F","SquareSubsetEqual":"\u2291","SquareSuperset":"\u2290","SquareSupersetEqual":"\u2292","SquareUnion":"\u2294","squarf":"\u25AA","squ":"\u25A1","squf":"\u25AA","srarr":"\u2192","Sscr":"\uD835\uDCAE","sscr":"\uD835\uDCC8","ssetmn":"\u2216","ssmile":"\u2323","sstarf":"\u22C6","Star":"\u22C6","star":"\u2606","starf":"\u2605","straightepsilon":"\u03F5","straightphi":"\u03D5","strns":"\u00AF","sub":"\u2282","Sub":"\u22D0","subdot":"\u2ABD","subE":"\u2AC5","sube":"\u2286","subedot":"\u2AC3","submult":"\u2AC1","subnE":"\u2ACB","subne":"\u228A","subplus":"\u2ABF","subrarr":"\u2979","subset":"\u2282","Subset":"\u22D0","subseteq":"\u2286","subseteqq":"\u2AC5","SubsetEqual":"\u2286","subsetneq":"\u228A","subsetneqq":"\u2ACB","subsim":"\u2AC7","subsub":"\u2AD5","subsup":"\u2AD3","succapprox":"\u2AB8","succ":"\u227B","succcurlyeq":"\u227D","Succeeds":"\u227B","SucceedsEqual":"\u2AB0","SucceedsSlantEqual":"\u227D","SucceedsTilde":"\u227F","succeq":"\u2AB0","succnapprox":"\u2ABA","succneqq":"\u2AB6","succnsim":"\u22E9","succsim":"\u227F","SuchThat":"\u220B","sum":"\u2211","Sum":"\u2211","sung":"\u266A","sup1":"\u00B9","sup2":"\u00B2","sup3":"\u00B3","sup":"\u2283","Sup":"\u22D1","supdot":"\u2ABE","supdsub":"\u2AD8","supE":"\u2AC6","supe":"\u2287","supedot":"\u2AC4","Superset":"\u2283","SupersetEqual":"\u2287","suphsol":"\u27C9","suphsub":"\u2AD7","suplarr":"\u297B","supmult":"\u2AC2","supnE":"\u2ACC","supne":"\u228B","supplus":"\u2AC0","supset":"\u2283","Supset":"\u22D1","supseteq":"\u2287","supseteqq":"\u2AC6","supsetneq":"\u228B","supsetneqq":"\u2ACC","supsim":"\u2AC8","supsub":"\u2AD4","supsup":"\u2AD6","swarhk":"\u2926","swarr":"\u2199","swArr":"\u21D9","swarrow":"\u2199","swnwar":"\u292A","szlig":"\u00DF","Tab":"\t","target":"\u2316","Tau":"\u03A4","tau":"\u03C4","tbrk":"\u23B4","Tcaron":"\u0164","tcaron":"\u0165","Tcedil":"\u0162","tcedil":"\u0163","Tcy":"\u0422","tcy":"\u0442","tdot":"\u20DB","telrec":"\u2315","Tfr":"\uD835\uDD17","tfr":"\uD835\uDD31","there4":"\u2234","therefore":"\u2234","Therefore":"\u2234","Theta":"\u0398","theta":"\u03B8","thetasym":"\u03D1","thetav":"\u03D1","thickapprox":"\u2248","thicksim":"\u223C","ThickSpace":"\u205F\u200A","ThinSpace":"\u2009","thinsp":"\u2009","thkap":"\u2248","thksim":"\u223C","THORN":"\u00DE","thorn":"\u00FE","tilde":"\u02DC","Tilde":"\u223C","TildeEqual":"\u2243","TildeFullEqual":"\u2245","TildeTilde":"\u2248","timesbar":"\u2A31","timesb":"\u22A0","times":"\u00D7","timesd":"\u2A30","tint":"\u222D","toea":"\u2928","topbot":"\u2336","topcir":"\u2AF1","top":"\u22A4","Topf":"\uD835\uDD4B","topf":"\uD835\uDD65","topfork":"\u2ADA","tosa":"\u2929","tprime":"\u2034","trade":"\u2122","TRADE":"\u2122","triangle":"\u25B5","triangledown":"\u25BF","triangleleft":"\u25C3","trianglelefteq":"\u22B4","triangleq":"\u225C","triangleright":"\u25B9","trianglerighteq":"\u22B5","tridot":"\u25EC","trie":"\u225C","triminus":"\u2A3A","TripleDot":"\u20DB","triplus":"\u2A39","trisb":"\u29CD","tritime":"\u2A3B","trpezium":"\u23E2","Tscr":"\uD835\uDCAF","tscr":"\uD835\uDCC9","TScy":"\u0426","tscy":"\u0446","TSHcy":"\u040B","tshcy":"\u045B","Tstrok":"\u0166","tstrok":"\u0167","twixt":"\u226C","twoheadleftarrow":"\u219E","twoheadrightarrow":"\u21A0","Uacute":"\u00DA","uacute":"\u00FA","uarr":"\u2191","Uarr":"\u219F","uArr":"\u21D1","Uarrocir":"\u2949","Ubrcy":"\u040E","ubrcy":"\u045E","Ubreve":"\u016C","ubreve":"\u016D","Ucirc":"\u00DB","ucirc":"\u00FB","Ucy":"\u0423","ucy":"\u0443","udarr":"\u21C5","Udblac":"\u0170","udblac":"\u0171","udhar":"\u296E","ufisht":"\u297E","Ufr":"\uD835\uDD18","ufr":"\uD835\uDD32","Ugrave":"\u00D9","ugrave":"\u00F9","uHar":"\u2963","uharl":"\u21BF","uharr":"\u21BE","uhblk":"\u2580","ulcorn":"\u231C","ulcorner":"\u231C","ulcrop":"\u230F","ultri":"\u25F8","Umacr":"\u016A","umacr":"\u016B","uml":"\u00A8","UnderBar":"_","UnderBrace":"\u23DF","UnderBracket":"\u23B5","UnderParenthesis":"\u23DD","Union":"\u22C3","UnionPlus":"\u228E","Uogon":"\u0172","uogon":"\u0173","Uopf":"\uD835\uDD4C","uopf":"\uD835\uDD66","UpArrowBar":"\u2912","uparrow":"\u2191","UpArrow":"\u2191","Uparrow":"\u21D1","UpArrowDownArrow":"\u21C5","updownarrow":"\u2195","UpDownArrow":"\u2195","Updownarrow":"\u21D5","UpEquilibrium":"\u296E","upharpoonleft":"\u21BF","upharpoonright":"\u21BE","uplus":"\u228E","UpperLeftArrow":"\u2196","UpperRightArrow":"\u2197","upsi":"\u03C5","Upsi":"\u03D2","upsih":"\u03D2","Upsilon":"\u03A5","upsilon":"\u03C5","UpTeeArrow":"\u21A5","UpTee":"\u22A5","upuparrows":"\u21C8","urcorn":"\u231D","urcorner":"\u231D","urcrop":"\u230E","Uring":"\u016E","uring":"\u016F","urtri":"\u25F9","Uscr":"\uD835\uDCB0","uscr":"\uD835\uDCCA","utdot":"\u22F0","Utilde":"\u0168","utilde":"\u0169","utri":"\u25B5","utrif":"\u25B4","uuarr":"\u21C8","Uuml":"\u00DC","uuml":"\u00FC","uwangle":"\u29A7","vangrt":"\u299C","varepsilon":"\u03F5","varkappa":"\u03F0","varnothing":"\u2205","varphi":"\u03D5","varpi":"\u03D6","varpropto":"\u221D","varr":"\u2195","vArr":"\u21D5","varrho":"\u03F1","varsigma":"\u03C2","varsubsetneq":"\u228A\uFE00","varsubsetneqq":"\u2ACB\uFE00","varsupsetneq":"\u228B\uFE00","varsupsetneqq":"\u2ACC\uFE00","vartheta":"\u03D1","vartriangleleft":"\u22B2","vartriangleright":"\u22B3","vBar":"\u2AE8","Vbar":"\u2AEB","vBarv":"\u2AE9","Vcy":"\u0412","vcy":"\u0432","vdash":"\u22A2","vDash":"\u22A8","Vdash":"\u22A9","VDash":"\u22AB","Vdashl":"\u2AE6","veebar":"\u22BB","vee":"\u2228","Vee":"\u22C1","veeeq":"\u225A","vellip":"\u22EE","verbar":"|","Verbar":"\u2016","vert":"|","Vert":"\u2016","VerticalBar":"\u2223","VerticalLine":"|","VerticalSeparator":"\u2758","VerticalTilde":"\u2240","VeryThinSpace":"\u200A","Vfr":"\uD835\uDD19","vfr":"\uD835\uDD33","vltri":"\u22B2","vnsub":"\u2282\u20D2","vnsup":"\u2283\u20D2","Vopf":"\uD835\uDD4D","vopf":"\uD835\uDD67","vprop":"\u221D","vrtri":"\u22B3","Vscr":"\uD835\uDCB1","vscr":"\uD835\uDCCB","vsubnE":"\u2ACB\uFE00","vsubne":"\u228A\uFE00","vsupnE":"\u2ACC\uFE00","vsupne":"\u228B\uFE00","Vvdash":"\u22AA","vzigzag":"\u299A","Wcirc":"\u0174","wcirc":"\u0175","wedbar":"\u2A5F","wedge":"\u2227","Wedge":"\u22C0","wedgeq":"\u2259","weierp":"\u2118","Wfr":"\uD835\uDD1A","wfr":"\uD835\uDD34","Wopf":"\uD835\uDD4E","wopf":"\uD835\uDD68","wp":"\u2118","wr":"\u2240","wreath":"\u2240","Wscr":"\uD835\uDCB2","wscr":"\uD835\uDCCC","xcap":"\u22C2","xcirc":"\u25EF","xcup":"\u22C3","xdtri":"\u25BD","Xfr":"\uD835\uDD1B","xfr":"\uD835\uDD35","xharr":"\u27F7","xhArr":"\u27FA","Xi":"\u039E","xi":"\u03BE","xlarr":"\u27F5","xlArr":"\u27F8","xmap":"\u27FC","xnis":"\u22FB","xodot":"\u2A00","Xopf":"\uD835\uDD4F","xopf":"\uD835\uDD69","xoplus":"\u2A01","xotime":"\u2A02","xrarr":"\u27F6","xrArr":"\u27F9","Xscr":"\uD835\uDCB3","xscr":"\uD835\uDCCD","xsqcup":"\u2A06","xuplus":"\u2A04","xutri":"\u25B3","xvee":"\u22C1","xwedge":"\u22C0","Yacute":"\u00DD","yacute":"\u00FD","YAcy":"\u042F","yacy":"\u044F","Ycirc":"\u0176","ycirc":"\u0177","Ycy":"\u042B","ycy":"\u044B","yen":"\u00A5","Yfr":"\uD835\uDD1C","yfr":"\uD835\uDD36","YIcy":"\u0407","yicy":"\u0457","Yopf":"\uD835\uDD50","yopf":"\uD835\uDD6A","Yscr":"\uD835\uDCB4","yscr":"\uD835\uDCCE","YUcy":"\u042E","yucy":"\u044E","yuml":"\u00FF","Yuml":"\u0178","Zacute":"\u0179","zacute":"\u017A","Zcaron":"\u017D","zcaron":"\u017E","Zcy":"\u0417","zcy":"\u0437","Zdot":"\u017B","zdot":"\u017C","zeetrf":"\u2128","ZeroWidthSpace":"\u200B","Zeta":"\u0396","zeta":"\u03B6","zfr":"\uD835\uDD37","Zfr":"\u2128","ZHcy":"\u0416","zhcy":"\u0436","zigrarr":"\u21DD","zopf":"\uD835\uDD6B","Zopf":"\u2124","Zscr":"\uD835\uDCB5","zscr":"\uD835\uDCCF","zwj":"\u200D","zwnj":"\u200C"}
-},{}],335:[function(require,module,exports){
+},{}],346:[function(require,module,exports){
 module.exports={"Aacute":"\u00C1","aacute":"\u00E1","Acirc":"\u00C2","acirc":"\u00E2","acute":"\u00B4","AElig":"\u00C6","aelig":"\u00E6","Agrave":"\u00C0","agrave":"\u00E0","amp":"&","AMP":"&","Aring":"\u00C5","aring":"\u00E5","Atilde":"\u00C3","atilde":"\u00E3","Auml":"\u00C4","auml":"\u00E4","brvbar":"\u00A6","Ccedil":"\u00C7","ccedil":"\u00E7","cedil":"\u00B8","cent":"\u00A2","copy":"\u00A9","COPY":"\u00A9","curren":"\u00A4","deg":"\u00B0","divide":"\u00F7","Eacute":"\u00C9","eacute":"\u00E9","Ecirc":"\u00CA","ecirc":"\u00EA","Egrave":"\u00C8","egrave":"\u00E8","ETH":"\u00D0","eth":"\u00F0","Euml":"\u00CB","euml":"\u00EB","frac12":"\u00BD","frac14":"\u00BC","frac34":"\u00BE","gt":">","GT":">","Iacute":"\u00CD","iacute":"\u00ED","Icirc":"\u00CE","icirc":"\u00EE","iexcl":"\u00A1","Igrave":"\u00CC","igrave":"\u00EC","iquest":"\u00BF","Iuml":"\u00CF","iuml":"\u00EF","laquo":"\u00AB","lt":"<","LT":"<","macr":"\u00AF","micro":"\u00B5","middot":"\u00B7","nbsp":"\u00A0","not":"\u00AC","Ntilde":"\u00D1","ntilde":"\u00F1","Oacute":"\u00D3","oacute":"\u00F3","Ocirc":"\u00D4","ocirc":"\u00F4","Ograve":"\u00D2","ograve":"\u00F2","ordf":"\u00AA","ordm":"\u00BA","Oslash":"\u00D8","oslash":"\u00F8","Otilde":"\u00D5","otilde":"\u00F5","Ouml":"\u00D6","ouml":"\u00F6","para":"\u00B6","plusmn":"\u00B1","pound":"\u00A3","quot":"\"","QUOT":"\"","raquo":"\u00BB","reg":"\u00AE","REG":"\u00AE","sect":"\u00A7","shy":"\u00AD","sup1":"\u00B9","sup2":"\u00B2","sup3":"\u00B3","szlig":"\u00DF","THORN":"\u00DE","thorn":"\u00FE","times":"\u00D7","Uacute":"\u00DA","uacute":"\u00FA","Ucirc":"\u00DB","ucirc":"\u00FB","Ugrave":"\u00D9","ugrave":"\u00F9","uml":"\u00A8","Uuml":"\u00DC","uuml":"\u00FC","Yacute":"\u00DD","yacute":"\u00FD","yen":"\u00A5","yuml":"\u00FF"}
-},{}],336:[function(require,module,exports){
+},{}],347:[function(require,module,exports){
 module.exports={"amp":"&","apos":"'","gt":">","lt":"<","quot":"\""}
 
-},{}],337:[function(require,module,exports){
+},{}],348:[function(require,module,exports){
 /* eslint-env browser */
 module.exports = typeof self == 'object' ? self.FormData : window.FormData;
 
-},{}],338:[function(require,module,exports){
+},{}],349:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var Transform = require('stream').Transform
@@ -45249,33 +62527,33 @@ HashBase.prototype._digest = function () {
 module.exports = HashBase
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"inherits":339,"stream":243}],339:[function(require,module,exports){
-arguments[4][192][0].apply(exports,arguments)
-},{"dup":192}],340:[function(require,module,exports){
-arguments[4][312][0].apply(exports,arguments)
-},{"./hash/common":341,"./hash/hmac":342,"./hash/ripemd":343,"./hash/sha":344,"./hash/utils":351,"dup":312}],341:[function(require,module,exports){
-arguments[4][313][0].apply(exports,arguments)
-},{"./utils":351,"dup":313,"minimalistic-assert":421}],342:[function(require,module,exports){
-arguments[4][314][0].apply(exports,arguments)
-},{"./utils":351,"dup":314,"minimalistic-assert":421}],343:[function(require,module,exports){
-arguments[4][315][0].apply(exports,arguments)
-},{"./common":341,"./utils":351,"dup":315}],344:[function(require,module,exports){
-arguments[4][316][0].apply(exports,arguments)
-},{"./sha/1":345,"./sha/224":346,"./sha/256":347,"./sha/384":348,"./sha/512":349,"dup":316}],345:[function(require,module,exports){
-arguments[4][317][0].apply(exports,arguments)
-},{"../common":341,"../utils":351,"./common":350,"dup":317}],346:[function(require,module,exports){
-arguments[4][318][0].apply(exports,arguments)
-},{"../utils":351,"./256":347,"dup":318}],347:[function(require,module,exports){
-arguments[4][319][0].apply(exports,arguments)
-},{"../common":341,"../utils":351,"./common":350,"dup":319,"minimalistic-assert":421}],348:[function(require,module,exports){
-arguments[4][320][0].apply(exports,arguments)
-},{"../utils":351,"./512":349,"dup":320}],349:[function(require,module,exports){
-arguments[4][321][0].apply(exports,arguments)
-},{"../common":341,"../utils":351,"dup":321,"minimalistic-assert":421}],350:[function(require,module,exports){
-arguments[4][322][0].apply(exports,arguments)
-},{"../utils":351,"dup":322}],351:[function(require,module,exports){
+},{"buffer":179,"inherits":350,"stream":254}],350:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],351:[function(require,module,exports){
 arguments[4][323][0].apply(exports,arguments)
-},{"dup":323,"inherits":361,"minimalistic-assert":421}],352:[function(require,module,exports){
+},{"./hash/common":352,"./hash/hmac":353,"./hash/ripemd":354,"./hash/sha":355,"./hash/utils":362,"dup":323}],352:[function(require,module,exports){
+arguments[4][324][0].apply(exports,arguments)
+},{"./utils":362,"dup":324,"minimalistic-assert":438}],353:[function(require,module,exports){
+arguments[4][325][0].apply(exports,arguments)
+},{"./utils":362,"dup":325,"minimalistic-assert":438}],354:[function(require,module,exports){
+arguments[4][326][0].apply(exports,arguments)
+},{"./common":352,"./utils":362,"dup":326}],355:[function(require,module,exports){
+arguments[4][327][0].apply(exports,arguments)
+},{"./sha/1":356,"./sha/224":357,"./sha/256":358,"./sha/384":359,"./sha/512":360,"dup":327}],356:[function(require,module,exports){
+arguments[4][328][0].apply(exports,arguments)
+},{"../common":352,"../utils":362,"./common":361,"dup":328}],357:[function(require,module,exports){
+arguments[4][329][0].apply(exports,arguments)
+},{"../utils":362,"./256":358,"dup":329}],358:[function(require,module,exports){
+arguments[4][330][0].apply(exports,arguments)
+},{"../common":352,"../utils":362,"./common":361,"dup":330,"minimalistic-assert":438}],359:[function(require,module,exports){
+arguments[4][331][0].apply(exports,arguments)
+},{"../utils":362,"./512":360,"dup":331}],360:[function(require,module,exports){
+arguments[4][332][0].apply(exports,arguments)
+},{"../common":352,"../utils":362,"dup":332,"minimalistic-assert":438}],361:[function(require,module,exports){
+arguments[4][333][0].apply(exports,arguments)
+},{"../utils":362,"dup":333}],362:[function(require,module,exports){
+arguments[4][334][0].apply(exports,arguments)
+},{"dup":334,"inherits":378,"minimalistic-assert":438}],363:[function(require,module,exports){
 module.exports = CollectingHandler;
 
 function CollectingHandler(cbs){
@@ -45332,7 +62610,7 @@ CollectingHandler.prototype.restart = function(){
 	}
 };
 
-},{"./":359}],353:[function(require,module,exports){
+},{"./":370}],364:[function(require,module,exports){
 var index = require("./index.js"),
     DomHandler = index.DomHandler,
     DomUtils = index.DomUtils;
@@ -45429,7 +62707,7 @@ FeedHandler.prototype.onend = function(){
 
 module.exports = FeedHandler;
 
-},{"./index.js":359,"inherits":360}],354:[function(require,module,exports){
+},{"./index.js":370,"inherits":371}],365:[function(require,module,exports){
 var Tokenizer = require("./Tokenizer.js");
 
 /*
@@ -45784,7 +63062,7 @@ Parser.prototype.done = Parser.prototype.end;
 
 module.exports = Parser;
 
-},{"./Tokenizer.js":357,"events":188,"inherits":360}],355:[function(require,module,exports){
+},{"./Tokenizer.js":368,"events":199,"inherits":371}],366:[function(require,module,exports){
 module.exports = ProxyHandler;
 
 function ProxyHandler(cbs){
@@ -45812,7 +63090,7 @@ Object.keys(EVENTS).forEach(function(name){
 		throw Error("wrong number of arguments");
 	}
 });
-},{"./":359}],356:[function(require,module,exports){
+},{"./":370}],367:[function(require,module,exports){
 module.exports = Stream;
 
 var Parser = require("./WritableStream.js");
@@ -45848,7 +63126,7 @@ Object.keys(EVENTS).forEach(function(name){
 		throw Error("wrong number of arguments!");
 	}
 });
-},{"../":359,"./WritableStream.js":358,"inherits":360}],357:[function(require,module,exports){
+},{"../":370,"./WritableStream.js":369,"inherits":371}],368:[function(require,module,exports){
 module.exports = Tokenizer;
 
 var decodeCodePoint = require("entities/lib/decode_codepoint.js"),
@@ -46756,7 +64034,7 @@ Tokenizer.prototype._emitPartial = function(value){
 	}
 };
 
-},{"entities/lib/decode_codepoint.js":331,"entities/maps/entities.json":334,"entities/maps/legacy.json":335,"entities/maps/xml.json":336}],358:[function(require,module,exports){
+},{"entities/lib/decode_codepoint.js":342,"entities/maps/entities.json":345,"entities/maps/legacy.json":346,"entities/maps/xml.json":347}],369:[function(require,module,exports){
 module.exports = Stream;
 
 var Parser = require("./Parser.js"),
@@ -46782,7 +64060,7 @@ WritableStream.prototype._write = function(chunk, encoding, cb){
 	this._parser.write(chunk);
 	cb();
 };
-},{"./Parser.js":354,"buffer":168,"inherits":360,"readable-stream":140,"stream":243,"string_decoder":244}],359:[function(require,module,exports){
+},{"./Parser.js":365,"buffer":179,"inherits":371,"readable-stream":151,"stream":254,"string_decoder":255}],370:[function(require,module,exports){
 var Parser = require("./Parser.js"),
     DomHandler = require("domhandler");
 
@@ -46852,11 +64130,1098 @@ module.exports = {
 	}
 };
 
-},{"./CollectingHandler.js":352,"./FeedHandler.js":353,"./Parser.js":354,"./ProxyHandler.js":355,"./Stream.js":356,"./Tokenizer.js":357,"./WritableStream.js":358,"domelementtype":284,"domhandler":285,"domutils":288}],360:[function(require,module,exports){
-arguments[4][192][0].apply(exports,arguments)
-},{"dup":192}],361:[function(require,module,exports){
-arguments[4][192][0].apply(exports,arguments)
-},{"dup":192}],362:[function(require,module,exports){
+},{"./CollectingHandler.js":363,"./FeedHandler.js":364,"./Parser.js":365,"./ProxyHandler.js":366,"./Stream.js":367,"./Tokenizer.js":368,"./WritableStream.js":369,"domelementtype":295,"domhandler":296,"domutils":299}],371:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],372:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.11
+(function() {
+  var BaseError, C, Canceler, EscErr, EscOk, c_to_camel, copy_trace, ipush, make_error_klass, make_errors, make_esc, to_lower, util,
+    __slice = [].slice;
+
+  util = require('util');
+
+  C = require('iced-runtime')["const"];
+
+  exports.BaseError = BaseError = function(msg, constructor) {
+    if (typeof Error.captureStackTrace === "function") {
+      Error.captureStackTrace(this, this.constructor);
+    }
+    return this.message = msg || 'Error';
+  };
+
+  util.inherits(BaseError, Error);
+
+  BaseError.prototype.name = "BaseError";
+
+  to_lower = function(s) {
+    return s[0].toUpperCase() + s.slice(1).toLowerCase();
+  };
+
+  c_to_camel = function(s) {
+    var p;
+    return ((function() {
+      var _i, _len, _ref, _results;
+      _ref = s.split(/_/);
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        p = _ref[_i];
+        _results.push(to_lower(p));
+      }
+      return _results;
+    })()).join('');
+  };
+
+  make_error_klass = function(k, code, default_msg) {
+    var ctor;
+    ctor = function(msg) {
+      BaseError.call(this, msg || default_msg, this.constructor);
+      this.istack = [];
+      this.code = code;
+      return this;
+    };
+    util.inherits(ctor, BaseError);
+    ctor.prototype.name = k;
+    ctor.prototype.inspect = function() {
+      return "[" + k + ": " + this.message + " (code " + this.code + ")]";
+    };
+    return ctor;
+  };
+
+  copy_trace = function(src, dst) {
+    dst[C.trace] = src[C.trace];
+    return dst;
+  };
+
+  exports.make_errors = make_errors = function(d) {
+    var enam, errno, k, msg, out, val;
+    out = {
+      msg: {},
+      name: {},
+      code: {}
+    };
+    d.OK = "Success";
+    errno = 100;
+    for (k in d) {
+      msg = d[k];
+      if (k !== "OK") {
+        enam = (c_to_camel(k)) + "Error";
+        val = errno++;
+        out[enam] = make_error_klass(enam, val, msg);
+      } else {
+        val = 0;
+      }
+      out[k] = val;
+      out.msg[k] = out.msg[val] = msg;
+      out.name[k] = out.name[val] = k;
+      out.code[k] = val;
+    }
+    return out;
+  };
+
+  ipush = function(e, msg) {
+    if (msg != null) {
+      if (e.istack == null) {
+        e.istack = [];
+      }
+      return e.istack.push(msg);
+    }
+  };
+
+  exports.make_esc = make_esc = function(gcb, where) {
+    return function(lcb) {
+      return copy_trace(lcb, function() {
+        var args, err, _ref, _ref1, _ref2;
+        err = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        if (err == null) {
+          return lcb.apply(null, args);
+        } else if (!gcb.__esc) {
+          gcb.__esc = true;
+          ipush(err, (_ref = where != null ? where : arguments != null ? (_ref1 = arguments.caller) != null ? (_ref2 = _ref1.callee) != null ? _ref2.name : void 0 : void 0 : void 0) != null ? _ref : "unnamed error");
+          return gcb(err);
+        }
+      });
+    };
+  };
+
+  exports.EscOk = EscOk = (function() {
+    function EscOk(gcb, where) {
+      this.gcb = gcb;
+      this.where = where;
+    }
+
+    EscOk.prototype.bailout = function() {
+      var t;
+      if (this.gcb) {
+        t = this.gcb;
+        this.gcb = null;
+        return t(false);
+      }
+    };
+
+    EscOk.prototype.check_ok = function(cb) {
+      return copy_trace(cb, (function(_this) {
+        return function() {
+          var args, ok;
+          ok = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+          if (!ok) {
+            return _this.bailout();
+          } else {
+            return cb.apply(null, args);
+          }
+        };
+      })(this));
+    };
+
+    EscOk.prototype.check_err = function(cb) {
+      return copy_trace(cb, (function(_this) {
+        return function() {
+          var args, err;
+          err = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+          if (err != null) {
+            ipush(err, _this.where);
+            return _this.bailout();
+          } else {
+            return cb.apply(null, args);
+          }
+        };
+      })(this));
+    };
+
+    EscOk.prototype.check_non_null = function(cb) {
+      return copy_trace(cb, (function(_this) {
+        return function() {
+          var args;
+          args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+          if (args[0] == null) {
+            return _this.bailout();
+          } else {
+            return cb.apply(null, args);
+          }
+        };
+      })(this));
+    };
+
+    return EscOk;
+
+  })();
+
+  exports.EscErr = EscErr = (function() {
+    function EscErr(gcb, where) {
+      this.gcb = gcb;
+      this.where = where;
+    }
+
+    EscErr.prototype.finish = function(err) {
+      var t;
+      if (this.gcb) {
+        t = this.gcb;
+        this.gcb = null;
+        return t(err);
+      }
+    };
+
+    EscErr.prototype.check_ok = function(cb, eclass, emsg) {
+      if (eclass == null) {
+        eclass = Error;
+      }
+      if (emsg == null) {
+        emsg = null;
+      }
+      return copy_trace(cb, function() {
+        var args, err, ok;
+        ok = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        if (!ok) {
+          err = new eclass(emsg);
+          ipush(err, this.where);
+          return this.finish(err);
+        } else {
+          return cb.apply(null, args);
+        }
+      });
+    };
+
+    EscErr.prototype.check_err = function(cb) {
+      return copy_trace(cb, function() {
+        var args, err;
+        err = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+        if (err != null) {
+          ipush(err, this.where);
+          return this.finish(err);
+        } else {
+          return cb.apply(null, args);
+        }
+      });
+    };
+
+    return EscErr;
+
+  })();
+
+  exports.Canceler = Canceler = (function() {
+    function Canceler(klass) {
+      this.klass = klass != null ? klass : Error;
+      this._canceled = false;
+    }
+
+    Canceler.prototype.is_canceled = function() {
+      return this._canceled;
+    };
+
+    Canceler.prototype.is_ok = function() {
+      return !this._canceled;
+    };
+
+    Canceler.prototype.cancel = function() {
+      return this._canceled = true;
+    };
+
+    Canceler.prototype.err = function() {
+      if (this._canceled) {
+        return new this.klass("Aborted");
+      } else {
+        return null;
+      }
+    };
+
+    return Canceler;
+
+  })();
+
+  exports.chain = function(cb, f) {
+    return function() {
+      var args;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return f(function() {
+        return cb.apply(null, args);
+      });
+    };
+  };
+
+  exports.chain_err = function(cb, f) {
+    return function() {
+      var args0;
+      args0 = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      return f(function() {
+        var args1;
+        args1 = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        return cb.apply(null, ((args1[0] != null) && !(args0[0] != null) ? args1 : args0));
+      });
+    };
+  };
+
+}).call(this);
+
+
+
+},{"iced-runtime":376,"util":261}],373:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.11
+(function() {
+  var Lock, NamedLock, SingleFlightTable, SingleFlighter, Table, iced, __iced_k, __iced_k_noop,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  exports.Lock = Lock = (function() {
+    function Lock() {
+      this._open = true;
+      this._waiters = [];
+    }
+
+    Lock.prototype.acquire = function(cb) {
+      if (this._open) {
+        this._open = false;
+        return cb();
+      } else {
+        return this._waiters.push(cb);
+      }
+    };
+
+    Lock.prototype.release = function() {
+      var w;
+      if (this._waiters.length) {
+        w = this._waiters.shift();
+        return w();
+      } else {
+        return this._open = true;
+      }
+    };
+
+    Lock.prototype.open = function() {
+      return this._open;
+    };
+
+    return Lock;
+
+  })();
+
+  NamedLock = (function(_super) {
+    __extends(NamedLock, _super);
+
+    function NamedLock(tab, name) {
+      this.tab = tab;
+      this.name = name;
+      NamedLock.__super__.constructor.call(this);
+      this.refs = 0;
+    }
+
+    NamedLock.prototype.incref = function() {
+      return ++this.refs;
+    };
+
+    NamedLock.prototype.decref = function() {
+      return --this.refs;
+    };
+
+    NamedLock.prototype.release = function() {
+      NamedLock.__super__.release.call(this);
+      if (this.decref() === 0) {
+        return delete this.tab.locks[this.name];
+      }
+    };
+
+    return NamedLock;
+
+  })(Lock);
+
+  exports.Table = Table = (function() {
+    function Table() {
+      this.locks = {};
+    }
+
+    Table.prototype.create = function(name) {
+      var l;
+      l = new NamedLock(this, name);
+      return this.locks[name] = l;
+    };
+
+    Table.prototype.acquire = function(name, cb, wait) {
+      var l, was_open, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      l = this.locks[name] || this.create(name);
+      was_open = l._open;
+      l.incref();
+      (function(_this) {
+        return (function(__iced_k) {
+          if (wait || l._open) {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/iced/iced-lock/index.iced",
+                funcname: "Table.acquire"
+              });
+              l.acquire(__iced_deferrals.defer({
+                lineno: 69
+              }));
+              __iced_deferrals._fulfill();
+            })(__iced_k);
+          } else {
+            return __iced_k(l = null);
+          }
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb(l, was_open);
+        };
+      })(this));
+    };
+
+    Table.prototype.lookup = function(name) {
+      return this.locks[name];
+    };
+
+    return Table;
+
+  })();
+
+  SingleFlighter = (function() {
+    function SingleFlighter(_arg) {
+      this.table = _arg.table, this.key = _arg.key;
+      this.seqid = null;
+      this.waiter = null;
+      this.open = true;
+      this.refs = 0;
+    }
+
+    SingleFlighter.prototype._incref = function() {
+      return ++this.refs;
+    };
+
+    SingleFlighter.prototype._decref = function() {
+      if (--this.refs === 0) {
+        return this.table._remove({
+          key: this.key
+        });
+      }
+    };
+
+    SingleFlighter.prototype._enter = function(_arg, cb) {
+      var seqid, tmp;
+      seqid = _arg.seqid;
+      if (this.open) {
+        this.open = false;
+        this.seqid = seqid;
+        return cb(null, this);
+      } else if (this.waiter != null) {
+        if (seqid > this.waiter.seqid) {
+          tmp = this.waiter;
+          this.waiter = {
+            cb: cb,
+            seqid: seqid
+          };
+          tmp.cb(new Error("our seqid=" + tmp.seqid + " was preempted by " + seqid));
+        } else {
+          cb(new Error("our seqid=" + seqid + " is too stale (since " + this.waiter.seqid + " is ahead of us)"));
+        }
+        return this._decref();
+      } else if (seqid > this.seqid) {
+        return this.waiter = {
+          seqid: seqid,
+          cb: cb
+        };
+      } else {
+        cb(new Error("our seqid=" + seqid + " is too stale (since " + this.seqid + " is already in flight)"));
+        return this._decref();
+      }
+    };
+
+    SingleFlighter.prototype.release = function() {
+      var cb, _ref;
+      if (this.waiter != null) {
+        _ref = this.waiter, this.seqid = _ref.seqid, cb = _ref.cb;
+        this.waiter = null;
+        cb(null, this);
+      } else {
+        this.open = true;
+        this.seqid = null;
+      }
+      return this._decref();
+    };
+
+    return SingleFlighter;
+
+  })();
+
+  exports.SingleFlightTable = SingleFlightTable = (function() {
+    function SingleFlightTable() {
+      this._jobs = {};
+    }
+
+    SingleFlightTable.prototype._create = function(_arg) {
+      var key;
+      key = _arg.key;
+      return this._jobs[key] = new SingleFlighter({
+        table: this,
+        key: key
+      });
+    };
+
+    SingleFlightTable.prototype._remove = function(_arg) {
+      var key;
+      key = _arg.key;
+      return delete this._jobs[key];
+    };
+
+    SingleFlightTable.prototype.enter = function(_arg, cb) {
+      var key, s, seqid;
+      seqid = _arg.seqid, key = _arg.key;
+      s = this._jobs[key] || this._create({
+        key: key
+      });
+      s._incref();
+      return s._enter({
+        seqid: seqid
+      }, cb);
+    };
+
+    return SingleFlightTable;
+
+  })();
+
+}).call(this);
+
+},{"iced-runtime":376}],374:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  module.exports = {
+    k: "__iced_k",
+    k_noop: "__iced_k_noop",
+    param: "__iced_p_",
+    ns: "iced",
+    runtime: "runtime",
+    Deferrals: "Deferrals",
+    deferrals: "__iced_deferrals",
+    fulfill: "_fulfill",
+    b_while: "_break",
+    t_while: "_while",
+    c_while: "_continue",
+    n_while: "_next",
+    n_arg: "__iced_next_arg",
+    defer_method: "defer",
+    slot: "__slot",
+    assign_fn: "assign_fn",
+    autocb: "autocb",
+    retslot: "ret",
+    trace: "__iced_trace",
+    passed_deferral: "__iced_passed_deferral",
+    findDeferral: "findDeferral",
+    lineno: "lineno",
+    parent: "parent",
+    filename: "filename",
+    funcname: "funcname",
+    catchExceptions: 'catchExceptions',
+    runtime_modes: ["node", "inline", "window", "none", "browserify", "interp"],
+    trampoline: "trampoline",
+    context: "context",
+    defer_arg: "__iced_defer_"
+  };
+
+}).call(this);
+
+},{}],375:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var C, Pipeliner, iced, __iced_k, __iced_k_noop, _iand, _ior, _timeout,
+    __slice = [].slice;
+
+  __iced_k = __iced_k_noop = function() {};
+
+  C = require('./const');
+
+  exports.iced = iced = require('./runtime');
+
+  _timeout = function(cb, t, res, tmp) {
+    var arr, rv, which, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    rv = new iced.Rendezvous;
+    tmp[0] = rv.id(true).defer({
+      assign_fn: (function(_this) {
+        return function() {
+          return function() {
+            return arr = __slice.call(arguments, 0);
+          };
+        };
+      })(this)(),
+      lineno: 20,
+      context: __iced_deferrals
+    });
+    setTimeout(rv.id(false).defer({
+      lineno: 21,
+      context: __iced_deferrals
+    }), t);
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/iced/iced-runtime/src/library.iced"
+        });
+        rv.wait(__iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return which = arguments[0];
+            };
+          })(),
+          lineno: 22
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        if (res) {
+          res[0] = which;
+        }
+        return cb.apply(null, arr);
+      };
+    })(this));
+  };
+
+  exports.timeout = function(cb, t, res) {
+    var tmp;
+    tmp = [];
+    _timeout(cb, t, res, tmp);
+    return tmp[0];
+  };
+
+  _iand = function(cb, res, tmp) {
+    var ok, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/iced/iced-runtime/src/library.iced"
+        });
+        tmp[0] = __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return ok = arguments[0];
+            };
+          })(),
+          lineno: 39
+        });
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        if (!ok) {
+          res[0] = false;
+        }
+        return cb();
+      };
+    })(this));
+  };
+
+  exports.iand = function(cb, res) {
+    var tmp;
+    tmp = [];
+    _iand(cb, res, tmp);
+    return tmp[0];
+  };
+
+  _ior = function(cb, res, tmp) {
+    var ok, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/iced/iced-runtime/src/library.iced"
+        });
+        tmp[0] = __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return ok = arguments[0];
+            };
+          })(),
+          lineno: 58
+        });
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        if (ok) {
+          res[0] = true;
+        }
+        return cb();
+      };
+    })(this));
+  };
+
+  exports.ior = function(cb, res) {
+    var tmp;
+    tmp = [];
+    _ior(cb, res, tmp);
+    return tmp[0];
+  };
+
+  exports.Pipeliner = Pipeliner = (function() {
+    function Pipeliner(window, delay) {
+      this.window = window || 1;
+      this.delay = delay || 0;
+      this.queue = [];
+      this.n_out = 0;
+      this.cb = null;
+      this[C.deferrals] = this;
+      this["defer"] = this._defer;
+    }
+
+    Pipeliner.prototype.waitInQueue = function(cb) {
+      var ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      (function(_this) {
+        return (function(__iced_k) {
+          var _while;
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = __iced_k;
+            _continue = function() {
+              return iced.trampoline(function() {
+                return _while(__iced_k);
+              });
+            };
+            _next = _continue;
+            if (!(_this.n_out >= _this.window)) {
+              return _break();
+            } else {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+                  funcname: "Pipeliner.waitInQueue"
+                });
+                _this.cb = __iced_deferrals.defer({
+                  lineno: 100
+                });
+                __iced_deferrals._fulfill();
+              })(_next);
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          _this.n_out++;
+          (function(__iced_k) {
+            if (_this.delay) {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+                  funcname: "Pipeliner.waitInQueue"
+                });
+                setTimeout(__iced_deferrals.defer({
+                  lineno: 108
+                }), _this.delay);
+                __iced_deferrals._fulfill();
+              })(__iced_k);
+            } else {
+              return __iced_k();
+            }
+          })(function() {
+            return cb();
+          });
+        };
+      })(this));
+    };
+
+    Pipeliner.prototype.__defer = function(out, deferArgs) {
+      var tmp, voidCb, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+            funcname: "Pipeliner.__defer"
+          });
+          voidCb = __iced_deferrals.defer({
+            lineno: 122
+          });
+          out[0] = function() {
+            var args, _ref;
+            args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+            if ((_ref = deferArgs.assign_fn) != null) {
+              _ref.apply(null, args);
+            }
+            return voidCb();
+          };
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          _this.n_out--;
+          if (_this.cb) {
+            tmp = _this.cb;
+            _this.cb = null;
+            return tmp();
+          }
+        };
+      })(this));
+    };
+
+    Pipeliner.prototype._defer = function(deferArgs) {
+      var tmp;
+      tmp = [];
+      this.__defer(tmp, deferArgs);
+      return tmp[0];
+    };
+
+    Pipeliner.prototype.flush = function(autocb) {
+      var ___iced_passed_deferral, __iced_k, _while;
+      __iced_k = autocb;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      _while = (function(_this) {
+        var __iced_deferrals;
+        return function(__iced_k) {
+          var _break, _continue, _next;
+          _break = __iced_k;
+          _continue = function() {
+            return iced.trampoline(function() {
+              return _while(__iced_k);
+            });
+          };
+          _next = _continue;
+          if (!_this.n_out) {
+            return _break();
+          } else {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/iced/iced-runtime/src/library.iced",
+                funcname: "Pipeliner.flush"
+              });
+              _this.cb = __iced_deferrals.defer({
+                lineno: 151
+              });
+              __iced_deferrals._fulfill();
+            })(_next);
+          }
+        };
+      })(this);
+      _while(__iced_k);
+    };
+
+    return Pipeliner;
+
+  })();
+
+}).call(this);
+
+},{"./const":374,"./runtime":377}],376:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var k, mod, mods, v, _i, _len;
+
+  exports["const"] = require('./const');
+
+  mods = [require('./runtime'), require('./library')];
+
+  for (_i = 0, _len = mods.length; _i < _len; _i++) {
+    mod = mods[_i];
+    for (k in mod) {
+      v = mod[k];
+      exports[k] = v;
+    }
+  }
+
+}).call(this);
+
+},{"./const":374,"./library":375,"./runtime":377}],377:[function(require,module,exports){
+(function (process){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var C, Deferrals, Rendezvous, exceptionHandler, findDeferral, make_defer_return, stackWalk, tick_counter, trampoline, warn, __active_trace, __c, _trace_to_string,
+    __slice = [].slice;
+
+  C = require('./const');
+
+  make_defer_return = function(obj, defer_args, id, trace_template, multi) {
+    var k, ret, trace, v;
+    trace = {};
+    for (k in trace_template) {
+      v = trace_template[k];
+      trace[k] = v;
+    }
+    trace[C.lineno] = defer_args != null ? defer_args[C.lineno] : void 0;
+    ret = function() {
+      var inner_args, o, _ref;
+      inner_args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if (defer_args != null) {
+        if ((_ref = defer_args.assign_fn) != null) {
+          _ref.apply(null, inner_args);
+        }
+      }
+      if (obj) {
+        o = obj;
+        if (!multi) {
+          obj = null;
+        }
+        return o._fulfill(id, trace);
+      } else {
+        return warn("overused deferral at " + (_trace_to_string(trace)));
+      }
+    };
+    ret[C.trace] = trace;
+    return ret;
+  };
+
+  __c = 0;
+
+  tick_counter = function(mod) {
+    __c++;
+    if ((__c % mod) === 0) {
+      __c = 0;
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  __active_trace = null;
+
+  _trace_to_string = function(tr) {
+    var fn;
+    fn = tr[C.funcname] || "<anonymous>";
+    return "" + fn + " (" + tr[C.filename] + ":" + (tr[C.lineno] + 1) + ")";
+  };
+
+  warn = function(m) {
+    return typeof console !== "undefined" && console !== null ? console.error("ICED warning: " + m) : void 0;
+  };
+
+  exports.trampoline = trampoline = function(fn) {
+    if (!tick_counter(500)) {
+      return fn();
+    } else if ((typeof process !== "undefined" && process !== null ? process.nextTick : void 0) != null) {
+      return process.nextTick(fn);
+    } else {
+      return setTimeout(fn);
+    }
+  };
+
+  exports.Deferrals = Deferrals = (function() {
+    function Deferrals(k, trace) {
+      this.trace = trace;
+      this.continuation = k;
+      this.count = 1;
+      this.ret = null;
+    }
+
+    Deferrals.prototype._call = function(trace) {
+      var c;
+      if (this.continuation) {
+        __active_trace = trace;
+        c = this.continuation;
+        this.continuation = null;
+        return c(this.ret);
+      } else {
+        return warn("Entered dead await at " + (_trace_to_string(trace)));
+      }
+    };
+
+    Deferrals.prototype._fulfill = function(id, trace) {
+      if (--this.count > 0) {
+
+      } else {
+        return trampoline(((function(_this) {
+          return function() {
+            return _this._call(trace);
+          };
+        })(this)));
+      }
+    };
+
+    Deferrals.prototype.defer = function(args) {
+      var self;
+      this.count++;
+      self = this;
+      return make_defer_return(self, args, null, this.trace);
+    };
+
+    return Deferrals;
+
+  })();
+
+  exports.findDeferral = findDeferral = function(args) {
+    var a, _i, _len;
+    for (_i = 0, _len = args.length; _i < _len; _i++) {
+      a = args[_i];
+      if (a != null ? a[C.trace] : void 0) {
+        return a;
+      }
+    }
+    return null;
+  };
+
+  exports.Rendezvous = Rendezvous = (function() {
+    var RvId;
+
+    function Rendezvous() {
+      this.completed = [];
+      this.waiters = [];
+      this.defer_id = 0;
+    }
+
+    RvId = (function() {
+      function RvId(rv, id, multi) {
+        this.rv = rv;
+        this.id = id;
+        this.multi = multi;
+      }
+
+      RvId.prototype.defer = function(defer_args) {
+        return this.rv._defer_with_id(this.id, defer_args, this.multi);
+      };
+
+      return RvId;
+
+    })();
+
+    Rendezvous.prototype.wait = function(cb) {
+      var x;
+      if (this.completed.length) {
+        x = this.completed.shift();
+        return cb(x);
+      } else {
+        return this.waiters.push(cb);
+      }
+    };
+
+    Rendezvous.prototype.defer = function(defer_args) {
+      var id;
+      id = this.defer_id++;
+      return this._defer_with_id(id, defer_args);
+    };
+
+    Rendezvous.prototype.id = function(i, multi) {
+      multi = !!multi;
+      return new RvId(this, i, multi);
+    };
+
+    Rendezvous.prototype._fulfill = function(id, trace) {
+      var cb;
+      if (this.waiters.length) {
+        cb = this.waiters.shift();
+        return cb(id);
+      } else {
+        return this.completed.push(id);
+      }
+    };
+
+    Rendezvous.prototype._defer_with_id = function(id, defer_args, multi) {
+      this.count++;
+      return make_defer_return(this, defer_args, id, {}, multi);
+    };
+
+    return Rendezvous;
+
+  })();
+
+  exports.stackWalk = stackWalk = function(cb) {
+    var line, ret, tr, _ref;
+    ret = [];
+    tr = cb ? cb[C.trace] : __active_trace;
+    while (tr) {
+      line = "   at " + (_trace_to_string(tr));
+      ret.push(line);
+      tr = tr != null ? (_ref = tr[C.parent]) != null ? _ref[C.trace] : void 0 : void 0;
+    }
+    return ret;
+  };
+
+  exports.exceptionHandler = exceptionHandler = function(err, logger) {
+    var stack;
+    if (!logger) {
+      logger = console.error;
+    }
+    logger(err.stack);
+    stack = stackWalk();
+    if (stack.length) {
+      logger("Iced 'stack' trace (w/ real line numbers):");
+      return logger(stack.join("\n"));
+    }
+  };
+
+  exports.catchExceptions = function(logger) {
+    return typeof process !== "undefined" && process !== null ? process.on('uncaughtException', function(err) {
+      exceptionHandler(err, logger);
+      return process.exit(1);
+    }) : void 0;
+  };
+
+}).call(this);
+
+}).call(this,require('_process'))
+},{"./const":374,"_process":219}],378:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],379:[function(require,module,exports){
 (function (Buffer){
 /*
  * This code is taken from https://github.com/Brightspace/node-ecdsa-sig-formatter
@@ -47003,7 +65368,7 @@ function joseToDer(signature, alg) {
     return signature;
 }
 }).call(this,require("buffer").Buffer)
-},{"asn1.js":47,"buffer":168}],363:[function(require,module,exports){
+},{"asn1.js":48,"buffer":179}],380:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -47019,7 +65384,7 @@ var cryptoClients = {
 
 exports.SECP256K1Client = _secp256k.SECP256K1Client;
 exports.cryptoClients = cryptoClients;
-},{"./secp256k1":364}],364:[function(require,module,exports){
+},{"./secp256k1":381}],381:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -47154,7 +65519,7 @@ SECP256K1Client.keyEncoder = new _keyEncoder2.default({
   curve: SECP256K1Client.ec
 });
 }).call(this,require("buffer").Buffer)
-},{"../errors":366,"./ecdsaSigFormatter":362,"buffer":168,"crypto":177,"elliptic":295,"key-encoder":370,"validator":448}],365:[function(require,module,exports){
+},{"../errors":383,"./ecdsaSigFormatter":379,"buffer":179,"crypto":188,"elliptic":306,"key-encoder":387,"validator":499}],382:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -47206,7 +65571,7 @@ function decodeToken(token) {
         };
     }
 }
-},{"./errors":366,"base64url":64}],366:[function(require,module,exports){
+},{"./errors":383,"base64url":66}],383:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -47250,7 +65615,7 @@ var InvalidTokenError = exports.InvalidTokenError = function (_Error2) {
 
   return InvalidTokenError;
 }(Error);
-},{}],367:[function(require,module,exports){
+},{}],384:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -47319,7 +65684,7 @@ Object.defineProperty(exports, 'cryptoClients', {
     return _cryptoClients.cryptoClients;
   }
 });
-},{"./cryptoClients":363,"./decode":365,"./errors":366,"./signer":368,"./verifier":369}],368:[function(require,module,exports){
+},{"./cryptoClients":380,"./decode":382,"./errors":383,"./signer":385,"./verifier":386}],385:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -47420,7 +65785,7 @@ var TokenSigner = exports.TokenSigner = function () {
 
     return TokenSigner;
 }();
-},{"./cryptoClients":363,"./decode":365,"./errors":366,"base64url":64}],369:[function(require,module,exports){
+},{"./cryptoClients":380,"./decode":382,"./errors":383,"base64url":66}],386:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -47516,11 +65881,11 @@ var TokenVerifier = exports.TokenVerifier = function () {
 
     return TokenVerifier;
 }();
-},{"./cryptoClients":363,"./decode":365,"base64url":64}],370:[function(require,module,exports){
+},{"./cryptoClients":380,"./decode":382,"base64url":66}],387:[function(require,module,exports){
 'use strict'
 
 module.exports = require('./lib/key-encoder')
-},{"./lib/key-encoder":371}],371:[function(require,module,exports){
+},{"./lib/key-encoder":388}],388:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 
@@ -47686,9 +66051,9 @@ KeyEncoder.prototype.encodePublic = function(publicKey, originalFormat, destinat
 
 module.exports = KeyEncoder
 }).call(this,require("buffer").Buffer)
-},{"asn1.js":372,"bn.js":387,"buffer":168,"elliptic":388}],372:[function(require,module,exports){
-arguments[4][47][0].apply(exports,arguments)
-},{"./asn1/api":373,"./asn1/base":375,"./asn1/constants":379,"./asn1/decoders":381,"./asn1/encoders":384,"bn.js":386,"dup":47}],373:[function(require,module,exports){
+},{"asn1.js":389,"bn.js":404,"buffer":179,"elliptic":405}],389:[function(require,module,exports){
+arguments[4][48][0].apply(exports,arguments)
+},{"./asn1/api":390,"./asn1/base":392,"./asn1/constants":396,"./asn1/decoders":398,"./asn1/encoders":401,"bn.js":403,"dup":48}],390:[function(require,module,exports){
 var asn1 = require('../asn1');
 var inherits = require('inherits');
 
@@ -47749,11 +66114,11 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":372,"inherits":361,"vm":251}],374:[function(require,module,exports){
-arguments[4][49][0].apply(exports,arguments)
-},{"../base":375,"buffer":168,"dup":49,"inherits":361}],375:[function(require,module,exports){
+},{"../asn1":389,"inherits":378,"vm":262}],391:[function(require,module,exports){
 arguments[4][50][0].apply(exports,arguments)
-},{"./buffer":374,"./node":376,"./reporter":377,"dup":50}],376:[function(require,module,exports){
+},{"../base":392,"buffer":179,"dup":50,"inherits":378}],392:[function(require,module,exports){
+arguments[4][51][0].apply(exports,arguments)
+},{"./buffer":391,"./node":393,"./reporter":394,"dup":51}],393:[function(require,module,exports){
 var Reporter = require('../base').Reporter;
 var EncoderBuffer = require('../base').EncoderBuffer;
 var assert = require('minimalistic-assert');
@@ -48353,7 +66718,7 @@ Node.prototype._encodePrimitive = function encodePrimitive(tag, data) {
     throw new Error('Unsupported tag: ' + tag);
 };
 
-},{"../base":375,"minimalistic-assert":421}],377:[function(require,module,exports){
+},{"../base":392,"minimalistic-assert":438}],394:[function(require,module,exports){
 var inherits = require('inherits');
 
 function Reporter(options) {
@@ -48457,11 +66822,11 @@ ReporterError.prototype.rethrow = function rethrow(msg) {
   return this;
 };
 
-},{"inherits":361}],378:[function(require,module,exports){
-arguments[4][53][0].apply(exports,arguments)
-},{"../constants":379,"dup":53}],379:[function(require,module,exports){
+},{"inherits":378}],395:[function(require,module,exports){
 arguments[4][54][0].apply(exports,arguments)
-},{"./der":378,"dup":54}],380:[function(require,module,exports){
+},{"../constants":396,"dup":54}],396:[function(require,module,exports){
+arguments[4][55][0].apply(exports,arguments)
+},{"./der":395,"dup":55}],397:[function(require,module,exports){
 var inherits = require('inherits');
 
 var asn1 = require('../../asn1');
@@ -48754,9 +67119,9 @@ function derDecodeLen(buf, primitive, fail) {
   return len;
 }
 
-},{"../../asn1":372,"inherits":361}],381:[function(require,module,exports){
-arguments[4][56][0].apply(exports,arguments)
-},{"./der":380,"./pem":382,"dup":56}],382:[function(require,module,exports){
+},{"../../asn1":389,"inherits":378}],398:[function(require,module,exports){
+arguments[4][57][0].apply(exports,arguments)
+},{"./der":397,"./pem":399,"dup":57}],399:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -48808,7 +67173,7 @@ PEMDecoder.prototype.decode = function decode(data, options) {
   return DERDecoder.prototype.decode.call(this, input, options);
 };
 
-},{"../../asn1":372,"./der":380,"buffer":168,"inherits":361}],383:[function(require,module,exports){
+},{"../../asn1":389,"./der":397,"buffer":179,"inherits":378}],400:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -49082,9 +67447,9 @@ function encodeTag(tag, primitive, cls, reporter) {
   return res;
 }
 
-},{"../../asn1":372,"buffer":168,"inherits":361}],384:[function(require,module,exports){
-arguments[4][59][0].apply(exports,arguments)
-},{"./der":383,"./pem":385,"dup":59}],385:[function(require,module,exports){
+},{"../../asn1":389,"buffer":179,"inherits":378}],401:[function(require,module,exports){
+arguments[4][60][0].apply(exports,arguments)
+},{"./der":400,"./pem":402,"dup":60}],402:[function(require,module,exports){
 var inherits = require('inherits');
 var Buffer = require('buffer').Buffer;
 
@@ -49109,7 +67474,7 @@ PEMEncoder.prototype.encode = function encode(data, options) {
   return out.join('\n');
 };
 
-},{"../../asn1":372,"./der":383,"buffer":168,"inherits":361}],386:[function(require,module,exports){
+},{"../../asn1":389,"./der":400,"buffer":179,"inherits":378}],403:[function(require,module,exports){
 (function (module, exports) {
 
 'use strict';
@@ -51429,7 +69794,7 @@ Mont.prototype.invm = function invm(a) {
 
 })(typeof module === 'undefined' || module, this);
 
-},{}],387:[function(require,module,exports){
+},{}],404:[function(require,module,exports){
 (function (module, exports) {
 
 'use strict';
@@ -53878,7 +72243,7 @@ Mont.prototype.invm = function invm(a) {
 
 })(typeof module === 'undefined' || module, this);
 
-},{}],388:[function(require,module,exports){
+},{}],405:[function(require,module,exports){
 'use strict';
 
 var elliptic = exports;
@@ -53894,7 +72259,7 @@ elliptic.curves = require('./elliptic/curves');
 elliptic.ec = require('./elliptic/ec');
 elliptic.eddsa = require('./elliptic/eddsa');
 
-},{"../package.json":404,"./elliptic/curve":391,"./elliptic/curves":394,"./elliptic/ec":395,"./elliptic/eddsa":398,"./elliptic/hmac-drbg":401,"./elliptic/utils":403,"brorand":121}],389:[function(require,module,exports){
+},{"../package.json":421,"./elliptic/curve":408,"./elliptic/curves":411,"./elliptic/ec":412,"./elliptic/eddsa":415,"./elliptic/hmac-drbg":418,"./elliptic/utils":420,"brorand":132}],406:[function(require,module,exports){
 'use strict';
 
 var bn = require('bn.js');
@@ -54247,7 +72612,7 @@ BasePoint.prototype.dblp = function dblp(k) {
   return r;
 };
 
-},{"../../elliptic":388,"bn.js":387}],390:[function(require,module,exports){
+},{"../../elliptic":405,"bn.js":404}],407:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -54655,9 +73020,9 @@ Point.prototype.eq = function eq(other) {
 Point.prototype.toP = Point.prototype.normalize;
 Point.prototype.mixedAdd = Point.prototype.add;
 
-},{"../../elliptic":388,"../curve":391,"bn.js":387,"inherits":361}],391:[function(require,module,exports){
-arguments[4][298][0].apply(exports,arguments)
-},{"./base":389,"./edwards":390,"./mont":392,"./short":393,"dup":298}],392:[function(require,module,exports){
+},{"../../elliptic":405,"../curve":408,"bn.js":404,"inherits":378}],408:[function(require,module,exports){
+arguments[4][309][0].apply(exports,arguments)
+},{"./base":406,"./edwards":407,"./mont":409,"./short":410,"dup":309}],409:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -54835,7 +73200,7 @@ Point.prototype.getX = function getX() {
   return this.x.fromRed();
 };
 
-},{"../../elliptic":388,"../curve":391,"bn.js":387,"inherits":361}],393:[function(require,module,exports){
+},{"../../elliptic":405,"../curve":408,"bn.js":404,"inherits":378}],410:[function(require,module,exports){
 'use strict';
 
 var curve = require('../curve');
@@ -55744,7 +74109,7 @@ JPoint.prototype.isInfinity = function isInfinity() {
   return this.z.cmpn(0) === 0;
 };
 
-},{"../../elliptic":388,"../curve":391,"bn.js":387,"inherits":361}],394:[function(require,module,exports){
+},{"../../elliptic":405,"../curve":408,"bn.js":404,"inherits":378}],411:[function(require,module,exports){
 'use strict';
 
 var curves = exports;
@@ -55951,7 +74316,7 @@ defineCurve('secp256k1', {
   ]
 });
 
-},{"../elliptic":388,"./precomputed/secp256k1":402,"hash.js":340}],395:[function(require,module,exports){
+},{"../elliptic":405,"./precomputed/secp256k1":419,"hash.js":351}],412:[function(require,module,exports){
 'use strict';
 
 var bn = require('bn.js');
@@ -56163,7 +74528,7 @@ EC.prototype.getKeyRecoveryParam = function(e, signature, Q, enc) {
   throw new Error('Unable to find valid recovery factor');
 };
 
-},{"../../elliptic":388,"./key":396,"./signature":397,"bn.js":387}],396:[function(require,module,exports){
+},{"../../elliptic":405,"./key":413,"./signature":414,"bn.js":404}],413:[function(require,module,exports){
 'use strict';
 
 var bn = require('bn.js');
@@ -56272,7 +74637,7 @@ KeyPair.prototype.inspect = function inspect() {
          ' pub: ' + (this.pub && this.pub.inspect()) + ' >';
 };
 
-},{"bn.js":387}],397:[function(require,module,exports){
+},{"bn.js":404}],414:[function(require,module,exports){
 'use strict';
 
 var bn = require('bn.js');
@@ -56409,9 +74774,9 @@ Signature.prototype.toDER = function toDER(enc) {
   return utils.encode(res, enc);
 };
 
-},{"../../elliptic":388,"bn.js":387}],398:[function(require,module,exports){
-arguments[4][305][0].apply(exports,arguments)
-},{"../../elliptic":388,"./key":399,"./signature":400,"dup":305,"hash.js":340}],399:[function(require,module,exports){
+},{"../../elliptic":405,"bn.js":404}],415:[function(require,module,exports){
+arguments[4][316][0].apply(exports,arguments)
+},{"../../elliptic":405,"./key":416,"./signature":417,"dup":316,"hash.js":351}],416:[function(require,module,exports){
 'use strict';
 
 var elliptic = require('../../elliptic');
@@ -56509,7 +74874,7 @@ KeyPair.prototype.getPublic = function getPublic(enc) {
 
 module.exports = KeyPair;
 
-},{"../../elliptic":388}],400:[function(require,module,exports){
+},{"../../elliptic":405}],417:[function(require,module,exports){
 'use strict';
 
 var bn = require('bn.js');
@@ -56577,7 +74942,7 @@ Signature.prototype.toHex = function toHex() {
 
 module.exports = Signature;
 
-},{"../../elliptic":388,"bn.js":387}],401:[function(require,module,exports){
+},{"../../elliptic":405,"bn.js":404}],418:[function(require,module,exports){
 'use strict';
 
 var hash = require('hash.js');
@@ -56693,9 +75058,9 @@ HmacDRBG.prototype.generate = function generate(len, enc, add, addEnc) {
   return utils.encode(res, enc);
 };
 
-},{"../elliptic":388,"hash.js":340}],402:[function(require,module,exports){
-arguments[4][308][0].apply(exports,arguments)
-},{"dup":308}],403:[function(require,module,exports){
+},{"../elliptic":405,"hash.js":351}],419:[function(require,module,exports){
+arguments[4][319][0].apply(exports,arguments)
+},{"dup":319}],420:[function(require,module,exports){
 'use strict';
 
 var utils = exports;
@@ -56870,7 +75235,7 @@ function intFromLE(bytes) {
 utils.intFromLE = intFromLE;
 
 
-},{"bn.js":387}],404:[function(require,module,exports){
+},{"bn.js":404}],421:[function(require,module,exports){
 module.exports={
   "_args": [
     [
@@ -56944,7 +75309,7 @@ module.exports={
   "version": "5.2.1"
 }
 
-},{}],405:[function(require,module,exports){
+},{}],422:[function(require,module,exports){
 /**
  * lodash (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
@@ -57572,7 +75937,7 @@ function keysIn(object) {
 
 module.exports = assignIn;
 
-},{}],406:[function(require,module,exports){
+},{}],423:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -58830,7 +77195,7 @@ bind.placeholder = {};
 module.exports = bind;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],407:[function(require,module,exports){
+},{}],424:[function(require,module,exports){
 /**
  * lodash (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
@@ -59500,7 +77865,7 @@ function keysIn(object) {
 
 module.exports = defaults;
 
-},{}],408:[function(require,module,exports){
+},{}],425:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -61870,7 +80235,7 @@ function property(path) {
 module.exports = filter;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],409:[function(require,module,exports){
+},{}],426:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -62223,7 +80588,7 @@ function isObjectLike(value) {
 module.exports = flatten;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],410:[function(require,module,exports){
+},{}],427:[function(require,module,exports){
 /**
  * lodash (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
@@ -62790,7 +81155,7 @@ function identity(value) {
 
 module.exports = forEach;
 
-},{}],411:[function(require,module,exports){
+},{}],428:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -65160,7 +83525,7 @@ function property(path) {
 module.exports = map;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],412:[function(require,module,exports){
+},{}],429:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -67371,7 +85736,7 @@ function stubFalse() {
 module.exports = merge;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],413:[function(require,module,exports){
+},{}],430:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -67878,7 +86243,7 @@ var pick = baseRest(function(object, props) {
 module.exports = pick;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],414:[function(require,module,exports){
+},{}],431:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -70254,7 +88619,7 @@ function property(path) {
 module.exports = reduce;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],415:[function(require,module,exports){
+},{}],432:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -72656,7 +91021,7 @@ function property(path) {
 module.exports = reject;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],416:[function(require,module,exports){
+},{}],433:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -75028,7 +93393,7 @@ function property(path) {
 module.exports = some;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],417:[function(require,module,exports){
+},{}],434:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var inherits = require('inherits')
@@ -75177,7 +93542,7 @@ function fnI (a, b, c, d, m, k, s) {
 module.exports = MD5
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168,"hash-base":418,"inherits":419}],418:[function(require,module,exports){
+},{"buffer":179,"hash-base":435,"inherits":436}],435:[function(require,module,exports){
 'use strict'
 var Buffer = require('safe-buffer').Buffer
 var Transform = require('stream').Transform
@@ -75274,9 +93639,9 @@ HashBase.prototype._digest = function () {
 
 module.exports = HashBase
 
-},{"inherits":419,"safe-buffer":431,"stream":243}],419:[function(require,module,exports){
-arguments[4][192][0].apply(exports,arguments)
-},{"dup":192}],420:[function(require,module,exports){
+},{"inherits":436,"safe-buffer":457,"stream":254}],436:[function(require,module,exports){
+arguments[4][203][0].apply(exports,arguments)
+},{"dup":203}],437:[function(require,module,exports){
 (function (Buffer){
 // constant-space merkle root calculation algorithm
 module.exports = function fastRoot (values, digestFn) {
@@ -75304,9 +93669,234 @@ module.exports = function fastRoot (values, digestFn) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":168}],421:[function(require,module,exports){
-arguments[4][196][0].apply(exports,arguments)
-},{"dup":196}],422:[function(require,module,exports){
+},{"buffer":179}],438:[function(require,module,exports){
+arguments[4][207][0].apply(exports,arguments)
+},{"dup":207}],439:[function(require,module,exports){
+// Generated by IcedCoffeeScript 1.7.1-f
+(function() {
+  var Generator, iced, __iced_k, __iced_k_noop;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  Generator = Generator = (function() {
+    function Generator(opts) {
+      opts = opts || {};
+      this.lazy_loop_delay = opts.lazy_loop_delay || 30;
+      this.loop_delay = opts.loop_delay || 5;
+      this.work_min = opts.work_min || 1;
+      this.auto_stop_bits = opts.auto_stop_bits || 4096;
+      this.max_bits_per_delta = opts.max_bits_per_delta || 4;
+      this.auto_stop = opts.auto_stop ? opts.auto_stop : true;
+      this.entropies = [];
+      this.running = true;
+      this.is_generating = false;
+      this.timer_race_loop();
+    }
+
+    Generator.prototype.generate = function(bits_wanted, cb) {
+      var e, harvested_bits, res, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      this.is_generating = true;
+      if (!this.running) {
+        this.resume();
+      }
+      harvested_bits = 0;
+      res = [];
+      (function(_this) {
+        return (function(__iced_k) {
+          var _results, _while;
+          _results = [];
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = function() {
+              return __iced_k(_results);
+            };
+            _continue = function() {
+              return iced.trampoline(function() {
+                return _while(__iced_k);
+              });
+            };
+            _next = function(__iced_next_arg) {
+              _results.push(__iced_next_arg);
+              return _continue();
+            };
+            if (!(harvested_bits < bits_wanted)) {
+              return _break();
+            } else {
+              (function(__iced_k) {
+                if (_this.entropies.length) {
+                  e = _this.entropies.splice(0, 1)[0];
+                  harvested_bits += e[1];
+                  return __iced_k(res.push(e[0]));
+                } else {
+                  (function(__iced_k) {
+                    __iced_deferrals = new iced.Deferrals(__iced_k, {
+                      parent: ___iced_passed_deferral,
+                      filename: "/Users/chris/git/more-entropy/src/generator.iced",
+                      funcname: "Generator.generate"
+                    });
+                    _this.delay(__iced_deferrals.defer({
+                      lineno: 28
+                    }));
+                    __iced_deferrals._fulfill();
+                  })(__iced_k);
+                }
+              })(_next);
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          if (_this.auto_stop) {
+            _this.stop();
+          }
+          _this.is_generating = false;
+          return cb(res);
+        };
+      })(this));
+    };
+
+    Generator.prototype.stop = function() {
+      return this.running = false;
+    };
+
+    Generator.prototype.resume = function() {
+      this.running = true;
+      return this.timer_race_loop();
+    };
+
+    Generator.prototype.reset = function() {
+      this.entropies = [];
+      return this.total_bits = 0;
+    };
+
+    Generator.prototype.count_unused_bits = function() {
+      var bits, e, _i, _len, _ref;
+      bits = 0;
+      _ref = this.entropies;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        bits += e[1];
+      }
+      return bits;
+    };
+
+    Generator.prototype.delay = function(cb) {
+      var delay, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      delay = this.is_generating ? this.loop_delay : this.lazy_loop_delay;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/chris/git/more-entropy/src/generator.iced",
+            funcname: "Generator.delay"
+          });
+          setTimeout(__iced_deferrals.defer({
+            lineno: 50
+          }), delay);
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb();
+        };
+      })(this));
+    };
+
+    Generator.prototype.timer_race_loop = function() {
+      var ___iced_passed_deferral, __iced_k, _results, _while;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      this._last_count = null;
+      _results = [];
+      _while = (function(_this) {
+        var count, delta, entropy, v, __iced_deferrals;
+        return function(__iced_k) {
+          var _break, _continue, _next;
+          _break = function() {
+            return __iced_k(_results);
+          };
+          _continue = function() {
+            return iced.trampoline(function() {
+              return _while(__iced_k);
+            });
+          };
+          _next = function(__iced_next_arg) {
+            _results.push(__iced_next_arg);
+            return _continue();
+          };
+          if (!_this.running) {
+            return _break();
+          } else {
+            if (_this.count_unused_bits() < _this.auto_stop_bits) {
+              count = _this.millisecond_count();
+              if ((_this._last_count != null) && (delta = count - _this._last_count)) {
+                entropy = Math.floor(_this.log_2(Math.abs(delta)));
+                entropy = Math.min(_this.max_bits_per_delta, entropy);
+                v = [delta, entropy];
+                _this.entropies.push(v);
+              }
+              _this._last_count = count;
+            }
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/chris/git/more-entropy/src/generator.iced",
+                funcname: "Generator.timer_race_loop"
+              });
+              _this.delay(__iced_deferrals.defer({
+                lineno: 64
+              }));
+              __iced_deferrals._fulfill();
+            })(_next);
+          }
+        };
+      })(this);
+      _while(__iced_k);
+    };
+
+    Generator.prototype.log_2 = function(x) {
+      return Math.log(x) / Math.LN2;
+    };
+
+    Generator.prototype.millisecond_count = function() {
+      var d, i, x;
+      d = Date.now();
+      i = x = 0;
+      while (Date.now() < d + this.work_min + 1) {
+        i++;
+        x = Math.sin(Math.sqrt(Math.log(i + x)));
+      }
+      return i;
+    };
+
+    return Generator;
+
+  })();
+
+  if (typeof window !== "undefined" && window !== null) {
+    window.Generator = Generator;
+  }
+
+  if (typeof exports !== "undefined" && exports !== null) {
+    exports.Generator = Generator;
+  }
+
+}).call(this);
+
+},{"iced-runtime":376}],440:[function(require,module,exports){
+// Generated by IcedCoffeeScript 1.7.1-c
+(function() {
+  exports.Generator = require('../lib/generator').Generator;
+
+}).call(this);
+
+},{"../lib/generator":439}],441:[function(require,module,exports){
 module.exports = compile;
 
 var BaseFuncs = require("boolbase"),
@@ -75347,7 +93937,7 @@ function compile(parsed){
 		return pos <= b && pos % a === bMod;
 	};
 }
-},{"boolbase":120}],423:[function(require,module,exports){
+},{"boolbase":131}],442:[function(require,module,exports){
 var parse = require("./parse.js"),
     compile = require("./compile.js");
 
@@ -75357,7 +93947,7 @@ module.exports = function nthCheck(formula){
 
 module.exports.parse = parse;
 module.exports.compile = compile;
-},{"./compile.js":422,"./parse.js":424}],424:[function(require,module,exports){
+},{"./compile.js":441,"./parse.js":443}],443:[function(require,module,exports){
 module.exports = parse;
 
 //following http://www.w3.org/TR/css3-selectors/#nth-child-pseudo
@@ -75399,7 +93989,252 @@ function parse(formula){
 	}
 }
 
-},{}],425:[function(require,module,exports){
+},{}],444:[function(require,module,exports){
+exports.pbkdf2 = require('./lib/async')
+exports.pbkdf2Sync = require('./lib/sync')
+
+},{"./lib/async":445,"./lib/sync":448}],445:[function(require,module,exports){
+(function (process,global){
+var checkParameters = require('./precondition')
+var defaultEncoding = require('./default-encoding')
+var sync = require('./sync')
+var Buffer = require('safe-buffer').Buffer
+
+var ZERO_BUF
+var subtle = global.crypto && global.crypto.subtle
+var toBrowser = {
+  'sha': 'SHA-1',
+  'sha-1': 'SHA-1',
+  'sha1': 'SHA-1',
+  'sha256': 'SHA-256',
+  'sha-256': 'SHA-256',
+  'sha384': 'SHA-384',
+  'sha-384': 'SHA-384',
+  'sha-512': 'SHA-512',
+  'sha512': 'SHA-512'
+}
+var checks = []
+function checkNative (algo) {
+  if (global.process && !global.process.browser) {
+    return Promise.resolve(false)
+  }
+  if (!subtle || !subtle.importKey || !subtle.deriveBits) {
+    return Promise.resolve(false)
+  }
+  if (checks[algo] !== undefined) {
+    return checks[algo]
+  }
+  ZERO_BUF = ZERO_BUF || Buffer.alloc(8)
+  var prom = browserPbkdf2(ZERO_BUF, ZERO_BUF, 10, 128, algo)
+    .then(function () {
+      return true
+    }).catch(function () {
+      return false
+    })
+  checks[algo] = prom
+  return prom
+}
+
+function browserPbkdf2 (password, salt, iterations, length, algo) {
+  return subtle.importKey(
+    'raw', password, {name: 'PBKDF2'}, false, ['deriveBits']
+  ).then(function (key) {
+    return subtle.deriveBits({
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: iterations,
+      hash: {
+        name: algo
+      }
+    }, key, length << 3)
+  }).then(function (res) {
+    return Buffer.from(res)
+  })
+}
+
+function resolvePromise (promise, callback) {
+  promise.then(function (out) {
+    process.nextTick(function () {
+      callback(null, out)
+    })
+  }, function (e) {
+    process.nextTick(function () {
+      callback(e)
+    })
+  })
+}
+module.exports = function (password, salt, iterations, keylen, digest, callback) {
+  if (typeof digest === 'function') {
+    callback = digest
+    digest = undefined
+  }
+
+  digest = digest || 'sha1'
+  var algo = toBrowser[digest.toLowerCase()]
+
+  if (!algo || typeof global.Promise !== 'function') {
+    return process.nextTick(function () {
+      var out
+      try {
+        out = sync(password, salt, iterations, keylen, digest)
+      } catch (e) {
+        return callback(e)
+      }
+      callback(null, out)
+    })
+  }
+
+  checkParameters(password, salt, iterations, keylen)
+  if (typeof callback !== 'function') throw new Error('No callback provided to pbkdf2')
+  if (!Buffer.isBuffer(password)) password = Buffer.from(password, defaultEncoding)
+  if (!Buffer.isBuffer(salt)) salt = Buffer.from(salt, defaultEncoding)
+
+  resolvePromise(checkNative(algo).then(function (resp) {
+    if (resp) return browserPbkdf2(password, salt, iterations, keylen, algo)
+
+    return sync(password, salt, iterations, keylen, digest)
+  }), callback)
+}
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./default-encoding":446,"./precondition":447,"./sync":448,"_process":219,"safe-buffer":457}],446:[function(require,module,exports){
+arguments[4][215][0].apply(exports,arguments)
+},{"_process":219,"dup":215}],447:[function(require,module,exports){
+(function (Buffer){
+var MAX_ALLOC = Math.pow(2, 30) - 1 // default in iojs
+
+function checkBuffer (buf, name) {
+  if (typeof buf !== 'string' && !Buffer.isBuffer(buf)) {
+    throw new TypeError(name + ' must be a buffer or string')
+  }
+}
+
+module.exports = function (password, salt, iterations, keylen) {
+  checkBuffer(password, 'Password')
+  checkBuffer(salt, 'Salt')
+
+  if (typeof iterations !== 'number') {
+    throw new TypeError('Iterations not a number')
+  }
+
+  if (iterations < 0) {
+    throw new TypeError('Bad iterations')
+  }
+
+  if (typeof keylen !== 'number') {
+    throw new TypeError('Key length not a number')
+  }
+
+  if (keylen < 0 || keylen > MAX_ALLOC || keylen !== keylen) { /* eslint no-self-compare: 0 */
+    throw new TypeError('Bad key length')
+  }
+}
+
+}).call(this,{"isBuffer":require("../../browserify/node_modules/is-buffer/index.js")})
+},{"../../browserify/node_modules/is-buffer/index.js":204}],448:[function(require,module,exports){
+var md5 = require('create-hash/md5')
+var rmd160 = require('ripemd160')
+var sha = require('sha.js')
+
+var checkParameters = require('./precondition')
+var defaultEncoding = require('./default-encoding')
+var Buffer = require('safe-buffer').Buffer
+var ZEROS = Buffer.alloc(128)
+var sizes = {
+  md5: 16,
+  sha1: 20,
+  sha224: 28,
+  sha256: 32,
+  sha384: 48,
+  sha512: 64,
+  rmd160: 20,
+  ripemd160: 20
+}
+
+function Hmac (alg, key, saltLen) {
+  var hash = getDigest(alg)
+  var blocksize = (alg === 'sha512' || alg === 'sha384') ? 128 : 64
+
+  if (key.length > blocksize) {
+    key = hash(key)
+  } else if (key.length < blocksize) {
+    key = Buffer.concat([key, ZEROS], blocksize)
+  }
+
+  var ipad = Buffer.allocUnsafe(blocksize + sizes[alg])
+  var opad = Buffer.allocUnsafe(blocksize + sizes[alg])
+  for (var i = 0; i < blocksize; i++) {
+    ipad[i] = key[i] ^ 0x36
+    opad[i] = key[i] ^ 0x5C
+  }
+
+  var ipad1 = Buffer.allocUnsafe(blocksize + saltLen + 4)
+  ipad.copy(ipad1, 0, 0, blocksize)
+  this.ipad1 = ipad1
+  this.ipad2 = ipad
+  this.opad = opad
+  this.alg = alg
+  this.blocksize = blocksize
+  this.hash = hash
+  this.size = sizes[alg]
+}
+
+Hmac.prototype.run = function (data, ipad) {
+  data.copy(ipad, this.blocksize)
+  var h = this.hash(ipad)
+  h.copy(this.opad, this.blocksize)
+  return this.hash(this.opad)
+}
+
+function getDigest (alg) {
+  function shaFunc (data) {
+    return sha(alg).update(data).digest()
+  }
+
+  if (alg === 'rmd160' || alg === 'ripemd160') return rmd160
+  if (alg === 'md5') return md5
+  return shaFunc
+}
+
+function pbkdf2 (password, salt, iterations, keylen, digest) {
+  checkParameters(password, salt, iterations, keylen)
+
+  if (!Buffer.isBuffer(password)) password = Buffer.from(password, defaultEncoding)
+  if (!Buffer.isBuffer(salt)) salt = Buffer.from(salt, defaultEncoding)
+
+  digest = digest || 'sha1'
+
+  var hmac = new Hmac(digest, password, salt.length)
+
+  var DK = Buffer.allocUnsafe(keylen)
+  var block1 = Buffer.allocUnsafe(salt.length + 4)
+  salt.copy(block1, 0, 0, salt.length)
+
+  var destPos = 0
+  var hLen = sizes[digest]
+  var l = Math.ceil(keylen / hLen)
+
+  for (var i = 1; i <= l; i++) {
+    block1.writeUInt32BE(i, salt.length)
+
+    var T = hmac.run(block1, hmac.ipad1)
+    var U = T
+
+    for (var j = 1; j < iterations; j++) {
+      U = hmac.run(U, hmac.ipad2)
+      for (var k = 0; k < hLen; k++) T[k] ^= U[k]
+    }
+
+    T.copy(DK, destPos)
+    destPos += hLen
+  }
+
+  return DK
+}
+
+module.exports = pbkdf2
+
+},{"./default-encoding":446,"./precondition":447,"create-hash/md5":280,"ripemd160":456,"safe-buffer":457,"sha.js":462}],449:[function(require,module,exports){
 var OPS = require('bitcoin-ops')
 
 function encodingLength (i) {
@@ -75478,7 +94313,7 @@ module.exports = {
   decode: decode
 }
 
-},{"bitcoin-ops":73}],426:[function(require,module,exports){
+},{"bitcoin-ops":84}],450:[function(require,module,exports){
 'use strict';
 var strictUriEncode = require('strict-uri-encode');
 var objectAssign = require('object-assign');
@@ -75685,7 +94520,7 @@ exports.stringify = function (obj, opts) {
 	}).join('&') : '';
 };
 
-},{"object-assign":427,"strict-uri-encode":428}],427:[function(require,module,exports){
+},{"object-assign":451,"strict-uri-encode":452}],451:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -75777,7 +94612,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],428:[function(require,module,exports){
+},{}],452:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
@@ -75785,7 +94620,7 @@ module.exports = function (str) {
 	});
 };
 
-},{}],429:[function(require,module,exports){
+},{}],453:[function(require,module,exports){
 (function (process,global){
 'use strict'
 
@@ -75827,14 +94662,776 @@ function randomBytes (size, cb) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":208,"safe-buffer":431}],430:[function(require,module,exports){
-arguments[4][234][0].apply(exports,arguments)
-},{"buffer":168,"dup":234,"hash-base":338,"inherits":361}],431:[function(require,module,exports){
-arguments[4][255][0].apply(exports,arguments)
-},{"buffer":168,"dup":255}],432:[function(require,module,exports){
+},{"_process":219,"safe-buffer":457}],454:[function(require,module,exports){
+// This method of obtaining a reference to the global object needs to be
+// kept identical to the way it is obtained in runtime.js
+var g = (function() { return this })() || Function("return this")();
+
+// Use `getOwnPropertyNames` because not all browsers support calling
+// `hasOwnProperty` on the global `self` object in a worker. See #183.
+var hadRuntime = g.regeneratorRuntime &&
+  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
+
+// Save the old regeneratorRuntime in case it needs to be restored later.
+var oldRuntime = hadRuntime && g.regeneratorRuntime;
+
+// Force reevalutation of runtime.js.
+g.regeneratorRuntime = undefined;
+
+module.exports = require("./runtime");
+
+if (hadRuntime) {
+  // Restore the original runtime.
+  g.regeneratorRuntime = oldRuntime;
+} else {
+  // Remove the global property added by runtime.js.
+  try {
+    delete g.regeneratorRuntime;
+  } catch(e) {
+    g.regeneratorRuntime = undefined;
+  }
+}
+
+},{"./runtime":455}],455:[function(require,module,exports){
+/**
+ * Copyright (c) 2014, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * https://raw.github.com/facebook/regenerator/master/LICENSE file. An
+ * additional grant of patent rights can be found in the PATENTS file in
+ * the same directory.
+ */
+
+!(function(global) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  var inModule = typeof module === "object";
+  var runtime = global.regeneratorRuntime;
+  if (runtime) {
+    if (inModule) {
+      // If regeneratorRuntime is defined globally and we're in a module,
+      // make the exports object identical to regeneratorRuntime.
+      module.exports = runtime;
+    }
+    // Don't bother evaluating the rest of this file if the runtime was
+    // already defined globally.
+    return;
+  }
+
+  // Define the runtime globally (as expected by generated code) as either
+  // module.exports (if we're in a module) or a new, empty object.
+  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  runtime.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+  }
+
+  runtime.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  runtime.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      if (!(toStringTagSymbol in genFun)) {
+        genFun[toStringTagSymbol] = "GeneratorFunction";
+      }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  runtime.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return Promise.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return Promise.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration. If the Promise is rejected, however, the
+          // result for this iteration will be rejected with the same
+          // reason. Note that rejections of yielded Promises are not
+          // thrown back into the generator function, as is the case
+          // when an awaited Promise is rejected. This difference in
+          // behavior between yield and await is important, because it
+          // allows the consumer to decide what to do with the yielded
+          // rejection (swallow it and continue, manually .throw it back
+          // into the generator, abandon iteration, whatever). With
+          // await, by contrast, there is no opportunity to examine the
+          // rejection reason outside the generator function, so the
+          // only option is to throw it from the await expression, and
+          // let the generator function handle the exception.
+          result.value = unwrapped;
+          resolve(result);
+        }, reject);
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new Promise(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  runtime.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList)
+    );
+
+    return runtime.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        if (delegate.iterator.return) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  Gp[toStringTagSymbol] = "Generator";
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  runtime.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  runtime.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+})(
+  // In sloppy mode, unbound `this` refers to the global object, fallback to
+  // Function constructor if we're in global strict mode. That is sadly a form
+  // of indirect eval which violates Content Security Policy.
+  (function() { return this })() || Function("return this")()
+);
+
+},{}],456:[function(require,module,exports){
+arguments[4][245][0].apply(exports,arguments)
+},{"buffer":179,"dup":245,"hash-base":349,"inherits":378}],457:[function(require,module,exports){
+arguments[4][266][0].apply(exports,arguments)
+},{"buffer":179,"dup":266}],458:[function(require,module,exports){
 module.exports = require('./lib/schema-inspector');
 
-},{"./lib/schema-inspector":433}],433:[function(require,module,exports){
+},{"./lib/schema-inspector":459}],459:[function(require,module,exports){
 /*
  * This module is intended to be executed both on client side and server side.
  * No error should be thrown. (soft error handling)
@@ -77413,7 +97010,7 @@ module.exports = require('./lib/schema-inspector');
 	};
 })();
 
-},{"async":434}],434:[function(require,module,exports){
+},{"async":460}],460:[function(require,module,exports){
 (function (process,global){
 /*!
  * async
@@ -78682,7 +98279,7 @@ module.exports = require('./lib/schema-inspector');
 }());
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":208}],435:[function(require,module,exports){
+},{"_process":219}],461:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 // prototype class for hash functions
@@ -78765,21 +98362,21 @@ Hash.prototype._update = function () {
 
 module.exports = Hash
 
-},{"safe-buffer":431}],436:[function(require,module,exports){
-arguments[4][236][0].apply(exports,arguments)
-},{"./sha":437,"./sha1":438,"./sha224":439,"./sha256":440,"./sha384":441,"./sha512":442,"dup":236}],437:[function(require,module,exports){
-arguments[4][237][0].apply(exports,arguments)
-},{"./hash":435,"dup":237,"inherits":361,"safe-buffer":431}],438:[function(require,module,exports){
-arguments[4][238][0].apply(exports,arguments)
-},{"./hash":435,"dup":238,"inherits":361,"safe-buffer":431}],439:[function(require,module,exports){
-arguments[4][239][0].apply(exports,arguments)
-},{"./hash":435,"./sha256":440,"dup":239,"inherits":361,"safe-buffer":431}],440:[function(require,module,exports){
-arguments[4][240][0].apply(exports,arguments)
-},{"./hash":435,"dup":240,"inherits":361,"safe-buffer":431}],441:[function(require,module,exports){
-arguments[4][241][0].apply(exports,arguments)
-},{"./hash":435,"./sha512":442,"dup":241,"inherits":361,"safe-buffer":431}],442:[function(require,module,exports){
-arguments[4][242][0].apply(exports,arguments)
-},{"./hash":435,"dup":242,"inherits":361,"safe-buffer":431}],443:[function(require,module,exports){
+},{"safe-buffer":457}],462:[function(require,module,exports){
+arguments[4][247][0].apply(exports,arguments)
+},{"./sha":463,"./sha1":464,"./sha224":465,"./sha256":466,"./sha384":467,"./sha512":468,"dup":247}],463:[function(require,module,exports){
+arguments[4][248][0].apply(exports,arguments)
+},{"./hash":461,"dup":248,"inherits":378,"safe-buffer":457}],464:[function(require,module,exports){
+arguments[4][249][0].apply(exports,arguments)
+},{"./hash":461,"dup":249,"inherits":378,"safe-buffer":457}],465:[function(require,module,exports){
+arguments[4][250][0].apply(exports,arguments)
+},{"./hash":461,"./sha256":466,"dup":250,"inherits":378,"safe-buffer":457}],466:[function(require,module,exports){
+arguments[4][251][0].apply(exports,arguments)
+},{"./hash":461,"dup":251,"inherits":378,"safe-buffer":457}],467:[function(require,module,exports){
+arguments[4][252][0].apply(exports,arguments)
+},{"./hash":461,"./sha512":468,"dup":252,"inherits":378,"safe-buffer":457}],468:[function(require,module,exports){
+arguments[4][253][0].apply(exports,arguments)
+},{"./hash":461,"dup":253,"inherits":378,"safe-buffer":457}],469:[function(require,module,exports){
 (function (Buffer){
 let BN = require('bn.js')
 let createHmac = require('create-hmac')
@@ -79099,7 +98696,5757 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bn.js":119,"buffer":168,"create-hmac":270,"elliptic":295}],444:[function(require,module,exports){
+},{"bn.js":130,"buffer":179,"create-hmac":281,"elliptic":306}],470:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var AES, BlockCipher, G, Global, scrub_vec,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  BlockCipher = require('./algbase').BlockCipher;
+
+  scrub_vec = require('./util').scrub_vec;
+
+  Global = (function() {
+    function Global() {
+      var i;
+      this.SBOX = [];
+      this.INV_SBOX = [];
+      this.SUB_MIX = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 4; i = ++_i) {
+          _results.push([]);
+        }
+        return _results;
+      })();
+      this.INV_SUB_MIX = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 4; i = ++_i) {
+          _results.push([]);
+        }
+        return _results;
+      })();
+      this.init();
+      this.RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
+    }
+
+    Global.prototype.init = function() {
+      var d, i, sx, t, x, x2, x4, x8, xi, _i;
+      d = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 256; i = ++_i) {
+          if (i < 128) {
+            _results.push(i << 1);
+          } else {
+            _results.push((i << 1) ^ 0x11b);
+          }
+        }
+        return _results;
+      })();
+      x = 0;
+      xi = 0;
+      for (i = _i = 0; _i < 256; i = ++_i) {
+        sx = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4);
+        sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63;
+        this.SBOX[x] = sx;
+        this.INV_SBOX[sx] = x;
+        x2 = d[x];
+        x4 = d[x2];
+        x8 = d[x4];
+        t = (d[sx] * 0x101) ^ (sx * 0x1010100);
+        this.SUB_MIX[0][x] = (t << 24) | (t >>> 8);
+        this.SUB_MIX[1][x] = (t << 16) | (t >>> 16);
+        this.SUB_MIX[2][x] = (t << 8) | (t >>> 24);
+        this.SUB_MIX[3][x] = t;
+        t = (x8 * 0x1010101) ^ (x4 * 0x10001) ^ (x2 * 0x101) ^ (x * 0x1010100);
+        this.INV_SUB_MIX[0][sx] = (t << 24) | (t >>> 8);
+        this.INV_SUB_MIX[1][sx] = (t << 16) | (t >>> 16);
+        this.INV_SUB_MIX[2][sx] = (t << 8) | (t >>> 24);
+        this.INV_SUB_MIX[3][sx] = t;
+        if (x === 0) {
+          x = xi = 1;
+        } else {
+          x = x2 ^ d[d[d[x8 ^ x2]]];
+          xi ^= d[d[xi]];
+        }
+      }
+      return true;
+    };
+
+    return Global;
+
+  })();
+
+  G = new Global();
+
+  AES = (function(_super) {
+    __extends(AES, _super);
+
+    AES.blockSize = 4 * 4;
+
+    AES.prototype.blockSize = AES.blockSize;
+
+    AES.keySize = 256 / 8;
+
+    AES.prototype.keySize = AES.keySize;
+
+    AES.ivSize = AES.blockSize;
+
+    AES.prototype.ivSize = AES.ivSize;
+
+    function AES(key) {
+      this._key = key.clone();
+      this._doReset();
+    }
+
+    AES.prototype._doReset = function() {
+      var invKsRow, keySize, keyWords, ksRow, ksRows, t, _i, _j;
+      keyWords = this._key.words;
+      keySize = this._key.sigBytes / 4;
+      this._nRounds = keySize + 6;
+      ksRows = (this._nRounds + 1) * 4;
+      this._keySchedule = [];
+      for (ksRow = _i = 0; 0 <= ksRows ? _i < ksRows : _i > ksRows; ksRow = 0 <= ksRows ? ++_i : --_i) {
+        this._keySchedule[ksRow] = ksRow < keySize ? keyWords[ksRow] : (t = this._keySchedule[ksRow - 1], (ksRow % keySize) === 0 ? (t = (t << 8) | (t >>> 24), t = (G.SBOX[t >>> 24] << 24) | (G.SBOX[(t >>> 16) & 0xff] << 16) | (G.SBOX[(t >>> 8) & 0xff] << 8) | G.SBOX[t & 0xff], t ^= G.RCON[(ksRow / keySize) | 0] << 24) : keySize > 6 && ksRow % keySize === 4 ? t = (G.SBOX[t >>> 24] << 24) | (G.SBOX[(t >>> 16) & 0xff] << 16) | (G.SBOX[(t >>> 8) & 0xff] << 8) | G.SBOX[t & 0xff] : void 0, this._keySchedule[ksRow - keySize] ^ t);
+      }
+      this._invKeySchedule = [];
+      for (invKsRow = _j = 0; 0 <= ksRows ? _j < ksRows : _j > ksRows; invKsRow = 0 <= ksRows ? ++_j : --_j) {
+        ksRow = ksRows - invKsRow;
+        t = this._keySchedule[ksRow - (invKsRow % 4 ? 0 : 4)];
+        this._invKeySchedule[invKsRow] = invKsRow < 4 || ksRow <= 4 ? t : G.INV_SUB_MIX[0][G.SBOX[t >>> 24]] ^ G.INV_SUB_MIX[1][G.SBOX[(t >>> 16) & 0xff]] ^ G.INV_SUB_MIX[2][G.SBOX[(t >>> 8) & 0xff]] ^ G.INV_SUB_MIX[3][G.SBOX[t & 0xff]];
+      }
+      return true;
+    };
+
+    AES.prototype.encryptBlock = function(M, offset) {
+      if (offset == null) {
+        offset = 0;
+      }
+      return this._doCryptBlock(M, offset, this._keySchedule, G.SUB_MIX, G.SBOX);
+    };
+
+    AES.prototype.decryptBlock = function(M, offset) {
+      var _ref, _ref1;
+      if (offset == null) {
+        offset = 0;
+      }
+      _ref = [M[offset + 3], M[offset + 1]], M[offset + 1] = _ref[0], M[offset + 3] = _ref[1];
+      this._doCryptBlock(M, offset, this._invKeySchedule, G.INV_SUB_MIX, G.INV_SBOX);
+      return _ref1 = [M[offset + 3], M[offset + 1]], M[offset + 1] = _ref1[0], M[offset + 3] = _ref1[1], _ref1;
+    };
+
+    AES.prototype.scrub = function() {
+      scrub_vec(this._keySchedule);
+      scrub_vec(this._invKeySchedule);
+      return this._key.scrub();
+    };
+
+    AES.prototype._doCryptBlock = function(M, offset, keySchedule, SUB_MIX, SBOX) {
+      var ksRow, round, s0, s1, s2, s3, t0, t1, t2, t3, _i, _ref;
+      s0 = M[offset] ^ keySchedule[0];
+      s1 = M[offset + 1] ^ keySchedule[1];
+      s2 = M[offset + 2] ^ keySchedule[2];
+      s3 = M[offset + 3] ^ keySchedule[3];
+      ksRow = 4;
+      for (round = _i = 1, _ref = this._nRounds; 1 <= _ref ? _i < _ref : _i > _ref; round = 1 <= _ref ? ++_i : --_i) {
+        t0 = SUB_MIX[0][s0 >>> 24] ^ SUB_MIX[1][(s1 >>> 16) & 0xff] ^ SUB_MIX[2][(s2 >>> 8) & 0xff] ^ SUB_MIX[3][s3 & 0xff] ^ keySchedule[ksRow++];
+        t1 = SUB_MIX[0][s1 >>> 24] ^ SUB_MIX[1][(s2 >>> 16) & 0xff] ^ SUB_MIX[2][(s3 >>> 8) & 0xff] ^ SUB_MIX[3][s0 & 0xff] ^ keySchedule[ksRow++];
+        t2 = SUB_MIX[0][s2 >>> 24] ^ SUB_MIX[1][(s3 >>> 16) & 0xff] ^ SUB_MIX[2][(s0 >>> 8) & 0xff] ^ SUB_MIX[3][s1 & 0xff] ^ keySchedule[ksRow++];
+        t3 = SUB_MIX[0][s3 >>> 24] ^ SUB_MIX[1][(s0 >>> 16) & 0xff] ^ SUB_MIX[2][(s1 >>> 8) & 0xff] ^ SUB_MIX[3][s2 & 0xff] ^ keySchedule[ksRow++];
+        s0 = t0;
+        s1 = t1;
+        s2 = t2;
+        s3 = t3;
+      }
+      t0 = ((SBOX[s0 >>> 24] << 24) | (SBOX[(s1 >>> 16) & 0xff] << 16) | (SBOX[(s2 >>> 8) & 0xff] << 8) | SBOX[s3 & 0xff]) ^ keySchedule[ksRow++];
+      t1 = ((SBOX[s1 >>> 24] << 24) | (SBOX[(s2 >>> 16) & 0xff] << 16) | (SBOX[(s3 >>> 8) & 0xff] << 8) | SBOX[s0 & 0xff]) ^ keySchedule[ksRow++];
+      t2 = ((SBOX[s2 >>> 24] << 24) | (SBOX[(s3 >>> 16) & 0xff] << 16) | (SBOX[(s0 >>> 8) & 0xff] << 8) | SBOX[s1 & 0xff]) ^ keySchedule[ksRow++];
+      t3 = ((SBOX[s3 >>> 24] << 24) | (SBOX[(s0 >>> 16) & 0xff] << 16) | (SBOX[(s1 >>> 8) & 0xff] << 8) | SBOX[s2 & 0xff]) ^ keySchedule[ksRow++];
+      M[offset] = t0;
+      M[offset + 1] = t1;
+      M[offset + 2] = t2;
+      return M[offset + 3] = t3;
+    };
+
+    return AES;
+
+  })(BlockCipher);
+
+  exports.AES = AES;
+
+}).call(this);
+
+},{"./algbase":471,"./util":492}],471:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var BlockCipher, BufferedBlockAlgorithm, Hasher, StreamCipher, WordArray, util,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  WordArray = require('./wordarray').WordArray;
+
+  util = require('./util');
+
+  BufferedBlockAlgorithm = (function() {
+    BufferedBlockAlgorithm.prototype._minBufferSize = 0;
+
+    function BufferedBlockAlgorithm() {
+      this.reset();
+    }
+
+    BufferedBlockAlgorithm.prototype.reset = function() {
+      this._data = new WordArray();
+      return this._nDataBytes = 0;
+    };
+
+    BufferedBlockAlgorithm.prototype._append = function(data) {
+      this._data.concat(data);
+      return this._nDataBytes += data.sigBytes;
+    };
+
+    BufferedBlockAlgorithm.prototype._process = function(doFlush) {
+      var blockSizeBytes, data, dataSigBytes, dataWords, nBlocksReady, nBytesReady, nWordsReady, offset, processedWords, _i, _ref;
+      data = this._data;
+      dataWords = data.words;
+      dataSigBytes = data.sigBytes;
+      blockSizeBytes = this.blockSize * 4;
+      nBlocksReady = dataSigBytes / blockSizeBytes;
+      if (doFlush) {
+        nBlocksReady = Math.ceil(nBlocksReady);
+      } else {
+        nBlocksReady = Math.max((nBlocksReady | 0) - this._minBufferSize, 0);
+      }
+      nWordsReady = nBlocksReady * this.blockSize;
+      nBytesReady = Math.min(nWordsReady * 4, dataSigBytes);
+      if (nWordsReady) {
+        for (offset = _i = 0, _ref = this.blockSize; _ref > 0 ? _i < nWordsReady : _i > nWordsReady; offset = _i += _ref) {
+          this._doProcessBlock(dataWords, offset);
+        }
+        processedWords = dataWords.splice(0, nWordsReady);
+        data.sigBytes -= nBytesReady;
+      }
+      return new WordArray(processedWords, nBytesReady);
+    };
+
+    BufferedBlockAlgorithm.prototype.copy_to = function(out) {
+      out._data = this._data.clone();
+      return out._nDataBytes = this._nDataBytes;
+    };
+
+    BufferedBlockAlgorithm.prototype.clone = function() {
+      var obj;
+      obj = new BufferedBlockAlgorithm();
+      this.copy_to(obj);
+      return obj;
+    };
+
+    return BufferedBlockAlgorithm;
+
+  })();
+
+  Hasher = (function(_super) {
+    __extends(Hasher, _super);
+
+    function Hasher() {
+      Hasher.__super__.constructor.call(this);
+    }
+
+    Hasher.prototype.reset = function() {
+      Hasher.__super__.reset.call(this);
+      this._doReset();
+      return this;
+    };
+
+    Hasher.prototype.update = function(messageUpdate) {
+      this._append(messageUpdate);
+      this._process();
+      return this;
+    };
+
+    Hasher.prototype.finalize = function(messageUpdate) {
+      if (messageUpdate) {
+        this._append(messageUpdate);
+      }
+      return this._doFinalize();
+    };
+
+    Hasher.prototype.bufhash = function(input) {
+      var out, wa_in, wa_out;
+      wa_in = WordArray.from_buffer(input);
+      wa_out = this.finalize(wa_in);
+      out = wa_out.to_buffer();
+      wa_in.scrub();
+      wa_out.scrub();
+      return out;
+    };
+
+    return Hasher;
+
+  })(BufferedBlockAlgorithm);
+
+  exports.BlockCipher = BlockCipher = (function() {
+    function BlockCipher(key) {}
+
+    BlockCipher.prototype.encryptBlock = function(M, offset) {};
+
+    return BlockCipher;
+
+  })();
+
+  StreamCipher = (function() {
+    function StreamCipher() {}
+
+    StreamCipher.prototype.encryptBlock = function(word_array, dst_offset) {
+      var n_words, pad;
+      if (dst_offset == null) {
+        dst_offset = 0;
+      }
+      pad = this.get_pad();
+      n_words = Math.min(word_array.words.length - dst_offset, this.bsiw);
+      word_array.xor(pad, {
+        dst_offset: dst_offset,
+        n_words: n_words
+      });
+      pad.scrub();
+      return this.bsiw;
+    };
+
+    StreamCipher.prototype.encrypt = function(word_array) {
+      var i, _i, _ref, _ref1;
+      for (i = _i = 0, _ref = word_array.words.length, _ref1 = this.bsiw; _ref1 > 0 ? _i < _ref : _i > _ref; i = _i += _ref1) {
+        this.encryptBlock(word_array, i);
+      }
+      return word_array;
+    };
+
+    StreamCipher.prototype.bulk_encrypt = function(_arg, cb) {
+      var async_args, input, progress_hook, slice_args, what;
+      input = _arg.input, progress_hook = _arg.progress_hook, what = _arg.what;
+      slice_args = {
+        update: (function(_this) {
+          return function(lo, hi) {
+            var i, _i, _ref, _results;
+            _results = [];
+            for (i = _i = lo, _ref = _this.bsiw; _ref > 0 ? _i < hi : _i > hi; i = _i += _ref) {
+              _results.push(_this.encryptBlock(input, i));
+            }
+            return _results;
+          };
+        })(this),
+        finalize: function() {
+          return input;
+        },
+        default_n: this.bsiw * 1024
+      };
+      async_args = {
+        progress_hook: progress_hook,
+        cb: cb,
+        what: what
+      };
+      return util.bulk(input.sigBytes, slice_args, async_args);
+    };
+
+    return StreamCipher;
+
+  })();
+
+  exports.BlockCipher = BlockCipher;
+
+  exports.Hasher = Hasher;
+
+  exports.BufferedBlockAlgorithm = BufferedBlockAlgorithm;
+
+  exports.StreamCipher = StreamCipher;
+
+}).call(this);
+
+},{"./util":492,"./wordarray":493}],472:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var CombineBase, Concat, HMAC, SHA3, SHA512, WordArray, XOR, bulk_sign, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  _ref = require('./hmac'), HMAC = _ref.HMAC, bulk_sign = _ref.bulk_sign;
+
+  SHA512 = require('./sha512').SHA512;
+
+  SHA3 = require('./sha3').SHA3;
+
+  WordArray = require('./wordarray').WordArray;
+
+  CombineBase = (function() {
+    function CombineBase() {
+      this.hasherBlockSize = this.hashers[0].hasherBlockSize;
+      this.hasherBlockSizeBytes = this.hasherBlockSize * 4;
+      this.reset();
+    }
+
+    CombineBase.prototype.reset = function() {
+      var h, _i, _len, _ref1;
+      _ref1 = this.hashers;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        h = _ref1[_i];
+        h.reset();
+      }
+      return this;
+    };
+
+    CombineBase.prototype.update = function(w) {
+      var h, _i, _len, _ref1;
+      _ref1 = this.hashers;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        h = _ref1[_i];
+        h.update(w);
+      }
+      return this;
+    };
+
+    CombineBase.prototype.scrub = function() {
+      var h, _i, _len, _ref1;
+      _ref1 = this.hashers;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        h = _ref1[_i];
+        h.scrub();
+      }
+      return this;
+    };
+
+    CombineBase.prototype.finalize = function(w) {
+      var h, hashes, out, _i, _len, _ref1;
+      hashes = (function() {
+        var _i, _len, _ref1, _results;
+        _ref1 = this.hashers;
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          h = _ref1[_i];
+          _results.push(h.finalize(w));
+        }
+        return _results;
+      }).call(this);
+      out = hashes[0];
+      _ref1 = hashes.slice(1);
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        h = _ref1[_i];
+        this._coalesce(out, h);
+        h.scrub();
+      }
+      return out;
+    };
+
+    return CombineBase;
+
+  })();
+
+  Concat = (function(_super) {
+    __extends(Concat, _super);
+
+    function Concat(key, klasses) {
+      var hm, i, klass, subkey, subkeys;
+      if (klasses == null) {
+        klasses = [SHA512, SHA3];
+      }
+      subkeys = key.split(klasses.length);
+      this.hashers = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (i = _i = 0, _len = klasses.length; _i < _len; i = ++_i) {
+          klass = klasses[i];
+          subkey = subkeys[i];
+          hm = new HMAC(subkey, klass);
+          subkey.scrub();
+          _results.push(hm);
+        }
+        return _results;
+      })();
+      Concat.__super__.constructor.call(this);
+    }
+
+    Concat.get_output_size = function() {
+      return SHA512.output_size + SHA3.output_size;
+    };
+
+    Concat.prototype._coalesce = function(out, h) {
+      return out.concat(h);
+    };
+
+    Concat.prototype.get_output_size = function() {
+      var h, tot, _i, _len, _ref1;
+      tot = 0;
+      _ref1 = this.hashers;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        h = _ref1[_i];
+        tot += h.get_output_size();
+      }
+      return tot;
+    };
+
+    Concat.sign = function(_arg) {
+      var input, key;
+      key = _arg.key, input = _arg.input;
+      return (new Concat(key)).finalize(input);
+    };
+
+    Concat.bulk_sign = function(args, cb) {
+      args.klass = Concat;
+      args.what = "HMAC-SHA512-SHA3";
+      return bulk_sign(args, cb);
+    };
+
+    return Concat;
+
+  })(CombineBase);
+
+  XOR = (function(_super) {
+    __extends(XOR, _super);
+
+    function XOR(key, klasses) {
+      var klass;
+      if (klasses == null) {
+        klasses = [SHA512, SHA3];
+      }
+      this.hashers = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = klasses.length; _i < _len; _i++) {
+          klass = klasses[_i];
+          _results.push(new HMAC(key, klass));
+        }
+        return _results;
+      })();
+      XOR.__super__.constructor.call(this);
+    }
+
+    XOR.prototype.reset = function() {
+      var h, i, _i, _len, _ref1;
+      XOR.__super__.reset.call(this);
+      _ref1 = this.hashers;
+      for (i = _i = 0, _len = _ref1.length; _i < _len; i = ++_i) {
+        h = _ref1[i];
+        h.update(new WordArray([i]));
+      }
+      return this;
+    };
+
+    XOR.get_output_size = function() {
+      return Math.max(SHA512.output_size, SHA3.output_size);
+    };
+
+    XOR.prototype._coalesce = function(out, h) {
+      return out.xor(h, {});
+    };
+
+    XOR.prototype.get_output_size = function() {
+      var h;
+      return Math.max.apply(Math, (function() {
+        var _i, _len, _ref1, _results;
+        _ref1 = this.hashers;
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          h = _ref1[_i];
+          _results.push(h.get_output_size());
+        }
+        return _results;
+      }).call(this));
+    };
+
+    XOR.sign = function(_arg) {
+      var input, key;
+      key = _arg.key, input = _arg.input;
+      return (new XOR(key)).finalize(input);
+    };
+
+    XOR.bulk_sign = function(arg, cb) {
+      arg.klass = XOR;
+      arg.what = "HMAC-SHA512-XOR-SHA3";
+      return bulk_sign(arg, cb);
+    };
+
+    return XOR;
+
+  })(CombineBase);
+
+  exports.Concat = Concat;
+
+  exports.XOR = XOR;
+
+}).call(this);
+
+},{"./hmac":477,"./sha3":488,"./sha512":490,"./wordarray":493}],473:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Cipher, Counter, StreamCipher, WordArray, bulk_encrypt, encrypt, iced, __iced_k, __iced_k_noop,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  WordArray = require('./wordarray').WordArray;
+
+  StreamCipher = require('./algbase').StreamCipher;
+
+  Counter = (function() {
+    Counter.prototype.WORD_MAX = 0xffffffff;
+
+    function Counter(_arg) {
+      var i, len, value;
+      value = _arg.value, len = _arg.len;
+      this._value = value != null ? value.clone() : (len == null ? len = 2 : void 0, new WordArray((function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; 0 <= len ? _i < len : _i > len; i = 0 <= len ? ++_i : --_i) {
+          _results.push(0);
+        }
+        return _results;
+      })()));
+    }
+
+    Counter.prototype.inc = function() {
+      var go, i;
+      go = true;
+      i = this._value.words.length - 1;
+      while (go && i >= 0) {
+        if ((++this._value.words[i]) > Counter.WORD_MAX) {
+          this._value.words[i] = 0;
+        } else {
+          go = false;
+        }
+        i--;
+      }
+      return this;
+    };
+
+    Counter.prototype.inc_le = function() {
+      var go, i;
+      go = true;
+      i = 0;
+      while (go && i < this._value.words.length) {
+        if ((++this._value.words[i]) > Counter.WORD_MAX) {
+          this._value.words[i] = 0;
+        } else {
+          go = false;
+        }
+        i++;
+      }
+      return this;
+    };
+
+    Counter.prototype.get = function() {
+      return this._value;
+    };
+
+    Counter.prototype.copy = function() {
+      return this._value.clone();
+    };
+
+    return Counter;
+
+  })();
+
+  Cipher = (function(_super) {
+    __extends(Cipher, _super);
+
+    function Cipher(_arg) {
+      this.block_cipher = _arg.block_cipher, this.iv = _arg.iv;
+      Cipher.__super__.constructor.call(this);
+      this.bsiw = this.block_cipher.blockSize / 4;
+      if (!(this.iv.sigBytes === this.block_cipher.blockSize)) {
+        throw new Error("IV is wrong length (" + this.iv.sigBytes + ")");
+      }
+      this.ctr = new Counter({
+        value: this.iv
+      });
+    }
+
+    Cipher.prototype.scrub = function() {
+      return this.block_cipher.scrub();
+    };
+
+    Cipher.prototype.get_pad = function() {
+      var pad;
+      pad = this.ctr.copy();
+      this.ctr.inc();
+      this.block_cipher.encryptBlock(pad.words);
+      return pad;
+    };
+
+    return Cipher;
+
+  })(StreamCipher);
+
+  encrypt = function(_arg) {
+    var block_cipher, cipher, input, iv, ret;
+    block_cipher = _arg.block_cipher, iv = _arg.iv, input = _arg.input;
+    cipher = new Cipher({
+      block_cipher: block_cipher,
+      iv: iv
+    });
+    ret = cipher.encrypt(input);
+    cipher.scrub();
+    return ret;
+  };
+
+  bulk_encrypt = function(_arg, cb) {
+    var block_cipher, cipher, input, iv, progress_hook, ret, what, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    block_cipher = _arg.block_cipher, iv = _arg.iv, input = _arg.input, progress_hook = _arg.progress_hook, what = _arg.what;
+    cipher = new Cipher({
+      block_cipher: block_cipher,
+      iv: iv
+    });
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/ctr.iced"
+        });
+        cipher.bulk_encrypt({
+          input: input,
+          progress_hook: progress_hook,
+          what: what
+        }, __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return ret = arguments[0];
+            };
+          })(),
+          lineno: 121
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        return cb(ret);
+      };
+    })(this));
+  };
+
+  exports.Counter = Counter;
+
+  exports.Cipher = Cipher;
+
+  exports.encrypt = encrypt;
+
+  exports.bulk_encrypt = bulk_encrypt;
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493,"iced-runtime":376}],474:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var AES, Base, Concat, Decryptor, SHA512, Salsa20, TwoFish, V, WordArray, ctr, decrypt, iced, make_esc, salsa20, __iced_k, __iced_k_noop, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  WordArray = require('./wordarray').WordArray;
+
+  salsa20 = require('./salsa20');
+
+  AES = require('./aes').AES;
+
+  TwoFish = require('./twofish').TwoFish;
+
+  ctr = require('./ctr');
+
+  Concat = require('./combine').Concat;
+
+  SHA512 = require('./sha512').SHA512;
+
+  Salsa20 = require('./salsa20').Salsa20;
+
+  _ref = require('./enc'), Base = _ref.Base, V = _ref.V;
+
+  make_esc = require('iced-error').make_esc;
+
+  Decryptor = (function(_super) {
+    __extends(Decryptor, _super);
+
+    function Decryptor(_arg) {
+      var enc, key;
+      key = _arg.key, enc = _arg.enc;
+      Decryptor.__super__.constructor.call(this, {
+        key: key
+      });
+      if (enc != null) {
+        this.key = enc.key;
+        this.derived_keys = enc.derived_keys;
+      }
+    }
+
+    Decryptor.prototype.read_header = function(cb) {
+      var err, wa;
+      err = (wa = this.ct.unshift(2)) == null ? new Error("Ciphertext underrun in header") : (this.version = V[wa.words[1]]) == null ? new Error("bad header; couldn't find a good version (got " + wa.words[1] + ")") : wa.words[0] !== this.version.header[0] ? new Error("Bad header: unrecognized magic value") : null;
+      return cb(err);
+    };
+
+    Decryptor.prototype.verify_sig = function(key, cb) {
+      var computed, err, received, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      (function(_this) {
+        return (function(__iced_k) {
+          if ((received = _this.ct.unshift(Concat.get_output_size() / 4)) == null) {
+            return __iced_k(err = new Error("Ciphertext underrun in signature"));
+          } else {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                funcname: "Decryptor.verify_sig"
+              });
+              _this.sign({
+                input: _this.ct,
+                key: key,
+                salt: _this.salt
+              }, __iced_deferrals.defer({
+                assign_fn: (function() {
+                  return function() {
+                    err = arguments[0];
+                    return computed = arguments[1];
+                  };
+                })(),
+                lineno: 63
+              }));
+              __iced_deferrals._fulfill();
+            })(function() {
+              return __iced_k(err = err != null ? err : received.equal(computed) ? null : new Error('Signature mismatch or bad decryption key'));
+            });
+          }
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb(err);
+        };
+      })(this));
+    };
+
+    Decryptor.prototype.unshift_iv = function(n_bytes, which, cb) {
+      var err, iv;
+      err = (iv = this.ct.unshift(n_bytes / 4)) != null ? null : new Error("Ciphertext underrun in " + which);
+      return cb(err, iv);
+    };
+
+    Decryptor.prototype.read_salt = function(cb) {
+      var err;
+      err = (this.salt = this.ct.unshift(this.version.salt_size / 4)) == null ? new Error("Ciphertext underrrun in read_salt") : null;
+      return cb(err);
+    };
+
+    Decryptor.prototype.generate_keys = function(_arg, cb) {
+      var err, keys, progress_hook, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      progress_hook = _arg.progress_hook;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+            funcname: "Decryptor.generate_keys"
+          });
+          _this.kdf({
+            salt: _this.salt,
+            progress_hook: progress_hook
+          }, __iced_deferrals.defer({
+            assign_fn: (function() {
+              return function() {
+                err = arguments[0];
+                return keys = arguments[1];
+              };
+            })(),
+            lineno: 114
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb(err, keys);
+        };
+      })(this));
+    };
+
+    Decryptor.prototype.run = function(_arg, cb) {
+      var ct1, ct2, data, esc, iv, progress_hook, pt, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      data = _arg.data, progress_hook = _arg.progress_hook;
+      esc = make_esc(cb, "Decryptor::run");
+      this.ct = WordArray.from_buffer(data);
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+            funcname: "Decryptor.run"
+          });
+          _this.read_header(esc(__iced_deferrals.defer({
+            lineno: 141
+          })));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+              funcname: "Decryptor.run"
+            });
+            _this.read_salt(esc(__iced_deferrals.defer({
+              lineno: 142
+            })));
+            __iced_deferrals._fulfill();
+          })(function() {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                funcname: "Decryptor.run"
+              });
+              _this.generate_keys({
+                progress_hook: progress_hook
+              }, esc(__iced_deferrals.defer({
+                assign_fn: (function(__slot_1) {
+                  return function() {
+                    return __slot_1.keys = arguments[0];
+                  };
+                })(_this),
+                lineno: 143
+              })));
+              __iced_deferrals._fulfill();
+            })(function() {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                  funcname: "Decryptor.run"
+                });
+                _this.verify_sig(_this.keys.hmac, esc(__iced_deferrals.defer({
+                  lineno: 144
+                })));
+                __iced_deferrals._fulfill();
+              })(function() {
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                    funcname: "Decryptor.run"
+                  });
+                  _this.unshift_iv(AES.ivSize, "AES", esc(__iced_deferrals.defer({
+                    assign_fn: (function() {
+                      return function() {
+                        return iv = arguments[0];
+                      };
+                    })(),
+                    lineno: 145
+                  })));
+                  __iced_deferrals._fulfill();
+                })(function() {
+                  (function(__iced_k) {
+                    __iced_deferrals = new iced.Deferrals(__iced_k, {
+                      parent: ___iced_passed_deferral,
+                      filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                      funcname: "Decryptor.run"
+                    });
+                    _this.run_aes({
+                      iv: iv,
+                      input: _this.ct,
+                      key: _this.keys.aes,
+                      progress_hook: progress_hook
+                    }, esc(__iced_deferrals.defer({
+                      assign_fn: (function() {
+                        return function() {
+                          return ct2 = arguments[0];
+                        };
+                      })(),
+                      lineno: 146
+                    })));
+                    __iced_deferrals._fulfill();
+                  })(function() {
+                    (function(__iced_k) {
+                      __iced_deferrals = new iced.Deferrals(__iced_k, {
+                        parent: ___iced_passed_deferral,
+                        filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                        funcname: "Decryptor.run"
+                      });
+                      _this.unshift_iv(TwoFish.ivSize, "2fish", esc(__iced_deferrals.defer({
+                        assign_fn: (function() {
+                          return function() {
+                            return iv = arguments[0];
+                          };
+                        })(),
+                        lineno: 147
+                      })));
+                      __iced_deferrals._fulfill();
+                    })(function() {
+                      (function(__iced_k) {
+                        __iced_deferrals = new iced.Deferrals(__iced_k, {
+                          parent: ___iced_passed_deferral,
+                          filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                          funcname: "Decryptor.run"
+                        });
+                        _this.run_twofish({
+                          iv: iv,
+                          input: _this.ct,
+                          key: _this.keys.twofish,
+                          progress_hook: progress_hook
+                        }, esc(__iced_deferrals.defer({
+                          assign_fn: (function() {
+                            return function() {
+                              return ct1 = arguments[0];
+                            };
+                          })(),
+                          lineno: 148
+                        })));
+                        __iced_deferrals._fulfill();
+                      })(function() {
+                        (function(__iced_k) {
+                          __iced_deferrals = new iced.Deferrals(__iced_k, {
+                            parent: ___iced_passed_deferral,
+                            filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                            funcname: "Decryptor.run"
+                          });
+                          _this.unshift_iv(Salsa20.ivSize, "Salsa", esc(__iced_deferrals.defer({
+                            assign_fn: (function() {
+                              return function() {
+                                return iv = arguments[0];
+                              };
+                            })(),
+                            lineno: 149
+                          })));
+                          __iced_deferrals._fulfill();
+                        })(function() {
+                          (function(__iced_k) {
+                            __iced_deferrals = new iced.Deferrals(__iced_k, {
+                              parent: ___iced_passed_deferral,
+                              filename: "/Users/max/src/keybase/triplesec/src/dec.iced",
+                              funcname: "Decryptor.run"
+                            });
+                            _this.run_salsa20({
+                              iv: iv,
+                              input: _this.ct,
+                              key: _this.keys.salsa20,
+                              output_iv: false,
+                              progress_hook: progress_hook
+                            }, esc(__iced_deferrals.defer({
+                              assign_fn: (function() {
+                                return function() {
+                                  return pt = arguments[0];
+                                };
+                              })(),
+                              lineno: 150
+                            })));
+                            __iced_deferrals._fulfill();
+                          })(function() {
+                            return cb(null, pt.to_buffer());
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        };
+      })(this));
+    };
+
+    Decryptor.prototype.clone = function() {
+      var ret, _ref1;
+      ret = new Decryptor({
+        key: (_ref1 = this.key) != null ? _ref1.to_buffer() : void 0,
+        rng: this.rng,
+        version: this.version
+      });
+      ret.derived_keys = this.clone_derived_keys();
+      return ret;
+    };
+
+    return Decryptor;
+
+  })(Base);
+
+  decrypt = function(_arg, cb) {
+    var data, dec, err, key, progress_hook, pt, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    key = _arg.key, data = _arg.data, progress_hook = _arg.progress_hook;
+    dec = new Decryptor({
+      key: key
+    });
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/dec.iced"
+        });
+        dec.run({
+          data: data,
+          progress_hook: progress_hook
+        }, __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              err = arguments[0];
+              return pt = arguments[1];
+            };
+          })(),
+          lineno: 180
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        dec.scrub();
+        return cb(err, pt);
+      };
+    })(this));
+  };
+
+  exports.Decryptor = Decryptor;
+
+  exports.decrypt = decrypt;
+
+}).call(this);
+
+},{"./aes":470,"./combine":472,"./ctr":473,"./enc":476,"./salsa20":483,"./sha512":490,"./twofish":491,"./wordarray":493,"iced-error":372,"iced-runtime":376}],475:[function(require,module,exports){
+(function (Buffer){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var ADRBG, DRBG, Lock, WordArray, XOR, hmac, iced, sha3, sha512, __iced_k, __iced_k_noop;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  hmac = require('./hmac');
+
+  XOR = require('./combine').XOR;
+
+  sha512 = require('./sha512');
+
+  sha3 = require('./sha3');
+
+  WordArray = require('./wordarray').WordArray;
+
+  Lock = require('iced-lock').Lock;
+
+  DRBG = (function() {
+    function DRBG(entropy, personalization_string, hmac_func) {
+      this.hmac = hmac_func || hmac.sign;
+      this.security_strength = 256;
+      entropy = this.check_entropy(entropy);
+      personalization_string || (personalization_string = new WordArray([]));
+      this._instantiate(entropy, personalization_string);
+    }
+
+    DRBG.prototype.check_entropy = function(entropy, reseed) {
+      if (reseed == null) {
+        reseed = false;
+      }
+      if ((entropy.sigBytes * 8 * 2) < ((reseed ? 2 : 3) * this.security_strength)) {
+        throw new Error("entropy must be at least " + (1.5 * this.security_strength) + " bits.");
+      }
+      return entropy;
+    };
+
+    DRBG.prototype._hmac = function(key, input) {
+      return this.hmac({
+        key: key,
+        input: input
+      });
+    };
+
+    DRBG.prototype._update = function(provided_data) {
+      var V, V_in;
+      V = new WordArray([0], 1);
+      if (provided_data != null) {
+        V = V.concat(provided_data);
+      }
+      V_in = this.V.clone().concat(V);
+      this.K = this._hmac(this.K, V_in);
+      V_in.scrub();
+      V.scrub();
+      this.V = this._hmac(this.K, this.V);
+      if (provided_data != null) {
+        V_in = this.V.clone().concat(new WordArray([1 << 24], 1)).concat(provided_data);
+        this.K = this._hmac(this.K, V_in);
+        V_in.scrub();
+        this.V = this._hmac(this.K, this.V);
+      }
+      return provided_data != null ? provided_data.scrub() : void 0;
+    };
+
+    DRBG.prototype._instantiate = function(entropy, personalization_string) {
+      var i, n, seed_material;
+      seed_material = entropy.concat(personalization_string);
+      n = 64;
+      this.K = WordArray.from_buffer(new Buffer((function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; 0 <= n ? _i < n : _i > n; i = 0 <= n ? ++_i : --_i) {
+          _results.push(0);
+        }
+        return _results;
+      })()));
+      this.V = WordArray.from_buffer(new Buffer((function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; 0 <= n ? _i < n : _i > n; i = 0 <= n ? ++_i : --_i) {
+          _results.push(1);
+        }
+        return _results;
+      })()));
+      this._update(seed_material);
+      entropy.scrub();
+      return this.reseed_counter = 1;
+    };
+
+    DRBG.prototype.reseed = function(entropy) {
+      this._update(this.check_entropy(entropy, true));
+      return this.reseed_counter = 1;
+    };
+
+    DRBG.prototype.generate = function(num_bytes) {
+      var i, tmp, _ref;
+      if ((num_bytes * 8) > 7500) {
+        throw new Error("generate cannot generate > 7500 bits in 1 call.");
+      }
+      if (this.reseed_counter >= 10000) {
+        throw new Error("Need a reseed!");
+      }
+      tmp = [];
+      i = 0;
+      while ((tmp.length === 0) || (tmp.length * tmp[0].length * 4) < num_bytes) {
+        this.V = this._hmac(this.K, this.V);
+        tmp.push(this.V.words);
+      }
+      this._update();
+      this.reseed_counter += 1;
+      return (new WordArray((_ref = []).concat.apply(_ref, tmp))).truncate(num_bytes);
+    };
+
+    return DRBG;
+
+  })();
+
+  ADRBG = (function() {
+    function ADRBG(gen_seed, hmac) {
+      this.gen_seed = gen_seed;
+      this.hmac = hmac;
+      this.drbg = null;
+      this.lock = new Lock();
+    }
+
+    ADRBG.prototype.generate = function(n, cb) {
+      var ret, seed, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/drbg.iced",
+            funcname: "ADRBG.generate"
+          });
+          _this.lock.acquire(__iced_deferrals.defer({
+            lineno: 148
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          (function(__iced_k) {
+            if (_this.drbg == null) {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/drbg.iced",
+                  funcname: "ADRBG.generate"
+                });
+                _this.gen_seed(256, __iced_deferrals.defer({
+                  assign_fn: (function() {
+                    return function() {
+                      return seed = arguments[0];
+                    };
+                  })(),
+                  lineno: 150
+                }));
+                __iced_deferrals._fulfill();
+              })(function() {
+                return __iced_k(_this.drbg = new DRBG(seed, null, _this.hmac));
+              });
+            } else {
+              return __iced_k();
+            }
+          })(function() {
+            (function(__iced_k) {
+              if (_this.drbg.reseed_counter > 100) {
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/max/src/keybase/triplesec/src/drbg.iced",
+                    funcname: "ADRBG.generate"
+                  });
+                  _this.gen_seed(256, __iced_deferrals.defer({
+                    assign_fn: (function() {
+                      return function() {
+                        return seed = arguments[0];
+                      };
+                    })(),
+                    lineno: 153
+                  }));
+                  __iced_deferrals._fulfill();
+                })(function() {
+                  return __iced_k(_this.drbg.reseed(seed));
+                });
+              } else {
+                return __iced_k();
+              }
+            })(function() {
+              ret = _this.drbg.generate(n);
+              _this.lock.release();
+              return cb(ret);
+            });
+          });
+        };
+      })(this));
+    };
+
+    return ADRBG;
+
+  })();
+
+  exports.DRBG = DRBG;
+
+  exports.ADRBG = ADRBG;
+
+}).call(this);
+
+}).call(this,require("buffer").Buffer)
+},{"./combine":472,"./hmac":477,"./sha3":488,"./sha512":490,"./wordarray":493,"buffer":179,"iced-lock":373,"iced-runtime":376}],476:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var AES, Base, CURRENT_VERSION, Concat, Encryptor, HMAC_SHA256, PBKDF2, SHA512, Scrypt, TwoFish, V, WordArray, XOR, ctr, encrypt, iced, make_esc, prng, salsa20, util, __iced_k, __iced_k_noop, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  WordArray = require('./wordarray').WordArray;
+
+  salsa20 = require('./salsa20');
+
+  AES = require('./aes').AES;
+
+  TwoFish = require('./twofish').TwoFish;
+
+  ctr = require('./ctr');
+
+  _ref = require('./combine'), XOR = _ref.XOR, Concat = _ref.Concat;
+
+  SHA512 = require('./sha512').SHA512;
+
+  PBKDF2 = require('./pbkdf2').PBKDF2;
+
+  Scrypt = require('./scrypt').Scrypt;
+
+  util = require('./util');
+
+  prng = require('./prng');
+
+  make_esc = require('iced-error').make_esc;
+
+  HMAC_SHA256 = require('./hmac').HMAC_SHA256;
+
+  V = {
+    "1": {
+      header: [0x1c94d7de, 1],
+      salt_size: 8,
+      xsalsa20_rev: true,
+      kdf: {
+        klass: PBKDF2,
+        opts: {
+          c: 1024,
+          klass: XOR
+        }
+      },
+      hmac_key_size: 768 / 8,
+      version: 1
+    },
+    "2": {
+      header: [0x1c94d7de, 2],
+      salt_size: 16,
+      xsalsa20_rev: true,
+      kdf: {
+        klass: Scrypt,
+        opts: {
+          c: 64,
+          klass: XOR,
+          N: 12,
+          r: 8,
+          p: 1
+        }
+      },
+      hmac_key_size: 768 / 8,
+      version: 2
+    },
+    "3": {
+      header: [0x1c94d7de, 3],
+      salt_size: 16,
+      xsalsa20_rev: false,
+      kdf: {
+        klass: Scrypt,
+        opts: {
+          c: 1,
+          klass: HMAC_SHA256,
+          N: 15,
+          r: 8,
+          p: 1
+        }
+      },
+      hmac_key_size: 768 / 8,
+      version: 3
+    }
+  };
+
+  exports.CURRENT_VERSION = CURRENT_VERSION = 3;
+
+  Base = (function() {
+    function Base(_arg) {
+      var key, version;
+      key = _arg.key, version = _arg.version;
+      this.version = V[version != null ? version : CURRENT_VERSION];
+      if (this.version == null) {
+        throw new Error("unknown version: " + version);
+      }
+      this.set_key(key);
+      this.derived_keys = {};
+    }
+
+    Base.prototype.kdf = function(_arg, cb) {
+      var args, dkLen, end, extra_keymaterial, i, k, key, keys, len, lens, order, progress_hook, raw, salt, salt_hex, v, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      salt = _arg.salt, extra_keymaterial = _arg.extra_keymaterial, progress_hook = _arg.progress_hook;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+            funcname: "Base.kdf"
+          });
+          _this._check_scrubbed(_this.key, "in KDF", cb, __iced_deferrals.defer({
+            lineno: 97
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          salt_hex = salt.to_hex();
+          key = _this.key.clone();
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+              funcname: "Base.kdf"
+            });
+            _this._check_scrubbed(key, "KDF", cb, __iced_deferrals.defer({
+              lineno: 105
+            }));
+            __iced_deferrals._fulfill();
+          })(function() {
+            (function(__iced_k) {
+              if ((keys = _this.derived_keys[salt_hex]) == null) {
+                _this._kdf = new _this.version.kdf.klass(_this.version.kdf.opts);
+                lens = {
+                  hmac: _this.version.hmac_key_size,
+                  aes: AES.keySize,
+                  twofish: TwoFish.keySize,
+                  salsa20: salsa20.Salsa20.keySize
+                };
+                order = ['hmac', 'aes', 'twofish', 'salsa20'];
+                dkLen = extra_keymaterial || 0;
+                for (k in lens) {
+                  v = lens[k];
+                  dkLen += v;
+                }
+                args = {
+                  dkLen: dkLen,
+                  key: key,
+                  progress_hook: progress_hook,
+                  salt: salt
+                };
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                    funcname: "Base.kdf"
+                  });
+                  _this._kdf.run(args, __iced_deferrals.defer({
+                    assign_fn: (function() {
+                      return function() {
+                        return raw = arguments[0];
+                      };
+                    })(),
+                    lineno: 124
+                  }));
+                  __iced_deferrals._fulfill();
+                })(function() {
+                  var _i, _len;
+                  keys = {};
+                  i = 0;
+                  for (_i = 0, _len = order.length; _i < _len; _i++) {
+                    k = order[_i];
+                    v = lens[k];
+                    len = v / 4;
+                    end = i + len;
+                    keys[k] = new WordArray(raw.words.slice(i, end));
+                    i = end;
+                  }
+                  keys.extra = (new WordArray(raw.words.slice(end))).to_buffer();
+                  return __iced_k(_this.derived_keys[salt_hex] = keys);
+                });
+              } else {
+                return __iced_k();
+              }
+            })(function() {
+              return cb(null, keys);
+            });
+          });
+        };
+      })(this));
+    };
+
+    Base.prototype.set_key = function(key) {
+      var wakey;
+      if (key != null) {
+        wakey = WordArray.from_buffer(key);
+        if (!this.key || !this.key.equal(wakey)) {
+          this.scrub();
+          return this.key = wakey;
+        }
+      } else {
+        return this.scrub();
+      }
+    };
+
+    Base.prototype._check_scrubbed = function(key, where, ecb, okcb) {
+      if ((key != null) && !key.is_scrubbed()) {
+        return okcb();
+      } else {
+        return ecb(new Error("" + where + ": Failed due to scrubbed key!"), null);
+      }
+    };
+
+    Base.prototype.sign = function(_arg, cb) {
+      var input, key, out, progress_hook, salt, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      input = _arg.input, key = _arg.key, salt = _arg.salt, progress_hook = _arg.progress_hook;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+            funcname: "Base.sign"
+          });
+          _this._check_scrubbed(key, "HMAC", cb, __iced_deferrals.defer({
+            lineno: 182
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          input = (new WordArray(_this.version.header)).concat(salt).concat(input);
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+              funcname: "Base.sign"
+            });
+            Concat.bulk_sign({
+              key: key,
+              input: input,
+              progress_hook: progress_hook
+            }, __iced_deferrals.defer({
+              assign_fn: (function() {
+                return function() {
+                  return out = arguments[0];
+                };
+              })(),
+              lineno: 184
+            }));
+            __iced_deferrals._fulfill();
+          })(function() {
+            input.scrub();
+            return cb(null, out);
+          });
+        };
+      })(this));
+    };
+
+    Base.prototype.run_salsa20 = function(_arg, cb) {
+      var args, ct, input, iv, key, output_iv, progress_hook, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      input = _arg.input, key = _arg.key, iv = _arg.iv, output_iv = _arg.output_iv, progress_hook = _arg.progress_hook;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+            funcname: "Base.run_salsa20"
+          });
+          _this._check_scrubbed(key, "Salsa20", cb, __iced_deferrals.defer({
+            lineno: 200
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          args = {
+            input: input,
+            progress_hook: progress_hook,
+            key: key,
+            iv: iv
+          };
+          if (_this.version.xsalsa20_rev) {
+            args.key = key.clone().endian_reverse();
+            args.iv = iv.clone().endian_reverse();
+          }
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+              funcname: "Base.run_salsa20"
+            });
+            salsa20.bulk_encrypt(args, __iced_deferrals.defer({
+              assign_fn: (function() {
+                return function() {
+                  return ct = arguments[0];
+                };
+              })(),
+              lineno: 212
+            }));
+            __iced_deferrals._fulfill();
+          })(function() {
+            if (output_iv) {
+              ct = iv.clone().concat(ct);
+            }
+            if (_this.version.xsalsa20_rev) {
+              args.key.scrub();
+              args.iv.scrub();
+            }
+            return cb(null, ct);
+          });
+        };
+      })(this));
+    };
+
+    Base.prototype.run_twofish = function(_arg, cb) {
+      var block_cipher, ct, input, iv, key, progress_hook, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      input = _arg.input, key = _arg.key, iv = _arg.iv, progress_hook = _arg.progress_hook;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+            funcname: "Base.run_twofish"
+          });
+          _this._check_scrubbed(key, "TwoFish", cb, __iced_deferrals.defer({
+            lineno: 235
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          block_cipher = new TwoFish(key);
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+              funcname: "Base.run_twofish"
+            });
+            ctr.bulk_encrypt({
+              block_cipher: block_cipher,
+              iv: iv,
+              input: input,
+              progress_hook: progress_hook,
+              what: "twofish"
+            }, __iced_deferrals.defer({
+              assign_fn: (function() {
+                return function() {
+                  return ct = arguments[0];
+                };
+              })(),
+              lineno: 237
+            }));
+            __iced_deferrals._fulfill();
+          })(function() {
+            block_cipher.scrub();
+            return cb(null, iv.clone().concat(ct));
+          });
+        };
+      })(this));
+    };
+
+    Base.prototype.run_aes = function(_arg, cb) {
+      var block_cipher, ct, input, iv, key, progress_hook, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      input = _arg.input, key = _arg.key, iv = _arg.iv, progress_hook = _arg.progress_hook;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+            funcname: "Base.run_aes"
+          });
+          _this._check_scrubbed(key, "AES", cb, __iced_deferrals.defer({
+            lineno: 252
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          block_cipher = new AES(key);
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+              funcname: "Base.run_aes"
+            });
+            ctr.bulk_encrypt({
+              block_cipher: block_cipher,
+              iv: iv,
+              input: input,
+              progress_hook: progress_hook,
+              what: "aes"
+            }, __iced_deferrals.defer({
+              assign_fn: (function() {
+                return function() {
+                  return ct = arguments[0];
+                };
+              })(),
+              lineno: 254
+            }));
+            __iced_deferrals._fulfill();
+          })(function() {
+            block_cipher.scrub();
+            return cb(null, iv.clone().concat(ct));
+          });
+        };
+      })(this));
+    };
+
+    Base.prototype.scrub = function() {
+      var algo, key, key_ring, salt, _ref1;
+      if (this.key != null) {
+        this.key.scrub();
+      }
+      if (this.derived_keys != null) {
+        _ref1 = this.derived_keys;
+        for (salt in _ref1) {
+          key_ring = _ref1[salt];
+          for (algo in key_ring) {
+            key = key_ring[algo];
+            if (algo !== 'extra') {
+              key.scrub();
+            }
+          }
+        }
+      }
+      this.derived_keys = {};
+      if (this.salt != null) {
+        this.salt.scrub();
+      }
+      this.salt = null;
+      return this.key = null;
+    };
+
+    Base.prototype.clone_derived_keys = function() {
+      var algo, key, key_ring, ret, salt, _ref1;
+      ret = null;
+      if (this.derived_keys != null) {
+        ret = {};
+        _ref1 = this.derived_keys;
+        for (salt in _ref1) {
+          key_ring = _ref1[salt];
+          ret[salt] = {};
+          for (algo in key_ring) {
+            key = key_ring[algo];
+            ret[salt][algo] = algo === 'extra' ? key : key.clone();
+          }
+        }
+      }
+      return ret;
+    };
+
+    return Base;
+
+  })();
+
+  Encryptor = (function(_super) {
+    __extends(Encryptor, _super);
+
+    function Encryptor(_arg) {
+      var key, rng, version;
+      key = _arg.key, rng = _arg.rng, version = _arg.version;
+      Encryptor.__super__.constructor.call(this, {
+        key: key,
+        version: version
+      });
+      this.rng = rng || prng.generate;
+    }
+
+    Encryptor.prototype.pick_random_ivs = function(_arg, cb) {
+      var iv_lens, ivs, k, progress_hook, v, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      progress_hook = _arg.progress_hook;
+      iv_lens = {
+        aes: AES.ivSize,
+        twofish: TwoFish.ivSize,
+        salsa20: salsa20.Salsa20.ivSize
+      };
+      ivs = {};
+      (function(_this) {
+        return (function(__iced_k) {
+          var _i, _k, _keys, _ref1, _results, _while;
+          _ref1 = iv_lens;
+          _keys = (function() {
+            var _results1;
+            _results1 = [];
+            for (_k in _ref1) {
+              _results1.push(_k);
+            }
+            return _results1;
+          })();
+          _i = 0;
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = __iced_k;
+            _continue = function() {
+              return iced.trampoline(function() {
+                ++_i;
+                return _while(__iced_k);
+              });
+            };
+            _next = _continue;
+            if (!(_i < _keys.length)) {
+              return _break();
+            } else {
+              k = _keys[_i];
+              v = _ref1[k];
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                  funcname: "Encryptor.pick_random_ivs"
+                });
+                _this.rng(v, __iced_deferrals.defer({
+                  assign_fn: (function(__slot_1, __slot_2) {
+                    return function() {
+                      return __slot_1[__slot_2] = arguments[0];
+                    };
+                  })(ivs, k),
+                  lineno: 377
+                }));
+                __iced_deferrals._fulfill();
+              })(_next);
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb(ivs);
+        };
+      })(this));
+    };
+
+    Encryptor.prototype.resalt = function(_arg, cb) {
+      var err, extra_keymaterial, progress_hook, salt, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      salt = _arg.salt, extra_keymaterial = _arg.extra_keymaterial, progress_hook = _arg.progress_hook;
+      err = null;
+      (function(_this) {
+        return (function(__iced_k) {
+          if (salt == null) {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                funcname: "Encryptor.resalt"
+              });
+              _this.rng(_this.version.salt_size, __iced_deferrals.defer({
+                assign_fn: (function(__slot_1) {
+                  return function() {
+                    return __slot_1.salt = arguments[0];
+                  };
+                })(_this),
+                lineno: 393
+              }));
+              __iced_deferrals._fulfill();
+            })(__iced_k);
+          } else {
+            return __iced_k(salt.length !== _this.version.salt_size ? err = new Error("Need a salt of exactly " + _this.version.salt_size + " bytes (got " + salt.length + ")") : _this.salt = WordArray.alloc(salt));
+          }
+        });
+      })(this)((function(_this) {
+        return function() {
+          (function(__iced_k) {
+            if (err == null) {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                  funcname: "Encryptor.resalt"
+                });
+                _this.kdf({
+                  extra_keymaterial: extra_keymaterial,
+                  progress_hook: progress_hook,
+                  salt: _this.salt
+                }, __iced_deferrals.defer({
+                  assign_fn: (function(__slot_1) {
+                    return function() {
+                      err = arguments[0];
+                      return __slot_1.keys = arguments[1];
+                    };
+                  })(_this),
+                  lineno: 399
+                }));
+                __iced_deferrals._fulfill();
+              })(__iced_k);
+            } else {
+              return __iced_k();
+            }
+          })(function() {
+            return cb(err, _this.keys);
+          });
+        };
+      })(this));
+    };
+
+    Encryptor.prototype.run = function(_arg, cb) {
+      var ct1, ct2, ct3, data, esc, extra_keymaterial, ivs, progress_hook, pt, ret, salt, sig, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      data = _arg.data, salt = _arg.salt, extra_keymaterial = _arg.extra_keymaterial, progress_hook = _arg.progress_hook;
+      esc = make_esc(cb, "Encryptor::run");
+      (function(_this) {
+        return (function(__iced_k) {
+          if ((salt != null) || (_this.salt == null)) {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                funcname: "Encryptor.run"
+              });
+              _this.resalt({
+                salt: salt,
+                extra_keymaterial: extra_keymaterial,
+                progress_hook: progress_hook
+              }, esc(__iced_deferrals.defer({
+                lineno: 430
+              })));
+              __iced_deferrals._fulfill();
+            })(__iced_k);
+          } else {
+            return __iced_k();
+          }
+        });
+      })(this)((function(_this) {
+        return function() {
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+              funcname: "Encryptor.run"
+            });
+            _this.pick_random_ivs({
+              progress_hook: progress_hook
+            }, __iced_deferrals.defer({
+              assign_fn: (function() {
+                return function() {
+                  return ivs = arguments[0];
+                };
+              })(),
+              lineno: 431
+            }));
+            __iced_deferrals._fulfill();
+          })(function() {
+            pt = WordArray.from_buffer(data);
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                funcname: "Encryptor.run"
+              });
+              _this.run_salsa20({
+                input: pt,
+                key: _this.keys.salsa20,
+                progress_hook: progress_hook,
+                iv: ivs.salsa20,
+                output_iv: true
+              }, esc(__iced_deferrals.defer({
+                assign_fn: (function() {
+                  return function() {
+                    return ct1 = arguments[0];
+                  };
+                })(),
+                lineno: 433
+              })));
+              __iced_deferrals._fulfill();
+            })(function() {
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                  funcname: "Encryptor.run"
+                });
+                _this.run_twofish({
+                  input: ct1,
+                  key: _this.keys.twofish,
+                  progress_hook: progress_hook,
+                  iv: ivs.twofish
+                }, esc(__iced_deferrals.defer({
+                  assign_fn: (function() {
+                    return function() {
+                      return ct2 = arguments[0];
+                    };
+                  })(),
+                  lineno: 434
+                })));
+                __iced_deferrals._fulfill();
+              })(function() {
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                    funcname: "Encryptor.run"
+                  });
+                  _this.run_aes({
+                    input: ct2,
+                    key: _this.keys.aes,
+                    progress_hook: progress_hook,
+                    iv: ivs.aes
+                  }, esc(__iced_deferrals.defer({
+                    assign_fn: (function() {
+                      return function() {
+                        return ct3 = arguments[0];
+                      };
+                    })(),
+                    lineno: 435
+                  })));
+                  __iced_deferrals._fulfill();
+                })(function() {
+                  (function(__iced_k) {
+                    __iced_deferrals = new iced.Deferrals(__iced_k, {
+                      parent: ___iced_passed_deferral,
+                      filename: "/Users/max/src/keybase/triplesec/src/enc.iced",
+                      funcname: "Encryptor.run"
+                    });
+                    _this.sign({
+                      input: ct3,
+                      key: _this.keys.hmac,
+                      progress_hook: progress_hook,
+                      salt: _this.salt
+                    }, esc(__iced_deferrals.defer({
+                      assign_fn: (function() {
+                        return function() {
+                          return sig = arguments[0];
+                        };
+                      })(),
+                      lineno: 436
+                    })));
+                    __iced_deferrals._fulfill();
+                  })(function() {
+                    ret = (new WordArray(_this.version.header)).concat(_this.salt).concat(sig).concat(ct3).to_buffer();
+                    util.scrub_buffer(data);
+                    return cb(null, ret);
+                  });
+                });
+              });
+            });
+          });
+        };
+      })(this));
+    };
+
+    Encryptor.prototype.clone = function() {
+      var ret, _ref1, _ref2;
+      ret = new Encryptor({
+        key: (_ref1 = this.key) != null ? _ref1.to_buffer() : void 0,
+        rng: this.rng,
+        version: (_ref2 = this.version) != null ? _ref2.version : void 0
+      });
+      ret.derived_keys = this.clone_derived_keys();
+      return ret;
+    };
+
+    return Encryptor;
+
+  })(Base);
+
+  encrypt = function(_arg, cb) {
+    var data, enc, err, key, progress_hook, ret, rng, version, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    key = _arg.key, data = _arg.data, rng = _arg.rng, progress_hook = _arg.progress_hook, version = _arg.version;
+    enc = new Encryptor({
+      key: key,
+      rng: rng,
+      version: version
+    });
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/enc.iced"
+        });
+        enc.run({
+          data: data,
+          progress_hook: progress_hook
+        }, __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              err = arguments[0];
+              return ret = arguments[1];
+            };
+          })(),
+          lineno: 475
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        enc.scrub();
+        return cb(err, ret);
+      };
+    })(this));
+  };
+
+  exports.V = V;
+
+  exports.encrypt = encrypt;
+
+  exports.Base = Base;
+
+  exports.Encryptor = Encryptor;
+
+}).call(this);
+
+},{"./aes":470,"./combine":472,"./ctr":473,"./hmac":477,"./pbkdf2":480,"./prng":481,"./salsa20":483,"./scrypt":484,"./sha512":490,"./twofish":491,"./util":492,"./wordarray":493,"iced-error":372,"iced-runtime":376}],477:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var HMAC, HMAC_SHA256, SHA256, SHA512, bulk_sign, iced, sign, util, __iced_k, __iced_k_noop,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  SHA512 = require('./sha512').SHA512;
+
+  SHA256 = require('./sha256').SHA256;
+
+  util = require('./util');
+
+  HMAC = (function() {
+    HMAC.outputSize = 512 / 8;
+
+    HMAC.prototype.outputSize = HMAC.outputSize;
+
+    function HMAC(key, klass) {
+      var i, _i, _ref;
+      if (klass == null) {
+        klass = SHA512;
+      }
+      this.key = key.clone();
+      this.hasher = new klass();
+      this.hasherBlockSize = this.hasher.blockSize;
+      this.hasherBlockSizeBytes = this.hasherBlockSize * 4;
+      if (this.key.sigBytes > this.hasherBlockSizeBytes) {
+        this.key = this.hasher.finalize(this.key);
+      }
+      this.key.clamp();
+      this._oKey = this.key.clone();
+      this._iKey = this.key.clone();
+      for (i = _i = 0, _ref = this.hasherBlockSize; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        this._oKey.words[i] ^= 0x5c5c5c5c;
+        this._iKey.words[i] ^= 0x36363636;
+      }
+      this._oKey.sigBytes = this._iKey.sigBytes = this.hasherBlockSizeBytes;
+      this.reset();
+    }
+
+    HMAC.prototype.get_output_size = function() {
+      return this.hasher.output_size;
+    };
+
+    HMAC.prototype.reset = function() {
+      return this.hasher.reset().update(this._iKey);
+    };
+
+    HMAC.prototype.update = function(wa) {
+      this.hasher.update(wa);
+      return this;
+    };
+
+    HMAC.prototype.finalize = function(wa) {
+      var innerHash, innerHash2, out;
+      innerHash = this.hasher.finalize(wa);
+      this.hasher.reset();
+      innerHash2 = this._oKey.clone().concat(innerHash);
+      out = this.hasher.finalize(innerHash2);
+      innerHash.scrub();
+      innerHash2.scrub();
+      return out;
+    };
+
+    HMAC.prototype.scrub = function() {
+      this.key.scrub();
+      this._iKey.scrub();
+      return this._oKey.scrub();
+    };
+
+    return HMAC;
+
+  })();
+
+  sign = function(_arg) {
+    var eng, hash_class, input, key, out;
+    key = _arg.key, input = _arg.input, hash_class = _arg.hash_class;
+    eng = new HMAC(key, hash_class);
+    out = eng.finalize(input.clamp());
+    eng.scrub();
+    return out;
+  };
+
+  bulk_sign = function(_arg, cb) {
+    var eng, input, key, klass, progress_hook, res, slice_args, what, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    key = _arg.key, input = _arg.input, progress_hook = _arg.progress_hook, klass = _arg.klass, what = _arg.what;
+    klass || (klass = HMAC);
+    what || (what = "hmac_sha512");
+    eng = new klass(key);
+    input.clamp();
+    slice_args = {
+      update: function(lo, hi) {
+        return eng.update(input.slice(lo, hi));
+      },
+      finalize: function() {
+        return eng.finalize();
+      },
+      default_n: eng.hasherBlockSize * 1000
+    };
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/hmac.iced"
+        });
+        util.bulk(input.sigBytes, slice_args, {
+          what: what,
+          progress_hook: progress_hook,
+          cb: __iced_deferrals.defer({
+            assign_fn: (function() {
+              return function() {
+                return res = arguments[0];
+              };
+            })(),
+            lineno: 137
+          })
+        });
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        eng.scrub();
+        return cb(res);
+      };
+    })(this));
+  };
+
+  exports.HMAC_SHA256 = HMAC_SHA256 = (function(_super) {
+    __extends(HMAC_SHA256, _super);
+
+    function HMAC_SHA256(key) {
+      HMAC_SHA256.__super__.constructor.call(this, key, SHA256);
+    }
+
+    return HMAC_SHA256;
+
+  })(HMAC);
+
+  exports.HMAC = HMAC;
+
+  exports.sign = sign;
+
+  exports.bulk_sign = bulk_sign;
+
+}).call(this);
+
+},{"./sha256":487,"./sha512":490,"./util":492,"iced-runtime":376}],478:[function(require,module,exports){
+(function (Buffer){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var hmac, k, v, _ref, _ref1;
+
+  _ref = require('./enc');
+  for (k in _ref) {
+    v = _ref[k];
+    exports[k] = v;
+  }
+
+  _ref1 = require('./dec');
+  for (k in _ref1) {
+    v = _ref1[k];
+    exports[k] = v;
+  }
+
+  exports.prng = require('./prng');
+
+  exports.Buffer = Buffer;
+
+  exports.WordArray = require('./wordarray').WordArray;
+
+  exports.util = require('./util');
+
+  exports.ciphers = {
+    AES: require('./aes').AES,
+    TwoFish: require('./twofish').TwoFish,
+    Salsa20: require('./salsa20').Salsa20
+  };
+
+  exports.hash = {
+    SHA1: require('./sha1').SHA1,
+    SHA224: require('./sha224').SHA224,
+    SHA256: require('./sha256').SHA256,
+    SHA384: require('./sha384').SHA384,
+    SHA512: require('./sha512').SHA512,
+    SHA3: require('./sha3').SHA3,
+    MD5: require('./md5').MD5,
+    RIPEMD160: require('./ripemd160').RIPEMD160
+  };
+
+  exports.modes = {
+    CTR: require('./ctr')
+  };
+
+  exports.scrypt = require('./scrypt').scrypt;
+
+  exports.pbkdf2 = require('./pbkdf2').pbkdf2;
+
+  exports.hmac = hmac = require('./hmac');
+
+  exports.HMAC_SHA256 = hmac.HMAC_SHA256;
+
+  exports.HMAC = hmac.HMAC;
+
+}).call(this);
+
+}).call(this,require("buffer").Buffer)
+},{"./aes":470,"./ctr":473,"./dec":474,"./enc":476,"./hmac":477,"./md5":479,"./pbkdf2":480,"./prng":481,"./ripemd160":482,"./salsa20":483,"./scrypt":484,"./sha1":485,"./sha224":486,"./sha256":487,"./sha3":488,"./sha384":489,"./sha512":490,"./twofish":491,"./util":492,"./wordarray":493,"buffer":179}],479:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var FF, GG, Global, HH, Hasher, II, MD5, WordArray, glbl,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  WordArray = require('./wordarray').WordArray;
+
+  Hasher = require('./algbase').Hasher;
+
+  Global = (function() {
+    function Global() {
+      var i;
+      this.T = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 64; i = ++_i) {
+          _results.push((Math.abs(Math.sin(i + 1)) * 0x100000000) | 0);
+        }
+        return _results;
+      })();
+    }
+
+    return Global;
+
+  })();
+
+  glbl = new Global();
+
+  exports.MD5 = MD5 = (function(_super) {
+    __extends(MD5, _super);
+
+    function MD5() {
+      return MD5.__super__.constructor.apply(this, arguments);
+    }
+
+    MD5.blockSize = 512 / 32;
+
+    MD5.prototype.blockSize = MD5.blockSize;
+
+    MD5.output_size = 16;
+
+    MD5.prototype.output_size = MD5.output_size;
+
+    MD5.prototype._doReset = function() {
+      return this._hash = new WordArray([0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]);
+    };
+
+    MD5.prototype._doProcessBlock = function(M, offset) {
+      var H, M_offset_0, M_offset_1, M_offset_10, M_offset_11, M_offset_12, M_offset_13, M_offset_14, M_offset_15, M_offset_2, M_offset_3, M_offset_4, M_offset_5, M_offset_6, M_offset_7, M_offset_8, M_offset_9, M_offset_i, a, b, c, d, i, offset_i, _i;
+      for (i = _i = 0; _i < 16; i = ++_i) {
+        offset_i = offset + i;
+        M_offset_i = M[offset_i];
+        M[offset_i] = (((M_offset_i << 8) | (M_offset_i >>> 24)) & 0x00ff00ff) | (((M_offset_i << 24) | (M_offset_i >>> 8)) & 0xff00ff00);
+      }
+      H = this._hash.words;
+      M_offset_0 = M[offset + 0];
+      M_offset_1 = M[offset + 1];
+      M_offset_2 = M[offset + 2];
+      M_offset_3 = M[offset + 3];
+      M_offset_4 = M[offset + 4];
+      M_offset_5 = M[offset + 5];
+      M_offset_6 = M[offset + 6];
+      M_offset_7 = M[offset + 7];
+      M_offset_8 = M[offset + 8];
+      M_offset_9 = M[offset + 9];
+      M_offset_10 = M[offset + 10];
+      M_offset_11 = M[offset + 11];
+      M_offset_12 = M[offset + 12];
+      M_offset_13 = M[offset + 13];
+      M_offset_14 = M[offset + 14];
+      M_offset_15 = M[offset + 15];
+      a = H[0];
+      b = H[1];
+      c = H[2];
+      d = H[3];
+      a = FF(a, b, c, d, M_offset_0, 7, glbl.T[0]);
+      d = FF(d, a, b, c, M_offset_1, 12, glbl.T[1]);
+      c = FF(c, d, a, b, M_offset_2, 17, glbl.T[2]);
+      b = FF(b, c, d, a, M_offset_3, 22, glbl.T[3]);
+      a = FF(a, b, c, d, M_offset_4, 7, glbl.T[4]);
+      d = FF(d, a, b, c, M_offset_5, 12, glbl.T[5]);
+      c = FF(c, d, a, b, M_offset_6, 17, glbl.T[6]);
+      b = FF(b, c, d, a, M_offset_7, 22, glbl.T[7]);
+      a = FF(a, b, c, d, M_offset_8, 7, glbl.T[8]);
+      d = FF(d, a, b, c, M_offset_9, 12, glbl.T[9]);
+      c = FF(c, d, a, b, M_offset_10, 17, glbl.T[10]);
+      b = FF(b, c, d, a, M_offset_11, 22, glbl.T[11]);
+      a = FF(a, b, c, d, M_offset_12, 7, glbl.T[12]);
+      d = FF(d, a, b, c, M_offset_13, 12, glbl.T[13]);
+      c = FF(c, d, a, b, M_offset_14, 17, glbl.T[14]);
+      b = FF(b, c, d, a, M_offset_15, 22, glbl.T[15]);
+      a = GG(a, b, c, d, M_offset_1, 5, glbl.T[16]);
+      d = GG(d, a, b, c, M_offset_6, 9, glbl.T[17]);
+      c = GG(c, d, a, b, M_offset_11, 14, glbl.T[18]);
+      b = GG(b, c, d, a, M_offset_0, 20, glbl.T[19]);
+      a = GG(a, b, c, d, M_offset_5, 5, glbl.T[20]);
+      d = GG(d, a, b, c, M_offset_10, 9, glbl.T[21]);
+      c = GG(c, d, a, b, M_offset_15, 14, glbl.T[22]);
+      b = GG(b, c, d, a, M_offset_4, 20, glbl.T[23]);
+      a = GG(a, b, c, d, M_offset_9, 5, glbl.T[24]);
+      d = GG(d, a, b, c, M_offset_14, 9, glbl.T[25]);
+      c = GG(c, d, a, b, M_offset_3, 14, glbl.T[26]);
+      b = GG(b, c, d, a, M_offset_8, 20, glbl.T[27]);
+      a = GG(a, b, c, d, M_offset_13, 5, glbl.T[28]);
+      d = GG(d, a, b, c, M_offset_2, 9, glbl.T[29]);
+      c = GG(c, d, a, b, M_offset_7, 14, glbl.T[30]);
+      b = GG(b, c, d, a, M_offset_12, 20, glbl.T[31]);
+      a = HH(a, b, c, d, M_offset_5, 4, glbl.T[32]);
+      d = HH(d, a, b, c, M_offset_8, 11, glbl.T[33]);
+      c = HH(c, d, a, b, M_offset_11, 16, glbl.T[34]);
+      b = HH(b, c, d, a, M_offset_14, 23, glbl.T[35]);
+      a = HH(a, b, c, d, M_offset_1, 4, glbl.T[36]);
+      d = HH(d, a, b, c, M_offset_4, 11, glbl.T[37]);
+      c = HH(c, d, a, b, M_offset_7, 16, glbl.T[38]);
+      b = HH(b, c, d, a, M_offset_10, 23, glbl.T[39]);
+      a = HH(a, b, c, d, M_offset_13, 4, glbl.T[40]);
+      d = HH(d, a, b, c, M_offset_0, 11, glbl.T[41]);
+      c = HH(c, d, a, b, M_offset_3, 16, glbl.T[42]);
+      b = HH(b, c, d, a, M_offset_6, 23, glbl.T[43]);
+      a = HH(a, b, c, d, M_offset_9, 4, glbl.T[44]);
+      d = HH(d, a, b, c, M_offset_12, 11, glbl.T[45]);
+      c = HH(c, d, a, b, M_offset_15, 16, glbl.T[46]);
+      b = HH(b, c, d, a, M_offset_2, 23, glbl.T[47]);
+      a = II(a, b, c, d, M_offset_0, 6, glbl.T[48]);
+      d = II(d, a, b, c, M_offset_7, 10, glbl.T[49]);
+      c = II(c, d, a, b, M_offset_14, 15, glbl.T[50]);
+      b = II(b, c, d, a, M_offset_5, 21, glbl.T[51]);
+      a = II(a, b, c, d, M_offset_12, 6, glbl.T[52]);
+      d = II(d, a, b, c, M_offset_3, 10, glbl.T[53]);
+      c = II(c, d, a, b, M_offset_10, 15, glbl.T[54]);
+      b = II(b, c, d, a, M_offset_1, 21, glbl.T[55]);
+      a = II(a, b, c, d, M_offset_8, 6, glbl.T[56]);
+      d = II(d, a, b, c, M_offset_15, 10, glbl.T[57]);
+      c = II(c, d, a, b, M_offset_6, 15, glbl.T[58]);
+      b = II(b, c, d, a, M_offset_13, 21, glbl.T[59]);
+      a = II(a, b, c, d, M_offset_4, 6, glbl.T[60]);
+      d = II(d, a, b, c, M_offset_11, 10, glbl.T[61]);
+      c = II(c, d, a, b, M_offset_2, 15, glbl.T[62]);
+      b = II(b, c, d, a, M_offset_9, 21, glbl.T[63]);
+      H[0] = (H[0] + a) | 0;
+      H[1] = (H[1] + b) | 0;
+      H[2] = (H[2] + c) | 0;
+      return H[3] = (H[3] + d) | 0;
+    };
+
+    MD5.prototype._doFinalize = function() {
+      var H, H_i, data, dataWords, hash, i, nBitsLeft, nBitsTotal, nBitsTotalH, nBitsTotalL, _i;
+      data = this._data;
+      dataWords = data.words;
+      nBitsTotal = this._nDataBytes * 8;
+      nBitsLeft = data.sigBytes * 8;
+      dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+      nBitsTotalH = Math.floor(nBitsTotal / 0x100000000);
+      nBitsTotalL = nBitsTotal;
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = (((nBitsTotalH << 8) | (nBitsTotalH >>> 24)) & 0x00ff00ff) | (((nBitsTotalH << 24) | (nBitsTotalH >>> 8)) & 0xff00ff00);
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = (((nBitsTotalL << 8) | (nBitsTotalL >>> 24)) & 0x00ff00ff) | (((nBitsTotalL << 24) | (nBitsTotalL >>> 8)) & 0xff00ff00);
+      data.sigBytes = (dataWords.length + 1) * 4;
+      this._process();
+      hash = this._hash;
+      H = hash.words;
+      for (i = _i = 0; _i < 4; i = ++_i) {
+        H_i = H[i];
+        H[i] = (((H_i << 8) | (H_i >>> 24)) & 0x00ff00ff) | (((H_i << 24) | (H_i >>> 8)) & 0xff00ff00);
+      }
+      return hash;
+    };
+
+    MD5.prototype.copy_to = function(obj) {
+      MD5.__super__.copy_to.call(this, obj);
+      return obj._hash = this._hash.clone();
+    };
+
+    MD5.prototype.clone = function() {
+      var out;
+      out = new MD5();
+      this.copy_to(out);
+      return out;
+    };
+
+    return MD5;
+
+  })(Hasher);
+
+  FF = function(a, b, c, d, x, s, t) {
+    var n;
+    n = a + ((b & c) | (~b & d)) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+
+  GG = function(a, b, c, d, x, s, t) {
+    var n;
+    n = a + ((b & d) | (c & ~d)) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+
+  HH = function(a, b, c, d, x, s, t) {
+    var n;
+    n = a + (b ^ c ^ d) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+
+  II = function(a, b, c, d, x, s, t) {
+    var n;
+    n = a + (c ^ (b | ~d)) + x + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+
+  exports.transform = function(x) {
+    var out;
+    out = (new MD5).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493}],480:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var HMAC, PBKDF2, WordArray, iced, pbkdf2, util, __iced_k, __iced_k_noop;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  HMAC = require('./hmac').HMAC;
+
+  WordArray = require('./wordarray').WordArray;
+
+  util = require('./util');
+
+  PBKDF2 = (function() {
+    function PBKDF2(_arg) {
+      this.klass = _arg.klass, this.c = _arg.c;
+      this.c || (this.c = 1024);
+      this.klass || (this.klass = HMAC);
+    }
+
+    PBKDF2.prototype._PRF = function(input) {
+      this.prf.reset();
+      return this.prf.finalize(input);
+    };
+
+    PBKDF2.prototype._gen_T_i = function(_arg, cb) {
+      var U, i, progress_hook, ret, salt, seed, stop, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      salt = _arg.salt, i = _arg.i, progress_hook = _arg.progress_hook;
+      progress_hook(0);
+      seed = salt.clone().concat(new WordArray([i]));
+      U = this._PRF(seed);
+      ret = U.clone();
+      i = 1;
+      (function(_this) {
+        return (function(__iced_k) {
+          var _while;
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = __iced_k;
+            _continue = function() {
+              return iced.trampoline(function() {
+                return _while(__iced_k);
+              });
+            };
+            _next = _continue;
+            if (!(i < _this.c)) {
+              return _break();
+            } else {
+              stop = Math.min(_this.c, i + 128);
+              while (i < stop) {
+                U = _this._PRF(U);
+                ret.xor(U, {});
+                i++;
+              }
+              progress_hook(i);
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/pbkdf2.iced",
+                  funcname: "PBKDF2._gen_T_i"
+                });
+                util.default_delay(0, 0, __iced_deferrals.defer({
+                  lineno: 57
+                }));
+                __iced_deferrals._fulfill();
+              })(function() {
+                return _next(null);
+              });
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          progress_hook(i);
+          return cb(ret);
+        };
+      })(this));
+    };
+
+    PBKDF2.prototype.run = function(_arg, cb) {
+      var bs, dkLen, flat, i, key, n, ph, progress_hook, salt, tmp, tph, words, ___iced_passed_deferral, __iced_deferrals, __iced_k, _begin, _end, _positive;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      key = _arg.key, salt = _arg.salt, dkLen = _arg.dkLen, progress_hook = _arg.progress_hook;
+      this.prf = new this.klass(key);
+      bs = this.prf.get_output_size();
+      n = Math.ceil(dkLen / bs);
+      words = [];
+      tph = null;
+      ph = (function(_this) {
+        return function(block) {
+          return function(iter) {
+            return typeof progress_hook === "function" ? progress_hook({
+              what: "pbkdf2",
+              total: n * _this.c,
+              i: block * _this.c + iter
+            }) : void 0;
+          };
+        };
+      })(this);
+      ph(0)(0);
+      (function(_this) {
+        return (function(__iced_k) {
+          var _i, _results, _while;
+          i = 1;
+          _begin = 1;
+          _end = n;
+          _positive = _end > _begin;
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = __iced_k;
+            _continue = function() {
+              return iced.trampoline(function() {
+                if (_positive) {
+                  i += 1;
+                } else {
+                  i -= 1;
+                }
+                return _while(__iced_k);
+              });
+            };
+            _next = _continue;
+            if (!!((_positive === true && i > n) || (_positive === false && i < n))) {
+              return _break();
+            } else {
+
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/pbkdf2.iced",
+                  funcname: "PBKDF2.run"
+                });
+                _this._gen_T_i({
+                  salt: salt,
+                  i: i,
+                  progress_hook: ph(i - 1)
+                }, __iced_deferrals.defer({
+                  assign_fn: (function() {
+                    return function() {
+                      return tmp = arguments[0];
+                    };
+                  })(),
+                  lineno: 80
+                }));
+                __iced_deferrals._fulfill();
+              })(function() {
+                return _next(words.push(tmp.words));
+              });
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          var _ref;
+          ph(n)(0);
+          flat = (_ref = []).concat.apply(_ref, words);
+          key.scrub();
+          _this.prf.scrub();
+          _this.prf = null;
+          return cb(new WordArray(flat, dkLen));
+        };
+      })(this));
+    };
+
+    return PBKDF2;
+
+  })();
+
+  pbkdf2 = function(_arg, cb) {
+    var c, dkLen, eng, key, klass, out, progress_hook, salt, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    key = _arg.key, salt = _arg.salt, klass = _arg.klass, c = _arg.c, dkLen = _arg.dkLen, progress_hook = _arg.progress_hook;
+    eng = new PBKDF2({
+      klass: klass,
+      c: c
+    });
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/pbkdf2.iced"
+        });
+        eng.run({
+          key: key,
+          salt: salt,
+          dkLen: dkLen,
+          progress_hook: progress_hook
+        }, __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return out = arguments[0];
+            };
+          })(),
+          lineno: 106
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        return cb(out);
+      };
+    })(this));
+  };
+
+  exports.pbkdf2 = pbkdf2;
+
+  exports.PBKDF2 = PBKDF2;
+
+}).call(this);
+
+},{"./hmac":477,"./util":492,"./wordarray":493,"iced-runtime":376}],481:[function(require,module,exports){
+(function (Buffer){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var ADRBG, PRNG, WordArray, XOR, browser_rng, e, generate, iced, m, more_entropy, native_rng, rng, util, __iced_k, __iced_k_noop, _browser_rng_primitive, _native_rng, _prng, _ref, _ref1;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  more_entropy = require('more-entropy');
+
+  ADRBG = require('./drbg').ADRBG;
+
+  WordArray = require('./wordarray').WordArray;
+
+  XOR = require('./combine').XOR;
+
+  util = require('./util');
+
+  _browser_rng_primitive = null;
+
+  browser_rng = function(n) {
+    var v;
+    v = new Uint8Array(n);
+    _browser_rng_primitive(v);
+    return new Buffer(v);
+  };
+
+  _browser_rng_primitive = (m = typeof window !== "undefined" && window !== null ? (_ref = window.crypto) != null ? _ref.getRandomValues : void 0 : void 0) != null ? m.bind(window.crypto) : (m = typeof window !== "undefined" && window !== null ? (_ref1 = window.msCrypto) != null ? _ref1.getRandomValues : void 0 : void 0) != null ? m.bind(window.msCrypto) : null;
+
+  if (_browser_rng_primitive != null) {
+    _native_rng = browser_rng;
+  } else {
+    try {
+      rng = require('cry' + 'pto').rng;
+      if (rng != null) {
+        _native_rng = rng;
+      }
+    } catch (_error) {
+      e = _error;
+    }
+  }
+
+  native_rng = function(x) {
+    if (_native_rng == null) {
+      throw new Error('No rng found; tried requiring "crypto" and window.crypto');
+    }
+    return _native_rng(x);
+  };
+
+  PRNG = (function() {
+    function PRNG() {
+      this.meg = new more_entropy.Generator();
+      this.adrbg = new ADRBG(((function(_this) {
+        return function(n, cb) {
+          return _this.gen_seed(n, cb);
+        };
+      })(this)), XOR.sign);
+    }
+
+    PRNG.prototype.now_to_buffer = function() {
+      var buf, d, ms, s;
+      d = Date.now();
+      ms = d % 1000;
+      s = Math.floor(d / 1000);
+      buf = new Buffer(8);
+      buf.writeUInt32BE(s, 0);
+      buf.writeUInt32BE(ms, 4);
+      return buf;
+    };
+
+    PRNG.prototype.gen_seed = function(nbits, cb) {
+      var b, bufs, cat, nbytes, wa, words, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      nbytes = nbits / 8;
+      bufs = [];
+      bufs.push(this.now_to_buffer());
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/prng.iced",
+            funcname: "PRNG.gen_seed"
+          });
+          _this.meg.generate(nbits, __iced_deferrals.defer({
+            assign_fn: (function() {
+              return function() {
+                return words = arguments[0];
+              };
+            })(),
+            lineno: 83
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          var _i, _len;
+          bufs.push(_this.now_to_buffer());
+          bufs.push(new Buffer(words));
+          bufs.push(native_rng(nbytes));
+          bufs.push(_this.now_to_buffer());
+          cat = Buffer.concat(bufs);
+          wa = WordArray.from_buffer(cat);
+          util.scrub_buffer(cat);
+          for (_i = 0, _len = bufs.length; _i < _len; _i++) {
+            b = bufs[_i];
+            util.scrub_buffer(b);
+          }
+          return cb(wa);
+        };
+      })(this));
+    };
+
+    PRNG.prototype.generate = function(n, cb) {
+      return this.adrbg.generate(n, cb);
+    };
+
+    return PRNG;
+
+  })();
+
+  _prng = null;
+
+  generate = function(n, cb) {
+    if (_prng == null) {
+      _prng = new PRNG();
+    }
+    return _prng.generate(n, cb);
+  };
+
+  exports.PRNG = PRNG;
+
+  exports.generate = generate;
+
+  exports.native_rng = native_rng;
+
+}).call(this);
+
+}).call(this,require("buffer").Buffer)
+},{"./combine":472,"./drbg":475,"./util":492,"./wordarray":493,"buffer":179,"iced-runtime":376,"more-entropy":440}],482:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var G, Global, Hasher, RIPEMD160, WordArray, X64Word, X64WordArray, f1, f2, f3, f4, f5, rotl, transform, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  _ref = require('./wordarray'), WordArray = _ref.WordArray, X64Word = _ref.X64Word, X64WordArray = _ref.X64WordArray;
+
+  Hasher = require('./algbase').Hasher;
+
+  Global = (function() {
+    function Global() {
+      this._zl = new WordArray([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8, 3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12, 1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2, 4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13]);
+      this._zr = new WordArray([5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12, 6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2, 15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13, 8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14, 12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11]);
+      this._sl = new WordArray([11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8, 7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12, 11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5, 11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12, 9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6]);
+      this._sr = new WordArray([8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6, 9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11, 9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5, 15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8, 8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11]);
+      this._hl = new WordArray([0x00000000, 0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xA953FD4E]);
+      this._hr = new WordArray([0x50A28BE6, 0x5C4DD124, 0x6D703EF3, 0x7A6D76E9, 0x00000000]);
+    }
+
+    return Global;
+
+  })();
+
+  G = new Global();
+
+  RIPEMD160 = (function(_super) {
+    __extends(RIPEMD160, _super);
+
+    function RIPEMD160() {
+      return RIPEMD160.__super__.constructor.apply(this, arguments);
+    }
+
+    RIPEMD160.blockSize = 512 / 32;
+
+    RIPEMD160.prototype.blockSize = RIPEMD160.blockSize;
+
+    RIPEMD160.output_size = 160 / 8;
+
+    RIPEMD160.prototype.output_size = RIPEMD160.output_size;
+
+    RIPEMD160.prototype._doReset = function() {
+      return this._hash = new WordArray([0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]);
+    };
+
+    RIPEMD160.prototype.get_output_size = function() {
+      return this.output_size;
+    };
+
+    RIPEMD160.prototype._doProcessBlock = function(M, offset) {
+      var H, M_offset_i, al, ar, bl, br, cl, cr, dl, dr, el, er, hl, hr, i, offset_i, sl, sr, t, zl, zr, _i, _j;
+      for (i = _i = 0; _i < 16; i = ++_i) {
+        offset_i = offset + i;
+        M_offset_i = M[offset_i];
+        M[offset_i] = (((M_offset_i << 8) | (M_offset_i >>> 24)) & 0x00ff00ff) | (((M_offset_i << 24) | (M_offset_i >>> 8)) & 0xff00ff00);
+      }
+      H = this._hash.words;
+      hl = G._hl.words;
+      hr = G._hr.words;
+      zl = G._zl.words;
+      zr = G._zr.words;
+      sl = G._sl.words;
+      sr = G._sr.words;
+      ar = al = H[0];
+      br = bl = H[1];
+      cr = cl = H[2];
+      dr = dl = H[3];
+      er = el = H[4];
+      for (i = _j = 0; _j < 80; i = ++_j) {
+        t = (al + M[offset + zl[i]]) | 0;
+        if (i < 16) {
+          t += f1(bl, cl, dl) + hl[0];
+        } else if (i < 32) {
+          t += f2(bl, cl, dl) + hl[1];
+        } else if (i < 48) {
+          t += f3(bl, cl, dl) + hl[2];
+        } else if (i < 64) {
+          t += f4(bl, cl, dl) + hl[3];
+        } else {
+          t += f5(bl, cl, dl) + hl[4];
+        }
+        t = t | 0;
+        t = rotl(t, sl[i]);
+        t = (t + el) | 0;
+        al = el;
+        el = dl;
+        dl = rotl(cl, 10);
+        cl = bl;
+        bl = t;
+        t = (ar + M[offset + zr[i]]) | 0;
+        if (i < 16) {
+          t += f5(br, cr, dr) + hr[0];
+        } else if (i < 32) {
+          t += f4(br, cr, dr) + hr[1];
+        } else if (i < 48) {
+          t += f3(br, cr, dr) + hr[2];
+        } else if (i < 64) {
+          t += f2(br, cr, dr) + hr[3];
+        } else {
+          t += f1(br, cr, dr) + hr[4];
+        }
+        t = t | 0;
+        t = rotl(t, sr[i]);
+        t = (t + er) | 0;
+        ar = er;
+        er = dr;
+        dr = rotl(cr, 10);
+        cr = br;
+        br = t;
+      }
+      t = (H[1] + cl + dr) | 0;
+      H[1] = (H[2] + dl + er) | 0;
+      H[2] = (H[3] + el + ar) | 0;
+      H[3] = (H[4] + al + br) | 0;
+      H[4] = (H[0] + bl + cr) | 0;
+      return H[0] = t;
+    };
+
+    RIPEMD160.prototype._doFinalize = function() {
+      var H, H_i, data, dataWords, hash, i, nBitsLeft, nBitsTotal, _i;
+      data = this._data;
+      dataWords = data.words;
+      nBitsTotal = this._nDataBytes * 8;
+      nBitsLeft = data.sigBytes * 8;
+      dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = (((nBitsTotal << 8) | (nBitsTotal >>> 24)) & 0x00ff00ff) | (((nBitsTotal << 24) | (nBitsTotal >>> 8)) & 0xff00ff00);
+      data.sigBytes = (dataWords.length + 1) * 4;
+      this._process();
+      hash = this._hash;
+      H = hash.words;
+      for (i = _i = 0; _i < 5; i = ++_i) {
+        H_i = H[i];
+        H[i] = (((H_i << 8) | (H_i >>> 24)) & 0x00ff00ff) | (((H_i << 24) | (H_i >>> 8)) & 0xff00ff00);
+      }
+      return hash;
+    };
+
+    RIPEMD160.prototype.scrub = function() {
+      return this._hash.scrub();
+    };
+
+    RIPEMD160.prototype.copy_to = function(obj) {
+      RIPEMD160.__super__.copy_to.call(this, obj);
+      return obj._hash = this._hash.clone();
+    };
+
+    RIPEMD160.prototype.clone = function() {
+      var out;
+      out = new RIPEMD160();
+      this.copy_to(out);
+      return out;
+    };
+
+    return RIPEMD160;
+
+  })(Hasher);
+
+  f1 = function(x, y, z) {
+    return x ^ y ^ z;
+  };
+
+  f2 = function(x, y, z) {
+    return (x & y) | ((~x) & z);
+  };
+
+  f3 = function(x, y, z) {
+    return (x | (~y)) ^ z;
+  };
+
+  f4 = function(x, y, z) {
+    return (x & z) | (y & (~z));
+  };
+
+  f5 = function(x, y, z) {
+    return x ^ (y | (~z));
+  };
+
+  rotl = function(x, n) {
+    return (x << n) | (x >>> (32 - n));
+  };
+
+  transform = function(x) {
+    var out;
+    out = (new RIPEMD160).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+  exports.RIPEMD160 = RIPEMD160;
+
+  exports.transform = transform;
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493}],483:[function(require,module,exports){
+(function (Buffer){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Cipher, Counter, Salsa20, Salsa20Core, Salsa20InnerCore, Salsa20WordStream, StreamCipher, WordArray, asum, bulk_encrypt, encrypt, endian_reverse, fixup_uint32, iced, util, __iced_k, __iced_k_noop, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  _ref = require('./wordarray'), endian_reverse = _ref.endian_reverse, WordArray = _ref.WordArray;
+
+  Counter = require('./ctr').Counter;
+
+  fixup_uint32 = require('./util').fixup_uint32;
+
+  StreamCipher = require('./algbase').StreamCipher;
+
+  util = require('./util');
+
+  asum = function(out, v) {
+    var e, i, _i, _len;
+    for (i = _i = 0, _len = v.length; _i < _len; i = ++_i) {
+      e = v[i];
+      out[i] += e;
+    }
+    return false;
+  };
+
+  Salsa20InnerCore = (function() {
+    function Salsa20InnerCore(rounds) {
+      this.rounds = rounds;
+    }
+
+    Salsa20InnerCore.prototype._core = function(v) {
+      "use asm";
+      var i, u, x0, x1, x10, x11, x12, x13, x14, x15, x2, x3, x4, x5, x6, x7, x8, x9, _i, _ref1;
+      x0 = v[0], x1 = v[1], x2 = v[2], x3 = v[3], x4 = v[4], x5 = v[5], x6 = v[6], x7 = v[7], x8 = v[8], x9 = v[9], x10 = v[10], x11 = v[11], x12 = v[12], x13 = v[13], x14 = v[14], x15 = v[15];
+      for (i = _i = 0, _ref1 = this.rounds; _i < _ref1; i = _i += 2) {
+        u = (x0 + x12) | 0;
+        x4 ^= (u << 7) | (u >>> 25);
+        u = (x4 + x0) | 0;
+        x8 ^= (u << 9) | (u >>> 23);
+        u = (x8 + x4) | 0;
+        x12 ^= (u << 13) | (u >>> 19);
+        u = (x12 + x8) | 0;
+        x0 ^= (u << 18) | (u >>> 14);
+        u = (x5 + x1) | 0;
+        x9 ^= (u << 7) | (u >>> 25);
+        u = (x9 + x5) | 0;
+        x13 ^= (u << 9) | (u >>> 23);
+        u = (x13 + x9) | 0;
+        x1 ^= (u << 13) | (u >>> 19);
+        u = (x1 + x13) | 0;
+        x5 ^= (u << 18) | (u >>> 14);
+        u = (x10 + x6) | 0;
+        x14 ^= (u << 7) | (u >>> 25);
+        u = (x14 + x10) | 0;
+        x2 ^= (u << 9) | (u >>> 23);
+        u = (x2 + x14) | 0;
+        x6 ^= (u << 13) | (u >>> 19);
+        u = (x6 + x2) | 0;
+        x10 ^= (u << 18) | (u >>> 14);
+        u = (x15 + x11) | 0;
+        x3 ^= (u << 7) | (u >>> 25);
+        u = (x3 + x15) | 0;
+        x7 ^= (u << 9) | (u >>> 23);
+        u = (x7 + x3) | 0;
+        x11 ^= (u << 13) | (u >>> 19);
+        u = (x11 + x7) | 0;
+        x15 ^= (u << 18) | (u >>> 14);
+        u = (x0 + x3) | 0;
+        x1 ^= (u << 7) | (u >>> 25);
+        u = (x1 + x0) | 0;
+        x2 ^= (u << 9) | (u >>> 23);
+        u = (x2 + x1) | 0;
+        x3 ^= (u << 13) | (u >>> 19);
+        u = (x3 + x2) | 0;
+        x0 ^= (u << 18) | (u >>> 14);
+        u = (x5 + x4) | 0;
+        x6 ^= (u << 7) | (u >>> 25);
+        u = (x6 + x5) | 0;
+        x7 ^= (u << 9) | (u >>> 23);
+        u = (x7 + x6) | 0;
+        x4 ^= (u << 13) | (u >>> 19);
+        u = (x4 + x7) | 0;
+        x5 ^= (u << 18) | (u >>> 14);
+        u = (x10 + x9) | 0;
+        x11 ^= (u << 7) | (u >>> 25);
+        u = (x11 + x10) | 0;
+        x8 ^= (u << 9) | (u >>> 23);
+        u = (x8 + x11) | 0;
+        x9 ^= (u << 13) | (u >>> 19);
+        u = (x9 + x8) | 0;
+        x10 ^= (u << 18) | (u >>> 14);
+        u = (x15 + x14) | 0;
+        x12 ^= (u << 7) | (u >>> 25);
+        u = (x12 + x15) | 0;
+        x13 ^= (u << 9) | (u >>> 23);
+        u = (x13 + x12) | 0;
+        x14 ^= (u << 13) | (u >>> 19);
+        u = (x14 + x13) | 0;
+        x15 ^= (u << 18) | (u >>> 14);
+      }
+      return [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15];
+    };
+
+    return Salsa20InnerCore;
+
+  })();
+
+  Salsa20Core = (function(_super) {
+    __extends(Salsa20Core, _super);
+
+    Salsa20Core.prototype.sigma = WordArray.from_buffer_le(new Buffer("expand 32-byte k"));
+
+    Salsa20Core.prototype.tau = WordArray.from_buffer_le(new Buffer("expand 16-byte k"));
+
+    Salsa20Core.blockSize = 64;
+
+    Salsa20Core.prototype.blockSize = Salsa20Core.blockSize;
+
+    Salsa20Core.keySize = 32;
+
+    Salsa20Core.prototype.keySize = Salsa20Core.keySize;
+
+    Salsa20Core.ivSize = 192 / 8;
+
+    Salsa20Core.prototype.ivSize = Salsa20Core.ivSize;
+
+    function Salsa20Core(key, nonce) {
+      var _ref1;
+      Salsa20Core.__super__.constructor.call(this, 20);
+      this.key = key.clone().endian_reverse();
+      this.nonce = nonce.clone().endian_reverse();
+      if (!(((this.key.sigBytes === 16) && (this.nonce.sigBytes === 8)) || ((this.key.sigBytes === 32) && ((_ref1 = this.nonce.sigBytes) === 8 || _ref1 === 24)))) {
+        throw new Error("Bad key/nonce lengths");
+      }
+      if (this.nonce.sigBytes === 24) {
+        this.xsalsa_setup();
+      }
+      this.input = this.key_iv_setup(this.nonce, this.key);
+      this._reset();
+    }
+
+    Salsa20Core.prototype.scrub = function() {
+      this.key.scrub();
+      this.nonce.scrub();
+      return util.scrub_vec(this.input);
+    };
+
+    Salsa20Core.prototype.xsalsa_setup = function() {
+      var n0, n1;
+      n0 = new WordArray(this.nonce.words.slice(0, 4));
+      this.nonce = n1 = new WordArray(this.nonce.words.slice(4));
+      return this.key = this.hsalsa20(n0, this.key);
+    };
+
+    Salsa20Core.prototype.hsalsa20 = function(nonce, key) {
+      var i, indexes, input, v;
+      input = this.key_iv_setup(nonce, key);
+      input[8] = nonce.words[2];
+      input[9] = nonce.words[3];
+      v = this._core(input);
+      indexes = [0, 5, 10, 15, 6, 7, 8, 9];
+      v = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = indexes.length; _i < _len; _i++) {
+          i = indexes[_i];
+          _results.push(fixup_uint32(v[i]));
+        }
+        return _results;
+      })();
+      util.scrub_vec(input);
+      return new WordArray(v);
+    };
+
+    Salsa20Core.prototype.key_iv_setup = function(nonce, key) {
+      var A, C, i, out, _i, _j, _k, _ref1;
+      out = [];
+      for (i = _i = 0; _i < 4; i = ++_i) {
+        out[i + 1] = key.words[i];
+      }
+      _ref1 = key.sigBytes === 32 ? [this.sigma, key.words.slice(4)] : [this.tau, key.words], C = _ref1[0], A = _ref1[1];
+      for (i = _j = 0; _j < 4; i = ++_j) {
+        out[i + 11] = A[i];
+      }
+      for (i = _k = 0; _k < 4; i = ++_k) {
+        out[i * 5] = C.words[i];
+      }
+      out[6] = nonce.words[0];
+      out[7] = nonce.words[1];
+      return out;
+    };
+
+    Salsa20Core.prototype.counter_setup = function() {
+      this.input[8] = this.counter.get().words[0];
+      return this.input[9] = this.counter.get().words[1];
+    };
+
+    Salsa20Core.prototype._reset = function() {
+      return this.counter = new Counter({
+        len: 2
+      });
+    };
+
+    Salsa20Core.prototype._generateBlock = function() {
+      var v;
+      this.counter_setup();
+      v = this._core(this.input);
+      asum(v, this.input);
+      this.counter.inc_le();
+      return v;
+    };
+
+    return Salsa20Core;
+
+  })(Salsa20InnerCore);
+
+  exports.Salsa20WordStream = Salsa20WordStream = (function(_super) {
+    __extends(Salsa20WordStream, _super);
+
+    function Salsa20WordStream() {
+      return Salsa20WordStream.__super__.constructor.apply(this, arguments);
+    }
+
+    Salsa20WordStream.prototype._reset = function() {
+      return Salsa20WordStream.__super__._reset.call(this);
+    };
+
+    Salsa20WordStream.prototype.getWordArray = function(nbytes) {
+      var blocks, i, nblocks, w, words, _i, _len, _ref1;
+      if ((nbytes == null) || nbytes === this.blockSize) {
+        words = this._generateBlock();
+      } else {
+        nblocks = Math.ceil(nbytes / this.blockSize);
+        blocks = (function() {
+          var _i, _results;
+          _results = [];
+          for (i = _i = 0; 0 <= nblocks ? _i < nblocks : _i > nblocks; i = 0 <= nblocks ? ++_i : --_i) {
+            _results.push(this._generateBlock());
+          }
+          return _results;
+        }).call(this);
+        words = (_ref1 = []).concat.apply(_ref1, blocks);
+      }
+      for (i = _i = 0, _len = words.length; _i < _len; i = ++_i) {
+        w = words[i];
+        words[i] = endian_reverse(w);
+      }
+      return new WordArray(words, nbytes);
+    };
+
+    return Salsa20WordStream;
+
+  })(Salsa20Core);
+
+  exports.Salsa20 = Salsa20 = (function(_super) {
+    __extends(Salsa20, _super);
+
+    function Salsa20() {
+      return Salsa20.__super__.constructor.apply(this, arguments);
+    }
+
+    Salsa20.prototype._reset = function() {
+      Salsa20.__super__._reset.call(this);
+      return this._i = this.blockSize;
+    };
+
+    Salsa20.prototype.getBytes = function(needed) {
+      var bsz, n, v;
+      if (needed == null) {
+        needed = this.blockSize;
+      }
+      v = [];
+      bsz = this.blockSize;
+      if ((this._i === bsz) && (needed === bsz)) {
+        return this._generateBlockBuffer();
+      } else {
+        while (needed > 0) {
+          if (this._i === bsz) {
+            this._generateBlockBuffer();
+            this._i = 0;
+          }
+          n = Math.min(needed, bsz - this._i);
+          v.push((n === bsz ? this._buf : this._buf.slice(this._i, this._i + n)));
+          this._i += n;
+          needed -= n;
+        }
+        return Buffer.concat(v);
+      }
+    };
+
+    Salsa20.prototype._generateBlockBuffer = function() {
+      var e, i, v, _i, _len;
+      this._buf = new Buffer(this.blockSize);
+      v = this._generateBlock();
+      for (i = _i = 0, _len = v.length; _i < _len; i = ++_i) {
+        e = v[i];
+        this._buf.writeUInt32LE(fixup_uint32(e), i * 4);
+      }
+      return this._buf;
+    };
+
+    return Salsa20;
+
+  })(Salsa20Core);
+
+  exports.Cipher = Cipher = (function(_super) {
+    __extends(Cipher, _super);
+
+    function Cipher(_arg) {
+      var iv, key;
+      key = _arg.key, iv = _arg.iv;
+      Cipher.__super__.constructor.call(this);
+      this.salsa = new Salsa20WordStream(key, iv);
+      this.bsiw = this.salsa.blockSize / 4;
+    }
+
+    Cipher.prototype.scrub = function() {
+      return this.salsa.scrub();
+    };
+
+    Cipher.prototype.get_pad = function() {
+      var pad;
+      pad = this.salsa.getWordArray();
+      return pad;
+    };
+
+    return Cipher;
+
+  })(StreamCipher);
+
+  exports.encrypt = encrypt = function(_arg) {
+    var cipher, input, iv, key, ret;
+    key = _arg.key, iv = _arg.iv, input = _arg.input;
+    cipher = new Cipher({
+      key: key,
+      iv: iv
+    });
+    ret = cipher.encrypt(input);
+    cipher.scrub();
+    return ret;
+  };
+
+  exports.bulk_encrypt = bulk_encrypt = function(_arg, cb) {
+    var cipher, input, iv, key, progress_hook, ret, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    key = _arg.key, iv = _arg.iv, input = _arg.input, progress_hook = _arg.progress_hook;
+    cipher = new Cipher({
+      key: key,
+      iv: iv
+    });
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/salsa20.iced"
+        });
+        cipher.bulk_encrypt({
+          input: input,
+          progress_hook: progress_hook,
+          what: "salsa20"
+        }, __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return ret = arguments[0];
+            };
+          })(),
+          lineno: 257
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        cipher.scrub();
+        return cb(ret);
+      };
+    })(this));
+  };
+
+  exports.Salsa20InnerCore = Salsa20InnerCore;
+
+  exports.endian_reverse = endian_reverse;
+
+  exports.asum = asum;
+
+}).call(this);
+
+}).call(this,require("buffer").Buffer)
+},{"./algbase":471,"./ctr":473,"./util":492,"./wordarray":493,"buffer":179,"iced-runtime":376}],484:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var HMAC_SHA256, Salsa20InnerCore, Scrypt, Timer, WordArray, blkcpy, blkxor, default_delay, endian_reverse, fixup_uint32, iced, pbkdf2, scrub_vec, scrypt, timer, ui8a_to_buffer, v_endian_reverse, __iced_k, __iced_k_noop, _ref, _ref1, _ref2;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  HMAC_SHA256 = require('./hmac').HMAC_SHA256;
+
+  pbkdf2 = require('./pbkdf2').pbkdf2;
+
+  _ref = require('./salsa20'), endian_reverse = _ref.endian_reverse, Salsa20InnerCore = _ref.Salsa20InnerCore;
+
+  _ref1 = require('./wordarray'), ui8a_to_buffer = _ref1.ui8a_to_buffer, WordArray = _ref1.WordArray;
+
+  _ref2 = require('./util'), fixup_uint32 = _ref2.fixup_uint32, default_delay = _ref2.default_delay, scrub_vec = _ref2.scrub_vec;
+
+  Timer = (function() {
+    function Timer() {
+      this.tot = 0;
+    }
+
+    Timer.prototype.start = function() {
+      return this._t = Date.now();
+    };
+
+    Timer.prototype.stop = function() {
+      return this.tot += Date.now() - this._t;
+    };
+
+    return Timer;
+
+  })();
+
+  timer = new Timer();
+
+  blkcpy = function(D, S, d_offset, s_offset, len) {
+    "use asm";
+    var end, i, j;
+    j = (d_offset << 4) | 0;
+    i = (s_offset << 4) | 0;
+    end = (i + (len << 4)) | 0;
+    while (i < end) {
+      D[j] = S[i];
+      D[j + 1] = S[i + 1];
+      D[j + 2] = S[i + 2];
+      D[j + 3] = S[i + 3];
+      D[j + 4] = S[i + 4];
+      D[j + 5] = S[i + 5];
+      D[j + 6] = S[i + 6];
+      D[j + 7] = S[i + 7];
+      D[j + 8] = S[i + 8];
+      D[j + 9] = S[i + 9];
+      D[j + 10] = S[i + 10];
+      D[j + 11] = S[i + 11];
+      D[j + 12] = S[i + 12];
+      D[j + 13] = S[i + 13];
+      D[j + 14] = S[i + 14];
+      D[j + 15] = S[i + 15];
+      i += 16;
+      j += 16;
+    }
+    return true;
+  };
+
+  blkxor = function(D, S, s_offset, len) {
+    "use asm";
+    var i, j;
+    len = (len << 4) | 0;
+    i = 0;
+    j = (s_offset << 4) | 0;
+    while (i < len) {
+      D[i] ^= S[j];
+      D[i + 1] ^= S[j + 1];
+      D[i + 2] ^= S[j + 2];
+      D[i + 3] ^= S[j + 3];
+      D[i + 4] ^= S[j + 4];
+      D[i + 5] ^= S[j + 5];
+      D[i + 6] ^= S[j + 6];
+      D[i + 7] ^= S[j + 7];
+      D[i + 8] ^= S[j + 8];
+      D[i + 9] ^= S[j + 9];
+      D[i + 10] ^= S[j + 10];
+      D[i + 11] ^= S[j + 11];
+      D[i + 12] ^= S[j + 12];
+      D[i + 13] ^= S[j + 13];
+      D[i + 14] ^= S[j + 14];
+      D[i + 15] ^= S[j + 15];
+      i += 16;
+      j += 16;
+    }
+    return true;
+  };
+
+  v_endian_reverse = function(v) {
+    var e, i, _i, _len;
+    for (i = _i = 0, _len = v.length; _i < _len; i = ++_i) {
+      e = v[i];
+      v[i] = endian_reverse(e);
+    }
+    return true;
+  };
+
+  Scrypt = (function() {
+    function Scrypt(_arg) {
+      var N, c, c0, c1;
+      N = _arg.N, this.r = _arg.r, this.p = _arg.p, c = _arg.c, c0 = _arg.c0, c1 = _arg.c1, this.klass = _arg.klass;
+      this.N || (this.N = 1 << (N || 15));
+      this.r || (this.r = 8);
+      this.p || (this.p = 1);
+      this.c0 = c0 || c || 1;
+      this.c1 = c1 || c || 1;
+      this.klass || (this.klass = HMAC_SHA256);
+      this.X16_tmp = new Int32Array(0x10);
+      this.s20ic = new Salsa20InnerCore(8);
+    }
+
+    Scrypt.prototype.salsa20_8 = function(B) {
+      var X, i, x, _i, _len;
+      X = this.s20ic._core(B);
+      for (i = _i = 0, _len = X.length; _i < _len; i = ++_i) {
+        x = X[i];
+        B[i] += x;
+      }
+      return true;
+    };
+
+    Scrypt.prototype.pbkdf2 = function(_arg, cb) {
+      var c, dkLen, key, progress_hook, salt, wa, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      key = _arg.key, salt = _arg.salt, dkLen = _arg.dkLen, progress_hook = _arg.progress_hook, c = _arg.c;
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced",
+            funcname: "Scrypt.pbkdf2"
+          });
+          pbkdf2({
+            key: key,
+            salt: salt,
+            c: c,
+            dkLen: dkLen,
+            klass: _this.klass,
+            progress_hook: progress_hook
+          }, __iced_deferrals.defer({
+            assign_fn: (function() {
+              return function() {
+                return wa = arguments[0];
+              };
+            })(),
+            lineno: 113
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          return cb(wa);
+        };
+      })(this));
+    };
+
+    Scrypt.prototype.blockmix_salsa8 = function(B, Y) {
+      var X, i, _i, _ref3;
+      X = this.X16_tmp;
+      blkcpy(X, B, 0, 2 * this.r - 1, 1);
+      for (i = _i = 0, _ref3 = 2 * this.r; 0 <= _ref3 ? _i < _ref3 : _i > _ref3; i = 0 <= _ref3 ? ++_i : --_i) {
+        blkxor(X, B, i, 1);
+        this.salsa20_8(X);
+        blkcpy(Y, X, i, 0, 1);
+      }
+      i = 0;
+      while (i < this.r) {
+        blkcpy(B, Y, i, i * 2, 1);
+        i++;
+      }
+      i = 0;
+      while (i < this.r) {
+        blkcpy(B, Y, i + this.r, i * 2 + 1, 1);
+        i++;
+      }
+      return true;
+    };
+
+    Scrypt.prototype.smix = function(_arg, cb) {
+      var B, V, X, XY, Y, i, j, lim, progress_hook, stop, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      B = _arg.B, V = _arg.V, XY = _arg.XY, progress_hook = _arg.progress_hook;
+      X = XY;
+      lim = 2 * this.r;
+      Y = XY.subarray(0x10 * lim);
+      blkcpy(X, B, 0, 0, lim);
+      i = 0;
+      (function(_this) {
+        return (function(__iced_k) {
+          var _while;
+          _while = function(__iced_k) {
+            var _break, _continue, _next;
+            _break = __iced_k;
+            _continue = function() {
+              return iced.trampoline(function() {
+                return _while(__iced_k);
+              });
+            };
+            _next = _continue;
+            if (!(i < _this.N)) {
+              return _break();
+            } else {
+              stop = Math.min(_this.N, i + 2048);
+              while (i < stop) {
+                blkcpy(V, X, lim * i, 0, lim);
+                _this.blockmix_salsa8(X, Y);
+                i++;
+              }
+              if (typeof progress_hook === "function") {
+                progress_hook(i);
+              }
+              (function(__iced_k) {
+                __iced_deferrals = new iced.Deferrals(__iced_k, {
+                  parent: ___iced_passed_deferral,
+                  filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced",
+                  funcname: "Scrypt.smix"
+                });
+                default_delay(0, 0, __iced_deferrals.defer({
+                  lineno: 170
+                }));
+                __iced_deferrals._fulfill();
+              })(_next);
+            }
+          };
+          _while(__iced_k);
+        });
+      })(this)((function(_this) {
+        return function() {
+          i = 0;
+          (function(__iced_k) {
+            var _while;
+            _while = function(__iced_k) {
+              var _break, _continue, _next;
+              _break = __iced_k;
+              _continue = function() {
+                return iced.trampoline(function() {
+                  return _while(__iced_k);
+                });
+              };
+              _next = _continue;
+              if (!(i < _this.N)) {
+                return _break();
+              } else {
+                stop = Math.min(_this.N, i + 256);
+                while (i < stop) {
+                  j = fixup_uint32(X[0x10 * (lim - 1)]) & (_this.N - 1);
+                  blkxor(X, V, j * lim, lim);
+                  _this.blockmix_salsa8(X, Y);
+                  i++;
+                }
+                if (typeof progress_hook === "function") {
+                  progress_hook(i + _this.N);
+                }
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced",
+                    funcname: "Scrypt.smix"
+                  });
+                  default_delay(0, 0, __iced_deferrals.defer({
+                    lineno: 187
+                  }));
+                  __iced_deferrals._fulfill();
+                })(_next);
+              }
+            };
+            _while(__iced_k);
+          })(function() {
+            blkcpy(B, X, 0, 0, lim);
+            return cb();
+          });
+        };
+      })(this));
+    };
+
+    Scrypt.prototype.run = function(_arg, cb) {
+      var B, MAX, V, XY, dkLen, err, j, key, lph, out, progress_hook, ret, salt, ___iced_passed_deferral, __iced_deferrals, __iced_k, _begin, _end, _positive;
+      __iced_k = __iced_k_noop;
+      ___iced_passed_deferral = iced.findDeferral(arguments);
+      key = _arg.key, salt = _arg.salt, dkLen = _arg.dkLen, progress_hook = _arg.progress_hook;
+      MAX = 0xffffffff;
+      err = ret = null;
+      err = dkLen > MAX ? err = new Error("asked for too much data") : this.r * this.p >= (1 << 30) ? new Error("r & p are too big") : (this.r > MAX / 128 / this.p) || (this.r > MAX / 256) || (this.N > MAX / 128 / this.r) ? new Error("N is too big") : null;
+      XY = new Int32Array(64 * this.r);
+      V = new Int32Array(32 * this.r * this.N);
+      lph = function(o) {
+        o.what += " (pass 1)";
+        return typeof progress_hook === "function" ? progress_hook(o) : void 0;
+      };
+      (function(_this) {
+        return (function(__iced_k) {
+          __iced_deferrals = new iced.Deferrals(__iced_k, {
+            parent: ___iced_passed_deferral,
+            filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced",
+            funcname: "Scrypt.run"
+          });
+          _this.pbkdf2({
+            key: key.clone(),
+            salt: salt,
+            dkLen: 128 * _this.r * _this.p,
+            c: _this.c0,
+            progress_hook: lph
+          }, __iced_deferrals.defer({
+            assign_fn: (function() {
+              return function() {
+                return B = arguments[0];
+              };
+            })(),
+            lineno: 218
+          }));
+          __iced_deferrals._fulfill();
+        });
+      })(this)((function(_this) {
+        return function() {
+          B = new Int32Array(B.words);
+          v_endian_reverse(B);
+          lph = function(j) {
+            return function(i) {
+              return typeof progress_hook === "function" ? progress_hook({
+                i: i + j * _this.N * 2,
+                what: "scrypt",
+                total: _this.p * _this.N * 2
+              }) : void 0;
+            };
+          };
+          (function(__iced_k) {
+            var _i, _results, _while;
+            j = 0;
+            _begin = 0;
+            _end = _this.p;
+            _positive = _end > _begin;
+            _while = function(__iced_k) {
+              var _break, _continue, _next;
+              _break = __iced_k;
+              _continue = function() {
+                return iced.trampoline(function() {
+                  if (_positive) {
+                    j += 1;
+                  } else {
+                    j -= 1;
+                  }
+                  return _while(__iced_k);
+                });
+              };
+              _next = _continue;
+              if (!!((_positive === true && j >= _this.p) || (_positive === false && j <= _this.p))) {
+                return _break();
+              } else {
+
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced",
+                    funcname: "Scrypt.run"
+                  });
+                  _this.smix({
+                    B: B.subarray(32 * _this.r * j),
+                    V: V,
+                    XY: XY,
+                    progress_hook: lph(j)
+                  }, __iced_deferrals.defer({
+                    lineno: 225
+                  }));
+                  __iced_deferrals._fulfill();
+                })(_next);
+              }
+            };
+            _while(__iced_k);
+          })(function() {
+            v_endian_reverse(B);
+            lph = function(o) {
+              o.what += " (pass 2)";
+              return typeof progress_hook === "function" ? progress_hook(o) : void 0;
+            };
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced",
+                funcname: "Scrypt.run"
+              });
+              _this.pbkdf2({
+                key: key,
+                salt: WordArray.from_i32a(B),
+                dkLen: dkLen,
+                c: _this.c1,
+                progress_hook: lph
+              }, __iced_deferrals.defer({
+                assign_fn: (function() {
+                  return function() {
+                    return out = arguments[0];
+                  };
+                })(),
+                lineno: 233
+              }));
+              __iced_deferrals._fulfill();
+            })(function() {
+              scrub_vec(XY);
+              scrub_vec(V);
+              scrub_vec(B);
+              key.scrub();
+              return cb(out);
+            });
+          });
+        };
+      })(this));
+    };
+
+    return Scrypt;
+
+  })();
+
+  scrypt = function(_arg, cb) {
+    var N, c, c0, c1, dkLen, eng, key, klass, p, progress_hook, r, salt, wa, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    key = _arg.key, salt = _arg.salt, r = _arg.r, N = _arg.N, p = _arg.p, c0 = _arg.c0, c1 = _arg.c1, c = _arg.c, klass = _arg.klass, progress_hook = _arg.progress_hook, dkLen = _arg.dkLen;
+    eng = new Scrypt({
+      r: r,
+      N: N,
+      p: p,
+      c: c,
+      c0: c0,
+      c1: c1,
+      klass: klass
+    });
+    (function(_this) {
+      return (function(__iced_k) {
+        __iced_deferrals = new iced.Deferrals(__iced_k, {
+          parent: ___iced_passed_deferral,
+          filename: "/Users/max/src/keybase/triplesec/src/scrypt.iced"
+        });
+        eng.run({
+          key: key,
+          salt: salt,
+          progress_hook: progress_hook,
+          dkLen: dkLen
+        }, __iced_deferrals.defer({
+          assign_fn: (function() {
+            return function() {
+              return wa = arguments[0];
+            };
+          })(),
+          lineno: 263
+        }));
+        __iced_deferrals._fulfill();
+      });
+    })(this)((function(_this) {
+      return function() {
+        return cb(wa);
+      };
+    })(this));
+  };
+
+  exports.Scrypt = Scrypt;
+
+  exports.scrypt = scrypt;
+
+  exports.v_endian_reverse = v_endian_reverse;
+
+}).call(this);
+
+},{"./hmac":477,"./pbkdf2":480,"./salsa20":483,"./util":492,"./wordarray":493,"iced-runtime":376}],485:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Hasher, SHA1, W, WordArray, transform,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  WordArray = require('./wordarray').WordArray;
+
+  Hasher = require('./algbase').Hasher;
+
+  W = [];
+
+  SHA1 = (function(_super) {
+    __extends(SHA1, _super);
+
+    function SHA1() {
+      return SHA1.__super__.constructor.apply(this, arguments);
+    }
+
+    SHA1.blockSize = 512 / 32;
+
+    SHA1.prototype.blockSize = SHA1.blockSize;
+
+    SHA1.output_size = 20;
+
+    SHA1.prototype.output_size = SHA1.output_size;
+
+    SHA1.prototype._doReset = function() {
+      return this._hash = new WordArray([0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0]);
+    };
+
+    SHA1.prototype._doProcessBlock = function(M, offset) {
+      var H, a, b, c, d, e, i, n, t, _i;
+      H = this._hash.words;
+      a = H[0];
+      b = H[1];
+      c = H[2];
+      d = H[3];
+      e = H[4];
+      for (i = _i = 0; _i < 80; i = ++_i) {
+        if (i < 16) {
+          W[i] = M[offset + i] | 0;
+        } else {
+          n = W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16];
+          W[i] = (n << 1) | (n >>> 31);
+        }
+        t = ((a << 5) | (a >>> 27)) + e + W[i];
+        if (i < 20) {
+          t += ((b & c) | (~b & d)) + 0x5a827999;
+        } else if (i < 40) {
+          t += (b ^ c ^ d) + 0x6ed9eba1;
+        } else if (i < 60) {
+          t += ((b & c) | (b & d) | (c & d)) - 0x70e44324;
+        } else {
+          t += (b ^ c ^ d) - 0x359d3e2a;
+        }
+        e = d;
+        d = c;
+        c = (b << 30) | (b >>> 2);
+        b = a;
+        a = t;
+      }
+      H[0] = (H[0] + a) | 0;
+      H[1] = (H[1] + b) | 0;
+      H[2] = (H[2] + c) | 0;
+      H[3] = (H[3] + d) | 0;
+      return H[4] = (H[4] + e) | 0;
+    };
+
+    SHA1.prototype._doFinalize = function() {
+      var data, dataWords, nBitsLeft, nBitsTotal;
+      data = this._data;
+      dataWords = data.words;
+      nBitsTotal = this._nDataBytes * 8;
+      nBitsLeft = data.sigBytes * 8;
+      dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
+      data.sigBytes = dataWords.length * 4;
+      this._process();
+      return this._hash;
+    };
+
+    SHA1.prototype.copy_to = function(obj) {
+      SHA1.__super__.copy_to.call(this, obj);
+      return obj._hash = this._hash.clone();
+    };
+
+    SHA1.prototype.clone = function() {
+      var out;
+      out = new SHA1();
+      this.copy_to(out);
+      return out;
+    };
+
+    return SHA1;
+
+  })(Hasher);
+
+  transform = transform = function(x) {
+    var out;
+    out = (new SHA1).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+  exports.SHA1 = SHA1;
+
+  exports.transform = transform;
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493}],486:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var SHA224, SHA256, WordArray, transform,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  WordArray = require('./wordarray').WordArray;
+
+  SHA256 = require('./sha256').SHA256;
+
+  SHA224 = (function(_super) {
+    __extends(SHA224, _super);
+
+    function SHA224() {
+      return SHA224.__super__.constructor.apply(this, arguments);
+    }
+
+    SHA224.output_size = 224 / 8;
+
+    SHA224.prototype.output_size = SHA224.output_size;
+
+    SHA224.prototype._doReset = function() {
+      return this._hash = new WordArray([0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4]);
+    };
+
+    SHA224.prototype._doFinalize = function() {
+      var hash;
+      hash = SHA224.__super__._doFinalize.call(this);
+      hash.sigBytes -= 4;
+      return hash;
+    };
+
+    SHA224.prototype.clone = function() {
+      var out;
+      out = new SHA224();
+      this.copy_to(out);
+      return out;
+    };
+
+    return SHA224;
+
+  })(SHA256);
+
+  transform = function(x) {
+    var out;
+    out = (new SHA224).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+  exports.SHA224 = SHA224;
+
+  exports.transform = transform;
+
+}).call(this);
+
+},{"./sha256":487,"./wordarray":493}],487:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Global, Hasher, SHA256, WordArray, glbl, transform,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  WordArray = require('./wordarray').WordArray;
+
+  Hasher = require('./algbase').Hasher;
+
+  Global = (function() {
+    function Global() {
+      this.H = [];
+      this.K = [];
+      this.W = [];
+      this.init();
+    }
+
+    Global.prototype.isPrime = function(n) {
+      var f, sqn, _i;
+      if (n === 2 || n === 3 || n === 5 || n === 7) {
+        return true;
+      }
+      if (n === 1 || n === 4 || n === 6 || n === 8 || n === 9) {
+        return false;
+      }
+      sqn = Math.ceil(Math.sqrt(n));
+      for (f = _i = 2; 2 <= sqn ? _i <= sqn : _i >= sqn; f = 2 <= sqn ? ++_i : --_i) {
+        if ((n % f) === 0) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    Global.prototype.getFractionalBits = function(n) {
+      return ((n - (n | 0)) * 0x100000000) | 0;
+    };
+
+    Global.prototype.init = function() {
+      var n, nPrime, _results;
+      n = 2;
+      nPrime = 0;
+      _results = [];
+      while (nPrime < 64) {
+        if (this.isPrime(n)) {
+          if (nPrime < 8) {
+            this.H[nPrime] = this.getFractionalBits(Math.pow(n, 1 / 2));
+          }
+          this.K[nPrime] = this.getFractionalBits(Math.pow(n, 1 / 3));
+          nPrime++;
+        }
+        _results.push(n++);
+      }
+      return _results;
+    };
+
+    return Global;
+
+  })();
+
+  glbl = new Global();
+
+  SHA256 = (function(_super) {
+    __extends(SHA256, _super);
+
+    function SHA256() {
+      return SHA256.__super__.constructor.apply(this, arguments);
+    }
+
+    SHA256.blockSize = 512 / 32;
+
+    SHA256.prototype.blockSize = SHA256.blockSize;
+
+    SHA256.output_size = 256 / 8;
+
+    SHA256.prototype.output_size = SHA256.output_size;
+
+    SHA256.prototype._doReset = function() {
+      return this._hash = new WordArray(glbl.H.slice(0));
+    };
+
+    SHA256.prototype.get_output_size = function() {
+      return this.output_size;
+    };
+
+    SHA256.prototype._doProcessBlock = function(M, offset) {
+      var H, K, W, a, b, c, ch, d, e, f, g, gamma0, gamma0x, gamma1, gamma1x, h, i, maj, sigma0, sigma1, t1, t2, _i;
+      H = this._hash.words;
+      W = glbl.W;
+      K = glbl.K;
+      a = H[0];
+      b = H[1];
+      c = H[2];
+      d = H[3];
+      e = H[4];
+      f = H[5];
+      g = H[6];
+      h = H[7];
+      for (i = _i = 0; _i < 64; i = ++_i) {
+        if (i < 16) {
+          W[i] = M[offset + i] | 0;
+        } else {
+          gamma0x = W[i - 15];
+          gamma0 = ((gamma0x << 25) | (gamma0x >>> 7)) ^ ((gamma0x << 14) | (gamma0x >>> 18)) ^ (gamma0x >>> 3);
+          gamma1x = W[i - 2];
+          gamma1 = ((gamma1x << 15) | (gamma1x >>> 17)) ^ ((gamma1x << 13) | (gamma1x >>> 19)) ^ (gamma1x >>> 10);
+          W[i] = gamma0 + W[i - 7] + gamma1 + W[i - 16];
+        }
+        ch = (e & f) ^ (~e & g);
+        maj = (a & b) ^ (a & c) ^ (b & c);
+        sigma0 = ((a << 30) | (a >>> 2)) ^ ((a << 19) | (a >>> 13)) ^ ((a << 10) | (a >>> 22));
+        sigma1 = ((e << 26) | (e >>> 6)) ^ ((e << 21) | (e >>> 11)) ^ ((e << 7) | (e >>> 25));
+        t1 = h + sigma1 + ch + K[i] + W[i];
+        t2 = sigma0 + maj;
+        h = g;
+        g = f;
+        f = e;
+        e = (d + t1) | 0;
+        d = c;
+        c = b;
+        b = a;
+        a = (t1 + t2) | 0;
+      }
+      H[0] = (H[0] + a) | 0;
+      H[1] = (H[1] + b) | 0;
+      H[2] = (H[2] + c) | 0;
+      H[3] = (H[3] + d) | 0;
+      H[4] = (H[4] + e) | 0;
+      H[5] = (H[5] + f) | 0;
+      H[6] = (H[6] + g) | 0;
+      return H[7] = (H[7] + h) | 0;
+    };
+
+    SHA256.prototype._doFinalize = function() {
+      var data, dataWords, nBitsLeft, nBitsTotal;
+      data = this._data;
+      dataWords = data.words;
+      nBitsTotal = this._nDataBytes * 8;
+      nBitsLeft = data.sigBytes * 8;
+      dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 14] = Math.floor(nBitsTotal / 0x100000000);
+      dataWords[(((nBitsLeft + 64) >>> 9) << 4) + 15] = nBitsTotal;
+      data.sigBytes = dataWords.length * 4;
+      this._process();
+      return this._hash;
+    };
+
+    SHA256.prototype.scrub = function() {
+      return this._hash.scrub();
+    };
+
+    SHA256.prototype.copy_to = function(obj) {
+      SHA256.__super__.copy_to.call(this, obj);
+      return obj._hash = this._hash.clone();
+    };
+
+    SHA256.prototype.clone = function() {
+      var out;
+      out = new SHA256();
+      this.copy_to(out);
+      return out;
+    };
+
+    return SHA256;
+
+  })(Hasher);
+
+  transform = function(x) {
+    var out;
+    out = (new SHA256).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+  exports.SHA256 = SHA256;
+
+  exports.transform = transform;
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493}],488:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Global, Hasher, SHA3, WordArray, X64Word, X64WordArray, glbl, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  _ref = require('./wordarray'), WordArray = _ref.WordArray, X64Word = _ref.X64Word, X64WordArray = _ref.X64WordArray;
+
+  Hasher = require('./algbase').Hasher;
+
+  Global = (function() {
+    function Global() {
+      this.RHO_OFFSETS = [];
+      this.PI_INDEXES = [];
+      this.ROUND_CONSTANTS = [];
+      this.T = [];
+      this.compute_rho_offsets();
+      this.compute_pi_indexes();
+      this.compute_round_constants();
+      this.make_reusables();
+    }
+
+    Global.prototype.compute_rho_offsets = function() {
+      var newX, newY, t, x, y, _i, _results;
+      x = 1;
+      y = 0;
+      _results = [];
+      for (t = _i = 0; _i < 24; t = ++_i) {
+        this.RHO_OFFSETS[x + 5 * y] = ((t + 1) * (t + 2) / 2) % 64;
+        newX = y % 5;
+        newY = (2 * x + 3 * y) % 5;
+        x = newX;
+        _results.push(y = newY);
+      }
+      return _results;
+    };
+
+    Global.prototype.compute_pi_indexes = function() {
+      var x, y, _i, _results;
+      _results = [];
+      for (x = _i = 0; _i < 5; x = ++_i) {
+        _results.push((function() {
+          var _j, _results1;
+          _results1 = [];
+          for (y = _j = 0; _j < 5; y = ++_j) {
+            _results1.push(this.PI_INDEXES[x + 5 * y] = y + ((2 * x + 3 * y) % 5) * 5);
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
+    };
+
+    Global.prototype.compute_round_constants = function() {
+      var LFSR, bitPosition, i, j, roundConstantLsw, roundConstantMsw, _i, _j, _results;
+      LFSR = 0x01;
+      _results = [];
+      for (i = _i = 0; _i < 24; i = ++_i) {
+        roundConstantMsw = 0;
+        roundConstantLsw = 0;
+        for (j = _j = 0; _j < 7; j = ++_j) {
+          if (LFSR & 0x01) {
+            bitPosition = (1 << j) - 1;
+            if (bitPosition < 32) {
+              roundConstantLsw ^= 1 << bitPosition;
+            } else {
+              roundConstantMsw ^= 1 << (bitPosition - 32);
+            }
+          }
+          if (LFSR & 0x80) {
+            LFSR = (LFSR << 1) ^ 0x71;
+          } else {
+            LFSR <<= 1;
+          }
+        }
+        _results.push(this.ROUND_CONSTANTS[i] = new X64Word(roundConstantMsw, roundConstantLsw));
+      }
+      return _results;
+    };
+
+    Global.prototype.make_reusables = function() {
+      var i;
+      return this.T = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 25; i = ++_i) {
+          _results.push(new X64Word(0, 0));
+        }
+        return _results;
+      })();
+    };
+
+    return Global;
+
+  })();
+
+  glbl = new Global();
+
+  exports.SHA3 = SHA3 = (function(_super) {
+    __extends(SHA3, _super);
+
+    function SHA3() {
+      return SHA3.__super__.constructor.apply(this, arguments);
+    }
+
+    SHA3.outputLength = 512;
+
+    SHA3.prototype.outputLength = SHA3.outputLength;
+
+    SHA3.blockSize = (1600 - 2 * SHA3.outputLength) / 32;
+
+    SHA3.prototype.blockSize = SHA3.blockSize;
+
+    SHA3.output_size = SHA3.outputLength / 8;
+
+    SHA3.prototype.output_size = SHA3.output_size;
+
+    SHA3.prototype._doReset = function() {
+      var i;
+      return this._state = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 25; i = ++_i) {
+          _results.push(new X64Word(0, 0));
+        }
+        return _results;
+      })();
+    };
+
+    SHA3.prototype._doProcessBlock = function(M, offset) {
+      var G, M2i, M2i1, T0, TLane, TPiLane, Tx, Tx1, Tx1Lane, Tx1Lsw, Tx1Msw, Tx2Lane, Tx4, i, lane, laneIndex, laneLsw, laneMsw, nBlockSizeLanes, rhoOffset, round, roundConstant, state, state0, tLsw, tMsw, x, y, _i, _j, _k, _l, _m, _n, _o, _p, _q, _results;
+      G = glbl;
+      state = this._state;
+      nBlockSizeLanes = this.blockSize / 2;
+      for (i = _i = 0; 0 <= nBlockSizeLanes ? _i < nBlockSizeLanes : _i > nBlockSizeLanes; i = 0 <= nBlockSizeLanes ? ++_i : --_i) {
+        M2i = M[offset + 2 * i];
+        M2i1 = M[offset + 2 * i + 1];
+        M2i = (((M2i << 8) | (M2i >>> 24)) & 0x00ff00ff) | (((M2i << 24) | (M2i >>> 8)) & 0xff00ff00);
+        M2i1 = (((M2i1 << 8) | (M2i1 >>> 24)) & 0x00ff00ff) | (((M2i1 << 24) | (M2i1 >>> 8)) & 0xff00ff00);
+        lane = state[i];
+        lane.high ^= M2i1;
+        lane.low ^= M2i;
+      }
+      _results = [];
+      for (round = _j = 0; _j < 24; round = ++_j) {
+        for (x = _k = 0; _k < 5; x = ++_k) {
+          tMsw = tLsw = 0;
+          for (y = _l = 0; _l < 5; y = ++_l) {
+            lane = state[x + 5 * y];
+            tMsw ^= lane.high;
+            tLsw ^= lane.low;
+          }
+          Tx = G.T[x];
+          Tx.high = tMsw;
+          Tx.low = tLsw;
+        }
+        for (x = _m = 0; _m < 5; x = ++_m) {
+          Tx4 = G.T[(x + 4) % 5];
+          Tx1 = G.T[(x + 1) % 5];
+          Tx1Msw = Tx1.high;
+          Tx1Lsw = Tx1.low;
+          tMsw = Tx4.high ^ ((Tx1Msw << 1) | (Tx1Lsw >>> 31));
+          tLsw = Tx4.low ^ ((Tx1Lsw << 1) | (Tx1Msw >>> 31));
+          for (y = _n = 0; _n < 5; y = ++_n) {
+            lane = state[x + 5 * y];
+            lane.high ^= tMsw;
+            lane.low ^= tLsw;
+          }
+        }
+        for (laneIndex = _o = 1; _o < 25; laneIndex = ++_o) {
+          lane = state[laneIndex];
+          laneMsw = lane.high;
+          laneLsw = lane.low;
+          rhoOffset = G.RHO_OFFSETS[laneIndex];
+          if (rhoOffset < 32) {
+            tMsw = (laneMsw << rhoOffset) | (laneLsw >>> (32 - rhoOffset));
+            tLsw = (laneLsw << rhoOffset) | (laneMsw >>> (32 - rhoOffset));
+          } else {
+            tMsw = (laneLsw << (rhoOffset - 32)) | (laneMsw >>> (64 - rhoOffset));
+            tLsw = (laneMsw << (rhoOffset - 32)) | (laneLsw >>> (64 - rhoOffset));
+          }
+          TPiLane = G.T[G.PI_INDEXES[laneIndex]];
+          TPiLane.high = tMsw;
+          TPiLane.low = tLsw;
+        }
+        T0 = G.T[0];
+        state0 = state[0];
+        T0.high = state0.high;
+        T0.low = state0.low;
+        for (x = _p = 0; _p < 5; x = ++_p) {
+          for (y = _q = 0; _q < 5; y = ++_q) {
+            laneIndex = x + 5 * y;
+            lane = state[laneIndex];
+            TLane = G.T[laneIndex];
+            Tx1Lane = G.T[((x + 1) % 5) + 5 * y];
+            Tx2Lane = G.T[((x + 2) % 5) + 5 * y];
+            lane.high = TLane.high ^ (~Tx1Lane.high & Tx2Lane.high);
+            lane.low = TLane.low ^ (~Tx1Lane.low & Tx2Lane.low);
+          }
+        }
+        lane = state[0];
+        roundConstant = G.ROUND_CONSTANTS[round];
+        lane.high ^= roundConstant.high;
+        _results.push(lane.low ^= roundConstant.low);
+      }
+      return _results;
+    };
+
+    SHA3.prototype._doFinalize = function() {
+      var blockSizeBits, data, dataWords, hashWords, i, lane, laneLsw, laneMsw, nBitsLeft, nBitsTotal, outputLengthBytes, outputLengthLanes, state, _i;
+      data = this._data;
+      dataWords = data.words;
+      nBitsTotal = this._nDataBytes * 8;
+      nBitsLeft = data.sigBytes * 8;
+      blockSizeBits = this.blockSize * 32;
+      dataWords[nBitsLeft >>> 5] |= 0x1 << (24 - nBitsLeft % 32);
+      dataWords[((Math.ceil((nBitsLeft + 1) / blockSizeBits) * blockSizeBits) >>> 5) - 1] |= 0x80;
+      data.sigBytes = dataWords.length * 4;
+      this._process();
+      state = this._state;
+      outputLengthBytes = this.outputLength / 8;
+      outputLengthLanes = outputLengthBytes / 8;
+      hashWords = [];
+      for (i = _i = 0; 0 <= outputLengthLanes ? _i < outputLengthLanes : _i > outputLengthLanes; i = 0 <= outputLengthLanes ? ++_i : --_i) {
+        lane = state[i];
+        laneMsw = lane.high;
+        laneLsw = lane.low;
+        laneMsw = (((laneMsw << 8) | (laneMsw >>> 24)) & 0x00ff00ff) | (((laneMsw << 24) | (laneMsw >>> 8)) & 0xff00ff00);
+        laneLsw = (((laneLsw << 8) | (laneLsw >>> 24)) & 0x00ff00ff) | (((laneLsw << 24) | (laneLsw >>> 8)) & 0xff00ff00);
+        hashWords.push(laneLsw);
+        hashWords.push(laneMsw);
+      }
+      return new WordArray(hashWords, outputLengthBytes);
+    };
+
+    SHA3.prototype.copy_to = function(obj) {
+      var s;
+      SHA3.__super__.copy_to.call(this, obj);
+      return obj._state = (function() {
+        var _i, _len, _ref1, _results;
+        _ref1 = this._state;
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          s = _ref1[_i];
+          _results.push(s.clone());
+        }
+        return _results;
+      }).call(this);
+    };
+
+    SHA3.prototype.scrub = function() {};
+
+    SHA3.prototype.clone = function() {
+      var out;
+      out = new SHA3();
+      this.copy_to(out);
+      return out;
+    };
+
+    return SHA3;
+
+  })(Hasher);
+
+  exports.transform = function(x) {
+    var out;
+    out = (new SHA3).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493}],489:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Global, SHA384, SHA512, WordArray, X64WordArray, transform, _ref, _ref1,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  _ref = require('./wordarray'), X64WordArray = _ref.X64WordArray, WordArray = _ref.WordArray;
+
+  _ref1 = require('./sha512'), SHA512 = _ref1.SHA512, Global = _ref1.Global;
+
+  SHA384 = (function(_super) {
+    __extends(SHA384, _super);
+
+    function SHA384() {
+      return SHA384.__super__.constructor.apply(this, arguments);
+    }
+
+    SHA384.output_size = 384 / 8;
+
+    SHA384.prototype.output_size = SHA384.output_size;
+
+    SHA384.prototype._doReset = function() {
+      return this._hash = new X64WordArray(Global.convert([0xcbbb9d5d, 0xc1059ed8, 0x629a292a, 0x367cd507, 0x9159015a, 0x3070dd17, 0x152fecd8, 0xf70e5939, 0x67332667, 0xffc00b31, 0x8eb44a87, 0x68581511, 0xdb0c2e0d, 0x64f98fa7, 0x47b5481d, 0xbefa4fa4]));
+    };
+
+    SHA384.prototype._doFinalize = function() {
+      var hash;
+      hash = SHA384.__super__._doFinalize.call(this);
+      hash.sigBytes -= 16;
+      return hash;
+    };
+
+    SHA384.prototype.clone = function() {
+      var out;
+      out = new SHA384();
+      this.copy_to(out);
+      return out;
+    };
+
+    return SHA384;
+
+  })(SHA512);
+
+  transform = function(x) {
+    var out;
+    out = (new SHA384).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+  exports.SHA384 = SHA384;
+
+  exports.transform = transform;
+
+}).call(this);
+
+},{"./sha512":490,"./wordarray":493}],490:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var Global, Hasher, SHA512, X64Word, X64WordArray, glbl, _ref,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  _ref = require('./wordarray'), X64Word = _ref.X64Word, X64WordArray = _ref.X64WordArray;
+
+  Hasher = require('./algbase').Hasher;
+
+  Global = (function() {
+    Global.convert = function(raw) {
+      var i, _i, _ref1, _results;
+      _results = [];
+      for (i = _i = 0, _ref1 = raw.length; _i < _ref1; i = _i += 2) {
+        _results.push(new X64Word(raw[i], raw[i + 1]));
+      }
+      return _results;
+    };
+
+    Global.prototype.convert = function(raw) {
+      return Global.convert(raw);
+    };
+
+    function Global() {
+      var i;
+      this.K = this.convert([0x428a2f98, 0xd728ae22, 0x71374491, 0x23ef65cd, 0xb5c0fbcf, 0xec4d3b2f, 0xe9b5dba5, 0x8189dbbc, 0x3956c25b, 0xf348b538, 0x59f111f1, 0xb605d019, 0x923f82a4, 0xaf194f9b, 0xab1c5ed5, 0xda6d8118, 0xd807aa98, 0xa3030242, 0x12835b01, 0x45706fbe, 0x243185be, 0x4ee4b28c, 0x550c7dc3, 0xd5ffb4e2, 0x72be5d74, 0xf27b896f, 0x80deb1fe, 0x3b1696b1, 0x9bdc06a7, 0x25c71235, 0xc19bf174, 0xcf692694, 0xe49b69c1, 0x9ef14ad2, 0xefbe4786, 0x384f25e3, 0x0fc19dc6, 0x8b8cd5b5, 0x240ca1cc, 0x77ac9c65, 0x2de92c6f, 0x592b0275, 0x4a7484aa, 0x6ea6e483, 0x5cb0a9dc, 0xbd41fbd4, 0x76f988da, 0x831153b5, 0x983e5152, 0xee66dfab, 0xa831c66d, 0x2db43210, 0xb00327c8, 0x98fb213f, 0xbf597fc7, 0xbeef0ee4, 0xc6e00bf3, 0x3da88fc2, 0xd5a79147, 0x930aa725, 0x06ca6351, 0xe003826f, 0x14292967, 0x0a0e6e70, 0x27b70a85, 0x46d22ffc, 0x2e1b2138, 0x5c26c926, 0x4d2c6dfc, 0x5ac42aed, 0x53380d13, 0x9d95b3df, 0x650a7354, 0x8baf63de, 0x766a0abb, 0x3c77b2a8, 0x81c2c92e, 0x47edaee6, 0x92722c85, 0x1482353b, 0xa2bfe8a1, 0x4cf10364, 0xa81a664b, 0xbc423001, 0xc24b8b70, 0xd0f89791, 0xc76c51a3, 0x0654be30, 0xd192e819, 0xd6ef5218, 0xd6990624, 0x5565a910, 0xf40e3585, 0x5771202a, 0x106aa070, 0x32bbd1b8, 0x19a4c116, 0xb8d2d0c8, 0x1e376c08, 0x5141ab53, 0x2748774c, 0xdf8eeb99, 0x34b0bcb5, 0xe19b48a8, 0x391c0cb3, 0xc5c95a63, 0x4ed8aa4a, 0xe3418acb, 0x5b9cca4f, 0x7763e373, 0x682e6ff3, 0xd6b2b8a3, 0x748f82ee, 0x5defb2fc, 0x78a5636f, 0x43172f60, 0x84c87814, 0xa1f0ab72, 0x8cc70208, 0x1a6439ec, 0x90befffa, 0x23631e28, 0xa4506ceb, 0xde82bde9, 0xbef9a3f7, 0xb2c67915, 0xc67178f2, 0xe372532b, 0xca273ece, 0xea26619c, 0xd186b8c7, 0x21c0c207, 0xeada7dd6, 0xcde0eb1e, 0xf57d4f7f, 0xee6ed178, 0x06f067aa, 0x72176fba, 0x0a637dc5, 0xa2c898a6, 0x113f9804, 0xbef90dae, 0x1b710b35, 0x131c471b, 0x28db77f5, 0x23047d84, 0x32caab7b, 0x40c72493, 0x3c9ebe0a, 0x15c9bebc, 0x431d67c4, 0x9c100d4c, 0x4cc5d4be, 0xcb3e42b6, 0x597f299c, 0xfc657e2a, 0x5fcb6fab, 0x3ad6faec, 0x6c44198c, 0x4a475817]);
+      this.I = new X64WordArray(this.convert([0x6a09e667, 0xf3bcc908, 0xbb67ae85, 0x84caa73b, 0x3c6ef372, 0xfe94f82b, 0xa54ff53a, 0x5f1d36f1, 0x510e527f, 0xade682d1, 0x9b05688c, 0x2b3e6c1f, 0x1f83d9ab, 0xfb41bd6b, 0x5be0cd19, 0x137e2179]));
+      this.W = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 0; _i < 80; i = ++_i) {
+          _results.push(new X64Word(0, 0));
+        }
+        return _results;
+      })();
+    }
+
+    return Global;
+
+  })();
+
+  exports.Global = Global;
+
+  glbl = new Global();
+
+  exports.SHA512 = SHA512 = (function(_super) {
+    __extends(SHA512, _super);
+
+    function SHA512() {
+      return SHA512.__super__.constructor.apply(this, arguments);
+    }
+
+    SHA512.blockSize = 1024 / 32;
+
+    SHA512.prototype.blockSize = SHA512.blockSize;
+
+    SHA512.output_size = 512 / 8;
+
+    SHA512.prototype.output_size = SHA512.output_size;
+
+    SHA512.prototype._doReset = function() {
+      return this._hash = glbl.I.clone();
+    };
+
+    SHA512.prototype._doProcessBlock = function(M, offset) {
+      var H, H0, H0h, H0l, H1, H1h, H1l, H2, H2h, H2l, H3, H3h, H3l, H4, H4h, H4l, H5, H5h, H5l, H6, H6h, H6l, H7, H7h, H7l, Ki, Kih, Kil, W, Wi, Wi16, Wi16h, Wi16l, Wi7, Wi7h, Wi7l, Wih, Wil, ah, al, bh, bl, ch, chh, chl, cl, dh, dl, eh, el, fh, fl, gamma0h, gamma0l, gamma0x, gamma0xh, gamma0xl, gamma1h, gamma1l, gamma1x, gamma1xh, gamma1xl, gh, gl, hh, hl, i, majh, majl, sigma0h, sigma0l, sigma1h, sigma1l, t1h, t1l, t2h, t2l, _i;
+      H = this._hash.words;
+      W = glbl.W;
+      H0 = H[0];
+      H1 = H[1];
+      H2 = H[2];
+      H3 = H[3];
+      H4 = H[4];
+      H5 = H[5];
+      H6 = H[6];
+      H7 = H[7];
+      H0h = H0.high;
+      H0l = H0.low;
+      H1h = H1.high;
+      H1l = H1.low;
+      H2h = H2.high;
+      H2l = H2.low;
+      H3h = H3.high;
+      H3l = H3.low;
+      H4h = H4.high;
+      H4l = H4.low;
+      H5h = H5.high;
+      H5l = H5.low;
+      H6h = H6.high;
+      H6l = H6.low;
+      H7h = H7.high;
+      H7l = H7.low;
+      ah = H0h;
+      al = H0l;
+      bh = H1h;
+      bl = H1l;
+      ch = H2h;
+      cl = H2l;
+      dh = H3h;
+      dl = H3l;
+      eh = H4h;
+      el = H4l;
+      fh = H5h;
+      fl = H5l;
+      gh = H6h;
+      gl = H6l;
+      hh = H7h;
+      hl = H7l;
+      for (i = _i = 0; _i < 80; i = ++_i) {
+        Wi = W[i];
+        if (i < 16) {
+          Wih = Wi.high = M[offset + i * 2] | 0;
+          Wil = Wi.low = M[offset + i * 2 + 1] | 0;
+        } else {
+          gamma0x = W[i - 15];
+          gamma0xh = gamma0x.high;
+          gamma0xl = gamma0x.low;
+          gamma0h = ((gamma0xh >>> 1) | (gamma0xl << 31)) ^ ((gamma0xh >>> 8) | (gamma0xl << 24)) ^ (gamma0xh >>> 7);
+          gamma0l = ((gamma0xl >>> 1) | (gamma0xh << 31)) ^ ((gamma0xl >>> 8) | (gamma0xh << 24)) ^ ((gamma0xl >>> 7) | (gamma0xh << 25));
+          gamma1x = W[i - 2];
+          gamma1xh = gamma1x.high;
+          gamma1xl = gamma1x.low;
+          gamma1h = ((gamma1xh >>> 19) | (gamma1xl << 13)) ^ ((gamma1xh << 3) | (gamma1xl >>> 29)) ^ (gamma1xh >>> 6);
+          gamma1l = ((gamma1xl >>> 19) | (gamma1xh << 13)) ^ ((gamma1xl << 3) | (gamma1xh >>> 29)) ^ ((gamma1xl >>> 6) | (gamma1xh << 26));
+          Wi7 = W[i - 7];
+          Wi7h = Wi7.high;
+          Wi7l = Wi7.low;
+          Wi16 = W[i - 16];
+          Wi16h = Wi16.high;
+          Wi16l = Wi16.low;
+          Wil = gamma0l + Wi7l;
+          Wih = gamma0h + Wi7h + ((Wil >>> 0) < (gamma0l >>> 0) ? 1 : 0);
+          Wil = Wil + gamma1l;
+          Wih = Wih + gamma1h + ((Wil >>> 0) < (gamma1l >>> 0) ? 1 : 0);
+          Wil = Wil + Wi16l;
+          Wih = Wih + Wi16h + ((Wil >>> 0) < (Wi16l >>> 0) ? 1 : 0);
+          Wi.high = Wih;
+          Wi.low = Wil;
+        }
+        chh = (eh & fh) ^ (~eh & gh);
+        chl = (el & fl) ^ (~el & gl);
+        majh = (ah & bh) ^ (ah & ch) ^ (bh & ch);
+        majl = (al & bl) ^ (al & cl) ^ (bl & cl);
+        sigma0h = ((ah >>> 28) | (al << 4)) ^ ((ah << 30) | (al >>> 2)) ^ ((ah << 25) | (al >>> 7));
+        sigma0l = ((al >>> 28) | (ah << 4)) ^ ((al << 30) | (ah >>> 2)) ^ ((al << 25) | (ah >>> 7));
+        sigma1h = ((eh >>> 14) | (el << 18)) ^ ((eh >>> 18) | (el << 14)) ^ ((eh << 23) | (el >>> 9));
+        sigma1l = ((el >>> 14) | (eh << 18)) ^ ((el >>> 18) | (eh << 14)) ^ ((el << 23) | (eh >>> 9));
+        Ki = glbl.K[i];
+        Kih = Ki.high;
+        Kil = Ki.low;
+        t1l = hl + sigma1l;
+        t1h = hh + sigma1h + ((t1l >>> 0) < (hl >>> 0) ? 1 : 0);
+        t1l = t1l + chl;
+        t1h = t1h + chh + ((t1l >>> 0) < (chl >>> 0) ? 1 : 0);
+        t1l = t1l + Kil;
+        t1h = t1h + Kih + ((t1l >>> 0) < (Kil >>> 0) ? 1 : 0);
+        t1l = t1l + Wil;
+        t1h = t1h + Wih + ((t1l >>> 0) < (Wil >>> 0) ? 1 : 0);
+        t2l = sigma0l + majl;
+        t2h = sigma0h + majh + ((t2l >>> 0) < (sigma0l >>> 0) ? 1 : 0);
+        hh = gh;
+        hl = gl;
+        gh = fh;
+        gl = fl;
+        fh = eh;
+        fl = el;
+        el = (dl + t1l) | 0;
+        eh = (dh + t1h + ((el >>> 0) < (dl >>> 0) ? 1 : 0)) | 0;
+        dh = ch;
+        dl = cl;
+        ch = bh;
+        cl = bl;
+        bh = ah;
+        bl = al;
+        al = (t1l + t2l) | 0;
+        ah = (t1h + t2h + ((al >>> 0) < (t1l >>> 0) ? 1 : 0)) | 0;
+      }
+      H0l = H0.low = H0l + al;
+      H0.high = H0h + ah + ((H0l >>> 0) < (al >>> 0) ? 1 : 0);
+      H1l = H1.low = H1l + bl;
+      H1.high = H1h + bh + ((H1l >>> 0) < (bl >>> 0) ? 1 : 0);
+      H2l = H2.low = H2l + cl;
+      H2.high = H2h + ch + ((H2l >>> 0) < (cl >>> 0) ? 1 : 0);
+      H3l = H3.low = H3l + dl;
+      H3.high = H3h + dh + ((H3l >>> 0) < (dl >>> 0) ? 1 : 0);
+      H4l = H4.low = H4l + el;
+      H4.high = H4h + eh + ((H4l >>> 0) < (el >>> 0) ? 1 : 0);
+      H5l = H5.low = H5l + fl;
+      H5.high = H5h + fh + ((H5l >>> 0) < (fl >>> 0) ? 1 : 0);
+      H6l = H6.low = H6l + gl;
+      H6.high = H6h + gh + ((H6l >>> 0) < (gl >>> 0) ? 1 : 0);
+      H7l = H7.low = H7l + hl;
+      return H7.high = H7h + hh + ((H7l >>> 0) < (hl >>> 0) ? 1 : 0);
+    };
+
+    SHA512.prototype._doFinalize = function() {
+      var dataWords, nBitsLeft, nBitsTotal;
+      dataWords = this._data.words;
+      nBitsTotal = this._nDataBytes * 8;
+      nBitsLeft = this._data.sigBytes * 8;
+      dataWords[nBitsLeft >>> 5] |= 0x80 << (24 - nBitsLeft % 32);
+      dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 30] = Math.floor(nBitsTotal / 0x100000000);
+      dataWords[(((nBitsLeft + 128) >>> 10) << 5) + 31] = nBitsTotal;
+      this._data.sigBytes = dataWords.length * 4;
+      this._process();
+      return this._hash.toX32();
+    };
+
+    SHA512.prototype.copy_to = function(obj) {
+      SHA512.__super__.copy_to.call(this, obj);
+      return obj._hash = this._hash.clone();
+    };
+
+    SHA512.prototype.clone = function() {
+      var out;
+      out = new SHA512();
+      this.copy_to(out);
+      return out;
+    };
+
+    return SHA512;
+
+  })(Hasher);
+
+  exports.transform = function(x) {
+    var out;
+    out = (new SHA512).finalize(x);
+    x.scrub();
+    return out;
+  };
+
+}).call(this);
+
+},{"./algbase":471,"./wordarray":493}],491:[function(require,module,exports){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var BlockCipher, G, Global, TwoFish, scrub_vec,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  BlockCipher = require('./algbase').BlockCipher;
+
+  scrub_vec = require('./util').scrub_vec;
+
+  Global = (function() {
+    function Global() {
+      this.P = [[0xA9, 0x67, 0xB3, 0xE8, 0x04, 0xFD, 0xA3, 0x76, 0x9A, 0x92, 0x80, 0x78, 0xE4, 0xDD, 0xD1, 0x38, 0x0D, 0xC6, 0x35, 0x98, 0x18, 0xF7, 0xEC, 0x6C, 0x43, 0x75, 0x37, 0x26, 0xFA, 0x13, 0x94, 0x48, 0xF2, 0xD0, 0x8B, 0x30, 0x84, 0x54, 0xDF, 0x23, 0x19, 0x5B, 0x3D, 0x59, 0xF3, 0xAE, 0xA2, 0x82, 0x63, 0x01, 0x83, 0x2E, 0xD9, 0x51, 0x9B, 0x7C, 0xA6, 0xEB, 0xA5, 0xBE, 0x16, 0x0C, 0xE3, 0x61, 0xC0, 0x8C, 0x3A, 0xF5, 0x73, 0x2C, 0x25, 0x0B, 0xBB, 0x4E, 0x89, 0x6B, 0x53, 0x6A, 0xB4, 0xF1, 0xE1, 0xE6, 0xBD, 0x45, 0xE2, 0xF4, 0xB6, 0x66, 0xCC, 0x95, 0x03, 0x56, 0xD4, 0x1C, 0x1E, 0xD7, 0xFB, 0xC3, 0x8E, 0xB5, 0xE9, 0xCF, 0xBF, 0xBA, 0xEA, 0x77, 0x39, 0xAF, 0x33, 0xC9, 0x62, 0x71, 0x81, 0x79, 0x09, 0xAD, 0x24, 0xCD, 0xF9, 0xD8, 0xE5, 0xC5, 0xB9, 0x4D, 0x44, 0x08, 0x86, 0xE7, 0xA1, 0x1D, 0xAA, 0xED, 0x06, 0x70, 0xB2, 0xD2, 0x41, 0x7B, 0xA0, 0x11, 0x31, 0xC2, 0x27, 0x90, 0x20, 0xF6, 0x60, 0xFF, 0x96, 0x5C, 0xB1, 0xAB, 0x9E, 0x9C, 0x52, 0x1B, 0x5F, 0x93, 0x0A, 0xEF, 0x91, 0x85, 0x49, 0xEE, 0x2D, 0x4F, 0x8F, 0x3B, 0x47, 0x87, 0x6D, 0x46, 0xD6, 0x3E, 0x69, 0x64, 0x2A, 0xCE, 0xCB, 0x2F, 0xFC, 0x97, 0x05, 0x7A, 0xAC, 0x7F, 0xD5, 0x1A, 0x4B, 0x0E, 0xA7, 0x5A, 0x28, 0x14, 0x3F, 0x29, 0x88, 0x3C, 0x4C, 0x02, 0xB8, 0xDA, 0xB0, 0x17, 0x55, 0x1F, 0x8A, 0x7D, 0x57, 0xC7, 0x8D, 0x74, 0xB7, 0xC4, 0x9F, 0x72, 0x7E, 0x15, 0x22, 0x12, 0x58, 0x07, 0x99, 0x34, 0x6E, 0x50, 0xDE, 0x68, 0x65, 0xBC, 0xDB, 0xF8, 0xC8, 0xA8, 0x2B, 0x40, 0xDC, 0xFE, 0x32, 0xA4, 0xCA, 0x10, 0x21, 0xF0, 0xD3, 0x5D, 0x0F, 0x00, 0x6F, 0x9D, 0x36, 0x42, 0x4A, 0x5E, 0xC1, 0xE0], [0x75, 0xF3, 0xC6, 0xF4, 0xDB, 0x7B, 0xFB, 0xC8, 0x4A, 0xD3, 0xE6, 0x6B, 0x45, 0x7D, 0xE8, 0x4B, 0xD6, 0x32, 0xD8, 0xFD, 0x37, 0x71, 0xF1, 0xE1, 0x30, 0x0F, 0xF8, 0x1B, 0x87, 0xFA, 0x06, 0x3F, 0x5E, 0xBA, 0xAE, 0x5B, 0x8A, 0x00, 0xBC, 0x9D, 0x6D, 0xC1, 0xB1, 0x0E, 0x80, 0x5D, 0xD2, 0xD5, 0xA0, 0x84, 0x07, 0x14, 0xB5, 0x90, 0x2C, 0xA3, 0xB2, 0x73, 0x4C, 0x54, 0x92, 0x74, 0x36, 0x51, 0x38, 0xB0, 0xBD, 0x5A, 0xFC, 0x60, 0x62, 0x96, 0x6C, 0x42, 0xF7, 0x10, 0x7C, 0x28, 0x27, 0x8C, 0x13, 0x95, 0x9C, 0xC7, 0x24, 0x46, 0x3B, 0x70, 0xCA, 0xE3, 0x85, 0xCB, 0x11, 0xD0, 0x93, 0xB8, 0xA6, 0x83, 0x20, 0xFF, 0x9F, 0x77, 0xC3, 0xCC, 0x03, 0x6F, 0x08, 0xBF, 0x40, 0xE7, 0x2B, 0xE2, 0x79, 0x0C, 0xAA, 0x82, 0x41, 0x3A, 0xEA, 0xB9, 0xE4, 0x9A, 0xA4, 0x97, 0x7E, 0xDA, 0x7A, 0x17, 0x66, 0x94, 0xA1, 0x1D, 0x3D, 0xF0, 0xDE, 0xB3, 0x0B, 0x72, 0xA7, 0x1C, 0xEF, 0xD1, 0x53, 0x3E, 0x8F, 0x33, 0x26, 0x5F, 0xEC, 0x76, 0x2A, 0x49, 0x81, 0x88, 0xEE, 0x21, 0xC4, 0x1A, 0xEB, 0xD9, 0xC5, 0x39, 0x99, 0xCD, 0xAD, 0x31, 0x8B, 0x01, 0x18, 0x23, 0xDD, 0x1F, 0x4E, 0x2D, 0xF9, 0x48, 0x4F, 0xF2, 0x65, 0x8E, 0x78, 0x5C, 0x58, 0x19, 0x8D, 0xE5, 0x98, 0x57, 0x67, 0x7F, 0x05, 0x64, 0xAF, 0x63, 0xB6, 0xFE, 0xF5, 0xB7, 0x3C, 0xA5, 0xCE, 0xE9, 0x68, 0x44, 0xE0, 0x4D, 0x43, 0x69, 0x29, 0x2E, 0xAC, 0x15, 0x59, 0xA8, 0x0A, 0x9E, 0x6E, 0x47, 0xDF, 0x34, 0x35, 0x6A, 0xCF, 0xDC, 0x22, 0xC9, 0xC0, 0x9B, 0x89, 0xD4, 0xED, 0xAB, 0x12, 0xA2, 0x0D, 0x52, 0xBB, 0x02, 0x2F, 0xA9, 0xD7, 0x61, 0x1E, 0xB4, 0x50, 0x04, 0xF6, 0xC2, 0x16, 0x25, 0x86, 0x56, 0x55, 0x09, 0xBE, 0x91]];
+      this.P_00 = 1;
+      this.P_01 = 0;
+      this.P_02 = 0;
+      this.P_03 = 1;
+      this.P_04 = 1;
+      this.P_10 = 0;
+      this.P_11 = 0;
+      this.P_12 = 1;
+      this.P_13 = 1;
+      this.P_14 = 0;
+      this.P_20 = 1;
+      this.P_21 = 1;
+      this.P_22 = 0;
+      this.P_23 = 0;
+      this.P_24 = 0;
+      this.P_30 = 0;
+      this.P_31 = 1;
+      this.P_32 = 1;
+      this.P_33 = 0;
+      this.P_34 = 1;
+      this.GF256_FDBK = 0x169;
+      this.GF256_FDBK_2 = this.GF256_FDBK / 2;
+      this.GF256_FDBK_4 = this.GF256_FDBK / 4;
+      this.RS_GF_FDBK = 0x14D;
+      this.SK_STEP = 0x02020202;
+      this.SK_BUMP = 0x01010101;
+      this.SK_ROTL = 9;
+    }
+
+    return Global;
+
+  })();
+
+  G = new Global();
+
+  exports.TwoFish = TwoFish = (function(_super) {
+    __extends(TwoFish, _super);
+
+    TwoFish.blockSize = 4 * 4;
+
+    TwoFish.prototype.blockSize = TwoFish.blockSize;
+
+    TwoFish.keySize = 256 / 8;
+
+    TwoFish.prototype.keySize = TwoFish.keySize;
+
+    TwoFish.ivSize = TwoFish.blockSize;
+
+    TwoFish.prototype.ivSize = TwoFish.ivSize;
+
+    function TwoFish(key) {
+      this._key = key.clone();
+      this.gMDS0 = [];
+      this.gMDS1 = [];
+      this.gMDS2 = [];
+      this.gMDS3 = [];
+      this.gSubKeys = [];
+      this.gSBox = [];
+      this.k64Cnt = 0;
+      this._doReset();
+    }
+
+    TwoFish.prototype.getByte = function(x, n) {
+      return (x >>> (n * 8)) & 0xFF;
+    };
+
+    TwoFish.prototype.switchEndianness = function(word) {
+      return ((word & 0xff) << 24) | (((word >> 8) & 0xff) << 16) | (((word >> 16) & 0xff) << 8) | ((word >> 24) & 0xff);
+    };
+
+    TwoFish.prototype.LFSR1 = function(x) {
+      return (x >> 1) ^ ((x & 0x01) !== 0 ? G.GF256_FDBK_2 : 0);
+    };
+
+    TwoFish.prototype.LFSR2 = function(x) {
+      return (x >> 2) ^ ((x & 0x02) !== 0 ? G.GF256_FDBK_2 : 0) ^ ((x & 0x01) !== 0 ? G.GF256_FDBK_4 : 0);
+    };
+
+    TwoFish.prototype.Mx_X = function(x) {
+      return x ^ this.LFSR2(x);
+    };
+
+    TwoFish.prototype.Mx_Y = function(x) {
+      return x ^ this.LFSR1(x) ^ this.LFSR2(x);
+    };
+
+    TwoFish.prototype.RS_rem = function(x) {
+      var b, g2, g3;
+      b = (x >>> 24) & 0xff;
+      g2 = ((b << 1) ^ ((b & 0x80) !== 0 ? G.RS_GF_FDBK : 0)) & 0xff;
+      g3 = ((b >>> 1) ^ ((b & 0x01) !== 0 ? G.RS_GF_FDBK >>> 1 : 0)) ^ g2;
+      return (x << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b;
+    };
+
+    TwoFish.prototype.RS_MDS_Encode = function(k0, k1) {
+      var i, r, _i, _j;
+      r = k1;
+      for (i = _i = 0; _i < 4; i = ++_i) {
+        r = this.RS_rem(r);
+      }
+      r ^= k0;
+      for (i = _j = 0; _j < 4; i = ++_j) {
+        r = this.RS_rem(r);
+      }
+      return r;
+    };
+
+    TwoFish.prototype.F32 = function(x, k32) {
+      var b0, b1, b2, b3, k0, k1, k2, k3, m, res;
+      b0 = this.getByte(x, 0);
+      b1 = this.getByte(x, 1);
+      b2 = this.getByte(x, 2);
+      b3 = this.getByte(x, 3);
+      k0 = k32[0];
+      k1 = k32[1];
+      k2 = k32[2];
+      k3 = k32[3];
+      m = this.k64Cnt & 3;
+      res = m === 1 ? this.gMDS0[(G.P[G.P_01][b0] & 0xff) ^ this.getByte(k0, 0)] ^ this.gMDS1[(G.P[G.P_11][b1] & 0xff) ^ this.getByte(k0, 1)] ^ this.gMDS2[(G.P[G.P_21][b2] & 0xff) ^ this.getByte(k0, 2)] ^ this.gMDS3[(G.P[G.P_31][b3] & 0xff) ^ this.getByte(k0, 3)] : (m === 0 ? (b0 = (G.P[G.P_04][b0] & 0xff) ^ this.getByte(k3, 0), b1 = (G.P[G.P_14][b1] & 0xff) ^ this.getByte(k3, 1), b2 = (G.P[G.P_24][b2] & 0xff) ^ this.getByte(k3, 2), b3 = (G.P[G.P_34][b3] & 0xff) ^ this.getByte(k3, 3)) : void 0, m === 0 || m === 3 ? (b0 = (G.P[G.P_03][b0] & 0xff) ^ this.getByte(k2, 0), b1 = (G.P[G.P_13][b1] & 0xff) ^ this.getByte(k2, 1), b2 = (G.P[G.P_23][b2] & 0xff) ^ this.getByte(k2, 2), b3 = (G.P[G.P_33][b3] & 0xff) ^ this.getByte(k2, 3)) : void 0, this.gMDS0[(G.P[G.P_01][(G.P[G.P_02][b0] & 0xff) ^ this.getByte(k1, 0)] & 0xff) ^ this.getByte(k0, 0)] ^ this.gMDS1[(G.P[G.P_11][(G.P[G.P_12][b1] & 0xff) ^ this.getByte(k1, 1)] & 0xff) ^ this.getByte(k0, 1)] ^ this.gMDS2[(G.P[G.P_21][(G.P[G.P_22][b2] & 0xff) ^ this.getByte(k1, 2)] & 0xff) ^ this.getByte(k0, 2)] ^ this.gMDS3[(G.P[G.P_31][(G.P[G.P_32][b3] & 0xff) ^ this.getByte(k1, 3)] & 0xff) ^ this.getByte(k0, 3)]);
+      return res;
+    };
+
+    TwoFish.prototype.Fe32_0 = function(x) {
+      return this.gSBox[0x000 + 2 * (x & 0xff)] ^ this.gSBox[0x001 + 2 * ((x >>> 8) & 0xff)] ^ this.gSBox[0x200 + 2 * ((x >>> 16) & 0xff)] ^ this.gSBox[0x201 + 2 * ((x >>> 24) & 0xff)];
+    };
+
+    TwoFish.prototype.Fe32_3 = function(x) {
+      return this.gSBox[0x000 + 2 * ((x >>> 24) & 0xff)] ^ this.gSBox[0x001 + 2 * (x & 0xff)] ^ this.gSBox[0x200 + 2 * ((x >>> 8) & 0xff)] ^ this.gSBox[0x201 + 2 * ((x >>> 16) & 0xff)];
+    };
+
+    TwoFish.prototype._doReset = function() {
+      var A, B, b0, b1, b2, b3, i, j, k0, k1, k2, k3, k32e, k32o, m, m1, mX, mY, p, q, sBoxKeys, _i, _j, _k, _l, _ref, _ref1, _results;
+      k32e = [];
+      k32o = [];
+      sBoxKeys = [];
+      m1 = [];
+      mX = [];
+      mY = [];
+      this.k64Cnt = this._key.words.length / 2;
+      if (this.k64Cnt < 1) {
+        throw "Key size less than 64 bits";
+      }
+      if (this.k64Cnt > 4) {
+        throw "Key size larger than 256 bits";
+      }
+      for (i = _i = 0; _i < 256; i = ++_i) {
+        j = G.P[0][i] & 0xff;
+        m1[0] = j;
+        mX[0] = this.Mx_X(j) & 0xff;
+        mY[0] = this.Mx_Y(j) & 0xff;
+        j = G.P[1][i] & 0xff;
+        m1[1] = j;
+        mX[1] = this.Mx_X(j) & 0xff;
+        mY[1] = this.Mx_Y(j) & 0xff;
+        this.gMDS0[i] = m1[G.P_00] | mX[G.P_00] << 8 | mY[G.P_00] << 16 | mY[G.P_00] << 24;
+        this.gMDS1[i] = mY[G.P_10] | mY[G.P_10] << 8 | mX[G.P_10] << 16 | m1[G.P_10] << 24;
+        this.gMDS2[i] = mX[G.P_20] | mY[G.P_20] << 8 | m1[G.P_20] << 16 | mY[G.P_20] << 24;
+        this.gMDS3[i] = mX[G.P_30] | m1[G.P_30] << 8 | mY[G.P_30] << 16 | mX[G.P_30] << 24;
+      }
+      for (i = _j = 0, _ref = this.k64Cnt; 0 <= _ref ? _j < _ref : _j > _ref; i = 0 <= _ref ? ++_j : --_j) {
+        p = i * 2;
+        k32e[i] = this.switchEndianness(this._key.words[p]);
+        k32o[i] = this.switchEndianness(this._key.words[p + 1]);
+        sBoxKeys[this.k64Cnt - 1 - i] = this.RS_MDS_Encode(k32e[i], k32o[i]);
+      }
+      for (i = _k = 0, _ref1 = 40 / 2; 0 <= _ref1 ? _k < _ref1 : _k > _ref1; i = 0 <= _ref1 ? ++_k : --_k) {
+        q = i * G.SK_STEP;
+        A = this.F32(q, k32e);
+        B = this.F32(q + G.SK_BUMP, k32o);
+        B = B << 8 | B >>> 24;
+        A += B;
+        this.gSubKeys[i * 2] = A;
+        A += B;
+        this.gSubKeys[i * 2 + 1] = A << G.SK_ROTL | A >>> (32 - G.SK_ROTL);
+      }
+      k0 = sBoxKeys[0];
+      k1 = sBoxKeys[1];
+      k2 = sBoxKeys[2];
+      k3 = sBoxKeys[3];
+      this.gSBox = [];
+      _results = [];
+      for (i = _l = 0; _l < 256; i = ++_l) {
+        b0 = b1 = b2 = b3 = i;
+        m = this.k64Cnt & 3;
+        if (m === 1) {
+          this.gSBox[i * 2] = this.gMDS0[(G.P[G.P_01][b0] & 0xff) ^ this.getByte(k0, 0)];
+          this.gSBox[i * 2 + 1] = this.gMDS1[(G.P[G.P_11][b1] & 0xff) ^ this.getByte(k0, 1)];
+          this.gSBox[i * 2 + 0x200] = this.gMDS2[(G.P[G.P_21][b2] & 0xff) ^ this.getByte(k0, 2)];
+          _results.push(this.gSBox[i * 2 + 0x201] = this.gMDS3[(G.P[G.P_31][b3] & 0xff) ^ this.getByte(k0, 3)]);
+        } else {
+          if (m === 0) {
+            b0 = (G.P[G.P_04][b0] & 0xff) ^ this.getByte(k3, 0);
+            b1 = (G.P[G.P_14][b1] & 0xff) ^ this.getByte(k3, 1);
+            b2 = (G.P[G.P_24][b2] & 0xff) ^ this.getByte(k3, 2);
+            b3 = (G.P[G.P_34][b3] & 0xff) ^ this.getByte(k3, 3);
+          }
+          if (m === 0 || m === 3) {
+            b0 = (G.P[G.P_03][b0] & 0xff) ^ this.getByte(k2, 0);
+            b1 = (G.P[G.P_13][b1] & 0xff) ^ this.getByte(k2, 1);
+            b2 = (G.P[G.P_23][b2] & 0xff) ^ this.getByte(k2, 2);
+            b3 = (G.P[G.P_33][b3] & 0xff) ^ this.getByte(k2, 3);
+          }
+          this.gSBox[i * 2] = this.gMDS0[(G.P[G.P_01][(G.P[G.P_02][b0] & 0xff) ^ this.getByte(k1, 0)] & 0xff) ^ this.getByte(k0, 0)];
+          this.gSBox[i * 2 + 1] = this.gMDS1[(G.P[G.P_11][(G.P[G.P_12][b1] & 0xff) ^ this.getByte(k1, 1)] & 0xff) ^ this.getByte(k0, 1)];
+          this.gSBox[i * 2 + 0x200] = this.gMDS2[(G.P[G.P_21][(G.P[G.P_22][b2] & 0xff) ^ this.getByte(k1, 2)] & 0xff) ^ this.getByte(k0, 2)];
+          _results.push(this.gSBox[i * 2 + 0x201] = this.gMDS3[(G.P[G.P_31][(G.P[G.P_32][b3] & 0xff) ^ this.getByte(k1, 3)] & 0xff) ^ this.getByte(k0, 3)]);
+        }
+      }
+      return _results;
+    };
+
+    TwoFish.prototype.scrub = function() {
+      scrub_vec(this.gSubKeys);
+      scrub_vec(this.gSBox);
+      return this._key.scrub();
+    };
+
+    TwoFish.prototype.decryptBlock = function(M, offset) {
+      var k, r, t0, t1, x0, x1, x2, x3, _i;
+      if (offset == null) {
+        offset = 0;
+      }
+      x2 = this.switchEndianness(M[offset]) ^ this.gSubKeys[4];
+      x3 = this.switchEndianness(M[offset + 1]) ^ this.gSubKeys[5];
+      x0 = this.switchEndianness(M[offset + 2]) ^ this.gSubKeys[6];
+      x1 = this.switchEndianness(M[offset + 3]) ^ this.gSubKeys[7];
+      k = 8 + 2 * 16 - 1;
+      for (r = _i = 0; _i < 16; r = _i += 2) {
+        t0 = this.Fe32_0(x2);
+        t1 = this.Fe32_3(x3);
+        x1 ^= t0 + 2 * t1 + this.gSubKeys[k--];
+        x0 = (x0 << 1 | x0 >>> 31) ^ (t0 + t1 + this.gSubKeys[k--]);
+        x1 = x1 >>> 1 | x1 << 31;
+        t0 = this.Fe32_0(x0);
+        t1 = this.Fe32_3(x1);
+        x3 ^= t0 + 2 * t1 + this.gSubKeys[k--];
+        x2 = (x2 << 1 | x2 >>> 31) ^ (t0 + t1 + this.gSubKeys[k--]);
+        x3 = x3 >>> 1 | x3 << 31;
+      }
+      M[offset] = this.switchEndianness(x0 ^ this.gSubKeys[0]);
+      M[offset + 1] = this.switchEndianness(x1 ^ this.gSubKeys[1]);
+      M[offset + 2] = this.switchEndianness(x2 ^ this.gSubKeys[2]);
+      return M[offset + 3] = this.switchEndianness(x3 ^ this.gSubKeys[3]);
+    };
+
+    TwoFish.prototype.encryptBlock = function(M, offset) {
+      var k, r, t0, t1, x0, x1, x2, x3, _i;
+      if (offset == null) {
+        offset = 0;
+      }
+      x0 = this.switchEndianness(M[offset]) ^ this.gSubKeys[0];
+      x1 = this.switchEndianness(M[offset + 1]) ^ this.gSubKeys[1];
+      x2 = this.switchEndianness(M[offset + 2]) ^ this.gSubKeys[2];
+      x3 = this.switchEndianness(M[offset + 3]) ^ this.gSubKeys[3];
+      k = 8;
+      for (r = _i = 0; _i < 16; r = _i += 2) {
+        t0 = this.Fe32_0(x0);
+        t1 = this.Fe32_3(x1);
+        x2 ^= t0 + t1 + this.gSubKeys[k++];
+        x2 = x2 >>> 1 | x2 << 31;
+        x3 = (x3 << 1 | x3 >>> 31) ^ (t0 + 2 * t1 + this.gSubKeys[k++]);
+        t0 = this.Fe32_0(x2);
+        t1 = this.Fe32_3(x3);
+        x0 ^= t0 + t1 + this.gSubKeys[k++];
+        x0 = x0 >>> 1 | x0 << 31;
+        x1 = (x1 << 1 | x1 >>> 31) ^ (t0 + 2 * t1 + this.gSubKeys[k++]);
+      }
+      M[offset] = this.switchEndianness(x2 ^ this.gSubKeys[4]);
+      M[offset + 1] = this.switchEndianness(x3 ^ this.gSubKeys[5]);
+      M[offset + 2] = this.switchEndianness(x0 ^ this.gSubKeys[6]);
+      return M[offset + 3] = this.switchEndianness(x1 ^ this.gSubKeys[7]);
+    };
+
+    return TwoFish;
+
+  })(BlockCipher);
+
+}).call(this);
+
+},{"./algbase":471,"./util":492}],492:[function(require,module,exports){
+(function (Buffer){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var default_delay, iced, uint_max, __iced_k, __iced_k_noop;
+
+  iced = require('iced-runtime');
+  __iced_k = __iced_k_noop = function() {};
+
+  uint_max = Math.pow(2, 32);
+
+  exports.fixup_uint32 = function(x) {
+    var ret, x_pos;
+    ret = x > uint_max || x < 0 ? (x_pos = Math.abs(x) % uint_max, x < 0 ? uint_max - x_pos : x_pos) : x;
+    return ret;
+  };
+
+  exports.scrub_buffer = function(b) {
+    var i, n_full_words;
+    n_full_words = b.length >> 2;
+    i = 0;
+    while (i < n_full_words) {
+      b.writeUInt32LE(0, i);
+      i += 4;
+    }
+    while (i < b.length) {
+      b.writeUInt8(0, i);
+      i++;
+    }
+    return false;
+  };
+
+  exports.copy_buffer = function(b) {
+    var i, ret, _i, _ref;
+    ret = new Buffer(b.length);
+    for (i = _i = 0, _ref = b.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      ret.writeUInt8(b.readUInt8(i), i);
+    }
+    return ret;
+  };
+
+  exports.scrub_vec = function(v) {
+    var i, _i, _ref;
+    for (i = _i = 0, _ref = v.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      v[i] = 0;
+    }
+    return false;
+  };
+
+  exports.default_delay = default_delay = function(i, n, cb) {
+    var ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    (function(_this) {
+      return (function(__iced_k) {
+        if (typeof setImmediate !== "undefined" && setImmediate !== null) {
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/util.iced"
+            });
+            setImmediate(__iced_deferrals.defer({
+              lineno: 45
+            }));
+            __iced_deferrals._fulfill();
+          })(__iced_k);
+        } else {
+          (function(__iced_k) {
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/max/src/keybase/triplesec/src/util.iced"
+            });
+            setTimeout(__iced_deferrals.defer({
+              lineno: 47
+            }), 1);
+            __iced_deferrals._fulfill();
+          })(__iced_k);
+        }
+      });
+    })(this)((function(_this) {
+      return function() {
+        return cb();
+      };
+    })(this));
+  };
+
+  exports.buffer_cmp_ule = function(b1, b2) {
+    var I, J, i, j, x, y;
+    i = j = 0;
+    I = b1.length;
+    J = b2.length;
+    while (i < I && b1.readUInt8(i) === 0) {
+      i++;
+    }
+    while (j < J && b2.readUInt8(j) === 0) {
+      j++;
+    }
+    if ((I - i) > (J - j)) {
+      return 1;
+    } else if ((J - j) > (I - i)) {
+      return -1;
+    }
+    while (i < I) {
+      if ((x = b1.readUInt8(i)) < (y = b2.readUInt8(j))) {
+        return -1;
+      } else if (y < x) {
+        return 1;
+      }
+      i++;
+      j++;
+    }
+    return 0;
+  };
+
+  exports.bulk = function(n_input_bytes, _arg, _arg1) {
+    var call_ph, cb, default_n, delay, finalize, i, left, n, n_words, progress_hook, ret, total_words, update, what, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+    __iced_k = __iced_k_noop;
+    ___iced_passed_deferral = iced.findDeferral(arguments);
+    update = _arg.update, finalize = _arg.finalize, default_n = _arg.default_n;
+    delay = _arg1.delay, n = _arg1.n, cb = _arg1.cb, what = _arg1.what, progress_hook = _arg1.progress_hook;
+    i = 0;
+    left = 0;
+    total_words = Math.ceil(n_input_bytes / 4);
+    delay || (delay = default_delay);
+    n || (n = default_n);
+    call_ph = function(i) {
+      return typeof progress_hook === "function" ? progress_hook({
+        what: what,
+        i: i,
+        total: total_words
+      }) : void 0;
+    };
+    call_ph(0);
+    (function(_this) {
+      return (function(__iced_k) {
+        var _while;
+        _while = function(__iced_k) {
+          var _break, _continue, _next;
+          _break = __iced_k;
+          _continue = function() {
+            return iced.trampoline(function() {
+              return _while(__iced_k);
+            });
+          };
+          _next = _continue;
+          if (!((left = total_words - i) > 0)) {
+            return _break();
+          } else {
+            n_words = Math.min(n, left);
+            update(i, i + n_words);
+            call_ph(i);
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/max/src/keybase/triplesec/src/util.iced",
+                funcname: "bulk"
+              });
+              delay(i, total_words, __iced_deferrals.defer({
+                lineno: 105
+              }));
+              __iced_deferrals._fulfill();
+            })(function() {
+              return _next(i += n_words);
+            });
+          }
+        };
+        _while(__iced_k);
+      });
+    })(this)((function(_this) {
+      return function() {
+        call_ph(total_words);
+        ret = finalize();
+        return cb(ret);
+      };
+    })(this));
+  };
+
+}).call(this);
+
+}).call(this,require("buffer").Buffer)
+},{"buffer":179,"iced-runtime":376}],493:[function(require,module,exports){
+(function (Buffer){
+// Generated by IcedCoffeeScript 108.0.8
+(function() {
+  var WordArray, X64Word, X64WordArray, buffer_to_ui8a, endian_reverse, ui8a_to_buffer, util;
+
+  util = require('./util');
+
+  buffer_to_ui8a = function(b) {
+    var i, ret, _i, _ref;
+    ret = new Uint8Array(b.length);
+    for (i = _i = 0, _ref = b.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      ret[i] = b.readUInt8(i);
+    }
+    return ret;
+  };
+
+  ui8a_to_buffer = function(v) {
+    var i, ret, _i, _ref;
+    ret = new Buffer(v.length);
+    for (i = _i = 0, _ref = v.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      ret.writeUInt8(v[i], i);
+    }
+    return ret;
+  };
+
+  endian_reverse = function(x) {
+    return ((x >>> 24) & 0xff) | (((x >>> 16) & 0xff) << 8) | (((x >>> 8) & 0xff) << 16) | ((x & 0xff) << 24);
+  };
+
+  exports.WordArray = WordArray = (function() {
+    function WordArray(words, sigBytes) {
+      this.words = words || [];
+      this.sigBytes = sigBytes != null ? sigBytes : this.words.length * 4;
+    }
+
+    WordArray.prototype.concat = function(wordArray) {
+      var i, thatByte, thatSigBytes, thatWords, _i;
+      thatWords = wordArray.words;
+      thatSigBytes = wordArray.sigBytes;
+      this.clamp();
+      if (this.sigBytes % 4) {
+        for (i = _i = 0; 0 <= thatSigBytes ? _i < thatSigBytes : _i > thatSigBytes; i = 0 <= thatSigBytes ? ++_i : --_i) {
+          thatByte = (thatWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+          this.words[(this.sigBytes + i) >>> 2] |= thatByte << (24 - ((this.sigBytes + i) % 4) * 8);
+        }
+      } else {
+        this.words = this.words.concat(thatWords);
+      }
+      this.sigBytes += thatSigBytes;
+      return this;
+    };
+
+    WordArray.prototype.clamp = function() {
+      this.words[this.sigBytes >>> 2] &= 0xffffffff << (32 - (this.sigBytes % 4) * 8);
+      this.words.length = Math.ceil(this.sigBytes / 4);
+      return this;
+    };
+
+    WordArray.prototype.clone = function() {
+      return new WordArray(this.words.slice(0), this.sigBytes);
+    };
+
+    WordArray.prototype.to_buffer = function() {
+      var ch, out, p, w, _i, _len, _ref;
+      out = new Buffer(this.sigBytes);
+      p = 0;
+      _ref = this.words;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        w = _ref[_i];
+        if (!((this.sigBytes - p) >= 4)) {
+          continue;
+        }
+        w = util.fixup_uint32(w);
+        out.writeUInt32BE(w, p);
+        p += 4;
+      }
+      while (p < this.sigBytes) {
+        ch = (this.words[p >>> 2] >>> (24 - (p % 4) * 8)) & 0xff;
+        out.writeUInt8(ch, p);
+        p++;
+      }
+      return out;
+    };
+
+    WordArray.prototype.endian_reverse = function() {
+      var i, w, _i, _len, _ref;
+      _ref = this.words;
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        w = _ref[i];
+        this.words[i] = endian_reverse(w);
+      }
+      return this;
+    };
+
+    WordArray.prototype.split = function(n) {
+      var i, out, sz;
+      if (!(((this.sigBytes % 4) === 0) && ((this.words.length % n) === 0))) {
+        throw new Error("bad key alignment");
+      }
+      sz = this.words.length / n;
+      out = (function() {
+        var _i, _ref, _results;
+        _results = [];
+        for (i = _i = 0, _ref = this.words.length; sz > 0 ? _i < _ref : _i > _ref; i = _i += sz) {
+          _results.push(new WordArray(this.words.slice(i, i + sz)));
+        }
+        return _results;
+      }).call(this);
+      return out;
+    };
+
+    WordArray.prototype.to_utf8 = function() {
+      return this.to_buffer().toString('utf8');
+    };
+
+    WordArray.prototype.to_hex = function() {
+      return this.to_buffer().toString('hex');
+    };
+
+    WordArray.prototype.to_ui8a = function() {
+      return buffer_to_ui8a(this.to_buffer());
+    };
+
+    WordArray.alloc = function(b) {
+      if (Buffer.isBuffer(b)) {
+        return WordArray.from_buffer(b);
+      } else if ((typeof b === 'object') && (b instanceof WordArray)) {
+        return b;
+      } else if (typeof b === 'string') {
+        return WordArray.from_hex(b);
+      } else {
+        return null;
+      }
+    };
+
+    WordArray.from_buffer = function(b) {
+      var ch, last, p, words;
+      words = [];
+      p = 0;
+      while ((b.length - p) >= 4) {
+        words.push(b.readUInt32BE(p));
+        p += 4;
+      }
+      if (p < b.length) {
+        last = 0;
+        while (p < b.length) {
+          ch = b.readUInt8(p);
+          last |= ch << (24 - (p % 4) * 8);
+          p++;
+        }
+        last = util.fixup_uint32(last);
+        words.push(last);
+      }
+      return new WordArray(words, b.length);
+    };
+
+    WordArray.from_buffer_le = function(b) {
+      var ch, last, p, words;
+      words = [];
+      p = 0;
+      while ((b.length - p) >= 4) {
+        words.push(b.readUInt32LE(p));
+        p += 4;
+      }
+      if (p < b.length) {
+        last = 0;
+        while (p < b.length) {
+          ch = b.readUInt8(p);
+          last |= ch << ((p % 4) * 8);
+          p++;
+        }
+        last = util.fixup_uint32(last);
+        words.push(last);
+      }
+      return new WordArray(words, b.length);
+    };
+
+    WordArray.from_utf8 = function(s) {
+      return WordArray.from_buffer(new Buffer(s, 'utf8'));
+    };
+
+    WordArray.from_utf8_le = function(s) {
+      return WordArray.from_buffer_le(new Buffer(s, 'utf8'));
+    };
+
+    WordArray.from_hex = function(s) {
+      return WordArray.from_buffer(new Buffer(s, 'hex'));
+    };
+
+    WordArray.from_hex_le = function(s) {
+      return WordArray.from_buffer_le(new Buffer(s, 'hex'));
+    };
+
+    WordArray.from_ui8a = function(v) {
+      return WordArray.from_buffer(ui8a_to_buffer(v));
+    };
+
+    WordArray.from_i32a = function(v) {
+      return new WordArray(Array.apply([], v));
+    };
+
+    WordArray.prototype.equal = function(wa) {
+      var i, ret, w, _i, _len, _ref;
+      ret = true;
+      if (wa.sigBytes !== this.sigBytes) {
+        ret = false;
+      } else {
+        _ref = this.words;
+        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+          w = _ref[i];
+          if (util.fixup_uint32(w) !== util.fixup_uint32(wa.words[i])) {
+            ret = false;
+          }
+        }
+      }
+      return ret;
+    };
+
+    WordArray.prototype.xor = function(wa2, _arg) {
+      var dst_offset, i, n_words, src_offset, tmp, _i;
+      dst_offset = _arg.dst_offset, src_offset = _arg.src_offset, n_words = _arg.n_words;
+      if (!dst_offset) {
+        dst_offset = 0;
+      }
+      if (!src_offset) {
+        src_offset = 0;
+      }
+      if (n_words == null) {
+        n_words = wa2.words.length - src_offset;
+      }
+      if (this.words.length < dst_offset + n_words) {
+        throw new Error("dest range exceeded (" + this.words.length + " < " + (dst_offset + n_words) + ")");
+      }
+      if (wa2.words.length < src_offset + n_words) {
+        throw new Error("source range exceeded");
+      }
+      for (i = _i = 0; 0 <= n_words ? _i < n_words : _i > n_words; i = 0 <= n_words ? ++_i : --_i) {
+        tmp = this.words[dst_offset + i] ^ wa2.words[src_offset + i];
+        this.words[dst_offset + i] = util.fixup_uint32(tmp);
+      }
+      return this;
+    };
+
+    WordArray.prototype.truncate = function(n_bytes) {
+      var n_words;
+      if (!(n_bytes <= this.sigBytes)) {
+        throw new Error("Cannot truncate: " + n_bytes + " > " + this.sigBytes);
+      }
+      n_words = Math.ceil(n_bytes / 4);
+      return new WordArray(this.words.slice(0, n_words), n_bytes);
+    };
+
+    WordArray.prototype.unshift = function(n_words) {
+      var ret;
+      if (this.words.length >= n_words) {
+        ret = this.words.splice(0, n_words);
+        this.sigBytes -= n_words * 4;
+        return new WordArray(ret);
+      } else {
+        return null;
+      }
+    };
+
+    WordArray.prototype.is_scrubbed = function() {
+      var w, _i, _len, _ref;
+      _ref = this.words;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        w = _ref[_i];
+        if (w !== 0) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    WordArray.prototype.scrub = function() {
+      return util.scrub_vec(this.words);
+    };
+
+    WordArray.prototype.cmp_ule = function(wa2) {
+      return util.buffer_cmp_ule(this.to_buffer(), wa2.to_buffer());
+    };
+
+    WordArray.prototype.slice = function(low, hi) {
+      var n, sb;
+      n = this.words.length;
+      if (!((low < hi) && (hi <= n))) {
+        throw new Error("Bad WordArray slice [" + low + "," + hi + ")] when only " + n + " avail");
+      }
+      sb = (hi - low) * 4;
+      if (hi === n) {
+        sb -= n * 4 - this.sigBytes;
+      }
+      return new WordArray(this.words.slice(low, hi), sb);
+    };
+
+    return WordArray;
+
+  })();
+
+  exports.X64Word = X64Word = (function() {
+    function X64Word(high, low) {
+      this.high = high;
+      this.low = low;
+    }
+
+    X64Word.prototype.clone = function() {
+      return new X64Word(this.high, this.low);
+    };
+
+    return X64Word;
+
+  })();
+
+  exports.X64WordArray = X64WordArray = (function() {
+    function X64WordArray(words, sigBytes) {
+      this.sigBytes = sigBytes;
+      this.words = words || [];
+      if (!this.sigBytes) {
+        this.sigBytes = this.words.length * 8;
+      }
+    }
+
+    X64WordArray.prototype.toX32 = function() {
+      var v, w, _i, _len, _ref;
+      v = [];
+      _ref = this.words;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        w = _ref[_i];
+        v.push(w.high);
+        v.push(w.low);
+      }
+      return new WordArray(v, this.sigBytes);
+    };
+
+    X64WordArray.prototype.clone = function() {
+      var w;
+      return new X64WordArray((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.words;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          w = _ref[_i];
+          _results.push(w.clone());
+        }
+        return _results;
+      }).call(this), this.sigBytes);
+    };
+
+    return X64WordArray;
+
+  })();
+
+  exports.buffer_to_ui8a = buffer_to_ui8a;
+
+  exports.ui8a_to_buffer = ui8a_to_buffer;
+
+  exports.endian_reverse = endian_reverse;
+
+}).call(this);
+
+}).call(this,require("buffer").Buffer)
+},{"./util":492,"buffer":179}],494:[function(require,module,exports){
 var native = require('./native')
 
 function getTypeName (fn) {
@@ -79205,7 +104552,7 @@ module.exports = {
   getValueTypeName: getValueTypeName
 }
 
-},{"./native":447}],445:[function(require,module,exports){
+},{"./native":497}],495:[function(require,module,exports){
 (function (Buffer){
 var NATIVE = require('./native')
 var ERRORS = require('./errors')
@@ -79281,7 +104628,7 @@ for (var typeName in types) {
 module.exports = types
 
 }).call(this,{"isBuffer":require("../browserify/node_modules/is-buffer/index.js")})
-},{"../browserify/node_modules/is-buffer/index.js":193,"./errors":444,"./native":447}],446:[function(require,module,exports){
+},{"../browserify/node_modules/is-buffer/index.js":204,"./errors":494,"./native":497}],496:[function(require,module,exports){
 var ERRORS = require('./errors')
 var NATIVE = require('./native')
 
@@ -79521,7 +104868,7 @@ typeforce.TfPropertyTypeError = TfPropertyTypeError
 
 module.exports = typeforce
 
-},{"./errors":444,"./extra":445,"./native":447}],447:[function(require,module,exports){
+},{"./errors":494,"./extra":495,"./native":497}],497:[function(require,module,exports){
 var types = {
   Array: function (value) { return value !== null && value !== undefined && value.constructor === Array },
   Boolean: function (value) { return typeof value === 'boolean' },
@@ -79544,7 +104891,451 @@ for (var typeName in types) {
 
 module.exports = types
 
-},{}],448:[function(require,module,exports){
+},{}],498:[function(require,module,exports){
+(function (root) {
+   "use strict";
+
+/***** unorm.js *****/
+
+/*
+ * UnicodeNormalizer 1.0.0
+ * Copyright (c) 2008 Matsuza
+ * Dual licensed under the MIT (MIT-LICENSE.txt) and GPL (GPL-LICENSE.txt) licenses.
+ * $Date: 2008-06-05 16:44:17 +0200 (Thu, 05 Jun 2008) $
+ * $Rev: 13309 $
+ */
+
+   var DEFAULT_FEATURE = [null, 0, {}];
+   var CACHE_THRESHOLD = 10;
+   var SBase = 0xAC00, LBase = 0x1100, VBase = 0x1161, TBase = 0x11A7, LCount = 19, VCount = 21, TCount = 28;
+   var NCount = VCount * TCount; // 588
+   var SCount = LCount * NCount; // 11172
+
+   var UChar = function(cp, feature){
+      this.codepoint = cp;
+      this.feature = feature;
+   };
+
+   // Strategies
+   var cache = {};
+   var cacheCounter = [];
+   for (var i = 0; i <= 0xFF; ++i){
+      cacheCounter[i] = 0;
+   }
+
+   function fromCache(next, cp, needFeature){
+      var ret = cache[cp];
+      if(!ret){
+         ret = next(cp, needFeature);
+         if(!!ret.feature && ++cacheCounter[(cp >> 8) & 0xFF] > CACHE_THRESHOLD){
+            cache[cp] = ret;
+         }
+      }
+      return ret;
+   }
+
+   function fromData(next, cp, needFeature){
+      var hash = cp & 0xFF00;
+      var dunit = UChar.udata[hash] || {};
+      var f = dunit[cp];
+      return f ? new UChar(cp, f) : new UChar(cp, DEFAULT_FEATURE);
+   }
+   function fromCpOnly(next, cp, needFeature){
+      return !!needFeature ? next(cp, needFeature) : new UChar(cp, null);
+   }
+   function fromRuleBasedJamo(next, cp, needFeature){
+      var j;
+      if(cp < LBase || (LBase + LCount <= cp && cp < SBase) || (SBase + SCount < cp)){
+         return next(cp, needFeature);
+      }
+      if(LBase <= cp && cp < LBase + LCount){
+         var c = {};
+         var base = (cp - LBase) * VCount;
+         for (j = 0; j < VCount; ++j){
+            c[VBase + j] = SBase + TCount * (j + base);
+         }
+         return new UChar(cp, [,,c]);
+      }
+
+      var SIndex = cp - SBase;
+      var TIndex = SIndex % TCount;
+      var feature = [];
+      if(TIndex !== 0){
+         feature[0] = [SBase + SIndex - TIndex, TBase + TIndex];
+      } else {
+         feature[0] = [LBase + Math.floor(SIndex / NCount), VBase + Math.floor((SIndex % NCount) / TCount)];
+         feature[2] = {};
+         for (j = 1; j < TCount; ++j){
+            feature[2][TBase + j] = cp + j;
+         }
+      }
+      return new UChar(cp, feature);
+   }
+   function fromCpFilter(next, cp, needFeature){
+      return cp < 60 || 13311 < cp && cp < 42607 ? new UChar(cp, DEFAULT_FEATURE) : next(cp, needFeature);
+   }
+
+   var strategies = [fromCpFilter, fromCache, fromCpOnly, fromRuleBasedJamo, fromData];
+
+   UChar.fromCharCode = strategies.reduceRight(function (next, strategy) {
+      return function (cp, needFeature) {
+         return strategy(next, cp, needFeature);
+      };
+   }, null);
+
+   UChar.isHighSurrogate = function(cp){
+      return cp >= 0xD800 && cp <= 0xDBFF;
+   };
+   UChar.isLowSurrogate = function(cp){
+      return cp >= 0xDC00 && cp <= 0xDFFF;
+   };
+
+   UChar.prototype.prepFeature = function(){
+      if(!this.feature){
+         this.feature = UChar.fromCharCode(this.codepoint, true).feature;
+      }
+   };
+
+   UChar.prototype.toString = function(){
+      if(this.codepoint < 0x10000){
+         return String.fromCharCode(this.codepoint);
+      } else {
+         var x = this.codepoint - 0x10000;
+         return String.fromCharCode(Math.floor(x / 0x400) + 0xD800, x % 0x400 + 0xDC00);
+      }
+   };
+
+   UChar.prototype.getDecomp = function(){
+      this.prepFeature();
+      return this.feature[0] || null;
+   };
+
+   UChar.prototype.isCompatibility = function(){
+      this.prepFeature();
+      return !!this.feature[1] && (this.feature[1] & (1 << 8));
+   };
+   UChar.prototype.isExclude = function(){
+      this.prepFeature();
+      return !!this.feature[1] && (this.feature[1] & (1 << 9));
+   };
+   UChar.prototype.getCanonicalClass = function(){
+      this.prepFeature();
+      return !!this.feature[1] ? (this.feature[1] & 0xff) : 0;
+   };
+   UChar.prototype.getComposite = function(following){
+      this.prepFeature();
+      if(!this.feature[2]){
+         return null;
+      }
+      var cp = this.feature[2][following.codepoint];
+      return cp ? UChar.fromCharCode(cp) : null;
+   };
+
+   var UCharIterator = function(str){
+      this.str = str;
+      this.cursor = 0;
+   };
+   UCharIterator.prototype.next = function(){
+      if(!!this.str && this.cursor < this.str.length){
+         var cp = this.str.charCodeAt(this.cursor++);
+         var d;
+         if(UChar.isHighSurrogate(cp) && this.cursor < this.str.length && UChar.isLowSurrogate((d = this.str.charCodeAt(this.cursor)))){
+            cp = (cp - 0xD800) * 0x400 + (d -0xDC00) + 0x10000;
+            ++this.cursor;
+         }
+         return UChar.fromCharCode(cp);
+      } else {
+         this.str = null;
+         return null;
+      }
+   };
+
+   var RecursDecompIterator = function(it, cano){
+      this.it = it;
+      this.canonical = cano;
+      this.resBuf = [];
+   };
+
+   RecursDecompIterator.prototype.next = function(){
+      function recursiveDecomp(cano, uchar){
+         var decomp = uchar.getDecomp();
+         if(!!decomp && !(cano && uchar.isCompatibility())){
+            var ret = [];
+            for(var i = 0; i < decomp.length; ++i){
+               var a = recursiveDecomp(cano, UChar.fromCharCode(decomp[i]));
+                ret = ret.concat(a);
+            }
+            return ret;
+         } else {
+            return [uchar];
+         }
+      }
+      if(this.resBuf.length === 0){
+         var uchar = this.it.next();
+         if(!uchar){
+            return null;
+         }
+         this.resBuf = recursiveDecomp(this.canonical, uchar);
+      }
+      return this.resBuf.shift();
+   };
+
+   var DecompIterator = function(it){
+      this.it = it;
+      this.resBuf = [];
+   };
+
+   DecompIterator.prototype.next = function(){
+      var cc;
+      if(this.resBuf.length === 0){
+         do{
+            var uchar = this.it.next();
+            if(!uchar){
+               break;
+            }
+            cc = uchar.getCanonicalClass();
+            var inspt = this.resBuf.length;
+            if(cc !== 0){
+               for(; inspt > 0; --inspt){
+                  var uchar2 = this.resBuf[inspt - 1];
+                  var cc2 = uchar2.getCanonicalClass();
+                  if(cc2 <= cc){
+                     break;
+                  }
+               }
+            }
+            this.resBuf.splice(inspt, 0, uchar);
+         } while(cc !== 0);
+      }
+      return this.resBuf.shift();
+   };
+
+   var CompIterator = function(it){
+      this.it = it;
+      this.procBuf = [];
+      this.resBuf = [];
+      this.lastClass = null;
+   };
+
+   CompIterator.prototype.next = function(){
+      while(this.resBuf.length === 0){
+         var uchar = this.it.next();
+         if(!uchar){
+            this.resBuf = this.procBuf;
+            this.procBuf = [];
+            break;
+         }
+         if(this.procBuf.length === 0){
+            this.lastClass = uchar.getCanonicalClass();
+            this.procBuf.push(uchar);
+         } else {
+            var starter = this.procBuf[0];
+            var composite = starter.getComposite(uchar);
+            var cc = uchar.getCanonicalClass();
+            if(!!composite && (this.lastClass < cc || this.lastClass === 0)){
+               this.procBuf[0] = composite;
+            } else {
+               if(cc === 0){
+                  this.resBuf = this.procBuf;
+                  this.procBuf = [];
+               }
+               this.lastClass = cc;
+               this.procBuf.push(uchar);
+            }
+         }
+      }
+      return this.resBuf.shift();
+   };
+
+   var createIterator = function(mode, str){
+      switch(mode){
+         case "NFD":
+            return new DecompIterator(new RecursDecompIterator(new UCharIterator(str), true));
+         case "NFKD":
+            return new DecompIterator(new RecursDecompIterator(new UCharIterator(str), false));
+         case "NFC":
+            return new CompIterator(new DecompIterator(new RecursDecompIterator(new UCharIterator(str), true)));
+         case "NFKC":
+            return new CompIterator(new DecompIterator(new RecursDecompIterator(new UCharIterator(str), false)));
+      }
+      throw mode + " is invalid";
+   };
+   var normalize = function(mode, str){
+      var it = createIterator(mode, str);
+      var ret = "";
+      var uchar;
+      while(!!(uchar = it.next())){
+         ret += uchar.toString();
+      }
+      return ret;
+   };
+
+   /* API functions */
+   function nfd(str){
+      return normalize("NFD", str);
+   }
+
+   function nfkd(str){
+      return normalize("NFKD", str);
+   }
+
+   function nfc(str){
+      return normalize("NFC", str);
+   }
+
+   function nfkc(str){
+      return normalize("NFKC", str);
+   }
+
+/* Unicode data */
+UChar.udata={
+0:{60:[,,{824:8814}],61:[,,{824:8800}],62:[,,{824:8815}],65:[,,{768:192,769:193,770:194,771:195,772:256,774:258,775:550,776:196,777:7842,778:197,780:461,783:512,785:514,803:7840,805:7680,808:260}],66:[,,{775:7682,803:7684,817:7686}],67:[,,{769:262,770:264,775:266,780:268,807:199}],68:[,,{775:7690,780:270,803:7692,807:7696,813:7698,817:7694}],69:[,,{768:200,769:201,770:202,771:7868,772:274,774:276,775:278,776:203,777:7866,780:282,783:516,785:518,803:7864,807:552,808:280,813:7704,816:7706}],70:[,,{775:7710}],71:[,,{769:500,770:284,772:7712,774:286,775:288,780:486,807:290}],72:[,,{770:292,775:7714,776:7718,780:542,803:7716,807:7720,814:7722}],73:[,,{768:204,769:205,770:206,771:296,772:298,774:300,775:304,776:207,777:7880,780:463,783:520,785:522,803:7882,808:302,816:7724}],74:[,,{770:308}],75:[,,{769:7728,780:488,803:7730,807:310,817:7732}],76:[,,{769:313,780:317,803:7734,807:315,813:7740,817:7738}],77:[,,{769:7742,775:7744,803:7746}],78:[,,{768:504,769:323,771:209,775:7748,780:327,803:7750,807:325,813:7754,817:7752}],79:[,,{768:210,769:211,770:212,771:213,772:332,774:334,775:558,776:214,777:7886,779:336,780:465,783:524,785:526,795:416,803:7884,808:490}],80:[,,{769:7764,775:7766}],82:[,,{769:340,775:7768,780:344,783:528,785:530,803:7770,807:342,817:7774}],83:[,,{769:346,770:348,775:7776,780:352,803:7778,806:536,807:350}],84:[,,{775:7786,780:356,803:7788,806:538,807:354,813:7792,817:7790}],85:[,,{768:217,769:218,770:219,771:360,772:362,774:364,776:220,777:7910,778:366,779:368,780:467,783:532,785:534,795:431,803:7908,804:7794,808:370,813:7798,816:7796}],86:[,,{771:7804,803:7806}],87:[,,{768:7808,769:7810,770:372,775:7814,776:7812,803:7816}],88:[,,{775:7818,776:7820}],89:[,,{768:7922,769:221,770:374,771:7928,772:562,775:7822,776:376,777:7926,803:7924}],90:[,,{769:377,770:7824,775:379,780:381,803:7826,817:7828}],97:[,,{768:224,769:225,770:226,771:227,772:257,774:259,775:551,776:228,777:7843,778:229,780:462,783:513,785:515,803:7841,805:7681,808:261}],98:[,,{775:7683,803:7685,817:7687}],99:[,,{769:263,770:265,775:267,780:269,807:231}],100:[,,{775:7691,780:271,803:7693,807:7697,813:7699,817:7695}],101:[,,{768:232,769:233,770:234,771:7869,772:275,774:277,775:279,776:235,777:7867,780:283,783:517,785:519,803:7865,807:553,808:281,813:7705,816:7707}],102:[,,{775:7711}],103:[,,{769:501,770:285,772:7713,774:287,775:289,780:487,807:291}],104:[,,{770:293,775:7715,776:7719,780:543,803:7717,807:7721,814:7723,817:7830}],105:[,,{768:236,769:237,770:238,771:297,772:299,774:301,776:239,777:7881,780:464,783:521,785:523,803:7883,808:303,816:7725}],106:[,,{770:309,780:496}],107:[,,{769:7729,780:489,803:7731,807:311,817:7733}],108:[,,{769:314,780:318,803:7735,807:316,813:7741,817:7739}],109:[,,{769:7743,775:7745,803:7747}],110:[,,{768:505,769:324,771:241,775:7749,780:328,803:7751,807:326,813:7755,817:7753}],111:[,,{768:242,769:243,770:244,771:245,772:333,774:335,775:559,776:246,777:7887,779:337,780:466,783:525,785:527,795:417,803:7885,808:491}],112:[,,{769:7765,775:7767}],114:[,,{769:341,775:7769,780:345,783:529,785:531,803:7771,807:343,817:7775}],115:[,,{769:347,770:349,775:7777,780:353,803:7779,806:537,807:351}],116:[,,{775:7787,776:7831,780:357,803:7789,806:539,807:355,813:7793,817:7791}],117:[,,{768:249,769:250,770:251,771:361,772:363,774:365,776:252,777:7911,778:367,779:369,780:468,783:533,785:535,795:432,803:7909,804:7795,808:371,813:7799,816:7797}],118:[,,{771:7805,803:7807}],119:[,,{768:7809,769:7811,770:373,775:7815,776:7813,778:7832,803:7817}],120:[,,{775:7819,776:7821}],121:[,,{768:7923,769:253,770:375,771:7929,772:563,775:7823,776:255,777:7927,778:7833,803:7925}],122:[,,{769:378,770:7825,775:380,780:382,803:7827,817:7829}],160:[[32],256],168:[[32,776],256,{768:8173,769:901,834:8129}],170:[[97],256],175:[[32,772],256],178:[[50],256],179:[[51],256],180:[[32,769],256],181:[[956],256],184:[[32,807],256],185:[[49],256],186:[[111],256],188:[[49,8260,52],256],189:[[49,8260,50],256],190:[[51,8260,52],256],192:[[65,768]],193:[[65,769]],194:[[65,770],,{768:7846,769:7844,771:7850,777:7848}],195:[[65,771]],196:[[65,776],,{772:478}],197:[[65,778],,{769:506}],198:[,,{769:508,772:482}],199:[[67,807],,{769:7688}],200:[[69,768]],201:[[69,769]],202:[[69,770],,{768:7872,769:7870,771:7876,777:7874}],203:[[69,776]],204:[[73,768]],205:[[73,769]],206:[[73,770]],207:[[73,776],,{769:7726}],209:[[78,771]],210:[[79,768]],211:[[79,769]],212:[[79,770],,{768:7890,769:7888,771:7894,777:7892}],213:[[79,771],,{769:7756,772:556,776:7758}],214:[[79,776],,{772:554}],216:[,,{769:510}],217:[[85,768]],218:[[85,769]],219:[[85,770]],220:[[85,776],,{768:475,769:471,772:469,780:473}],221:[[89,769]],224:[[97,768]],225:[[97,769]],226:[[97,770],,{768:7847,769:7845,771:7851,777:7849}],227:[[97,771]],228:[[97,776],,{772:479}],229:[[97,778],,{769:507}],230:[,,{769:509,772:483}],231:[[99,807],,{769:7689}],232:[[101,768]],233:[[101,769]],234:[[101,770],,{768:7873,769:7871,771:7877,777:7875}],235:[[101,776]],236:[[105,768]],237:[[105,769]],238:[[105,770]],239:[[105,776],,{769:7727}],241:[[110,771]],242:[[111,768]],243:[[111,769]],244:[[111,770],,{768:7891,769:7889,771:7895,777:7893}],245:[[111,771],,{769:7757,772:557,776:7759}],246:[[111,776],,{772:555}],248:[,,{769:511}],249:[[117,768]],250:[[117,769]],251:[[117,770]],252:[[117,776],,{768:476,769:472,772:470,780:474}],253:[[121,769]],255:[[121,776]]},
+256:{256:[[65,772]],257:[[97,772]],258:[[65,774],,{768:7856,769:7854,771:7860,777:7858}],259:[[97,774],,{768:7857,769:7855,771:7861,777:7859}],260:[[65,808]],261:[[97,808]],262:[[67,769]],263:[[99,769]],264:[[67,770]],265:[[99,770]],266:[[67,775]],267:[[99,775]],268:[[67,780]],269:[[99,780]],270:[[68,780]],271:[[100,780]],274:[[69,772],,{768:7700,769:7702}],275:[[101,772],,{768:7701,769:7703}],276:[[69,774]],277:[[101,774]],278:[[69,775]],279:[[101,775]],280:[[69,808]],281:[[101,808]],282:[[69,780]],283:[[101,780]],284:[[71,770]],285:[[103,770]],286:[[71,774]],287:[[103,774]],288:[[71,775]],289:[[103,775]],290:[[71,807]],291:[[103,807]],292:[[72,770]],293:[[104,770]],296:[[73,771]],297:[[105,771]],298:[[73,772]],299:[[105,772]],300:[[73,774]],301:[[105,774]],302:[[73,808]],303:[[105,808]],304:[[73,775]],306:[[73,74],256],307:[[105,106],256],308:[[74,770]],309:[[106,770]],310:[[75,807]],311:[[107,807]],313:[[76,769]],314:[[108,769]],315:[[76,807]],316:[[108,807]],317:[[76,780]],318:[[108,780]],319:[[76,183],256],320:[[108,183],256],323:[[78,769]],324:[[110,769]],325:[[78,807]],326:[[110,807]],327:[[78,780]],328:[[110,780]],329:[[700,110],256],332:[[79,772],,{768:7760,769:7762}],333:[[111,772],,{768:7761,769:7763}],334:[[79,774]],335:[[111,774]],336:[[79,779]],337:[[111,779]],340:[[82,769]],341:[[114,769]],342:[[82,807]],343:[[114,807]],344:[[82,780]],345:[[114,780]],346:[[83,769],,{775:7780}],347:[[115,769],,{775:7781}],348:[[83,770]],349:[[115,770]],350:[[83,807]],351:[[115,807]],352:[[83,780],,{775:7782}],353:[[115,780],,{775:7783}],354:[[84,807]],355:[[116,807]],356:[[84,780]],357:[[116,780]],360:[[85,771],,{769:7800}],361:[[117,771],,{769:7801}],362:[[85,772],,{776:7802}],363:[[117,772],,{776:7803}],364:[[85,774]],365:[[117,774]],366:[[85,778]],367:[[117,778]],368:[[85,779]],369:[[117,779]],370:[[85,808]],371:[[117,808]],372:[[87,770]],373:[[119,770]],374:[[89,770]],375:[[121,770]],376:[[89,776]],377:[[90,769]],378:[[122,769]],379:[[90,775]],380:[[122,775]],381:[[90,780]],382:[[122,780]],383:[[115],256,{775:7835}],416:[[79,795],,{768:7900,769:7898,771:7904,777:7902,803:7906}],417:[[111,795],,{768:7901,769:7899,771:7905,777:7903,803:7907}],431:[[85,795],,{768:7914,769:7912,771:7918,777:7916,803:7920}],432:[[117,795],,{768:7915,769:7913,771:7919,777:7917,803:7921}],439:[,,{780:494}],452:[[68,381],256],453:[[68,382],256],454:[[100,382],256],455:[[76,74],256],456:[[76,106],256],457:[[108,106],256],458:[[78,74],256],459:[[78,106],256],460:[[110,106],256],461:[[65,780]],462:[[97,780]],463:[[73,780]],464:[[105,780]],465:[[79,780]],466:[[111,780]],467:[[85,780]],468:[[117,780]],469:[[220,772]],470:[[252,772]],471:[[220,769]],472:[[252,769]],473:[[220,780]],474:[[252,780]],475:[[220,768]],476:[[252,768]],478:[[196,772]],479:[[228,772]],480:[[550,772]],481:[[551,772]],482:[[198,772]],483:[[230,772]],486:[[71,780]],487:[[103,780]],488:[[75,780]],489:[[107,780]],490:[[79,808],,{772:492}],491:[[111,808],,{772:493}],492:[[490,772]],493:[[491,772]],494:[[439,780]],495:[[658,780]],496:[[106,780]],497:[[68,90],256],498:[[68,122],256],499:[[100,122],256],500:[[71,769]],501:[[103,769]],504:[[78,768]],505:[[110,768]],506:[[197,769]],507:[[229,769]],508:[[198,769]],509:[[230,769]],510:[[216,769]],511:[[248,769]],66045:[,220]},
+512:{512:[[65,783]],513:[[97,783]],514:[[65,785]],515:[[97,785]],516:[[69,783]],517:[[101,783]],518:[[69,785]],519:[[101,785]],520:[[73,783]],521:[[105,783]],522:[[73,785]],523:[[105,785]],524:[[79,783]],525:[[111,783]],526:[[79,785]],527:[[111,785]],528:[[82,783]],529:[[114,783]],530:[[82,785]],531:[[114,785]],532:[[85,783]],533:[[117,783]],534:[[85,785]],535:[[117,785]],536:[[83,806]],537:[[115,806]],538:[[84,806]],539:[[116,806]],542:[[72,780]],543:[[104,780]],550:[[65,775],,{772:480}],551:[[97,775],,{772:481}],552:[[69,807],,{774:7708}],553:[[101,807],,{774:7709}],554:[[214,772]],555:[[246,772]],556:[[213,772]],557:[[245,772]],558:[[79,775],,{772:560}],559:[[111,775],,{772:561}],560:[[558,772]],561:[[559,772]],562:[[89,772]],563:[[121,772]],658:[,,{780:495}],688:[[104],256],689:[[614],256],690:[[106],256],691:[[114],256],692:[[633],256],693:[[635],256],694:[[641],256],695:[[119],256],696:[[121],256],728:[[32,774],256],729:[[32,775],256],730:[[32,778],256],731:[[32,808],256],732:[[32,771],256],733:[[32,779],256],736:[[611],256],737:[[108],256],738:[[115],256],739:[[120],256],740:[[661],256],66272:[,220]},
+768:{768:[,230],769:[,230],770:[,230],771:[,230],772:[,230],773:[,230],774:[,230],775:[,230],776:[,230,{769:836}],777:[,230],778:[,230],779:[,230],780:[,230],781:[,230],782:[,230],783:[,230],784:[,230],785:[,230],786:[,230],787:[,230],788:[,230],789:[,232],790:[,220],791:[,220],792:[,220],793:[,220],794:[,232],795:[,216],796:[,220],797:[,220],798:[,220],799:[,220],800:[,220],801:[,202],802:[,202],803:[,220],804:[,220],805:[,220],806:[,220],807:[,202],808:[,202],809:[,220],810:[,220],811:[,220],812:[,220],813:[,220],814:[,220],815:[,220],816:[,220],817:[,220],818:[,220],819:[,220],820:[,1],821:[,1],822:[,1],823:[,1],824:[,1],825:[,220],826:[,220],827:[,220],828:[,220],829:[,230],830:[,230],831:[,230],832:[[768],230],833:[[769],230],834:[,230],835:[[787],230],836:[[776,769],230],837:[,240],838:[,230],839:[,220],840:[,220],841:[,220],842:[,230],843:[,230],844:[,230],845:[,220],846:[,220],848:[,230],849:[,230],850:[,230],851:[,220],852:[,220],853:[,220],854:[,220],855:[,230],856:[,232],857:[,220],858:[,220],859:[,230],860:[,233],861:[,234],862:[,234],863:[,233],864:[,234],865:[,234],866:[,233],867:[,230],868:[,230],869:[,230],870:[,230],871:[,230],872:[,230],873:[,230],874:[,230],875:[,230],876:[,230],877:[,230],878:[,230],879:[,230],884:[[697]],890:[[32,837],256],894:[[59]],900:[[32,769],256],901:[[168,769]],902:[[913,769]],903:[[183]],904:[[917,769]],905:[[919,769]],906:[[921,769]],908:[[927,769]],910:[[933,769]],911:[[937,769]],912:[[970,769]],913:[,,{768:8122,769:902,772:8121,774:8120,787:7944,788:7945,837:8124}],917:[,,{768:8136,769:904,787:7960,788:7961}],919:[,,{768:8138,769:905,787:7976,788:7977,837:8140}],921:[,,{768:8154,769:906,772:8153,774:8152,776:938,787:7992,788:7993}],927:[,,{768:8184,769:908,787:8008,788:8009}],929:[,,{788:8172}],933:[,,{768:8170,769:910,772:8169,774:8168,776:939,788:8025}],937:[,,{768:8186,769:911,787:8040,788:8041,837:8188}],938:[[921,776]],939:[[933,776]],940:[[945,769],,{837:8116}],941:[[949,769]],942:[[951,769],,{837:8132}],943:[[953,769]],944:[[971,769]],945:[,,{768:8048,769:940,772:8113,774:8112,787:7936,788:7937,834:8118,837:8115}],949:[,,{768:8050,769:941,787:7952,788:7953}],951:[,,{768:8052,769:942,787:7968,788:7969,834:8134,837:8131}],953:[,,{768:8054,769:943,772:8145,774:8144,776:970,787:7984,788:7985,834:8150}],959:[,,{768:8056,769:972,787:8000,788:8001}],961:[,,{787:8164,788:8165}],965:[,,{768:8058,769:973,772:8161,774:8160,776:971,787:8016,788:8017,834:8166}],969:[,,{768:8060,769:974,787:8032,788:8033,834:8182,837:8179}],970:[[953,776],,{768:8146,769:912,834:8151}],971:[[965,776],,{768:8162,769:944,834:8167}],972:[[959,769]],973:[[965,769]],974:[[969,769],,{837:8180}],976:[[946],256],977:[[952],256],978:[[933],256,{769:979,776:980}],979:[[978,769]],980:[[978,776]],981:[[966],256],982:[[960],256],1008:[[954],256],1009:[[961],256],1010:[[962],256],1012:[[920],256],1013:[[949],256],1017:[[931],256],66422:[,230],66423:[,230],66424:[,230],66425:[,230],66426:[,230]},
+1024:{1024:[[1045,768]],1025:[[1045,776]],1027:[[1043,769]],1030:[,,{776:1031}],1031:[[1030,776]],1036:[[1050,769]],1037:[[1048,768]],1038:[[1059,774]],1040:[,,{774:1232,776:1234}],1043:[,,{769:1027}],1045:[,,{768:1024,774:1238,776:1025}],1046:[,,{774:1217,776:1244}],1047:[,,{776:1246}],1048:[,,{768:1037,772:1250,774:1049,776:1252}],1049:[[1048,774]],1050:[,,{769:1036}],1054:[,,{776:1254}],1059:[,,{772:1262,774:1038,776:1264,779:1266}],1063:[,,{776:1268}],1067:[,,{776:1272}],1069:[,,{776:1260}],1072:[,,{774:1233,776:1235}],1075:[,,{769:1107}],1077:[,,{768:1104,774:1239,776:1105}],1078:[,,{774:1218,776:1245}],1079:[,,{776:1247}],1080:[,,{768:1117,772:1251,774:1081,776:1253}],1081:[[1080,774]],1082:[,,{769:1116}],1086:[,,{776:1255}],1091:[,,{772:1263,774:1118,776:1265,779:1267}],1095:[,,{776:1269}],1099:[,,{776:1273}],1101:[,,{776:1261}],1104:[[1077,768]],1105:[[1077,776]],1107:[[1075,769]],1110:[,,{776:1111}],1111:[[1110,776]],1116:[[1082,769]],1117:[[1080,768]],1118:[[1091,774]],1140:[,,{783:1142}],1141:[,,{783:1143}],1142:[[1140,783]],1143:[[1141,783]],1155:[,230],1156:[,230],1157:[,230],1158:[,230],1159:[,230],1217:[[1046,774]],1218:[[1078,774]],1232:[[1040,774]],1233:[[1072,774]],1234:[[1040,776]],1235:[[1072,776]],1238:[[1045,774]],1239:[[1077,774]],1240:[,,{776:1242}],1241:[,,{776:1243}],1242:[[1240,776]],1243:[[1241,776]],1244:[[1046,776]],1245:[[1078,776]],1246:[[1047,776]],1247:[[1079,776]],1250:[[1048,772]],1251:[[1080,772]],1252:[[1048,776]],1253:[[1080,776]],1254:[[1054,776]],1255:[[1086,776]],1256:[,,{776:1258}],1257:[,,{776:1259}],1258:[[1256,776]],1259:[[1257,776]],1260:[[1069,776]],1261:[[1101,776]],1262:[[1059,772]],1263:[[1091,772]],1264:[[1059,776]],1265:[[1091,776]],1266:[[1059,779]],1267:[[1091,779]],1268:[[1063,776]],1269:[[1095,776]],1272:[[1067,776]],1273:[[1099,776]]},
+1280:{1415:[[1381,1410],256],1425:[,220],1426:[,230],1427:[,230],1428:[,230],1429:[,230],1430:[,220],1431:[,230],1432:[,230],1433:[,230],1434:[,222],1435:[,220],1436:[,230],1437:[,230],1438:[,230],1439:[,230],1440:[,230],1441:[,230],1442:[,220],1443:[,220],1444:[,220],1445:[,220],1446:[,220],1447:[,220],1448:[,230],1449:[,230],1450:[,220],1451:[,230],1452:[,230],1453:[,222],1454:[,228],1455:[,230],1456:[,10],1457:[,11],1458:[,12],1459:[,13],1460:[,14],1461:[,15],1462:[,16],1463:[,17],1464:[,18],1465:[,19],1466:[,19],1467:[,20],1468:[,21],1469:[,22],1471:[,23],1473:[,24],1474:[,25],1476:[,230],1477:[,220],1479:[,18]},
+1536:{1552:[,230],1553:[,230],1554:[,230],1555:[,230],1556:[,230],1557:[,230],1558:[,230],1559:[,230],1560:[,30],1561:[,31],1562:[,32],1570:[[1575,1619]],1571:[[1575,1620]],1572:[[1608,1620]],1573:[[1575,1621]],1574:[[1610,1620]],1575:[,,{1619:1570,1620:1571,1621:1573}],1608:[,,{1620:1572}],1610:[,,{1620:1574}],1611:[,27],1612:[,28],1613:[,29],1614:[,30],1615:[,31],1616:[,32],1617:[,33],1618:[,34],1619:[,230],1620:[,230],1621:[,220],1622:[,220],1623:[,230],1624:[,230],1625:[,230],1626:[,230],1627:[,230],1628:[,220],1629:[,230],1630:[,230],1631:[,220],1648:[,35],1653:[[1575,1652],256],1654:[[1608,1652],256],1655:[[1735,1652],256],1656:[[1610,1652],256],1728:[[1749,1620]],1729:[,,{1620:1730}],1730:[[1729,1620]],1746:[,,{1620:1747}],1747:[[1746,1620]],1749:[,,{1620:1728}],1750:[,230],1751:[,230],1752:[,230],1753:[,230],1754:[,230],1755:[,230],1756:[,230],1759:[,230],1760:[,230],1761:[,230],1762:[,230],1763:[,220],1764:[,230],1767:[,230],1768:[,230],1770:[,220],1771:[,230],1772:[,230],1773:[,220]},
+1792:{1809:[,36],1840:[,230],1841:[,220],1842:[,230],1843:[,230],1844:[,220],1845:[,230],1846:[,230],1847:[,220],1848:[,220],1849:[,220],1850:[,230],1851:[,220],1852:[,220],1853:[,230],1854:[,220],1855:[,230],1856:[,230],1857:[,230],1858:[,220],1859:[,230],1860:[,220],1861:[,230],1862:[,220],1863:[,230],1864:[,220],1865:[,230],1866:[,230],2027:[,230],2028:[,230],2029:[,230],2030:[,230],2031:[,230],2032:[,230],2033:[,230],2034:[,220],2035:[,230]},
+2048:{2070:[,230],2071:[,230],2072:[,230],2073:[,230],2075:[,230],2076:[,230],2077:[,230],2078:[,230],2079:[,230],2080:[,230],2081:[,230],2082:[,230],2083:[,230],2085:[,230],2086:[,230],2087:[,230],2089:[,230],2090:[,230],2091:[,230],2092:[,230],2093:[,230],2137:[,220],2138:[,220],2139:[,220],2276:[,230],2277:[,230],2278:[,220],2279:[,230],2280:[,230],2281:[,220],2282:[,230],2283:[,230],2284:[,230],2285:[,220],2286:[,220],2287:[,220],2288:[,27],2289:[,28],2290:[,29],2291:[,230],2292:[,230],2293:[,230],2294:[,220],2295:[,230],2296:[,230],2297:[,220],2298:[,220],2299:[,230],2300:[,230],2301:[,230],2302:[,230],2303:[,230]},
+2304:{2344:[,,{2364:2345}],2345:[[2344,2364]],2352:[,,{2364:2353}],2353:[[2352,2364]],2355:[,,{2364:2356}],2356:[[2355,2364]],2364:[,7],2381:[,9],2385:[,230],2386:[,220],2387:[,230],2388:[,230],2392:[[2325,2364],512],2393:[[2326,2364],512],2394:[[2327,2364],512],2395:[[2332,2364],512],2396:[[2337,2364],512],2397:[[2338,2364],512],2398:[[2347,2364],512],2399:[[2351,2364],512],2492:[,7],2503:[,,{2494:2507,2519:2508}],2507:[[2503,2494]],2508:[[2503,2519]],2509:[,9],2524:[[2465,2492],512],2525:[[2466,2492],512],2527:[[2479,2492],512]},
+2560:{2611:[[2610,2620],512],2614:[[2616,2620],512],2620:[,7],2637:[,9],2649:[[2582,2620],512],2650:[[2583,2620],512],2651:[[2588,2620],512],2654:[[2603,2620],512],2748:[,7],2765:[,9],68109:[,220],68111:[,230],68152:[,230],68153:[,1],68154:[,220],68159:[,9],68325:[,230],68326:[,220]},
+2816:{2876:[,7],2887:[,,{2878:2891,2902:2888,2903:2892}],2888:[[2887,2902]],2891:[[2887,2878]],2892:[[2887,2903]],2893:[,9],2908:[[2849,2876],512],2909:[[2850,2876],512],2962:[,,{3031:2964}],2964:[[2962,3031]],3014:[,,{3006:3018,3031:3020}],3015:[,,{3006:3019}],3018:[[3014,3006]],3019:[[3015,3006]],3020:[[3014,3031]],3021:[,9]},
+3072:{3142:[,,{3158:3144}],3144:[[3142,3158]],3149:[,9],3157:[,84],3158:[,91],3260:[,7],3263:[,,{3285:3264}],3264:[[3263,3285]],3270:[,,{3266:3274,3285:3271,3286:3272}],3271:[[3270,3285]],3272:[[3270,3286]],3274:[[3270,3266],,{3285:3275}],3275:[[3274,3285]],3277:[,9]},
+3328:{3398:[,,{3390:3402,3415:3404}],3399:[,,{3390:3403}],3402:[[3398,3390]],3403:[[3399,3390]],3404:[[3398,3415]],3405:[,9],3530:[,9],3545:[,,{3530:3546,3535:3548,3551:3550}],3546:[[3545,3530]],3548:[[3545,3535],,{3530:3549}],3549:[[3548,3530]],3550:[[3545,3551]]},
+3584:{3635:[[3661,3634],256],3640:[,103],3641:[,103],3642:[,9],3656:[,107],3657:[,107],3658:[,107],3659:[,107],3763:[[3789,3762],256],3768:[,118],3769:[,118],3784:[,122],3785:[,122],3786:[,122],3787:[,122],3804:[[3755,3737],256],3805:[[3755,3745],256]},
+3840:{3852:[[3851],256],3864:[,220],3865:[,220],3893:[,220],3895:[,220],3897:[,216],3907:[[3906,4023],512],3917:[[3916,4023],512],3922:[[3921,4023],512],3927:[[3926,4023],512],3932:[[3931,4023],512],3945:[[3904,4021],512],3953:[,129],3954:[,130],3955:[[3953,3954],512],3956:[,132],3957:[[3953,3956],512],3958:[[4018,3968],512],3959:[[4018,3969],256],3960:[[4019,3968],512],3961:[[4019,3969],256],3962:[,130],3963:[,130],3964:[,130],3965:[,130],3968:[,130],3969:[[3953,3968],512],3970:[,230],3971:[,230],3972:[,9],3974:[,230],3975:[,230],3987:[[3986,4023],512],3997:[[3996,4023],512],4002:[[4001,4023],512],4007:[[4006,4023],512],4012:[[4011,4023],512],4025:[[3984,4021],512],4038:[,220]},
+4096:{4133:[,,{4142:4134}],4134:[[4133,4142]],4151:[,7],4153:[,9],4154:[,9],4237:[,220],4348:[[4316],256],69702:[,9],69759:[,9],69785:[,,{69818:69786}],69786:[[69785,69818]],69787:[,,{69818:69788}],69788:[[69787,69818]],69797:[,,{69818:69803}],69803:[[69797,69818]],69817:[,9],69818:[,7]},
+4352:{69888:[,230],69889:[,230],69890:[,230],69934:[[69937,69927]],69935:[[69938,69927]],69937:[,,{69927:69934}],69938:[,,{69927:69935}],69939:[,9],69940:[,9],70003:[,7],70080:[,9]},
+4608:{70197:[,9],70198:[,7],70377:[,7],70378:[,9]},
+4864:{4957:[,230],4958:[,230],4959:[,230],70460:[,7],70471:[,,{70462:70475,70487:70476}],70475:[[70471,70462]],70476:[[70471,70487]],70477:[,9],70502:[,230],70503:[,230],70504:[,230],70505:[,230],70506:[,230],70507:[,230],70508:[,230],70512:[,230],70513:[,230],70514:[,230],70515:[,230],70516:[,230]},
+5120:{70841:[,,{70832:70844,70842:70843,70845:70846}],70843:[[70841,70842]],70844:[[70841,70832]],70846:[[70841,70845]],70850:[,9],70851:[,7]},
+5376:{71096:[,,{71087:71098}],71097:[,,{71087:71099}],71098:[[71096,71087]],71099:[[71097,71087]],71103:[,9],71104:[,7]},
+5632:{71231:[,9],71350:[,9],71351:[,7]},
+5888:{5908:[,9],5940:[,9],6098:[,9],6109:[,230]},
+6144:{6313:[,228]},
+6400:{6457:[,222],6458:[,230],6459:[,220]},
+6656:{6679:[,230],6680:[,220],6752:[,9],6773:[,230],6774:[,230],6775:[,230],6776:[,230],6777:[,230],6778:[,230],6779:[,230],6780:[,230],6783:[,220],6832:[,230],6833:[,230],6834:[,230],6835:[,230],6836:[,230],6837:[,220],6838:[,220],6839:[,220],6840:[,220],6841:[,220],6842:[,220],6843:[,230],6844:[,230],6845:[,220]},
+6912:{6917:[,,{6965:6918}],6918:[[6917,6965]],6919:[,,{6965:6920}],6920:[[6919,6965]],6921:[,,{6965:6922}],6922:[[6921,6965]],6923:[,,{6965:6924}],6924:[[6923,6965]],6925:[,,{6965:6926}],6926:[[6925,6965]],6929:[,,{6965:6930}],6930:[[6929,6965]],6964:[,7],6970:[,,{6965:6971}],6971:[[6970,6965]],6972:[,,{6965:6973}],6973:[[6972,6965]],6974:[,,{6965:6976}],6975:[,,{6965:6977}],6976:[[6974,6965]],6977:[[6975,6965]],6978:[,,{6965:6979}],6979:[[6978,6965]],6980:[,9],7019:[,230],7020:[,220],7021:[,230],7022:[,230],7023:[,230],7024:[,230],7025:[,230],7026:[,230],7027:[,230],7082:[,9],7083:[,9],7142:[,7],7154:[,9],7155:[,9]},
+7168:{7223:[,7],7376:[,230],7377:[,230],7378:[,230],7380:[,1],7381:[,220],7382:[,220],7383:[,220],7384:[,220],7385:[,220],7386:[,230],7387:[,230],7388:[,220],7389:[,220],7390:[,220],7391:[,220],7392:[,230],7394:[,1],7395:[,1],7396:[,1],7397:[,1],7398:[,1],7399:[,1],7400:[,1],7405:[,220],7412:[,230],7416:[,230],7417:[,230]},
+7424:{7468:[[65],256],7469:[[198],256],7470:[[66],256],7472:[[68],256],7473:[[69],256],7474:[[398],256],7475:[[71],256],7476:[[72],256],7477:[[73],256],7478:[[74],256],7479:[[75],256],7480:[[76],256],7481:[[77],256],7482:[[78],256],7484:[[79],256],7485:[[546],256],7486:[[80],256],7487:[[82],256],7488:[[84],256],7489:[[85],256],7490:[[87],256],7491:[[97],256],7492:[[592],256],7493:[[593],256],7494:[[7426],256],7495:[[98],256],7496:[[100],256],7497:[[101],256],7498:[[601],256],7499:[[603],256],7500:[[604],256],7501:[[103],256],7503:[[107],256],7504:[[109],256],7505:[[331],256],7506:[[111],256],7507:[[596],256],7508:[[7446],256],7509:[[7447],256],7510:[[112],256],7511:[[116],256],7512:[[117],256],7513:[[7453],256],7514:[[623],256],7515:[[118],256],7516:[[7461],256],7517:[[946],256],7518:[[947],256],7519:[[948],256],7520:[[966],256],7521:[[967],256],7522:[[105],256],7523:[[114],256],7524:[[117],256],7525:[[118],256],7526:[[946],256],7527:[[947],256],7528:[[961],256],7529:[[966],256],7530:[[967],256],7544:[[1085],256],7579:[[594],256],7580:[[99],256],7581:[[597],256],7582:[[240],256],7583:[[604],256],7584:[[102],256],7585:[[607],256],7586:[[609],256],7587:[[613],256],7588:[[616],256],7589:[[617],256],7590:[[618],256],7591:[[7547],256],7592:[[669],256],7593:[[621],256],7594:[[7557],256],7595:[[671],256],7596:[[625],256],7597:[[624],256],7598:[[626],256],7599:[[627],256],7600:[[628],256],7601:[[629],256],7602:[[632],256],7603:[[642],256],7604:[[643],256],7605:[[427],256],7606:[[649],256],7607:[[650],256],7608:[[7452],256],7609:[[651],256],7610:[[652],256],7611:[[122],256],7612:[[656],256],7613:[[657],256],7614:[[658],256],7615:[[952],256],7616:[,230],7617:[,230],7618:[,220],7619:[,230],7620:[,230],7621:[,230],7622:[,230],7623:[,230],7624:[,230],7625:[,230],7626:[,220],7627:[,230],7628:[,230],7629:[,234],7630:[,214],7631:[,220],7632:[,202],7633:[,230],7634:[,230],7635:[,230],7636:[,230],7637:[,230],7638:[,230],7639:[,230],7640:[,230],7641:[,230],7642:[,230],7643:[,230],7644:[,230],7645:[,230],7646:[,230],7647:[,230],7648:[,230],7649:[,230],7650:[,230],7651:[,230],7652:[,230],7653:[,230],7654:[,230],7655:[,230],7656:[,230],7657:[,230],7658:[,230],7659:[,230],7660:[,230],7661:[,230],7662:[,230],7663:[,230],7664:[,230],7665:[,230],7666:[,230],7667:[,230],7668:[,230],7669:[,230],7676:[,233],7677:[,220],7678:[,230],7679:[,220]},
+7680:{7680:[[65,805]],7681:[[97,805]],7682:[[66,775]],7683:[[98,775]],7684:[[66,803]],7685:[[98,803]],7686:[[66,817]],7687:[[98,817]],7688:[[199,769]],7689:[[231,769]],7690:[[68,775]],7691:[[100,775]],7692:[[68,803]],7693:[[100,803]],7694:[[68,817]],7695:[[100,817]],7696:[[68,807]],7697:[[100,807]],7698:[[68,813]],7699:[[100,813]],7700:[[274,768]],7701:[[275,768]],7702:[[274,769]],7703:[[275,769]],7704:[[69,813]],7705:[[101,813]],7706:[[69,816]],7707:[[101,816]],7708:[[552,774]],7709:[[553,774]],7710:[[70,775]],7711:[[102,775]],7712:[[71,772]],7713:[[103,772]],7714:[[72,775]],7715:[[104,775]],7716:[[72,803]],7717:[[104,803]],7718:[[72,776]],7719:[[104,776]],7720:[[72,807]],7721:[[104,807]],7722:[[72,814]],7723:[[104,814]],7724:[[73,816]],7725:[[105,816]],7726:[[207,769]],7727:[[239,769]],7728:[[75,769]],7729:[[107,769]],7730:[[75,803]],7731:[[107,803]],7732:[[75,817]],7733:[[107,817]],7734:[[76,803],,{772:7736}],7735:[[108,803],,{772:7737}],7736:[[7734,772]],7737:[[7735,772]],7738:[[76,817]],7739:[[108,817]],7740:[[76,813]],7741:[[108,813]],7742:[[77,769]],7743:[[109,769]],7744:[[77,775]],7745:[[109,775]],7746:[[77,803]],7747:[[109,803]],7748:[[78,775]],7749:[[110,775]],7750:[[78,803]],7751:[[110,803]],7752:[[78,817]],7753:[[110,817]],7754:[[78,813]],7755:[[110,813]],7756:[[213,769]],7757:[[245,769]],7758:[[213,776]],7759:[[245,776]],7760:[[332,768]],7761:[[333,768]],7762:[[332,769]],7763:[[333,769]],7764:[[80,769]],7765:[[112,769]],7766:[[80,775]],7767:[[112,775]],7768:[[82,775]],7769:[[114,775]],7770:[[82,803],,{772:7772}],7771:[[114,803],,{772:7773}],7772:[[7770,772]],7773:[[7771,772]],7774:[[82,817]],7775:[[114,817]],7776:[[83,775]],7777:[[115,775]],7778:[[83,803],,{775:7784}],7779:[[115,803],,{775:7785}],7780:[[346,775]],7781:[[347,775]],7782:[[352,775]],7783:[[353,775]],7784:[[7778,775]],7785:[[7779,775]],7786:[[84,775]],7787:[[116,775]],7788:[[84,803]],7789:[[116,803]],7790:[[84,817]],7791:[[116,817]],7792:[[84,813]],7793:[[116,813]],7794:[[85,804]],7795:[[117,804]],7796:[[85,816]],7797:[[117,816]],7798:[[85,813]],7799:[[117,813]],7800:[[360,769]],7801:[[361,769]],7802:[[362,776]],7803:[[363,776]],7804:[[86,771]],7805:[[118,771]],7806:[[86,803]],7807:[[118,803]],7808:[[87,768]],7809:[[119,768]],7810:[[87,769]],7811:[[119,769]],7812:[[87,776]],7813:[[119,776]],7814:[[87,775]],7815:[[119,775]],7816:[[87,803]],7817:[[119,803]],7818:[[88,775]],7819:[[120,775]],7820:[[88,776]],7821:[[120,776]],7822:[[89,775]],7823:[[121,775]],7824:[[90,770]],7825:[[122,770]],7826:[[90,803]],7827:[[122,803]],7828:[[90,817]],7829:[[122,817]],7830:[[104,817]],7831:[[116,776]],7832:[[119,778]],7833:[[121,778]],7834:[[97,702],256],7835:[[383,775]],7840:[[65,803],,{770:7852,774:7862}],7841:[[97,803],,{770:7853,774:7863}],7842:[[65,777]],7843:[[97,777]],7844:[[194,769]],7845:[[226,769]],7846:[[194,768]],7847:[[226,768]],7848:[[194,777]],7849:[[226,777]],7850:[[194,771]],7851:[[226,771]],7852:[[7840,770]],7853:[[7841,770]],7854:[[258,769]],7855:[[259,769]],7856:[[258,768]],7857:[[259,768]],7858:[[258,777]],7859:[[259,777]],7860:[[258,771]],7861:[[259,771]],7862:[[7840,774]],7863:[[7841,774]],7864:[[69,803],,{770:7878}],7865:[[101,803],,{770:7879}],7866:[[69,777]],7867:[[101,777]],7868:[[69,771]],7869:[[101,771]],7870:[[202,769]],7871:[[234,769]],7872:[[202,768]],7873:[[234,768]],7874:[[202,777]],7875:[[234,777]],7876:[[202,771]],7877:[[234,771]],7878:[[7864,770]],7879:[[7865,770]],7880:[[73,777]],7881:[[105,777]],7882:[[73,803]],7883:[[105,803]],7884:[[79,803],,{770:7896}],7885:[[111,803],,{770:7897}],7886:[[79,777]],7887:[[111,777]],7888:[[212,769]],7889:[[244,769]],7890:[[212,768]],7891:[[244,768]],7892:[[212,777]],7893:[[244,777]],7894:[[212,771]],7895:[[244,771]],7896:[[7884,770]],7897:[[7885,770]],7898:[[416,769]],7899:[[417,769]],7900:[[416,768]],7901:[[417,768]],7902:[[416,777]],7903:[[417,777]],7904:[[416,771]],7905:[[417,771]],7906:[[416,803]],7907:[[417,803]],7908:[[85,803]],7909:[[117,803]],7910:[[85,777]],7911:[[117,777]],7912:[[431,769]],7913:[[432,769]],7914:[[431,768]],7915:[[432,768]],7916:[[431,777]],7917:[[432,777]],7918:[[431,771]],7919:[[432,771]],7920:[[431,803]],7921:[[432,803]],7922:[[89,768]],7923:[[121,768]],7924:[[89,803]],7925:[[121,803]],7926:[[89,777]],7927:[[121,777]],7928:[[89,771]],7929:[[121,771]]},
+7936:{7936:[[945,787],,{768:7938,769:7940,834:7942,837:8064}],7937:[[945,788],,{768:7939,769:7941,834:7943,837:8065}],7938:[[7936,768],,{837:8066}],7939:[[7937,768],,{837:8067}],7940:[[7936,769],,{837:8068}],7941:[[7937,769],,{837:8069}],7942:[[7936,834],,{837:8070}],7943:[[7937,834],,{837:8071}],7944:[[913,787],,{768:7946,769:7948,834:7950,837:8072}],7945:[[913,788],,{768:7947,769:7949,834:7951,837:8073}],7946:[[7944,768],,{837:8074}],7947:[[7945,768],,{837:8075}],7948:[[7944,769],,{837:8076}],7949:[[7945,769],,{837:8077}],7950:[[7944,834],,{837:8078}],7951:[[7945,834],,{837:8079}],7952:[[949,787],,{768:7954,769:7956}],7953:[[949,788],,{768:7955,769:7957}],7954:[[7952,768]],7955:[[7953,768]],7956:[[7952,769]],7957:[[7953,769]],7960:[[917,787],,{768:7962,769:7964}],7961:[[917,788],,{768:7963,769:7965}],7962:[[7960,768]],7963:[[7961,768]],7964:[[7960,769]],7965:[[7961,769]],7968:[[951,787],,{768:7970,769:7972,834:7974,837:8080}],7969:[[951,788],,{768:7971,769:7973,834:7975,837:8081}],7970:[[7968,768],,{837:8082}],7971:[[7969,768],,{837:8083}],7972:[[7968,769],,{837:8084}],7973:[[7969,769],,{837:8085}],7974:[[7968,834],,{837:8086}],7975:[[7969,834],,{837:8087}],7976:[[919,787],,{768:7978,769:7980,834:7982,837:8088}],7977:[[919,788],,{768:7979,769:7981,834:7983,837:8089}],7978:[[7976,768],,{837:8090}],7979:[[7977,768],,{837:8091}],7980:[[7976,769],,{837:8092}],7981:[[7977,769],,{837:8093}],7982:[[7976,834],,{837:8094}],7983:[[7977,834],,{837:8095}],7984:[[953,787],,{768:7986,769:7988,834:7990}],7985:[[953,788],,{768:7987,769:7989,834:7991}],7986:[[7984,768]],7987:[[7985,768]],7988:[[7984,769]],7989:[[7985,769]],7990:[[7984,834]],7991:[[7985,834]],7992:[[921,787],,{768:7994,769:7996,834:7998}],7993:[[921,788],,{768:7995,769:7997,834:7999}],7994:[[7992,768]],7995:[[7993,768]],7996:[[7992,769]],7997:[[7993,769]],7998:[[7992,834]],7999:[[7993,834]],8000:[[959,787],,{768:8002,769:8004}],8001:[[959,788],,{768:8003,769:8005}],8002:[[8000,768]],8003:[[8001,768]],8004:[[8000,769]],8005:[[8001,769]],8008:[[927,787],,{768:8010,769:8012}],8009:[[927,788],,{768:8011,769:8013}],8010:[[8008,768]],8011:[[8009,768]],8012:[[8008,769]],8013:[[8009,769]],8016:[[965,787],,{768:8018,769:8020,834:8022}],8017:[[965,788],,{768:8019,769:8021,834:8023}],8018:[[8016,768]],8019:[[8017,768]],8020:[[8016,769]],8021:[[8017,769]],8022:[[8016,834]],8023:[[8017,834]],8025:[[933,788],,{768:8027,769:8029,834:8031}],8027:[[8025,768]],8029:[[8025,769]],8031:[[8025,834]],8032:[[969,787],,{768:8034,769:8036,834:8038,837:8096}],8033:[[969,788],,{768:8035,769:8037,834:8039,837:8097}],8034:[[8032,768],,{837:8098}],8035:[[8033,768],,{837:8099}],8036:[[8032,769],,{837:8100}],8037:[[8033,769],,{837:8101}],8038:[[8032,834],,{837:8102}],8039:[[8033,834],,{837:8103}],8040:[[937,787],,{768:8042,769:8044,834:8046,837:8104}],8041:[[937,788],,{768:8043,769:8045,834:8047,837:8105}],8042:[[8040,768],,{837:8106}],8043:[[8041,768],,{837:8107}],8044:[[8040,769],,{837:8108}],8045:[[8041,769],,{837:8109}],8046:[[8040,834],,{837:8110}],8047:[[8041,834],,{837:8111}],8048:[[945,768],,{837:8114}],8049:[[940]],8050:[[949,768]],8051:[[941]],8052:[[951,768],,{837:8130}],8053:[[942]],8054:[[953,768]],8055:[[943]],8056:[[959,768]],8057:[[972]],8058:[[965,768]],8059:[[973]],8060:[[969,768],,{837:8178}],8061:[[974]],8064:[[7936,837]],8065:[[7937,837]],8066:[[7938,837]],8067:[[7939,837]],8068:[[7940,837]],8069:[[7941,837]],8070:[[7942,837]],8071:[[7943,837]],8072:[[7944,837]],8073:[[7945,837]],8074:[[7946,837]],8075:[[7947,837]],8076:[[7948,837]],8077:[[7949,837]],8078:[[7950,837]],8079:[[7951,837]],8080:[[7968,837]],8081:[[7969,837]],8082:[[7970,837]],8083:[[7971,837]],8084:[[7972,837]],8085:[[7973,837]],8086:[[7974,837]],8087:[[7975,837]],8088:[[7976,837]],8089:[[7977,837]],8090:[[7978,837]],8091:[[7979,837]],8092:[[7980,837]],8093:[[7981,837]],8094:[[7982,837]],8095:[[7983,837]],8096:[[8032,837]],8097:[[8033,837]],8098:[[8034,837]],8099:[[8035,837]],8100:[[8036,837]],8101:[[8037,837]],8102:[[8038,837]],8103:[[8039,837]],8104:[[8040,837]],8105:[[8041,837]],8106:[[8042,837]],8107:[[8043,837]],8108:[[8044,837]],8109:[[8045,837]],8110:[[8046,837]],8111:[[8047,837]],8112:[[945,774]],8113:[[945,772]],8114:[[8048,837]],8115:[[945,837]],8116:[[940,837]],8118:[[945,834],,{837:8119}],8119:[[8118,837]],8120:[[913,774]],8121:[[913,772]],8122:[[913,768]],8123:[[902]],8124:[[913,837]],8125:[[32,787],256],8126:[[953]],8127:[[32,787],256,{768:8141,769:8142,834:8143}],8128:[[32,834],256],8129:[[168,834]],8130:[[8052,837]],8131:[[951,837]],8132:[[942,837]],8134:[[951,834],,{837:8135}],8135:[[8134,837]],8136:[[917,768]],8137:[[904]],8138:[[919,768]],8139:[[905]],8140:[[919,837]],8141:[[8127,768]],8142:[[8127,769]],8143:[[8127,834]],8144:[[953,774]],8145:[[953,772]],8146:[[970,768]],8147:[[912]],8150:[[953,834]],8151:[[970,834]],8152:[[921,774]],8153:[[921,772]],8154:[[921,768]],8155:[[906]],8157:[[8190,768]],8158:[[8190,769]],8159:[[8190,834]],8160:[[965,774]],8161:[[965,772]],8162:[[971,768]],8163:[[944]],8164:[[961,787]],8165:[[961,788]],8166:[[965,834]],8167:[[971,834]],8168:[[933,774]],8169:[[933,772]],8170:[[933,768]],8171:[[910]],8172:[[929,788]],8173:[[168,768]],8174:[[901]],8175:[[96]],8178:[[8060,837]],8179:[[969,837]],8180:[[974,837]],8182:[[969,834],,{837:8183}],8183:[[8182,837]],8184:[[927,768]],8185:[[908]],8186:[[937,768]],8187:[[911]],8188:[[937,837]],8189:[[180]],8190:[[32,788],256,{768:8157,769:8158,834:8159}]},
+8192:{8192:[[8194]],8193:[[8195]],8194:[[32],256],8195:[[32],256],8196:[[32],256],8197:[[32],256],8198:[[32],256],8199:[[32],256],8200:[[32],256],8201:[[32],256],8202:[[32],256],8209:[[8208],256],8215:[[32,819],256],8228:[[46],256],8229:[[46,46],256],8230:[[46,46,46],256],8239:[[32],256],8243:[[8242,8242],256],8244:[[8242,8242,8242],256],8246:[[8245,8245],256],8247:[[8245,8245,8245],256],8252:[[33,33],256],8254:[[32,773],256],8263:[[63,63],256],8264:[[63,33],256],8265:[[33,63],256],8279:[[8242,8242,8242,8242],256],8287:[[32],256],8304:[[48],256],8305:[[105],256],8308:[[52],256],8309:[[53],256],8310:[[54],256],8311:[[55],256],8312:[[56],256],8313:[[57],256],8314:[[43],256],8315:[[8722],256],8316:[[61],256],8317:[[40],256],8318:[[41],256],8319:[[110],256],8320:[[48],256],8321:[[49],256],8322:[[50],256],8323:[[51],256],8324:[[52],256],8325:[[53],256],8326:[[54],256],8327:[[55],256],8328:[[56],256],8329:[[57],256],8330:[[43],256],8331:[[8722],256],8332:[[61],256],8333:[[40],256],8334:[[41],256],8336:[[97],256],8337:[[101],256],8338:[[111],256],8339:[[120],256],8340:[[601],256],8341:[[104],256],8342:[[107],256],8343:[[108],256],8344:[[109],256],8345:[[110],256],8346:[[112],256],8347:[[115],256],8348:[[116],256],8360:[[82,115],256],8400:[,230],8401:[,230],8402:[,1],8403:[,1],8404:[,230],8405:[,230],8406:[,230],8407:[,230],8408:[,1],8409:[,1],8410:[,1],8411:[,230],8412:[,230],8417:[,230],8421:[,1],8422:[,1],8423:[,230],8424:[,220],8425:[,230],8426:[,1],8427:[,1],8428:[,220],8429:[,220],8430:[,220],8431:[,220],8432:[,230]},
+8448:{8448:[[97,47,99],256],8449:[[97,47,115],256],8450:[[67],256],8451:[[176,67],256],8453:[[99,47,111],256],8454:[[99,47,117],256],8455:[[400],256],8457:[[176,70],256],8458:[[103],256],8459:[[72],256],8460:[[72],256],8461:[[72],256],8462:[[104],256],8463:[[295],256],8464:[[73],256],8465:[[73],256],8466:[[76],256],8467:[[108],256],8469:[[78],256],8470:[[78,111],256],8473:[[80],256],8474:[[81],256],8475:[[82],256],8476:[[82],256],8477:[[82],256],8480:[[83,77],256],8481:[[84,69,76],256],8482:[[84,77],256],8484:[[90],256],8486:[[937]],8488:[[90],256],8490:[[75]],8491:[[197]],8492:[[66],256],8493:[[67],256],8495:[[101],256],8496:[[69],256],8497:[[70],256],8499:[[77],256],8500:[[111],256],8501:[[1488],256],8502:[[1489],256],8503:[[1490],256],8504:[[1491],256],8505:[[105],256],8507:[[70,65,88],256],8508:[[960],256],8509:[[947],256],8510:[[915],256],8511:[[928],256],8512:[[8721],256],8517:[[68],256],8518:[[100],256],8519:[[101],256],8520:[[105],256],8521:[[106],256],8528:[[49,8260,55],256],8529:[[49,8260,57],256],8530:[[49,8260,49,48],256],8531:[[49,8260,51],256],8532:[[50,8260,51],256],8533:[[49,8260,53],256],8534:[[50,8260,53],256],8535:[[51,8260,53],256],8536:[[52,8260,53],256],8537:[[49,8260,54],256],8538:[[53,8260,54],256],8539:[[49,8260,56],256],8540:[[51,8260,56],256],8541:[[53,8260,56],256],8542:[[55,8260,56],256],8543:[[49,8260],256],8544:[[73],256],8545:[[73,73],256],8546:[[73,73,73],256],8547:[[73,86],256],8548:[[86],256],8549:[[86,73],256],8550:[[86,73,73],256],8551:[[86,73,73,73],256],8552:[[73,88],256],8553:[[88],256],8554:[[88,73],256],8555:[[88,73,73],256],8556:[[76],256],8557:[[67],256],8558:[[68],256],8559:[[77],256],8560:[[105],256],8561:[[105,105],256],8562:[[105,105,105],256],8563:[[105,118],256],8564:[[118],256],8565:[[118,105],256],8566:[[118,105,105],256],8567:[[118,105,105,105],256],8568:[[105,120],256],8569:[[120],256],8570:[[120,105],256],8571:[[120,105,105],256],8572:[[108],256],8573:[[99],256],8574:[[100],256],8575:[[109],256],8585:[[48,8260,51],256],8592:[,,{824:8602}],8594:[,,{824:8603}],8596:[,,{824:8622}],8602:[[8592,824]],8603:[[8594,824]],8622:[[8596,824]],8653:[[8656,824]],8654:[[8660,824]],8655:[[8658,824]],8656:[,,{824:8653}],8658:[,,{824:8655}],8660:[,,{824:8654}]},
+8704:{8707:[,,{824:8708}],8708:[[8707,824]],8712:[,,{824:8713}],8713:[[8712,824]],8715:[,,{824:8716}],8716:[[8715,824]],8739:[,,{824:8740}],8740:[[8739,824]],8741:[,,{824:8742}],8742:[[8741,824]],8748:[[8747,8747],256],8749:[[8747,8747,8747],256],8751:[[8750,8750],256],8752:[[8750,8750,8750],256],8764:[,,{824:8769}],8769:[[8764,824]],8771:[,,{824:8772}],8772:[[8771,824]],8773:[,,{824:8775}],8775:[[8773,824]],8776:[,,{824:8777}],8777:[[8776,824]],8781:[,,{824:8813}],8800:[[61,824]],8801:[,,{824:8802}],8802:[[8801,824]],8804:[,,{824:8816}],8805:[,,{824:8817}],8813:[[8781,824]],8814:[[60,824]],8815:[[62,824]],8816:[[8804,824]],8817:[[8805,824]],8818:[,,{824:8820}],8819:[,,{824:8821}],8820:[[8818,824]],8821:[[8819,824]],8822:[,,{824:8824}],8823:[,,{824:8825}],8824:[[8822,824]],8825:[[8823,824]],8826:[,,{824:8832}],8827:[,,{824:8833}],8828:[,,{824:8928}],8829:[,,{824:8929}],8832:[[8826,824]],8833:[[8827,824]],8834:[,,{824:8836}],8835:[,,{824:8837}],8836:[[8834,824]],8837:[[8835,824]],8838:[,,{824:8840}],8839:[,,{824:8841}],8840:[[8838,824]],8841:[[8839,824]],8849:[,,{824:8930}],8850:[,,{824:8931}],8866:[,,{824:8876}],8872:[,,{824:8877}],8873:[,,{824:8878}],8875:[,,{824:8879}],8876:[[8866,824]],8877:[[8872,824]],8878:[[8873,824]],8879:[[8875,824]],8882:[,,{824:8938}],8883:[,,{824:8939}],8884:[,,{824:8940}],8885:[,,{824:8941}],8928:[[8828,824]],8929:[[8829,824]],8930:[[8849,824]],8931:[[8850,824]],8938:[[8882,824]],8939:[[8883,824]],8940:[[8884,824]],8941:[[8885,824]]},
+8960:{9001:[[12296]],9002:[[12297]]},
+9216:{9312:[[49],256],9313:[[50],256],9314:[[51],256],9315:[[52],256],9316:[[53],256],9317:[[54],256],9318:[[55],256],9319:[[56],256],9320:[[57],256],9321:[[49,48],256],9322:[[49,49],256],9323:[[49,50],256],9324:[[49,51],256],9325:[[49,52],256],9326:[[49,53],256],9327:[[49,54],256],9328:[[49,55],256],9329:[[49,56],256],9330:[[49,57],256],9331:[[50,48],256],9332:[[40,49,41],256],9333:[[40,50,41],256],9334:[[40,51,41],256],9335:[[40,52,41],256],9336:[[40,53,41],256],9337:[[40,54,41],256],9338:[[40,55,41],256],9339:[[40,56,41],256],9340:[[40,57,41],256],9341:[[40,49,48,41],256],9342:[[40,49,49,41],256],9343:[[40,49,50,41],256],9344:[[40,49,51,41],256],9345:[[40,49,52,41],256],9346:[[40,49,53,41],256],9347:[[40,49,54,41],256],9348:[[40,49,55,41],256],9349:[[40,49,56,41],256],9350:[[40,49,57,41],256],9351:[[40,50,48,41],256],9352:[[49,46],256],9353:[[50,46],256],9354:[[51,46],256],9355:[[52,46],256],9356:[[53,46],256],9357:[[54,46],256],9358:[[55,46],256],9359:[[56,46],256],9360:[[57,46],256],9361:[[49,48,46],256],9362:[[49,49,46],256],9363:[[49,50,46],256],9364:[[49,51,46],256],9365:[[49,52,46],256],9366:[[49,53,46],256],9367:[[49,54,46],256],9368:[[49,55,46],256],9369:[[49,56,46],256],9370:[[49,57,46],256],9371:[[50,48,46],256],9372:[[40,97,41],256],9373:[[40,98,41],256],9374:[[40,99,41],256],9375:[[40,100,41],256],9376:[[40,101,41],256],9377:[[40,102,41],256],9378:[[40,103,41],256],9379:[[40,104,41],256],9380:[[40,105,41],256],9381:[[40,106,41],256],9382:[[40,107,41],256],9383:[[40,108,41],256],9384:[[40,109,41],256],9385:[[40,110,41],256],9386:[[40,111,41],256],9387:[[40,112,41],256],9388:[[40,113,41],256],9389:[[40,114,41],256],9390:[[40,115,41],256],9391:[[40,116,41],256],9392:[[40,117,41],256],9393:[[40,118,41],256],9394:[[40,119,41],256],9395:[[40,120,41],256],9396:[[40,121,41],256],9397:[[40,122,41],256],9398:[[65],256],9399:[[66],256],9400:[[67],256],9401:[[68],256],9402:[[69],256],9403:[[70],256],9404:[[71],256],9405:[[72],256],9406:[[73],256],9407:[[74],256],9408:[[75],256],9409:[[76],256],9410:[[77],256],9411:[[78],256],9412:[[79],256],9413:[[80],256],9414:[[81],256],9415:[[82],256],9416:[[83],256],9417:[[84],256],9418:[[85],256],9419:[[86],256],9420:[[87],256],9421:[[88],256],9422:[[89],256],9423:[[90],256],9424:[[97],256],9425:[[98],256],9426:[[99],256],9427:[[100],256],9428:[[101],256],9429:[[102],256],9430:[[103],256],9431:[[104],256],9432:[[105],256],9433:[[106],256],9434:[[107],256],9435:[[108],256],9436:[[109],256],9437:[[110],256],9438:[[111],256],9439:[[112],256],9440:[[113],256],9441:[[114],256],9442:[[115],256],9443:[[116],256],9444:[[117],256],9445:[[118],256],9446:[[119],256],9447:[[120],256],9448:[[121],256],9449:[[122],256],9450:[[48],256]},
+10752:{10764:[[8747,8747,8747,8747],256],10868:[[58,58,61],256],10869:[[61,61],256],10870:[[61,61,61],256],10972:[[10973,824],512]},
+11264:{11388:[[106],256],11389:[[86],256],11503:[,230],11504:[,230],11505:[,230]},
+11520:{11631:[[11617],256],11647:[,9],11744:[,230],11745:[,230],11746:[,230],11747:[,230],11748:[,230],11749:[,230],11750:[,230],11751:[,230],11752:[,230],11753:[,230],11754:[,230],11755:[,230],11756:[,230],11757:[,230],11758:[,230],11759:[,230],11760:[,230],11761:[,230],11762:[,230],11763:[,230],11764:[,230],11765:[,230],11766:[,230],11767:[,230],11768:[,230],11769:[,230],11770:[,230],11771:[,230],11772:[,230],11773:[,230],11774:[,230],11775:[,230]},
+11776:{11935:[[27597],256],12019:[[40863],256]},
+12032:{12032:[[19968],256],12033:[[20008],256],12034:[[20022],256],12035:[[20031],256],12036:[[20057],256],12037:[[20101],256],12038:[[20108],256],12039:[[20128],256],12040:[[20154],256],12041:[[20799],256],12042:[[20837],256],12043:[[20843],256],12044:[[20866],256],12045:[[20886],256],12046:[[20907],256],12047:[[20960],256],12048:[[20981],256],12049:[[20992],256],12050:[[21147],256],12051:[[21241],256],12052:[[21269],256],12053:[[21274],256],12054:[[21304],256],12055:[[21313],256],12056:[[21340],256],12057:[[21353],256],12058:[[21378],256],12059:[[21430],256],12060:[[21448],256],12061:[[21475],256],12062:[[22231],256],12063:[[22303],256],12064:[[22763],256],12065:[[22786],256],12066:[[22794],256],12067:[[22805],256],12068:[[22823],256],12069:[[22899],256],12070:[[23376],256],12071:[[23424],256],12072:[[23544],256],12073:[[23567],256],12074:[[23586],256],12075:[[23608],256],12076:[[23662],256],12077:[[23665],256],12078:[[24027],256],12079:[[24037],256],12080:[[24049],256],12081:[[24062],256],12082:[[24178],256],12083:[[24186],256],12084:[[24191],256],12085:[[24308],256],12086:[[24318],256],12087:[[24331],256],12088:[[24339],256],12089:[[24400],256],12090:[[24417],256],12091:[[24435],256],12092:[[24515],256],12093:[[25096],256],12094:[[25142],256],12095:[[25163],256],12096:[[25903],256],12097:[[25908],256],12098:[[25991],256],12099:[[26007],256],12100:[[26020],256],12101:[[26041],256],12102:[[26080],256],12103:[[26085],256],12104:[[26352],256],12105:[[26376],256],12106:[[26408],256],12107:[[27424],256],12108:[[27490],256],12109:[[27513],256],12110:[[27571],256],12111:[[27595],256],12112:[[27604],256],12113:[[27611],256],12114:[[27663],256],12115:[[27668],256],12116:[[27700],256],12117:[[28779],256],12118:[[29226],256],12119:[[29238],256],12120:[[29243],256],12121:[[29247],256],12122:[[29255],256],12123:[[29273],256],12124:[[29275],256],12125:[[29356],256],12126:[[29572],256],12127:[[29577],256],12128:[[29916],256],12129:[[29926],256],12130:[[29976],256],12131:[[29983],256],12132:[[29992],256],12133:[[30000],256],12134:[[30091],256],12135:[[30098],256],12136:[[30326],256],12137:[[30333],256],12138:[[30382],256],12139:[[30399],256],12140:[[30446],256],12141:[[30683],256],12142:[[30690],256],12143:[[30707],256],12144:[[31034],256],12145:[[31160],256],12146:[[31166],256],12147:[[31348],256],12148:[[31435],256],12149:[[31481],256],12150:[[31859],256],12151:[[31992],256],12152:[[32566],256],12153:[[32593],256],12154:[[32650],256],12155:[[32701],256],12156:[[32769],256],12157:[[32780],256],12158:[[32786],256],12159:[[32819],256],12160:[[32895],256],12161:[[32905],256],12162:[[33251],256],12163:[[33258],256],12164:[[33267],256],12165:[[33276],256],12166:[[33292],256],12167:[[33307],256],12168:[[33311],256],12169:[[33390],256],12170:[[33394],256],12171:[[33400],256],12172:[[34381],256],12173:[[34411],256],12174:[[34880],256],12175:[[34892],256],12176:[[34915],256],12177:[[35198],256],12178:[[35211],256],12179:[[35282],256],12180:[[35328],256],12181:[[35895],256],12182:[[35910],256],12183:[[35925],256],12184:[[35960],256],12185:[[35997],256],12186:[[36196],256],12187:[[36208],256],12188:[[36275],256],12189:[[36523],256],12190:[[36554],256],12191:[[36763],256],12192:[[36784],256],12193:[[36789],256],12194:[[37009],256],12195:[[37193],256],12196:[[37318],256],12197:[[37324],256],12198:[[37329],256],12199:[[38263],256],12200:[[38272],256],12201:[[38428],256],12202:[[38582],256],12203:[[38585],256],12204:[[38632],256],12205:[[38737],256],12206:[[38750],256],12207:[[38754],256],12208:[[38761],256],12209:[[38859],256],12210:[[38893],256],12211:[[38899],256],12212:[[38913],256],12213:[[39080],256],12214:[[39131],256],12215:[[39135],256],12216:[[39318],256],12217:[[39321],256],12218:[[39340],256],12219:[[39592],256],12220:[[39640],256],12221:[[39647],256],12222:[[39717],256],12223:[[39727],256],12224:[[39730],256],12225:[[39740],256],12226:[[39770],256],12227:[[40165],256],12228:[[40565],256],12229:[[40575],256],12230:[[40613],256],12231:[[40635],256],12232:[[40643],256],12233:[[40653],256],12234:[[40657],256],12235:[[40697],256],12236:[[40701],256],12237:[[40718],256],12238:[[40723],256],12239:[[40736],256],12240:[[40763],256],12241:[[40778],256],12242:[[40786],256],12243:[[40845],256],12244:[[40860],256],12245:[[40864],256]},
+12288:{12288:[[32],256],12330:[,218],12331:[,228],12332:[,232],12333:[,222],12334:[,224],12335:[,224],12342:[[12306],256],12344:[[21313],256],12345:[[21316],256],12346:[[21317],256],12358:[,,{12441:12436}],12363:[,,{12441:12364}],12364:[[12363,12441]],12365:[,,{12441:12366}],12366:[[12365,12441]],12367:[,,{12441:12368}],12368:[[12367,12441]],12369:[,,{12441:12370}],12370:[[12369,12441]],12371:[,,{12441:12372}],12372:[[12371,12441]],12373:[,,{12441:12374}],12374:[[12373,12441]],12375:[,,{12441:12376}],12376:[[12375,12441]],12377:[,,{12441:12378}],12378:[[12377,12441]],12379:[,,{12441:12380}],12380:[[12379,12441]],12381:[,,{12441:12382}],12382:[[12381,12441]],12383:[,,{12441:12384}],12384:[[12383,12441]],12385:[,,{12441:12386}],12386:[[12385,12441]],12388:[,,{12441:12389}],12389:[[12388,12441]],12390:[,,{12441:12391}],12391:[[12390,12441]],12392:[,,{12441:12393}],12393:[[12392,12441]],12399:[,,{12441:12400,12442:12401}],12400:[[12399,12441]],12401:[[12399,12442]],12402:[,,{12441:12403,12442:12404}],12403:[[12402,12441]],12404:[[12402,12442]],12405:[,,{12441:12406,12442:12407}],12406:[[12405,12441]],12407:[[12405,12442]],12408:[,,{12441:12409,12442:12410}],12409:[[12408,12441]],12410:[[12408,12442]],12411:[,,{12441:12412,12442:12413}],12412:[[12411,12441]],12413:[[12411,12442]],12436:[[12358,12441]],12441:[,8],12442:[,8],12443:[[32,12441],256],12444:[[32,12442],256],12445:[,,{12441:12446}],12446:[[12445,12441]],12447:[[12424,12426],256],12454:[,,{12441:12532}],12459:[,,{12441:12460}],12460:[[12459,12441]],12461:[,,{12441:12462}],12462:[[12461,12441]],12463:[,,{12441:12464}],12464:[[12463,12441]],12465:[,,{12441:12466}],12466:[[12465,12441]],12467:[,,{12441:12468}],12468:[[12467,12441]],12469:[,,{12441:12470}],12470:[[12469,12441]],12471:[,,{12441:12472}],12472:[[12471,12441]],12473:[,,{12441:12474}],12474:[[12473,12441]],12475:[,,{12441:12476}],12476:[[12475,12441]],12477:[,,{12441:12478}],12478:[[12477,12441]],12479:[,,{12441:12480}],12480:[[12479,12441]],12481:[,,{12441:12482}],12482:[[12481,12441]],12484:[,,{12441:12485}],12485:[[12484,12441]],12486:[,,{12441:12487}],12487:[[12486,12441]],12488:[,,{12441:12489}],12489:[[12488,12441]],12495:[,,{12441:12496,12442:12497}],12496:[[12495,12441]],12497:[[12495,12442]],12498:[,,{12441:12499,12442:12500}],12499:[[12498,12441]],12500:[[12498,12442]],12501:[,,{12441:12502,12442:12503}],12502:[[12501,12441]],12503:[[12501,12442]],12504:[,,{12441:12505,12442:12506}],12505:[[12504,12441]],12506:[[12504,12442]],12507:[,,{12441:12508,12442:12509}],12508:[[12507,12441]],12509:[[12507,12442]],12527:[,,{12441:12535}],12528:[,,{12441:12536}],12529:[,,{12441:12537}],12530:[,,{12441:12538}],12532:[[12454,12441]],12535:[[12527,12441]],12536:[[12528,12441]],12537:[[12529,12441]],12538:[[12530,12441]],12541:[,,{12441:12542}],12542:[[12541,12441]],12543:[[12467,12488],256]},
+12544:{12593:[[4352],256],12594:[[4353],256],12595:[[4522],256],12596:[[4354],256],12597:[[4524],256],12598:[[4525],256],12599:[[4355],256],12600:[[4356],256],12601:[[4357],256],12602:[[4528],256],12603:[[4529],256],12604:[[4530],256],12605:[[4531],256],12606:[[4532],256],12607:[[4533],256],12608:[[4378],256],12609:[[4358],256],12610:[[4359],256],12611:[[4360],256],12612:[[4385],256],12613:[[4361],256],12614:[[4362],256],12615:[[4363],256],12616:[[4364],256],12617:[[4365],256],12618:[[4366],256],12619:[[4367],256],12620:[[4368],256],12621:[[4369],256],12622:[[4370],256],12623:[[4449],256],12624:[[4450],256],12625:[[4451],256],12626:[[4452],256],12627:[[4453],256],12628:[[4454],256],12629:[[4455],256],12630:[[4456],256],12631:[[4457],256],12632:[[4458],256],12633:[[4459],256],12634:[[4460],256],12635:[[4461],256],12636:[[4462],256],12637:[[4463],256],12638:[[4464],256],12639:[[4465],256],12640:[[4466],256],12641:[[4467],256],12642:[[4468],256],12643:[[4469],256],12644:[[4448],256],12645:[[4372],256],12646:[[4373],256],12647:[[4551],256],12648:[[4552],256],12649:[[4556],256],12650:[[4558],256],12651:[[4563],256],12652:[[4567],256],12653:[[4569],256],12654:[[4380],256],12655:[[4573],256],12656:[[4575],256],12657:[[4381],256],12658:[[4382],256],12659:[[4384],256],12660:[[4386],256],12661:[[4387],256],12662:[[4391],256],12663:[[4393],256],12664:[[4395],256],12665:[[4396],256],12666:[[4397],256],12667:[[4398],256],12668:[[4399],256],12669:[[4402],256],12670:[[4406],256],12671:[[4416],256],12672:[[4423],256],12673:[[4428],256],12674:[[4593],256],12675:[[4594],256],12676:[[4439],256],12677:[[4440],256],12678:[[4441],256],12679:[[4484],256],12680:[[4485],256],12681:[[4488],256],12682:[[4497],256],12683:[[4498],256],12684:[[4500],256],12685:[[4510],256],12686:[[4513],256],12690:[[19968],256],12691:[[20108],256],12692:[[19977],256],12693:[[22235],256],12694:[[19978],256],12695:[[20013],256],12696:[[19979],256],12697:[[30002],256],12698:[[20057],256],12699:[[19993],256],12700:[[19969],256],12701:[[22825],256],12702:[[22320],256],12703:[[20154],256]},
+12800:{12800:[[40,4352,41],256],12801:[[40,4354,41],256],12802:[[40,4355,41],256],12803:[[40,4357,41],256],12804:[[40,4358,41],256],12805:[[40,4359,41],256],12806:[[40,4361,41],256],12807:[[40,4363,41],256],12808:[[40,4364,41],256],12809:[[40,4366,41],256],12810:[[40,4367,41],256],12811:[[40,4368,41],256],12812:[[40,4369,41],256],12813:[[40,4370,41],256],12814:[[40,4352,4449,41],256],12815:[[40,4354,4449,41],256],12816:[[40,4355,4449,41],256],12817:[[40,4357,4449,41],256],12818:[[40,4358,4449,41],256],12819:[[40,4359,4449,41],256],12820:[[40,4361,4449,41],256],12821:[[40,4363,4449,41],256],12822:[[40,4364,4449,41],256],12823:[[40,4366,4449,41],256],12824:[[40,4367,4449,41],256],12825:[[40,4368,4449,41],256],12826:[[40,4369,4449,41],256],12827:[[40,4370,4449,41],256],12828:[[40,4364,4462,41],256],12829:[[40,4363,4457,4364,4453,4523,41],256],12830:[[40,4363,4457,4370,4462,41],256],12832:[[40,19968,41],256],12833:[[40,20108,41],256],12834:[[40,19977,41],256],12835:[[40,22235,41],256],12836:[[40,20116,41],256],12837:[[40,20845,41],256],12838:[[40,19971,41],256],12839:[[40,20843,41],256],12840:[[40,20061,41],256],12841:[[40,21313,41],256],12842:[[40,26376,41],256],12843:[[40,28779,41],256],12844:[[40,27700,41],256],12845:[[40,26408,41],256],12846:[[40,37329,41],256],12847:[[40,22303,41],256],12848:[[40,26085,41],256],12849:[[40,26666,41],256],12850:[[40,26377,41],256],12851:[[40,31038,41],256],12852:[[40,21517,41],256],12853:[[40,29305,41],256],12854:[[40,36001,41],256],12855:[[40,31069,41],256],12856:[[40,21172,41],256],12857:[[40,20195,41],256],12858:[[40,21628,41],256],12859:[[40,23398,41],256],12860:[[40,30435,41],256],12861:[[40,20225,41],256],12862:[[40,36039,41],256],12863:[[40,21332,41],256],12864:[[40,31085,41],256],12865:[[40,20241,41],256],12866:[[40,33258,41],256],12867:[[40,33267,41],256],12868:[[21839],256],12869:[[24188],256],12870:[[25991],256],12871:[[31631],256],12880:[[80,84,69],256],12881:[[50,49],256],12882:[[50,50],256],12883:[[50,51],256],12884:[[50,52],256],12885:[[50,53],256],12886:[[50,54],256],12887:[[50,55],256],12888:[[50,56],256],12889:[[50,57],256],12890:[[51,48],256],12891:[[51,49],256],12892:[[51,50],256],12893:[[51,51],256],12894:[[51,52],256],12895:[[51,53],256],12896:[[4352],256],12897:[[4354],256],12898:[[4355],256],12899:[[4357],256],12900:[[4358],256],12901:[[4359],256],12902:[[4361],256],12903:[[4363],256],12904:[[4364],256],12905:[[4366],256],12906:[[4367],256],12907:[[4368],256],12908:[[4369],256],12909:[[4370],256],12910:[[4352,4449],256],12911:[[4354,4449],256],12912:[[4355,4449],256],12913:[[4357,4449],256],12914:[[4358,4449],256],12915:[[4359,4449],256],12916:[[4361,4449],256],12917:[[4363,4449],256],12918:[[4364,4449],256],12919:[[4366,4449],256],12920:[[4367,4449],256],12921:[[4368,4449],256],12922:[[4369,4449],256],12923:[[4370,4449],256],12924:[[4366,4449,4535,4352,4457],256],12925:[[4364,4462,4363,4468],256],12926:[[4363,4462],256],12928:[[19968],256],12929:[[20108],256],12930:[[19977],256],12931:[[22235],256],12932:[[20116],256],12933:[[20845],256],12934:[[19971],256],12935:[[20843],256],12936:[[20061],256],12937:[[21313],256],12938:[[26376],256],12939:[[28779],256],12940:[[27700],256],12941:[[26408],256],12942:[[37329],256],12943:[[22303],256],12944:[[26085],256],12945:[[26666],256],12946:[[26377],256],12947:[[31038],256],12948:[[21517],256],12949:[[29305],256],12950:[[36001],256],12951:[[31069],256],12952:[[21172],256],12953:[[31192],256],12954:[[30007],256],12955:[[22899],256],12956:[[36969],256],12957:[[20778],256],12958:[[21360],256],12959:[[27880],256],12960:[[38917],256],12961:[[20241],256],12962:[[20889],256],12963:[[27491],256],12964:[[19978],256],12965:[[20013],256],12966:[[19979],256],12967:[[24038],256],12968:[[21491],256],12969:[[21307],256],12970:[[23447],256],12971:[[23398],256],12972:[[30435],256],12973:[[20225],256],12974:[[36039],256],12975:[[21332],256],12976:[[22812],256],12977:[[51,54],256],12978:[[51,55],256],12979:[[51,56],256],12980:[[51,57],256],12981:[[52,48],256],12982:[[52,49],256],12983:[[52,50],256],12984:[[52,51],256],12985:[[52,52],256],12986:[[52,53],256],12987:[[52,54],256],12988:[[52,55],256],12989:[[52,56],256],12990:[[52,57],256],12991:[[53,48],256],12992:[[49,26376],256],12993:[[50,26376],256],12994:[[51,26376],256],12995:[[52,26376],256],12996:[[53,26376],256],12997:[[54,26376],256],12998:[[55,26376],256],12999:[[56,26376],256],13000:[[57,26376],256],13001:[[49,48,26376],256],13002:[[49,49,26376],256],13003:[[49,50,26376],256],13004:[[72,103],256],13005:[[101,114,103],256],13006:[[101,86],256],13007:[[76,84,68],256],13008:[[12450],256],13009:[[12452],256],13010:[[12454],256],13011:[[12456],256],13012:[[12458],256],13013:[[12459],256],13014:[[12461],256],13015:[[12463],256],13016:[[12465],256],13017:[[12467],256],13018:[[12469],256],13019:[[12471],256],13020:[[12473],256],13021:[[12475],256],13022:[[12477],256],13023:[[12479],256],13024:[[12481],256],13025:[[12484],256],13026:[[12486],256],13027:[[12488],256],13028:[[12490],256],13029:[[12491],256],13030:[[12492],256],13031:[[12493],256],13032:[[12494],256],13033:[[12495],256],13034:[[12498],256],13035:[[12501],256],13036:[[12504],256],13037:[[12507],256],13038:[[12510],256],13039:[[12511],256],13040:[[12512],256],13041:[[12513],256],13042:[[12514],256],13043:[[12516],256],13044:[[12518],256],13045:[[12520],256],13046:[[12521],256],13047:[[12522],256],13048:[[12523],256],13049:[[12524],256],13050:[[12525],256],13051:[[12527],256],13052:[[12528],256],13053:[[12529],256],13054:[[12530],256]},
+13056:{13056:[[12450,12497,12540,12488],256],13057:[[12450,12523,12501,12449],256],13058:[[12450,12531,12506,12450],256],13059:[[12450,12540,12523],256],13060:[[12452,12491,12531,12464],256],13061:[[12452,12531,12481],256],13062:[[12454,12457,12531],256],13063:[[12456,12473,12463,12540,12489],256],13064:[[12456,12540,12459,12540],256],13065:[[12458,12531,12473],256],13066:[[12458,12540,12512],256],13067:[[12459,12452,12522],256],13068:[[12459,12521,12483,12488],256],13069:[[12459,12525,12522,12540],256],13070:[[12460,12525,12531],256],13071:[[12460,12531,12510],256],13072:[[12462,12460],256],13073:[[12462,12491,12540],256],13074:[[12461,12517,12522,12540],256],13075:[[12462,12523,12480,12540],256],13076:[[12461,12525],256],13077:[[12461,12525,12464,12521,12512],256],13078:[[12461,12525,12513,12540,12488,12523],256],13079:[[12461,12525,12527,12483,12488],256],13080:[[12464,12521,12512],256],13081:[[12464,12521,12512,12488,12531],256],13082:[[12463,12523,12476,12452,12525],256],13083:[[12463,12525,12540,12493],256],13084:[[12465,12540,12473],256],13085:[[12467,12523,12490],256],13086:[[12467,12540,12509],256],13087:[[12469,12452,12463,12523],256],13088:[[12469,12531,12481,12540,12512],256],13089:[[12471,12522,12531,12464],256],13090:[[12475,12531,12481],256],13091:[[12475,12531,12488],256],13092:[[12480,12540,12473],256],13093:[[12487,12471],256],13094:[[12489,12523],256],13095:[[12488,12531],256],13096:[[12490,12494],256],13097:[[12494,12483,12488],256],13098:[[12495,12452,12484],256],13099:[[12497,12540,12475,12531,12488],256],13100:[[12497,12540,12484],256],13101:[[12496,12540,12524,12523],256],13102:[[12500,12450,12473,12488,12523],256],13103:[[12500,12463,12523],256],13104:[[12500,12467],256],13105:[[12499,12523],256],13106:[[12501,12449,12521,12483,12489],256],13107:[[12501,12451,12540,12488],256],13108:[[12502,12483,12471,12455,12523],256],13109:[[12501,12521,12531],256],13110:[[12504,12463,12479,12540,12523],256],13111:[[12506,12477],256],13112:[[12506,12491,12498],256],13113:[[12504,12523,12484],256],13114:[[12506,12531,12473],256],13115:[[12506,12540,12472],256],13116:[[12505,12540,12479],256],13117:[[12509,12452,12531,12488],256],13118:[[12508,12523,12488],256],13119:[[12507,12531],256],13120:[[12509,12531,12489],256],13121:[[12507,12540,12523],256],13122:[[12507,12540,12531],256],13123:[[12510,12452,12463,12525],256],13124:[[12510,12452,12523],256],13125:[[12510,12483,12495],256],13126:[[12510,12523,12463],256],13127:[[12510,12531,12471,12519,12531],256],13128:[[12511,12463,12525,12531],256],13129:[[12511,12522],256],13130:[[12511,12522,12496,12540,12523],256],13131:[[12513,12460],256],13132:[[12513,12460,12488,12531],256],13133:[[12513,12540,12488,12523],256],13134:[[12516,12540,12489],256],13135:[[12516,12540,12523],256],13136:[[12518,12450,12531],256],13137:[[12522,12483,12488,12523],256],13138:[[12522,12521],256],13139:[[12523,12500,12540],256],13140:[[12523,12540,12502,12523],256],13141:[[12524,12512],256],13142:[[12524,12531,12488,12466,12531],256],13143:[[12527,12483,12488],256],13144:[[48,28857],256],13145:[[49,28857],256],13146:[[50,28857],256],13147:[[51,28857],256],13148:[[52,28857],256],13149:[[53,28857],256],13150:[[54,28857],256],13151:[[55,28857],256],13152:[[56,28857],256],13153:[[57,28857],256],13154:[[49,48,28857],256],13155:[[49,49,28857],256],13156:[[49,50,28857],256],13157:[[49,51,28857],256],13158:[[49,52,28857],256],13159:[[49,53,28857],256],13160:[[49,54,28857],256],13161:[[49,55,28857],256],13162:[[49,56,28857],256],13163:[[49,57,28857],256],13164:[[50,48,28857],256],13165:[[50,49,28857],256],13166:[[50,50,28857],256],13167:[[50,51,28857],256],13168:[[50,52,28857],256],13169:[[104,80,97],256],13170:[[100,97],256],13171:[[65,85],256],13172:[[98,97,114],256],13173:[[111,86],256],13174:[[112,99],256],13175:[[100,109],256],13176:[[100,109,178],256],13177:[[100,109,179],256],13178:[[73,85],256],13179:[[24179,25104],256],13180:[[26157,21644],256],13181:[[22823,27491],256],13182:[[26126,27835],256],13183:[[26666,24335,20250,31038],256],13184:[[112,65],256],13185:[[110,65],256],13186:[[956,65],256],13187:[[109,65],256],13188:[[107,65],256],13189:[[75,66],256],13190:[[77,66],256],13191:[[71,66],256],13192:[[99,97,108],256],13193:[[107,99,97,108],256],13194:[[112,70],256],13195:[[110,70],256],13196:[[956,70],256],13197:[[956,103],256],13198:[[109,103],256],13199:[[107,103],256],13200:[[72,122],256],13201:[[107,72,122],256],13202:[[77,72,122],256],13203:[[71,72,122],256],13204:[[84,72,122],256],13205:[[956,8467],256],13206:[[109,8467],256],13207:[[100,8467],256],13208:[[107,8467],256],13209:[[102,109],256],13210:[[110,109],256],13211:[[956,109],256],13212:[[109,109],256],13213:[[99,109],256],13214:[[107,109],256],13215:[[109,109,178],256],13216:[[99,109,178],256],13217:[[109,178],256],13218:[[107,109,178],256],13219:[[109,109,179],256],13220:[[99,109,179],256],13221:[[109,179],256],13222:[[107,109,179],256],13223:[[109,8725,115],256],13224:[[109,8725,115,178],256],13225:[[80,97],256],13226:[[107,80,97],256],13227:[[77,80,97],256],13228:[[71,80,97],256],13229:[[114,97,100],256],13230:[[114,97,100,8725,115],256],13231:[[114,97,100,8725,115,178],256],13232:[[112,115],256],13233:[[110,115],256],13234:[[956,115],256],13235:[[109,115],256],13236:[[112,86],256],13237:[[110,86],256],13238:[[956,86],256],13239:[[109,86],256],13240:[[107,86],256],13241:[[77,86],256],13242:[[112,87],256],13243:[[110,87],256],13244:[[956,87],256],13245:[[109,87],256],13246:[[107,87],256],13247:[[77,87],256],13248:[[107,937],256],13249:[[77,937],256],13250:[[97,46,109,46],256],13251:[[66,113],256],13252:[[99,99],256],13253:[[99,100],256],13254:[[67,8725,107,103],256],13255:[[67,111,46],256],13256:[[100,66],256],13257:[[71,121],256],13258:[[104,97],256],13259:[[72,80],256],13260:[[105,110],256],13261:[[75,75],256],13262:[[75,77],256],13263:[[107,116],256],13264:[[108,109],256],13265:[[108,110],256],13266:[[108,111,103],256],13267:[[108,120],256],13268:[[109,98],256],13269:[[109,105,108],256],13270:[[109,111,108],256],13271:[[80,72],256],13272:[[112,46,109,46],256],13273:[[80,80,77],256],13274:[[80,82],256],13275:[[115,114],256],13276:[[83,118],256],13277:[[87,98],256],13278:[[86,8725,109],256],13279:[[65,8725,109],256],13280:[[49,26085],256],13281:[[50,26085],256],13282:[[51,26085],256],13283:[[52,26085],256],13284:[[53,26085],256],13285:[[54,26085],256],13286:[[55,26085],256],13287:[[56,26085],256],13288:[[57,26085],256],13289:[[49,48,26085],256],13290:[[49,49,26085],256],13291:[[49,50,26085],256],13292:[[49,51,26085],256],13293:[[49,52,26085],256],13294:[[49,53,26085],256],13295:[[49,54,26085],256],13296:[[49,55,26085],256],13297:[[49,56,26085],256],13298:[[49,57,26085],256],13299:[[50,48,26085],256],13300:[[50,49,26085],256],13301:[[50,50,26085],256],13302:[[50,51,26085],256],13303:[[50,52,26085],256],13304:[[50,53,26085],256],13305:[[50,54,26085],256],13306:[[50,55,26085],256],13307:[[50,56,26085],256],13308:[[50,57,26085],256],13309:[[51,48,26085],256],13310:[[51,49,26085],256],13311:[[103,97,108],256]},
+27136:{92912:[,1],92913:[,1],92914:[,1],92915:[,1],92916:[,1]},
+27392:{92976:[,230],92977:[,230],92978:[,230],92979:[,230],92980:[,230],92981:[,230],92982:[,230]},
+42496:{42607:[,230],42612:[,230],42613:[,230],42614:[,230],42615:[,230],42616:[,230],42617:[,230],42618:[,230],42619:[,230],42620:[,230],42621:[,230],42652:[[1098],256],42653:[[1100],256],42655:[,230],42736:[,230],42737:[,230]},
+42752:{42864:[[42863],256],43000:[[294],256],43001:[[339],256]},
+43008:{43014:[,9],43204:[,9],43232:[,230],43233:[,230],43234:[,230],43235:[,230],43236:[,230],43237:[,230],43238:[,230],43239:[,230],43240:[,230],43241:[,230],43242:[,230],43243:[,230],43244:[,230],43245:[,230],43246:[,230],43247:[,230],43248:[,230],43249:[,230]},
+43264:{43307:[,220],43308:[,220],43309:[,220],43347:[,9],43443:[,7],43456:[,9]},
+43520:{43696:[,230],43698:[,230],43699:[,230],43700:[,220],43703:[,230],43704:[,230],43710:[,230],43711:[,230],43713:[,230],43766:[,9]},
+43776:{43868:[[42791],256],43869:[[43831],256],43870:[[619],256],43871:[[43858],256],44013:[,9]},
+48128:{113822:[,1]},
+53504:{119134:[[119127,119141],512],119135:[[119128,119141],512],119136:[[119135,119150],512],119137:[[119135,119151],512],119138:[[119135,119152],512],119139:[[119135,119153],512],119140:[[119135,119154],512],119141:[,216],119142:[,216],119143:[,1],119144:[,1],119145:[,1],119149:[,226],119150:[,216],119151:[,216],119152:[,216],119153:[,216],119154:[,216],119163:[,220],119164:[,220],119165:[,220],119166:[,220],119167:[,220],119168:[,220],119169:[,220],119170:[,220],119173:[,230],119174:[,230],119175:[,230],119176:[,230],119177:[,230],119178:[,220],119179:[,220],119210:[,230],119211:[,230],119212:[,230],119213:[,230],119227:[[119225,119141],512],119228:[[119226,119141],512],119229:[[119227,119150],512],119230:[[119228,119150],512],119231:[[119227,119151],512],119232:[[119228,119151],512]},
+53760:{119362:[,230],119363:[,230],119364:[,230]},
+54272:{119808:[[65],256],119809:[[66],256],119810:[[67],256],119811:[[68],256],119812:[[69],256],119813:[[70],256],119814:[[71],256],119815:[[72],256],119816:[[73],256],119817:[[74],256],119818:[[75],256],119819:[[76],256],119820:[[77],256],119821:[[78],256],119822:[[79],256],119823:[[80],256],119824:[[81],256],119825:[[82],256],119826:[[83],256],119827:[[84],256],119828:[[85],256],119829:[[86],256],119830:[[87],256],119831:[[88],256],119832:[[89],256],119833:[[90],256],119834:[[97],256],119835:[[98],256],119836:[[99],256],119837:[[100],256],119838:[[101],256],119839:[[102],256],119840:[[103],256],119841:[[104],256],119842:[[105],256],119843:[[106],256],119844:[[107],256],119845:[[108],256],119846:[[109],256],119847:[[110],256],119848:[[111],256],119849:[[112],256],119850:[[113],256],119851:[[114],256],119852:[[115],256],119853:[[116],256],119854:[[117],256],119855:[[118],256],119856:[[119],256],119857:[[120],256],119858:[[121],256],119859:[[122],256],119860:[[65],256],119861:[[66],256],119862:[[67],256],119863:[[68],256],119864:[[69],256],119865:[[70],256],119866:[[71],256],119867:[[72],256],119868:[[73],256],119869:[[74],256],119870:[[75],256],119871:[[76],256],119872:[[77],256],119873:[[78],256],119874:[[79],256],119875:[[80],256],119876:[[81],256],119877:[[82],256],119878:[[83],256],119879:[[84],256],119880:[[85],256],119881:[[86],256],119882:[[87],256],119883:[[88],256],119884:[[89],256],119885:[[90],256],119886:[[97],256],119887:[[98],256],119888:[[99],256],119889:[[100],256],119890:[[101],256],119891:[[102],256],119892:[[103],256],119894:[[105],256],119895:[[106],256],119896:[[107],256],119897:[[108],256],119898:[[109],256],119899:[[110],256],119900:[[111],256],119901:[[112],256],119902:[[113],256],119903:[[114],256],119904:[[115],256],119905:[[116],256],119906:[[117],256],119907:[[118],256],119908:[[119],256],119909:[[120],256],119910:[[121],256],119911:[[122],256],119912:[[65],256],119913:[[66],256],119914:[[67],256],119915:[[68],256],119916:[[69],256],119917:[[70],256],119918:[[71],256],119919:[[72],256],119920:[[73],256],119921:[[74],256],119922:[[75],256],119923:[[76],256],119924:[[77],256],119925:[[78],256],119926:[[79],256],119927:[[80],256],119928:[[81],256],119929:[[82],256],119930:[[83],256],119931:[[84],256],119932:[[85],256],119933:[[86],256],119934:[[87],256],119935:[[88],256],119936:[[89],256],119937:[[90],256],119938:[[97],256],119939:[[98],256],119940:[[99],256],119941:[[100],256],119942:[[101],256],119943:[[102],256],119944:[[103],256],119945:[[104],256],119946:[[105],256],119947:[[106],256],119948:[[107],256],119949:[[108],256],119950:[[109],256],119951:[[110],256],119952:[[111],256],119953:[[112],256],119954:[[113],256],119955:[[114],256],119956:[[115],256],119957:[[116],256],119958:[[117],256],119959:[[118],256],119960:[[119],256],119961:[[120],256],119962:[[121],256],119963:[[122],256],119964:[[65],256],119966:[[67],256],119967:[[68],256],119970:[[71],256],119973:[[74],256],119974:[[75],256],119977:[[78],256],119978:[[79],256],119979:[[80],256],119980:[[81],256],119982:[[83],256],119983:[[84],256],119984:[[85],256],119985:[[86],256],119986:[[87],256],119987:[[88],256],119988:[[89],256],119989:[[90],256],119990:[[97],256],119991:[[98],256],119992:[[99],256],119993:[[100],256],119995:[[102],256],119997:[[104],256],119998:[[105],256],119999:[[106],256],120000:[[107],256],120001:[[108],256],120002:[[109],256],120003:[[110],256],120005:[[112],256],120006:[[113],256],120007:[[114],256],120008:[[115],256],120009:[[116],256],120010:[[117],256],120011:[[118],256],120012:[[119],256],120013:[[120],256],120014:[[121],256],120015:[[122],256],120016:[[65],256],120017:[[66],256],120018:[[67],256],120019:[[68],256],120020:[[69],256],120021:[[70],256],120022:[[71],256],120023:[[72],256],120024:[[73],256],120025:[[74],256],120026:[[75],256],120027:[[76],256],120028:[[77],256],120029:[[78],256],120030:[[79],256],120031:[[80],256],120032:[[81],256],120033:[[82],256],120034:[[83],256],120035:[[84],256],120036:[[85],256],120037:[[86],256],120038:[[87],256],120039:[[88],256],120040:[[89],256],120041:[[90],256],120042:[[97],256],120043:[[98],256],120044:[[99],256],120045:[[100],256],120046:[[101],256],120047:[[102],256],120048:[[103],256],120049:[[104],256],120050:[[105],256],120051:[[106],256],120052:[[107],256],120053:[[108],256],120054:[[109],256],120055:[[110],256],120056:[[111],256],120057:[[112],256],120058:[[113],256],120059:[[114],256],120060:[[115],256],120061:[[116],256],120062:[[117],256],120063:[[118],256]},
+54528:{120064:[[119],256],120065:[[120],256],120066:[[121],256],120067:[[122],256],120068:[[65],256],120069:[[66],256],120071:[[68],256],120072:[[69],256],120073:[[70],256],120074:[[71],256],120077:[[74],256],120078:[[75],256],120079:[[76],256],120080:[[77],256],120081:[[78],256],120082:[[79],256],120083:[[80],256],120084:[[81],256],120086:[[83],256],120087:[[84],256],120088:[[85],256],120089:[[86],256],120090:[[87],256],120091:[[88],256],120092:[[89],256],120094:[[97],256],120095:[[98],256],120096:[[99],256],120097:[[100],256],120098:[[101],256],120099:[[102],256],120100:[[103],256],120101:[[104],256],120102:[[105],256],120103:[[106],256],120104:[[107],256],120105:[[108],256],120106:[[109],256],120107:[[110],256],120108:[[111],256],120109:[[112],256],120110:[[113],256],120111:[[114],256],120112:[[115],256],120113:[[116],256],120114:[[117],256],120115:[[118],256],120116:[[119],256],120117:[[120],256],120118:[[121],256],120119:[[122],256],120120:[[65],256],120121:[[66],256],120123:[[68],256],120124:[[69],256],120125:[[70],256],120126:[[71],256],120128:[[73],256],120129:[[74],256],120130:[[75],256],120131:[[76],256],120132:[[77],256],120134:[[79],256],120138:[[83],256],120139:[[84],256],120140:[[85],256],120141:[[86],256],120142:[[87],256],120143:[[88],256],120144:[[89],256],120146:[[97],256],120147:[[98],256],120148:[[99],256],120149:[[100],256],120150:[[101],256],120151:[[102],256],120152:[[103],256],120153:[[104],256],120154:[[105],256],120155:[[106],256],120156:[[107],256],120157:[[108],256],120158:[[109],256],120159:[[110],256],120160:[[111],256],120161:[[112],256],120162:[[113],256],120163:[[114],256],120164:[[115],256],120165:[[116],256],120166:[[117],256],120167:[[118],256],120168:[[119],256],120169:[[120],256],120170:[[121],256],120171:[[122],256],120172:[[65],256],120173:[[66],256],120174:[[67],256],120175:[[68],256],120176:[[69],256],120177:[[70],256],120178:[[71],256],120179:[[72],256],120180:[[73],256],120181:[[74],256],120182:[[75],256],120183:[[76],256],120184:[[77],256],120185:[[78],256],120186:[[79],256],120187:[[80],256],120188:[[81],256],120189:[[82],256],120190:[[83],256],120191:[[84],256],120192:[[85],256],120193:[[86],256],120194:[[87],256],120195:[[88],256],120196:[[89],256],120197:[[90],256],120198:[[97],256],120199:[[98],256],120200:[[99],256],120201:[[100],256],120202:[[101],256],120203:[[102],256],120204:[[103],256],120205:[[104],256],120206:[[105],256],120207:[[106],256],120208:[[107],256],120209:[[108],256],120210:[[109],256],120211:[[110],256],120212:[[111],256],120213:[[112],256],120214:[[113],256],120215:[[114],256],120216:[[115],256],120217:[[116],256],120218:[[117],256],120219:[[118],256],120220:[[119],256],120221:[[120],256],120222:[[121],256],120223:[[122],256],120224:[[65],256],120225:[[66],256],120226:[[67],256],120227:[[68],256],120228:[[69],256],120229:[[70],256],120230:[[71],256],120231:[[72],256],120232:[[73],256],120233:[[74],256],120234:[[75],256],120235:[[76],256],120236:[[77],256],120237:[[78],256],120238:[[79],256],120239:[[80],256],120240:[[81],256],120241:[[82],256],120242:[[83],256],120243:[[84],256],120244:[[85],256],120245:[[86],256],120246:[[87],256],120247:[[88],256],120248:[[89],256],120249:[[90],256],120250:[[97],256],120251:[[98],256],120252:[[99],256],120253:[[100],256],120254:[[101],256],120255:[[102],256],120256:[[103],256],120257:[[104],256],120258:[[105],256],120259:[[106],256],120260:[[107],256],120261:[[108],256],120262:[[109],256],120263:[[110],256],120264:[[111],256],120265:[[112],256],120266:[[113],256],120267:[[114],256],120268:[[115],256],120269:[[116],256],120270:[[117],256],120271:[[118],256],120272:[[119],256],120273:[[120],256],120274:[[121],256],120275:[[122],256],120276:[[65],256],120277:[[66],256],120278:[[67],256],120279:[[68],256],120280:[[69],256],120281:[[70],256],120282:[[71],256],120283:[[72],256],120284:[[73],256],120285:[[74],256],120286:[[75],256],120287:[[76],256],120288:[[77],256],120289:[[78],256],120290:[[79],256],120291:[[80],256],120292:[[81],256],120293:[[82],256],120294:[[83],256],120295:[[84],256],120296:[[85],256],120297:[[86],256],120298:[[87],256],120299:[[88],256],120300:[[89],256],120301:[[90],256],120302:[[97],256],120303:[[98],256],120304:[[99],256],120305:[[100],256],120306:[[101],256],120307:[[102],256],120308:[[103],256],120309:[[104],256],120310:[[105],256],120311:[[106],256],120312:[[107],256],120313:[[108],256],120314:[[109],256],120315:[[110],256],120316:[[111],256],120317:[[112],256],120318:[[113],256],120319:[[114],256]},
+54784:{120320:[[115],256],120321:[[116],256],120322:[[117],256],120323:[[118],256],120324:[[119],256],120325:[[120],256],120326:[[121],256],120327:[[122],256],120328:[[65],256],120329:[[66],256],120330:[[67],256],120331:[[68],256],120332:[[69],256],120333:[[70],256],120334:[[71],256],120335:[[72],256],120336:[[73],256],120337:[[74],256],120338:[[75],256],120339:[[76],256],120340:[[77],256],120341:[[78],256],120342:[[79],256],120343:[[80],256],120344:[[81],256],120345:[[82],256],120346:[[83],256],120347:[[84],256],120348:[[85],256],120349:[[86],256],120350:[[87],256],120351:[[88],256],120352:[[89],256],120353:[[90],256],120354:[[97],256],120355:[[98],256],120356:[[99],256],120357:[[100],256],120358:[[101],256],120359:[[102],256],120360:[[103],256],120361:[[104],256],120362:[[105],256],120363:[[106],256],120364:[[107],256],120365:[[108],256],120366:[[109],256],120367:[[110],256],120368:[[111],256],120369:[[112],256],120370:[[113],256],120371:[[114],256],120372:[[115],256],120373:[[116],256],120374:[[117],256],120375:[[118],256],120376:[[119],256],120377:[[120],256],120378:[[121],256],120379:[[122],256],120380:[[65],256],120381:[[66],256],120382:[[67],256],120383:[[68],256],120384:[[69],256],120385:[[70],256],120386:[[71],256],120387:[[72],256],120388:[[73],256],120389:[[74],256],120390:[[75],256],120391:[[76],256],120392:[[77],256],120393:[[78],256],120394:[[79],256],120395:[[80],256],120396:[[81],256],120397:[[82],256],120398:[[83],256],120399:[[84],256],120400:[[85],256],120401:[[86],256],120402:[[87],256],120403:[[88],256],120404:[[89],256],120405:[[90],256],120406:[[97],256],120407:[[98],256],120408:[[99],256],120409:[[100],256],120410:[[101],256],120411:[[102],256],120412:[[103],256],120413:[[104],256],120414:[[105],256],120415:[[106],256],120416:[[107],256],120417:[[108],256],120418:[[109],256],120419:[[110],256],120420:[[111],256],120421:[[112],256],120422:[[113],256],120423:[[114],256],120424:[[115],256],120425:[[116],256],120426:[[117],256],120427:[[118],256],120428:[[119],256],120429:[[120],256],120430:[[121],256],120431:[[122],256],120432:[[65],256],120433:[[66],256],120434:[[67],256],120435:[[68],256],120436:[[69],256],120437:[[70],256],120438:[[71],256],120439:[[72],256],120440:[[73],256],120441:[[74],256],120442:[[75],256],120443:[[76],256],120444:[[77],256],120445:[[78],256],120446:[[79],256],120447:[[80],256],120448:[[81],256],120449:[[82],256],120450:[[83],256],120451:[[84],256],120452:[[85],256],120453:[[86],256],120454:[[87],256],120455:[[88],256],120456:[[89],256],120457:[[90],256],120458:[[97],256],120459:[[98],256],120460:[[99],256],120461:[[100],256],120462:[[101],256],120463:[[102],256],120464:[[103],256],120465:[[104],256],120466:[[105],256],120467:[[106],256],120468:[[107],256],120469:[[108],256],120470:[[109],256],120471:[[110],256],120472:[[111],256],120473:[[112],256],120474:[[113],256],120475:[[114],256],120476:[[115],256],120477:[[116],256],120478:[[117],256],120479:[[118],256],120480:[[119],256],120481:[[120],256],120482:[[121],256],120483:[[122],256],120484:[[305],256],120485:[[567],256],120488:[[913],256],120489:[[914],256],120490:[[915],256],120491:[[916],256],120492:[[917],256],120493:[[918],256],120494:[[919],256],120495:[[920],256],120496:[[921],256],120497:[[922],256],120498:[[923],256],120499:[[924],256],120500:[[925],256],120501:[[926],256],120502:[[927],256],120503:[[928],256],120504:[[929],256],120505:[[1012],256],120506:[[931],256],120507:[[932],256],120508:[[933],256],120509:[[934],256],120510:[[935],256],120511:[[936],256],120512:[[937],256],120513:[[8711],256],120514:[[945],256],120515:[[946],256],120516:[[947],256],120517:[[948],256],120518:[[949],256],120519:[[950],256],120520:[[951],256],120521:[[952],256],120522:[[953],256],120523:[[954],256],120524:[[955],256],120525:[[956],256],120526:[[957],256],120527:[[958],256],120528:[[959],256],120529:[[960],256],120530:[[961],256],120531:[[962],256],120532:[[963],256],120533:[[964],256],120534:[[965],256],120535:[[966],256],120536:[[967],256],120537:[[968],256],120538:[[969],256],120539:[[8706],256],120540:[[1013],256],120541:[[977],256],120542:[[1008],256],120543:[[981],256],120544:[[1009],256],120545:[[982],256],120546:[[913],256],120547:[[914],256],120548:[[915],256],120549:[[916],256],120550:[[917],256],120551:[[918],256],120552:[[919],256],120553:[[920],256],120554:[[921],256],120555:[[922],256],120556:[[923],256],120557:[[924],256],120558:[[925],256],120559:[[926],256],120560:[[927],256],120561:[[928],256],120562:[[929],256],120563:[[1012],256],120564:[[931],256],120565:[[932],256],120566:[[933],256],120567:[[934],256],120568:[[935],256],120569:[[936],256],120570:[[937],256],120571:[[8711],256],120572:[[945],256],120573:[[946],256],120574:[[947],256],120575:[[948],256]},
+55040:{120576:[[949],256],120577:[[950],256],120578:[[951],256],120579:[[952],256],120580:[[953],256],120581:[[954],256],120582:[[955],256],120583:[[956],256],120584:[[957],256],120585:[[958],256],120586:[[959],256],120587:[[960],256],120588:[[961],256],120589:[[962],256],120590:[[963],256],120591:[[964],256],120592:[[965],256],120593:[[966],256],120594:[[967],256],120595:[[968],256],120596:[[969],256],120597:[[8706],256],120598:[[1013],256],120599:[[977],256],120600:[[1008],256],120601:[[981],256],120602:[[1009],256],120603:[[982],256],120604:[[913],256],120605:[[914],256],120606:[[915],256],120607:[[916],256],120608:[[917],256],120609:[[918],256],120610:[[919],256],120611:[[920],256],120612:[[921],256],120613:[[922],256],120614:[[923],256],120615:[[924],256],120616:[[925],256],120617:[[926],256],120618:[[927],256],120619:[[928],256],120620:[[929],256],120621:[[1012],256],120622:[[931],256],120623:[[932],256],120624:[[933],256],120625:[[934],256],120626:[[935],256],120627:[[936],256],120628:[[937],256],120629:[[8711],256],120630:[[945],256],120631:[[946],256],120632:[[947],256],120633:[[948],256],120634:[[949],256],120635:[[950],256],120636:[[951],256],120637:[[952],256],120638:[[953],256],120639:[[954],256],120640:[[955],256],120641:[[956],256],120642:[[957],256],120643:[[958],256],120644:[[959],256],120645:[[960],256],120646:[[961],256],120647:[[962],256],120648:[[963],256],120649:[[964],256],120650:[[965],256],120651:[[966],256],120652:[[967],256],120653:[[968],256],120654:[[969],256],120655:[[8706],256],120656:[[1013],256],120657:[[977],256],120658:[[1008],256],120659:[[981],256],120660:[[1009],256],120661:[[982],256],120662:[[913],256],120663:[[914],256],120664:[[915],256],120665:[[916],256],120666:[[917],256],120667:[[918],256],120668:[[919],256],120669:[[920],256],120670:[[921],256],120671:[[922],256],120672:[[923],256],120673:[[924],256],120674:[[925],256],120675:[[926],256],120676:[[927],256],120677:[[928],256],120678:[[929],256],120679:[[1012],256],120680:[[931],256],120681:[[932],256],120682:[[933],256],120683:[[934],256],120684:[[935],256],120685:[[936],256],120686:[[937],256],120687:[[8711],256],120688:[[945],256],120689:[[946],256],120690:[[947],256],120691:[[948],256],120692:[[949],256],120693:[[950],256],120694:[[951],256],120695:[[952],256],120696:[[953],256],120697:[[954],256],120698:[[955],256],120699:[[956],256],120700:[[957],256],120701:[[958],256],120702:[[959],256],120703:[[960],256],120704:[[961],256],120705:[[962],256],120706:[[963],256],120707:[[964],256],120708:[[965],256],120709:[[966],256],120710:[[967],256],120711:[[968],256],120712:[[969],256],120713:[[8706],256],120714:[[1013],256],120715:[[977],256],120716:[[1008],256],120717:[[981],256],120718:[[1009],256],120719:[[982],256],120720:[[913],256],120721:[[914],256],120722:[[915],256],120723:[[916],256],120724:[[917],256],120725:[[918],256],120726:[[919],256],120727:[[920],256],120728:[[921],256],120729:[[922],256],120730:[[923],256],120731:[[924],256],120732:[[925],256],120733:[[926],256],120734:[[927],256],120735:[[928],256],120736:[[929],256],120737:[[1012],256],120738:[[931],256],120739:[[932],256],120740:[[933],256],120741:[[934],256],120742:[[935],256],120743:[[936],256],120744:[[937],256],120745:[[8711],256],120746:[[945],256],120747:[[946],256],120748:[[947],256],120749:[[948],256],120750:[[949],256],120751:[[950],256],120752:[[951],256],120753:[[952],256],120754:[[953],256],120755:[[954],256],120756:[[955],256],120757:[[956],256],120758:[[957],256],120759:[[958],256],120760:[[959],256],120761:[[960],256],120762:[[961],256],120763:[[962],256],120764:[[963],256],120765:[[964],256],120766:[[965],256],120767:[[966],256],120768:[[967],256],120769:[[968],256],120770:[[969],256],120771:[[8706],256],120772:[[1013],256],120773:[[977],256],120774:[[1008],256],120775:[[981],256],120776:[[1009],256],120777:[[982],256],120778:[[988],256],120779:[[989],256],120782:[[48],256],120783:[[49],256],120784:[[50],256],120785:[[51],256],120786:[[52],256],120787:[[53],256],120788:[[54],256],120789:[[55],256],120790:[[56],256],120791:[[57],256],120792:[[48],256],120793:[[49],256],120794:[[50],256],120795:[[51],256],120796:[[52],256],120797:[[53],256],120798:[[54],256],120799:[[55],256],120800:[[56],256],120801:[[57],256],120802:[[48],256],120803:[[49],256],120804:[[50],256],120805:[[51],256],120806:[[52],256],120807:[[53],256],120808:[[54],256],120809:[[55],256],120810:[[56],256],120811:[[57],256],120812:[[48],256],120813:[[49],256],120814:[[50],256],120815:[[51],256],120816:[[52],256],120817:[[53],256],120818:[[54],256],120819:[[55],256],120820:[[56],256],120821:[[57],256],120822:[[48],256],120823:[[49],256],120824:[[50],256],120825:[[51],256],120826:[[52],256],120827:[[53],256],120828:[[54],256],120829:[[55],256],120830:[[56],256],120831:[[57],256]},
+59392:{125136:[,220],125137:[,220],125138:[,220],125139:[,220],125140:[,220],125141:[,220],125142:[,220]},
+60928:{126464:[[1575],256],126465:[[1576],256],126466:[[1580],256],126467:[[1583],256],126469:[[1608],256],126470:[[1586],256],126471:[[1581],256],126472:[[1591],256],126473:[[1610],256],126474:[[1603],256],126475:[[1604],256],126476:[[1605],256],126477:[[1606],256],126478:[[1587],256],126479:[[1593],256],126480:[[1601],256],126481:[[1589],256],126482:[[1602],256],126483:[[1585],256],126484:[[1588],256],126485:[[1578],256],126486:[[1579],256],126487:[[1582],256],126488:[[1584],256],126489:[[1590],256],126490:[[1592],256],126491:[[1594],256],126492:[[1646],256],126493:[[1722],256],126494:[[1697],256],126495:[[1647],256],126497:[[1576],256],126498:[[1580],256],126500:[[1607],256],126503:[[1581],256],126505:[[1610],256],126506:[[1603],256],126507:[[1604],256],126508:[[1605],256],126509:[[1606],256],126510:[[1587],256],126511:[[1593],256],126512:[[1601],256],126513:[[1589],256],126514:[[1602],256],126516:[[1588],256],126517:[[1578],256],126518:[[1579],256],126519:[[1582],256],126521:[[1590],256],126523:[[1594],256],126530:[[1580],256],126535:[[1581],256],126537:[[1610],256],126539:[[1604],256],126541:[[1606],256],126542:[[1587],256],126543:[[1593],256],126545:[[1589],256],126546:[[1602],256],126548:[[1588],256],126551:[[1582],256],126553:[[1590],256],126555:[[1594],256],126557:[[1722],256],126559:[[1647],256],126561:[[1576],256],126562:[[1580],256],126564:[[1607],256],126567:[[1581],256],126568:[[1591],256],126569:[[1610],256],126570:[[1603],256],126572:[[1605],256],126573:[[1606],256],126574:[[1587],256],126575:[[1593],256],126576:[[1601],256],126577:[[1589],256],126578:[[1602],256],126580:[[1588],256],126581:[[1578],256],126582:[[1579],256],126583:[[1582],256],126585:[[1590],256],126586:[[1592],256],126587:[[1594],256],126588:[[1646],256],126590:[[1697],256],126592:[[1575],256],126593:[[1576],256],126594:[[1580],256],126595:[[1583],256],126596:[[1607],256],126597:[[1608],256],126598:[[1586],256],126599:[[1581],256],126600:[[1591],256],126601:[[1610],256],126603:[[1604],256],126604:[[1605],256],126605:[[1606],256],126606:[[1587],256],126607:[[1593],256],126608:[[1601],256],126609:[[1589],256],126610:[[1602],256],126611:[[1585],256],126612:[[1588],256],126613:[[1578],256],126614:[[1579],256],126615:[[1582],256],126616:[[1584],256],126617:[[1590],256],126618:[[1592],256],126619:[[1594],256],126625:[[1576],256],126626:[[1580],256],126627:[[1583],256],126629:[[1608],256],126630:[[1586],256],126631:[[1581],256],126632:[[1591],256],126633:[[1610],256],126635:[[1604],256],126636:[[1605],256],126637:[[1606],256],126638:[[1587],256],126639:[[1593],256],126640:[[1601],256],126641:[[1589],256],126642:[[1602],256],126643:[[1585],256],126644:[[1588],256],126645:[[1578],256],126646:[[1579],256],126647:[[1582],256],126648:[[1584],256],126649:[[1590],256],126650:[[1592],256],126651:[[1594],256]},
+61696:{127232:[[48,46],256],127233:[[48,44],256],127234:[[49,44],256],127235:[[50,44],256],127236:[[51,44],256],127237:[[52,44],256],127238:[[53,44],256],127239:[[54,44],256],127240:[[55,44],256],127241:[[56,44],256],127242:[[57,44],256],127248:[[40,65,41],256],127249:[[40,66,41],256],127250:[[40,67,41],256],127251:[[40,68,41],256],127252:[[40,69,41],256],127253:[[40,70,41],256],127254:[[40,71,41],256],127255:[[40,72,41],256],127256:[[40,73,41],256],127257:[[40,74,41],256],127258:[[40,75,41],256],127259:[[40,76,41],256],127260:[[40,77,41],256],127261:[[40,78,41],256],127262:[[40,79,41],256],127263:[[40,80,41],256],127264:[[40,81,41],256],127265:[[40,82,41],256],127266:[[40,83,41],256],127267:[[40,84,41],256],127268:[[40,85,41],256],127269:[[40,86,41],256],127270:[[40,87,41],256],127271:[[40,88,41],256],127272:[[40,89,41],256],127273:[[40,90,41],256],127274:[[12308,83,12309],256],127275:[[67],256],127276:[[82],256],127277:[[67,68],256],127278:[[87,90],256],127280:[[65],256],127281:[[66],256],127282:[[67],256],127283:[[68],256],127284:[[69],256],127285:[[70],256],127286:[[71],256],127287:[[72],256],127288:[[73],256],127289:[[74],256],127290:[[75],256],127291:[[76],256],127292:[[77],256],127293:[[78],256],127294:[[79],256],127295:[[80],256],127296:[[81],256],127297:[[82],256],127298:[[83],256],127299:[[84],256],127300:[[85],256],127301:[[86],256],127302:[[87],256],127303:[[88],256],127304:[[89],256],127305:[[90],256],127306:[[72,86],256],127307:[[77,86],256],127308:[[83,68],256],127309:[[83,83],256],127310:[[80,80,86],256],127311:[[87,67],256],127338:[[77,67],256],127339:[[77,68],256],127376:[[68,74],256]},
+61952:{127488:[[12411,12363],256],127489:[[12467,12467],256],127490:[[12469],256],127504:[[25163],256],127505:[[23383],256],127506:[[21452],256],127507:[[12487],256],127508:[[20108],256],127509:[[22810],256],127510:[[35299],256],127511:[[22825],256],127512:[[20132],256],127513:[[26144],256],127514:[[28961],256],127515:[[26009],256],127516:[[21069],256],127517:[[24460],256],127518:[[20877],256],127519:[[26032],256],127520:[[21021],256],127521:[[32066],256],127522:[[29983],256],127523:[[36009],256],127524:[[22768],256],127525:[[21561],256],127526:[[28436],256],127527:[[25237],256],127528:[[25429],256],127529:[[19968],256],127530:[[19977],256],127531:[[36938],256],127532:[[24038],256],127533:[[20013],256],127534:[[21491],256],127535:[[25351],256],127536:[[36208],256],127537:[[25171],256],127538:[[31105],256],127539:[[31354],256],127540:[[21512],256],127541:[[28288],256],127542:[[26377],256],127543:[[26376],256],127544:[[30003],256],127545:[[21106],256],127546:[[21942],256],127552:[[12308,26412,12309],256],127553:[[12308,19977,12309],256],127554:[[12308,20108,12309],256],127555:[[12308,23433,12309],256],127556:[[12308,28857,12309],256],127557:[[12308,25171,12309],256],127558:[[12308,30423,12309],256],127559:[[12308,21213,12309],256],127560:[[12308,25943,12309],256],127568:[[24471],256],127569:[[21487],256]},
+63488:{194560:[[20029]],194561:[[20024]],194562:[[20033]],194563:[[131362]],194564:[[20320]],194565:[[20398]],194566:[[20411]],194567:[[20482]],194568:[[20602]],194569:[[20633]],194570:[[20711]],194571:[[20687]],194572:[[13470]],194573:[[132666]],194574:[[20813]],194575:[[20820]],194576:[[20836]],194577:[[20855]],194578:[[132380]],194579:[[13497]],194580:[[20839]],194581:[[20877]],194582:[[132427]],194583:[[20887]],194584:[[20900]],194585:[[20172]],194586:[[20908]],194587:[[20917]],194588:[[168415]],194589:[[20981]],194590:[[20995]],194591:[[13535]],194592:[[21051]],194593:[[21062]],194594:[[21106]],194595:[[21111]],194596:[[13589]],194597:[[21191]],194598:[[21193]],194599:[[21220]],194600:[[21242]],194601:[[21253]],194602:[[21254]],194603:[[21271]],194604:[[21321]],194605:[[21329]],194606:[[21338]],194607:[[21363]],194608:[[21373]],194609:[[21375]],194610:[[21375]],194611:[[21375]],194612:[[133676]],194613:[[28784]],194614:[[21450]],194615:[[21471]],194616:[[133987]],194617:[[21483]],194618:[[21489]],194619:[[21510]],194620:[[21662]],194621:[[21560]],194622:[[21576]],194623:[[21608]],194624:[[21666]],194625:[[21750]],194626:[[21776]],194627:[[21843]],194628:[[21859]],194629:[[21892]],194630:[[21892]],194631:[[21913]],194632:[[21931]],194633:[[21939]],194634:[[21954]],194635:[[22294]],194636:[[22022]],194637:[[22295]],194638:[[22097]],194639:[[22132]],194640:[[20999]],194641:[[22766]],194642:[[22478]],194643:[[22516]],194644:[[22541]],194645:[[22411]],194646:[[22578]],194647:[[22577]],194648:[[22700]],194649:[[136420]],194650:[[22770]],194651:[[22775]],194652:[[22790]],194653:[[22810]],194654:[[22818]],194655:[[22882]],194656:[[136872]],194657:[[136938]],194658:[[23020]],194659:[[23067]],194660:[[23079]],194661:[[23000]],194662:[[23142]],194663:[[14062]],194664:[[14076]],194665:[[23304]],194666:[[23358]],194667:[[23358]],194668:[[137672]],194669:[[23491]],194670:[[23512]],194671:[[23527]],194672:[[23539]],194673:[[138008]],194674:[[23551]],194675:[[23558]],194676:[[24403]],194677:[[23586]],194678:[[14209]],194679:[[23648]],194680:[[23662]],194681:[[23744]],194682:[[23693]],194683:[[138724]],194684:[[23875]],194685:[[138726]],194686:[[23918]],194687:[[23915]],194688:[[23932]],194689:[[24033]],194690:[[24034]],194691:[[14383]],194692:[[24061]],194693:[[24104]],194694:[[24125]],194695:[[24169]],194696:[[14434]],194697:[[139651]],194698:[[14460]],194699:[[24240]],194700:[[24243]],194701:[[24246]],194702:[[24266]],194703:[[172946]],194704:[[24318]],194705:[[140081]],194706:[[140081]],194707:[[33281]],194708:[[24354]],194709:[[24354]],194710:[[14535]],194711:[[144056]],194712:[[156122]],194713:[[24418]],194714:[[24427]],194715:[[14563]],194716:[[24474]],194717:[[24525]],194718:[[24535]],194719:[[24569]],194720:[[24705]],194721:[[14650]],194722:[[14620]],194723:[[24724]],194724:[[141012]],194725:[[24775]],194726:[[24904]],194727:[[24908]],194728:[[24910]],194729:[[24908]],194730:[[24954]],194731:[[24974]],194732:[[25010]],194733:[[24996]],194734:[[25007]],194735:[[25054]],194736:[[25074]],194737:[[25078]],194738:[[25104]],194739:[[25115]],194740:[[25181]],194741:[[25265]],194742:[[25300]],194743:[[25424]],194744:[[142092]],194745:[[25405]],194746:[[25340]],194747:[[25448]],194748:[[25475]],194749:[[25572]],194750:[[142321]],194751:[[25634]],194752:[[25541]],194753:[[25513]],194754:[[14894]],194755:[[25705]],194756:[[25726]],194757:[[25757]],194758:[[25719]],194759:[[14956]],194760:[[25935]],194761:[[25964]],194762:[[143370]],194763:[[26083]],194764:[[26360]],194765:[[26185]],194766:[[15129]],194767:[[26257]],194768:[[15112]],194769:[[15076]],194770:[[20882]],194771:[[20885]],194772:[[26368]],194773:[[26268]],194774:[[32941]],194775:[[17369]],194776:[[26391]],194777:[[26395]],194778:[[26401]],194779:[[26462]],194780:[[26451]],194781:[[144323]],194782:[[15177]],194783:[[26618]],194784:[[26501]],194785:[[26706]],194786:[[26757]],194787:[[144493]],194788:[[26766]],194789:[[26655]],194790:[[26900]],194791:[[15261]],194792:[[26946]],194793:[[27043]],194794:[[27114]],194795:[[27304]],194796:[[145059]],194797:[[27355]],194798:[[15384]],194799:[[27425]],194800:[[145575]],194801:[[27476]],194802:[[15438]],194803:[[27506]],194804:[[27551]],194805:[[27578]],194806:[[27579]],194807:[[146061]],194808:[[138507]],194809:[[146170]],194810:[[27726]],194811:[[146620]],194812:[[27839]],194813:[[27853]],194814:[[27751]],194815:[[27926]]},
+63744:{63744:[[35912]],63745:[[26356]],63746:[[36554]],63747:[[36040]],63748:[[28369]],63749:[[20018]],63750:[[21477]],63751:[[40860]],63752:[[40860]],63753:[[22865]],63754:[[37329]],63755:[[21895]],63756:[[22856]],63757:[[25078]],63758:[[30313]],63759:[[32645]],63760:[[34367]],63761:[[34746]],63762:[[35064]],63763:[[37007]],63764:[[27138]],63765:[[27931]],63766:[[28889]],63767:[[29662]],63768:[[33853]],63769:[[37226]],63770:[[39409]],63771:[[20098]],63772:[[21365]],63773:[[27396]],63774:[[29211]],63775:[[34349]],63776:[[40478]],63777:[[23888]],63778:[[28651]],63779:[[34253]],63780:[[35172]],63781:[[25289]],63782:[[33240]],63783:[[34847]],63784:[[24266]],63785:[[26391]],63786:[[28010]],63787:[[29436]],63788:[[37070]],63789:[[20358]],63790:[[20919]],63791:[[21214]],63792:[[25796]],63793:[[27347]],63794:[[29200]],63795:[[30439]],63796:[[32769]],63797:[[34310]],63798:[[34396]],63799:[[36335]],63800:[[38706]],63801:[[39791]],63802:[[40442]],63803:[[30860]],63804:[[31103]],63805:[[32160]],63806:[[33737]],63807:[[37636]],63808:[[40575]],63809:[[35542]],63810:[[22751]],63811:[[24324]],63812:[[31840]],63813:[[32894]],63814:[[29282]],63815:[[30922]],63816:[[36034]],63817:[[38647]],63818:[[22744]],63819:[[23650]],63820:[[27155]],63821:[[28122]],63822:[[28431]],63823:[[32047]],63824:[[32311]],63825:[[38475]],63826:[[21202]],63827:[[32907]],63828:[[20956]],63829:[[20940]],63830:[[31260]],63831:[[32190]],63832:[[33777]],63833:[[38517]],63834:[[35712]],63835:[[25295]],63836:[[27138]],63837:[[35582]],63838:[[20025]],63839:[[23527]],63840:[[24594]],63841:[[29575]],63842:[[30064]],63843:[[21271]],63844:[[30971]],63845:[[20415]],63846:[[24489]],63847:[[19981]],63848:[[27852]],63849:[[25976]],63850:[[32034]],63851:[[21443]],63852:[[22622]],63853:[[30465]],63854:[[33865]],63855:[[35498]],63856:[[27578]],63857:[[36784]],63858:[[27784]],63859:[[25342]],63860:[[33509]],63861:[[25504]],63862:[[30053]],63863:[[20142]],63864:[[20841]],63865:[[20937]],63866:[[26753]],63867:[[31975]],63868:[[33391]],63869:[[35538]],63870:[[37327]],63871:[[21237]],63872:[[21570]],63873:[[22899]],63874:[[24300]],63875:[[26053]],63876:[[28670]],63877:[[31018]],63878:[[38317]],63879:[[39530]],63880:[[40599]],63881:[[40654]],63882:[[21147]],63883:[[26310]],63884:[[27511]],63885:[[36706]],63886:[[24180]],63887:[[24976]],63888:[[25088]],63889:[[25754]],63890:[[28451]],63891:[[29001]],63892:[[29833]],63893:[[31178]],63894:[[32244]],63895:[[32879]],63896:[[36646]],63897:[[34030]],63898:[[36899]],63899:[[37706]],63900:[[21015]],63901:[[21155]],63902:[[21693]],63903:[[28872]],63904:[[35010]],63905:[[35498]],63906:[[24265]],63907:[[24565]],63908:[[25467]],63909:[[27566]],63910:[[31806]],63911:[[29557]],63912:[[20196]],63913:[[22265]],63914:[[23527]],63915:[[23994]],63916:[[24604]],63917:[[29618]],63918:[[29801]],63919:[[32666]],63920:[[32838]],63921:[[37428]],63922:[[38646]],63923:[[38728]],63924:[[38936]],63925:[[20363]],63926:[[31150]],63927:[[37300]],63928:[[38584]],63929:[[24801]],63930:[[20102]],63931:[[20698]],63932:[[23534]],63933:[[23615]],63934:[[26009]],63935:[[27138]],63936:[[29134]],63937:[[30274]],63938:[[34044]],63939:[[36988]],63940:[[40845]],63941:[[26248]],63942:[[38446]],63943:[[21129]],63944:[[26491]],63945:[[26611]],63946:[[27969]],63947:[[28316]],63948:[[29705]],63949:[[30041]],63950:[[30827]],63951:[[32016]],63952:[[39006]],63953:[[20845]],63954:[[25134]],63955:[[38520]],63956:[[20523]],63957:[[23833]],63958:[[28138]],63959:[[36650]],63960:[[24459]],63961:[[24900]],63962:[[26647]],63963:[[29575]],63964:[[38534]],63965:[[21033]],63966:[[21519]],63967:[[23653]],63968:[[26131]],63969:[[26446]],63970:[[26792]],63971:[[27877]],63972:[[29702]],63973:[[30178]],63974:[[32633]],63975:[[35023]],63976:[[35041]],63977:[[37324]],63978:[[38626]],63979:[[21311]],63980:[[28346]],63981:[[21533]],63982:[[29136]],63983:[[29848]],63984:[[34298]],63985:[[38563]],63986:[[40023]],63987:[[40607]],63988:[[26519]],63989:[[28107]],63990:[[33256]],63991:[[31435]],63992:[[31520]],63993:[[31890]],63994:[[29376]],63995:[[28825]],63996:[[35672]],63997:[[20160]],63998:[[33590]],63999:[[21050]],194816:[[27966]],194817:[[28023]],194818:[[27969]],194819:[[28009]],194820:[[28024]],194821:[[28037]],194822:[[146718]],194823:[[27956]],194824:[[28207]],194825:[[28270]],194826:[[15667]],194827:[[28363]],194828:[[28359]],194829:[[147153]],194830:[[28153]],194831:[[28526]],194832:[[147294]],194833:[[147342]],194834:[[28614]],194835:[[28729]],194836:[[28702]],194837:[[28699]],194838:[[15766]],194839:[[28746]],194840:[[28797]],194841:[[28791]],194842:[[28845]],194843:[[132389]],194844:[[28997]],194845:[[148067]],194846:[[29084]],194847:[[148395]],194848:[[29224]],194849:[[29237]],194850:[[29264]],194851:[[149000]],194852:[[29312]],194853:[[29333]],194854:[[149301]],194855:[[149524]],194856:[[29562]],194857:[[29579]],194858:[[16044]],194859:[[29605]],194860:[[16056]],194861:[[16056]],194862:[[29767]],194863:[[29788]],194864:[[29809]],194865:[[29829]],194866:[[29898]],194867:[[16155]],194868:[[29988]],194869:[[150582]],194870:[[30014]],194871:[[150674]],194872:[[30064]],194873:[[139679]],194874:[[30224]],194875:[[151457]],194876:[[151480]],194877:[[151620]],194878:[[16380]],194879:[[16392]],194880:[[30452]],194881:[[151795]],194882:[[151794]],194883:[[151833]],194884:[[151859]],194885:[[30494]],194886:[[30495]],194887:[[30495]],194888:[[30538]],194889:[[16441]],194890:[[30603]],194891:[[16454]],194892:[[16534]],194893:[[152605]],194894:[[30798]],194895:[[30860]],194896:[[30924]],194897:[[16611]],194898:[[153126]],194899:[[31062]],194900:[[153242]],194901:[[153285]],194902:[[31119]],194903:[[31211]],194904:[[16687]],194905:[[31296]],194906:[[31306]],194907:[[31311]],194908:[[153980]],194909:[[154279]],194910:[[154279]],194911:[[31470]],194912:[[16898]],194913:[[154539]],194914:[[31686]],194915:[[31689]],194916:[[16935]],194917:[[154752]],194918:[[31954]],194919:[[17056]],194920:[[31976]],194921:[[31971]],194922:[[32000]],194923:[[155526]],194924:[[32099]],194925:[[17153]],194926:[[32199]],194927:[[32258]],194928:[[32325]],194929:[[17204]],194930:[[156200]],194931:[[156231]],194932:[[17241]],194933:[[156377]],194934:[[32634]],194935:[[156478]],194936:[[32661]],194937:[[32762]],194938:[[32773]],194939:[[156890]],194940:[[156963]],194941:[[32864]],194942:[[157096]],194943:[[32880]],194944:[[144223]],194945:[[17365]],194946:[[32946]],194947:[[33027]],194948:[[17419]],194949:[[33086]],194950:[[23221]],194951:[[157607]],194952:[[157621]],194953:[[144275]],194954:[[144284]],194955:[[33281]],194956:[[33284]],194957:[[36766]],194958:[[17515]],194959:[[33425]],194960:[[33419]],194961:[[33437]],194962:[[21171]],194963:[[33457]],194964:[[33459]],194965:[[33469]],194966:[[33510]],194967:[[158524]],194968:[[33509]],194969:[[33565]],194970:[[33635]],194971:[[33709]],194972:[[33571]],194973:[[33725]],194974:[[33767]],194975:[[33879]],194976:[[33619]],194977:[[33738]],194978:[[33740]],194979:[[33756]],194980:[[158774]],194981:[[159083]],194982:[[158933]],194983:[[17707]],194984:[[34033]],194985:[[34035]],194986:[[34070]],194987:[[160714]],194988:[[34148]],194989:[[159532]],194990:[[17757]],194991:[[17761]],194992:[[159665]],194993:[[159954]],194994:[[17771]],194995:[[34384]],194996:[[34396]],194997:[[34407]],194998:[[34409]],194999:[[34473]],195000:[[34440]],195001:[[34574]],195002:[[34530]],195003:[[34681]],195004:[[34600]],195005:[[34667]],195006:[[34694]],195007:[[17879]],195008:[[34785]],195009:[[34817]],195010:[[17913]],195011:[[34912]],195012:[[34915]],195013:[[161383]],195014:[[35031]],195015:[[35038]],195016:[[17973]],195017:[[35066]],195018:[[13499]],195019:[[161966]],195020:[[162150]],195021:[[18110]],195022:[[18119]],195023:[[35488]],195024:[[35565]],195025:[[35722]],195026:[[35925]],195027:[[162984]],195028:[[36011]],195029:[[36033]],195030:[[36123]],195031:[[36215]],195032:[[163631]],195033:[[133124]],195034:[[36299]],195035:[[36284]],195036:[[36336]],195037:[[133342]],195038:[[36564]],195039:[[36664]],195040:[[165330]],195041:[[165357]],195042:[[37012]],195043:[[37105]],195044:[[37137]],195045:[[165678]],195046:[[37147]],195047:[[37432]],195048:[[37591]],195049:[[37592]],195050:[[37500]],195051:[[37881]],195052:[[37909]],195053:[[166906]],195054:[[38283]],195055:[[18837]],195056:[[38327]],195057:[[167287]],195058:[[18918]],195059:[[38595]],195060:[[23986]],195061:[[38691]],195062:[[168261]],195063:[[168474]],195064:[[19054]],195065:[[19062]],195066:[[38880]],195067:[[168970]],195068:[[19122]],195069:[[169110]],195070:[[38923]],195071:[[38923]]},
+64000:{64000:[[20999]],64001:[[24230]],64002:[[25299]],64003:[[31958]],64004:[[23429]],64005:[[27934]],64006:[[26292]],64007:[[36667]],64008:[[34892]],64009:[[38477]],64010:[[35211]],64011:[[24275]],64012:[[20800]],64013:[[21952]],64016:[[22618]],64018:[[26228]],64021:[[20958]],64022:[[29482]],64023:[[30410]],64024:[[31036]],64025:[[31070]],64026:[[31077]],64027:[[31119]],64028:[[38742]],64029:[[31934]],64030:[[32701]],64032:[[34322]],64034:[[35576]],64037:[[36920]],64038:[[37117]],64042:[[39151]],64043:[[39164]],64044:[[39208]],64045:[[40372]],64046:[[37086]],64047:[[38583]],64048:[[20398]],64049:[[20711]],64050:[[20813]],64051:[[21193]],64052:[[21220]],64053:[[21329]],64054:[[21917]],64055:[[22022]],64056:[[22120]],64057:[[22592]],64058:[[22696]],64059:[[23652]],64060:[[23662]],64061:[[24724]],64062:[[24936]],64063:[[24974]],64064:[[25074]],64065:[[25935]],64066:[[26082]],64067:[[26257]],64068:[[26757]],64069:[[28023]],64070:[[28186]],64071:[[28450]],64072:[[29038]],64073:[[29227]],64074:[[29730]],64075:[[30865]],64076:[[31038]],64077:[[31049]],64078:[[31048]],64079:[[31056]],64080:[[31062]],64081:[[31069]],64082:[[31117]],64083:[[31118]],64084:[[31296]],64085:[[31361]],64086:[[31680]],64087:[[32244]],64088:[[32265]],64089:[[32321]],64090:[[32626]],64091:[[32773]],64092:[[33261]],64093:[[33401]],64094:[[33401]],64095:[[33879]],64096:[[35088]],64097:[[35222]],64098:[[35585]],64099:[[35641]],64100:[[36051]],64101:[[36104]],64102:[[36790]],64103:[[36920]],64104:[[38627]],64105:[[38911]],64106:[[38971]],64107:[[24693]],64108:[[148206]],64109:[[33304]],64112:[[20006]],64113:[[20917]],64114:[[20840]],64115:[[20352]],64116:[[20805]],64117:[[20864]],64118:[[21191]],64119:[[21242]],64120:[[21917]],64121:[[21845]],64122:[[21913]],64123:[[21986]],64124:[[22618]],64125:[[22707]],64126:[[22852]],64127:[[22868]],64128:[[23138]],64129:[[23336]],64130:[[24274]],64131:[[24281]],64132:[[24425]],64133:[[24493]],64134:[[24792]],64135:[[24910]],64136:[[24840]],64137:[[24974]],64138:[[24928]],64139:[[25074]],64140:[[25140]],64141:[[25540]],64142:[[25628]],64143:[[25682]],64144:[[25942]],64145:[[26228]],64146:[[26391]],64147:[[26395]],64148:[[26454]],64149:[[27513]],64150:[[27578]],64151:[[27969]],64152:[[28379]],64153:[[28363]],64154:[[28450]],64155:[[28702]],64156:[[29038]],64157:[[30631]],64158:[[29237]],64159:[[29359]],64160:[[29482]],64161:[[29809]],64162:[[29958]],64163:[[30011]],64164:[[30237]],64165:[[30239]],64166:[[30410]],64167:[[30427]],64168:[[30452]],64169:[[30538]],64170:[[30528]],64171:[[30924]],64172:[[31409]],64173:[[31680]],64174:[[31867]],64175:[[32091]],64176:[[32244]],64177:[[32574]],64178:[[32773]],64179:[[33618]],64180:[[33775]],64181:[[34681]],64182:[[35137]],64183:[[35206]],64184:[[35222]],64185:[[35519]],64186:[[35576]],64187:[[35531]],64188:[[35585]],64189:[[35582]],64190:[[35565]],64191:[[35641]],64192:[[35722]],64193:[[36104]],64194:[[36664]],64195:[[36978]],64196:[[37273]],64197:[[37494]],64198:[[38524]],64199:[[38627]],64200:[[38742]],64201:[[38875]],64202:[[38911]],64203:[[38923]],64204:[[38971]],64205:[[39698]],64206:[[40860]],64207:[[141386]],64208:[[141380]],64209:[[144341]],64210:[[15261]],64211:[[16408]],64212:[[16441]],64213:[[152137]],64214:[[154832]],64215:[[163539]],64216:[[40771]],64217:[[40846]],195072:[[38953]],195073:[[169398]],195074:[[39138]],195075:[[19251]],195076:[[39209]],195077:[[39335]],195078:[[39362]],195079:[[39422]],195080:[[19406]],195081:[[170800]],195082:[[39698]],195083:[[40000]],195084:[[40189]],195085:[[19662]],195086:[[19693]],195087:[[40295]],195088:[[172238]],195089:[[19704]],195090:[[172293]],195091:[[172558]],195092:[[172689]],195093:[[40635]],195094:[[19798]],195095:[[40697]],195096:[[40702]],195097:[[40709]],195098:[[40719]],195099:[[40726]],195100:[[40763]],195101:[[173568]]},
+64256:{64256:[[102,102],256],64257:[[102,105],256],64258:[[102,108],256],64259:[[102,102,105],256],64260:[[102,102,108],256],64261:[[383,116],256],64262:[[115,116],256],64275:[[1396,1398],256],64276:[[1396,1381],256],64277:[[1396,1387],256],64278:[[1406,1398],256],64279:[[1396,1389],256],64285:[[1497,1460],512],64286:[,26],64287:[[1522,1463],512],64288:[[1506],256],64289:[[1488],256],64290:[[1491],256],64291:[[1492],256],64292:[[1499],256],64293:[[1500],256],64294:[[1501],256],64295:[[1512],256],64296:[[1514],256],64297:[[43],256],64298:[[1513,1473],512],64299:[[1513,1474],512],64300:[[64329,1473],512],64301:[[64329,1474],512],64302:[[1488,1463],512],64303:[[1488,1464],512],64304:[[1488,1468],512],64305:[[1489,1468],512],64306:[[1490,1468],512],64307:[[1491,1468],512],64308:[[1492,1468],512],64309:[[1493,1468],512],64310:[[1494,1468],512],64312:[[1496,1468],512],64313:[[1497,1468],512],64314:[[1498,1468],512],64315:[[1499,1468],512],64316:[[1500,1468],512],64318:[[1502,1468],512],64320:[[1504,1468],512],64321:[[1505,1468],512],64323:[[1507,1468],512],64324:[[1508,1468],512],64326:[[1510,1468],512],64327:[[1511,1468],512],64328:[[1512,1468],512],64329:[[1513,1468],512],64330:[[1514,1468],512],64331:[[1493,1465],512],64332:[[1489,1471],512],64333:[[1499,1471],512],64334:[[1508,1471],512],64335:[[1488,1500],256],64336:[[1649],256],64337:[[1649],256],64338:[[1659],256],64339:[[1659],256],64340:[[1659],256],64341:[[1659],256],64342:[[1662],256],64343:[[1662],256],64344:[[1662],256],64345:[[1662],256],64346:[[1664],256],64347:[[1664],256],64348:[[1664],256],64349:[[1664],256],64350:[[1658],256],64351:[[1658],256],64352:[[1658],256],64353:[[1658],256],64354:[[1663],256],64355:[[1663],256],64356:[[1663],256],64357:[[1663],256],64358:[[1657],256],64359:[[1657],256],64360:[[1657],256],64361:[[1657],256],64362:[[1700],256],64363:[[1700],256],64364:[[1700],256],64365:[[1700],256],64366:[[1702],256],64367:[[1702],256],64368:[[1702],256],64369:[[1702],256],64370:[[1668],256],64371:[[1668],256],64372:[[1668],256],64373:[[1668],256],64374:[[1667],256],64375:[[1667],256],64376:[[1667],256],64377:[[1667],256],64378:[[1670],256],64379:[[1670],256],64380:[[1670],256],64381:[[1670],256],64382:[[1671],256],64383:[[1671],256],64384:[[1671],256],64385:[[1671],256],64386:[[1677],256],64387:[[1677],256],64388:[[1676],256],64389:[[1676],256],64390:[[1678],256],64391:[[1678],256],64392:[[1672],256],64393:[[1672],256],64394:[[1688],256],64395:[[1688],256],64396:[[1681],256],64397:[[1681],256],64398:[[1705],256],64399:[[1705],256],64400:[[1705],256],64401:[[1705],256],64402:[[1711],256],64403:[[1711],256],64404:[[1711],256],64405:[[1711],256],64406:[[1715],256],64407:[[1715],256],64408:[[1715],256],64409:[[1715],256],64410:[[1713],256],64411:[[1713],256],64412:[[1713],256],64413:[[1713],256],64414:[[1722],256],64415:[[1722],256],64416:[[1723],256],64417:[[1723],256],64418:[[1723],256],64419:[[1723],256],64420:[[1728],256],64421:[[1728],256],64422:[[1729],256],64423:[[1729],256],64424:[[1729],256],64425:[[1729],256],64426:[[1726],256],64427:[[1726],256],64428:[[1726],256],64429:[[1726],256],64430:[[1746],256],64431:[[1746],256],64432:[[1747],256],64433:[[1747],256],64467:[[1709],256],64468:[[1709],256],64469:[[1709],256],64470:[[1709],256],64471:[[1735],256],64472:[[1735],256],64473:[[1734],256],64474:[[1734],256],64475:[[1736],256],64476:[[1736],256],64477:[[1655],256],64478:[[1739],256],64479:[[1739],256],64480:[[1733],256],64481:[[1733],256],64482:[[1737],256],64483:[[1737],256],64484:[[1744],256],64485:[[1744],256],64486:[[1744],256],64487:[[1744],256],64488:[[1609],256],64489:[[1609],256],64490:[[1574,1575],256],64491:[[1574,1575],256],64492:[[1574,1749],256],64493:[[1574,1749],256],64494:[[1574,1608],256],64495:[[1574,1608],256],64496:[[1574,1735],256],64497:[[1574,1735],256],64498:[[1574,1734],256],64499:[[1574,1734],256],64500:[[1574,1736],256],64501:[[1574,1736],256],64502:[[1574,1744],256],64503:[[1574,1744],256],64504:[[1574,1744],256],64505:[[1574,1609],256],64506:[[1574,1609],256],64507:[[1574,1609],256],64508:[[1740],256],64509:[[1740],256],64510:[[1740],256],64511:[[1740],256]},
+64512:{64512:[[1574,1580],256],64513:[[1574,1581],256],64514:[[1574,1605],256],64515:[[1574,1609],256],64516:[[1574,1610],256],64517:[[1576,1580],256],64518:[[1576,1581],256],64519:[[1576,1582],256],64520:[[1576,1605],256],64521:[[1576,1609],256],64522:[[1576,1610],256],64523:[[1578,1580],256],64524:[[1578,1581],256],64525:[[1578,1582],256],64526:[[1578,1605],256],64527:[[1578,1609],256],64528:[[1578,1610],256],64529:[[1579,1580],256],64530:[[1579,1605],256],64531:[[1579,1609],256],64532:[[1579,1610],256],64533:[[1580,1581],256],64534:[[1580,1605],256],64535:[[1581,1580],256],64536:[[1581,1605],256],64537:[[1582,1580],256],64538:[[1582,1581],256],64539:[[1582,1605],256],64540:[[1587,1580],256],64541:[[1587,1581],256],64542:[[1587,1582],256],64543:[[1587,1605],256],64544:[[1589,1581],256],64545:[[1589,1605],256],64546:[[1590,1580],256],64547:[[1590,1581],256],64548:[[1590,1582],256],64549:[[1590,1605],256],64550:[[1591,1581],256],64551:[[1591,1605],256],64552:[[1592,1605],256],64553:[[1593,1580],256],64554:[[1593,1605],256],64555:[[1594,1580],256],64556:[[1594,1605],256],64557:[[1601,1580],256],64558:[[1601,1581],256],64559:[[1601,1582],256],64560:[[1601,1605],256],64561:[[1601,1609],256],64562:[[1601,1610],256],64563:[[1602,1581],256],64564:[[1602,1605],256],64565:[[1602,1609],256],64566:[[1602,1610],256],64567:[[1603,1575],256],64568:[[1603,1580],256],64569:[[1603,1581],256],64570:[[1603,1582],256],64571:[[1603,1604],256],64572:[[1603,1605],256],64573:[[1603,1609],256],64574:[[1603,1610],256],64575:[[1604,1580],256],64576:[[1604,1581],256],64577:[[1604,1582],256],64578:[[1604,1605],256],64579:[[1604,1609],256],64580:[[1604,1610],256],64581:[[1605,1580],256],64582:[[1605,1581],256],64583:[[1605,1582],256],64584:[[1605,1605],256],64585:[[1605,1609],256],64586:[[1605,1610],256],64587:[[1606,1580],256],64588:[[1606,1581],256],64589:[[1606,1582],256],64590:[[1606,1605],256],64591:[[1606,1609],256],64592:[[1606,1610],256],64593:[[1607,1580],256],64594:[[1607,1605],256],64595:[[1607,1609],256],64596:[[1607,1610],256],64597:[[1610,1580],256],64598:[[1610,1581],256],64599:[[1610,1582],256],64600:[[1610,1605],256],64601:[[1610,1609],256],64602:[[1610,1610],256],64603:[[1584,1648],256],64604:[[1585,1648],256],64605:[[1609,1648],256],64606:[[32,1612,1617],256],64607:[[32,1613,1617],256],64608:[[32,1614,1617],256],64609:[[32,1615,1617],256],64610:[[32,1616,1617],256],64611:[[32,1617,1648],256],64612:[[1574,1585],256],64613:[[1574,1586],256],64614:[[1574,1605],256],64615:[[1574,1606],256],64616:[[1574,1609],256],64617:[[1574,1610],256],64618:[[1576,1585],256],64619:[[1576,1586],256],64620:[[1576,1605],256],64621:[[1576,1606],256],64622:[[1576,1609],256],64623:[[1576,1610],256],64624:[[1578,1585],256],64625:[[1578,1586],256],64626:[[1578,1605],256],64627:[[1578,1606],256],64628:[[1578,1609],256],64629:[[1578,1610],256],64630:[[1579,1585],256],64631:[[1579,1586],256],64632:[[1579,1605],256],64633:[[1579,1606],256],64634:[[1579,1609],256],64635:[[1579,1610],256],64636:[[1601,1609],256],64637:[[1601,1610],256],64638:[[1602,1609],256],64639:[[1602,1610],256],64640:[[1603,1575],256],64641:[[1603,1604],256],64642:[[1603,1605],256],64643:[[1603,1609],256],64644:[[1603,1610],256],64645:[[1604,1605],256],64646:[[1604,1609],256],64647:[[1604,1610],256],64648:[[1605,1575],256],64649:[[1605,1605],256],64650:[[1606,1585],256],64651:[[1606,1586],256],64652:[[1606,1605],256],64653:[[1606,1606],256],64654:[[1606,1609],256],64655:[[1606,1610],256],64656:[[1609,1648],256],64657:[[1610,1585],256],64658:[[1610,1586],256],64659:[[1610,1605],256],64660:[[1610,1606],256],64661:[[1610,1609],256],64662:[[1610,1610],256],64663:[[1574,1580],256],64664:[[1574,1581],256],64665:[[1574,1582],256],64666:[[1574,1605],256],64667:[[1574,1607],256],64668:[[1576,1580],256],64669:[[1576,1581],256],64670:[[1576,1582],256],64671:[[1576,1605],256],64672:[[1576,1607],256],64673:[[1578,1580],256],64674:[[1578,1581],256],64675:[[1578,1582],256],64676:[[1578,1605],256],64677:[[1578,1607],256],64678:[[1579,1605],256],64679:[[1580,1581],256],64680:[[1580,1605],256],64681:[[1581,1580],256],64682:[[1581,1605],256],64683:[[1582,1580],256],64684:[[1582,1605],256],64685:[[1587,1580],256],64686:[[1587,1581],256],64687:[[1587,1582],256],64688:[[1587,1605],256],64689:[[1589,1581],256],64690:[[1589,1582],256],64691:[[1589,1605],256],64692:[[1590,1580],256],64693:[[1590,1581],256],64694:[[1590,1582],256],64695:[[1590,1605],256],64696:[[1591,1581],256],64697:[[1592,1605],256],64698:[[1593,1580],256],64699:[[1593,1605],256],64700:[[1594,1580],256],64701:[[1594,1605],256],64702:[[1601,1580],256],64703:[[1601,1581],256],64704:[[1601,1582],256],64705:[[1601,1605],256],64706:[[1602,1581],256],64707:[[1602,1605],256],64708:[[1603,1580],256],64709:[[1603,1581],256],64710:[[1603,1582],256],64711:[[1603,1604],256],64712:[[1603,1605],256],64713:[[1604,1580],256],64714:[[1604,1581],256],64715:[[1604,1582],256],64716:[[1604,1605],256],64717:[[1604,1607],256],64718:[[1605,1580],256],64719:[[1605,1581],256],64720:[[1605,1582],256],64721:[[1605,1605],256],64722:[[1606,1580],256],64723:[[1606,1581],256],64724:[[1606,1582],256],64725:[[1606,1605],256],64726:[[1606,1607],256],64727:[[1607,1580],256],64728:[[1607,1605],256],64729:[[1607,1648],256],64730:[[1610,1580],256],64731:[[1610,1581],256],64732:[[1610,1582],256],64733:[[1610,1605],256],64734:[[1610,1607],256],64735:[[1574,1605],256],64736:[[1574,1607],256],64737:[[1576,1605],256],64738:[[1576,1607],256],64739:[[1578,1605],256],64740:[[1578,1607],256],64741:[[1579,1605],256],64742:[[1579,1607],256],64743:[[1587,1605],256],64744:[[1587,1607],256],64745:[[1588,1605],256],64746:[[1588,1607],256],64747:[[1603,1604],256],64748:[[1603,1605],256],64749:[[1604,1605],256],64750:[[1606,1605],256],64751:[[1606,1607],256],64752:[[1610,1605],256],64753:[[1610,1607],256],64754:[[1600,1614,1617],256],64755:[[1600,1615,1617],256],64756:[[1600,1616,1617],256],64757:[[1591,1609],256],64758:[[1591,1610],256],64759:[[1593,1609],256],64760:[[1593,1610],256],64761:[[1594,1609],256],64762:[[1594,1610],256],64763:[[1587,1609],256],64764:[[1587,1610],256],64765:[[1588,1609],256],64766:[[1588,1610],256],64767:[[1581,1609],256]},
+64768:{64768:[[1581,1610],256],64769:[[1580,1609],256],64770:[[1580,1610],256],64771:[[1582,1609],256],64772:[[1582,1610],256],64773:[[1589,1609],256],64774:[[1589,1610],256],64775:[[1590,1609],256],64776:[[1590,1610],256],64777:[[1588,1580],256],64778:[[1588,1581],256],64779:[[1588,1582],256],64780:[[1588,1605],256],64781:[[1588,1585],256],64782:[[1587,1585],256],64783:[[1589,1585],256],64784:[[1590,1585],256],64785:[[1591,1609],256],64786:[[1591,1610],256],64787:[[1593,1609],256],64788:[[1593,1610],256],64789:[[1594,1609],256],64790:[[1594,1610],256],64791:[[1587,1609],256],64792:[[1587,1610],256],64793:[[1588,1609],256],64794:[[1588,1610],256],64795:[[1581,1609],256],64796:[[1581,1610],256],64797:[[1580,1609],256],64798:[[1580,1610],256],64799:[[1582,1609],256],64800:[[1582,1610],256],64801:[[1589,1609],256],64802:[[1589,1610],256],64803:[[1590,1609],256],64804:[[1590,1610],256],64805:[[1588,1580],256],64806:[[1588,1581],256],64807:[[1588,1582],256],64808:[[1588,1605],256],64809:[[1588,1585],256],64810:[[1587,1585],256],64811:[[1589,1585],256],64812:[[1590,1585],256],64813:[[1588,1580],256],64814:[[1588,1581],256],64815:[[1588,1582],256],64816:[[1588,1605],256],64817:[[1587,1607],256],64818:[[1588,1607],256],64819:[[1591,1605],256],64820:[[1587,1580],256],64821:[[1587,1581],256],64822:[[1587,1582],256],64823:[[1588,1580],256],64824:[[1588,1581],256],64825:[[1588,1582],256],64826:[[1591,1605],256],64827:[[1592,1605],256],64828:[[1575,1611],256],64829:[[1575,1611],256],64848:[[1578,1580,1605],256],64849:[[1578,1581,1580],256],64850:[[1578,1581,1580],256],64851:[[1578,1581,1605],256],64852:[[1578,1582,1605],256],64853:[[1578,1605,1580],256],64854:[[1578,1605,1581],256],64855:[[1578,1605,1582],256],64856:[[1580,1605,1581],256],64857:[[1580,1605,1581],256],64858:[[1581,1605,1610],256],64859:[[1581,1605,1609],256],64860:[[1587,1581,1580],256],64861:[[1587,1580,1581],256],64862:[[1587,1580,1609],256],64863:[[1587,1605,1581],256],64864:[[1587,1605,1581],256],64865:[[1587,1605,1580],256],64866:[[1587,1605,1605],256],64867:[[1587,1605,1605],256],64868:[[1589,1581,1581],256],64869:[[1589,1581,1581],256],64870:[[1589,1605,1605],256],64871:[[1588,1581,1605],256],64872:[[1588,1581,1605],256],64873:[[1588,1580,1610],256],64874:[[1588,1605,1582],256],64875:[[1588,1605,1582],256],64876:[[1588,1605,1605],256],64877:[[1588,1605,1605],256],64878:[[1590,1581,1609],256],64879:[[1590,1582,1605],256],64880:[[1590,1582,1605],256],64881:[[1591,1605,1581],256],64882:[[1591,1605,1581],256],64883:[[1591,1605,1605],256],64884:[[1591,1605,1610],256],64885:[[1593,1580,1605],256],64886:[[1593,1605,1605],256],64887:[[1593,1605,1605],256],64888:[[1593,1605,1609],256],64889:[[1594,1605,1605],256],64890:[[1594,1605,1610],256],64891:[[1594,1605,1609],256],64892:[[1601,1582,1605],256],64893:[[1601,1582,1605],256],64894:[[1602,1605,1581],256],64895:[[1602,1605,1605],256],64896:[[1604,1581,1605],256],64897:[[1604,1581,1610],256],64898:[[1604,1581,1609],256],64899:[[1604,1580,1580],256],64900:[[1604,1580,1580],256],64901:[[1604,1582,1605],256],64902:[[1604,1582,1605],256],64903:[[1604,1605,1581],256],64904:[[1604,1605,1581],256],64905:[[1605,1581,1580],256],64906:[[1605,1581,1605],256],64907:[[1605,1581,1610],256],64908:[[1605,1580,1581],256],64909:[[1605,1580,1605],256],64910:[[1605,1582,1580],256],64911:[[1605,1582,1605],256],64914:[[1605,1580,1582],256],64915:[[1607,1605,1580],256],64916:[[1607,1605,1605],256],64917:[[1606,1581,1605],256],64918:[[1606,1581,1609],256],64919:[[1606,1580,1605],256],64920:[[1606,1580,1605],256],64921:[[1606,1580,1609],256],64922:[[1606,1605,1610],256],64923:[[1606,1605,1609],256],64924:[[1610,1605,1605],256],64925:[[1610,1605,1605],256],64926:[[1576,1582,1610],256],64927:[[1578,1580,1610],256],64928:[[1578,1580,1609],256],64929:[[1578,1582,1610],256],64930:[[1578,1582,1609],256],64931:[[1578,1605,1610],256],64932:[[1578,1605,1609],256],64933:[[1580,1605,1610],256],64934:[[1580,1581,1609],256],64935:[[1580,1605,1609],256],64936:[[1587,1582,1609],256],64937:[[1589,1581,1610],256],64938:[[1588,1581,1610],256],64939:[[1590,1581,1610],256],64940:[[1604,1580,1610],256],64941:[[1604,1605,1610],256],64942:[[1610,1581,1610],256],64943:[[1610,1580,1610],256],64944:[[1610,1605,1610],256],64945:[[1605,1605,1610],256],64946:[[1602,1605,1610],256],64947:[[1606,1581,1610],256],64948:[[1602,1605,1581],256],64949:[[1604,1581,1605],256],64950:[[1593,1605,1610],256],64951:[[1603,1605,1610],256],64952:[[1606,1580,1581],256],64953:[[1605,1582,1610],256],64954:[[1604,1580,1605],256],64955:[[1603,1605,1605],256],64956:[[1604,1580,1605],256],64957:[[1606,1580,1581],256],64958:[[1580,1581,1610],256],64959:[[1581,1580,1610],256],64960:[[1605,1580,1610],256],64961:[[1601,1605,1610],256],64962:[[1576,1581,1610],256],64963:[[1603,1605,1605],256],64964:[[1593,1580,1605],256],64965:[[1589,1605,1605],256],64966:[[1587,1582,1610],256],64967:[[1606,1580,1610],256],65008:[[1589,1604,1746],256],65009:[[1602,1604,1746],256],65010:[[1575,1604,1604,1607],256],65011:[[1575,1603,1576,1585],256],65012:[[1605,1581,1605,1583],256],65013:[[1589,1604,1593,1605],256],65014:[[1585,1587,1608,1604],256],65015:[[1593,1604,1610,1607],256],65016:[[1608,1587,1604,1605],256],65017:[[1589,1604,1609],256],65018:[[1589,1604,1609,32,1575,1604,1604,1607,32,1593,1604,1610,1607,32,1608,1587,1604,1605],256],65019:[[1580,1604,32,1580,1604,1575,1604,1607],256],65020:[[1585,1740,1575,1604],256]},
+65024:{65040:[[44],256],65041:[[12289],256],65042:[[12290],256],65043:[[58],256],65044:[[59],256],65045:[[33],256],65046:[[63],256],65047:[[12310],256],65048:[[12311],256],65049:[[8230],256],65056:[,230],65057:[,230],65058:[,230],65059:[,230],65060:[,230],65061:[,230],65062:[,230],65063:[,220],65064:[,220],65065:[,220],65066:[,220],65067:[,220],65068:[,220],65069:[,220],65072:[[8229],256],65073:[[8212],256],65074:[[8211],256],65075:[[95],256],65076:[[95],256],65077:[[40],256],65078:[[41],256],65079:[[123],256],65080:[[125],256],65081:[[12308],256],65082:[[12309],256],65083:[[12304],256],65084:[[12305],256],65085:[[12298],256],65086:[[12299],256],65087:[[12296],256],65088:[[12297],256],65089:[[12300],256],65090:[[12301],256],65091:[[12302],256],65092:[[12303],256],65095:[[91],256],65096:[[93],256],65097:[[8254],256],65098:[[8254],256],65099:[[8254],256],65100:[[8254],256],65101:[[95],256],65102:[[95],256],65103:[[95],256],65104:[[44],256],65105:[[12289],256],65106:[[46],256],65108:[[59],256],65109:[[58],256],65110:[[63],256],65111:[[33],256],65112:[[8212],256],65113:[[40],256],65114:[[41],256],65115:[[123],256],65116:[[125],256],65117:[[12308],256],65118:[[12309],256],65119:[[35],256],65120:[[38],256],65121:[[42],256],65122:[[43],256],65123:[[45],256],65124:[[60],256],65125:[[62],256],65126:[[61],256],65128:[[92],256],65129:[[36],256],65130:[[37],256],65131:[[64],256],65136:[[32,1611],256],65137:[[1600,1611],256],65138:[[32,1612],256],65140:[[32,1613],256],65142:[[32,1614],256],65143:[[1600,1614],256],65144:[[32,1615],256],65145:[[1600,1615],256],65146:[[32,1616],256],65147:[[1600,1616],256],65148:[[32,1617],256],65149:[[1600,1617],256],65150:[[32,1618],256],65151:[[1600,1618],256],65152:[[1569],256],65153:[[1570],256],65154:[[1570],256],65155:[[1571],256],65156:[[1571],256],65157:[[1572],256],65158:[[1572],256],65159:[[1573],256],65160:[[1573],256],65161:[[1574],256],65162:[[1574],256],65163:[[1574],256],65164:[[1574],256],65165:[[1575],256],65166:[[1575],256],65167:[[1576],256],65168:[[1576],256],65169:[[1576],256],65170:[[1576],256],65171:[[1577],256],65172:[[1577],256],65173:[[1578],256],65174:[[1578],256],65175:[[1578],256],65176:[[1578],256],65177:[[1579],256],65178:[[1579],256],65179:[[1579],256],65180:[[1579],256],65181:[[1580],256],65182:[[1580],256],65183:[[1580],256],65184:[[1580],256],65185:[[1581],256],65186:[[1581],256],65187:[[1581],256],65188:[[1581],256],65189:[[1582],256],65190:[[1582],256],65191:[[1582],256],65192:[[1582],256],65193:[[1583],256],65194:[[1583],256],65195:[[1584],256],65196:[[1584],256],65197:[[1585],256],65198:[[1585],256],65199:[[1586],256],65200:[[1586],256],65201:[[1587],256],65202:[[1587],256],65203:[[1587],256],65204:[[1587],256],65205:[[1588],256],65206:[[1588],256],65207:[[1588],256],65208:[[1588],256],65209:[[1589],256],65210:[[1589],256],65211:[[1589],256],65212:[[1589],256],65213:[[1590],256],65214:[[1590],256],65215:[[1590],256],65216:[[1590],256],65217:[[1591],256],65218:[[1591],256],65219:[[1591],256],65220:[[1591],256],65221:[[1592],256],65222:[[1592],256],65223:[[1592],256],65224:[[1592],256],65225:[[1593],256],65226:[[1593],256],65227:[[1593],256],65228:[[1593],256],65229:[[1594],256],65230:[[1594],256],65231:[[1594],256],65232:[[1594],256],65233:[[1601],256],65234:[[1601],256],65235:[[1601],256],65236:[[1601],256],65237:[[1602],256],65238:[[1602],256],65239:[[1602],256],65240:[[1602],256],65241:[[1603],256],65242:[[1603],256],65243:[[1603],256],65244:[[1603],256],65245:[[1604],256],65246:[[1604],256],65247:[[1604],256],65248:[[1604],256],65249:[[1605],256],65250:[[1605],256],65251:[[1605],256],65252:[[1605],256],65253:[[1606],256],65254:[[1606],256],65255:[[1606],256],65256:[[1606],256],65257:[[1607],256],65258:[[1607],256],65259:[[1607],256],65260:[[1607],256],65261:[[1608],256],65262:[[1608],256],65263:[[1609],256],65264:[[1609],256],65265:[[1610],256],65266:[[1610],256],65267:[[1610],256],65268:[[1610],256],65269:[[1604,1570],256],65270:[[1604,1570],256],65271:[[1604,1571],256],65272:[[1604,1571],256],65273:[[1604,1573],256],65274:[[1604,1573],256],65275:[[1604,1575],256],65276:[[1604,1575],256]},
+65280:{65281:[[33],256],65282:[[34],256],65283:[[35],256],65284:[[36],256],65285:[[37],256],65286:[[38],256],65287:[[39],256],65288:[[40],256],65289:[[41],256],65290:[[42],256],65291:[[43],256],65292:[[44],256],65293:[[45],256],65294:[[46],256],65295:[[47],256],65296:[[48],256],65297:[[49],256],65298:[[50],256],65299:[[51],256],65300:[[52],256],65301:[[53],256],65302:[[54],256],65303:[[55],256],65304:[[56],256],65305:[[57],256],65306:[[58],256],65307:[[59],256],65308:[[60],256],65309:[[61],256],65310:[[62],256],65311:[[63],256],65312:[[64],256],65313:[[65],256],65314:[[66],256],65315:[[67],256],65316:[[68],256],65317:[[69],256],65318:[[70],256],65319:[[71],256],65320:[[72],256],65321:[[73],256],65322:[[74],256],65323:[[75],256],65324:[[76],256],65325:[[77],256],65326:[[78],256],65327:[[79],256],65328:[[80],256],65329:[[81],256],65330:[[82],256],65331:[[83],256],65332:[[84],256],65333:[[85],256],65334:[[86],256],65335:[[87],256],65336:[[88],256],65337:[[89],256],65338:[[90],256],65339:[[91],256],65340:[[92],256],65341:[[93],256],65342:[[94],256],65343:[[95],256],65344:[[96],256],65345:[[97],256],65346:[[98],256],65347:[[99],256],65348:[[100],256],65349:[[101],256],65350:[[102],256],65351:[[103],256],65352:[[104],256],65353:[[105],256],65354:[[106],256],65355:[[107],256],65356:[[108],256],65357:[[109],256],65358:[[110],256],65359:[[111],256],65360:[[112],256],65361:[[113],256],65362:[[114],256],65363:[[115],256],65364:[[116],256],65365:[[117],256],65366:[[118],256],65367:[[119],256],65368:[[120],256],65369:[[121],256],65370:[[122],256],65371:[[123],256],65372:[[124],256],65373:[[125],256],65374:[[126],256],65375:[[10629],256],65376:[[10630],256],65377:[[12290],256],65378:[[12300],256],65379:[[12301],256],65380:[[12289],256],65381:[[12539],256],65382:[[12530],256],65383:[[12449],256],65384:[[12451],256],65385:[[12453],256],65386:[[12455],256],65387:[[12457],256],65388:[[12515],256],65389:[[12517],256],65390:[[12519],256],65391:[[12483],256],65392:[[12540],256],65393:[[12450],256],65394:[[12452],256],65395:[[12454],256],65396:[[12456],256],65397:[[12458],256],65398:[[12459],256],65399:[[12461],256],65400:[[12463],256],65401:[[12465],256],65402:[[12467],256],65403:[[12469],256],65404:[[12471],256],65405:[[12473],256],65406:[[12475],256],65407:[[12477],256],65408:[[12479],256],65409:[[12481],256],65410:[[12484],256],65411:[[12486],256],65412:[[12488],256],65413:[[12490],256],65414:[[12491],256],65415:[[12492],256],65416:[[12493],256],65417:[[12494],256],65418:[[12495],256],65419:[[12498],256],65420:[[12501],256],65421:[[12504],256],65422:[[12507],256],65423:[[12510],256],65424:[[12511],256],65425:[[12512],256],65426:[[12513],256],65427:[[12514],256],65428:[[12516],256],65429:[[12518],256],65430:[[12520],256],65431:[[12521],256],65432:[[12522],256],65433:[[12523],256],65434:[[12524],256],65435:[[12525],256],65436:[[12527],256],65437:[[12531],256],65438:[[12441],256],65439:[[12442],256],65440:[[12644],256],65441:[[12593],256],65442:[[12594],256],65443:[[12595],256],65444:[[12596],256],65445:[[12597],256],65446:[[12598],256],65447:[[12599],256],65448:[[12600],256],65449:[[12601],256],65450:[[12602],256],65451:[[12603],256],65452:[[12604],256],65453:[[12605],256],65454:[[12606],256],65455:[[12607],256],65456:[[12608],256],65457:[[12609],256],65458:[[12610],256],65459:[[12611],256],65460:[[12612],256],65461:[[12613],256],65462:[[12614],256],65463:[[12615],256],65464:[[12616],256],65465:[[12617],256],65466:[[12618],256],65467:[[12619],256],65468:[[12620],256],65469:[[12621],256],65470:[[12622],256],65474:[[12623],256],65475:[[12624],256],65476:[[12625],256],65477:[[12626],256],65478:[[12627],256],65479:[[12628],256],65482:[[12629],256],65483:[[12630],256],65484:[[12631],256],65485:[[12632],256],65486:[[12633],256],65487:[[12634],256],65490:[[12635],256],65491:[[12636],256],65492:[[12637],256],65493:[[12638],256],65494:[[12639],256],65495:[[12640],256],65498:[[12641],256],65499:[[12642],256],65500:[[12643],256],65504:[[162],256],65505:[[163],256],65506:[[172],256],65507:[[175],256],65508:[[166],256],65509:[[165],256],65510:[[8361],256],65512:[[9474],256],65513:[[8592],256],65514:[[8593],256],65515:[[8594],256],65516:[[8595],256],65517:[[9632],256],65518:[[9675],256]}
+
+};
+
+   /***** Module to export */
+   var unorm = {
+      nfc: nfc,
+      nfd: nfd,
+      nfkc: nfkc,
+      nfkd: nfkd
+   };
+
+   /*globals module:true,define:true*/
+
+   // CommonJS
+   if (typeof module === "object") {
+      module.exports = unorm;
+
+   // AMD
+   } else if (typeof define === "function" && define.amd) {
+      define("unorm", function () {
+         return unorm;
+      });
+
+   // Global
+   } else {
+      root.unorm = unorm;
+   }
+
+   /***** Export as shim for String::normalize method *****/
+   /*
+      http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts#november_8_2013_draft_rev_21
+
+      21.1.3.12 String.prototype.normalize(form="NFC")
+      When the normalize method is called with one argument form, the following steps are taken:
+
+      1. Let O be CheckObjectCoercible(this value).
+      2. Let S be ToString(O).
+      3. ReturnIfAbrupt(S).
+      4. If form is not provided or undefined let form be "NFC".
+      5. Let f be ToString(form).
+      6. ReturnIfAbrupt(f).
+      7. If f is not one of "NFC", "NFD", "NFKC", or "NFKD", then throw a RangeError Exception.
+      8. Let ns be the String value is the result of normalizing S into the normalization form named by f as specified in Unicode Standard Annex #15, UnicodeNormalizatoin Forms.
+      9. Return ns.
+
+      The length property of the normalize method is 0.
+
+      *NOTE* The normalize function is intentionally generic; it does not require that its this value be a String object. Therefore it can be transferred to other kinds of objects for use as a method.
+   */
+    unorm.shimApplied = false;
+
+   if (!String.prototype.normalize) {
+      String.prototype.normalize = function(form) {
+         var str = "" + this;
+         form =  form === undefined ? "NFC" : form;
+
+         if (form === "NFC") {
+            return unorm.nfc(str);
+         } else if (form === "NFD") {
+            return unorm.nfd(str);
+         } else if (form === "NFKC") {
+            return unorm.nfkc(str);
+         } else if (form === "NFKD") {
+            return unorm.nfkd(str);
+         } else {
+            throw new RangeError("Invalid normalization form: " + form);
+         }
+      };
+
+      unorm.shimApplied = true;
+   }
+}(this));
+
+},{}],499:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79866,7 +105657,7 @@ var validator = {
 
 exports.default = validator;
 module.exports = exports['default'];
-},{"./lib/blacklist":450,"./lib/contains":451,"./lib/equals":452,"./lib/escape":453,"./lib/isAfter":454,"./lib/isAlpha":455,"./lib/isAlphanumeric":456,"./lib/isAscii":457,"./lib/isBase64":458,"./lib/isBefore":459,"./lib/isBoolean":460,"./lib/isByteLength":461,"./lib/isCreditCard":462,"./lib/isCurrency":463,"./lib/isDataURI":464,"./lib/isDecimal":465,"./lib/isDivisibleBy":466,"./lib/isEmail":467,"./lib/isEmpty":468,"./lib/isFQDN":469,"./lib/isFloat":470,"./lib/isFullWidth":471,"./lib/isHalfWidth":472,"./lib/isHexColor":473,"./lib/isHexadecimal":474,"./lib/isIP":475,"./lib/isISBN":476,"./lib/isISIN":477,"./lib/isISO8601":478,"./lib/isISRC":479,"./lib/isISSN":480,"./lib/isIn":481,"./lib/isInt":482,"./lib/isJSON":483,"./lib/isLength":484,"./lib/isLowercase":485,"./lib/isMACAddress":486,"./lib/isMD5":487,"./lib/isMobilePhone":488,"./lib/isMongoId":489,"./lib/isMultibyte":490,"./lib/isNumeric":491,"./lib/isSurrogatePair":492,"./lib/isURL":493,"./lib/isUUID":494,"./lib/isUppercase":495,"./lib/isVariableWidth":496,"./lib/isWhitelisted":497,"./lib/ltrim":498,"./lib/matches":499,"./lib/normalizeEmail":500,"./lib/rtrim":501,"./lib/stripLow":502,"./lib/toBoolean":503,"./lib/toDate":504,"./lib/toFloat":505,"./lib/toInt":506,"./lib/trim":507,"./lib/unescape":508,"./lib/util/toString":511,"./lib/whitelist":512}],449:[function(require,module,exports){
+},{"./lib/blacklist":501,"./lib/contains":502,"./lib/equals":503,"./lib/escape":504,"./lib/isAfter":505,"./lib/isAlpha":506,"./lib/isAlphanumeric":507,"./lib/isAscii":508,"./lib/isBase64":509,"./lib/isBefore":510,"./lib/isBoolean":511,"./lib/isByteLength":512,"./lib/isCreditCard":513,"./lib/isCurrency":514,"./lib/isDataURI":515,"./lib/isDecimal":516,"./lib/isDivisibleBy":517,"./lib/isEmail":518,"./lib/isEmpty":519,"./lib/isFQDN":520,"./lib/isFloat":521,"./lib/isFullWidth":522,"./lib/isHalfWidth":523,"./lib/isHexColor":524,"./lib/isHexadecimal":525,"./lib/isIP":526,"./lib/isISBN":527,"./lib/isISIN":528,"./lib/isISO8601":529,"./lib/isISRC":530,"./lib/isISSN":531,"./lib/isIn":532,"./lib/isInt":533,"./lib/isJSON":534,"./lib/isLength":535,"./lib/isLowercase":536,"./lib/isMACAddress":537,"./lib/isMD5":538,"./lib/isMobilePhone":539,"./lib/isMongoId":540,"./lib/isMultibyte":541,"./lib/isNumeric":542,"./lib/isSurrogatePair":543,"./lib/isURL":544,"./lib/isUUID":545,"./lib/isUppercase":546,"./lib/isVariableWidth":547,"./lib/isWhitelisted":548,"./lib/ltrim":549,"./lib/matches":550,"./lib/normalizeEmail":551,"./lib/rtrim":552,"./lib/stripLow":553,"./lib/toBoolean":554,"./lib/toDate":555,"./lib/toFloat":556,"./lib/toInt":557,"./lib/trim":558,"./lib/unescape":559,"./lib/util/toString":562,"./lib/whitelist":563}],500:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79929,7 +105720,7 @@ for (var _locale, _i = 0; _i < arabicLocales.length; _i++) {
   alpha[_locale] = alpha.ar;
   alphanumeric[_locale] = alphanumeric.ar;
 }
-},{}],450:[function(require,module,exports){
+},{}],501:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79948,7 +105739,7 @@ function blacklist(str, chars) {
   return str.replace(new RegExp('[' + chars + ']+', 'g'), '');
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],451:[function(require,module,exports){
+},{"./util/assertString":560}],502:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79971,7 +105762,7 @@ function contains(str, elem) {
   return str.indexOf((0, _toString2.default)(elem)) >= 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509,"./util/toString":511}],452:[function(require,module,exports){
+},{"./util/assertString":560,"./util/toString":562}],503:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79990,7 +105781,7 @@ function equals(str, comparison) {
   return str === comparison;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],453:[function(require,module,exports){
+},{"./util/assertString":560}],504:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80009,7 +105800,7 @@ function escape(str) {
   return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/\\/g, '&#x5C;').replace(/`/g, '&#96;');
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],454:[function(require,module,exports){
+},{"./util/assertString":560}],505:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80036,7 +105827,7 @@ function isAfter(str) {
   return !!(original && comparison && original > comparison);
 }
 module.exports = exports['default'];
-},{"./toDate":504,"./util/assertString":509}],455:[function(require,module,exports){
+},{"./toDate":555,"./util/assertString":560}],506:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80062,7 +105853,7 @@ function isAlpha(str) {
   throw new Error('Invalid locale \'' + locale + '\'');
 }
 module.exports = exports['default'];
-},{"./alpha":449,"./util/assertString":509}],456:[function(require,module,exports){
+},{"./alpha":500,"./util/assertString":560}],507:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80088,7 +105879,7 @@ function isAlphanumeric(str) {
   throw new Error('Invalid locale \'' + locale + '\'');
 }
 module.exports = exports['default'];
-},{"./alpha":449,"./util/assertString":509}],457:[function(require,module,exports){
+},{"./alpha":500,"./util/assertString":560}],508:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80111,7 +105902,7 @@ function isAscii(str) {
   return ascii.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],458:[function(require,module,exports){
+},{"./util/assertString":560}],509:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80137,7 +105928,7 @@ function isBase64(str) {
   return firstPaddingChar === -1 || firstPaddingChar === len - 1 || firstPaddingChar === len - 2 && str[len - 1] === '=';
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],459:[function(require,module,exports){
+},{"./util/assertString":560}],510:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80164,7 +105955,7 @@ function isBefore(str) {
   return !!(original && comparison && original < comparison);
 }
 module.exports = exports['default'];
-},{"./toDate":504,"./util/assertString":509}],460:[function(require,module,exports){
+},{"./toDate":555,"./util/assertString":560}],511:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80183,7 +105974,7 @@ function isBoolean(str) {
   return ['true', 'false', '1', '0'].indexOf(str) >= 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],461:[function(require,module,exports){
+},{"./util/assertString":560}],512:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80217,7 +106008,7 @@ function isByteLength(str, options) {
   return len >= min && (typeof max === 'undefined' || len <= max);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],462:[function(require,module,exports){
+},{"./util/assertString":560}],513:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80263,7 +106054,7 @@ function isCreditCard(str) {
   return !!(sum % 10 === 0 ? sanitized : false);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],463:[function(require,module,exports){
+},{"./util/assertString":560}],514:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80349,7 +106140,7 @@ function isCurrency(str, options) {
   return currencyRegex(options).test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509,"./util/merge":510}],464:[function(require,module,exports){
+},{"./util/assertString":560,"./util/merge":561}],515:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80370,7 +106161,7 @@ function isDataURI(str) {
   return dataURI.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],465:[function(require,module,exports){
+},{"./util/assertString":560}],516:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80391,7 +106182,7 @@ function isDecimal(str) {
   return str !== '' && decimal.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],466:[function(require,module,exports){
+},{"./util/assertString":560}],517:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80414,7 +106205,7 @@ function isDivisibleBy(str, num) {
   return (0, _toFloat2.default)(str) % parseInt(num, 10) === 0;
 }
 module.exports = exports['default'];
-},{"./toFloat":505,"./util/assertString":509}],467:[function(require,module,exports){
+},{"./toFloat":556,"./util/assertString":560}],518:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80504,7 +106295,7 @@ function isEmail(str, options) {
   return true;
 }
 module.exports = exports['default'];
-},{"./isByteLength":461,"./isFQDN":469,"./util/assertString":509,"./util/merge":510}],468:[function(require,module,exports){
+},{"./isByteLength":512,"./isFQDN":520,"./util/assertString":560,"./util/merge":561}],519:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80523,7 +106314,7 @@ function isEmpty(str) {
   return str.length === 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],469:[function(require,module,exports){
+},{"./util/assertString":560}],520:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80585,7 +106376,7 @@ function isFDQN(str, options) {
   return true;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509,"./util/merge":510}],470:[function(require,module,exports){
+},{"./util/assertString":560,"./util/merge":561}],521:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80610,7 +106401,7 @@ function isFloat(str, options) {
   return float.test(str) && (!options.hasOwnProperty('min') || str >= options.min) && (!options.hasOwnProperty('max') || str <= options.max) && (!options.hasOwnProperty('lt') || str < options.lt) && (!options.hasOwnProperty('gt') || str > options.gt);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],471:[function(require,module,exports){
+},{"./util/assertString":560}],522:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80631,7 +106422,7 @@ function isFullWidth(str) {
   (0, _assertString2.default)(str);
   return fullWidth.test(str);
 }
-},{"./util/assertString":509}],472:[function(require,module,exports){
+},{"./util/assertString":560}],523:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80652,7 +106443,7 @@ function isHalfWidth(str) {
   (0, _assertString2.default)(str);
   return halfWidth.test(str);
 }
-},{"./util/assertString":509}],473:[function(require,module,exports){
+},{"./util/assertString":560}],524:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80673,7 +106464,7 @@ function isHexColor(str) {
   return hexcolor.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],474:[function(require,module,exports){
+},{"./util/assertString":560}],525:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80694,7 +106485,7 @@ function isHexadecimal(str) {
   return hexadecimal.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],475:[function(require,module,exports){
+},{"./util/assertString":560}],526:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80776,7 +106567,7 @@ function isIP(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],476:[function(require,module,exports){
+},{"./util/assertString":560}],527:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80834,7 +106625,7 @@ function isISBN(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],477:[function(require,module,exports){
+},{"./util/assertString":560}],528:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80883,7 +106674,7 @@ function isISIN(str) {
   return parseInt(str.substr(str.length - 1), 10) === (10000 - sum) % 10;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],478:[function(require,module,exports){
+},{"./util/assertString":560}],529:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80906,7 +106697,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // from http://goo.gl/0ejHHW
 var iso8601 = exports.iso8601 = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
 /* eslint-enable max-len */
-},{"./util/assertString":509}],479:[function(require,module,exports){
+},{"./util/assertString":560}],530:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80928,7 +106719,7 @@ function isISRC(str) {
   return isrc.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],480:[function(require,module,exports){
+},{"./util/assertString":560}],531:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80987,7 +106778,7 @@ function isISSN(str) {
   return checksum % 11 === 0;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],481:[function(require,module,exports){
+},{"./util/assertString":560}],532:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81027,7 +106818,7 @@ function isIn(str, options) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509,"./util/toString":511}],482:[function(require,module,exports){
+},{"./util/assertString":560,"./util/toString":562}],533:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81061,7 +106852,7 @@ function isInt(str, options) {
   return regex.test(str) && minCheckPassed && maxCheckPassed && ltCheckPassed && gtCheckPassed;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],483:[function(require,module,exports){
+},{"./util/assertString":560}],534:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81087,7 +106878,7 @@ function isJSON(str) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],484:[function(require,module,exports){
+},{"./util/assertString":560}],535:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81122,7 +106913,7 @@ function isLength(str, options) {
   return len >= min && (typeof max === 'undefined' || len <= max);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],485:[function(require,module,exports){
+},{"./util/assertString":560}],536:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81141,7 +106932,7 @@ function isLowercase(str) {
   return str === str.toLowerCase();
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],486:[function(require,module,exports){
+},{"./util/assertString":560}],537:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81162,7 +106953,7 @@ function isMACAddress(str) {
   return macAddress.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],487:[function(require,module,exports){
+},{"./util/assertString":560}],538:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81183,7 +106974,7 @@ function isMD5(str) {
   return md5.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],488:[function(require,module,exports){
+},{"./util/assertString":560}],539:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81265,7 +107056,7 @@ function isMobilePhone(str, locale) {
   return false;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],489:[function(require,module,exports){
+},{"./util/assertString":560}],540:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81288,7 +107079,7 @@ function isMongoId(str) {
   return (0, _isHexadecimal2.default)(str) && str.length === 24;
 }
 module.exports = exports['default'];
-},{"./isHexadecimal":474,"./util/assertString":509}],490:[function(require,module,exports){
+},{"./isHexadecimal":525,"./util/assertString":560}],541:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81311,7 +107102,7 @@ function isMultibyte(str) {
   return multibyte.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],491:[function(require,module,exports){
+},{"./util/assertString":560}],542:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81332,7 +107123,7 @@ function isNumeric(str) {
   return numeric.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],492:[function(require,module,exports){
+},{"./util/assertString":560}],543:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81353,7 +107144,7 @@ function isSurrogatePair(str) {
   return surrogatePair.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],493:[function(require,module,exports){
+},{"./util/assertString":560}],544:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81497,7 +107288,7 @@ function isURL(url, options) {
   return true;
 }
 module.exports = exports['default'];
-},{"./isFQDN":469,"./isIP":475,"./util/assertString":509,"./util/merge":510}],494:[function(require,module,exports){
+},{"./isFQDN":520,"./isIP":526,"./util/assertString":560,"./util/merge":561}],545:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81526,7 +107317,7 @@ function isUUID(str) {
   return pattern && pattern.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],495:[function(require,module,exports){
+},{"./util/assertString":560}],546:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81545,7 +107336,7 @@ function isUppercase(str) {
   return str === str.toUpperCase();
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],496:[function(require,module,exports){
+},{"./util/assertString":560}],547:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81568,7 +107359,7 @@ function isVariableWidth(str) {
   return _isFullWidth.fullWidth.test(str) && _isHalfWidth.halfWidth.test(str);
 }
 module.exports = exports['default'];
-},{"./isFullWidth":471,"./isHalfWidth":472,"./util/assertString":509}],497:[function(require,module,exports){
+},{"./isFullWidth":522,"./isHalfWidth":523,"./util/assertString":560}],548:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81592,7 +107383,7 @@ function isWhitelisted(str, chars) {
   return true;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],498:[function(require,module,exports){
+},{"./util/assertString":560}],549:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81612,7 +107403,7 @@ function ltrim(str, chars) {
   return str.replace(pattern, '');
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],499:[function(require,module,exports){
+},{"./util/assertString":560}],550:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81634,7 +107425,7 @@ function matches(str, pattern, modifiers) {
   return pattern.test(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],500:[function(require,module,exports){
+},{"./util/assertString":560}],551:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81772,7 +107563,7 @@ function normalizeEmail(email, options) {
   return parts.join('@');
 }
 module.exports = exports['default'];
-},{"./isEmail":467,"./util/merge":510}],501:[function(require,module,exports){
+},{"./isEmail":518,"./util/merge":561}],552:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81798,7 +107589,7 @@ function rtrim(str, chars) {
   return idx < str.length ? str.substr(0, idx + 1) : str;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],502:[function(require,module,exports){
+},{"./util/assertString":560}],553:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81822,7 +107613,7 @@ function stripLow(str, keep_new_lines) {
   return (0, _blacklist2.default)(str, chars);
 }
 module.exports = exports['default'];
-},{"./blacklist":450,"./util/assertString":509}],503:[function(require,module,exports){
+},{"./blacklist":501,"./util/assertString":560}],554:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81844,7 +107635,7 @@ function toBoolean(str, strict) {
   return str !== '0' && str !== 'false' && str !== '';
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],504:[function(require,module,exports){
+},{"./util/assertString":560}],555:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81864,7 +107655,7 @@ function toDate(date) {
   return !isNaN(date) ? new Date(date) : null;
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],505:[function(require,module,exports){
+},{"./util/assertString":560}],556:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81883,7 +107674,7 @@ function toFloat(str) {
   return parseFloat(str);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],506:[function(require,module,exports){
+},{"./util/assertString":560}],557:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81902,7 +107693,7 @@ function toInt(str, radix) {
   return parseInt(str, radix || 10);
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],507:[function(require,module,exports){
+},{"./util/assertString":560}],558:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81924,7 +107715,7 @@ function trim(str, chars) {
   return (0, _rtrim2.default)((0, _ltrim2.default)(str, chars), chars);
 }
 module.exports = exports['default'];
-},{"./ltrim":498,"./rtrim":501}],508:[function(require,module,exports){
+},{"./ltrim":549,"./rtrim":552}],559:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81943,7 +107734,7 @@ function unescape(str) {
   return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x2F;/g, '/').replace(/&#96;/g, '`');
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],509:[function(require,module,exports){
+},{"./util/assertString":560}],560:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81958,7 +107749,7 @@ function assertString(input) {
   }
 }
 module.exports = exports['default'];
-},{}],510:[function(require,module,exports){
+},{}],561:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -81977,7 +107768,7 @@ function merge() {
   return obj;
 }
 module.exports = exports['default'];
-},{}],511:[function(require,module,exports){
+},{}],562:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -82000,7 +107791,7 @@ function toString(input) {
   return String(input);
 }
 module.exports = exports['default'];
-},{}],512:[function(require,module,exports){
+},{}],563:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -82019,7 +107810,7 @@ function whitelist(str, chars) {
   return str.replace(new RegExp('[^' + chars + ']+', 'g'), '');
 }
 module.exports = exports['default'];
-},{"./util/assertString":509}],513:[function(require,module,exports){
+},{"./util/assertString":560}],564:[function(require,module,exports){
 'use strict'
 var Buffer = require('safe-buffer').Buffer
 
@@ -82111,7 +107902,7 @@ function encodingLength (number) {
 
 module.exports = { encode: encode, decode: decode, encodingLength: encodingLength }
 
-},{"safe-buffer":431}],514:[function(require,module,exports){
+},{"safe-buffer":457}],565:[function(require,module,exports){
 (function (Buffer){
 var bs58check = require('bs58check')
 
@@ -82178,7 +107969,7 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bs58check":254,"buffer":168}],515:[function(require,module,exports){
+},{"bs58check":265,"buffer":179}],566:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -82211,7 +108002,7 @@ Object.defineProperty(exports, 'ZoneFile', {
     return _zoneFile.ZoneFile;
   }
 });
-},{"./makeZoneFile":516,"./parseZoneFile":517,"./zoneFile":518}],516:[function(require,module,exports){
+},{"./makeZoneFile":567,"./parseZoneFile":568,"./zoneFile":569}],567:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -82380,7 +108171,7 @@ var processValues = function processValues(jsonZoneFile, template) {
     template = template.replace('{datetime}', new Date().toISOString());
     return template.replace('{time}', Math.round(Date.now() / 1000));
 };
-},{"./zoneFileTemplate":519}],517:[function(require,module,exports){
+},{"./zoneFileTemplate":570}],568:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -82636,7 +108427,7 @@ var parseURI = function parseURI(rr) {
     if (!isNaN(rrTokens[1])) result.ttl = parseInt(rrTokens[1], 10);
     return result;
 };
-},{}],518:[function(require,module,exports){
+},{}],569:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -82679,7 +108470,7 @@ var ZoneFile = exports.ZoneFile = function () {
 
   return ZoneFile;
 }();
-},{"./makeZoneFile":516,"./parseZoneFile":517}],519:[function(require,module,exports){
+},{"./makeZoneFile":567,"./parseZoneFile":568}],570:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
