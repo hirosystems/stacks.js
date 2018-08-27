@@ -30,6 +30,9 @@ export class BlockstackSession {
 
   identityAddress: ?string
 
+  // TODO use this
+  authenticatorURL: ?string
+
   // using this in place of
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
   userData: ?any

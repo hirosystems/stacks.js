@@ -303,6 +303,7 @@ function handleSignedEncryptedContents(path: string, storedContents: string,
 
 /**
  * Retrieves the specified file from the app's data store.
+ * @param {Blockstack} caller - instance calling this method
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
@@ -316,8 +317,9 @@ function handleSignedEncryptedContents(path: string, storedContents: string,
  * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
+ * @private
  */
-export function getFile(path: string, options?: {
+export function getFileImpl(caller: Blockstack, path: string, options?: {
     decrypt?: boolean,
     verify?: boolean,
     username?: string,
@@ -365,6 +367,7 @@ export function getFile(path: string, options?: {
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
+ * @param {Blockstack} caller - instance calling this method
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
@@ -375,7 +378,7 @@ export function getFile(path: string, options?: {
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-export function putFile(path: string, content: string | Buffer, options?: {
+export function putFileImpl(caller: Blockstack, path: string, content: string | Buffer, options?: {
   encrypt?: boolean | string,
   sign?: boolean
   }) {
@@ -456,17 +459,6 @@ export function putFile(path: string, content: string | Buffer, options?: {
  */
 export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
   return getBucketUrl(gaiaHubUrl, appPrivateKey)
-}
-
-/**
- * Deletes the specified file from the app's data store. Currently not implemented.
- * @param {String} path - the path to the file to delete
- * @returns {Promise} that resolves when the file has been removed
- * or rejects with an error
- * @private
- */
-export function deleteFile(path: string) {
-  Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
 }
 
 /**

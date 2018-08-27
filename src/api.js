@@ -21,7 +21,9 @@ import {
 
 import {
   decryptContentImpl,
-  encryptContentImpl
+  encryptContentImpl,
+  getFileImpl,
+  putFileImpl
 } from './storage'
 import {
   nextHour
@@ -156,9 +158,10 @@ export class Blockstack {
     return loadUserDataImpl(this)
   }
 
+
   // isUserSignedIn
   // signUserOut
-  // makeAuthRequest
+
   //
   //
   // /* PROFILES */
@@ -168,11 +171,9 @@ export class Blockstack {
   // verifyProfileToken
   // validateProofs
   // lookupProfile
-  //
+
+
   /* STORAGE */
-  //
-  // getFile
-  // putFile
 
   /**
    * Encrypts the data provided with the app public key.
@@ -200,6 +201,59 @@ export class Blockstack {
     return decryptContentImpl(this, content, options)
   }
 
-  // getAppBucketUrl
-  // getUserAppFileUrl
+  /**
+   * Stores the data provided in the app's data store to to the file specified.
+   * @param {String} path - the path to store the data in
+   * @param {String|Buffer} content - the data to store in the file
+   * @param {Object} [options=null] - options object
+   * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+   *                                                  or the provided public key
+   * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+   *                                         the app private key
+   * @return {Promise} that resolves if the operation succeed and rejects
+   * if it failed
+   */
+  putFile(path: string, content: string | Buffer, options?:{
+    encrypt?: boolean | string,
+    sign?: boolean
+    }) {
+    return putFileImpl(this, path, content, options)
+  }
+
+  /**
+   * Retrieves the specified file from the app's data store.
+   * @param {String} path - the path to the file to read
+   * @param {Object} [options=null] - options object
+   * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
+   * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+   * @param {Boolean} options.verify - Whether the content should be verified, only to be used
+   * when `putFile` was set to `sign = true`
+   * @param {String} options.app - the app to lookup for multi-player storage -
+   * defaults to current origin
+   * @param {String} [options.zoneFileLookupURL=null] - The URL
+   * to use for zonefile lookup. If falsey, this will use the
+   * blockstack.js's getNameInfo function instead.
+   * @returns {Promise} that resolves to the raw data in the file
+   * or rejects with an error
+   */
+  getFile(path: string, options?: {
+      decrypt?: boolean,
+      verify?: boolean,
+      username?: string,
+      app?: string,
+      zoneFileLookupURL?: ?string
+    }) {
+    return getFileImpl(this, path, options)
+  }
+
+  /**
+   * Deletes the specified file from the app's data store. Currently not implemented.
+   * @param {String} path - the path to the file to delete
+   * @returns {Promise} that resolves when the file has been removed
+   * or rejects with an error
+   * @private
+   */
+  deleteFile(path: string) {
+    Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
+  }
 }
