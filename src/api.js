@@ -23,7 +23,8 @@ import {
   decryptContentImpl,
   encryptContentImpl,
   getFileImpl,
-  putFileImpl
+  putFileImpl,
+  listFilesImpl
 } from './storage'
 import {
   nextHour
@@ -120,7 +121,6 @@ export class Blockstack {
     return transitKey
   }
 
-
   /**
    * Retrieve the authentication token from the URL query
    * @return {String} the authentication token if it exists otherwise `null`
@@ -136,6 +136,14 @@ export class Blockstack {
    */
   isSignInPending() {
     return !!this.getAuthResponseToken()
+  }
+
+  /**
+   * Check if a user is currently signed in.
+   * @return {Boolean} `true` if the user is signed in, `false` if not.
+   */
+  isUserSignedIn() {
+    return !!this.session.userData
   }
 
   /**
@@ -159,8 +167,13 @@ export class Blockstack {
   }
 
 
-  // isUserSignedIn
-  // signUserOut
+  /**
+   * Sign the user out
+   * @return {void}
+   */
+  signUserOut() {
+    throw new Error('Not yet implemented')
+  }
 
   //
   //
@@ -244,6 +257,16 @@ export class Blockstack {
       zoneFileLookupURL?: ?string
     }) {
     return getFileImpl(this, path, options)
+  }
+
+  /**
+   * List the set of files in this application's Gaia storage bucket.
+   * @param {function} callback - a callback to invoke on each named file that
+   * returns `true` to continue the listing operation or `false` to end it
+   * @return {Promise} that resolves to the number of files listed
+   */
+  listFiles(callback: (name: string) => boolean) : Promise<number> {
+    return listFilesImpl(this, callback)
   }
 
   /**

@@ -676,22 +676,22 @@
     ],
     "loc": {
       "start": {
-        "line": 30,
+        "line": 33,
         "column": 0
       },
       "end": {
-        "line": 34,
+        "line": 37,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 35,
+          "line": 38,
           "column": 0
         },
         "end": {
-          "line": 205,
+          "line": 270,
           "column": 1
         }
       },
@@ -703,7 +703,7 @@
       {
         "title": "param",
         "name": "initialValue",
-        "lineNumber": 38,
+        "lineNumber": 41,
         "type": {
           "type": "NameExpression",
           "name": "AppConfig"
@@ -1027,22 +1027,22 @@
           ],
           "loc": {
             "start": {
-              "line": 47,
+              "line": 50,
               "column": 2
             },
             "end": {
-              "line": 61,
+              "line": 64,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 62,
+                "line": 65,
                 "column": 2
               },
               "end": {
-                "line": 64,
+                "line": 67,
                 "column": 3
               }
             },
@@ -1303,22 +1303,22 @@
           ],
           "loc": {
             "start": {
-              "line": 66,
+              "line": 69,
               "column": 2
             },
             "end": {
-              "line": 77,
+              "line": 80,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 78,
+                "line": 81,
                 "column": 2
               },
               "end": {
-                "line": 82,
+                "line": 85,
                 "column": 3
               }
             },
@@ -1597,22 +1597,22 @@
           ],
           "loc": {
             "start": {
-              "line": 108,
+              "line": 111,
               "column": 2
             },
             "end": {
-              "line": 114,
+              "line": 117,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 115,
+                "line": 118,
                 "column": 2
               },
               "end": {
-                "line": 119,
+                "line": 122,
                 "column": 3
               }
             },
@@ -1776,22 +1776,22 @@
           ],
           "loc": {
             "start": {
-              "line": 122,
+              "line": 125,
               "column": 2
             },
             "end": {
-              "line": 125,
+              "line": 128,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 126,
+                "line": 129,
                 "column": 2
               },
               "end": {
-                "line": 129,
+                "line": 132,
                 "column": 3
               }
             },
@@ -1972,22 +1972,22 @@
           ],
           "loc": {
             "start": {
-              "line": 131,
+              "line": 134,
               "column": 2
             },
             "end": {
-              "line": 134,
+              "line": 137,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 135,
+                "line": 138,
                 "column": 2
               },
               "end": {
-                "line": 137,
+                "line": 140,
                 "column": 3
               }
             },
@@ -2233,22 +2233,22 @@
           ],
           "loc": {
             "start": {
-              "line": 139,
+              "line": 142,
               "column": 2
             },
             "end": {
-              "line": 146,
+              "line": 149,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 147,
+                "line": 150,
                 "column": 2
               },
               "end": {
-                "line": 149,
+                "line": 152,
                 "column": 3
               }
             },
@@ -2513,22 +2513,22 @@
           ],
           "loc": {
             "start": {
-              "line": 151,
+              "line": 154,
               "column": 2
             },
             "end": {
-              "line": 154,
+              "line": 157,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 155,
+                "line": 158,
                 "column": 2
               },
               "end": {
-                "line": 157,
+                "line": 160,
                 "column": 3
               }
             },
@@ -2735,22 +2735,22 @@
           ],
           "loc": {
             "start": {
-              "line": 177,
+              "line": 179,
               "column": 2
             },
             "end": {
-              "line": 184,
+              "line": 186,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 185,
+                "line": 187,
                 "column": 2
               },
               "end": {
-                "line": 188,
+                "line": 190,
                 "column": 3
               }
             },
@@ -3204,22 +3204,22 @@
           ],
           "loc": {
             "start": {
-              "line": 190,
+              "line": 192,
               "column": 2
             },
             "end": {
-              "line": 198,
+              "line": 200,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 199,
+                "line": 201,
                 "column": 2
               },
               "end": {
-                "line": 201,
+                "line": 203,
                 "column": 3
               }
             },
@@ -3525,6 +3525,1692 @@
             }
           ],
           "namespace": "Blockstack#decryptContent"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Stores the data provided in the app's data store to to the file specified.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 75,
+                        "offset": 74
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 75,
+                    "offset": 74
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 75,
+                "offset": 74
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "param",
+              "description": "the path to store the data in",
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "String"
+              },
+              "name": "path"
+            },
+            {
+              "title": "param",
+              "description": "the data to store in the file",
+              "lineNumber": 3,
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "NameExpression",
+                    "name": "String"
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "Buffer"
+                  }
+                ]
+              },
+              "name": "content"
+            },
+            {
+              "title": "param",
+              "description": "options object",
+              "lineNumber": 4,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              },
+              "name": "options",
+              "default": "null"
+            },
+            {
+              "title": "param",
+              "description": "encrypt the data with the app private key\n                                                 or the provided public key",
+              "lineNumber": 5,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "UnionType",
+                  "elements": [
+                    {
+                      "type": "NameExpression",
+                      "name": "Boolean"
+                    },
+                    {
+                      "type": "NameExpression",
+                      "name": "String"
+                    }
+                  ]
+                }
+              },
+              "name": "options.encrypt",
+              "default": "true"
+            },
+            {
+              "title": "param",
+              "description": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+              "lineNumber": 7,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Boolean"
+                }
+              },
+              "name": "options.sign",
+              "default": "false"
+            },
+            {
+              "title": "return",
+              "description": "that resolves if the operation succeed and rejects\nif it failed",
+              "lineNumber": 9,
+              "type": {
+                "type": "NameExpression",
+                "name": "Promise"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 205,
+              "column": 2
+            },
+            "end": {
+              "line": 216,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 217,
+                "column": 2
+              },
+              "end": {
+                "line": 222,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "path",
+              "lineNumber": 2,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "the path to store the data in",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 30,
+                            "offset": 29
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 30,
+                        "offset": 29
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 30,
+                    "offset": 29
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "String"
+              }
+            },
+            {
+              "title": "param",
+              "name": "content",
+              "lineNumber": 3,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "the data to store in the file",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 30,
+                            "offset": 29
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 30,
+                        "offset": 29
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 30,
+                    "offset": 29
+                  }
+                }
+              },
+              "type": {
+                "type": "UnionType",
+                "elements": [
+                  {
+                    "type": "NameExpression",
+                    "name": "String"
+                  },
+                  {
+                    "type": "NameExpression",
+                    "name": "Buffer"
+                  }
+                ]
+              }
+            },
+            {
+              "title": "param",
+              "name": "options",
+              "lineNumber": 4,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "options object",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 15,
+                            "offset": 14
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 15,
+                    "offset": 14
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "default": "null",
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "options.encrypt",
+                  "lineNumber": 5,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "encrypt the data with the app private key\n                                                 or the provided public key",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 76,
+                                "offset": 117
+                              },
+                              "indent": [
+                                1
+                              ]
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 76,
+                            "offset": 117
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 76,
+                        "offset": 117
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "UnionType",
+                    "elements": [
+                      {
+                        "type": "NameExpression",
+                        "name": "Boolean"
+                      },
+                      {
+                        "type": "NameExpression",
+                        "name": "String"
+                      }
+                    ]
+                  },
+                  "default": "true"
+                },
+                {
+                  "title": "param",
+                  "name": "options.sign",
+                  "lineNumber": 7,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 60,
+                                "offset": 107
+                              },
+                              "indent": [
+                                1
+                              ]
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 60,
+                            "offset": 107
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 60,
+                        "offset": 107
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "Boolean"
+                  },
+                  "default": "false"
+                }
+              ]
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "that resolves if the operation succeed and rejects\nif it failed",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 13,
+                            "offset": 63
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 13,
+                        "offset": 63
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 13,
+                    "offset": 63
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "Promise"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "putFile",
+          "kind": "function",
+          "memberof": "Blockstack",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Blockstack",
+              "kind": "class"
+            },
+            {
+              "name": "putFile",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "Blockstack#putFile"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Retrieves the specified file from the app's data store.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 56,
+                        "offset": 55
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 56,
+                    "offset": 55
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 56,
+                "offset": 55
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "param",
+              "description": "the path to the file to read",
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "String"
+              },
+              "name": "path"
+            },
+            {
+              "title": "param",
+              "description": "options object",
+              "lineNumber": 3,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Object"
+                }
+              },
+              "name": "options",
+              "default": "null"
+            },
+            {
+              "title": "param",
+              "description": "try to decrypt the data with the app private key",
+              "lineNumber": 4,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "Boolean"
+                }
+              },
+              "name": "options.decrypt",
+              "default": "true"
+            },
+            {
+              "title": "param",
+              "description": "the Blockstack ID to lookup for multi-player storage",
+              "lineNumber": 5,
+              "type": {
+                "type": "NameExpression",
+                "name": "String"
+              },
+              "name": "options.username"
+            },
+            {
+              "title": "param",
+              "description": "Whether the content should be verified, only to be used\nwhen `putFile` was set to `sign = true`",
+              "lineNumber": 6,
+              "type": {
+                "type": "NameExpression",
+                "name": "Boolean"
+              },
+              "name": "options.verify"
+            },
+            {
+              "title": "param",
+              "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
+              "lineNumber": 8,
+              "type": {
+                "type": "NameExpression",
+                "name": "String"
+              },
+              "name": "options.app"
+            },
+            {
+              "title": "param",
+              "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
+              "lineNumber": 10,
+              "type": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "String"
+                }
+              },
+              "name": "options.zoneFileLookupURL",
+              "default": "null"
+            },
+            {
+              "title": "returns",
+              "description": "that resolves to the raw data in the file\nor rejects with an error",
+              "lineNumber": 13,
+              "type": {
+                "type": "NameExpression",
+                "name": "Promise"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 224,
+              "column": 2
+            },
+            "end": {
+              "line": 239,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 240,
+                "column": 2
+              },
+              "end": {
+                "line": 248,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "path",
+              "lineNumber": 2,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "the path to the file to read",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 29,
+                            "offset": 28
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 29,
+                        "offset": 28
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 29,
+                    "offset": 28
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "String"
+              }
+            },
+            {
+              "title": "param",
+              "name": "options",
+              "lineNumber": 3,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "options object",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 15,
+                            "offset": 14
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 15,
+                    "offset": 14
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "Object"
+              },
+              "default": "null",
+              "properties": [
+                {
+                  "title": "param",
+                  "name": "options.decrypt",
+                  "lineNumber": 4,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "try to decrypt the data with the app private key",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 49,
+                                "offset": 48
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 49,
+                            "offset": 48
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 49,
+                        "offset": 48
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "Boolean"
+                  },
+                  "default": "true"
+                },
+                {
+                  "title": "param",
+                  "name": "options.username",
+                  "lineNumber": 5,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "the Blockstack ID to lookup for multi-player storage",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 1,
+                                "column": 53,
+                                "offset": 52
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 53,
+                            "offset": 52
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 53,
+                        "offset": 52
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "String"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "options.verify",
+                  "lineNumber": 6,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "Whether the content should be verified, only to be used\nwhen ",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 6,
+                                "offset": 61
+                              },
+                              "indent": [
+                                1
+                              ]
+                            }
+                          },
+                          {
+                            "type": "inlineCode",
+                            "value": "putFile",
+                            "position": {
+                              "start": {
+                                "line": 2,
+                                "column": 6,
+                                "offset": 61
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 15,
+                                "offset": 70
+                              },
+                              "indent": []
+                            }
+                          },
+                          {
+                            "type": "text",
+                            "value": " was set to ",
+                            "position": {
+                              "start": {
+                                "line": 2,
+                                "column": 15,
+                                "offset": 70
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 27,
+                                "offset": 82
+                              },
+                              "indent": []
+                            }
+                          },
+                          {
+                            "type": "inlineCode",
+                            "value": "sign = true",
+                            "position": {
+                              "start": {
+                                "line": 2,
+                                "column": 27,
+                                "offset": 82
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 40,
+                                "offset": 95
+                              },
+                              "indent": []
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 40,
+                            "offset": 95
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 40,
+                        "offset": 95
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "Boolean"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "options.app",
+                  "lineNumber": 8,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "the app to lookup for multi-player storage -\ndefaults to current origin",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 2,
+                                "column": 27,
+                                "offset": 71
+                              },
+                              "indent": [
+                                1
+                              ]
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 27,
+                            "offset": 71
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 27,
+                        "offset": 71
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "String"
+                  }
+                },
+                {
+                  "title": "param",
+                  "name": "options.zoneFileLookupURL",
+                  "lineNumber": 10,
+                  "description": {
+                    "type": "root",
+                    "children": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "value": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
+                            "position": {
+                              "start": {
+                                "line": 1,
+                                "column": 1,
+                                "offset": 0
+                              },
+                              "end": {
+                                "line": 3,
+                                "column": 46,
+                                "offset": 110
+                              },
+                              "indent": [
+                                1,
+                                1
+                              ]
+                            }
+                          }
+                        ],
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 46,
+                            "offset": 110
+                          },
+                          "indent": [
+                            1,
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 46,
+                        "offset": 110
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "NameExpression",
+                    "name": "String"
+                  },
+                  "default": "null"
+                }
+              ]
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "that resolves to the raw data in the file\nor rejects with an error",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 25,
+                            "offset": 66
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 25,
+                        "offset": 66
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 25,
+                    "offset": 66
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "Promise"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "getFile",
+          "kind": "function",
+          "memberof": "Blockstack",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Blockstack",
+              "kind": "class"
+            },
+            {
+              "name": "getFile",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "Blockstack#getFile"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "List the set of files in this application's Gaia storage bucket.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 65,
+                        "offset": 64
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 65,
+                    "offset": 64
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 65,
+                "offset": 64
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "param",
+              "description": "a callback to invoke on each named file that\nreturns `true` to continue the listing operation or `false` to end it",
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "function"
+              },
+              "name": "callback"
+            },
+            {
+              "title": "return",
+              "description": "that resolves to the number of files listed",
+              "lineNumber": 4,
+              "type": {
+                "type": "NameExpression",
+                "name": "Promise"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 250,
+              "column": 2
+            },
+            "end": {
+              "line": 255,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 256,
+                "column": 2
+              },
+              "end": {
+                "line": 258,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [
+            {
+              "title": "param",
+              "name": "callback",
+              "lineNumber": 2,
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "a callback to invoke on each named file that\nreturns ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 9,
+                            "offset": 53
+                          },
+                          "indent": [
+                            1
+                          ]
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "true",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 9,
+                            "offset": 53
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 15,
+                            "offset": 59
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " to continue the listing operation or ",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 15,
+                            "offset": 59
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 53,
+                            "offset": 97
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "false",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 53,
+                            "offset": 97
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 60,
+                            "offset": 104
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " to end it",
+                        "position": {
+                          "start": {
+                            "line": 2,
+                            "column": 60,
+                            "offset": 104
+                          },
+                          "end": {
+                            "line": 2,
+                            "column": 70,
+                            "offset": 114
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 70,
+                        "offset": 114
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 70,
+                    "offset": 114
+                  }
+                }
+              },
+              "type": {
+                "type": "NameExpression",
+                "name": "function"
+              }
+            }
+          ],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "that resolves to the number of files listed",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 44,
+                            "offset": 43
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 44,
+                        "offset": 43
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 44,
+                    "offset": 43
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "Promise"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "listFiles",
+          "kind": "function",
+          "memberof": "Blockstack",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Blockstack",
+              "kind": "class"
+            },
+            {
+              "name": "listFiles",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "Blockstack#listFiles"
         }
       ],
       "events": [],
@@ -6433,1355 +8119,6 @@
           "children": [
             {
               "type": "text",
-              "value": "Retrieves the specified file from the app's data store.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 56,
-                  "offset": 55
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 56,
-              "offset": 55
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 56,
-          "offset": 55
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the path to the file to read",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "param",
-        "description": "options object",
-        "lineNumber": 3,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Object"
-          }
-        },
-        "name": "options",
-        "default": "null"
-      },
-      {
-        "title": "param",
-        "description": "try to decrypt the data with the app private key",
-        "lineNumber": 4,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Boolean"
-          }
-        },
-        "name": "options.decrypt",
-        "default": "true"
-      },
-      {
-        "title": "param",
-        "description": "the Blockstack ID to lookup for multi-player storage",
-        "lineNumber": 5,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "options.username"
-      },
-      {
-        "title": "param",
-        "description": "Whether the content should be verified, only to be used\nwhen `putFile` was set to `sign = true`",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
-        },
-        "name": "options.verify"
-      },
-      {
-        "title": "param",
-        "description": "the app to lookup for multi-player storage -\ndefaults to current origin",
-        "lineNumber": 8,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "options.app"
-      },
-      {
-        "title": "param",
-        "description": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
-        "lineNumber": 10,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "String"
-          }
-        },
-        "name": "options.zoneFileLookupURL",
-        "default": "null"
-      },
-      {
-        "title": "returns",
-        "description": "that resolves to the raw data in the file\nor rejects with an error",
-        "lineNumber": 13,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 304,
-        "column": 0
-      },
-      "end": {
-        "line": 319,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 320,
-          "column": 0
-        },
-        "end": {
-          "line": 364,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the path to the file to read",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 29,
-                      "offset": 28
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 29,
-                  "offset": 28
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 29,
-              "offset": 28
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "options",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "options object",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 15,
-                      "offset": 14
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 15,
-                  "offset": 14
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 15,
-              "offset": 14
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        },
-        "default": "null",
-        "properties": [
-          {
-            "title": "param",
-            "name": "options.decrypt",
-            "lineNumber": 4,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "try to decrypt the data with the app private key",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 1,
-                          "column": 49,
-                          "offset": 48
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 49,
-                      "offset": 48
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 49,
-                  "offset": 48
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "Boolean"
-            },
-            "default": "true"
-          },
-          {
-            "title": "param",
-            "name": "options.username",
-            "lineNumber": 5,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "the Blockstack ID to lookup for multi-player storage",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 1,
-                          "column": 53,
-                          "offset": 52
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 53,
-                      "offset": 52
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 53,
-                  "offset": 52
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "String"
-            }
-          },
-          {
-            "title": "param",
-            "name": "options.verify",
-            "lineNumber": 6,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "Whether the content should be verified, only to be used\nwhen ",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 6,
-                          "offset": 61
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    },
-                    {
-                      "type": "inlineCode",
-                      "value": "putFile",
-                      "position": {
-                        "start": {
-                          "line": 2,
-                          "column": 6,
-                          "offset": 61
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 15,
-                          "offset": 70
-                        },
-                        "indent": []
-                      }
-                    },
-                    {
-                      "type": "text",
-                      "value": " was set to ",
-                      "position": {
-                        "start": {
-                          "line": 2,
-                          "column": 15,
-                          "offset": 70
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 27,
-                          "offset": 82
-                        },
-                        "indent": []
-                      }
-                    },
-                    {
-                      "type": "inlineCode",
-                      "value": "sign = true",
-                      "position": {
-                        "start": {
-                          "line": 2,
-                          "column": 27,
-                          "offset": 82
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 40,
-                          "offset": 95
-                        },
-                        "indent": []
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 40,
-                      "offset": 95
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 40,
-                  "offset": 95
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "Boolean"
-            }
-          },
-          {
-            "title": "param",
-            "name": "options.app",
-            "lineNumber": 8,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "the app to lookup for multi-player storage -\ndefaults to current origin",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 27,
-                          "offset": 71
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 27,
-                      "offset": 71
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 27,
-                  "offset": 71
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "String"
-            }
-          },
-          {
-            "title": "param",
-            "name": "options.zoneFileLookupURL",
-            "lineNumber": 10,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "The URL\nto use for zonefile lookup. If falsey, this will use the\nblockstack.js's getNameInfo function instead.",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 3,
-                          "column": 46,
-                          "offset": 110
-                        },
-                        "indent": [
-                          1,
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 3,
-                      "column": 46,
-                      "offset": 110
-                    },
-                    "indent": [
-                      1,
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 3,
-                  "column": 46,
-                  "offset": 110
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            "default": "null"
-          }
-        ]
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves to the raw data in the file\nor rejects with an error",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 25,
-                      "offset": 66
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 25,
-                  "offset": 66
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 25,
-              "offset": 66
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "getFile",
-    "kind": "function",
-    "path": [
-      {
-        "name": "getFile",
-        "kind": "function"
-      }
-    ],
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "namespace": "getFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Stores the data provided in the app's data store to to the file specified.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 75,
-                  "offset": 74
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 75,
-              "offset": 74
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 75,
-          "offset": 74
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the path to store the data in",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "param",
-        "description": "the data to store in the file",
-        "lineNumber": 3,
-        "type": {
-          "type": "UnionType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            {
-              "type": "NameExpression",
-              "name": "Buffer"
-            }
-          ]
-        },
-        "name": "content"
-      },
-      {
-        "title": "param",
-        "description": "options object",
-        "lineNumber": 4,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Object"
-          }
-        },
-        "name": "options",
-        "default": "null"
-      },
-      {
-        "title": "param",
-        "description": "encrypt the data with the app private key\n                                                 or the provided public key",
-        "lineNumber": 5,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "UnionType",
-            "elements": [
-              {
-                "type": "NameExpression",
-                "name": "Boolean"
-              },
-              {
-                "type": "NameExpression",
-                "name": "String"
-              }
-            ]
-          }
-        },
-        "name": "options.encrypt",
-        "default": "true"
-      },
-      {
-        "title": "param",
-        "description": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
-        "lineNumber": 7,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Boolean"
-          }
-        },
-        "name": "options.sign",
-        "default": "false"
-      },
-      {
-        "title": "return",
-        "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 9,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 366,
-        "column": 0
-      },
-      "end": {
-        "line": 377,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 378,
-          "column": 0
-        },
-        "end": {
-          "line": 448,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the path to store the data in",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 30,
-                      "offset": 29
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 30,
-              "offset": 29
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "content",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the data to store in the file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 30,
-                      "offset": 29
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 30,
-              "offset": 29
-            }
-          }
-        },
-        "type": {
-          "type": "UnionType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            {
-              "type": "NameExpression",
-              "name": "Buffer"
-            }
-          ]
-        }
-      },
-      {
-        "title": "param",
-        "name": "options",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "options object",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 15,
-                      "offset": 14
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 15,
-                  "offset": 14
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 15,
-              "offset": 14
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        },
-        "default": "null",
-        "properties": [
-          {
-            "title": "param",
-            "name": "options.encrypt",
-            "lineNumber": 5,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "encrypt the data with the app private key\n                                                 or the provided public key",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 76,
-                          "offset": 117
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 76,
-                      "offset": 117
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 76,
-                  "offset": 117
-                }
-              }
-            },
-            "type": {
-              "type": "UnionType",
-              "elements": [
-                {
-                  "type": "NameExpression",
-                  "name": "Boolean"
-                },
-                {
-                  "type": "NameExpression",
-                  "name": "String"
-                }
-              ]
-            },
-            "default": "true"
-          },
-          {
-            "title": "param",
-            "name": "options.sign",
-            "lineNumber": 7,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 60,
-                          "offset": 107
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 60,
-                      "offset": 107
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 60,
-                  "offset": 107
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "Boolean"
-            },
-            "default": "false"
-          }
-        ]
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves if the operation succeed and rejects\nif it failed",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 13,
-                      "offset": 63
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 13,
-                  "offset": 63
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 13,
-              "offset": 63
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "putFile",
-    "kind": "function",
-    "path": [
-      {
-        "name": "putFile",
-        "kind": "function"
-      }
-    ],
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "namespace": "putFile"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "Get the app storage bucket URL",
               "position": {
                 "start": {
@@ -7859,22 +8196,22 @@
     ],
     "loc": {
       "start": {
-        "line": 450,
+        "line": 454,
         "column": 0
       },
       "end": {
-        "line": 456,
+        "line": 460,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 457,
+          "line": 461,
           "column": 0
         },
         "end": {
-          "line": 459,
+          "line": 463,
           "column": 1
         }
       },
@@ -8202,22 +8539,22 @@
     ],
     "loc": {
       "start": {
-        "line": 24,
+        "line": 23,
         "column": 0
       },
       "end": {
-        "line": 34,
+        "line": 33,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 35,
+          "line": 34,
           "column": 0
         },
         "end": {
-          "line": 57,
+          "line": 56,
           "column": 1
         }
       },
@@ -8634,22 +8971,22 @@
     ],
     "loc": {
       "start": {
-        "line": 38,
+        "line": 41,
         "column": 2
       },
       "end": {
-        "line": 42,
+        "line": 45,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 43,
+          "line": 46,
           "column": 2
         },
         "end": {
-          "line": 43,
+          "line": 46,
           "column": 23
         }
       },
@@ -8696,7 +9033,7 @@
           "children": [
             {
               "type": "text",
-              "value": "List the set of files in this application's Gaia storage bucket.",
+              "value": "Stores the data provided in the app's data store to to the file specified.",
               "position": {
                 "start": {
                   "line": 1,
@@ -8705,8 +9042,8 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 65,
-                  "offset": 64
+                  "column": 75,
+                  "offset": 74
                 },
                 "indent": []
               }
@@ -8720,8 +9057,8 @@
             },
             "end": {
               "line": 1,
-              "column": 65,
-              "offset": 64
+              "column": 75,
+              "offset": 74
             },
             "indent": []
           }
@@ -8735,26 +9072,106 @@
         },
         "end": {
           "line": 1,
-          "column": 65,
-          "offset": 64
+          "column": 75,
+          "offset": 74
         }
       }
     },
     "tags": [
       {
         "title": "param",
-        "description": "a callback to invoke on each named file that\nreturns `true` to continue the listing operation or `false` to end it",
+        "description": "instance calling this method",
         "lineNumber": 2,
         "type": {
           "type": "NameExpression",
-          "name": "function"
+          "name": "Blockstack"
         },
-        "name": "callback"
+        "name": "caller"
+      },
+      {
+        "title": "param",
+        "description": "the path to store the data in",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "path"
+      },
+      {
+        "title": "param",
+        "description": "the data to store in the file",
+        "lineNumber": 4,
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        },
+        "name": "content"
+      },
+      {
+        "title": "param",
+        "description": "options object",
+        "lineNumber": 5,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Object"
+          }
+        },
+        "name": "options",
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "description": "encrypt the data with the app private key\n                                                 or the provided public key",
+        "lineNumber": 6,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "UnionType",
+            "elements": [
+              {
+                "type": "NameExpression",
+                "name": "Boolean"
+              },
+              {
+                "type": "NameExpression",
+                "name": "String"
+              }
+            ]
+          }
+        },
+        "name": "options.encrypt",
+        "default": "true"
+      },
+      {
+        "title": "param",
+        "description": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+        "lineNumber": 8,
+        "type": {
+          "type": "OptionalType",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Boolean"
+          }
+        },
+        "name": "options.sign",
+        "default": "false"
       },
       {
         "title": "return",
-        "description": "that resolves to the number of files listed",
-        "lineNumber": 4,
+        "description": "that resolves if the operation succeed and rejects\nif it failed",
+        "lineNumber": 10,
         "type": {
           "type": "NameExpression",
           "name": "Promise"
@@ -8763,22 +9180,22 @@
     ],
     "loc": {
       "start": {
-        "line": 544,
+        "line": 369,
         "column": 0
       },
       "end": {
-        "line": 549,
+        "line": 381,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 550,
+          "line": 382,
           "column": 0
         },
         "end": {
-          "line": 553,
+          "line": 452,
           "column": 1
         }
       },
@@ -8789,7 +9206,7 @@
     "params": [
       {
         "title": "param",
-        "name": "callback",
+        "name": "caller",
         "lineNumber": 2,
         "description": {
           "type": "root",
@@ -8799,7 +9216,7 @@
               "children": [
                 {
                   "type": "text",
-                  "value": "a callback to invoke on each named file that\nreturns ",
+                  "value": "instance calling this method",
                   "position": {
                     "start": {
                       "line": 1,
@@ -8807,79 +9224,9 @@
                       "offset": 0
                     },
                     "end": {
-                      "line": 2,
-                      "column": 9,
-                      "offset": 53
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "true",
-                  "position": {
-                    "start": {
-                      "line": 2,
-                      "column": 9,
-                      "offset": 53
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 15,
-                      "offset": 59
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " to continue the listing operation or ",
-                  "position": {
-                    "start": {
-                      "line": 2,
-                      "column": 15,
-                      "offset": 59
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 53,
-                      "offset": 97
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "false",
-                  "position": {
-                    "start": {
-                      "line": 2,
-                      "column": 53,
-                      "offset": 97
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 60,
-                      "offset": 104
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " to end it",
-                  "position": {
-                    "start": {
-                      "line": 2,
-                      "column": 60,
-                      "offset": 104
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 70,
-                      "offset": 114
+                      "line": 1,
+                      "column": 29,
+                      "offset": 28
                     },
                     "indent": []
                   }
@@ -8892,9 +9239,408 @@
                   "offset": 0
                 },
                 "end": {
+                  "line": 1,
+                  "column": 29,
+                  "offset": 28
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 29,
+              "offset": 28
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Blockstack"
+        }
+      },
+      {
+        "title": "param",
+        "name": "path",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the path to store the data in",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 30,
+                      "offset": 29
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "content",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the data to store in the file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 30,
+                      "offset": 29
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 30,
+                  "offset": 29
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 30,
+              "offset": 29
+            }
+          }
+        },
+        "type": {
+          "type": "UnionType",
+          "elements": [
+            {
+              "type": "NameExpression",
+              "name": "String"
+            },
+            {
+              "type": "NameExpression",
+              "name": "Buffer"
+            }
+          ]
+        }
+      },
+      {
+        "title": "param",
+        "name": "options",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "options object",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "Object"
+        },
+        "default": "null",
+        "properties": [
+          {
+            "title": "param",
+            "name": "options.encrypt",
+            "lineNumber": 6,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "encrypt the data with the app private key\n                                                 or the provided public key",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 76,
+                          "offset": 117
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 76,
+                      "offset": 117
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
                   "line": 2,
-                  "column": 70,
-                  "offset": 114
+                  "column": 76,
+                  "offset": 117
+                }
+              }
+            },
+            "type": {
+              "type": "UnionType",
+              "elements": [
+                {
+                  "type": "NameExpression",
+                  "name": "Boolean"
+                },
+                {
+                  "type": "NameExpression",
+                  "name": "String"
+                }
+              ]
+            },
+            "default": "true"
+          },
+          {
+            "title": "param",
+            "name": "options.sign",
+            "lineNumber": 8,
+            "description": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "paragraph",
+                  "children": [
+                    {
+                      "type": "text",
+                      "value": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
+                      "position": {
+                        "start": {
+                          "line": 1,
+                          "column": 1,
+                          "offset": 0
+                        },
+                        "end": {
+                          "line": 2,
+                          "column": 60,
+                          "offset": 107
+                        },
+                        "indent": [
+                          1
+                        ]
+                      }
+                    }
+                  ],
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 60,
+                      "offset": 107
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 60,
+                  "offset": 107
+                }
+              }
+            },
+            "type": {
+              "type": "NameExpression",
+              "name": "Boolean"
+            },
+            "default": "false"
+          }
+        ]
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "that resolves if the operation succeed and rejects\nif it failed",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 2,
+                      "column": 13,
+                      "offset": 63
+                    },
+                    "indent": [
+                      1
+                    ]
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 13,
+                  "offset": 63
                 },
                 "indent": [
                   1
@@ -8910,69 +9656,8 @@
             },
             "end": {
               "line": 2,
-              "column": 70,
-              "offset": 114
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "function"
-        }
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves to the number of files listed",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 44,
-                      "offset": 43
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 44,
-                  "offset": 43
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 44,
-              "offset": 43
+              "column": 13,
+              "offset": 63
             }
           }
         },
@@ -8986,7 +9671,7 @@
     "sees": [],
     "throws": [],
     "todos": [],
-    "name": "listFiles",
+    "name": "putFileImpl",
     "kind": "function",
     "members": {
       "global": [],
@@ -8997,10 +9682,10 @@
     },
     "path": [
       {
-        "name": "listFiles",
+        "name": "putFileImpl",
         "kind": "function"
       }
     ],
-    "namespace": "listFiles"
+    "namespace": "putFileImpl"
   }
 ]

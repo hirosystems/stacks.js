@@ -10,7 +10,6 @@ import {
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
 } from '../encryption'
-import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 
@@ -118,13 +117,14 @@ export function decryptContentImpl(caller: Blockstack,
  * (username, app) pair.
  * @private
  */
-function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?string) {
+function getGaiaAddress(caller: Blockstack,
+                        app: string, username: ?string, zoneFileLookupURL: ?string) {
   return Promise.resolve()
     .then(() => {
       if (username) {
         return getUserAppFileUrl('/', username, app, zoneFileLookupURL)
       } else {
-        return getOrSetLocalGaiaHubConnection()
+        return getOrSetLocalGaiaHubConnection(caller)
           .then(gaiaHubConfig => getFullReadUrl('/', gaiaHubConfig))
       }
     })
@@ -141,14 +141,15 @@ function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?stri
  *  multi-player reads and reads from own storage.
  * @private
  */
-function getFileContents(path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
+function getFileContents(caller: Blockstack,
+                         path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
                          forceText: boolean) : Promise<?string | ?ArrayBuffer> {
   return Promise.resolve()
     .then(() => {
       if (username) {
         return getUserAppFileUrl(path, username, app, zoneFileLookupURL)
       } else {
-        return getOrSetLocalGaiaHubConnection()
+        return getOrSetLocalGaiaHubConnection(caller)
           .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
       }
     })
@@ -185,7 +186,7 @@ function getFileContents(path: string, app: string, username: ?string, zoneFileL
  *  from own storage.
  * @private
  */
-function getFileSignedUnencrypted(path: string, opt: {
+function getFileSignedUnencrypted(caller: Blockstack, path: string, opt: {
   username?: ?string,
   app: string,
   zoneFileLookupURL?: ?string
@@ -195,10 +196,10 @@ function getFileSignedUnencrypted(path: string, opt: {
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
   return Promise.all(
-    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false),
-     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+    [getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false),
+     getFileContents(caller, `${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
                      opt.zoneFileLookupURL, true),
-     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)]
+     getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)]
   )
     .then(([fileContents, signatureContents, gaiaAddress]) => {
       if (!fileContents) {
@@ -249,14 +250,14 @@ function getFileSignedUnencrypted(path: string, opt: {
  *  gaia address for verification of the claimed public key.
  * @private
  */
-function handleSignedEncryptedContents(path: string, storedContents: string,
+function handleSignedEncryptedContents(caller: Blockstack, path: string, storedContents: string,
                                        app: string, username: ?string, zoneFileLookupURL: ?string) {
-  const appPrivateKey = loadUserData().appPrivateKey
+  const appPrivateKey = caller.loadUserData().appPrivateKey
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
 
   let addressPromise
   if (username) {
-    addressPromise = getGaiaAddress(app, username, zoneFileLookupURL)
+    addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL)
   } else {
     const address = publicKeyToAddress(appPublicKey)
     addressPromise = Promise.resolve(address)
@@ -296,7 +297,7 @@ function handleSignedEncryptedContents(path: string, storedContents: string,
       throw new SignatureVerificationError('Contents do not match ECDSA signature in file:'
                                            + ` ${path}`)
     } else {
-      return decryptContent(cipherText)
+      return caller.decryptContent(cipherText)
     }
   })
 }
@@ -330,7 +331,7 @@ export function getFileImpl(caller: Blockstack, path: string, options?: {
     decrypt: true,
     verify: false,
     username: null,
-    app: window.location.origin,
+    app: caller.session.appConfig.appDomain,
     zoneFileLookupURL: null
   }
 
@@ -339,10 +340,10 @@ export function getFileImpl(caller: Blockstack, path: string, options?: {
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.
   if (opt.verify && !opt.decrypt) {
-    return getFileSignedUnencrypted(path, opt)
+    return getFileSignedUnencrypted(caller, path, opt)
   }
 
-  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
+  return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
     .then((storedContents) => {
       if (storedContents === null) {
         return storedContents
@@ -350,12 +351,12 @@ export function getFileImpl(caller: Blockstack, path: string, options?: {
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
-        return decryptContent(storedContents)
+        return decryptContentImpl(caller, storedContents)
       } else if (opt.decrypt && opt.verify) {
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
-        return handleSignedEncryptedContents(path, storedContents,
+        return handleSignedEncryptedContents(caller, path, storedContents,
                                              opt.app, opt.username, opt.zoneFileLookupURL)
       } else if (!opt.verify && !opt.decrypt) {
         return storedContents
@@ -403,7 +404,7 @@ export function putFileImpl(caller: Blockstack, path: string, content: string | 
     if (typeof (opt.sign) === 'string') {
       privateKey = opt.sign
     } else {
-      privateKey = loadUserData().appPrivateKey
+      privateKey = caller.loadUserData().appPrivateKey
     }
   }
   if (opt.encrypt) {
@@ -411,7 +412,7 @@ export function putFileImpl(caller: Blockstack, path: string, content: string | 
       publicKey = opt.encrypt
     } else {
       if (!privateKey) {
-        privateKey = loadUserData().appPrivateKey
+        privateKey = caller.loadUserData().appPrivateKey
       }
       publicKey = getPublicKeyFromPrivate(privateKey)
     }
@@ -423,7 +424,7 @@ export function putFileImpl(caller: Blockstack, path: string, content: string | 
   if (!opt.encrypt && opt.sign) {
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
-    return getOrSetLocalGaiaHubConnection()
+    return getOrSetLocalGaiaHubConnection(caller)
       .then(gaiaHubConfig => Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
@@ -433,10 +434,10 @@ export function putFileImpl(caller: Blockstack, path: string, content: string | 
 
   // In all other cases, we only need one upload.
   if (opt.encrypt && !opt.sign) {
-    content = encryptContent(content, { publicKey })
+    content = encryptContentImpl(caller, content, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const cipherText = encryptContent(content, { publicKey })
+    const cipherText = encryptContentImpl(caller, content, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,
@@ -446,7 +447,7 @@ export function putFileImpl(caller: Blockstack, path: string, content: string | 
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
   }
-  return getOrSetLocalGaiaHubConnection()
+  return getOrSetLocalGaiaHubConnection(caller)
     .then(gaiaHubConfig => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
 }
 
@@ -535,12 +536,15 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
 
 /**
  * List the set of files in this application's Gaia storage bucket.
+ * @param {Blockstack} caller - instance calling this method
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
+ * @private
  */
-export function listFiles(callback: (name: string) => boolean) : Promise<number> {
-  return getOrSetLocalGaiaHubConnection()
+export function listFilesImpl(caller: Blockstack,
+                              callback: (name: string) => boolean) : Promise<number> {
+  return getOrSetLocalGaiaHubConnection(caller)
     .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
 }
 

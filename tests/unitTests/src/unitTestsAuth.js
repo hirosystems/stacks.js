@@ -6,7 +6,6 @@ import FetchMock from 'fetch-mock'
 import {
   makeECPrivateKey,
   getPublicKeyFromPrivate,
-  makeAuthRequest,
   makeAuthResponse,
   verifyAuthRequest,
   verifyAuthResponse,
@@ -20,13 +19,10 @@ import {
   isManifestUriValid,
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
-  handlePendingSignIn,
   signUserOut,
   Blockstack,
   AppConfig
 } from '../../../lib'
-
-import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
 
@@ -35,7 +31,7 @@ global.window = {}
 export function runAuthTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
-  const nameLookupURL = 'https://explorer-api.appartisan.com/get_name_blockchain_record/'
+  const nameLookupURL = 'https://core.blockstack.org/v1/names/'
 
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(15)
@@ -232,6 +228,9 @@ export function runAuthTests() {
   test('auth response with invalid private key', (t) => {
     t.plan(2)
 
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
+
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
 
@@ -241,24 +240,15 @@ export function runAuthTests() {
     const transitPrivateKey = makeECPrivateKey()
     const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
     const badTransitPrivateKey = makeECPrivateKey()
+    blockstack.session.transitKey = badTransitPrivateKey
     const metadata = { }
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
-    // console.log(decodeToken(authResponse))
-    global.window = Object.assign({ }, global.window, {
-      location: {
-        search: `authResponse=${authResponse}`
-      }
-    })
 
-    global.location = global.window.location
 
-    global.localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
-                                badTransitPrivateKey)
-
-    handlePendingSignIn(nameLookupURL)
+    blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.fail('Should have failed to decrypt auth response')
       })
@@ -267,9 +257,9 @@ export function runAuthTests() {
         t.pass('Should fail to decrypt auth response')
       })
       .then(() => {
-        global.window.localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
-                                           transitPrivateKey)
-        return handlePendingSignIn(nameLookupURL)
+        blockstack.session.transitKey = transitPrivateKey
+
+        return blockstack.handlePendingSignIn(authResponse)
       })
       .then(() => {
         t.pass('Should correctly sign in with correct transit key')
@@ -311,12 +301,15 @@ export function runAuthTests() {
     const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
     const metadata = {}
 
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
+    blockstack.session.transitKey = transitPrivateKey
+
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
-    global.window.localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
-                                       transitPrivateKey)
-    handlePendingSignIn(nameLookupURL, authResponse)
+
+    blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
       })
@@ -326,7 +319,7 @@ export function runAuthTests() {
       })
   })
 
-  test('handlePendingSignIn with authResponseToken and transit key', (t) => {
+  test('handlePendingSignIn 2', (t) => {
     t.plan(1)
 
     const url = `${nameLookupURL}ryan.id`
@@ -342,7 +335,11 @@ export function runAuthTests() {
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
-    handlePendingSignIn(nameLookupURL, authResponse, transitPrivateKey)
+    const appConfig = new AppConfig('http://localhost:3000')
+    const blockstack = new Blockstack(appConfig)
+    blockstack.session.transitKey = transitPrivateKey
+
+    blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
       })

@@ -7,15 +7,11 @@ import { getAddressFromDID } from '../index'
 import { LoginFailedError } from '../errors'
 import { decryptPrivateKey } from './authMessages'
 import {
-  BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
-  BLOCKSTACK_STORAGE_LABEL,
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
   NAME_LOOKUP_PATH,
   DEFAULT_CORE_NODE
 } from './authConstants'
-
-import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage'
 
 import { extractProfile } from '../profiles'
 
@@ -26,24 +22,6 @@ import type { Blockstack } from '../api'
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
-}
-
-/**
- * Fetches the hex value of the transit private key from local storage.
- * @return {String} the hex encoded private key
- * @private
- */
-export function getTransitKey() : string {
-  const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
-  return ((transitKey: any): string)
-}
-
-/**
- * Check if a user is currently signed in.
- * @return {Boolean} `true` if the user is signed in, `false` if not.
- */
-export function isUserSignedIn() {
-  return !!window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
 }
 
 /**
@@ -226,19 +204,4 @@ export function handlePendingSignInImpl(caller: Blockstack,
  */
 export function loadUserDataImpl(caller: Blockstack) {
   return caller.session.userData
-}
-
-/**
- * TODO remove localStorage from this method
- * Sign the user out and optionally redirect to given location.
- * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
- * @return {void}
- */
-export function signUserOut(redirectURL: ?string = null) {
-  window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
-  window.localStorage.removeItem(BLOCKSTACK_GAIA_HUB_LABEL)
-
-  if (redirectURL !== null) {
-    window.location = redirectURL
-  }
 }

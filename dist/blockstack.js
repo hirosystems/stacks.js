@@ -188,7 +188,7 @@ var Blockstack = exports.Blockstack = function () {
 
     // isUserSignedIn
     // signUserOut
-    // makeAuthRequest
+
     //
     //
     // /* PROFILES */
@@ -198,11 +198,9 @@ var Blockstack = exports.Blockstack = function () {
     // verifyProfileToken
     // validateProofs
     // lookupProfile
-    //
+
+
     /* STORAGE */
-    //
-    // getFile
-    // putFile
 
     /**
      * Encrypts the data provided with the app public key.
@@ -235,9 +233,74 @@ var Blockstack = exports.Blockstack = function () {
       return (0, _storage.decryptContentImpl)(this, content, options);
     }
 
-    // getAppBucketUrl
-    // getUserAppFileUrl
+    /**
+     * Stores the data provided in the app's data store to to the file specified.
+     * @param {String} path - the path to store the data in
+     * @param {String|Buffer} content - the data to store in the file
+     * @param {Object} [options=null] - options object
+     * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+     *                                                  or the provided public key
+     * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+     *                                         the app private key
+     * @return {Promise} that resolves if the operation succeed and rejects
+     * if it failed
+     */
 
+  }, {
+    key: 'putFile',
+    value: function putFile(path, content, options) {
+      return (0, _storage.putFileImpl)(this, path, content, options);
+    }
+
+    /**
+     * Retrieves the specified file from the app's data store.
+     * @param {String} path - the path to the file to read
+     * @param {Object} [options=null] - options object
+     * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
+     * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+     * @param {Boolean} options.verify - Whether the content should be verified, only to be used
+     * when `putFile` was set to `sign = true`
+     * @param {String} options.app - the app to lookup for multi-player storage -
+     * defaults to current origin
+     * @param {String} [options.zoneFileLookupURL=null] - The URL
+     * to use for zonefile lookup. If falsey, this will use the
+     * blockstack.js's getNameInfo function instead.
+     * @returns {Promise} that resolves to the raw data in the file
+     * or rejects with an error
+     */
+
+  }, {
+    key: 'getFile',
+    value: function getFile(path, options) {
+      return (0, _storage.getFileImpl)(this, path, options);
+    }
+
+    /**
+     * List the set of files in this application's Gaia storage bucket.
+     * @param {function} callback - a callback to invoke on each named file that
+     * returns `true` to continue the listing operation or `false` to end it
+     * @return {Promise} that resolves to the number of files listed
+     */
+
+  }, {
+    key: 'listFiles',
+    value: function listFiles(callback) {
+      return (0, _storage.listFilesImpl)(this, callback);
+    }
+
+    /**
+     * Deletes the specified file from the app's data store. Currently not implemented.
+     * @param {String} path - the path to the file to delete
+     * @returns {Promise} that resolves when the file has been removed
+     * or rejects with an error
+     * @private
+     */
+
+  }, {
+    key: 'deleteFile',
+    value: function deleteFile(path) {
+      Promise.reject(new Error('Delete of ' + path + ' not supported by gaia hubs'));
+    }
   }]);
 
   return Blockstack;
@@ -2624,7 +2687,9 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
     value: function getNameInfo(fullyQualifiedName) {
       var _this4 = this;
 
-      return fetch(this.blockstackAPIUrl + '/v1/names/' + fullyQualifiedName).then(function (resp) {
+      console.log(this.blockstackAPIUrl);
+      var nameLookupURL = this.blockstackAPIUrl + '/v1/names/' + fullyQualifiedName;
+      return fetch(nameLookupURL).then(function (resp) {
         if (resp.status === 404) {
           throw new Error('Name not found');
         } else if (resp.status !== 200) {
@@ -2633,6 +2698,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
           return resp.json();
         }
       }).then(function (nameInfo) {
+        console.log('nameInfo: ' + JSON.stringify(nameInfo));
         // the returned address _should_ be in the correct network ---
         //  blockstackd gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
@@ -7809,6 +7875,9 @@ var BlockstackSession = exports.BlockstackSession = function () {
    * Blockstack app
    * @type {AppConfig}
    */
+
+
+  // TODO use this
   function BlockstackSession(options) {
     _classCallCheck(this, BlockstackSession);
 
@@ -7878,8 +7947,6 @@ var _crypto2 = _interopRequireDefault(_crypto);
 
 var _jsontokens = require('jsontokens');
 
-var _authApp = require('../auth/authApp');
-
 var _utils = require('../utils');
 
 var _index = require('../index');
@@ -7891,7 +7958,6 @@ var _logger = require('../logger');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
-
 function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
 
@@ -7978,35 +8044,29 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
  * These two functions are app-specific connections to gaia hub,
  *   they read the user data object for information on setting up
  *   a hub connection, and store the hub config to localstorage
+ * @param {Blockstack} caller - the instance calling this function
  * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
-function setLocalGaiaHubConnection() {
-  var userData = (0, _authApp.loadUserData)();
+function setLocalGaiaHubConnection(caller) {
+  var userData = caller.loadUserData();
 
   if (!userData.hubUrl) {
     userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
-
-    window.localStorage.setItem(_authConstants.BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData));
-
-    userData = (0, _authApp.loadUserData)();
   }
 
   return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey).then(function (gaiaConfig) {
-    localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(gaiaConfig));
+    userData.gaiaHubConfig = gaiaConfig;
     return gaiaConfig;
   });
 }
 
-function getOrSetLocalGaiaHubConnection() {
-  var hubConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL);
+function getOrSetLocalGaiaHubConnection(caller) {
+  var hubConfig = caller.session.userData.gaiaHubConfig;
   if (hubConfig) {
-    var hubJSON = JSON.parse(hubConfig);
-    if (hubJSON !== null) {
-      return Promise.resolve(hubJSON);
-    }
+    return Promise.resolve(hubConfig);
   }
-  return setLocalGaiaHubConnection();
+  return setLocalGaiaHubConnection(caller);
 }
 
 function getBucketUrl(gaiaHubUrl, appPrivateKey) {
@@ -8029,7 +8089,7 @@ function getBucketUrl(gaiaHubUrl, appPrivateKey) {
   });
 }
 }).call(this,require("buffer").Buffer)
-},{"../auth/authApp":3,"../auth/authConstants":4,"../index":14,"../logger":16,"../utils":49,"bitcoinjs-lib":95,"buffer":182,"crypto":191,"jsontokens":387}],48:[function(require,module,exports){
+},{"../auth/authConstants":4,"../index":14,"../logger":16,"../utils":49,"bitcoinjs-lib":95,"buffer":182,"crypto":191,"jsontokens":387}],48:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8044,17 +8104,14 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 exports.getUserAppFileUrl = getUserAppFileUrl;
 exports.encryptContentImpl = encryptContentImpl;
 exports.decryptContentImpl = decryptContentImpl;
-exports.getFile = getFile;
-exports.putFile = putFile;
+exports.getFileImpl = getFileImpl;
+exports.putFileImpl = putFileImpl;
 exports.getAppBucketUrl = getAppBucketUrl;
-exports.deleteFile = deleteFile;
-exports.listFiles = listFiles;
+exports.listFilesImpl = listFilesImpl;
 
 var _hub = require('./hub');
 
 var _encryption = require('../encryption');
-
-var _auth = require('../auth');
 
 var _keys = require('../keys');
 
@@ -8157,12 +8214,12 @@ function decryptContentImpl(caller, content, options) {
  * (username, app) pair.
  * @private
  */
-function getGaiaAddress(app, username, zoneFileLookupURL) {
+function getGaiaAddress(caller, app, username, zoneFileLookupURL) {
   return Promise.resolve().then(function () {
     if (username) {
       return getUserAppFileUrl('/', username, app, zoneFileLookupURL);
     } else {
-      return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+      return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
         return (0, _hub.getFullReadUrl)('/', gaiaHubConfig);
       });
     }
@@ -8179,12 +8236,12 @@ function getGaiaAddress(app, username, zoneFileLookupURL) {
  *  multi-player reads and reads from own storage.
  * @private
  */
-function getFileContents(path, app, username, zoneFileLookupURL, forceText) {
+function getFileContents(caller, path, app, username, zoneFileLookupURL, forceText) {
   return Promise.resolve().then(function () {
     if (username) {
       return getUserAppFileUrl(path, username, app, zoneFileLookupURL);
     } else {
-      return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+      return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
         return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
       });
     }
@@ -8221,12 +8278,12 @@ function getFileContents(path, app, username, zoneFileLookupURL, forceText) {
  *  from own storage.
  * @private
  */
-function getFileSignedUnencrypted(path, opt) {
+function getFileSignedUnencrypted(caller, path, opt) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
-  return Promise.all([getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false), getFileContents('' + path + SIGNATURE_FILE_SUFFIX, opt.app, opt.username, opt.zoneFileLookupURL, true), getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL)]).then(function (_ref) {
+  return Promise.all([getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false), getFileContents(caller, '' + path + SIGNATURE_FILE_SUFFIX, opt.app, opt.username, opt.zoneFileLookupURL, true), getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)]).then(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 3),
         fileContents = _ref2[0],
         signatureContents = _ref2[1],
@@ -8271,13 +8328,13 @@ function getFileSignedUnencrypted(path, opt) {
  *  gaia address for verification of the claimed public key.
  * @private
  */
-function handleSignedEncryptedContents(path, storedContents, app, username, zoneFileLookupURL) {
-  var appPrivateKey = (0, _auth.loadUserData)().appPrivateKey;
+function handleSignedEncryptedContents(caller, path, storedContents, app, username, zoneFileLookupURL) {
+  var appPrivateKey = caller.loadUserData().appPrivateKey;
   var appPublicKey = (0, _keys.getPublicKeyFromPrivate)(appPrivateKey);
 
   var addressPromise = void 0;
   if (username) {
-    addressPromise = getGaiaAddress(app, username, zoneFileLookupURL);
+    addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL);
   } else {
     var address = (0, _keys.publicKeyToAddress)(appPublicKey);
     addressPromise = Promise.resolve(address);
@@ -8309,13 +8366,14 @@ function handleSignedEncryptedContents(path, storedContents, app, username, zone
     } else if (!(0, _encryption.verifyECDSA)(cipherText, signerPublicKey, signature)) {
       throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature in file:' + (' ' + path));
     } else {
-      return decryptContent(cipherText);
+      return caller.decryptContent(cipherText);
     }
   });
 }
 
 /**
  * Retrieves the specified file from the app's data store.
+ * @param {Blockstack} caller - instance calling this method
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
@@ -8329,13 +8387,14 @@ function handleSignedEncryptedContents(path, storedContents, app, username, zone
  * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
+ * @private
  */
-function getFile(path, options) {
+function getFileImpl(caller, path, options) {
   var defaults = {
     decrypt: true,
     verify: false,
     username: null,
-    app: window.location.origin,
+    app: caller.session.appConfig.appDomain,
     zoneFileLookupURL: null
   };
 
@@ -8344,22 +8403,22 @@ function getFile(path, options) {
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.
   if (opt.verify && !opt.decrypt) {
-    return getFileSignedUnencrypted(path, opt);
+    return getFileSignedUnencrypted(caller, path, opt);
   }
 
-  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt).then(function (storedContents) {
+  return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt).then(function (storedContents) {
     if (storedContents === null) {
       return storedContents;
     } else if (opt.decrypt && !opt.verify) {
       if (typeof storedContents !== 'string') {
         throw new Error('Expected to get back a string for the cipherText');
       }
-      return decryptContent(storedContents);
+      return decryptContentImpl(caller, storedContents);
     } else if (opt.decrypt && opt.verify) {
       if (typeof storedContents !== 'string') {
         throw new Error('Expected to get back a string for the cipherText');
       }
-      return handleSignedEncryptedContents(path, storedContents, opt.app, opt.username, opt.zoneFileLookupURL);
+      return handleSignedEncryptedContents(caller, path, storedContents, opt.app, opt.username, opt.zoneFileLookupURL);
     } else if (!opt.verify && !opt.decrypt) {
       return storedContents;
     } else {
@@ -8370,6 +8429,7 @@ function getFile(path, options) {
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
+ * @param {Blockstack} caller - instance calling this method
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
@@ -8380,7 +8440,7 @@ function getFile(path, options) {
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-function putFile(path, content, options) {
+function putFileImpl(caller, path, content, options) {
   var defaults = {
     encrypt: true,
     sign: false
@@ -8402,7 +8462,7 @@ function putFile(path, content, options) {
     if (typeof opt.sign === 'string') {
       privateKey = opt.sign;
     } else {
-      privateKey = (0, _auth.loadUserData)().appPrivateKey;
+      privateKey = caller.loadUserData().appPrivateKey;
     }
   }
   if (opt.encrypt) {
@@ -8410,7 +8470,7 @@ function putFile(path, content, options) {
       publicKey = opt.encrypt;
     } else {
       if (!privateKey) {
-        privateKey = (0, _auth.loadUserData)().appPrivateKey;
+        privateKey = caller.loadUserData().appPrivateKey;
       }
       publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
     }
@@ -8422,7 +8482,7 @@ function putFile(path, content, options) {
   if (!opt.encrypt && opt.sign) {
     var signatureObject = (0, _encryption.signECDSA)(privateKey, content);
     var signatureContent = JSON.stringify(signatureObject);
-    return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+    return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
       return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType), (0, _hub.uploadToGaiaHub)('' + path + SIGNATURE_FILE_SUFFIX, signatureContent, gaiaHubConfig, 'application/json')]);
     }).then(function (fileUrls) {
       return fileUrls[0];
@@ -8431,10 +8491,10 @@ function putFile(path, content, options) {
 
   // In all other cases, we only need one upload.
   if (opt.encrypt && !opt.sign) {
-    content = encryptContent(content, { publicKey: publicKey });
+    content = encryptContentImpl(caller, content, { publicKey: publicKey });
     contentType = 'application/json';
   } else if (opt.encrypt && opt.sign) {
-    var cipherText = encryptContent(content, { publicKey: publicKey });
+    var cipherText = encryptContentImpl(caller, content, { publicKey: publicKey });
     var _signatureObject = (0, _encryption.signECDSA)(privateKey, cipherText);
     var signedCipherObject = {
       signature: _signatureObject.signature,
@@ -8444,7 +8504,7 @@ function putFile(path, content, options) {
     content = JSON.stringify(signedCipherObject);
     contentType = 'application/json';
   }
-  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+  return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
     return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType);
   });
 }
@@ -8458,17 +8518,6 @@ function putFile(path, content, options) {
  */
 function getAppBucketUrl(gaiaHubUrl, appPrivateKey) {
   return (0, _hub.getBucketUrl)(gaiaHubUrl, appPrivateKey);
-}
-
-/**
- * Deletes the specified file from the app's data store. Currently not implemented.
- * @param {String} path - the path to the file to delete
- * @returns {Promise} that resolves when the file has been removed
- * or rejects with an error
- * @private
- */
-function deleteFile(path) {
-  Promise.reject(new Error('Delete of ' + path + ' not supported by gaia hubs'));
 }
 
 /**
@@ -8538,12 +8587,14 @@ function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
 
 /**
  * List the set of files in this application's Gaia storage bucket.
+ * @param {Blockstack} caller - instance calling this method
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
+ * @private
  */
-function listFiles(callback) {
-  return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
+function listFilesImpl(caller, callback) {
+  return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
     return listFilesLoop(gaiaHubConfig, null, 0, 0, callback);
   });
 }
@@ -8552,7 +8603,7 @@ exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
 exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
 }).call(this,require("buffer").Buffer)
-},{"../auth":9,"../encryption":12,"../errors":13,"../keys":15,"../logger":16,"../profiles":24,"./hub":47,"buffer":182}],49:[function(require,module,exports){
+},{"../encryption":12,"../errors":13,"../keys":15,"../logger":16,"../profiles":24,"./hub":47,"buffer":182}],49:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 

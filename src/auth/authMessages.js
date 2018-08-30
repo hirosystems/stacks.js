@@ -8,13 +8,11 @@ import {
 
 import {
   makeDIDFromAddress, makeUUID4,
-  nextMonth, nextHour, publicKeyToAddress,
+  nextMonth, publicKeyToAddress,
   makeECPrivateKey
 } from '../index'
 
 import { encryptECIES, decryptECIES } from '../encryption'
-
-import type { BlockstackSession } from '../session'
 
 import { Logger } from '../logger'
 

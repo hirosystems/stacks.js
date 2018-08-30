@@ -3,11 +3,6 @@ export {
 } from './appConfig'
 
 export {
-  isUserSignedIn,
-  signUserOut,
-  getTransitKey
-} from './authApp'
-export {
   makeAuthResponse
 } from './authMessages'
 export {
