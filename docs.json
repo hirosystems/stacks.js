@@ -133,446 +133,6 @@
           "children": [
             {
               "type": "text",
-              "value": "Check if a user is currently signed in.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 40,
-                  "offset": 39
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 40,
-              "offset": 39
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 40,
-          "offset": 39
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "return",
-        "description": "`true` if the user is signed in, `false` if not.",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 41,
-        "column": 0
-      },
-      "end": {
-        "line": 44,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 45,
-          "column": 0
-        },
-        "end": {
-          "line": 47,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "inlineCode",
-                  "value": "true",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 7,
-                      "offset": 6
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " if the user is signed in, ",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 7,
-                      "offset": 6
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 34,
-                      "offset": 33
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "inlineCode",
-                  "value": "false",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 34,
-                      "offset": 33
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "indent": []
-                  }
-                },
-                {
-                  "type": "text",
-                  "value": " if not.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 41,
-                      "offset": 40
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 49,
-                      "offset": 48
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 49,
-                  "offset": 48
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 49,
-              "offset": 48
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Boolean"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "isUserSignedIn",
-    "kind": "function",
-    "path": [
-      {
-        "name": "isUserSignedIn",
-        "kind": "function"
-      }
-    ],
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "namespace": "isUserSignedIn"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "TODO remove localStorage from this method\nSign the user out and optionally redirect to given location.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 61,
-                  "offset": 102
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 61,
-              "offset": 102
-            },
-            "indent": [
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 2,
-          "column": 61,
-          "offset": 102
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "Location to redirect user to after sign out.",
-        "lineNumber": 3,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "String"
-          }
-        },
-        "name": "redirectURL",
-        "default": "null"
-      },
-      {
-        "title": "return",
-        "description": null,
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "void"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 231,
-        "column": 0
-      },
-      "end": {
-        "line": 236,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 237,
-          "column": 0
-        },
-        "end": {
-          "line": 244,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/auth/authApp.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "redirectURL",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "Location to redirect user to after sign out.",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 45,
-                      "offset": 44
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 45,
-                  "offset": 44
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 45,
-              "offset": 44
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "default": "null"
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "void"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "signUserOut",
-    "kind": "function",
-    "path": [
-      {
-        "name": "signUserOut",
-        "kind": "function"
-      }
-    ],
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "namespace": "signUserOut"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "abc\n",
               "position": {
                 "start": {
@@ -676,22 +236,22 @@
     ],
     "loc": {
       "start": {
-        "line": 33,
+        "line": 36,
         "column": 0
       },
       "end": {
-        "line": 37,
+        "line": 40,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 38,
+          "line": 41,
           "column": 0
         },
         "end": {
-          "line": 270,
+          "line": 289,
           "column": 1
         }
       },
@@ -703,7 +263,7 @@
       {
         "title": "param",
         "name": "initialValue",
-        "lineNumber": 41,
+        "lineNumber": 44,
         "type": {
           "type": "NameExpression",
           "name": "AppConfig"
@@ -1027,22 +587,22 @@
           ],
           "loc": {
             "start": {
-              "line": 50,
+              "line": 53,
               "column": 2
             },
             "end": {
-              "line": 64,
+              "line": 67,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 65,
+                "line": 68,
                 "column": 2
               },
               "end": {
-                "line": 67,
+                "line": 70,
                 "column": 3
               }
             },
@@ -1303,22 +863,22 @@
           ],
           "loc": {
             "start": {
-              "line": 69,
+              "line": 72,
               "column": 2
             },
             "end": {
-              "line": 80,
+              "line": 83,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 81,
+                "line": 84,
                 "column": 2
               },
               "end": {
-                "line": 85,
+                "line": 88,
                 "column": 3
               }
             },
@@ -1597,22 +1157,22 @@
           ],
           "loc": {
             "start": {
-              "line": 111,
+              "line": 118,
               "column": 2
             },
             "end": {
-              "line": 117,
+              "line": 124,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 118,
+                "line": 125,
                 "column": 2
               },
               "end": {
-                "line": 122,
+                "line": 129,
                 "column": 3
               }
             },
@@ -1776,22 +1336,22 @@
           ],
           "loc": {
             "start": {
-              "line": 125,
+              "line": 131,
               "column": 2
             },
             "end": {
-              "line": 128,
+              "line": 134,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 129,
+                "line": 135,
                 "column": 2
               },
               "end": {
-                "line": 132,
+                "line": 138,
                 "column": 3
               }
             },
@@ -1972,22 +1532,22 @@
           ],
           "loc": {
             "start": {
-              "line": 134,
+              "line": 140,
               "column": 2
             },
             "end": {
-              "line": 137,
+              "line": 143,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 138,
+                "line": 144,
                 "column": 2
               },
               "end": {
-                "line": 140,
+                "line": 146,
                 "column": 3
               }
             },
@@ -2128,6 +1688,236 @@
                 "children": [
                   {
                     "type": "text",
+                    "value": "Check if a user is currently signed in.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 40,
+                        "offset": 39
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 40,
+                    "offset": 39
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 40,
+                "offset": 39
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "return",
+              "description": "`true` if the user is signed in, `false` if not.",
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "Boolean"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 148,
+              "column": 2
+            },
+            "end": {
+              "line": 151,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 152,
+                "column": 2
+              },
+              "end": {
+                "line": 154,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "inlineCode",
+                        "value": "true",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " if the user is signed in, ",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 7,
+                            "offset": 6
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "inlineCode",
+                        "value": "false",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 34,
+                            "offset": 33
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 41,
+                            "offset": 40
+                          },
+                          "indent": []
+                        }
+                      },
+                      {
+                        "type": "text",
+                        "value": " if not.",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 41,
+                            "offset": 40
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 49,
+                            "offset": 48
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 49,
+                        "offset": 48
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 49,
+                    "offset": 48
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "Boolean"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "isUserSignedIn",
+          "kind": "function",
+          "memberof": "Blockstack",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Blockstack",
+              "kind": "class"
+            },
+            {
+              "name": "isUserSignedIn",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "Blockstack#isUserSignedIn"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
                     "value": "Try to process any pending sign in request by returning a ",
                     "position": {
                       "start": {
@@ -2233,22 +2023,22 @@
           ],
           "loc": {
             "start": {
-              "line": 142,
+              "line": 156,
               "column": 2
             },
             "end": {
-              "line": 149,
+              "line": 163,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 150,
+                "line": 164,
                 "column": 2
               },
               "end": {
-                "line": 152,
+                "line": 166,
                 "column": 3
               }
             },
@@ -2513,22 +2303,22 @@
           ],
           "loc": {
             "start": {
-              "line": 154,
+              "line": 168,
               "column": 2
             },
             "end": {
-              "line": 157,
+              "line": 171,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 158,
+                "line": 172,
                 "column": 2
               },
               "end": {
-                "line": 160,
+                "line": 174,
                 "column": 3
               }
             },
@@ -2625,6 +2415,149 @@
             }
           ],
           "namespace": "Blockstack#loadUserData"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Sign the user out",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 18,
+                        "offset": 17
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 18,
+                    "offset": 17
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 18,
+                "offset": 17
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "return",
+              "description": null,
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "void"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 177,
+              "column": 2
+            },
+            "end": {
+              "line": 180,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 181,
+                "column": 2
+              },
+              "end": {
+                "line": 183,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/api.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "void"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "signUserOut",
+          "kind": "function",
+          "memberof": "Blockstack",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "Blockstack",
+              "kind": "class"
+            },
+            {
+              "name": "signUserOut",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "Blockstack#signUserOut"
         },
         {
           "description": {
@@ -2735,22 +2668,22 @@
           ],
           "loc": {
             "start": {
-              "line": 179,
+              "line": 198,
               "column": 2
             },
             "end": {
-              "line": 186,
+              "line": 205,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 187,
+                "line": 206,
                 "column": 2
               },
               "end": {
-                "line": 190,
+                "line": 209,
                 "column": 3
               }
             },
@@ -3204,22 +3137,22 @@
           ],
           "loc": {
             "start": {
-              "line": 192,
+              "line": 211,
               "column": 2
             },
             "end": {
-              "line": 200,
+              "line": 219,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 201,
+                "line": 220,
                 "column": 2
               },
               "end": {
-                "line": 203,
+                "line": 222,
                 "column": 3
               }
             },
@@ -3672,22 +3605,22 @@
           ],
           "loc": {
             "start": {
-              "line": 205,
+              "line": 224,
               "column": 2
             },
             "end": {
-              "line": 216,
+              "line": 235,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 217,
+                "line": 236,
                 "column": 2
               },
               "end": {
-                "line": 222,
+                "line": 241,
                 "column": 3
               }
             },
@@ -4274,22 +4207,22 @@
           ],
           "loc": {
             "start": {
-              "line": 224,
+              "line": 243,
               "column": 2
             },
             "end": {
-              "line": 239,
+              "line": 258,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 240,
+                "line": 259,
                 "column": 2
               },
               "end": {
-                "line": 248,
+                "line": 267,
                 "column": 3
               }
             },
@@ -4965,22 +4898,22 @@
           ],
           "loc": {
             "start": {
-              "line": 250,
+              "line": 269,
               "column": 2
             },
             "end": {
-              "line": 255,
+              "line": 274,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 256,
+                "line": 275,
                 "column": 2
               },
               "end": {
-                "line": 258,
+                "line": 277,
                 "column": 3
               }
             },
@@ -8196,22 +8129,22 @@
     ],
     "loc": {
       "start": {
-        "line": 454,
+        "line": 461,
         "column": 0
       },
       "end": {
-        "line": 460,
+        "line": 467,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 461,
+          "line": 468,
           "column": 0
         },
         "end": {
-          "line": 463,
+          "line": 470,
           "column": 1
         }
       },
@@ -8539,22 +8472,22 @@
     ],
     "loc": {
       "start": {
-        "line": 23,
+        "line": 25,
         "column": 0
       },
       "end": {
-        "line": 33,
+        "line": 35,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 34,
+          "line": 36,
           "column": 0
         },
         "end": {
-          "line": 56,
+          "line": 58,
           "column": 1
         }
       },
@@ -9180,22 +9113,22 @@
     ],
     "loc": {
       "start": {
-        "line": 369,
+        "line": 376,
         "column": 0
       },
       "end": {
-        "line": 381,
+        "line": 388,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 382,
+          "line": 389,
           "column": 0
         },
         "end": {
-          "line": 452,
+          "line": 459,
           "column": 1
         }
       },

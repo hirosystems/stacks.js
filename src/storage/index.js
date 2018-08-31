@@ -12,8 +12,10 @@ import {
 } from '../encryption'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
-
-import { SignatureVerificationError } from '../errors'
+import {
+  InvalidStateError,
+  SignatureVerificationError
+} from '../errors'
 import { Logger } from '../logger'
 
 import type { Blockstack } from '../api'
@@ -71,7 +73,8 @@ export function encryptContentImpl(caller: Blockstack,
   const defaults = { publicKey: null }
   const opt = Object.assign({}, defaults, options)
   if (!opt.publicKey) {
-    const privateKey = caller.loadUserData().appPrivateKey
+    const userData = caller.loadUserData()
+    const privateKey = userData.appPrivateKey
     opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
 
@@ -327,11 +330,15 @@ export function getFileImpl(caller: Blockstack, path: string, options?: {
     app?: string,
     zoneFileLookupURL?: ?string
   }) {
+  const appConfig = caller.session.appConfig
+  if (!appConfig) {
+    throw new InvalidStateError('Missing AppConfig')
+  }
   const defaults = {
     decrypt: true,
     verify: false,
     username: null,
-    app: caller.session.appConfig.appDomain,
+    app: appConfig.appDomain,
     zoneFileLookupURL: null
   }
 

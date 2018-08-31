@@ -35,26 +35,6 @@
               
                 
                 <li><a
-                  href='#isusersignedin'
-                  class="">
-                  isUserSignedIn
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#signuserout'
-                  class="">
-                  signUserOut
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
                   href='#blockstack'
                   class=" toggle-sibling">
                   Blockstack
@@ -98,6 +78,12 @@
                       </a></li>
                       
                       <li><a
+                        href='#blockstackisusersignedin'
+                        class='regular pre-open'>
+                        #isUserSignedIn
+                      </a></li>
+                      
+                      <li><a
                         href='#blockstackhandlependingsignin'
                         class='regular pre-open'>
                         #handlePendingSignIn
@@ -107,6 +93,12 @@
                         href='#blockstackloaduserdata'
                         class='regular pre-open'>
                         #loadUserData
+                      </a></li>
+                      
+                      <li><a
+                        href='#blockstacksignuserout'
+                        class='regular pre-open'>
+                        #signUserOut
                       </a></li>
                       
                       <li><a
@@ -290,135 +282,6 @@
   
 </section>
 </div>
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='isusersignedin'>
-      isUserSignedIn
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Check if a user is currently signed in.</p>
-
-
-  <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
-        <code>true</code>
- if the user is signed in, 
-<code>false</code>
- if not.
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='signuserout'>
-      signUserOut
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>TODO remove localStorage from this method
-Sign the user out and optionally redirect to given location.</p>
-
-
-  <div class='pre p1 fill-light mt0'>signUserOut(redirectURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>redirectURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
-            = <code>null</code>)</code>
-	    Location to redirect user to after sign out.
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code>void</code>:
-        
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
           
         
           
@@ -797,6 +660,63 @@ and store in the session</p>
       </div>
     </div>
   
+    <div class='border-bottom' id='blockstackisusersignedin'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>isUserSignedIn()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Check if a user is currently signed in.</p>
+
+
+  <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>:
+        <code>true</code>
+ if the user is signed in, 
+<code>false</code>
+ if not.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='blockstackhandlependingsignin'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -903,6 +823,60 @@ if handling the sign in request fails or there was no pending sign in request.
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
         User data object.
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='blockstacksignuserout'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>signUserOut()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Sign the user out</p>
+
+
+  <div class='pre p1 fill-light mt0'>signUserOut(): void</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>void</code>:
+        
 
       
     

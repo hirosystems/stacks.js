@@ -9,6 +9,7 @@ import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from '../auth/authConstants'
 
 import type { Blockstack } from '../api'
 import { Logger } from '../logger'
+import { InvalidStateError } from '../errors'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
@@ -118,6 +119,10 @@ export function connectToGaiaHub(gaiaHubUrl: string,
 export function setLocalGaiaHubConnection(caller: Blockstack): Promise<GaiaHubConfig> {
   const userData = caller.loadUserData()
 
+  if (!userData) {
+    throw new InvalidStateError('Missing userData')
+  }
+
   if (!userData.hubUrl) {
     userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
   }
@@ -130,7 +135,11 @@ export function setLocalGaiaHubConnection(caller: Blockstack): Promise<GaiaHubCo
 }
 
 export function getOrSetLocalGaiaHubConnection(caller: Blockstack): Promise<GaiaHubConfig> {
-  const hubConfig = caller.session.userData.gaiaHubConfig
+  const userData = caller.session.userData
+  if (!userData) {
+    throw new InvalidStateError('Missing userData')
+  }
+  const hubConfig = userData.gaiaHubConfig
   if (hubConfig) {
     return Promise.resolve(hubConfig)
   }

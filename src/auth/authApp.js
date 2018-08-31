@@ -4,7 +4,7 @@ import protocolCheck from 'custom-protocol-detection-blockstack'
 import { verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID } from '../index'
-import { LoginFailedError } from '../errors'
+import { InvalidStateError, LoginFailedError } from '../errors'
 import { decryptPrivateKey } from './authMessages'
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
@@ -203,5 +203,9 @@ export function handlePendingSignInImpl(caller: Blockstack,
  *  @private
  */
 export function loadUserDataImpl(caller: Blockstack) {
-  return caller.session.userData
+  const userData = caller.session.userData
+  if (!userData) {
+    throw InvalidStateError('No user data found. Did the user sign in?')
+  }
+  return userData
 }

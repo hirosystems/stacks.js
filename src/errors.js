@@ -2,6 +2,7 @@
 export const ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',
+  INVALID_STATE: 'invalid_state',
   UNKNOWN: 'unknown'
 }
 
@@ -105,5 +106,13 @@ export class SignatureVerificationError extends BlockstackError {
     super({ code: 'signature_verification_failure', message })
     this.message = message
     this.name = 'SignatureVerificationError'
+  }
+}
+
+export class InvalidStateError extends BlockstackError {
+  constructor(message: string) {
+    super({ code: ERROR_CODES.INVALID_STATE, message })
+    this.message = message
+    this.name = 'InvalidStateError'
   }
 }

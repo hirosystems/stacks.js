@@ -29,6 +29,9 @@ import {
 import {
   nextHour
 } from './utils'
+import {
+  InvalidStateError
+} from './errors'
 
 /**
  * abc
@@ -101,6 +104,10 @@ export class Blockstack {
   makeAuthRequest(transitKey: string,
                   expiresAt: number = nextHour().getTime()): string {
     const appConfig = this.session.appConfig
+
+    if (!appConfig) {
+      throw new InvalidStateError('Missing AppConfig')
+    }
     const redirectURI = appConfig.redirectURI()
     const manifestURI = appConfig.manifestURI()
     const scopes = appConfig.scopes

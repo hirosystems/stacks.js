@@ -57,7 +57,7 @@ export function generateTransitKey() {
 export function makeAuthRequestImpl(transitPrivateKey: string,
                                     redirectURI: string,
                                     manifestURI: string,
-                                    scopes: Array<String>,
+                                    scopes: Array<string>,
                                     appDomain: string = window.location.origin,
                                     expiresAt: number): string {
   /* Create the payload */
