@@ -19,7 +19,6 @@ import {
   isManifestUriValid,
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
-  signUserOut,
   Blockstack,
   AppConfig
 } from '../../../lib'
@@ -268,25 +267,6 @@ export function runAuthTests() {
         console.log(err.stack)
         t.fail('Should not error')
       })
-  })
-
-  test('signUserOut with redirect', (t) => {
-    t.plan(1)
-    const startURL = 'https://example.com'
-    const redirectURL = 'https://example.com/redirect'
-    window.location = startURL
-
-    signUserOut(redirectURL)
-    t.equal(redirectURL, window.location, 'User should be redirected to the redirectURL')
-  })
-
-  test('signUserOut without redirect', (t) => {
-    t.plan(1)
-    const startURL = 'https://example.com'
-    window.location = startURL
-
-    signUserOut()
-    t.equal(startURL, window.location, 'User should not be redirected')
   })
 
   test('handlePendingSignIn with authResponseToken', (t) => {
