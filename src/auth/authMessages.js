@@ -26,7 +26,7 @@ type AuthMetadata = {
 /**
  * Generates a ECDSA keypair to
  * use as the ephemeral app transit private key
- * @param {BlockstackSession} session - session object in which key will be stored
+ * @param {SessionData} session - session object in which key will be stored
  * @return {String} the hex encoded private key
  * @private
  */

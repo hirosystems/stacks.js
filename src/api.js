@@ -1,8 +1,8 @@
 /* @flow */
 import queryString from 'query-string'
 import { AppConfig } from './auth/appConfig'
-import { BlockstackSession } from './session'
-import type { BlockstackSessionOptions } from './session'
+import { SessionData } from './session'
+import type { SessionOptions } from './session'
 import {
   redirectToSignInImpl,
   redirectToSignInWithAuthRequestImpl,
@@ -38,14 +38,14 @@ import {
  * [session description]
  * @type {[type]}
  */
-export class Blockstack {
-  session: BlockstackSession
+export class UserSession {
+  session: SessionData
 
   constructor(initialValue: AppConfig) {
-    const sessionOptions: BlockstackSessionOptions = {
+    const sessionOptions: SessionOptions = {
       appConfig: initialValue
     }
-    this.session = new BlockstackSession(sessionOptions)
+    this.session = new SessionData(sessionOptions)
   }
 
   /* AUTHENTICATION */

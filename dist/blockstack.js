@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Blockstack = undefined;
+exports.UserSession = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -37,14 +37,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * [session description]
  * @type {[type]}
  */
-var Blockstack = exports.Blockstack = function () {
-  function Blockstack(initialValue) {
-    _classCallCheck(this, Blockstack);
+var UserSession = exports.UserSession = function () {
+  function UserSession(initialValue) {
+    _classCallCheck(this, UserSession);
 
     var sessionOptions = {
       appConfig: initialValue
     };
-    this.session = new _session.BlockstackSession(sessionOptions);
+    this.session = new _session.SessionData(sessionOptions);
   }
 
   /* AUTHENTICATION */
@@ -66,7 +66,7 @@ var Blockstack = exports.Blockstack = function () {
    */
 
 
-  _createClass(Blockstack, [{
+  _createClass(UserSession, [{
     key: 'redirectToSignIn',
     value: function redirectToSignIn() {
       return (0, _authApp.redirectToSignInImpl)(this);
@@ -328,7 +328,7 @@ var Blockstack = exports.Blockstack = function () {
     }
   }]);
 
-  return Blockstack;
+  return UserSession;
 }();
 },{"./auth/appConfig":2,"./auth/authApp":3,"./auth/authConstants":4,"./auth/authMessages":5,"./errors":13,"./session":46,"./storage":48,"./utils":49,"query-string":453}],2:[function(require,module,exports){
 'use strict';
@@ -485,7 +485,7 @@ var DEFAULT_PROFILE = {
  * authentication request is generated. If your app falls into this category,
  * use `makeAuthRequest`,
  * and `redirectToSignInWithAuthRequest` to build your own sign in process.
- * @param {Blockstack} caller - the instance calling this function
+ * @param {UserSession} caller - the instance calling this function
  * @return {void}
  * @private
  */
@@ -499,7 +499,7 @@ function redirectToSignInImpl(caller) {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
- * @param {Blockstack} caller - the instance calling this function
+ * @param {UserSession} caller - the instance calling this function
  * @param {String} authResponseToken - the signed authentication response token
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
@@ -595,7 +595,7 @@ function handlePendingSignInImpl(caller, authResponseToken) {
 /**
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  *
- *  @param {Blockstack} caller - the instance calling this function
+ *  @param {UserSession} caller - the instance calling this function
  *  @return {Object} User data object.
  *  @private
  */
@@ -650,7 +650,7 @@ var VERSION = '1.2.0';
 /**
  * Generates a ECDSA keypair to
  * use as the ephemeral app transit private key
- * @param {BlockstackSession} session - session object in which key will be stored
+ * @param {SessionData} session - session object in which key will be stored
  * @return {String} the hex encoded private key
  * @private
  */
@@ -2363,10 +2363,10 @@ Object.defineProperty(exports, 'decryptMnemonic', {
 
 var _api = require('./api');
 
-Object.defineProperty(exports, 'Blockstack', {
+Object.defineProperty(exports, 'UserSession', {
   enumerable: true,
   get: function get() {
-    return _api.Blockstack;
+    return _api.UserSession;
   }
 });
 },{"./api":1,"./auth":9,"./config":10,"./dids":11,"./encryption":12,"./keys":15,"./network":17,"./operations":18,"./profiles":24,"./storage":48,"./utils":49,"./wallet":50,"jsontokens":387}],15:[function(require,module,exports){
@@ -7840,7 +7840,7 @@ exports.Twitter = Twitter;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BlockstackSession = undefined;
+exports.SessionData = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -7850,7 +7850,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var SESSION_VERSION = '1.0.0';
 
-var BlockstackSession = exports.BlockstackSession = function () {
+var SessionData = exports.SessionData = function () {
 
   /**
    * This holds the configuration settings for a web app-style
@@ -7860,8 +7860,8 @@ var BlockstackSession = exports.BlockstackSession = function () {
 
 
   // TODO use this
-  function BlockstackSession(options) {
-    _classCallCheck(this, BlockstackSession);
+  function SessionData(options) {
+    _classCallCheck(this, SessionData);
 
     this.version = SESSION_VERSION;
     this.appPrivateKey = options.appPrivateKey;
@@ -7880,7 +7880,7 @@ var BlockstackSession = exports.BlockstackSession = function () {
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
 
 
-  _createClass(BlockstackSession, [{
+  _createClass(SessionData, [{
     key: 'getGaiaHubConfig',
     value: function getGaiaHubConfig() {
       return this.gaiaHubConfig;
@@ -7902,7 +7902,7 @@ var BlockstackSession = exports.BlockstackSession = function () {
     }
   }]);
 
-  return BlockstackSession;
+  return SessionData;
 }();
 },{"./auth/appConfig":2}],47:[function(require,module,exports){
 (function (Buffer){
@@ -8029,7 +8029,7 @@ function connectToGaiaHub(gaiaHubUrl, challengeSignerHex) {
  * These two functions are app-specific connections to gaia hub,
  *   they read the user data object for information on setting up
  *   a hub connection, and store the hub config to localstorage
- * @param {Blockstack} caller - the instance calling this function
+ * @param {UserSession} caller - the instance calling this function
  * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
@@ -8152,7 +8152,7 @@ function getUserAppFileUrl(path, username, appOrigin) {
 
 /**
  * Encrypts the data provided with the app public key.
- * @param {Blockstack} caller - the instance calling this method
+ * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
@@ -8176,7 +8176,7 @@ function encryptContentImpl(caller, content, options) {
 /**
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
- * @param {Blockstack} caller - the instance calling this method
+ * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - encrypted content.
  * @param {Object} [options=null] - options object
  * @param {String} options.privateKey - the hex string of the ECDSA private
@@ -8367,7 +8367,7 @@ function handleSignedEncryptedContents(caller, path, storedContents, app, userna
 
 /**
  * Retrieves the specified file from the app's data store.
- * @param {Blockstack} caller - instance calling this method
+ * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
@@ -8427,7 +8427,7 @@ function getFileImpl(caller, path, options) {
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
- * @param {Blockstack} caller - instance calling this method
+ * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
@@ -8585,7 +8585,7 @@ function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
 
 /**
  * List the set of files in this application's Gaia storage bucket.
- * @param {Blockstack} caller - instance calling this method
+ * @param {UserSession} caller - instance calling this method
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed

@@ -18,7 +18,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 
-import type { Blockstack } from '../api'
+import type { UserSession } from '../api'
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
@@ -59,7 +59,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 
 /**
  * Encrypts the data provided with the app public key.
- * @param {Blockstack} caller - the instance calling this method
+ * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
@@ -67,7 +67,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @return {String} Stringified ciphertext object
  * @private
  */
-export function encryptContentImpl(caller: Blockstack,
+export function encryptContentImpl(caller: UserSession,
                                    content: string | Buffer,
                                    options?: {publicKey?: string}) {
   const defaults = { publicKey: null }
@@ -85,7 +85,7 @@ export function encryptContentImpl(caller: Blockstack,
 /**
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
- * @param {Blockstack} caller - the instance calling this method
+ * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - encrypted content.
  * @param {Object} [options=null] - options object
  * @param {String} options.privateKey - the hex string of the ECDSA private
@@ -93,7 +93,7 @@ export function encryptContentImpl(caller: Blockstack,
  * @return {String|Buffer} decrypted content.
  * @private
  */
-export function decryptContentImpl(caller: Blockstack,
+export function decryptContentImpl(caller: UserSession,
                                    content: string,
                                    options?: {privateKey?: ?string}) {
   const defaults = { privateKey: null }
@@ -120,7 +120,7 @@ export function decryptContentImpl(caller: Blockstack,
  * (username, app) pair.
  * @private
  */
-function getGaiaAddress(caller: Blockstack,
+function getGaiaAddress(caller: UserSession,
                         app: string, username: ?string, zoneFileLookupURL: ?string) {
   return Promise.resolve()
     .then(() => {
@@ -144,7 +144,7 @@ function getGaiaAddress(caller: Blockstack,
  *  multi-player reads and reads from own storage.
  * @private
  */
-function getFileContents(caller: Blockstack,
+function getFileContents(caller: UserSession,
                          path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
                          forceText: boolean) : Promise<?string | ?ArrayBuffer> {
   return Promise.resolve()
@@ -189,7 +189,7 @@ function getFileContents(caller: Blockstack,
  *  from own storage.
  * @private
  */
-function getFileSignedUnencrypted(caller: Blockstack, path: string, opt: {
+function getFileSignedUnencrypted(caller: UserSession, path: string, opt: {
   username?: ?string,
   app: string,
   zoneFileLookupURL?: ?string
@@ -253,7 +253,7 @@ function getFileSignedUnencrypted(caller: Blockstack, path: string, opt: {
  *  gaia address for verification of the claimed public key.
  * @private
  */
-function handleSignedEncryptedContents(caller: Blockstack, path: string, storedContents: string,
+function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
                                        app: string, username: ?string, zoneFileLookupURL: ?string) {
   const appPrivateKey = caller.loadUserData().appPrivateKey
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
@@ -307,7 +307,7 @@ function handleSignedEncryptedContents(caller: Blockstack, path: string, storedC
 
 /**
  * Retrieves the specified file from the app's data store.
- * @param {Blockstack} caller - instance calling this method
+ * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
@@ -323,7 +323,7 @@ function handleSignedEncryptedContents(caller: Blockstack, path: string, storedC
  * or rejects with an error
  * @private
  */
-export function getFileImpl(caller: Blockstack, path: string, options?: {
+export function getFileImpl(caller: UserSession, path: string, options?: {
     decrypt?: boolean,
     verify?: boolean,
     username?: string,
@@ -375,7 +375,7 @@ export function getFileImpl(caller: Blockstack, path: string, options?: {
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
- * @param {Blockstack} caller - instance calling this method
+ * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
@@ -386,7 +386,7 @@ export function getFileImpl(caller: Blockstack, path: string, options?: {
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
-export function putFileImpl(caller: Blockstack, path: string, content: string | Buffer, options?: {
+export function putFileImpl(caller: UserSession, path: string, content: string | Buffer, options?: {
   encrypt?: boolean | string,
   sign?: boolean
   }) {
@@ -543,13 +543,13 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
 
 /**
  * List the set of files in this application's Gaia storage bucket.
- * @param {Blockstack} caller - instance calling this method
+ * @param {UserSession} caller - instance calling this method
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
  * @private
  */
-export function listFilesImpl(caller: Blockstack,
+export function listFilesImpl(caller: UserSession,
                               callback: (name: string) => boolean) : Promise<number> {
   return getOrSetLocalGaiaHubConnection(caller)
     .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))

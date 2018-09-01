@@ -4,7 +4,7 @@ import type { GaiaHubConfig } from './storage/hub'
 
 const SESSION_VERSION = '1.0.0'
 
-export type BlockstackSessionOptions = {
+export type SessionOptions = {
   appPrivateKey?: string,
   username?: string,
   identityAddress?: string,
@@ -13,7 +13,7 @@ export type BlockstackSessionOptions = {
   appConfig?: AppConfig
 }
 
-export class BlockstackSession {
+export class SessionData {
   version: string
 
   appPrivateKey: ?string
@@ -47,7 +47,7 @@ export class BlockstackSession {
 
   gaiaHubConfig: ?GaiaHubConfig
 
-  constructor(options: BlockstackSessionOptions) {
+  constructor(options: SessionOptions) {
     this.version = SESSION_VERSION
     this.appPrivateKey = options.appPrivateKey
     this.identityAddress = options.identityAddress

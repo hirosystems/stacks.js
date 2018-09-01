@@ -17,7 +17,7 @@ import { extractProfile } from '../profiles'
 
 import { Logger } from '../logger'
 
-import type { Blockstack } from '../api'
+import type { UserSession } from '../api'
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',
@@ -81,11 +81,11 @@ export function redirectToSignInWithAuthRequestImpl(authRequest: string,
  * authentication request is generated. If your app falls into this category,
  * use `makeAuthRequest`,
  * and `redirectToSignInWithAuthRequest` to build your own sign in process.
- * @param {Blockstack} caller - the instance calling this function
+ * @param {UserSession} caller - the instance calling this function
  * @return {void}
  * @private
  */
-export function redirectToSignInImpl(caller: Blockstack) {
+export function redirectToSignInImpl(caller: UserSession) {
   const transitKey = caller.generateAndStoreTransitKey()
   const authRequest = caller.makeAuthRequest(transitKey)
   redirectToSignInWithAuthRequestImpl(authRequest)
@@ -96,13 +96,13 @@ export function redirectToSignInImpl(caller: Blockstack) {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
- * @param {Blockstack} caller - the instance calling this function
+ * @param {UserSession} caller - the instance calling this function
  * @param {String} authResponseToken - the signed authentication response token
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  * @private
  */
-export function handlePendingSignInImpl(caller: Blockstack,
+export function handlePendingSignInImpl(caller: UserSession,
                                         authResponseToken: string) {
   const transitKey = caller.session.transitKey
 
@@ -198,11 +198,11 @@ export function handlePendingSignInImpl(caller: Blockstack,
 /**
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  *
- *  @param {Blockstack} caller - the instance calling this function
+ *  @param {UserSession} caller - the instance calling this function
  *  @return {Object} User data object.
  *  @private
  */
-export function loadUserDataImpl(caller: Blockstack) {
+export function loadUserDataImpl(caller: UserSession) {
   const userData = caller.session.userData
   if (!userData) {
     throw InvalidStateError('No user data found. Did the user sign in?')

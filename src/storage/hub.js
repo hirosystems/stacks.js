@@ -7,7 +7,7 @@ import { ecPairToAddress } from '../utils'
 import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from '../auth/authConstants'
 
-import type { Blockstack } from '../api'
+import type { UserSession } from '../api'
 import { Logger } from '../logger'
 import { InvalidStateError } from '../errors'
 
@@ -112,11 +112,11 @@ export function connectToGaiaHub(gaiaHubUrl: string,
  * These two functions are app-specific connections to gaia hub,
  *   they read the user data object for information on setting up
  *   a hub connection, and store the hub config to localstorage
- * @param {Blockstack} caller - the instance calling this function
+ * @param {UserSession} caller - the instance calling this function
  * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
-export function setLocalGaiaHubConnection(caller: Blockstack): Promise<GaiaHubConfig> {
+export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
   const userData = caller.loadUserData()
 
   if (!userData) {
@@ -134,7 +134,7 @@ export function setLocalGaiaHubConnection(caller: Blockstack): Promise<GaiaHubCo
     })
 }
 
-export function getOrSetLocalGaiaHubConnection(caller: Blockstack): Promise<GaiaHubConfig> {
+export function getOrSetLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
   const userData = caller.session.userData
   if (!userData) {
     throw new InvalidStateError('Missing userData')

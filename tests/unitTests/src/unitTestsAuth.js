@@ -19,7 +19,7 @@ import {
   isManifestUriValid,
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
-  Blockstack,
+  UserSession,
   AppConfig
 } from '../../../lib'
 
@@ -36,7 +36,7 @@ export function runAuthTests() {
     t.plan(15)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
 
     const authRequest = blockstack.makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
@@ -99,7 +99,7 @@ export function runAuthTests() {
     t.plan(3)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
 
     const authRequest = blockstack.makeAuthRequest(privateKey)
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
@@ -125,7 +125,7 @@ export function runAuthTests() {
     t.plan(3)
     const appConfig = new AppConfig('http://localhost:3000')
     appConfig.redirectURI = () => 'https://example.com' // monkey patch for test
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
 
     const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
     console.log(invalidAuthRequest)
@@ -151,7 +151,7 @@ export function runAuthTests() {
 
     const appConfig = new AppConfig('http://localhost:3000')
     appConfig.manifestURI = () => 'https://example.com/manifest.json' // monkey patch for test
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
     const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
 
     t.equal(isManifestUriValid(invalidAuthRequest), false,
@@ -228,7 +228,7 @@ export function runAuthTests() {
     t.plan(2)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
 
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
@@ -282,7 +282,7 @@ export function runAuthTests() {
     const metadata = {}
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
     blockstack.session.transitKey = transitPrivateKey
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
@@ -316,7 +316,7 @@ export function runAuthTests() {
                                           transitPublicKey)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new Blockstack(appConfig)
+    const blockstack = new UserSession(appConfig)
     blockstack.session.transitKey = transitPrivateKey
 
     blockstack.handlePendingSignIn(authResponse)

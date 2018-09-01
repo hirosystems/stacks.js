@@ -30,4 +30,4 @@ export { config } from './config'
 
 export { encryptMnemonic, decryptMnemonic } from './encryption'
 
-export { Blockstack }  from './api'
+export { UserSession }  from './api'
