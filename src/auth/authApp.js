@@ -17,7 +17,7 @@ import { extractProfile } from '../profiles'
 
 import { Logger } from '../logger'
 
-import type { UserSession } from '../api'
+import type { UserSession } from './userSession'
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',

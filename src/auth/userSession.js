@@ -1,23 +1,23 @@
 /* @flow */
 import queryString from 'query-string'
-import { AppConfig } from './auth/appConfig'
-import { SessionData } from './session'
-import type { SessionOptions } from './session'
+import { AppConfig } from './appConfig'
+import { SessionData } from './sessionData'
+import type { SessionOptions } from './sessionData'
 import {
   redirectToSignInImpl,
   redirectToSignInWithAuthRequestImpl,
   handlePendingSignInImpl,
   loadUserDataImpl
-} from './auth/authApp'
+} from './authApp'
 
 import {
   makeAuthRequestImpl,
   generateTransitKey
-} from './auth/authMessages'
+} from './authMessages'
 
 import {
   DEFAULT_BLOCKSTACK_HOST
-} from './auth/authConstants'
+} from './authConstants'
 
 import {
   decryptContentImpl,
@@ -25,20 +25,20 @@ import {
   getFileImpl,
   putFileImpl,
   listFilesImpl
-} from './storage'
+} from '../storage'
 import {
   nextHour
-} from './utils'
+} from '../utils'
 import {
   InvalidStateError
-} from './errors'
+} from '../errors'
 
 /**
  * Represents an instance of a signed in user for a particular app.
  *
  * A signed in user has access to two major pieces of information
  * about the user, the user's private key for that app and the location
- * of the user's gaia storage bucket for the app. 
+ * of the user's gaia storage bucket for the app.
  *
  * A user can be signed in either directly through the interactive
  * sign in process or by directly providing the app private key.

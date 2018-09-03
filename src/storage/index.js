@@ -18,7 +18,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 
-import type { UserSession } from '../api'
+import type { UserSession } from '../auth/userSession'
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
 

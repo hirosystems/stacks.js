@@ -1,6 +1,6 @@
 /* @flow */
-import { AppConfig } from './auth/appConfig'
-import type { GaiaHubConfig } from './storage/hub'
+import { AppConfig } from './appConfig'
+import type { GaiaHubConfig } from '../storage/hub'
 
 const SESSION_VERSION = '1.0.0'
 

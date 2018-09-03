@@ -7,7 +7,7 @@ import { ecPairToAddress } from '../utils'
 import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from '../auth/authConstants'
 
-import type { UserSession } from '../api'
+import type { UserSession } from '../auth/userSession'
 import { Logger } from '../logger'
 import { InvalidStateError } from '../errors'
 
