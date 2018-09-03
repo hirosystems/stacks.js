@@ -34,9 +34,15 @@ import {
 } from './errors'
 
 /**
- * abc
- * [session description]
- * @type {[type]}
+ * Represents an instance of a signed in user for a particular app.
+ *
+ * A signed in user has access to two major pieces of information
+ * about the user, the user's private key for that app and the location
+ * of the user's gaia storage bucket for the app. 
+ *
+ * A user can be signed in either directly through the interactive
+ * sign in process or by directly providing the app private key.
+ * @type {UserSession}
  */
 export class UserSession {
   session: SessionData
