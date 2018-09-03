@@ -19,7 +19,7 @@ export class AppConfig {
 
   constructor(appDomain: string = window.location.origin,
               scopes: Array<string> = DEFAULT_SCOPE.slice(),
-              redirectPath: string = '/',
+              redirectPath: string = '',
               manifestPath: string = '/manifest.json',
               coreNode: ?string = null) {
     this.appDomain = appDomain

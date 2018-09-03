@@ -54,7 +54,7 @@ export function runAuthTests() {
     t.equal(decodedToken.payload.domain_name,
             origin, 'auth request domain_name should be origin')
     t.equal(decodedToken.payload.redirect_uri,
-            'http://localhost:3000/', 'auth request redirects to correct uri')
+            'http://localhost:3000', 'auth request redirects to correct uri')
     t.equal(decodedToken.payload.manifest_uri,
             'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
 
@@ -327,5 +327,39 @@ export function runAuthTests() {
         console.log(err.stack)
         t.fail('Should not error')
       })
+  })
+
+  test('app config defaults app domain to origin', (t) => {
+    t.plan(5)
+    global.window = {
+      location: {
+        origin: 'https://example.com'
+      }
+    }
+
+    const appConfig = new AppConfig()
+
+    t.equal(appConfig.appDomain, 'https://example.com')
+    t.equal(appConfig.scopes.length, 1)
+    t.equal(appConfig.scopes[0], 'store_write')
+    t.equal(appConfig.manifestURI(), 'https://example.com/manifest.json')
+    t.equal(appConfig.redirectURI(), 'https://example.com')
+  })
+
+  test('app config works with custom app domain to origin', (t) => {
+    t.plan(5)
+    global.window = {
+      location: {
+        origin: 'https://example.com'
+      }
+    }
+
+    const appConfig = new AppConfig('https://custom.example.com')
+
+    t.equal(appConfig.appDomain, 'https://custom.example.com')
+    t.equal(appConfig.scopes.length, 1)
+    t.equal(appConfig.scopes[0], 'store_write')
+    t.equal(appConfig.manifestURI(), 'https://custom.example.com/manifest.json')
+    t.equal(appConfig.redirectURI(), 'https://custom.example.com')
   })
 }
