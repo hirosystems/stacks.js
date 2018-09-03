@@ -47,11 +47,15 @@ import {
 export class UserSession {
   session: SessionData
 
-  constructor(initialValue: AppConfig) {
-    const sessionOptions: SessionOptions = {
-      appConfig: initialValue
+  constructor(initialValue: AppConfig | SessionData = new AppConfig()) {
+    if (initialValue instanceof SessionData) {
+      this.session = initialValue
+    } else {
+      const sessionOptions: SessionOptions = {
+        appConfig: initialValue
+      }
+      this.session = new SessionData(sessionOptions)
     }
-    this.session = new SessionData(sessionOptions)
   }
 
   /* AUTHENTICATION */

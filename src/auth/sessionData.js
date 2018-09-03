@@ -16,19 +16,17 @@ export type SessionOptions = {
 export class SessionData {
   version: string
 
-  appPrivateKey: ?string
+  appPrivateKey: ?string // required after sign in
 
-  identityAddress: ?string
+  identityAddress: ?string // required after sign in
 
   username: ?string
 
   coreNode: ?string
 
-  hubUrl: ?string
+  hubUrl: ?string // required after sign in
 
   transitKey: ?string
-
-  identityAddress: ?string
 
   // TODO use this
   authenticatorURL: ?string
