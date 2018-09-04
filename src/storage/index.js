@@ -8,7 +8,7 @@ import {
 // export { type GaiaHubConfig } from './hub'
 
 import {
-  encryptECIES, decryptECIES, signECDSA, verifyECDSA 
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA
 } from '../encryption'
 import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
@@ -428,7 +428,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
     const signedCipherObject = {
       signature: signatureObject.signature,
       publicKey: signatureObject.publicKey,
-      cipherText 
+      cipherText
     }
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
@@ -533,7 +533,8 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
 
 /**
  * List the set of files in this application's Gaia storage bucket.
- * @param {function} callback - a callback to invoke on each named file
+ * @param {function} callback - a callback to invoke on each named file that
+ * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
  */
 export function listFiles(callback: (name: string) => boolean) : Promise<number> {

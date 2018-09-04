@@ -21,8 +21,12 @@ export {
   PubkeyHashSigner, addUTXOsToFund, estimateTXBytes
 } from './operations'
 
+export { BlockstackWallet, IdentityKeyPair } from './wallet'
+
 export { network } from './network'
 
 export { decodeToken } from 'jsontokens'
 
 export { config } from './config'
+
+export { encryptMnemonic, decryptMnemonic } from './encryption'
