@@ -15,13 +15,13 @@ export function makeECPrivateKey() {
 }
 
 export function publicKeyToAddress(publicKey: string) {
-  const publicKeyBuffer = new Buffer(publicKey, 'hex')
+  const publicKeyBuffer = Buffer.from(publicKey, 'hex')
   const publicKeyHash160 = bcrypto.hash160(publicKeyBuffer)
   const address = baddress.toBase58Check(publicKeyHash160, 0x00)
   return address
 }
 
 export function getPublicKeyFromPrivate(privateKey: string) {
-  const keyPair = ECPair.fromPrivateKey(new Buffer(privateKey, 'hex'))
+  const keyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'))
   return keyPair.publicKey.toString('hex')
 }

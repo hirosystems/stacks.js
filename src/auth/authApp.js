@@ -29,18 +29,6 @@ const DEFAULT_PROFILE = {
 }
 
 /**
- * Generates a ECDSA keypair and stores the hex value of the private key in
- * local storage.
- * @return {String} the hex encoded private key
- * @private
- */
-export function generateAndStoreTransitKey() {
-  const transitKey = makeECPrivateKey()
-  localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
-  return transitKey
-}
-
-/**
  * Fetches the hex value of the transit private key from local storage.
  * @return {String} the hex encoded private key
  * @private
@@ -48,6 +36,19 @@ export function generateAndStoreTransitKey() {
 export function getTransitKey() : string {
   const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
   return ((transitKey: any): string)
+}
+
+/**
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * and stores the hex value of the private key in
+ * local storage.
+ * @return {String} the hex encoded private key
+ */
+export function generateAndStoreTransitKey() {
+  const transitKey = makeECPrivateKey()
+  localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
+  return transitKey
 }
 
 /**
