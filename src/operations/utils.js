@@ -5,6 +5,7 @@ import RIPEMD160 from 'ripemd160'
 import bigi from 'bigi'
 
 import { NotEnoughFundsError } from '../errors'
+import { TransactionSigner } from './signers'
 
 export const DUST_MINIMUM = 5500
 
@@ -169,4 +170,23 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
     return addUTXOsToFund(txBuilderIn, utxos.slice(1),
                           remainToFund, feeRate, fundNewFees)
   }
+}
+
+
+export function signInputs(txB: bitcoinjs.TransactionBuilder,
+                           defaultSigner: TransactionSigner,
+                           otherSigners?: Array<{index: number, signer: TransactionSigner}>) {
+  const signerArray = txB.__tx.ins.map(() => defaultSigner)
+  if (otherSigners) {
+    otherSigners.forEach((signerPair) => {
+      signerArray[signerPair.index] = signerPair.signer
+    })
+  }
+  let signingPromise = Promise.resolve()
+  for (let i = 0; i < txB.__tx.ins.length; i++) {
+    signingPromise = signingPromise.then(
+      () => signerArray[i].signTransaction(txB, i)
+    )
+  }
+  return signingPromise.then(() => txB)
 }

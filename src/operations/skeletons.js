@@ -143,6 +143,12 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
   }
 }
 
+function makeTXbuilder() {
+  const txb = new bitcoin.TransactionBuilder(config.network.layer1)
+  txb.setVersion(1)
+  return txb
+}
+
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
   burnAddress : string, burn: AmountType,
@@ -183,7 +189,7 @@ export function makePreorderSkeleton(
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
@@ -227,7 +233,6 @@ export function makeRegisterSkeleton(
   */
 
   let payload
-  const network = config.network
   if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
@@ -245,7 +250,7 @@ export function makeRegisterSkeleton(
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(ownerAddress, DUST_MINIMUM)
@@ -308,7 +313,6 @@ export function makeTransferSkeleton(
     magic op keep  hash128(name.ns_id) consensus hash
              data?
   */
-  const network = config.network
   const opRet = Buffer.alloc(36)
   let keepChar = '~'
   if (keepZonefile) {
@@ -324,7 +328,7 @@ export function makeTransferSkeleton(
 
   const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(opRetPayload, 0)
   tx.addOutput(newOwner, DUST_MINIMUM)
@@ -350,7 +354,6 @@ export function makeUpdateSkeleton(
     magic op  hash128(name.ns_id,consensus hash) hash160(data)
   */
 
-  const network = config.network
   const opRet = Buffer.alloc(39)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
@@ -366,7 +369,7 @@ export function makeUpdateSkeleton(
 
   const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(opRetPayload, 0)
 
@@ -389,7 +392,6 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
    magic op   name.ns_id (37 bytes)
   */
 
-  const network = config.network
   const opRet = Buffer.alloc(3)
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
@@ -400,7 +402,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
 
@@ -447,7 +449,7 @@ export function makeNamespacePreorderSkeleton(
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
@@ -469,7 +471,6 @@ export function makeNamespaceRevealSkeleton(
                                                   bucket exponents        no-vowel
                                                                           discounts
   */
-  const network = config.network
   const hexPayload = namespace.toHexPayload()
 
   const opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2)
@@ -477,7 +478,7 @@ export function makeNamespaceRevealSkeleton(
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(revealAddress, DUST_MINIMUM)
@@ -497,13 +498,12 @@ export function makeNamespaceReadySkeleton(
    magic op  .  ns_id
 
    */
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
 
@@ -534,7 +534,7 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
   const zonefileHashB58 = bitcoin.address.toBase58Check(
     new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash
   )
@@ -559,14 +559,13 @@ export function makeAnnounceSkeleton(messageHash: string) {
     throw new Error('Invalid message hash: must be 20 bytes hex-encoded')
   }
 
-  const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
   opReturnBuffer.write('id#', 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
 
-  const tx = new bitcoin.TransactionBuilder(network.layer1)
+  const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   return tx.buildIncomplete()
