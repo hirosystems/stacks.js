@@ -104,12 +104,13 @@ export function redirectToSignInImpl(caller: UserSession) {
  */
 export function handlePendingSignInImpl(caller: UserSession,
                                         authResponseToken: string) {
-  const transitKey = caller.session.transitKey
+  const transitKey = caller.store.getSessionData().transitKey
 
-  let coreNode = DEFAULT_CORE_NODE
+  let coreNode : string = DEFAULT_CORE_NODE
 
-  if (caller.session.coreNode) {
-    coreNode = caller.session.coreNode
+  const coreNodeSessionValue = caller.store.getSessionData().coreNode
+  if (coreNodeSessionValue) {
+    coreNode = coreNodeSessionValue
   }
 
   const nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`
@@ -174,22 +175,28 @@ export function handlePendingSignInImpl(caller: UserSession,
           .then((response) => {
             if (!response.ok) { // return blank profile if we fail to fetch
               userData.profile = Object.assign({}, DEFAULT_PROFILE)
-              caller.session.userData = userData
+              const sessionData = caller.store.getSessionData()
+              sessionData.userData = userData
+              caller.store.setSessionData(sessionData)
               return userData
             } else {
               return response.text()
                 .then(responseText => JSON.parse(responseText))
                 .then(wrappedProfile => extractProfile(wrappedProfile[0].token))
                 .then((profile) => {
+                  const sessionData = caller.store.getSessionData()
                   userData.profile = profile
-                  caller.session.userData = userData
+                  sessionData.userData = userData
+                  caller.store.setSessionData(sessionData)
                   return userData
                 })
             }
           })
       } else {
+        const sessionData = caller.store.getSessionData()
         userData.profile = tokenPayload.profile
-        caller.session.userData = userData
+        sessionData.userData = userData
+        caller.store.setSessionData(sessionData)
         return userData
       }
     })
@@ -203,7 +210,7 @@ export function handlePendingSignInImpl(caller: UserSession,
  *  @private
  */
 export function loadUserDataImpl(caller: UserSession) {
-  const userData = caller.session.userData
+  const userData = caller.store.getSessionData().userData
   if (!userData) {
     throw InvalidStateError('No user data found. Did the user sign in?')
   }

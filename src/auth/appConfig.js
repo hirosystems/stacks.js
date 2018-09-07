@@ -17,6 +17,9 @@ export class AppConfig {
   // if null, use node passed by auth token v1.3 or otherwise core.blockstack.org
   coreNode: string
 
+  // TODO use this
+  // authenticatorURL: ?string
+
   constructor(appDomain: string = window.location.origin,
               scopes: Array<string> = DEFAULT_SCOPE.slice(),
               redirectPath: string = '',

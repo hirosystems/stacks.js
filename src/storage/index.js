@@ -330,7 +330,7 @@ export function getFileImpl(caller: UserSession, path: string, options?: {
     app?: string,
     zoneFileLookupURL?: ?string
   }) {
-  const appConfig = caller.session.appConfig
+  const appConfig = caller.appConfig
   if (!appConfig) {
     throw new InvalidStateError('Missing AppConfig')
   }

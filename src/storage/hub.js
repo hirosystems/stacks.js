@@ -135,7 +135,7 @@ export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubC
 }
 
 export function getOrSetLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
-  const userData = caller.session.userData
+  const userData = caller.store.getSessionData().userData
   if (!userData) {
     throw new InvalidStateError('Missing userData')
   }

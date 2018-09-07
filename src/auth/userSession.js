@@ -1,8 +1,12 @@
 /* @flow */
 import queryString from 'query-string'
 import { AppConfig } from './appConfig'
-import { SessionData } from './sessionData'
 import type { SessionOptions } from './sessionData'
+import {
+  LocalStorageStore,
+  SessionDataStore,
+  InstanceDataStore
+} from './sessionStore'
 import {
   redirectToSignInImpl,
   redirectToSignInWithAuthRequestImpl,
@@ -30,8 +34,10 @@ import {
   nextHour
 } from '../utils'
 import {
+  MissingParameterError,
   InvalidStateError
 } from '../errors'
+import { Logger } from '../logger'
 
 /**
  * Represents an instance of a signed in user for a particular app.
@@ -45,16 +51,35 @@ import {
  * @type {UserSession}
  */
 export class UserSession {
-  session: SessionData
+  appConfig: AppConfig
 
-  constructor(initialValue: AppConfig | SessionData = new AppConfig()) {
-    if (initialValue instanceof SessionData) {
-      this.session = initialValue
+  store: SessionDataStore
+
+  constructor(options: {appConfig?: AppConfig,
+    sessionStore?: SessionDataStore,
+    sessionOptions?: SessionOptions }) {
+    let runningInBrowser = true
+
+    if (typeof window === 'undefined') {
+      runningInBrowser = false
+    }
+
+    Logger.debug(`UserSession: runningInBrowser: ${runningInBrowser ? 'yes' : 'no'}`)
+
+    if (options && options.appConfig) {
+      this.appConfig = options.appConfig
+    } else if (runningInBrowser) {
+      this.appConfig = new AppConfig()
     } else {
-      const sessionOptions: SessionOptions = {
-        appConfig: initialValue
-      }
-      this.session = new SessionData(sessionOptions)
+      throw new MissingParameterError('You need to specify options.appConfig')
+    }
+
+    if (options && options.sessionStore) {
+      this.store = options.sessionStore
+    } else if (runningInBrowser) {
+      this.store = new LocalStorageStore(options.sessionOptions)
+    } else {
+      this.store = new InstanceDataStore(options.sessionOptions)
     }
   }
 
@@ -113,7 +138,7 @@ export class UserSession {
    */
   makeAuthRequest(transitKey: string,
                   expiresAt: number = nextHour().getTime()): string {
-    const appConfig = this.session.appConfig
+    const appConfig = this.appConfig
 
     if (!appConfig) {
       throw new InvalidStateError('Missing AppConfig')
@@ -132,9 +157,11 @@ export class UserSession {
    * @return {String} the hex encoded private key
    *
    */
-  generateAndStoreTransitKey() {
+  generateAndStoreTransitKey(): string {
+    const sessionData = this.store.getSessionData()
     const transitKey = generateTransitKey()
-    this.session.transitKey = transitKey
+    sessionData.transitKey = transitKey
+    this.store.setSessionData(sessionData)
     return transitKey
   }
 
@@ -160,7 +187,7 @@ export class UserSession {
    * @return {Boolean} `true` if the user is signed in, `false` if not.
    */
   isUserSignedIn() {
-    return !!this.session.userData
+    return !!this.store.getSessionData().userData
   }
 
   /**

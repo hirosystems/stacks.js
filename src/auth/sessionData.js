@@ -1,6 +1,6 @@
 /* @flow */
-import { AppConfig } from './appConfig'
 import type { GaiaHubConfig } from '../storage/hub'
+import { InvalidStateError } from '../errors'
 
 const SESSION_VERSION = '1.0.0'
 
@@ -10,7 +10,7 @@ export type SessionOptions = {
   identityAddress?: string,
   coreNode?: string,
   hubUrl?: string,
-  appConfig?: AppConfig
+  storeOptions?: {}
 }
 
 export class SessionData {
@@ -28,20 +28,9 @@ export class SessionData {
 
   transitKey: ?string
 
-  // TODO use this
-  authenticatorURL: ?string
-
   // using this in place of
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
   userData: ?any
-
-
-  /**
-   * This holds the configuration settings for a web app-style
-   * Blockstack app
-   * @type {AppConfig}
-   */
-  appConfig: ?AppConfig
 
   gaiaHubConfig: ?GaiaHubConfig
 
@@ -52,7 +41,6 @@ export class SessionData {
     this.username = options.username
     this.coreNode = options.coreNode
     this.hubUrl = options.hubUrl
-    this.appConfig = options.appConfig
 
     // initializing Gaia connection requires a network request
     // so we'll defer it until the first time it's needed
@@ -67,8 +55,18 @@ export class SessionData {
     this.gaiaHubConfig = config
   }
 
-  toJSON() : JSON {
-    return JSON.parse(JSON.stringify(this))
+  static fromJSON(json: Object) : SessionData {
+    if (json.version !== SESSION_VERSION) {
+      throw new InvalidStateError(`JSON data version ${json.version} not supported by SessionData`)
+    }
+    const options: SessionOptions = {
+      appPrivateKey: json.appPrivateKey,
+      identityAddress: json.identityAddress,
+      username: json.username,
+      coreNode: json.coreNode,
+      hubUrl: json.hubUrl
+    }
+    return new SessionData(options)
   }
 
   toString(): string {

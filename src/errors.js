@@ -3,6 +3,7 @@ export const ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',
   INVALID_STATE: 'invalid_state',
+  NO_SESSION_DATA: 'no_session_data',
   UNKNOWN: 'unknown'
 }
 
@@ -114,5 +115,13 @@ export class InvalidStateError extends BlockstackError {
     super({ code: ERROR_CODES.INVALID_STATE, message })
     this.message = message
     this.name = 'InvalidStateError'
+  }
+}
+
+export class NoSessionDataError extends BlockstackError {
+  constructor(message: string) {
+    super({ code: ERROR_CODES.INVALID_STATE, message })
+    this.message = message
+    this.name = 'NoSessionDataError'
   }
 }

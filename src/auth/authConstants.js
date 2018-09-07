@@ -8,3 +8,4 @@ export const BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org'
 
 export const DEFAULT_CORE_NODE = 'https://core.blockstack.org'
 export const NAME_LOOKUP_PATH = '/v1/names'
+export const LOCALSTORAGE_SESSION_KEY = 'blockstack-session'

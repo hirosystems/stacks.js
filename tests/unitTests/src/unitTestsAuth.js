@@ -25,7 +25,7 @@ import {
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
 
-global.window = {}
+// global.window = {}
 
 export function runAuthTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -36,7 +36,7 @@ export function runAuthTests() {
     t.plan(15)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new UserSession(appConfig)
+    const blockstack = new UserSession({ appConfig })
 
     const authRequest = blockstack.makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
@@ -99,7 +99,7 @@ export function runAuthTests() {
     t.plan(3)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new UserSession(appConfig)
+    const blockstack = new UserSession({ appConfig })
 
     const authRequest = blockstack.makeAuthRequest(privateKey)
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
@@ -125,7 +125,7 @@ export function runAuthTests() {
     t.plan(3)
     const appConfig = new AppConfig('http://localhost:3000')
     appConfig.redirectURI = () => 'https://example.com' // monkey patch for test
-    const blockstack = new UserSession(appConfig)
+    const blockstack = new UserSession({ appConfig })
 
     const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
     console.log(invalidAuthRequest)
@@ -151,7 +151,7 @@ export function runAuthTests() {
 
     const appConfig = new AppConfig('http://localhost:3000')
     appConfig.manifestURI = () => 'https://example.com/manifest.json' // monkey patch for test
-    const blockstack = new UserSession(appConfig)
+    const blockstack = new UserSession({ appConfig })
     const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
 
     t.equal(isManifestUriValid(invalidAuthRequest), false,
@@ -228,7 +228,7 @@ export function runAuthTests() {
     t.plan(2)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new UserSession(appConfig)
+    const blockstack = new UserSession({ appConfig })
 
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
@@ -239,7 +239,7 @@ export function runAuthTests() {
     const transitPrivateKey = makeECPrivateKey()
     const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
     const badTransitPrivateKey = makeECPrivateKey()
-    blockstack.session.transitKey = badTransitPrivateKey
+    blockstack.store.getSessionData().transitKey = badTransitPrivateKey
     const metadata = { }
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
@@ -256,7 +256,7 @@ export function runAuthTests() {
         t.pass('Should fail to decrypt auth response')
       })
       .then(() => {
-        blockstack.session.transitKey = transitPrivateKey
+        blockstack.store.getSessionData().transitKey = transitPrivateKey
 
         return blockstack.handlePendingSignIn(authResponse)
       })
@@ -282,8 +282,8 @@ export function runAuthTests() {
     const metadata = {}
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new UserSession(appConfig)
-    blockstack.session.transitKey = transitPrivateKey
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().transitKey = transitPrivateKey
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
@@ -316,8 +316,8 @@ export function runAuthTests() {
                                           transitPublicKey)
 
     const appConfig = new AppConfig('http://localhost:3000')
-    const blockstack = new UserSession(appConfig)
-    blockstack.session.transitKey = transitPrivateKey
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().transitKey = transitPrivateKey
 
     blockstack.handlePendingSignIn(authResponse)
       .then(() => {
@@ -344,6 +344,7 @@ export function runAuthTests() {
     t.equal(appConfig.scopes[0], 'store_write')
     t.equal(appConfig.manifestURI(), 'https://example.com/manifest.json')
     t.equal(appConfig.redirectURI(), 'https://example.com')
+    global.window = undefined
   })
 
   test('app config works with custom app domain to origin', (t) => {
@@ -361,5 +362,6 @@ export function runAuthTests() {
     t.equal(appConfig.scopes[0], 'store_write')
     t.equal(appConfig.manifestURI(), 'https://custom.example.com/manifest.json')
     t.equal(appConfig.redirectURI(), 'https://custom.example.com')
+    global.window = undefined
   })
 }
