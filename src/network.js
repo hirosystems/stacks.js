@@ -397,7 +397,11 @@ export class BlockstackNetwork {
    *   with the transaction broadcast service
    * * `MissingParameterError` if you call the function without a required
    *   parameter
+<<<<<<< HEAD
    * @private
+=======
+   *  @private
+>>>>>>> e63017c... Updates to the build
    */
   broadcastNameRegistration(preorderTransaction: string,
                             registerTransaction: string,
