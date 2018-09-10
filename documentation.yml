@@ -6,6 +6,9 @@ toc:
       [Read more about authentication](https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md)
   - AppConfig
   - UserSession
+  - SessionDataStore
+  - InstanceDataStore
+  - LocalStorageStore
   - name: Profiles
     description: |
       Identity you own and control.

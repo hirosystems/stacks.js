@@ -211,6 +211,36 @@
               
                 
                 <li><a
+                  href='#sessiondatastore'
+                  class="">
+                  SessionDataStore
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#instancedatastore'
+                  class="">
+                  InstanceDataStore
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#localstoragestore'
+                  class="">
+                  LocalStorageStore
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#profiles'
                   class="h5 bold black caps">
                   Profiles
@@ -906,7 +936,7 @@ of the user's gaia storage bucket for the app.</p>
 sign in process or by directly providing the app private key.</p>
 
 
-  <div class='pre p1 fill-light mt0'>new UserSession(options: {appConfig: <a href="#appconfig">AppConfig</a>?, sessionStore: SessionDataStore?, sessionOptions: SessionOptions?})</div>
+  <div class='pre p1 fill-light mt0'>new UserSession(options: {appConfig: <a href="#appconfig">AppConfig</a>?, sessionStore: <a href="#sessiondatastore">SessionDataStore</a>?, sessionOptions: SessionOptions?})</div>
   
     <p>
       Type:
@@ -928,7 +958,7 @@ sign in process or by directly providing the app private key.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>options</span> <code class='quiet'>({appConfig: <a href="#appconfig">AppConfig</a>?, sessionStore: SessionDataStore?, sessionOptions: SessionOptions?})</code>
+            <span class='code bold'>options</span> <code class='quiet'>({appConfig: <a href="#appconfig">AppConfig</a>?, sessionStore: <a href="#sessiondatastore">SessionDataStore</a>?, sessionOptions: SessionOptions?})</code>
 	    
           </div>
           
@@ -2052,6 +2082,215 @@ returns
     </div>
   
 </div>
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='sessiondatastore'>
+      SessionDataStore
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>An abstract class representing the SessionDataStore interface.</p>
+
+
+  <div class='pre p1 fill-light mt0'>new SessionDataStore(sessionOptions: SessionOptions)</div>
+  
+    <p>
+      Type:
+      SessionData
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>sessionOptions</span> <code class='quiet'>(SessionOptions)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='instancedatastore'>
+      InstanceDataStore
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Stores session data in the instance of this class.</p>
+
+
+  <div class='pre p1 fill-light mt0'>new InstanceDataStore(sessionOptions: SessionOptions)</div>
+  
+    <p>
+      Type:
+      <a href="#instancedatastore">InstanceDataStore</a>
+    </p>
+  
+  
+    <p>
+      Extends
+      
+        <a href="#sessiondatastore">SessionDataStore</a>
+      
+    </p>
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>sessionOptions</span> <code class='quiet'>(SessionOptions)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='localstoragestore'>
+      LocalStorageStore
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Stores session data in browser a localStorage entry.</p>
+
+
+  <div class='pre p1 fill-light mt0'>new LocalStorageStore(sessionOptions: SessionOptions)</div>
+  
+    <p>
+      Type:
+      <a href="#localstoragestore">LocalStorageStore</a>
+    </p>
+  
+  
+    <p>
+      Extends
+      
+        <a href="#sessiondatastore">SessionDataStore</a>
+      
+    </p>
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>sessionOptions</span> <code class='quiet'>(SessionOptions)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
 
   
 

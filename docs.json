@@ -7444,6 +7444,394 @@
     "namespace": "UserSession"
   },
   {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "An abstract class representing the SessionDataStore interface.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 63,
+                  "offset": 62
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 63,
+              "offset": 62
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 63,
+          "offset": 62
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "type",
+        "description": null,
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "SessionData"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 11,
+        "column": 0
+      },
+      "end": {
+        "line": 14,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 15,
+          "column": 0
+        },
+        "end": {
+          "line": 36,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/sessionStore.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "sessionOptions",
+        "lineNumber": 16,
+        "type": {
+          "type": "NameExpression",
+          "name": "SessionOptions"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "type": {
+      "type": "NameExpression",
+      "name": "SessionData"
+    },
+    "name": "SessionDataStore",
+    "kind": "class",
+    "path": [
+      {
+        "name": "SessionDataStore",
+        "kind": "class"
+      }
+    ],
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "namespace": "SessionDataStore"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Stores session data in the instance of this class.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 51,
+          "offset": 50
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "type",
+        "description": null,
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "InstanceDataStore"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 38,
+        "column": 0
+      },
+      "end": {
+        "line": 41,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 42,
+          "column": 0
+        },
+        "end": {
+          "line": 69,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/sessionStore.js"
+    },
+    "augments": [
+      {
+        "title": "augments",
+        "name": "SessionDataStore"
+      }
+    ],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "sessionOptions",
+        "lineNumber": 45,
+        "type": {
+          "type": "NameExpression",
+          "name": "SessionOptions"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "type": {
+      "type": "NameExpression",
+      "name": "InstanceDataStore"
+    },
+    "name": "InstanceDataStore",
+    "kind": "class",
+    "path": [
+      {
+        "name": "InstanceDataStore",
+        "kind": "class"
+      }
+    ],
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "namespace": "InstanceDataStore"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Stores session data in browser a localStorage entry.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 53,
+                  "offset": 52
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 53,
+              "offset": 52
+            },
+            "indent": []
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 53,
+          "offset": 52
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "type",
+        "description": null,
+        "lineNumber": 2,
+        "type": {
+          "type": "NameExpression",
+          "name": "LocalStorageStore"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 71,
+        "column": 0
+      },
+      "end": {
+        "line": 74,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 75,
+          "column": 0
+        },
+        "end": {
+          "line": 128,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/sessionStore.js"
+    },
+    "augments": [
+      {
+        "title": "augments",
+        "name": "SessionDataStore"
+      }
+    ],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "sessionOptions",
+        "lineNumber": 78,
+        "type": {
+          "type": "NameExpression",
+          "name": "SessionOptions"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "type": {
+      "type": "NameExpression",
+      "name": "LocalStorageStore"
+    },
+    "name": "LocalStorageStore",
+    "kind": "class",
+    "path": [
+      {
+        "name": "LocalStorageStore",
+        "kind": "class"
+      }
+    ],
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "namespace": "LocalStorageStore"
+  },
+  {
     "name": "Profiles",
     "description": {
       "type": "root",

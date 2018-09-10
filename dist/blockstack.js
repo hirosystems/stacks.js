@@ -1349,6 +1349,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 // import { Logger } from '../logger'
 
+/**
+ * An abstract class representing the SessionDataStore interface.
+ * @type {SessionData}
+ */
 var SessionDataStore = exports.SessionDataStore = function () {
   function SessionDataStore(sessionOptions) {
     _classCallCheck(this, SessionDataStore);
@@ -1383,6 +1387,12 @@ var SessionDataStore = exports.SessionDataStore = function () {
 
   return SessionDataStore;
 }();
+
+/**
+ * Stores session data in the instance of this class.
+ * @type {InstanceDataStore}
+ */
+
 
 var InstanceDataStore = exports.InstanceDataStore = function (_SessionDataStore) {
   _inherits(InstanceDataStore, _SessionDataStore);
@@ -1422,6 +1432,12 @@ var InstanceDataStore = exports.InstanceDataStore = function (_SessionDataStore)
 
   return InstanceDataStore;
 }(SessionDataStore);
+
+/**
+ * Stores session data in browser a localStorage entry.
+ * @type {LocalStorageStore}
+ */
+
 
 var LocalStorageStore = exports.LocalStorageStore = function (_SessionDataStore2) {
   _inherits(LocalStorageStore, _SessionDataStore2);

@@ -8,6 +8,10 @@ import {
 import { NoSessionDataError } from '../errors'
 // import { Logger } from '../logger'
 
+/**
+ * An abstract class representing the SessionDataStore interface.
+ * @type {SessionData}
+ */
 export class SessionDataStore {
   constructor(sessionOptions?: SessionOptions) {
     if (sessionOptions) {
@@ -31,6 +35,10 @@ export class SessionDataStore {
   /* eslint-enable */
 }
 
+/**
+ * Stores session data in the instance of this class.
+ * @type {InstanceDataStore}
+ */
 export class InstanceDataStore extends SessionDataStore {
   sessionData: ?SessionData
 
@@ -60,6 +68,10 @@ export class InstanceDataStore extends SessionDataStore {
   }
 }
 
+/**
+ * Stores session data in browser a localStorage entry.
+ * @type {LocalStorageStore}
+ */
 export class LocalStorageStore extends SessionDataStore {
   key: string
 
