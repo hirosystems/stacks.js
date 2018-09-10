@@ -483,6 +483,7 @@ function encryptPrivateKey(publicKey, privateKey) {
  * @param  {String} hexedEncrypted the ciphertext
  * @return {String}  the decrypted private key
  * @throws {Error} if unable to decrypt
+ *
  * @private
  */
 function decryptPrivateKey(privateKey, hexedEncrypted) {
@@ -1006,6 +1007,7 @@ function isIssuanceDateValid(token) {
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if the `token` has not yet expired, `false`
  * if the `token` has expired
+ *
  * @private
  */
 function isExpirationDateValid(token) {
@@ -2939,8 +2941,18 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
   _createClass(BlockstackNetwork, [{
     key: 'coerceAddress',
     value: function coerceAddress(address) {
-      var addressHash = _bitcoinjsLib2.default.address.fromBase58Check(address).hash;
-      return _bitcoinjsLib2.default.address.toBase58Check(addressHash, this.layer1.pubKeyHash);
+      var _bitcoinjs$address$fr = _bitcoinjsLib2.default.address.fromBase58Check(address),
+          hash = _bitcoinjs$address$fr.hash,
+          version = _bitcoinjs$address$fr.version;
+
+      var scriptHashes = [_bitcoinjsLib2.default.networks.bitcoin.scriptHash, _bitcoinjsLib2.default.networks.testnet.scriptHash];
+      var coercedVersion = void 0;
+      if (scriptHashes.indexOf(version) >= 0) {
+        coercedVersion = this.layer1.scriptHash;
+      } else {
+        coercedVersion = this.layer1.pubKeyHash;
+      }
+      return _bitcoinjsLib2.default.address.toBase58Check(hash, coercedVersion);
     }
   }, {
     key: 'getDefaultBurnAddress',
@@ -3302,7 +3314,11 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
      *   with the transaction broadcast service
      * * `MissingParameterError` if you call the function without a required
      *   parameter
+    <<<<<<< HEAD
      * @private
+    =======
+     *  @private
+    >>>>>>> e63017c... Updates to the build
      */
 
   }, {
@@ -4257,6 +4273,12 @@ function asAmountV2(amount) {
   }
 }
 
+function makeTXbuilder() {
+  var txb = new _bitcoinjsLib2.default.TransactionBuilder(_config.config.network.layer1);
+  txb.setVersion(1);
+  return txb;
+}
+
 function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burn) {
   var registerAddress = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
@@ -4294,7 +4316,7 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
@@ -4331,7 +4353,6 @@ function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
    */
 
   var payload = void 0;
-  var network = _config.config.network;
   if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded');
@@ -4348,7 +4369,7 @@ function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
   var opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload]);
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(ownerAddress, _utils.DUST_MINIMUM);
@@ -4398,7 +4419,6 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
     magic op keep  hash128(name.ns_id) consensus hash
              data?
   */
-  var network = _config.config.network;
   var opRet = Buffer.alloc(36);
   var keepChar = '~';
   if (keepZonefile) {
@@ -4414,7 +4434,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
 
   var opRetPayload = _bitcoinjsLib2.default.payments.embed({ data: [opRet] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(opRetPayload, 0);
   tx.addOutput(newOwner, _utils.DUST_MINIMUM);
@@ -4436,7 +4456,6 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
     magic op  hash128(name.ns_id,consensus hash) hash160(data)
   */
 
-  var network = _config.config.network;
   var opRet = Buffer.alloc(39);
 
   var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
@@ -4450,7 +4469,7 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
 
   var opRetPayload = _bitcoinjsLib2.default.payments.embed({ data: [opRet] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(opRetPayload, 0);
 
@@ -4471,7 +4490,6 @@ function makeRevokeSkeleton(fullyQualifiedName) {
    magic op   name.ns_id (37 bytes)
   */
 
-  var network = _config.config.network;
   var opRet = Buffer.alloc(3);
 
   var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
@@ -4481,7 +4499,7 @@ function makeRevokeSkeleton(fullyQualifiedName) {
   var opReturnBuffer = Buffer.concat([opRet, nameBuff]);
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
 
@@ -4524,7 +4542,7 @@ function makeNamespacePreorderSkeleton(namespaceID, consensusHash, preorderAddre
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
@@ -4542,7 +4560,6 @@ function makeNamespaceRevealSkeleton(namespace, revealAddress) {
                                                   bucket exponents        no-vowel
                                                                           discounts
   */
-  var network = _config.config.network;
   var hexPayload = namespace.toHexPayload();
 
   var opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2);
@@ -4550,7 +4567,7 @@ function makeNamespaceRevealSkeleton(namespace, revealAddress) {
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
   tx.addOutput(revealAddress, _utils.DUST_MINIMUM);
@@ -4565,13 +4582,12 @@ function makeNamespaceReadySkeleton(namespaceID) {
    |-----|--|--|------------|
    magic op  .  ns_id
     */
-  var network = _config.config.network;
   var opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1);
   opReturnBuffer.write('id!', 0, 3, 'ascii');
   opReturnBuffer.write('.' + namespaceID, 3, namespaceID.length + 1, 'ascii');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
 
@@ -4599,7 +4615,7 @@ function makeNameImportSkeleton(name, recipientAddr, zonefileHash) {
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
   var zonefileHashB58 = _bitcoinjsLib2.default.address.toBase58Check(new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash);
 
   tx.addOutput(nullOutput, 0);
@@ -4620,14 +4636,13 @@ function makeAnnounceSkeleton(messageHash) {
     throw new Error('Invalid message hash: must be 20 bytes hex-encoded');
   }
 
-  var network = _config.config.network;
   var opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2);
   opReturnBuffer.write('id#', 0, 3, 'ascii');
   opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
 
-  var tx = new _bitcoinjsLib2.default.TransactionBuilder(network.layer1);
+  var tx = makeTXbuilder();
 
   tx.addOutput(nullOutput, 0);
   return tx.buildIncomplete();
@@ -4695,6 +4710,24 @@ function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
   var change = (0, _utils.addUTXOsToFund)(txB, utxos, txFee + outAmounts - inAmounts, feeRate);
   txB.__tx.outs[changeIndex].value += change;
   return txB;
+}
+
+function returnTransactionHex(txB) {
+  var buildIncomplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  if (buildIncomplete) {
+    return txB.buildIncomplete().toHex();
+  } else {
+    return txB.build().toHex();
+  }
+}
+
+function getTransactionSigner(input) {
+  if (typeof input === 'string') {
+    return _signers.PubkeyHashSigner.fromHexString(input);
+  } else {
+    return input;
+  }
 }
 
 /**
@@ -5028,22 +5061,22 @@ function estimateAnnounce(messageHash) {
  *    must be passed as the 'registrationAddress' in the register transaction)
  * @param {String | TransactionSigner} paymentKeyIn - a hex string of
  *    the private key used to fund the transaction or a transaction signer object
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
  */
 function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
   var network = _config.config.network;
 
   var namespace = fullyQualifiedName.split('.').pop();
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
 
   return paymentKey.getAddress().then(function (preorderAddress) {
     var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref9) {
@@ -5067,22 +5100,9 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyIn) {
       var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
       var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
 
-      var signingPromise = Promise.resolve();
-
-      var _loop = function _loop(i) {
-        signingPromise = signingPromise.then(function () {
-          return paymentKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
     }).then(function (signingTxB) {
-      return signingTxB.build().toHex();
+      return returnTransactionHex(signingTxB, buildIncomplete);
     });
   });
 }
@@ -5101,6 +5121,9 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyIn) {
  *    after the UPDATE propagates.
  * @param {String} valueHash - if given, this is the hash to store (instead of
  *    zonefile).  zonefile will be ignored if this is given.
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -5108,6 +5131,7 @@ function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyIn) {
  */
 function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
   var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+  var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
   var network = _config.config.network;
   if (!valueHash && !zonefile) {
@@ -5122,19 +5146,8 @@ function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
     return Promise.reject(new Error('Invalid valueHash ' + valueHash));
   }
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
-
-  var ownerKey = void 0;
-  if (typeof ownerKeyIn === 'string') {
-    ownerKey = _signers.PubkeyHashSigner.fromHexString(ownerKeyIn);
-  } else {
-    ownerKey = ownerKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
 
   return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref13) {
     var _ref14 = _slicedToArray(_ref13, 2),
@@ -5159,29 +5172,10 @@ function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
       var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
       var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
 
-      var signingPromise = Promise.resolve();
-
-      var _loop2 = function _loop2(i) {
-        if (i === ownerInput.index) {
-          signingPromise = signingPromise.then(function () {
-            return ownerKey.signTransaction(signingTxB, i);
-          });
-        } else {
-          signingPromise = signingPromise.then(function () {
-            return paymentKey.signTransaction(signingTxB, i);
-          });
-        }
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop2(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{ index: ownerInput.index, signer: ownerKey }]);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5200,6 +5194,9 @@ function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
  *    after the UPDATE propagates.
  * @param {String} valueHash - the hash of the zone file data to include.
  *    It will be used instead of zonefile, if given
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -5208,6 +5205,7 @@ function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
 function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
   var zonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
   var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
   var network = _config.config.network;
   if (!valueHash && !!zonefile) {
@@ -5221,12 +5219,7 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
   var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1);
   txB.setVersion(1);
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
 
   return paymentKey.getAddress().then(function (paymentAddress) {
     return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref17) {
@@ -5236,23 +5229,10 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
 
       var signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0);
 
-      var signingPromise = Promise.resolve();
-
-      var _loop3 = function _loop3(i) {
-        signingPromise = signingPromise.then(function () {
-          return paymentKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop3(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5267,6 +5247,9 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
  *    the private key used to fund the transaction (or a
  *    TransactionSigner object)
  * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *   indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *   transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -5274,22 +5257,12 @@ function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
  */
 function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyIn, paymentKeyIn) {
   var keepZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
   var network = _config.config.network;
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
-
-  var ownerKey = void 0;
-  if (typeof ownerKeyIn === 'string') {
-    ownerKey = _signers.PubkeyHashSigner.fromHexString(ownerKeyIn);
-  } else {
-    ownerKey = ownerKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
 
   return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref19) {
     var _ref20 = _slicedToArray(_ref19, 2),
@@ -5314,29 +5287,10 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyIn, paymen
       var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
       var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
 
-      var signingPromise = Promise.resolve();
-
-      var _loop4 = function _loop4(i) {
-        if (i === ownerInput.index) {
-          signingPromise = signingPromise.then(function () {
-            return ownerKey.signTransaction(signingTxB, i);
-          });
-        } else {
-          signingPromise = signingPromise.then(function () {
-            return paymentKey.signTransaction(signingTxB, i);
-          });
-        }
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop4(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{ index: ownerInput.index, signer: ownerKey }]);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5348,27 +5302,21 @@ function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyIn, paymen
  * @param {String | TransactionSigner} paymentKeyIn - a hex string of
  *    the private key used to fund the transaction (or a
  *    TransactionSigner object)
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
  */
 function makeRevoke(fullyQualifiedName, ownerKeyIn, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
   var network = _config.config.network;
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
-
-  var ownerKey = void 0;
-  if (typeof ownerKeyIn === 'string') {
-    ownerKey = _signers.PubkeyHashSigner.fromHexString(ownerKeyIn);
-  } else {
-    ownerKey = ownerKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
 
   return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref23) {
     var _ref24 = _slicedToArray(_ref23, 2),
@@ -5388,30 +5336,10 @@ function makeRevoke(fullyQualifiedName, ownerKeyIn, paymentKeyIn) {
 
       var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
       var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
-
-      var signingPromise = Promise.resolve();
-
-      var _loop5 = function _loop5(i) {
-        if (i === ownerInput.index) {
-          signingPromise = signingPromise.then(function () {
-            return ownerKey.signTransaction(signingTxB, i);
-          });
-        } else {
-          signingPromise = signingPromise.then(function () {
-            return paymentKey.signTransaction(signingTxB, i);
-          });
-        }
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop5(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{ index: ownerInput.index, signer: ownerKey }]);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5430,6 +5358,9 @@ function makeRevoke(fullyQualifiedName, ownerKeyIn, paymentKeyIn) {
  *    after the RENEWAL propagates.
  * @param {String} valueHash - the raw zone file hash to include (this will be used
  *    instead of zonefile, if given).
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -5438,6 +5369,7 @@ function makeRevoke(fullyQualifiedName, ownerKeyIn, paymentKeyIn) {
 function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyIn, paymentKeyIn) {
   var zonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
   var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var buildIncomplete = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
 
   var network = _config.config.network;
 
@@ -5447,19 +5379,8 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyIn, payment
 
   var namespace = fullyQualifiedName.split('.').pop();
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
-
-  var ownerKey = void 0;
-  if (typeof ownerKeyIn === 'string') {
-    ownerKey = _signers.PubkeyHashSigner.fromHexString(ownerKeyIn);
-  } else {
-    ownerKey = ownerKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
 
   return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref27) {
     var _ref28 = _slicedToArray(_ref27, 2),
@@ -5493,29 +5414,10 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyIn, payment
       }
       ownerOutput.value = ownerInput.value;
       var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
-      var signingPromise = Promise.resolve();
-
-      var _loop6 = function _loop6(i) {
-        if (i === ownerInput.index) {
-          signingPromise = signingPromise.then(function () {
-            return ownerKey.signTransaction(signingTxB, i);
-          });
-        } else {
-          signingPromise = signingPromise.then(function () {
-            return paymentKey.signTransaction(signingTxB, i);
-          });
-        }
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop6(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{ index: ownerInput.index, signer: ownerKey }]);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5527,20 +5429,20 @@ function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyIn, payment
  * @param {String | TransactionSigner} paymentKeyIn - a hex string of
  *    the private key used to fund the transaction (or a
  *    TransactionSigner object)
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
  */
 function makeNamespacePreorder(namespaceID, revealAddress, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
   var network = _config.config.network;
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
 
   return paymentKey.getAddress().then(function (preorderAddress) {
     var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamespacePrice(namespaceID)]).then(function (_ref33) {
@@ -5563,22 +5465,9 @@ function makeNamespacePreorder(namespaceID, revealAddress, paymentKeyIn) {
       var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
       var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
 
-      var signingPromise = Promise.resolve();
-
-      var _loop7 = function _loop7(i) {
-        signingPromise = signingPromise.then(function () {
-          return paymentKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop7(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
     }).then(function (signingTxB) {
-      return signingTxB.build().toHex();
+      return returnTransactionHex(signingTxB, buildIncomplete);
     });
   });
 }
@@ -5591,12 +5480,17 @@ function makeNamespacePreorder(namespaceID, revealAddress, paymentKeyIn) {
  * @param {String | TransactionSigner} paymentKeyIn - a hex string (or
  *   a TransactionSigner object) of the private key used to fund the
  *   transaction
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *   indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *   transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *   this function *does not* perform the requisite safety checks -- please see
  *   the safety module for those.
  * @private
  */
 function makeNamespaceReveal(namespace, revealAddress, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
   var network = _config.config.network;
 
   if (!namespace.check()) {
@@ -5605,12 +5499,7 @@ function makeNamespaceReveal(namespace, revealAddress, paymentKeyIn) {
 
   var namespaceRevealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
 
   return paymentKey.getAddress().then(function (preorderAddress) {
     return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()]).then(function (_ref37) {
@@ -5622,23 +5511,10 @@ function makeNamespaceReveal(namespace, revealAddress, paymentKeyIn) {
       txB.setVersion(1);
       var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0);
 
-      var signingPromise = Promise.resolve();
-
-      var _loop8 = function _loop8(i) {
-        signingPromise = signingPromise.then(function () {
-          return paymentKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop8(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5647,22 +5523,22 @@ function makeNamespaceReveal(namespace, revealAddress, paymentKeyIn) {
  * @param {String} namespaceID - the namespace to launch
  * @param {String | TransactionSigner} revealKeyIn - the private key
  *  of the 'revealAddress' used to reveal the namespace
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *  indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *  transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *  this function *does not* perform the requisite safety checks -- please see
  *  the safety module for those.
  * @private
  */
 function makeNamespaceReady(namespaceID, revealKeyIn) {
+  var buildIncomplete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
   var network = _config.config.network;
 
   var namespaceReadyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
 
-  var revealKey = void 0;
-  if (typeof revealKeyIn === 'string') {
-    revealKey = _signers.PubkeyHashSigner.fromHexString(revealKeyIn);
-  } else {
-    revealKey = revealKeyIn;
-  }
+  var revealKey = getTransactionSigner(revealKeyIn);
 
   return revealKey.getAddress().then(function (revealAddress) {
     return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()]).then(function (_ref39) {
@@ -5673,23 +5549,10 @@ function makeNamespaceReady(namespaceID, revealKeyIn) {
       var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1);
       txB.setVersion(1);
       var signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0);
-      var signingPromise = Promise.resolve();
-
-      var _loop9 = function _loop9(i) {
-        signingPromise = signingPromise.then(function () {
-          return revealKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop9(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, revealKey);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5700,22 +5563,22 @@ function makeNamespaceReady(namespaceID, revealKeyIn) {
  * @param {String} zonefileHash - the hash of the zonefile to give this name
  * @param {String | TransactionSigner} importerKeyIn - the private key
  * that pays for the import
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * this function does not perform the requisite safety checks -- please see
  * the safety module for those.
  * @private
  */
 function makeNameImport(name, recipientAddr, zonefileHash, importerKeyIn) {
+  var buildIncomplete = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
   var network = _config.config.network;
 
   var nameImportTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
 
-  var importerKey = void 0;
-  if (typeof importerKeyIn === 'string') {
-    importerKey = _signers.PubkeyHashSigner.fromHexString(importerKeyIn);
-  } else {
-    importerKey = importerKeyIn;
-  }
+  var importerKey = getTransactionSigner(importerKeyIn);
 
   return importerKey.getAddress().then(function (importerAddress) {
     return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()]).then(function (_ref41) {
@@ -5725,23 +5588,10 @@ function makeNameImport(name, recipientAddr, zonefileHash, importerKeyIn) {
 
       var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(nameImportTX, network.layer1);
       var signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0);
-      var signingPromise = Promise.resolve();
-
-      var _loop10 = function _loop10(i) {
-        signingPromise = signingPromise.then(function () {
-          return importerKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop10(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, importerKey);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5752,22 +5602,22 @@ function makeNameImport(name, recipientAddr, zonefileHash, importerKeyIn) {
  * @param {String | TransactionSigner} senderKeyIn - the private key
  *  that pays for the transaction.  Should be the key that owns the
  *  name that the message recipients subscribe to
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * this function does not perform the requisite safety checks -- please see the
  * safety module for those.
  * @private
  */
 function makeAnnounce(messageHash, senderKeyIn) {
+  var buildIncomplete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
   var network = _config.config.network;
 
   var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
 
-  var senderKey = void 0;
-  if (typeof senderKeyIn === 'string') {
-    senderKey = _signers.PubkeyHashSigner.fromHexString(senderKeyIn);
-  } else {
-    senderKey = senderKeyIn;
-  }
+  var senderKey = getTransactionSigner(senderKeyIn);
 
   return senderKey.getAddress().then(function (senderAddress) {
     return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()]).then(function (_ref43) {
@@ -5777,23 +5627,10 @@ function makeAnnounce(messageHash, senderKeyIn) {
 
       var txB = _bitcoinjsLib2.default.TransactionBuilder.fromTransaction(announceTX, network.layer1);
       var signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0);
-      var signingPromise = Promise.resolve();
-
-      var _loop11 = function _loop11(i) {
-        signingPromise = signingPromise.then(function () {
-          return senderKey.signTransaction(signingTxB, i);
-        });
-      };
-
-      for (var i = 0; i < signingTxB.__tx.ins.length; i++) {
-        _loop11(i);
-      }
-      return signingPromise.then(function () {
-        return signingTxB;
-      });
+      return (0, _utils.signInputs)(signingTxB, senderKey);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5815,22 +5652,22 @@ function makeAnnounce(messageHash, senderKeyIn) {
  *    used to fund the bitcoin spend
  * @param {number} amount - the amount in satoshis for the payment address to
  *    spend in this transaction
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
  */
 function makeBitcoinSpend(destinationAddress, paymentKeyIn, amount) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
   if (amount <= 0) {
     return Promise.reject(new _errors.InvalidParameterError('amount', 'amount must be greater than zero'));
   }
 
   var network = _config.config.network;
 
-  var paymentKey = void 0;
-  if (typeof paymentKeyIn === 'string') {
-    paymentKey = _signers.PubkeyHashSigner.fromHexString(paymentKeyIn);
-  } else {
-    paymentKey = paymentKeyIn;
-  }
+  var paymentKey = getTransactionSigner(paymentKeyIn);
 
   return paymentKey.getAddress().then(function (paymentAddress) {
     return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref45) {
@@ -5874,23 +5711,10 @@ function makeBitcoinSpend(destinationAddress, paymentKeyIn, amount) {
       txB.__tx.outs[destinationIndex].value = outputAmount;
 
       // ready to sign.
-      var signingPromise = Promise.resolve();
-
-      var _loop12 = function _loop12(i) {
-        signingPromise = signingPromise.then(function () {
-          return paymentKey.signTransaction(txB, i);
-        });
-      };
-
-      for (var i = 0; i < txB.__tx.ins.length; i++) {
-        _loop12(i);
-      }
-      return signingPromise.then(function () {
-        return txB;
-      });
+      return (0, _utils.signInputs)(txB, paymentKey);
     });
   }).then(function (signingTxB) {
-    return signingTxB.build().toHex();
+    return returnTransactionHex(signingTxB, buildIncomplete);
   });
 }
 
@@ -5935,6 +5759,7 @@ exports.estimateTXBytes = estimateTXBytes;
 exports.sumOutputValues = sumOutputValues;
 exports.decodeB40 = decodeB40;
 exports.addUTXOsToFund = addUTXOsToFund;
+exports.signInputs = signInputs;
 
 var _bitcoinjsLib = require('bitcoinjs-lib');
 
@@ -5949,6 +5774,8 @@ var _bigi = require('bigi');
 var _bigi2 = _interopRequireDefault(_bigi);
 
 var _errors = require('../errors');
+
+var _signers = require('./signers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6114,8 +5941,33 @@ function addUTXOsToFund(txBuilderIn, utxos, amountToFund, feeRate) {
     return addUTXOsToFund(txBuilderIn, utxos.slice(1), remainToFund, feeRate, fundNewFees);
   }
 }
+
+function signInputs(txB, defaultSigner, otherSigners) {
+  var signerArray = txB.__tx.ins.map(function () {
+    return defaultSigner;
+  });
+  if (otherSigners) {
+    otherSigners.forEach(function (signerPair) {
+      signerArray[signerPair.index] = signerPair.signer;
+    });
+  }
+  var signingPromise = Promise.resolve();
+
+  var _loop = function _loop(i) {
+    signingPromise = signingPromise.then(function () {
+      return signerArray[i].signTransaction(txB, i);
+    });
+  };
+
+  for (var i = 0; i < txB.__tx.ins.length; i++) {
+    _loop(i);
+  }
+  return signingPromise.then(function () {
+    return txB;
+  });
+}
 }).call(this,require("buffer").Buffer)
-},{"../errors":15,"bigi":74,"bitcoinjs-lib":96,"buffer":183,"ripemd160":460}],26:[function(require,module,exports){
+},{"../errors":15,"./signers":22,"bigi":74,"bitcoinjs-lib":96,"buffer":183,"ripemd160":460}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

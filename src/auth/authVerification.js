@@ -159,6 +159,7 @@ export function isIssuanceDateValid(token: string) {
  * @param  {String}  token encoded and signed authentication token
  * @return {Boolean} `true` if the `token` has not yet expired, `false`
  * if the `token` has expired
+ *
  * @private
  */
 export function isExpirationDateValid(token: string) {
