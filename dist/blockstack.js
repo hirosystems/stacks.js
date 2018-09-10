@@ -20,7 +20,7 @@ var AppConfig = exports.AppConfig = function () {
   function AppConfig() {
     var appDomain = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.location.origin;
     var scopes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _authConstants.DEFAULT_SCOPE.slice();
-    var redirectPath = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '/';
+    var redirectPath = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
     var manifestPath = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/manifest.json';
     var coreNode = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
@@ -1196,6 +1196,8 @@ var SessionData = exports.SessionData = function () {
 
 
   // TODO use this
+  // required after sign in
+
   function SessionData(options) {
     _classCallCheck(this, SessionData);
 
@@ -1214,7 +1216,9 @@ var SessionData = exports.SessionData = function () {
 
   // using this in place of
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+  // required after sign in
 
+  // required after sign in
 
   _createClass(SessionData, [{
     key: 'getGaiaHubConfig',
@@ -1286,13 +1290,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @type {UserSession}
  */
 var UserSession = exports.UserSession = function () {
-  function UserSession(initialValue) {
+  function UserSession() {
+    var initialValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new _appConfig.AppConfig();
+
     _classCallCheck(this, UserSession);
 
-    var sessionOptions = {
-      appConfig: initialValue
-    };
-    this.session = new _sessionData.SessionData(sessionOptions);
+    if (initialValue instanceof _sessionData.SessionData) {
+      this.session = initialValue;
+    } else {
+      var sessionOptions = {
+        appConfig: initialValue
+      };
+      this.session = new _sessionData.SessionData(sessionOptions);
+    }
   }
 
   /* AUTHENTICATION */
