@@ -133,7 +133,7 @@
           "children": [
             {
               "type": "text",
-              "value": "abc\n",
+              "value": "Configuration data for the current app.",
               "position": {
                 "start": {
                   "line": 1,
@@ -141,48 +141,9 @@
                   "offset": 0
                 },
                 "end": {
-                  "line": 2,
-                  "column": 1,
-                  "offset": 4
-                },
-                "indent": [
-                  1
-                ]
-              }
-            },
-            {
-              "type": "linkReference",
-              "identifier": "session description",
-              "referenceType": "shortcut",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "session description",
-                  "position": {
-                    "start": {
-                      "line": 2,
-                      "column": 2,
-                      "offset": 5
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 21,
-                      "offset": 24
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 2,
-                  "column": 1,
-                  "offset": 4
-                },
-                "end": {
-                  "line": 2,
-                  "column": 22,
-                  "offset": 25
+                  "line": 1,
+                  "column": 40,
+                  "offset": 39
                 },
                 "indent": []
               }
@@ -195,9 +156,2389 @@
               "offset": 0
             },
             "end": {
-              "line": 2,
-              "column": 22,
-              "offset": 25
+              "line": 1,
+              "column": 40,
+              "offset": 39
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "On browser platforms, creating an instance of this\nclass without any arguments will use\n",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 41
+                },
+                "end": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 129
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            },
+            {
+              "type": "inlineCode",
+              "value": "window.location.origin",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 1,
+                  "offset": 129
+                },
+                "end": {
+                  "line": 5,
+                  "column": 25,
+                  "offset": 153
+                },
+                "indent": []
+              }
+            },
+            {
+              "type": "text",
+              "value": " as the app domain.\nOn non-browser platforms, you need to\nspecify an app domain as the first argument.",
+              "position": {
+                "start": {
+                  "line": 5,
+                  "column": 25,
+                  "offset": 153
+                },
+                "end": {
+                  "line": 7,
+                  "column": 45,
+                  "offset": 255
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 41
+            },
+            "end": {
+              "line": 7,
+              "column": 45,
+              "offset": 255
+            },
+            "indent": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 7,
+          "column": 45,
+          "offset": 255
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "type",
+        "description": null,
+        "lineNumber": 8,
+        "type": {
+          "type": "NameExpression",
+          "name": "AppConfig"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 5,
+        "column": 0
+      },
+      "end": {
+        "line": 14,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 15,
+          "column": 0
+        },
+        "end": {
+          "line": 105,
+          "column": 1
+        }
+      },
+      "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "appDomain",
+        "lineNumber": 1,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the app domain",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 15,
+                      "offset": 14
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 15,
+                  "offset": 14
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 15,
+              "offset": 14
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "window.location.origin"
+      },
+      {
+        "title": "param",
+        "name": "scopes",
+        "lineNumber": 2,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "permissions this app is requesting",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 35,
+                      "offset": 34
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 35,
+                  "offset": 34
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 35,
+              "offset": 34
+            }
+          }
+        },
+        "type": {
+          "type": "TypeApplication",
+          "expression": {
+            "type": "NameExpression",
+            "name": "Array"
+          },
+          "applications": [
+            {
+              "type": "NameExpression",
+              "name": "string"
+            }
+          ]
+        },
+        "default": "DEFAULT_SCOPE.slice()"
+      },
+      {
+        "title": "param",
+        "name": "redirectPath",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "path on app domain to redirect users to after authentication",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 61,
+                      "offset": 60
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 61,
+                  "offset": 60
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 61,
+              "offset": 60
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "''"
+      },
+      {
+        "title": "param",
+        "name": "manifestPath",
+        "lineNumber": 4,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "path relative to app domain of app's manifest file",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 51,
+                      "offset": 50
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 51,
+                  "offset": 50
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 51,
+              "offset": 50
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "'/manifest.json'"
+      },
+      {
+        "title": "param",
+        "name": "coreNode",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "override the default or user selected core node",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 48,
+                      "offset": 47
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 48,
+                  "offset": 47
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 48,
+              "offset": 47
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "null"
+      },
+      {
+        "title": "param",
+        "name": "authenticatorURL",
+        "lineNumber": 6,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "the web-based fall back authenticator",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 38,
+                      "offset": 37
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 38,
+                  "offset": 37
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 38,
+              "offset": 37
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "string"
+        },
+        "default": "DEFAULT_BLOCKSTACK_HOST"
+      }
+    ],
+    "properties": [],
+    "returns": [],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "type": {
+      "type": "NameExpression",
+      "name": "AppConfig"
+    },
+    "constructorComment": {
+      "description": "",
+      "tags": [
+        {
+          "title": "param",
+          "description": "the app domain",
+          "lineNumber": 1,
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "appDomain"
+        },
+        {
+          "title": "param",
+          "description": "permissions this app is requesting",
+          "lineNumber": 2,
+          "type": {
+            "type": "TypeApplication",
+            "expression": {
+              "type": "NameExpression",
+              "name": "Array"
+            },
+            "applications": [
+              {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            ]
+          },
+          "name": "scopes"
+        },
+        {
+          "title": "param",
+          "description": "path on app domain to redirect users to after authentication",
+          "lineNumber": 3,
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "redirectPath"
+        },
+        {
+          "title": "param",
+          "description": "path relative to app domain of app's manifest file",
+          "lineNumber": 4,
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "manifestPath"
+        },
+        {
+          "title": "param",
+          "description": "override the default or user selected core node",
+          "lineNumber": 5,
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "coreNode"
+        },
+        {
+          "title": "param",
+          "description": "the web-based fall back authenticator",
+          "lineNumber": 6,
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "authenticatorURL"
+        }
+      ],
+      "loc": {
+        "start": {
+          "line": 61,
+          "column": 2
+        },
+        "end": {
+          "line": 68,
+          "column": 5
+        }
+      },
+      "context": {
+        "loc": {
+          "start": {
+            "line": 69,
+            "column": 2
+          },
+          "end": {
+            "line": 87,
+            "column": 3
+          }
+        },
+        "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js",
+        "sortKey": "!/Users/larry/git/blockstack.js/src/auth/appConfig.js 00000069",
+        "code": "{\n  /**\n   * Blockstack apps are uniquely identified by their app domain.\n   * @type {string}\n   */\n  appDomain: string\n\n  /**\n   * An array of string representing permissions requested by the app.\n   * @type {[Array<string>}\n   */\n  scopes: Array<string>\n\n\n  /**\n   * Path on app domain to redirect users to after authentication. The\n   * authentication response token will be postpended in a query.\n   * @type {string}\n   */\n  redirectPath: string\n\n  /**\n   * Path relative to app domain of app's manifest file.\n   *\n   * This file needs to have CORS headers set so that it can be fetched\n   * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.\n   * @type {string}\n   */\n  manifestPath: string\n\n  /**\n   * The URL of Blockstack core node to use for this app. If this is\n   * `null`, the core node specified by the user or default core node\n   * will be used.\n   * @type {string}\n   */\n  coreNode: string\n\n  /**\n   * The URL of a web-based Blockstack Authenticator to use in the event\n   * the user doesn't have Blockstack installed on their machine. If this\n   * is not specified, the current default in this library will be used.\n   * @type {string}\n   */\n  authenticatorURL: ?string\n\n  /**\n   * @param {string} appDomain - the app domain\n   * @param {Array<string>} scopes - permissions this app is requesting\n   * @param {string} redirectPath - path on app domain to redirect users to after authentication\n   * @param {string} manifestPath - path relative to app domain of app's manifest file\n   * @param {string} coreNode - override the default or user selected core node\n   * @param {string} authenticatorURL - the web-based fall back authenticator\n   */\n  constructor(appDomain: string = window.location.origin,\n              scopes: Array<string> = DEFAULT_SCOPE.slice(),\n              redirectPath: string = '',\n              manifestPath: string = '/manifest.json',\n              coreNode: ?string = null,\n              authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST) {\n    this.appDomain = appDomain\n    this.scopes = scopes\n    this.redirectPath = redirectPath\n    this.manifestPath = manifestPath\n\n    if (!coreNode) {\n      this.coreNode = DEFAULT_CORE_NODE\n    } else {\n      this.coreNode = coreNode\n    }\n\n    this.authenticatorURL = authenticatorURL\n  }\n\n  /**\n   * The location to which the authenticator should\n   * redirect the user.\n   * @returns {string} - URI\n   */\n  redirectURI() : string {\n    return `${this.appDomain}${this.redirectPath}`\n  }\n\n  /**\n   * The location of the app's manifest file.\n   * @returns {string} - URI\n   */\n  manifestURI() : string {\n    return `${this.appDomain}${this.manifestPath}`\n  }\n}"
+      },
+      "augments": [],
+      "errors": [],
+      "examples": [],
+      "params": [
+        {
+          "title": "param",
+          "name": "appDomain",
+          "lineNumber": 1,
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "the app domain",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 15,
+                        "offset": 14
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 15,
+                    "offset": 14
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 15,
+                "offset": 14
+              }
+            }
+          },
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "default": "window.location.origin"
+        },
+        {
+          "title": "param",
+          "name": "scopes",
+          "lineNumber": 2,
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "permissions this app is requesting",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 35,
+                        "offset": 34
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 35,
+                    "offset": 34
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 35,
+                "offset": 34
+              }
+            }
+          },
+          "type": {
+            "type": "TypeApplication",
+            "expression": {
+              "type": "NameExpression",
+              "name": "Array"
+            },
+            "applications": [
+              {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            ]
+          },
+          "default": "DEFAULT_SCOPE.slice()"
+        },
+        {
+          "title": "param",
+          "name": "redirectPath",
+          "lineNumber": 3,
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "path on app domain to redirect users to after authentication",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 61,
+                        "offset": 60
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 61,
+                    "offset": 60
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 61,
+                "offset": 60
+              }
+            }
+          },
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "default": "''"
+        },
+        {
+          "title": "param",
+          "name": "manifestPath",
+          "lineNumber": 4,
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "path relative to app domain of app's manifest file",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 51,
+                        "offset": 50
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 51,
+                    "offset": 50
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 51,
+                "offset": 50
+              }
+            }
+          },
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "default": "'/manifest.json'"
+        },
+        {
+          "title": "param",
+          "name": "coreNode",
+          "lineNumber": 5,
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "override the default or user selected core node",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 48,
+                        "offset": 47
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 48,
+                    "offset": 47
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 48,
+                "offset": 47
+              }
+            }
+          },
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "default": "null"
+        },
+        {
+          "title": "param",
+          "name": "authenticatorURL",
+          "lineNumber": 6,
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "the web-based fall back authenticator",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 38,
+                        "offset": 37
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 38,
+                    "offset": 37
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 38,
+                "offset": 37
+              }
+            }
+          },
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "default": "DEFAULT_BLOCKSTACK_HOST"
+        }
+      ],
+      "properties": [],
+      "returns": [],
+      "sees": [],
+      "throws": [],
+      "todos": []
+    },
+    "name": "AppConfig",
+    "kind": "class",
+    "path": [
+      {
+        "name": "AppConfig",
+        "kind": "class"
+      }
+    ],
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Blockstack apps are uniquely identified by their app domain.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 61,
+                        "offset": 60
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 61,
+                    "offset": 60
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 61,
+                "offset": 60
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 16,
+              "column": 2
+            },
+            "end": {
+              "line": 19,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 20,
+                "column": 2
+              },
+              "end": {
+                "line": 20,
+                "column": 19
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "appDomain",
+          "kind": "member",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "appDomain",
+              "kind": "member",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#appDomain"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "An array of string representing permissions requested by the app.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 66,
+                        "offset": 65
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 66,
+                    "offset": 65
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 66,
+                "offset": 65
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 2,
+              "type": null,
+              "errors": [
+                "unexpected token"
+              ]
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 22,
+              "column": 2
+            },
+            "end": {
+              "line": 25,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 26,
+                "column": 2
+              },
+              "end": {
+                "line": 26,
+                "column": 23
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "scopes",
+          "kind": "member",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "type": {
+            "type": "TypeApplication",
+            "expression": {
+              "type": "NameExpression",
+              "name": "Array"
+            },
+            "applications": [
+              {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            ]
+          },
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "scopes",
+              "kind": "member",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#scopes"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Path on app domain to redirect users to after authentication. The\nauthentication response token will be postpended in a query.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 61,
+                        "offset": 126
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 61,
+                    "offset": 126
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 61,
+                "offset": 126
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 3,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 29,
+              "column": 2
+            },
+            "end": {
+              "line": 33,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 34,
+                "column": 2
+              },
+              "end": {
+                "line": 34,
+                "column": 22
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "redirectPath",
+          "kind": "member",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "redirectPath",
+              "kind": "member",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#redirectPath"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Path relative to app domain of app's manifest file.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 52,
+                        "offset": 51
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 52,
+                    "offset": 51
+                  },
+                  "indent": []
+                }
+              },
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "This file needs to have CORS headers set so that it can be fetched\nfrom any origin. Typically this means return the header ",
+                    "position": {
+                      "start": {
+                        "line": 3,
+                        "column": 1,
+                        "offset": 53
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 57,
+                        "offset": 176
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "Access-Control-Allow-Origin: *",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 57,
+                        "offset": 176
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 89,
+                        "offset": 208
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ".",
+                    "position": {
+                      "start": {
+                        "line": 4,
+                        "column": 89,
+                        "offset": 208
+                      },
+                      "end": {
+                        "line": 4,
+                        "column": 90,
+                        "offset": 209
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 1,
+                    "offset": 53
+                  },
+                  "end": {
+                    "line": 4,
+                    "column": 90,
+                    "offset": 209
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 4,
+                "column": 90,
+                "offset": 209
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 5,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 36,
+              "column": 2
+            },
+            "end": {
+              "line": 42,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 43,
+                "column": 2
+              },
+              "end": {
+                "line": 43,
+                "column": 22
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "manifestPath",
+          "kind": "member",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "manifestPath",
+              "kind": "member",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#manifestPath"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The URL of Blockstack core node to use for this app. If this is\n",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 64
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  },
+                  {
+                    "type": "inlineCode",
+                    "value": "null",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 1,
+                        "offset": 64
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 7,
+                        "offset": 70
+                      },
+                      "indent": []
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "value": ", the core node specified by the user or default core node\nwill be used.",
+                    "position": {
+                      "start": {
+                        "line": 2,
+                        "column": 7,
+                        "offset": 70
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 14,
+                        "offset": 142
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 14,
+                    "offset": 142
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 14,
+                "offset": 142
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 4,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 45,
+              "column": 2
+            },
+            "end": {
+              "line": 50,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 51,
+                "column": 2
+              },
+              "end": {
+                "line": 51,
+                "column": 18
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "coreNode",
+          "kind": "member",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "coreNode",
+              "kind": "member",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#coreNode"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The URL of a web-based Blockstack Authenticator to use in the event\nthe user doesn't have Blockstack installed on their machine. If this\nis not specified, the current default in this library will be used.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 3,
+                        "column": 68,
+                        "offset": 204
+                      },
+                      "indent": [
+                        1,
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 68,
+                    "offset": 204
+                  },
+                  "indent": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 3,
+                "column": 68,
+                "offset": 204
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "type",
+              "description": null,
+              "lineNumber": 4,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 53,
+              "column": 2
+            },
+            "end": {
+              "line": 58,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 59,
+                "column": 2
+              },
+              "end": {
+                "line": 59,
+                "column": 27
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "type": {
+            "type": "NameExpression",
+            "name": "string"
+          },
+          "name": "authenticatorURL",
+          "kind": "member",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "authenticatorURL",
+              "kind": "member",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#authenticatorURL"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The location to which the authenticator should\nredirect the user.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 2,
+                        "column": 19,
+                        "offset": 65
+                      },
+                      "indent": [
+                        1
+                      ]
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 2,
+                    "column": 19,
+                    "offset": 65
+                  },
+                  "indent": [
+                    1
+                  ]
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 2,
+                "column": 19,
+                "offset": 65
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "returns",
+              "description": "URI",
+              "lineNumber": 3,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 89,
+              "column": 2
+            },
+            "end": {
+              "line": 93,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 94,
+                "column": 2
+              },
+              "end": {
+                "line": 96,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "URI",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 4,
+                            "offset": 3
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "redirectURI",
+          "kind": "function",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "redirectURI",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#redirectURI"
+        },
+        {
+          "description": {
+            "type": "root",
+            "children": [
+              {
+                "type": "paragraph",
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "The location of the app's manifest file.",
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 41,
+                        "offset": 40
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 41,
+                    "offset": 40
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 41,
+                "offset": 40
+              }
+            }
+          },
+          "tags": [
+            {
+              "title": "returns",
+              "description": "URI",
+              "lineNumber": 2,
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "loc": {
+            "start": {
+              "line": 98,
+              "column": 2
+            },
+            "end": {
+              "line": 101,
+              "column": 5
+            }
+          },
+          "context": {
+            "loc": {
+              "start": {
+                "line": 102,
+                "column": 2
+              },
+              "end": {
+                "line": 104,
+                "column": 3
+              }
+            },
+            "file": "/Users/larry/git/blockstack.js/src/auth/appConfig.js"
+          },
+          "augments": [],
+          "examples": [],
+          "params": [],
+          "properties": [],
+          "returns": [
+            {
+              "description": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "URI",
+                        "position": {
+                          "start": {
+                            "line": 1,
+                            "column": 1,
+                            "offset": 0
+                          },
+                          "end": {
+                            "line": 1,
+                            "column": 4,
+                            "offset": 3
+                          },
+                          "indent": []
+                        }
+                      }
+                    ],
+                    "position": {
+                      "start": {
+                        "line": 1,
+                        "column": 1,
+                        "offset": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "column": 4,
+                        "offset": 3
+                      },
+                      "indent": []
+                    }
+                  }
+                ],
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 1,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 4,
+                    "offset": 3
+                  }
+                }
+              },
+              "title": "returns",
+              "type": {
+                "type": "NameExpression",
+                "name": "string"
+              }
+            }
+          ],
+          "sees": [],
+          "throws": [],
+          "todos": [],
+          "name": "manifestURI",
+          "kind": "function",
+          "memberof": "AppConfig",
+          "scope": "instance",
+          "members": {
+            "global": [],
+            "inner": [],
+            "instance": [],
+            "events": [],
+            "static": []
+          },
+          "path": [
+            {
+              "name": "AppConfig",
+              "kind": "class"
+            },
+            {
+              "name": "manifestURI",
+              "kind": "function",
+              "scope": "instance"
+            }
+          ],
+          "namespace": "AppConfig#manifestURI"
+        }
+      ],
+      "events": [],
+      "static": []
+    },
+    "namespace": "AppConfig"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Represents an instance of a signed in user for a particular app.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 65,
+                  "offset": 64
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 65,
+              "offset": 64
+            },
+            "indent": []
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A signed in user has access to two major pieces of information\nabout the user, the user's private key for that app and the location\nof the user's gaia storage bucket for the app.",
+              "position": {
+                "start": {
+                  "line": 3,
+                  "column": 1,
+                  "offset": 66
+                },
+                "end": {
+                  "line": 5,
+                  "column": 47,
+                  "offset": 244
+                },
+                "indent": [
+                  1,
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 3,
+              "column": 1,
+              "offset": 66
+            },
+            "end": {
+              "line": 5,
+              "column": 47,
+              "offset": 244
+            },
+            "indent": [
+              1,
+              1
+            ]
+          }
+        },
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "A user can be signed in either directly through the interactive\nsign in process or by directly providing the app private key.",
+              "position": {
+                "start": {
+                  "line": 7,
+                  "column": 1,
+                  "offset": 246
+                },
+                "end": {
+                  "line": 8,
+                  "column": 62,
+                  "offset": 371
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 7,
+              "column": 1,
+              "offset": 246
+            },
+            "end": {
+              "line": 8,
+              "column": 62,
+              "offset": 371
             },
             "indent": [
               1
@@ -212,9 +2553,9 @@
           "offset": 0
         },
         "end": {
-          "line": 2,
-          "column": 22,
-          "offset": 25
+          "line": 8,
+          "column": 62,
+          "offset": 371
         }
       }
     },
@@ -222,51 +2563,80 @@
       {
         "title": "type",
         "description": null,
-        "lineNumber": 3,
+        "lineNumber": 9,
         "type": {
-          "type": "ArrayType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "type"
-            }
-          ]
+          "type": "NameExpression",
+          "name": "UserSession"
         }
       }
     ],
     "loc": {
       "start": {
-        "line": 36,
+        "line": 38,
         "column": 0
       },
       "end": {
-        "line": 40,
+        "line": 48,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 41,
+          "line": 49,
           "column": 0
         },
         "end": {
-          "line": 289,
+          "line": 319,
           "column": 1
         }
       },
-      "file": "/Users/larry/git/blockstack.js/src/api.js"
+      "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
     },
     "augments": [],
     "examples": [],
     "params": [
       {
         "title": "param",
-        "name": "initialValue",
-        "lineNumber": 44,
+        "name": "options",
+        "lineNumber": 54,
         "type": {
-          "type": "NameExpression",
-          "name": "AppConfig"
+          "type": "RecordType",
+          "fields": [
+            {
+              "type": "FieldType",
+              "key": "appConfig",
+              "value": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "AppConfig"
+                }
+              }
+            },
+            {
+              "type": "FieldType",
+              "key": "sessionStore",
+              "value": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "SessionDataStore"
+                }
+              }
+            },
+            {
+              "type": "FieldType",
+              "key": "sessionOptions",
+              "value": {
+                "type": "OptionalType",
+                "expression": {
+                  "type": "NameExpression",
+                  "name": "SessionOptions"
+                }
+              }
+            }
+          ]
         }
       }
     ],
@@ -276,19 +2646,14 @@
     "throws": [],
     "todos": [],
     "type": {
-      "type": "ArrayType",
-      "elements": [
-        {
-          "type": "NameExpression",
-          "name": "type"
-        }
-      ]
+      "type": "NameExpression",
+      "name": "UserSession"
     },
-    "name": "Blockstack",
+    "name": "UserSession",
     "kind": "class",
     "path": [
       {
-        "name": "Blockstack",
+        "name": "UserSession",
         "kind": "class"
       }
     ],
@@ -587,26 +2952,26 @@
           ],
           "loc": {
             "start": {
-              "line": 53,
+              "line": 84,
               "column": 2
             },
             "end": {
-              "line": 67,
+              "line": 98,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 68,
+                "line": 99,
                 "column": 2
               },
               "end": {
-                "line": 70,
+                "line": 101,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -642,7 +3007,7 @@
           "todos": [],
           "name": "redirectToSignIn",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -653,7 +3018,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -662,7 +3027,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#redirectToSignIn"
+          "namespace": "UserSession#redirectToSignIn"
         },
         {
           "description": {
@@ -712,7 +3077,7 @@
                 "children": [
                   {
                     "type": "text",
-                    "value": "The user is redirected to the ",
+                    "value": "The user is redirected to the authenticator URL specified in the ",
                     "position": {
                       "start": {
                         "line": 4,
@@ -721,44 +3086,46 @@
                       },
                       "end": {
                         "line": 4,
-                        "column": 31,
-                        "offset": 114
+                        "column": 66,
+                        "offset": 149
                       },
                       "indent": []
                     }
                   },
                   {
                     "type": "inlineCode",
-                    "value": "blockstackIDHost",
+                    "value": "AppConfig",
                     "position": {
                       "start": {
                         "line": 4,
-                        "column": 31,
-                        "offset": 114
+                        "column": 66,
+                        "offset": 149
                       },
                       "end": {
                         "line": 4,
-                        "column": 49,
-                        "offset": 132
+                        "column": 77,
+                        "offset": 160
                       },
                       "indent": []
                     }
                   },
                   {
                     "type": "text",
-                    "value": " if the ",
+                    "value": "\nif the ",
                     "position": {
                       "start": {
                         "line": 4,
-                        "column": 49,
-                        "offset": 132
+                        "column": 77,
+                        "offset": 160
                       },
                       "end": {
-                        "line": 4,
-                        "column": 57,
-                        "offset": 140
+                        "line": 5,
+                        "column": 8,
+                        "offset": 168
                       },
-                      "indent": []
+                      "indent": [
+                        1
+                      ]
                     }
                   },
                   {
@@ -766,31 +3133,31 @@
                     "value": "blockstack:",
                     "position": {
                       "start": {
-                        "line": 4,
-                        "column": 57,
-                        "offset": 140
+                        "line": 5,
+                        "column": 8,
+                        "offset": 168
                       },
                       "end": {
-                        "line": 4,
-                        "column": 70,
-                        "offset": 153
+                        "line": 5,
+                        "column": 21,
+                        "offset": 181
                       },
                       "indent": []
                     }
                   },
                   {
                     "type": "text",
-                    "value": "\nprotocol handler is not detected. Please note that the protocol handler detection\ndoes not work on all browsers.",
+                    "value": " protocol handler is not detected.\nPlease note that the protocol handler detection\ndoes not work on all browsers.",
                     "position": {
                       "start": {
-                        "line": 4,
-                        "column": 70,
-                        "offset": 153
+                        "line": 5,
+                        "column": 21,
+                        "offset": 181
                       },
                       "end": {
-                        "line": 6,
+                        "line": 7,
                         "column": 31,
-                        "offset": 266
+                        "offset": 294
                       },
                       "indent": [
                         1,
@@ -806,11 +3173,12 @@
                     "offset": 84
                   },
                   "end": {
-                    "line": 6,
+                    "line": 7,
                     "column": 31,
-                    "offset": 266
+                    "offset": 294
                   },
                   "indent": [
+                    1,
                     1,
                     1
                   ]
@@ -824,9 +3192,9 @@
                 "offset": 0
               },
               "end": {
-                "line": 6,
+                "line": 7,
                 "column": 31,
-                "offset": 266
+                "offset": 294
               }
             }
           },
@@ -834,7 +3202,7 @@
             {
               "title": "param",
               "description": "the authentication request generated by `makeAuthRequest`",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "type": {
                 "type": "NameExpression",
                 "name": "String"
@@ -842,19 +3210,9 @@
               "name": "authRequest"
             },
             {
-              "title": "param",
-              "description": "the URL to redirect the user to if the blockstack\n                                    protocol handler is not detected",
-              "lineNumber": 8,
-              "type": {
-                "type": "NameExpression",
-                "name": "String"
-              },
-              "name": "blockstackIDHost"
-            },
-            {
               "title": "return",
               "description": null,
-              "lineNumber": 10,
+              "lineNumber": 9,
               "type": {
                 "type": "NameExpression",
                 "name": "void"
@@ -863,26 +3221,26 @@
           ],
           "loc": {
             "start": {
-              "line": 72,
+              "line": 103,
               "column": 2
             },
             "end": {
-              "line": 83,
+              "line": 113,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 84,
+                "line": 114,
                 "column": 2
               },
               "end": {
-                "line": 88,
+                "line": 116,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -890,7 +3248,7 @@
             {
               "title": "param",
               "name": "authRequest",
-              "lineNumber": 7,
+              "lineNumber": 8,
               "description": {
                 "type": "root",
                 "children": [
@@ -964,72 +3322,6 @@
                 "type": "NameExpression",
                 "name": "String"
               }
-            },
-            {
-              "title": "param",
-              "name": "blockstackIDHost",
-              "lineNumber": 8,
-              "description": {
-                "type": "root",
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      {
-                        "type": "text",
-                        "value": "the URL to redirect the user to if the blockstack\n                                    protocol handler is not detected",
-                        "position": {
-                          "start": {
-                            "line": 1,
-                            "column": 1,
-                            "offset": 0
-                          },
-                          "end": {
-                            "line": 2,
-                            "column": 69,
-                            "offset": 118
-                          },
-                          "indent": [
-                            1
-                          ]
-                        }
-                      }
-                    ],
-                    "position": {
-                      "start": {
-                        "line": 1,
-                        "column": 1,
-                        "offset": 0
-                      },
-                      "end": {
-                        "line": 2,
-                        "column": 69,
-                        "offset": 118
-                      },
-                      "indent": [
-                        1
-                      ]
-                    }
-                  }
-                ],
-                "position": {
-                  "start": {
-                    "line": 1,
-                    "column": 1,
-                    "offset": 0
-                  },
-                  "end": {
-                    "line": 2,
-                    "column": 69,
-                    "offset": 118
-                  }
-                }
-              },
-              "type": {
-                "type": "NameExpression",
-                "name": "String"
-              },
-              "default": "DEFAULT_BLOCKSTACK_HOST"
             }
           ],
           "properties": [],
@@ -1063,7 +3355,7 @@
           "todos": [],
           "name": "redirectToSignInWithAuthRequest",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -1074,7 +3366,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -1083,7 +3375,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#redirectToSignInWithAuthRequest"
+          "namespace": "UserSession#redirectToSignInWithAuthRequest"
         },
         {
           "description": {
@@ -1157,26 +3449,26 @@
           ],
           "loc": {
             "start": {
-              "line": 118,
+              "line": 146,
               "column": 2
             },
             "end": {
-              "line": 124,
+              "line": 152,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 125,
+                "line": 153,
                 "column": 2
               },
               "end": {
-                "line": 129,
+                "line": 159,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -1248,7 +3540,7 @@
           "todos": [],
           "name": "generateAndStoreTransitKey",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -1259,7 +3551,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -1268,7 +3560,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#generateAndStoreTransitKey"
+          "namespace": "UserSession#generateAndStoreTransitKey"
         },
         {
           "description": {
@@ -1336,26 +3628,26 @@
           ],
           "loc": {
             "start": {
-              "line": 131,
+              "line": 161,
               "column": 2
             },
             "end": {
-              "line": 134,
+              "line": 164,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 135,
+                "line": 165,
                 "column": 2
               },
               "end": {
-                "line": 138,
+                "line": 168,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -1444,7 +3736,7 @@
           "todos": [],
           "name": "getAuthResponseToken",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -1455,7 +3747,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -1464,7 +3756,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#getAuthResponseToken"
+          "namespace": "UserSession#getAuthResponseToken"
         },
         {
           "description": {
@@ -1532,26 +3824,26 @@
           ],
           "loc": {
             "start": {
-              "line": 140,
+              "line": 170,
               "column": 2
             },
             "end": {
-              "line": 143,
+              "line": 173,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 144,
+                "line": 174,
                 "column": 2
               },
               "end": {
-                "line": 146,
+                "line": 176,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -1657,7 +3949,7 @@
           "todos": [],
           "name": "isSignInPending",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -1668,7 +3960,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -1677,7 +3969,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#isSignInPending"
+          "namespace": "UserSession#isSignInPending"
         },
         {
           "description": {
@@ -1745,26 +4037,26 @@
           ],
           "loc": {
             "start": {
-              "line": 148,
+              "line": 178,
               "column": 2
             },
             "end": {
-              "line": 151,
+              "line": 181,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 152,
+                "line": 182,
                 "column": 2
               },
               "end": {
-                "line": 154,
+                "line": 184,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -1887,7 +4179,7 @@
           "todos": [],
           "name": "isUserSignedIn",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -1898,7 +4190,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -1907,7 +4199,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#isUserSignedIn"
+          "namespace": "UserSession#isUserSignedIn"
         },
         {
           "description": {
@@ -2023,26 +4315,26 @@
           ],
           "loc": {
             "start": {
-              "line": 156,
+              "line": 186,
               "column": 2
             },
             "end": {
-              "line": 163,
+              "line": 193,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 164,
+                "line": 194,
                 "column": 2
               },
               "end": {
-                "line": 166,
+                "line": 196,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -2181,7 +4473,7 @@
           "todos": [],
           "name": "handlePendingSignIn",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -2192,7 +4484,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -2201,7 +4493,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#handlePendingSignIn"
+          "namespace": "UserSession#handlePendingSignIn"
         },
         {
           "description": {
@@ -2303,26 +4595,26 @@
           ],
           "loc": {
             "start": {
-              "line": 168,
+              "line": 198,
               "column": 2
             },
             "end": {
-              "line": 171,
+              "line": 201,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 172,
+                "line": 202,
                 "column": 2
               },
               "end": {
-                "line": 174,
+                "line": 204,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -2394,7 +4686,7 @@
           "todos": [],
           "name": "loadUserData",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -2405,7 +4697,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -2414,7 +4706,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#loadUserData"
+          "namespace": "UserSession#loadUserData"
         },
         {
           "description": {
@@ -2482,26 +4774,26 @@
           ],
           "loc": {
             "start": {
-              "line": 177,
+              "line": 207,
               "column": 2
             },
             "end": {
-              "line": 180,
+              "line": 210,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 181,
+                "line": 211,
                 "column": 2
               },
               "end": {
-                "line": 183,
+                "line": 213,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -2537,7 +4829,7 @@
           "todos": [],
           "name": "signUserOut",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -2548,7 +4840,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -2557,7 +4849,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#signUserOut"
+          "namespace": "UserSession#signUserOut"
         },
         {
           "description": {
@@ -2668,26 +4960,26 @@
           ],
           "loc": {
             "start": {
-              "line": 198,
+              "line": 228,
               "column": 2
             },
             "end": {
-              "line": 205,
+              "line": 235,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 206,
+                "line": 236,
                 "column": 2
               },
               "end": {
-                "line": 209,
+                "line": 239,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -2959,7 +5251,7 @@
           "todos": [],
           "name": "encryptContent",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -2970,7 +5262,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -2979,7 +5271,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#encryptContent"
+          "namespace": "UserSession#encryptContent"
         },
         {
           "description": {
@@ -3137,26 +5429,26 @@
           ],
           "loc": {
             "start": {
-              "line": 211,
+              "line": 241,
               "column": 2
             },
             "end": {
-              "line": 219,
+              "line": 249,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 220,
+                "line": 250,
                 "column": 2
               },
               "end": {
-                "line": 222,
+                "line": 252,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -3437,7 +5729,7 @@
           "todos": [],
           "name": "decryptContent",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -3448,7 +5740,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -3457,7 +5749,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#decryptContent"
+          "namespace": "UserSession#decryptContent"
         },
         {
           "description": {
@@ -3605,26 +5897,26 @@
           ],
           "loc": {
             "start": {
-              "line": 224,
+              "line": 254,
               "column": 2
             },
             "end": {
-              "line": 235,
+              "line": 265,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 236,
+                "line": 266,
                 "column": 2
               },
               "end": {
-                "line": 241,
+                "line": 271,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -4037,7 +6329,7 @@
           "todos": [],
           "name": "putFile",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -4048,7 +6340,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -4057,7 +6349,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#putFile"
+          "namespace": "UserSession#putFile"
         },
         {
           "description": {
@@ -4207,26 +6499,26 @@
           ],
           "loc": {
             "start": {
-              "line": 243,
+              "line": 273,
               "column": 2
             },
             "end": {
-              "line": 258,
+              "line": 288,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 259,
+                "line": 289,
                 "column": 2
               },
               "end": {
-                "line": 267,
+                "line": 297,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -4800,7 +7092,7 @@
           "todos": [],
           "name": "getFile",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -4811,7 +7103,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -4820,7 +7112,7 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#getFile"
+          "namespace": "UserSession#getFile"
         },
         {
           "description": {
@@ -4898,26 +7190,26 @@
           ],
           "loc": {
             "start": {
-              "line": 269,
+              "line": 299,
               "column": 2
             },
             "end": {
-              "line": 274,
+              "line": 304,
               "column": 5
             }
           },
           "context": {
             "loc": {
               "start": {
-                "line": 275,
+                "line": 305,
                 "column": 2
               },
               "end": {
-                "line": 277,
+                "line": 307,
                 "column": 3
               }
             },
-            "file": "/Users/larry/git/blockstack.js/src/api.js"
+            "file": "/Users/larry/git/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -5123,7 +7415,7 @@
           "todos": [],
           "name": "listFiles",
           "kind": "function",
-          "memberof": "Blockstack",
+          "memberof": "UserSession",
           "scope": "instance",
           "members": {
             "global": [],
@@ -5134,7 +7426,7 @@
           },
           "path": [
             {
-              "name": "Blockstack",
+              "name": "UserSession",
               "kind": "class"
             },
             {
@@ -5143,13 +7435,13 @@
               "scope": "instance"
             }
           ],
-          "namespace": "Blockstack#listFiles"
+          "namespace": "UserSession#listFiles"
         }
       ],
       "events": [],
       "static": []
     },
-    "namespace": "Blockstack"
+    "namespace": "UserSession"
   },
   {
     "name": "Profiles",
@@ -8129,22 +10421,22 @@
     ],
     "loc": {
       "start": {
-        "line": 461,
+        "line": 462,
         "column": 0
       },
       "end": {
-        "line": 467,
+        "line": 468,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 468,
+          "line": 469,
           "column": 0
         },
         "end": {
-          "line": 470,
+          "line": 471,
           "column": 1
         }
       },
@@ -8833,792 +11125,5 @@
       "static": []
     },
     "namespace": "getUserAppFileUrl"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "This holds the configuration settings for a web app-style\nBlockstack app",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 15,
-                  "offset": 72
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 15,
-              "offset": 72
-            },
-            "indent": [
-              1
-            ]
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 2,
-          "column": 15,
-          "offset": 72
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "type",
-        "description": null,
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "AppConfig"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 41,
-        "column": 2
-      },
-      "end": {
-        "line": 45,
-        "column": 5
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 46,
-          "column": 2
-        },
-        "end": {
-          "line": 46,
-          "column": 23
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/session.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [],
-    "properties": [],
-    "returns": [],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "type": {
-      "type": "NameExpression",
-      "name": "AppConfig"
-    },
-    "name": "appConfig",
-    "kind": "member",
-    "memberof": "BlockstackSession",
-    "scope": "instance",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "appConfig",
-        "kind": "member",
-        "scope": "instance"
-      }
-    ],
-    "namespace": "#appConfig"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Stores the data provided in the app's data store to to the file specified.",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 75,
-                  "offset": 74
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 75,
-              "offset": 74
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 75,
-          "offset": 74
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "instance calling this method",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "Blockstack"
-        },
-        "name": "caller"
-      },
-      {
-        "title": "param",
-        "description": "the path to store the data in",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "path"
-      },
-      {
-        "title": "param",
-        "description": "the data to store in the file",
-        "lineNumber": 4,
-        "type": {
-          "type": "UnionType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            {
-              "type": "NameExpression",
-              "name": "Buffer"
-            }
-          ]
-        },
-        "name": "content"
-      },
-      {
-        "title": "param",
-        "description": "options object",
-        "lineNumber": 5,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Object"
-          }
-        },
-        "name": "options",
-        "default": "null"
-      },
-      {
-        "title": "param",
-        "description": "encrypt the data with the app private key\n                                                 or the provided public key",
-        "lineNumber": 6,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "UnionType",
-            "elements": [
-              {
-                "type": "NameExpression",
-                "name": "Boolean"
-              },
-              {
-                "type": "NameExpression",
-                "name": "String"
-              }
-            ]
-          }
-        },
-        "name": "options.encrypt",
-        "default": "true"
-      },
-      {
-        "title": "param",
-        "description": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
-        "lineNumber": 8,
-        "type": {
-          "type": "OptionalType",
-          "expression": {
-            "type": "NameExpression",
-            "name": "Boolean"
-          }
-        },
-        "name": "options.sign",
-        "default": "false"
-      },
-      {
-        "title": "return",
-        "description": "that resolves if the operation succeed and rejects\nif it failed",
-        "lineNumber": 10,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 376,
-        "column": 0
-      },
-      "end": {
-        "line": 388,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 389,
-          "column": 0
-        },
-        "end": {
-          "line": 459,
-          "column": 1
-        }
-      },
-      "file": "/Users/larry/git/blockstack.js/src/storage/index.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "caller",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "instance calling this method",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 29,
-                      "offset": 28
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 29,
-                  "offset": 28
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 29,
-              "offset": 28
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Blockstack"
-        }
-      },
-      {
-        "title": "param",
-        "name": "path",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the path to store the data in",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 30,
-                      "offset": 29
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 30,
-              "offset": 29
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "content",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the data to store in the file",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 30,
-                      "offset": 29
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 30,
-                  "offset": 29
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 30,
-              "offset": 29
-            }
-          }
-        },
-        "type": {
-          "type": "UnionType",
-          "elements": [
-            {
-              "type": "NameExpression",
-              "name": "String"
-            },
-            {
-              "type": "NameExpression",
-              "name": "Buffer"
-            }
-          ]
-        }
-      },
-      {
-        "title": "param",
-        "name": "options",
-        "lineNumber": 5,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "options object",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 15,
-                      "offset": 14
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 15,
-                  "offset": 14
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 15,
-              "offset": 14
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        },
-        "default": "null",
-        "properties": [
-          {
-            "title": "param",
-            "name": "options.encrypt",
-            "lineNumber": 6,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "encrypt the data with the app private key\n                                                 or the provided public key",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 76,
-                          "offset": 117
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 76,
-                      "offset": 117
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 76,
-                  "offset": 117
-                }
-              }
-            },
-            "type": {
-              "type": "UnionType",
-              "elements": [
-                {
-                  "type": "NameExpression",
-                  "name": "Boolean"
-                },
-                {
-                  "type": "NameExpression",
-                  "name": "String"
-                }
-              ]
-            },
-            "default": "true"
-          },
-          {
-            "title": "param",
-            "name": "options.sign",
-            "lineNumber": 8,
-            "description": {
-              "type": "root",
-              "children": [
-                {
-                  "type": "paragraph",
-                  "children": [
-                    {
-                      "type": "text",
-                      "value": "sign the data using ECDSA on SHA256 hashes with\n                                        the app private key",
-                      "position": {
-                        "start": {
-                          "line": 1,
-                          "column": 1,
-                          "offset": 0
-                        },
-                        "end": {
-                          "line": 2,
-                          "column": 60,
-                          "offset": 107
-                        },
-                        "indent": [
-                          1
-                        ]
-                      }
-                    }
-                  ],
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 60,
-                      "offset": 107
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 60,
-                  "offset": 107
-                }
-              }
-            },
-            "type": {
-              "type": "NameExpression",
-              "name": "Boolean"
-            },
-            "default": "false"
-          }
-        ]
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "that resolves if the operation succeed and rejects\nif it failed",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 13,
-                      "offset": 63
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 13,
-                  "offset": 63
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 13,
-              "offset": 63
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "putFileImpl",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "putFileImpl",
-        "kind": "function"
-      }
-    ],
-    "namespace": "putFileImpl"
   }
 ]

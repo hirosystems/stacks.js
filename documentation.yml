@@ -4,18 +4,8 @@ toc:
       Single sign on and authentication without third parties or remote servers.
 
       [Read more about authentication](https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md)
-  - redirectToSignIn
-  - isSignInPending
-  - handlePendingSignIn
-  - loadUserData
-  - isUserSignedIn
-  - signUserOut
-  - makeAuthRequest
-  - generateAndStoreTransitKey
-  - redirectToSignInWithAuthRequest
-  - getAuthResponseToken
-  - verifyAuthResponse
-  - Blockstack
+  - AppConfig
+  - UserSession
   - name: Profiles
     description: |
       Identity you own and control.
@@ -39,10 +29,5 @@ toc:
       version. These features will be rolled out in future updates._
 
       [Read more about storage](https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md)
-  - getFile
-  - putFile
-  - deleteFile
-  - encryptContent
-  - decryptContent
   - getAppBucketUrl
   - getUserAppFileUrl

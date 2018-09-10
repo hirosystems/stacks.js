@@ -385,6 +385,7 @@ export function getFileImpl(caller: UserSession, path: string, options?: {
  *                                         the app private key
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
+ * @private
  */
 export function putFileImpl(caller: UserSession, path: string, content: string | Buffer, options?: {
   encrypt?: boolean | string,
