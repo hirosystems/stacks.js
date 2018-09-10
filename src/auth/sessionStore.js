@@ -63,7 +63,7 @@ export class InstanceDataStore extends SessionDataStore {
   }
 
   deleteSessionData(): boolean {
-    this.sessionData = null
+    this.setSessionData(new SessionData({}))
     return true
   }
 }
@@ -109,6 +109,7 @@ export class LocalStorageStore extends SessionDataStore {
 
   deleteSessionData(): boolean {
     localStorage.removeItem(this.key)
+    this.setSessionData(new SessionData({}))
     return true
   }
 

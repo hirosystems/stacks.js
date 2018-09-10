@@ -215,7 +215,7 @@ export class UserSession {
    * @return {void}
    */
   signUserOut() {
-    throw new Error('Not yet implemented')
+    this.store.deleteSessionData()
   }
 
   //
