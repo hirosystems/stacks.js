@@ -1,27 +1,78 @@
 /* @flow */
-import { DEFAULT_CORE_NODE, DEFAULT_SCOPE } from './authConstants'
+import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST } from './authConstants'
 
-// modeled after what we have in Android
-// https://github.com/blockstack/blockstack-android/blob/d70864acdc12f50bd90fb276853c523845e04e22/blockstack-sdk/src/main/java/org/blockstack/android/sdk/BlockstackConfig.kt#L14
+
+/**
+ * Configuration data for the current app.
+ *
+ * On browser platforms, creating an instance of this
+ * class without any arguments will use
+ * `window.location.origin` as the app domain.
+ * On non-browser platforms, you need to
+ * specify an app domain as the first argument.
+ * @type {AppConfig}
+ */
 export class AppConfig {
+
+  /**
+   * Blockstack apps are uniquely identified by their app domain.
+   * @type {string}
+   */
   appDomain: string
 
+  /**
+   * An array of string representing permissions requested by the app.
+   * @type {[Array<string>}
+   */
   scopes: Array<string>
 
-  // this needs to be on appDomain so only accept paths
+
+  /**
+   * Path on app domain to redirect users to after authentication. The
+   * authentication response token will be postpended in a query.
+   * @type {string}
+   */
   redirectPath: string
 
-  // this needs to be on appDomain so only accept paths
+  /**
+   * Path relative to app domain of app's manifest file.
+   *
+   * This file needs to have CORS headers set so that it can be fetched
+   * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.
+   * @type {string}
+   */
   manifestPath: string
 
-  // if null, use node passed by auth token v1.3 or otherwise core.blockstack.org
+  /**
+   * The URL of Blockstack core node to use for this app. If this is
+   * `null`, the core node specified by the user or default core node
+   * will be used.
+   * @type {string}
+   */
   coreNode: string
 
+  /**
+   * The URL of a web-based Blockstack Authenticator to use in the event
+   * the user doesn't have Blockstack installed on their machine. If this
+   * is not specified, the current default in this library will be used.
+   * @type {string}
+   */
+  authenticatorURL: ?string
+
+  /**
+   * @param {string} appDomain - the app domain
+   * @param {Array<string>} scopes - permissions this app is requesting
+   * @param {string} redirectPath - path on app domain to redirect users to after authentication
+   * @param {string} manifestPath - path relative to app domain of app's manifest file
+   * @param {string} coreNode - override the default or user selected core node
+   * @param {string} authenticatorURL - the web-based fall back authenticator
+   */
   constructor(appDomain: string = window.location.origin,
               scopes: Array<string> = DEFAULT_SCOPE.slice(),
               redirectPath: string = '',
               manifestPath: string = '/manifest.json',
-              coreNode: ?string = null) {
+              coreNode: ?string = null,
+              authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST) {
     this.appDomain = appDomain
     this.scopes = scopes
     this.redirectPath = redirectPath
@@ -32,12 +83,23 @@ export class AppConfig {
     } else {
       this.coreNode = coreNode
     }
+
+    this.authenticatorURL = authenticatorURL
   }
 
+  /**
+   * The location to which the authenticator should
+   * redirect the user.
+   * @returns {string} - URI
+   */
   redirectURI() : string {
     return `${this.appDomain}${this.redirectPath}`
   }
 
+  /**
+   * The location of the app's manifest file.
+   * @returns {string} - URI
+   */
   manifestURI() : string {
     return `${this.appDomain}${this.manifestPath}`
   }

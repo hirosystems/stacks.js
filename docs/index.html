@@ -48,6 +48,42 @@
                       <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
+                        href='#appconfigappdomain'
+                        class='regular pre-open'>
+                        #appDomain
+                      </a></li>
+                      
+                      <li><a
+                        href='#appconfigscopes'
+                        class='regular pre-open'>
+                        #scopes
+                      </a></li>
+                      
+                      <li><a
+                        href='#appconfigredirectpath'
+                        class='regular pre-open'>
+                        #redirectPath
+                      </a></li>
+                      
+                      <li><a
+                        href='#appconfigmanifestpath'
+                        class='regular pre-open'>
+                        #manifestPath
+                      </a></li>
+                      
+                      <li><a
+                        href='#appconfigcorenode'
+                        class='regular pre-open'>
+                        #coreNode
+                      </a></li>
+                      
+                      <li><a
+                        href='#appconfigauthenticatorurl'
+                        class='regular pre-open'>
+                        #authenticatorURL
+                      </a></li>
+                      
+                      <li><a
                         href='#appconfigredirecturi'
                         class='regular pre-open'>
                         #redirectURI
@@ -416,6 +452,319 @@ specify an app domain as the first argument.</p>
   
     <div class='py1 quiet mt1 prose-big'>Instance Members</div>
     <div class="clearfix">
+  
+    <div class='border-bottom' id='appconfigappdomain'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>appDomain</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Blockstack apps are uniquely identified by their app domain.</p>
+
+
+  <div class='pre p1 fill-light mt0'>appDomain</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='appconfigscopes'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>scopes</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>An array of string representing permissions requested by the app.</p>
+
+
+  <div class='pre p1 fill-light mt0'>scopes</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='appconfigredirectpath'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>redirectPath</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Path on app domain to redirect users to after authentication. The
+authentication response token will be postpended in a query.</p>
+
+
+  <div class='pre p1 fill-light mt0'>redirectPath</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='appconfigmanifestpath'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>manifestPath</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Path relative to app domain of app's manifest file.</p>
+<p>This file needs to have CORS headers set so that it can be fetched
+from any origin. Typically this means return the header <code>Access-Control-Allow-Origin: *</code>.</p>
+
+
+  <div class='pre p1 fill-light mt0'>manifestPath</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='appconfigcorenode'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>coreNode</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The URL of Blockstack core node to use for this app. If this is
+<code>null</code>, the core node specified by the user or default core node
+will be used.</p>
+
+
+  <div class='pre p1 fill-light mt0'>coreNode</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='appconfigauthenticatorurl'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>authenticatorURL</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The URL of a web-based Blockstack Authenticator to use in the event
+the user doesn't have Blockstack installed on their machine. If this
+is not specified, the current default in this library will be used.</p>
+
+
+  <div class='pre p1 fill-light mt0'>authenticatorURL</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
   
     <div class='border-bottom' id='appconfigredirecturi'>
       <div class="clearfix small pointer toggle-sibling">

@@ -28,9 +28,6 @@ export class SessionData {
 
   transitKey: ?string
 
-  // TODO use this
-  authenticatorURL: ?string
-
   // using this in place of
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
   userData: ?any
@@ -40,6 +37,7 @@ export class SessionData {
    * This holds the configuration settings for a web app-style
    * Blockstack app
    * @type {AppConfig}
+   * @private
    */
   appConfig: ?AppConfig
 
