@@ -35,9 +35,9 @@
               
                 
                 <li><a
-                  href='#blockstack'
+                  href='#appconfig'
                   class=" toggle-sibling">
-                  Blockstack
+                  AppConfig
                   <span class='icon'>▸</span>
                 </a>
                 
@@ -48,85 +48,119 @@
                       <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
-                        href='#blockstackredirecttosignin'
+                        href='#appconfigredirecturi'
+                        class='regular pre-open'>
+                        #redirectURI
+                      </a></li>
+                      
+                      <li><a
+                        href='#appconfigmanifesturi'
+                        class='regular pre-open'>
+                        #manifestURI
+                      </a></li>
+                      
+                    </ul>
+                  
+                  
+                  
+                </div>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#usersession'
+                  class=" toggle-sibling">
+                  UserSession
+                  <span class='icon'>▸</span>
+                </a>
+                
+                <div class='toggle-target display-none'>
+                  
+                  
+                    <ul class='list-reset py1-ul pl1'>
+                      <li class='h5'><span>Instance members</span></li>
+                      
+                      <li><a
+                        href='#usersessionredirecttosignin'
                         class='regular pre-open'>
                         #redirectToSignIn
                       </a></li>
                       
                       <li><a
-                        href='#blockstackredirecttosigninwithauthrequest'
+                        href='#usersessionredirecttosigninwithauthrequest'
                         class='regular pre-open'>
                         #redirectToSignInWithAuthRequest
                       </a></li>
                       
                       <li><a
-                        href='#blockstackgenerateandstoretransitkey'
+                        href='#usersessiongenerateandstoretransitkey'
                         class='regular pre-open'>
                         #generateAndStoreTransitKey
                       </a></li>
                       
                       <li><a
-                        href='#blockstackgetauthresponsetoken'
+                        href='#usersessiongetauthresponsetoken'
                         class='regular pre-open'>
                         #getAuthResponseToken
                       </a></li>
                       
                       <li><a
-                        href='#blockstackissigninpending'
+                        href='#usersessionissigninpending'
                         class='regular pre-open'>
                         #isSignInPending
                       </a></li>
                       
                       <li><a
-                        href='#blockstackisusersignedin'
+                        href='#usersessionisusersignedin'
                         class='regular pre-open'>
                         #isUserSignedIn
                       </a></li>
                       
                       <li><a
-                        href='#blockstackhandlependingsignin'
+                        href='#usersessionhandlependingsignin'
                         class='regular pre-open'>
                         #handlePendingSignIn
                       </a></li>
                       
                       <li><a
-                        href='#blockstackloaduserdata'
+                        href='#usersessionloaduserdata'
                         class='regular pre-open'>
                         #loadUserData
                       </a></li>
                       
                       <li><a
-                        href='#blockstacksignuserout'
+                        href='#usersessionsignuserout'
                         class='regular pre-open'>
                         #signUserOut
                       </a></li>
                       
                       <li><a
-                        href='#blockstackencryptcontent'
+                        href='#usersessionencryptcontent'
                         class='regular pre-open'>
                         #encryptContent
                       </a></li>
                       
                       <li><a
-                        href='#blockstackdecryptcontent'
+                        href='#usersessiondecryptcontent'
                         class='regular pre-open'>
                         #decryptContent
                       </a></li>
                       
                       <li><a
-                        href='#blockstackputfile'
+                        href='#usersessionputfile'
                         class='regular pre-open'>
                         #putFile
                       </a></li>
                       
                       <li><a
-                        href='#blockstackgetfile'
+                        href='#usersessiongetfile'
                         class='regular pre-open'>
                         #getFile
                       </a></li>
                       
                       <li><a
-                        href='#blockstacklistfiles'
+                        href='#usersessionlistfiles'
                         class='regular pre-open'>
                         #listFiles
                       </a></li>
@@ -239,26 +273,6 @@
                 
                 </li>
               
-                
-                <li><a
-                  href='#appconfig'
-                  class="">
-                  appConfig
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#putfileimpl'
-                  class="">
-                  putFileImpl
-                  
-                </a>
-                
-                </li>
-              
             </ul>
           </div>
           <div class='mt1 h6 quiet'>
@@ -290,23 +304,27 @@
   
   <div class='clearfix'>
     
-    <h3 class='fl m0' id='blockstack'>
-      Blockstack
+    <h3 class='fl m0' id='appconfig'>
+      AppConfig
     </h3>
     
     
   </div>
   
 
-  <p>abc
-[session description]</p>
+  <p>Configuration data for the current app.</p>
+<p>On browser platforms, creating an instance of this
+class without any arguments will use
+<code>window.location.origin</code> as the app domain.
+On non-browser platforms, you need to
+specify an app domain as the first argument.</p>
 
 
-  <div class='pre p1 fill-light mt0'>new Blockstack(initialValue: AppConfig)</div>
+  <div class='pre p1 fill-light mt0'>new AppConfig(appDomain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>, redirectPath: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, manifestPath: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, coreNode: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, authenticatorURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
   
     <p>
       Type:
-      [type]
+      <a href="#appconfig">AppConfig</a>
     </p>
   
   
@@ -324,7 +342,245 @@
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>initialValue</span> <code class='quiet'>(AppConfig)</code>
+            <span class='code bold'>appDomain</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>window.location.origin</code>)</code>
+	    the app domain
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>
+            = <code>DEFAULT_SCOPE.slice()</code>)</code>
+	    permissions this app is requesting
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>redirectPath</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>&#39;&#39;</code>)</code>
+	    path on app domain to redirect users to after authentication
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>manifestPath</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>&#39;/manifest.json&#39;</code>)</code>
+	    path relative to app domain of app's manifest file
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>coreNode</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>null</code>)</code>
+	    override the default or user selected core node
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>authenticatorURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>DEFAULT_BLOCKSTACK_HOST</code>)</code>
+	    the web-based fall back authenticator
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='appconfigredirecturi'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>redirectURI()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The location to which the authenticator should
+redirect the user.</p>
+
+
+  <div class='pre p1 fill-light mt0'>redirectURI(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
+        URI
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='appconfigmanifesturi'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>manifestURI()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>The location of the app's manifest file.</p>
+
+
+  <div class='pre p1 fill-light mt0'>manifestURI(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
+        URI
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+</section>
+
+          
+        
+          
+            <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='usersession'>
+      UserSession
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Represents an instance of a signed in user for a particular app.</p>
+<p>A signed in user has access to two major pieces of information
+about the user, the user's private key for that app and the location
+of the user's gaia storage bucket for the app.</p>
+<p>A user can be signed in either directly through the interactive
+sign in process or by directly providing the app private key.</p>
+
+
+  <div class='pre p1 fill-light mt0'>new UserSession(initialValue: (<a href="#appconfig">AppConfig</a> | SessionData))</div>
+  
+    <p>
+      Type:
+      <a href="#usersession">UserSession</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>initialValue</span> <code class='quiet'>((<a href="#appconfig">AppConfig</a> | SessionData)
+            = <code>new AppConfig()</code>)</code>
 	    
           </div>
           
@@ -347,7 +603,7 @@
     <div class='py1 quiet mt1 prose-big'>Instance Members</div>
     <div class="clearfix">
   
-    <div class='border-bottom' id='blockstackredirecttosignin'>
+    <div class='border-bottom' id='usersessionredirecttosignin'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -409,11 +665,11 @@ and <code>redirectToSignInWithAuthRequest</code> to build your own sign in proce
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackredirecttosigninwithauthrequest'>
+    <div class='border-bottom' id='usersessionredirecttosigninwithauthrequest'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>redirectToSignInWithAuthRequest(authRequest, blockstackIDHost)</span>
+            <span class='code strong strong truncate'>redirectToSignInWithAuthRequest(authRequest)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -423,12 +679,13 @@ and <code>redirectToSignInWithAuthRequest</code> to build your own sign in proce
 
   <p>Redirects the user to the Blockstack browser to approve the sign in request
 given.</p>
-<p>The user is redirected to the <code>blockstackIDHost</code> if the <code>blockstack:</code>
-protocol handler is not detected. Please note that the protocol handler detection
+<p>The user is redirected to the authenticator URL specified in the <code>AppConfig</code>
+if the <code>blockstack:</code> protocol handler is not detected.
+Please note that the protocol handler detection
 does not work on all browsers.</p>
 
 
-  <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, blockstackIDHost: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
+  <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
   
   
 
@@ -448,17 +705,6 @@ does not work on all browsers.</p>
             <span class='code bold'>authRequest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    the authentication request generated by 
 <code>makeAuthRequest</code>
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>blockstackIDHost</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
-            = <code>DEFAULT_BLOCKSTACK_HOST</code>)</code>
-	    the URL to redirect the user to if the blockstack
-protocol handler is not detected
 
           </div>
           
@@ -493,7 +739,7 @@ protocol handler is not detected
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackgenerateandstoretransitkey'>
+    <div class='border-bottom' id='usersessiongenerateandstoretransitkey'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -549,7 +795,7 @@ and store in the session</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackgetauthresponsetoken'>
+    <div class='border-bottom' id='usersessiongetauthresponsetoken'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -604,7 +850,7 @@ and store in the session</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackissigninpending'>
+    <div class='border-bottom' id='usersessionissigninpending'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -660,7 +906,7 @@ and store in the session</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackisusersignedin'>
+    <div class='border-bottom' id='usersessionisusersignedin'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -717,7 +963,7 @@ and store in the session</p>
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackhandlependingsignin'>
+    <div class='border-bottom' id='usersessionhandlependingsignin'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -788,7 +1034,7 @@ if handling the sign in request fails or there was no pending sign in request.
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackloaduserdata'>
+    <div class='border-bottom' id='usersessionloaduserdata'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -842,7 +1088,7 @@ if handling the sign in request fails or there was no pending sign in request.
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstacksignuserout'>
+    <div class='border-bottom' id='usersessionsignuserout'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -896,7 +1142,7 @@ if handling the sign in request fails or there was no pending sign in request.
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackencryptcontent'>
+    <div class='border-bottom' id='usersessionencryptcontent'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -1000,7 +1246,7 @@ key to use for encryption. If not provided, will use user's appPrivateKey.
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackdecryptcontent'>
+    <div class='border-bottom' id='usersessiondecryptcontent'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -1105,7 +1351,7 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackputfile'>
+    <div class='border-bottom' id='usersessionputfile'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -1233,7 +1479,7 @@ if it failed
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstackgetfile'>
+    <div class='border-bottom' id='usersessiongetfile'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -1384,7 +1630,7 @@ or rejects with an error
       </div>
     </div>
   
-    <div class='border-bottom' id='blockstacklistfiles'>
+    <div class='border-bottom' id='usersessionlistfiles'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
@@ -2211,197 +2457,6 @@ blockstack.js's getNameInfo function instead.
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         that resolves to the public read URL of the file
 or rejects with an error
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='appconfig'>
-      appConfig
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>This holds the configuration settings for a web app-style
-Blockstack app</p>
-
-
-  <div class='pre p1 fill-light mt0'>appConfig</div>
-  
-    <p>
-      Type:
-      AppConfig
-    </p>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-          
-        
-          
-            <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='putfileimpl'>
-      putFileImpl
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Stores the data provided in the app's data store to to the file specified.</p>
-
-
-  <div class='pre p1 fill-light mt0'>putFileImpl(caller: <a href="#blockstack">Blockstack</a>, path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>caller</span> <code class='quiet'>(<a href="#blockstack">Blockstack</a>)</code>
-	    instance calling this method
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>path</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the path to store the data in
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>content</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>))</code>
-	    the data to store in the file
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
-            = <code>null</code>)</code>
-	    options object
-
-          </div>
-          
-          <table class='mt1 mb2 fixed-table h5 col-12'>
-            <colgroup>
-              <col width='30%' />
-              <col width='70%' />
-            </colgroup>
-            <thead>
-              <tr class='bold fill-light'>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody class='mt1'>
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>options.encrypt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-  
-    (default <code>true</code>)
-  </td>
-  <td class='break-word'><span>encrypt the data with the app private key
-or the provided public key
-</span></td>
-</tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>options.sign</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></code>
-  
-    (default <code>false</code>)
-  </td>
-  <td class='break-word'><span>sign the data using ECDSA on SHA256 hashes with
-the app private key
-</span></td>
-</tr>
-
-
-              
-            </tbody>
-          </table>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        that resolves if the operation succeed and rejects
-if it failed
 
       
     
