@@ -1,17 +1,8 @@
 toc:
   - name: Authentication
     file: src/auth/README.md
-  - redirectToSignIn
-  - isSignInPending
-  - handlePendingSignIn
-  - loadUserData
-  - isUserSignedIn
-  - signUserOut
-  - makeAuthRequest
-  - generateAndStoreTransitKey
-  - redirectToSignInWithAuthRequest
-  - getAuthResponseToken
-  - verifyAuthResponse
+  - AppConfig
+  - UserSession
   - name: Profiles
     file: src/profiles/README.md
   - extractProfile
@@ -21,11 +12,7 @@ toc:
   - validateProofs
   - lookupProfile
   - name: Storage
+    description: |
     file: src/storage/README.md
-  - getFile
-  - putFile
-  - deleteFile
-  - encryptContent
-  - decryptContent
   - getAppBucketUrl
   - getUserAppFileUrl

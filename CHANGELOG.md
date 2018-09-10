@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug in version checking during the authentication process
   that manifested itself when signing in with apps using very old versions
   of blockstack.js.
+- Default redirect URI changed from origin plus trailing slash to the
+  origin. For example, app with origin `https://example.com` default
+  redirect URI which was previously `https://example.com/` is
+  now `https://example.com`.
 - Fixed a couple bugs in the transaction generation, networking
   code. First, coerce address now correctly coerces P2SH
   addresses. Second, bitcoinjs-lib recently switched to defaulting to

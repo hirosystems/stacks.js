@@ -1,3 +1,5 @@
+/* @flow */
+
 export * from './auth'
 export * from './profiles'
 export * from './storage'
@@ -27,3 +29,5 @@ export { decodeToken } from 'jsontokens'
 export { config } from './config'
 
 export { encryptMnemonic, decryptMnemonic } from './encryption'
+
+export { UserSession }  from './auth/userSession'
