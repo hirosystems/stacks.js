@@ -61,8 +61,16 @@ export class BlockstackNetwork {
   }
 
   coerceAddress(address: string) {
-    const addressHash = bitcoinjs.address.fromBase58Check(address).hash
-    return bitcoinjs.address.toBase58Check(addressHash, this.layer1.pubKeyHash)
+    const { hash, version } = bitcoinjs.address.fromBase58Check(address)
+    const scriptHashes = [bitcoinjs.networks.bitcoin.scriptHash,
+                          bitcoinjs.networks.testnet.scriptHash]
+    let coercedVersion
+    if (scriptHashes.indexOf(version) >= 0) {
+      coercedVersion = this.layer1.scriptHash
+    } else {
+      coercedVersion = this.layer1.pubKeyHash
+    }
+    return bitcoinjs.address.toBase58Check(hash, coercedVersion)
   }
 
   getDefaultBurnAddress() {
@@ -392,7 +400,11 @@ export class BlockstackNetwork {
    *   with the transaction broadcast service
    * * `MissingParameterError` if you call the function without a required
    *   parameter
+<<<<<<< HEAD
    * @private
+=======
+   *  @private
+>>>>>>> e63017c... Updates to the build
    */
   broadcastNameRegistration(preorderTransaction: string,
                             registerTransaction: string,

@@ -1,16 +1,10 @@
 toc:
   - name: Authentication
-    description: |
-      Single sign on and authentication without third parties or remote servers.
-
-      [Read more about authentication](https://github.com/blockstack/blockstack.js/blob/master/src/auth/README.md)
+    file: src/auth/README.md
   - AppConfig
   - UserSession
   - name: Profiles
-    description: |
-      Identity you own and control.
-
-      [Read more about profiles](https://github.com/blockstack/blockstack.js/blob/master/src/profiles/README.md)
+    file: src/profiles/README.md
   - extractProfile
   - wrapProfileToken
   - signProfileToken
@@ -19,15 +13,6 @@ toc:
   - lookupProfile
   - name: Storage
     description: |
-      Store your app's data without servers in storage your user controls.
-
-      _Note: Blockstack Gaia Storage APIs and on-disk format will change in
-      upcoming pre-releases breaking backward compatibility. File encryption is currently
-      opt-in on a file by file basis._
-
-      _Certain storage features such as and collections are not implemented in the current
-      version. These features will be rolled out in future updates._
-
-      [Read more about storage](https://github.com/blockstack/blockstack.js/blob/master/src/storage/README.md)
+    file: src/storage/README.md
   - getAppBucketUrl
   - getUserAppFileUrl

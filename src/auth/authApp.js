@@ -43,7 +43,7 @@ export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
   const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
 
   let httpsURI = `${DEFAULT_BLOCKSTACK_HOST}?authRequest=${authRequest}`
-  
+
   if (caller.session && caller.session.appConfig
       && caller.session.appConfig.authenticatorURL) {
     httpsURI = `${caller.session.appConfig.authenticatorURL}?authRequest=${authRequest}`
