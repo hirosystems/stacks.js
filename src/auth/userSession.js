@@ -73,9 +73,15 @@ export class UserSession {
     if (options && options.sessionStore) {
       this.store = options.sessionStore
     } else if (runningInBrowser) {
-      this.store = new LocalStorageStore(options.sessionOptions)
-    } else {
+      if (options) {
+        this.store = new LocalStorageStore(options.sessionOptions)
+      } else {
+        this.store = new LocalStorageStore()
+      }
+    } else if (options) {
       this.store = new InstanceDataStore(options.sessionOptions)
+    } else {
+      this.store = new InstanceDataStore()
     }
   }
 

@@ -10,7 +10,9 @@ export type SessionOptions = {
   identityAddress?: string,
   coreNode?: string,
   hubUrl?: string,
-  storeOptions?: {}
+  storeOptions?: {},
+  userData?: any,
+  transitKey?: string
 }
 
 export class SessionData {
@@ -41,6 +43,8 @@ export class SessionData {
     this.username = options.username
     this.coreNode = options.coreNode
     this.hubUrl = options.hubUrl
+    this.userData = options.userData
+    this.transitKey = options.transitKey
 
     // initializing Gaia connection requires a network request
     // so we'll defer it until the first time it's needed
@@ -64,7 +68,9 @@ export class SessionData {
       identityAddress: json.identityAddress,
       username: json.username,
       coreNode: json.coreNode,
-      hubUrl: json.hubUrl
+      hubUrl: json.hubUrl,
+      userData: json.userData,
+      transitKey: json.transitKey
     }
     return new SessionData(options)
   }
