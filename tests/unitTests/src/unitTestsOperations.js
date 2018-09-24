@@ -414,6 +414,56 @@ function transactionTests() {
     }, 0)
   }
 
+  test('address coercion', (t) => {
+    t.plan(8)
+    const stashed = config.network.layer1
+    try {
+      const singleSigAddressMain = '1EJh2y3xKUwFjJ8v29a2NRruPJ71neozEE'
+      const singleSigAddressTest = 'mtpeL28w8WNWWQcXjiYQCM5EFHhijXMF62'
+      const multiSigAddressTest  = '2N6GHvciC9M4ze5QXpW2jZxjf5trnPFsyqZ'
+      const multiSigAddressMain  = '3Ei5rsnAXtZeSHmz9NQrx1kPsYecbfdKiy'
+      config.network.layer1 = btc.networks.testnet
+      t.equal(config.network.coerceAddress(singleSigAddressMain), singleSigAddressTest)
+      t.equal(config.network.coerceAddress(singleSigAddressTest), singleSigAddressTest)
+      t.equal(config.network.coerceAddress(multiSigAddressMain), multiSigAddressTest)
+      t.equal(config.network.coerceAddress(multiSigAddressTest), multiSigAddressTest)
+      config.network.layer1 = btc.networks.bitcoin
+      t.equal(config.network.coerceAddress(singleSigAddressMain), singleSigAddressMain)
+      t.equal(config.network.coerceAddress(singleSigAddressTest), singleSigAddressMain)
+      t.equal(config.network.coerceAddress(multiSigAddressMain), multiSigAddressMain)
+      t.equal(config.network.coerceAddress(multiSigAddressTest), multiSigAddressMain)
+    } finally {
+      config.network.layer1 = stashed
+    }
+  })
+
+  test('build incomplete', (t) => {
+    setupMocks()
+    t.plan(2)
+    const getAddress = () => Promise.resolve(testAddresses[2].address)
+    const signTransaction = () => Promise.resolve()
+    const nullSigner = { getAddress, signTransaction }
+    return transactions.makeNamespacePreorder('hello',
+                                              testAddresses[3].address,
+                                              nullSigner)
+      .then(() => {
+        t.fail('Should have failed to build unsigned TX.')
+      })
+      .catch(() => {
+        t.pass('Should have failed to build unsigned TX.')
+      })
+      .then(() => transactions.makeNamespacePreorder('hello',
+                                                     testAddresses[3].address,
+                                                     nullSigner,
+                                                     true))
+      .then((txhex) => {
+        t.ok(txhex, 'Should have built incomplete TX when buildIncomplete = true')
+      })
+      .catch((err) => {
+        t.fail(`Should have built incomplete TX when buildIncomplete = true: Error: ${err}`)
+      })
+  })
+
   test('build and fund namespace preorder', (t) => {
     t.plan(6)
     setupMocks()
