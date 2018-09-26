@@ -420,6 +420,8 @@ function estimateAnnounce(messageHash: string,
  * @param {String} scratchArea - an arbitrary string to store with the transaction
  * @param {Number} senderUtxos - the number of utxos we expect will
  *  be required from the importer address
+ * @param {Number} additionalOutputs - the number of outputs we expect to add beyond
+ *  just the recipient output (default = 1, if the token owner is also the bitcoin funder)
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this token-transfer transaction
  */
@@ -427,7 +429,8 @@ function estimateTokenTransfer(recipientAddress: string,
                                tokenType: string,
                                tokenAmount: BigInteger,
                                scratchArea: string,
-                               senderUtxos: number = 1) {
+                               senderUtxos: number = 1,
+                               additionalOutputs: number = 1) {
   const network = config.network
   const tokenTransferTX = makeTokenTransferSkeleton(
     recipientAddress, dummyConsensusHash, tokenType, tokenAmount, scratchArea)
@@ -435,7 +438,7 @@ function estimateTokenTransfer(recipientAddress: string,
   return network.getFeeRate()
     .then((feeRate) => {
       const outputsValue = sumOutputValues(tokenTransferTX)
-      const txFee = feeRate * estimateTXBytes(tokenTransferTX, senderUtxos, 1)
+      const txFee = feeRate * estimateTXBytes(tokenTransferTX, senderUtxos, additionalOutputs)
       return txFee + outputsValue
     })
 }
@@ -1045,7 +1048,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
 
           if (separateFunder) {
             const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
-            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, 0)
+            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
             return signInputs(signingTxB, btcKey,
                               [{ index: payerInput.index, signer: senderKey }])
           } else {

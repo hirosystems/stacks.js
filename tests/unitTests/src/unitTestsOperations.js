@@ -374,6 +374,14 @@ function transactionTests() {
                           'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
                           tx_output_n: 2 }]
 
+  const tokenUtxoSet2 = [{
+    value: 1654321,
+    tx_hash_big_endian:
+    'fefefefeaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
+    tx_output_n: 0
+  }]
+
+
   function setupMocks() {
     FetchMock.restore()
     FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
@@ -387,6 +395,8 @@ function transactionTests() {
                   { unspent_outputs: namespaceUtxoSet2 })
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[4].address}&cors=true`,
                   { unspent_outputs: tokenUtxoSet })
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[5].address}&cors=true`,
+                  { unspent_outputs: tokenUtxoSet2 })
     FetchMock.get('https://core.blockstack.org/v2/prices/names/foo.test',
                   { name_price: { units: 'BTC', amount: String(BURN_AMT) } })
     FetchMock.get('https://core.blockstack.org/v2/prices/namespaces/hello',
@@ -661,6 +671,45 @@ function transactionTests() {
         t.equal(tx.ins.length, 2, 'Should use 2 utxos from the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx length ${txLen} should equal 1K satoshi/byte`)
+      })
+  })
+
+  test('build and fund token transfer with separate funder', (t) => {
+    t.plan(6)
+    setupMocks()
+
+    Promise.all([
+      transactions.estimateTokenTransfer(testAddresses[1].address,
+                                         'STACKS',
+                                         bigi.fromByteArrayUnsigned('123'),
+                                         'hello world!', 2, 2),
+      transactions.makeTokenTransfer(testAddresses[1].address,
+                                     'STACKS',
+                                     bigi.fromByteArrayUnsigned('123'),
+                                     'hello world!',
+                                     testAddresses[4].skHex,
+                                     testAddresses[5].skHex)])
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx, tokenUtxoSet) + getInputVals(tx, tokenUtxoSet2)
+        const fee = inputVals - outputVals
+        const change = tx.outs[3].value
+        const recipientAddr = btc.address.fromOutputScript(tx.outs[1].script)
+        const funderInputVals = getInputVals(tx, tokenUtxoSet2)
+
+        t.equal(funderInputVals - change, estimatedCost, 'Estimated cost should be equal')
+        t.equal(recipientAddr, testAddresses[1].address, 'Recipient address is correct')
+        t.equal(tx.outs[1].value, 5500, 'Recipient address should have +DUST_MINIMUM')
+        t.equal(tx.ins.length, 2, 'Should use 2 utxos from (token-payer, btc-payer)')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx length ${txLen} should equal 1K satoshi/byte`)
+      })
+      .catch((err) => {
+        console.log(err)
+        t.fail(err)
       })
   })
 
