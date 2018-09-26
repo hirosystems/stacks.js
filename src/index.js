@@ -16,7 +16,7 @@ export {
   ecPairToAddress
 } from './utils'
 
-export { 
+export {
   transactions, safety, TransactionSigner,
   PubkeyHashSigner, addUTXOsToFund, estimateTXBytes
 } from './operations'

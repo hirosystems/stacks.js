@@ -13,11 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ecosystem.
 - A `listFiles` function allows an application to list files in its
   Gaia storage bucket.
+- In the transaction generation library, the makeTX functions now
+  take an optional 'buildIncomplete' argument, allowing you to get
+  a serialized transaction which hasn't been fully signed yet.
 
 ### Changed
 - Fixed a bug in version checking during the authentication process
   that manifested itself when signing in with apps using very old versions
   of blockstack.js.
+- Fixed a couple bugs in the transaction generation, networking
+  code. First, coerce address now correctly coerces P2SH
+  addresses. Second, bitcoinjs-lib recently switched to defaulting to
+  version 2 transactions, which breaks our interoperability with a handful
+  of other libraries. Finally, with this comes a little bit of refactoring,
+  to reduce the repeated code in the transaction libraries.
 
 ## [18.0.4] - 2018-08-06
 

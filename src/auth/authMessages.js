@@ -104,6 +104,7 @@ export function encryptPrivateKey(publicKey: string,
  * @param  {String} hexedEncrypted the ciphertext
  * @return {String}  the decrypted private key
  * @throws {Error} if unable to decrypt
+ *
  * @private
  */
 export function decryptPrivateKey(privateKey: string,
