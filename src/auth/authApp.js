@@ -21,8 +21,6 @@ import { extractProfile } from '../profiles'
 
 import { Logger } from '../logger'
 
-import { config } from '../config'
-
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
@@ -164,22 +162,9 @@ export function isSignInPending() {
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export function handlePendingSignIn(nameLookupURL: string = '',
+export function handlePendingSignIn(nameLookupURL: string = 'https://core.blockstack.org/v1/names/',
                                     authResponseToken: string = getAuthResponseToken(),
                                     transitKey: string = getTransitKey()) {
-  if (!nameLookupURL) {
-    const tokenPayload = decodeToken(authResponseToken).payload
-    if (isLaterVersion(tokenPayload.version, '1.3.0')
-       && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
-      // override globally
-      Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
-        + `with ${tokenPayload.blockstackAPIUrl}`)
-      config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
-      nameLookupURL = `${tokenPayload.blockstackAPIUrl}/v1/names`
-    } 
-
-    nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
-  }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
     .then((isValid) => {
       if (!isValid) {
@@ -217,14 +202,9 @@ export function handlePendingSignIn(nameLookupURL: string = '',
         }
       }
       let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
-      let gaiaAssociationToken
       if (isLaterVersion(tokenPayload.version, '1.2.0')
         && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
         hubUrl = tokenPayload.hubUrl
-      }
-      if (isLaterVersion(tokenPayload.version, '1.3.0')
-        && tokenPayload.associationToken !== null && tokenPayload.associationToken !== undefined) {
-        gaiaAssociationToken = tokenPayload.associationToken
       }
 
       const userData = {
@@ -235,8 +215,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
         appPrivateKey,
         coreSessionToken,
         authResponseToken,
-        hubUrl,
-        gaiaAssociationToken
+        hubUrl
       }
       const profileURL = tokenPayload.profile_url
       if ((userData.profile === null
