@@ -35,7 +35,7 @@ export function runAuthTests() {
   test('makeAuthRequest && verifyAuthRequest', (t) => {
     t.plan(15)
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
     const authRequest = blockstack.makeAuthRequest(privateKey)
@@ -98,7 +98,7 @@ export function runAuthTests() {
   test('invalid auth request - signature not verified', (t) => {
     t.plan(3)
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
     const authRequest = blockstack.makeAuthRequest(privateKey)
@@ -123,7 +123,7 @@ export function runAuthTests() {
 
   test('invalid auth request - invalid redirect uri', (t) => {
     t.plan(3)
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     appConfig.redirectURI = () => 'https://example.com' // monkey patch for test
     const blockstack = new UserSession({ appConfig })
 
@@ -149,7 +149,7 @@ export function runAuthTests() {
   test('invalid auth request - invalid manifest uri', (t) => {
     t.plan(2)
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     appConfig.manifestURI = () => 'https://example.com/manifest.json' // monkey patch for test
     const blockstack = new UserSession({ appConfig })
     const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
@@ -227,7 +227,7 @@ export function runAuthTests() {
   test('auth response with invalid private key', (t) => {
     t.plan(2)
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
     const url = `${nameLookupURL}ryan.id`
@@ -281,7 +281,7 @@ export function runAuthTests() {
     const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
     const metadata = {}
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
@@ -315,7 +315,7 @@ export function runAuthTests() {
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
@@ -355,7 +355,7 @@ export function runAuthTests() {
       }
     }
 
-    const appConfig = new AppConfig('https://custom.example.com')
+    const appConfig = new AppConfig(['store_write'], 'https://custom.example.com')
 
     t.equal(appConfig.appDomain, 'https://custom.example.com')
     t.equal(appConfig.scopes.length, 1)

@@ -59,15 +59,15 @@ export class AppConfig {
   authenticatorURL: ?string
 
   /**
-   * @param {string} appDomain - the app domain
    * @param {Array<string>} scopes - permissions this app is requesting
+   * @param {string} appDomain - the app domain
    * @param {string} redirectPath - path on app domain to redirect users to after authentication
    * @param {string} manifestPath - path relative to app domain of app's manifest file
    * @param {string} coreNode - override the default or user selected core node
    * @param {string} authenticatorURL - the web-based fall back authenticator
    */
-  constructor(appDomain: string = window.location.origin,
-              scopes: Array<string> = DEFAULT_SCOPE.slice(),
+  constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
+              appDomain: string = window.location.origin,
               redirectPath: string = '',
               manifestPath: string = '/manifest.json',
               coreNode: ?string = null,

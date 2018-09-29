@@ -52,7 +52,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
     const fileContent = { test: 'test' }
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
@@ -82,7 +82,7 @@ export function runStorageTests() {
       url_prefix: 'gaia.testblockstack.org/hub/'
     }
 
-    const appConfig = new AppConfig('http://localhost:8080')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:8080')
     const blockstack = new UserSession({ appConfig })
 
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
@@ -229,7 +229,7 @@ export function runStorageTests() {
   test('encrypt & decrypt content', (t) => {
     t.plan(2)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey
@@ -244,7 +244,7 @@ export function runStorageTests() {
 
   test('encrypt & decrypt content -- specify key', (t) => {
     t.plan(2)
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
     const publicKey = getPublicKeyFromPrivate(privateKey)
@@ -266,7 +266,7 @@ export function runStorageTests() {
       url_prefix: 'gaia.testblockstack.org/hub/'
     }
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
@@ -291,7 +291,7 @@ export function runStorageTests() {
     t.plan(2)
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey
@@ -341,7 +341,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const publicKey = getPublicKeyFromPrivate(privateKey)
 
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey
@@ -386,7 +386,7 @@ export function runStorageTests() {
 
   test('putFile & getFile encrypted, signed', (t) => {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey
@@ -489,7 +489,7 @@ export function runStorageTests() {
 
   test('putFile & getFile unencrypted, signed', (t) => {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey
@@ -629,7 +629,7 @@ export function runStorageTests() {
 
   test('promises reject', (t) => {
     t.plan(2)
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     const path = 'file.json'
     const fullReadUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
@@ -667,7 +667,7 @@ export function runStorageTests() {
     }
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey,
@@ -814,7 +814,7 @@ export function runStorageTests() {
     }
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
-    const appConfig = new AppConfig('http://localhost:3000')
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().userData = {
       appPrivateKey: privateKey,
