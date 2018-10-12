@@ -12,20 +12,34 @@ import {
 import { transactions, safety, config } from '../../../lib'
 
 const testAddresses = [
-  { skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
-    address: '1br553PVnK6F5nyBtb4ju1owwBKdsep5c' },
-  { skHex: '744196d67ed78fe39009c71fbfd53e6ecca98353fbfe81ccba21b0703a69be9c01',
-    address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR' },
-  { address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
-    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001' },
-  { address: '16TaQJi78o4A3nKDSzswqZiX3bhecNuNBQ',
-    skHex: '58f7b29ee4a9a8b05855591b8a5405a0647c74c0a539515173adb9a32c964a9a01' },
-  { address: '15eNSvgT3UFvHSonajxFswnmHFifJPE5LB',
-    skHex: 'f5360140d18c6a34fbd2c45b98c1857c3fdad5454350249688a90efe936d475101' },
-  { address: '1Lt8ajRt7i8ajkQsYQZbk3ULCVTsSn2TNV',
-    skHex: '6eaed28d7f26f57fac925283aa0fe49c031028212863219f1c0141e4b0de2b2d01' },
-  { address: '1GvM4xksXrQsq4xPRck11toRLXVq9UYj2B',
-    skHex: '4c103c5c3de544c90f18a3ed29aaeebd33feedb1bb4f026df24aa3eddae826aa01' }
+  {
+    skHex: '85b33fdfa5efeca980806c6ad3c8a55d67a850bd987237e7d49c967566346fbd01',
+    address: '1br553PVnK6F5nyBtb4ju1owwBKdsep5c'
+  },
+  {
+    skHex: '744196d67ed78fe39009c71fbfd53e6ecca98353fbfe81ccba21b0703a69be9c01',
+    address: '16xVjkJ3nY62B9t9q3N9wY6hx1duAfwRZR'
+  },
+  {
+    address: '1HEjCcUjZXtbiDnCYviHLVZvSQsSZoDRFa',
+    skHex: '12f90d1b9e34d8df56f0dc6754a97ab4a2eb962918c281b1b552162438e313c001'
+  },
+  {
+    address: '16TaQJi78o4A3nKDSzswqZiX3bhecNuNBQ',
+    skHex: '58f7b29ee4a9a8b05855591b8a5405a0647c74c0a539515173adb9a32c964a9a01'
+  },
+  {
+    address: '15eNSvgT3UFvHSonajxFswnmHFifJPE5LB',
+    skHex: 'f5360140d18c6a34fbd2c45b98c1857c3fdad5454350249688a90efe936d475101'
+  },
+  {
+    address: '1Lt8ajRt7i8ajkQsYQZbk3ULCVTsSn2TNV',
+    skHex: '6eaed28d7f26f57fac925283aa0fe49c031028212863219f1c0141e4b0de2b2d01'
+  },
+  {
+    address: '1GvM4xksXrQsq4xPRck11toRLXVq9UYj2B',
+    skHex: '4c103c5c3de544c90f18a3ed29aaeebd33feedb1bb4f026df24aa3eddae826aa01'
+  }
 ]
 
 function networkTests() {
@@ -309,78 +323,83 @@ function transactionTests() {
   const BURN_ADDR = '15GAGiT2j2F1EzZrvjk3B8vBCfwVEzQaZx'
   const NAMESPACE_BURN_ADDR = '1111111111111111111114oLvT2'
 
-  const utxoSet = [{
-    value: utxoValues[0],
-    tx_hash_big_endian:
-                   '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-    tx_output_n: 0
-  },
-                   {
-                     value: utxoValues[1],
-                     tx_hash_big_endian:
-                   '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                     tx_output_n: 0
-                   },
-                   {
-                     value: utxoValues[2],
-                     tx_hash_big_endian:
-                   'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
-                     tx_output_n: 2
-                   }]
+  const utxoSet = [
+    {
+      value: utxoValues[0],
+      tx_hash_big_endian: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+      tx_output_n: 0
+    },
+    {
+      value: utxoValues[1],
+      tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+      tx_output_n: 0
+    },
+    {
+      value: utxoValues[2],
+      tx_hash_big_endian: 'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
+      tx_output_n: 2
+    }
+  ]
 
+  const utxoSet2 = [
+    {
+      value: 5500,
+      tx_hash_big_endian: 'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdedffff',
+      tx_output_n: 0
+    }
+  ]
 
-  const utxoSet2 = [{
-    value: 5500,
-    tx_hash_big_endian:
-                    'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdedffff',
-    tx_output_n: 0
-  }]
+  const namespaceUtxoSet = [
+    {
+      value: namespaceUtxoValues[0],
+      tx_hash_big_endian: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c',
+      tx_output_n: 0
+    },
+    {
+      value: namespaceUtxoValues[1],
+      tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
+      tx_output_n: 0
+    },
+    {
+      value: namespaceUtxoValues[2],
+      tx_hash_big_endian: 'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
+      tx_output_n: 2
+    }
+  ]
 
-  const namespaceUtxoSet = [{
-    value: namespaceUtxoValues[0],
-    tx_hash_big_endian:
-                              '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c',
-    tx_output_n: 0
-  },
-                            {
-                              value: namespaceUtxoValues[1],
-                              tx_hash_big_endian:
-                              '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
-                              tx_output_n: 0
-                            },
-                            {
-                              value: namespaceUtxoValues[2],
-                              tx_hash_big_endian:
-                              'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
-                              tx_output_n: 2
-                            }]
-  const namespaceUtxoSet2 = [{
-    value: 654321,
-    tx_hash_big_endian:
-                            'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
-    tx_output_n: 0
-  }]
+  const namespaceUtxoSet2 = [
+    {
+      value: 654321,
+      tx_hash_big_endian: 'ffffffffaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
+      tx_output_n: 0
+    }
+  ]
 
-  const tokenUtxoSet = [{ value: tokenUtxoValues[0],
-                          tx_hash_big_endian:
-                          '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c',
-                          tx_output_n: 0 },
-                        { value: tokenUtxoValues[1],
-                          tx_hash_big_endian:
-                          '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
-                          tx_output_n: 0 },
-                        { value: tokenUtxoValues[2],
-                          tx_hash_big_endian:
-                          'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
-                          tx_output_n: 2 }]
+  const tokenUtxoSet = [
+    {
+      value: tokenUtxoValues[0],
+      tx_hash_big_endian: '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33c',
+      tx_output_n: 0
+    },
+    {
+      value: tokenUtxoValues[1],
+      tx_hash_big_endian: '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
+      tx_output_n: 0
+    },
+    {
+      value: tokenUtxoValues[2],
+      tx_hash_big_endian: 'ffffffffffdb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e689',
+      tx_output_n: 2
+    }
+  ]
 
-  const tokenUtxoSet2 = [{
-    value: 1654321,
-    tx_hash_big_endian:
-    'fefefefeaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
-    tx_output_n: 0
-  }]
-
+  const tokenUtxoSet2 = [
+    {
+      value: 1654321,
+      tx_hash_big_endian: 'fefefefeaab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdee0000',
+      tx_output_n: 0
+    }
+  ]
 
   function setupMocks() {
     FetchMock.restore()
@@ -399,10 +418,14 @@ function transactionTests() {
                   { unspent_outputs: tokenUtxoSet2 })
     FetchMock.get('https://core.blockstack.org/v2/prices/names/foo.test',
                   { name_price: { units: 'BTC', amount: String(BURN_AMT) } })
+    FetchMock.get('https://core.blockstack.org/v2/prices/names/bar.test2',
+                  { name_price: { units: 'STACKS', amount: String(BURN_AMT) } })
     FetchMock.get('https://core.blockstack.org/v2/prices/namespaces/hello',
                   NAMESPACE_PRICE)
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { version: 2, address: BURN_ADDR, reveal_block: 600 })
+    FetchMock.get('https://core.blockstack.org/v1/namespaces/test2',
+                  { version: 3, address: BURN_ADDR, reveal_block: 600 })
     FetchMock.get('https://core.blockstack.org/v1/blockchains/bitcoin/consensus',
                   { consensus_hash: 'dfe87cfd31ffa2a3b8101e3e93096f2b' })
     FetchMock.get('https://blockchain.info/latestblock?cors=true',
@@ -747,6 +770,40 @@ function transactionTests() {
       .catch((err) => { console.log(err.stack); throw err })
   })
 
+  test('build and fund preorder with stacks', (t) => {
+    t.plan(6)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimatePreorder('bar.test2',
+                                     testAddresses[0].address,
+                                     testAddresses[1].address,
+                                     2),
+       transactions.makePreorder('bar.test2',
+                                 testAddresses[0].address,
+                                 testAddresses[1].skHex)]
+    )
+      .then(([estimatedCost, hexTX]) => {
+        t.ok(hexTX)
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx)
+        const fee = inputVals - outputVals
+        const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
+
+        const change = tx.outs[1].value
+        t.equal(inputVals - change,
+                estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
+        t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
+        t.equal(tx.outs[2].value, 5500, 'Output should not have burned more than +DUST_MINIMUM')
+        t.equal(tx.ins.length, 2, 'Should use 2 utxos for the payer')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
   test('build and fund register', (t) => {
     t.plan(4)
     setupMocks()
@@ -996,6 +1053,54 @@ function transactionTests() {
                 'Payer change should be fifth output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should be accurate.')
         t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
+        t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
+             `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
+      })
+      .catch((err) => { console.log(err.stack); throw err })
+  })
+
+  test('build and fund renewal with stacks', (t) => {
+    t.plan(8)
+    setupMocks()
+
+    Promise.all(
+      [transactions.estimateRenewal('bar.test2',
+                                    testAddresses[2].address,
+                                    testAddresses[0].address,
+                                    testAddresses[1].address,
+                                    true,
+                                    3),
+       transactions.makeRenewal('bar.test2',
+                                testAddresses[2].address,
+                                testAddresses[0].skHex,
+                                testAddresses[1].skHex,
+                                'hello world')]
+    )
+      .then(([estimatedCost, hexTX]) => {
+        const tx = btc.Transaction.fromHex(hexTX)
+        const txLen = hexTX.length / 2
+        const outputVals = sumOutputValues(tx)
+        const inputVals = getInputVals(tx)
+        const fee = inputVals - outputVals
+
+        // payer change address is the 5th output...
+        const changeOut = tx.outs[4]
+        // old owner change address is the 3rd output
+        const ownerChange = tx.outs[2]
+
+        const change = changeOut.value
+
+        t.equal(btc.address.fromOutputScript(tx.outs[1].script), testAddresses[2].address,
+                'New owner should be second output')
+        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+                'Prior owner should be third output')
+        t.equal(btc.address.fromOutputScript(tx.outs[3].script), NAMESPACE_BURN_ADDR,
+                'Burn address should be fourth output, and it should be 11111....')
+        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+                'Payer change should be fifth output')
+        t.equal(inputVals - change, estimatedCost, 'Estimated cost should be accurate.')
+        t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
+        t.equal(tx.outs[3].value, 5500, 'Output should not have burned more than +DUST_MINIMUM')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
       })
