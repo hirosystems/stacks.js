@@ -109,7 +109,8 @@ export class BlockstackNetwork {
       .then((namePrice) => {
         if (!namePrice || !namePrice.satoshis) {
           throw new Error(
-            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`)
+            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`
+          )
         }
         if (namePrice.satoshis < this.DUST_MINIMUM) {
           namePrice.satoshis = this.DUST_MINIMUM
@@ -173,7 +174,8 @@ export class BlockstackNetwork {
       .then((namePrice) => {
         if (!namePrice) {
           throw new Error(
-            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`)
+            `Failed to get price for ${fullyQualifiedName}. Does the namespace exist?`
+          )
         }
         const result = {
           units: namePrice.units,
@@ -410,14 +412,15 @@ export class BlockstackNetwork {
         } else {
           return resp.json()
         }
-      })
-      .then(accountStatus =>
+      }).then((accountStatus) => {
         // coerce all addresses, and convert credit/debit to biginteger
-        Object.assign({}, accountStatus, {
+        const formattedStatus = Object.assign({}, accountStatus, {
           address: this.coerceAddress(accountStatus.address),
           debit_value: bigi.fromByteArrayUnsigned(String(accountStatus.debit_value)),
           credit_value: bigi.fromByteArrayUnsigned(String(accountStatus.credit_value))
-        }))
+        })
+        return formattedStatus
+      })
   }
   
   
