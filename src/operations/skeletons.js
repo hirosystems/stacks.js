@@ -153,7 +153,8 @@ function makeTXbuilder() {
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
   burnAddress : string, burn: AmountType,
-  registerAddress: ?string = null) {
+  registerAddress: ?string = null
+) {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -221,7 +222,8 @@ export function makePreorderSkeleton(
 
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
-  valueHash: ?string = null, burnTokenAmountHex: ?string = null) {
+  valueHash: ?string = null, burnTokenAmountHex: ?string = null
+) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
   //                    2. The owner address (can be different from REGISTER address on renewals)
@@ -292,7 +294,8 @@ export function makeRegisterSkeleton(
 
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
-  burnAddress: string, burn: AmountType, valueHash: ?string = null) {
+  burnAddress: string, burn: AmountType, valueHash: ?string = null
+) {
   /*
     Formats
 
@@ -326,8 +329,8 @@ export function makeRenewalSkeleton(
   const burnAmount = asAmountV2(burn)
   const network = config.network
   const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
-  const burnBTCAmount = burnAmount.units === 'BTC' ? 
-    parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
+  const burnBTCAmount = burnAmount.units === 'BTC' 
+    ? parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
   
   let burnTokenHex = null
   if (!!burnTokenAmount) {
@@ -340,7 +343,8 @@ export function makeRenewalSkeleton(
   }
 
   const registerTX = makeRegisterSkeleton(
-    fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex)
+    fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex
+  )
   const txB = bitcoin.TransactionBuilder.fromTransaction(
     registerTX, network.layer1
   )
@@ -351,7 +355,8 @@ export function makeRenewalSkeleton(
 
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
-  keepZonefile: boolean = false) {
+  keepZonefile: boolean = false
+) {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -395,7 +400,8 @@ export function makeTransferSkeleton(
 
 
 export function makeUpdateSkeleton(
-  fullyQualifiedName: string, consensusHash: string, valueHash: string) {
+  fullyQualifiedName: string, consensusHash: string, valueHash: string
+) {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -471,7 +477,8 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash : string, preorderAddress: string,
-  registerAddress: string, burn: AmountType) {
+  registerAddress: string, burn: AmountType
+) {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*
@@ -542,7 +549,8 @@ export function makeNamespacePreorderSkeleton(
 
 
 export function makeNamespaceRevealSkeleton(
-  namespace: BlockstackNamespace, revealAddress: string) {
+  namespace: BlockstackNamespace, revealAddress: string
+) {
   /*
    Format:
 
@@ -571,8 +579,7 @@ export function makeNamespaceRevealSkeleton(
 }
 
 
-export function makeNamespaceReadySkeleton(
-  namespaceID: string) {
+export function makeNamespaceReadySkeleton(namespaceID: string) {
   /*
    Format:
 
@@ -658,7 +665,8 @@ export function makeAnnounceSkeleton(messageHash: string) {
 
 export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string,
                                           tokenType: string, tokenAmount: BigInteger,
-                                          scratchArea: string) {
+                                          scratchArea: string
+) {
   /*
    Format:
 
