@@ -1009,6 +1009,7 @@ function makeBitcoinSpend(destinationAddress: string,
     paymentAddress => Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
       .then(([utxos, feeRate]) => {
         const txB = new bitcoinjs.TransactionBuilder(network.layer1)
+        txb.setVersion(1)
         const destinationIndex = txB.addOutput(destinationAddress, 0)
 
         // will add utxos up to _amount_ and return the amount of leftover _change_
