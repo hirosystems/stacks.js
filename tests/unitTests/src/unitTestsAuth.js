@@ -1,6 +1,6 @@
 // import test from 'tape'
 import test from 'tape-promise/tape'
-import { decodeToken } from 'jsontokens'
+import { decodeToken, TokenSigner } from 'jsontokens'
 import FetchMock from 'fetch-mock'
 
 import {
@@ -21,7 +21,9 @@ import {
   isRedirectUriValid,
   verifyAuthRequestAndLoadManifest,
   handlePendingSignIn,
-  signUserOut
+  signUserOut,
+  config,
+  loadUserData
 } from '../../../lib'
 
 import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
@@ -337,6 +339,90 @@ export function runAuthTests() {
     handlePendingSignIn(nameLookupURL, authResponse, transitPrivateKey)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
+      })
+      .catch((err) => {
+        console.log(err.stack)
+        t.fail('Should not error')
+      })
+  })
+
+  test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', (t) => {
+    t.plan(2)
+
+    const customBlockstackAPIUrl = 'https://test.name.lookups'
+    const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
+    const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const appPrivateKey = makeECPrivateKey()
+    const transitPrivateKey = makeECPrivateKey()
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
+    const metadata = {}
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+                                          metadata, undefined, appPrivateKey, undefined,
+                                          transitPublicKey, undefined, customBlockstackAPIUrl)
+
+    handlePendingSignIn(null, authResponse, transitPrivateKey)
+      .then(() => {
+        t.pass('Should correctly sign in with auth response')
+        t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl, 
+                'Should override global Blockstack API URL')
+
+        config.network.blockstackAPIUrl = oldBlockstackAPIUrl
+      })
+      .catch((err) => {
+        console.log(err.stack)
+        t.fail('Should not error')
+      })
+  })
+
+  test('handlePendingSignIn with authResponseToken, transit key, '
+    + 'Blockstack API URL, and Gaia association token', (t) => {
+    t.plan(3)
+
+    const customBlockstackAPIUrl = 'https://test.name.lookups'
+    const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
+    const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const appPrivateKey = makeECPrivateKey()
+    const identityPrivateKey = makeECPrivateKey()
+    const transitPrivateKey = makeECPrivateKey()
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
+    const metadata = {}
+
+    const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
+    const FOUR_MONTH_SECONDS = 60 * 60 * 24 * 31 * 4
+    const salt = '00000000000000000000000000000'
+    const identityPublicKey = getPublicKeyFromPrivate(identityPrivateKey)
+    const associationTokenClaim = {
+      childToAssociate: appPublicKey,
+      iss: identityPublicKey,
+      exp: FOUR_MONTH_SECONDS + (new Date() / 1000),
+      salt 
+    }
+    const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
+      .sign(associationTokenClaim)
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+                                          metadata, undefined, appPrivateKey, undefined,
+                                          transitPublicKey, undefined, customBlockstackAPIUrl,
+                                          gaiaAssociationToken)
+
+    handlePendingSignIn(null, authResponse, transitPrivateKey)
+      .then(() => {
+        t.pass('Should correctly sign in with auth response')
+        t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl, 
+                'Should override global Blockstack API URL')
+
+        t.equal(loadUserData().gaiaAssociationToken, gaiaAssociationToken,
+                'Should have Gaia association token')
+
+        // restore
+        config.network.blockstackAPIUrl = oldBlockstackAPIUrl
       })
       .catch((err) => {
         console.log(err.stack)
