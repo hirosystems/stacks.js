@@ -154,4 +154,23 @@ export function runNetworkTests() {
       .then(() => t.fail('did not get exception when querying block txs of unknown address'))
       .catch(e => t.equal(e.message, 'Account not found'))
   })
+  
+  test('zonefiles', (t) => {
+    t.plan(2)
+    FetchMock.restore()
+    const zf = '$ORIGIN judecn.id\n$TTL 3600\n_https._tcp URI 10 1 '
+      + '"https://raw.githubusercontent.com/jcnelson/profile/master/judecn.id"\n_https._tcp URI '
+      + '10 1 "https://www.cs.princeton.edu/~jcnelson/judecn.id"\n'
+    const zfh = '737c631c7c5d911c6617993c21fba731363f1cfe'
+    const zfh2 = '737c631c7c5d911c6617993c21fba731363f1cff'
+
+    FetchMock.get(`https://core.blockstack.org/v1/zonefiles/${zfh}`, zf)
+    FetchMock.get(`https://core.blockstack.org/v1/zonefiles/${zfh2}`, zf)
+
+    mynet.getZonefile(zfh)
+      .then(response => t.equal(response, zf))
+
+    mynet.getZonefile(zfh2)
+      .catch(e => t.equal(e.message, `Zone file contents hash to ${zfh}, not ${zfh2}`))
+  })
 }
