@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In the transaction generation library, the makeTX functions now
   take an optional 'buildIncomplete' argument, allowing you to get
   a serialized transaction which hasn't been fully signed yet.
+- A `blockstackAPIUrl` field to the authentication response token that overrides the default
+  in `blockstack.config.network` allowing the user to specify their own Blockstack
+  Core node.
+- A `gaiaAssociationToken` field to the authentication response token which enables
+  users to run private Gaia hubs without authorization each application address.
 
 ### Changed
 - Fixed a bug in version checking during the authentication process
@@ -27,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   version 2 transactions, which breaks our interoperability with a handful
   of other libraries. Finally, with this comes a little bit of refactoring,
   to reduce the repeated code in the transaction libraries.
+- Increments the authentication process version to 1.3.
 
 ## [18.0.4] - 2018-08-06
 
