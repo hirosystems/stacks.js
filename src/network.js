@@ -16,12 +16,6 @@ const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
-export function hash160(buff: Buffer) {
-  const sha256 = bitcoinjs.crypto.sha256(buff)
-  return (new RIPEMD160()).update(sha256).digest()
-}
-
-
 export class BitcoinNetwork {
   broadcastTransaction(transaction: string) : Promise<Object> {
     return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
@@ -382,7 +376,7 @@ export class BlockstackNetwork {
           return resp.text()
             .then((body) => {
               const sha256 = bitcoinjs.crypto.sha256(body)
-              const h = (new RIPEMD160()).update(sha256).digest()
+              const h = (new RIPEMD160()).update(sha256).digest('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)
               }
