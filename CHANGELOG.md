@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of other libraries. Finally, with this comes a little bit of refactoring,
   to reduce the repeated code in the transaction libraries.
 - Increments the authentication process version to 1.3.
+- When using the bitcoind client in development networks,
+  track which addresses we've already called `importaddress` with
+  and do not retry.
 
 ## [18.0.4] - 2018-08-06
 
