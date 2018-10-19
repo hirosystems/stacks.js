@@ -281,6 +281,50 @@ export function runStorageTests() {
         t.ok(publicURL, fullReadUrl)
       })
   })
+  
+  test('putFile & getFile unencrypted, not signed, with contentType', (t) => {
+    t.plan(2)
+    const path = 'file.html'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.html'
+    const fileContent = '<!DOCTYPE html><html><head><title>Title</title></head><body>Blockstack</body></html>'
+
+    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
+    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+
+    const { putFile } = proxyquire('../../../lib/storage', {
+      './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
+    })
+    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+      './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
+    })
+
+    const config = {
+      status: 200,
+      body: fileContent,
+      headers: { 'Content-Type': 'text/html' }
+    }
+    FetchMock.get(fullReadUrl, config)
+
+    const options = { encrypt: false, contentType: 'text/html' }
+    putFile(path, fileContent, options)
+      .then((publicURL) => {
+        t.ok(publicURL, fullReadUrl)
+      })
+      .then(() => {
+        const decryptOptions = { decrypt: false }
+        getFile(path, decryptOptions).then((readContent) => {
+          t.equal(readContent, fileContent)
+        })
+      })
+  })
 
   test('putFile & getFile encrypted, not signed', (t) => {
     t.plan(2)

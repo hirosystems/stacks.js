@@ -362,23 +362,26 @@ export function getFile(path: string, options?: {
  *                                                  or the provided public key
  * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
  *                                         the app private key
+ * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
 export function putFile(path: string, content: string | Buffer, options?: {
   encrypt?: boolean | string,
-  sign?: boolean
+  sign?: boolean,
+  contentType?: string
   }) {
   const defaults = {
     encrypt: true,
-    sign: false
+    sign: false,
+    contentType: ''
   }
 
   const opt = Object.assign({}, defaults, options)
 
-  let contentType = 'text/plain'
-  if (typeof (content) !== 'string') {
-    contentType = 'application/octet-stream'
+  let contentType = opt.contentType
+  if (!contentType) {
+    contentType = (typeof (content) === 'string') ? 'text/plain' : 'application/octet-stream'
   }
 
   // First, let's figure out if we need to get public/private keys,
