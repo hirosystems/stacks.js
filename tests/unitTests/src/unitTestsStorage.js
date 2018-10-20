@@ -283,7 +283,7 @@ export function runStorageTests() {
   })
   
   test('putFile & getFile unencrypted, not signed, with contentType', (t) => {
-    t.plan(2)
+    t.plan(3)
     const path = 'file.html'
     const gaiaHubConfig = {
       address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
@@ -322,6 +322,7 @@ export function runStorageTests() {
         const decryptOptions = { decrypt: false }
         getFile(path, decryptOptions).then((readContent) => {
           t.equal(readContent, fileContent)
+          t.ok(typeof (readContent) === 'string')
         })
       })
   })

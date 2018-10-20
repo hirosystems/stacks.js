@@ -379,7 +379,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
 
   const opt = Object.assign({}, defaults, options)
 
-  let contentType = opt.contentType
+  let { contentType } = opt
   if (!contentType) {
     contentType = (typeof (content) === 'string') ? 'text/plain' : 'application/octet-stream'
   }
