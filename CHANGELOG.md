@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Core node.
 - A `gaiaAssociationToken` field to the authentication response token which enables
   users to run private Gaia hubs without authorization each application address.
+- An option `contentType` to the `putFile` `options` object that sets the 
+  Content-Type header for unencrypted data. Thanks to @muneebm for this!
 
 ### Changed
 - Fixed a bug in version checking during the authentication process
