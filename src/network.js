@@ -906,10 +906,13 @@ export class BitcoindAPI extends BitcoinNetwork {
 
   bitcoindCredentials: Object
 
+  importedBefore: Object
+
   constructor(bitcoindUrl: string, bitcoindCredentials: {username: string, password: string}) {
     super()
     this.bitcoindUrl = bitcoindUrl
     this.bitcoindCredentials = bitcoindCredentials
+    this.importedBefore = {}
   }
 
   broadcastTransaction(transaction: string) {
@@ -999,15 +1002,20 @@ export class BitcoindAPI extends BitcoinNetwork {
       method: 'listunspent',
       params: [0, 9999999, [address]]
     }
-    const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
+    const authString = Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
     const headers = { Authorization: `Basic ${authString}` }
 
-    return fetch(this.bitcoindUrl, {
-      method: 'POST',
-      body: JSON.stringify(jsonRPCImport),
-      headers
-    })
+    const importPromise = (this.importedBefore[address])
+      ? Promise.resolve()
+      : fetch(this.bitcoindUrl, {
+        method: 'POST',
+        body: JSON.stringify(jsonRPCImport),
+        headers
+      })
+        .then(() => { this.importedBefore[address] = true })
+
+    return importPromise
       .then(() => fetch(this.bitcoindUrl, {
         method: 'POST',
         body: JSON.stringify(jsonRPCUnspent),

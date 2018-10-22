@@ -3,7 +3,7 @@ import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
 import bigi from 'bigi'
 
-import { network, InsightClient } from '../../../lib/network'
+import { network, InsightClient, BitcoindAPI } from '../../../lib/network'
 import {
   estimateTXBytes, addUTXOsToFund, sumOutputValues,
   hash160, hash128, decodeB40
@@ -102,6 +102,51 @@ function networkTests() {
         t.deepEqual(utxos, [{
           value: 1e8, confirmations: 2, tx_hash: 'bar', tx_output_n: 10
         }])
+      })
+  })
+  test('bitcoind-client', (t) => {
+    t.plan(2)
+    const mynet = new BitcoindAPI('https://utxo.tester.com', { username: 'foo', password: 'bar' })
+
+    FetchMock.restore()
+
+    FetchMock.postOnce({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://utxo.tester.com'
+          && opts
+          && opts.body.indexOf('importaddress') > 0),
+      response: {
+        body: {},
+        status: 200
+      }
+    })
+
+    FetchMock.post({
+      name: 'Broadcast',
+      matcher: (url, opts) => (url === 'https://utxo.tester.com'
+          && opts
+          && opts.body.indexOf('listunspent') > 0),
+      response: {
+        body: JSON.stringify({ result: [] }),
+        status: 200
+      }
+    })
+
+    mynet.getNetworkedUTXOs(testAddresses[0].address)
+      .then((utxos) => {
+        t.deepEqual(utxos, [])
+      })
+      .catch((err) => {
+        console.log(err)
+        t.fail()
+      })
+      .then(() => mynet.getNetworkedUTXOs(testAddresses[0].address))
+      .then((utxos) => {
+        t.deepEqual(utxos, [])
+      })
+      .catch((err) => {
+        console.log(err)
+        t.fail()
       })
   })
 }
