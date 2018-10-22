@@ -218,7 +218,7 @@ export function handlePendingSignInImpl(caller: UserSession,
 export function loadUserDataImpl(caller: UserSession) {
   const userData = caller.store.getSessionData().userData
   if (!userData) {
-    throw InvalidStateError('No user data found. Did the user sign in?')
+    throw new InvalidStateError('No user data found. Did the user sign in?')
   }
   return userData
 }
