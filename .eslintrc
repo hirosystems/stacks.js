@@ -49,5 +49,6 @@
      "ImportDeclaration": "first",
      "CallExpression": { "arguments": "first" }
      }],
+     "function-paren-newline": 0
   }
 }

@@ -86,7 +86,6 @@ function makeV1GaiaAuthToken(hubInfo: Object,
     salt,
     associationToken
   }
-  
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
 }

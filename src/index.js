@@ -16,9 +16,12 @@ export {
   ecPairToAddress
 } from './utils'
 
-export { BlockstackWallet, IdentityKeyPair } from './wallet'
+export {
+  transactions, safety, TransactionSigner,
+  PubkeyHashSigner, addUTXOsToFund, estimateTXBytes
+} from './operations'
 
-export { transactions, safety } from './operations'
+export { BlockstackWallet, IdentityKeyPair } from './wallet'
 
 export { network } from './network'
 

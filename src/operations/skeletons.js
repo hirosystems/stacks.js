@@ -107,15 +107,15 @@ export class BlockstackNamespace {
   }
 
   setNonalphaDiscount(nonalphaDiscount: number) {
-    if (nonalphaDiscount < 0 || nonalphaDiscount > 15) {
-      throw new Error('Invalid nonalphaDiscount: must be a 4-bit number')
+    if (nonalphaDiscount <= 0 || nonalphaDiscount > 15) {
+      throw new Error('Invalid nonalphaDiscount: must be a positive 4-bit number')
     }
     this.nonalphaDiscount = nonalphaDiscount
   }
 
   setNoVowelDiscount(noVowelDiscount: number) {
-    if (noVowelDiscount < 0 || noVowelDiscount > 15) {
-      throw new Error('Invalid noVowelDiscount: must be a 4-bit number')
+    if (noVowelDiscount <= 0 || noVowelDiscount > 15) {
+      throw new Error('Invalid noVowelDiscount: must be a positive 4-bit number')
     }
     this.noVowelDiscount = noVowelDiscount
   }
@@ -132,6 +132,7 @@ export class BlockstackNamespace {
     return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex
   }
 }
+
 
 function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
@@ -159,9 +160,14 @@ export function makePreorderSkeleton(
   //                    2. the Preorder's change address (5500 satoshi minimum)
   //                    3. the BURN
   //
-  // 0     2  3                                     23             39
-  // |-----|--|--------------------------------------|--------------|
-  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash
+  // 0     2  3                                     23             39          47            66
+  // |-----|--|--------------------------------------|--------------|-----------|-------------|
+  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash token burn  token type
+  //                                                                 (optional)   (optional)
+  //
+  // output 0: name preorder code
+  // output 1: preorder address
+  // output 2: burn address
   //
   // Returns an unsigned serialized transaction.
   const burnAmount = asAmountV2(burn)
@@ -180,29 +186,43 @@ export function makePreorderSkeleton(
 
   const hashed = hash160(dataBuff)
 
-  const opReturnBufferLen = 39
+  const opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
   opReturnBuffer.write('id?', 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
+  if (burnAmount.units !== 'BTC') {
+    const burnHex = burnAmount.amount.toHex()
+    if (burnHex.length > 16) {
+      // exceeds 2**64; can't fit
+      throw new Error(`Cannot preorder '${fullyQualifiedName}': cannot fit price into 8 bytes`)
+    }
+    const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
+
+    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
+    opReturnBuffer.write(burnAmount.units, 47, burnAmount.units.length, 'ascii')
+  }
+
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-
-
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
   tx.addOutput(preorderAddress, DUST_MINIMUM)
 
-  const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
-  tx.addOutput(burnAddress, btcBurnAmount)
+  if (burnAmount.units === 'BTC') {
+    const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
+    tx.addOutput(burnAddress, btcBurnAmount)
+  } else {
+    tx.addOutput(burnAddress, DUST_MINIMUM)
+  }
 
   return tx.buildIncomplete()
 }
 
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
-  valueHash: ?string = null
+  valueHash: ?string = null, burnTokenAmountHex: ?string = null
 ) {
   // Returns a register tx skeleton.
   //   with 2 outputs : 1. The register OP_RETURN
@@ -230,26 +250,40 @@ export function makeRegisterSkeleton(
     |----|--|----------------------------------|-------------------|
     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
 
+    output 0: name registration code
+    output 1: owner address
   */
 
   let payload
+
+  if (!!burnTokenAmountHex && !valueHash) {
+    // empty value hash
+    valueHash = '0000000000000000000000000000000000000000'
+  }
+
   if (!!valueHash) {
     if (valueHash.length !== 40) {
       throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded')
     }
+    if (!!burnTokenAmountHex) {
+      if (burnTokenAmountHex.length !== 16) {
+        throw new Error('Burn field length incorrect.  Expecting 8-bytes, hex-encoded')
+      }
+    }
 
-    const payloadLen = 57
+    const payloadLen = burnTokenAmountHex ? 65 : 57
     payload = Buffer.alloc(payloadLen, 0)
     payload.write(fullyQualifiedName, 0, 37, 'ascii')
     payload.write(valueHash, 37, 20, 'hex')
+    if (!!burnTokenAmountHex) {
+      payload.write(burnTokenAmountHex, 57, 8, 'hex')
+    }
   } else {
     payload = Buffer.from(fullyQualifiedName, 'ascii')
   }
 
   const opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload])
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-
-
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -278,13 +312,38 @@ export function makeRenewalSkeleton(
     |----|--|----------------------------------|-------------------|
     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
 
+
+   With renewal payment in a token:
+   (for register, tokens burned is not included)
+   (for renew, tokens burned is the number of tokens to burn)
+
+   0    2  3                                  39                  59                            67
+   |----|--|----------------------------------|-------------------|------------------------------|
+   magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (big-endian)
+
+   output 0: renewal code
+   output 1: new owner address
+   output 2: current owner address
+   output 3: burn address
   */
   const burnAmount = asAmountV2(burn)
   const network = config.network
-  const burnBTCAmount = parseInt(burnAmount.amount.toHex(), 16)
+  const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
+  const burnBTCAmount = burnAmount.units === 'BTC' 
+    ? parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
+  
+  let burnTokenHex = null
+  if (!!burnTokenAmount) {
+    const burnHex = burnTokenAmount.toHex()
+    if (burnHex.length > 16) {
+      // exceeds 2**64; can't fit 
+      throw new Error(`Cannot renew '${fullyQualifiedName}': cannot fit price into 8 bytes`)
+    }
+    burnTokenHex = `0000000000000000${burnHex}`.slice(-16)
+  }
 
   const registerTX = makeRegisterSkeleton(
-    fullyQualifiedName, nextOwnerAddress, valueHash
+    fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex
   )
   const txB = bitcoin.TransactionBuilder.fromTransaction(
     registerTX, network.layer1
@@ -312,6 +371,9 @@ export function makeTransferSkeleton(
     |-----|--|----|-------------------|---------------|
     magic op keep  hash128(name.ns_id) consensus hash
              data?
+
+    output 0: transfer code
+    output 1: new owner
   */
   const opRet = Buffer.alloc(36)
   let keepChar = '~'
@@ -346,12 +408,16 @@ export function makeUpdateSkeleton(
   // You MUST make the first input a UTXO from the current OWNER
   //
   // Returns an unsigned serialized transaction.
+  //
+  // output 0: the revoke code
   /*
     Format:
 
     0     2  3                                   19                      39
     |-----|--|-----------------------------------|-----------------------|
     magic op  hash128(name.ns_id,consensus hash) hash160(data)
+
+    output 0: update code
   */
 
   const opRet = Buffer.alloc(39)
@@ -390,6 +456,8 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
    0    2  3                             39
    |----|--|-----------------------------|
    magic op   name.ns_id (37 bytes)
+
+   output 0: the revoke code
   */
 
   const opRet = Buffer.alloc(3)
@@ -400,8 +468,6 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
   const opReturnBuffer = Buffer.concat([opRet, nameBuff])
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-
-
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -418,13 +484,26 @@ export function makeNamespacePreorderSkeleton(
   /*
    Formats:
 
+   Without STACKS:
+
    0     2   3                                      23               39
    |-----|---|--------------------------------------|----------------|
    magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash
+
+
+   with STACKs:
+
+   0     2   3                                      23               39                         47
+   |-----|---|--------------------------------------|----------------|--------------------------|
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (big-endian)
+
+   output 0: namespace preorder code
+   output 1: change address
+   otuput 2: burn address
   */
 
   const burnAmount = asAmountV2(burn)
-  if (burnAmount.units !== 'BTC') {
+  if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
     throw new Error(`Invalid burnUnits ${burnAmount.units}`)
   }
 
@@ -438,17 +517,27 @@ export function makeNamespacePreorderSkeleton(
   const dataBuff = Buffer.concat(dataBuffers)
 
   const hashed = hash160(dataBuff)
-
-  const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
-  const opReturnBufferLen = 39
+  
+  let btcBurnAmount = DUST_MINIMUM
+  let opReturnBufferLen = 39
+  if (burnAmount.units === 'STACKS') {
+    opReturnBufferLen = 47
+  } else {
+    btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
+  }
 
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
   opReturnBuffer.write('id*', 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  if (burnAmount.units === 'STACKS') {
+    const burnHex = burnAmount.amount.toHex()
+    const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
+    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
+  }
 
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -470,6 +559,9 @@ export function makeNamespaceRevealSkeleton(
    magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
                                                   bucket exponents        no-vowel
                                                                           discounts
+   
+   output 0: namespace reveal code
+   output 1: reveal address
   */
   const hexPayload = namespace.toHexPayload()
 
@@ -487,9 +579,7 @@ export function makeNamespaceRevealSkeleton(
 }
 
 
-export function makeNamespaceReadySkeleton(
-  namespaceID: string
-) {
+export function makeNamespaceReadySkeleton(namespaceID: string) {
   /*
    Format:
 
@@ -497,6 +587,7 @@ export function makeNamespaceReadySkeleton(
    |-----|--|--|------------|
    magic op  .  ns_id
 
+   output 0: namespace ready code
    */
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
   opReturnBuffer.write('id!', 0, 3, 'ascii')
@@ -554,6 +645,8 @@ export function makeAnnounceSkeleton(messageHash: string) {
     0    2  3                             23
     |----|--|-----------------------------|
     magic op   message hash (160-bit)
+
+    output 0: the OP_RETURN
   */
   if (messageHash.length !== 40) {
     throw new Error('Invalid message hash: must be 20 bytes hex-encoded')
@@ -561,12 +654,59 @@ export function makeAnnounceSkeleton(messageHash: string) {
 
   const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
   opReturnBuffer.write('id#', 0, 3, 'ascii')
-  opReturnBuffer.write(messageHash, 3, messageHash.length, 'hex')
+  opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
-
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
+  return tx.buildIncomplete()
+}
+
+export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string,
+                                          tokenType: string, tokenAmount: BigInteger,
+                                          scratchArea: string
+) {
+  /*
+   Format:
+
+    0     2  3              19         38          46                        80
+    |-----|--|--------------|----------|-----------|-------------------------|
+    magic op  consensus_hash token_type amount (BE) scratch area
+                             (ns_id)
+
+    output 0: token transfer code
+    output 1: recipient address
+  */
+  if (scratchArea.length > 34) {
+    throw new Error('Invalid scratch area: must be no more than 34 bytes')
+  }
+
+  const opReturnBuffer = Buffer.alloc(46 + scratchArea.length)
+
+  const tokenTypeHex = new Buffer(tokenType).toString('hex')
+  const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
+
+  const tokenValueHex = tokenAmount.toHex()
+
+  if (tokenValueHex.length > 16) {
+    // exceeds 2**64; can't fit
+    throw new Error(`Cannot send tokens: cannot fit ${tokenAmount.toString()} into 8 bytes`)
+  }
+
+  const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
+
+  opReturnBuffer.write('id$', 0, 3, 'ascii')
+  opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex')
+  opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex')
+  opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex')
+  opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii')
+
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const tx = makeTXbuilder()
+
+  tx.addOutput(nullOutput, 0)
+  tx.addOutput(recipientAddress, DUST_MINIMUM)
+
   return tx.buildIncomplete()
 }
