@@ -119,7 +119,11 @@ export function connectToGaiaHub(gaiaHubUrl: string,
     .then(response => response.json())
     .then((hubInfo) => {
       const readURL = hubInfo.read_url_prefix
-      const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken, scopes)
+      const token = makeV1GaiaAuthToken(hubInfo, 
+                                        challengeSignerHex, 
+                                        gaiaHubUrl, 
+                                        associationToken, 
+                                        scopes)
       const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
                                         + (challengeSignerHex.length === 64 ? '01' : '')))
       return {
