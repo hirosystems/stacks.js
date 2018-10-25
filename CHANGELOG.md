@@ -4,6 +4,16 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- New function `getFileUrl()` will return a URL for reading a particular file
+  from an applications' Gaia bucket.
+
+### Changed
+- If `window` and `window.location` is not set (e.g., you are running outside
+  a browser context), `getFile` is now usable for multi-player reads.
+
 ## [18.1.0] - 2018-10-024
 
 ### Added

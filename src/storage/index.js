@@ -143,7 +143,8 @@ export function getFileUrl(path: string,
                            options?: { username?: ?string,
                                        app?: string,
                                        zoneFileLookupURL?: ?string}): Promise<string> {
-  const appDefault = window.location ? window.location.origin : ''
+  const appDefault = (typeof window !== 'undefined' && window.location)
+    ? window.location.origin : ''
   const defaults = {
     username: null,
     app: appDefault,
@@ -342,7 +343,8 @@ export function getFile(path: string, options?: {
     app?: string,
     zoneFileLookupURL?: ?string
   }) {
-  const appDefault = window.location ? window.location.origin : ''
+  const appDefault = (typeof window !== 'undefined' && window.location)
+    ? window.location.origin : ''
   const defaults = {
     decrypt: true,
     verify: false,
