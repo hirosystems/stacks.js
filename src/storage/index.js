@@ -127,21 +127,49 @@ function getGaiaAddress(app: string, username: ?string, zoneFileLookupURL: ?stri
     })
 }
 
+/**
+ * Get the URL for reading a file from an app's data store.
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise} that resolves to the URL or rejects with an error
+ */
+export function getFileUrl(path: string,
+                           options?: { username?: ?string,
+                                       app?: string,
+                                       zoneFileLookupURL?: ?string}): Promise<string> {
+  const appDefault = window.location ? window.location.origin : ''
+  const defaults = {
+    username: null,
+    app: appDefault,
+    zoneFileLookupURL: null
+  }
+  const opt = Object.assign({}, defaults, options)
+
+  if (opt.username) {
+    if (!opt.app) {
+      return Promise.reject(new Error('When passing a username to getFileUrl, you must also supply an app name.'))
+    } else {
+      return getUserAppFileUrl(path, opt.username, opt.app, opt.zoneFileLookupURL)
+    }
+  } else {
+    return getOrSetLocalGaiaHubConnection()
+      .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
+  }
+}
+
 /* Handle fetching the contents from a given path. Handles both
  *  multi-player reads and reads from own storage.
  * @private
  */
 function getFileContents(path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
                          forceText: boolean) : Promise<?string | ?ArrayBuffer> {
-  return Promise.resolve()
-    .then(() => {
-      if (username) {
-        return getUserAppFileUrl(path, username, app, zoneFileLookupURL)
-      } else {
-        return getOrSetLocalGaiaHubConnection()
-          .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
-      }
-    })
+  return getFileUrl(path, { username, app, zoneFileLookupURL })
     .then(readUrl => new Promise((resolve, reject) => {
       if (!readUrl) {
         reject(null)
@@ -314,11 +342,12 @@ export function getFile(path: string, options?: {
     app?: string,
     zoneFileLookupURL?: ?string
   }) {
+  const appDefault = window.location ? window.location.origin : ''
   const defaults = {
     decrypt: true,
     verify: false,
     username: null,
-    app: window.location.origin,
+    app: appDefault,
     zoneFileLookupURL: null
   }
 
