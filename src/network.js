@@ -1043,7 +1043,7 @@ export class InsightClient extends BitcoinNetwork {
   }
 
   broadcastTransaction(transaction: string) {
-    const jsonData = { tx: transaction }
+    const jsonData = { rawtx: transaction }
     return fetch(`${this.apiUrl}/tx/send`,
                  {
                    method: 'POST',
