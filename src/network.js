@@ -49,6 +49,8 @@ export class BlockstackNetwork {
 
   btc: BitcoinNetwork
 
+  MAGIC_BYTES: string
+
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork,
               network: Object = bitcoinjs.networks.bitcoin) {
@@ -60,6 +62,7 @@ export class BlockstackNetwork {
     this.DUST_MINIMUM = 5500
     this.includeUtxoMap = {}
     this.excludeUtxoSet = []
+    this.MAGIC_BYTES = 'id'
   }
 
   coerceAddress(address: string) {
@@ -81,6 +84,17 @@ export class BlockstackNetwork {
 
   getDefaultBurnAddress() {
     return this.coerceAddress('1111111111111111111114oLvT2')
+  }
+
+  getMagicBytes(): string {
+    return this.MAGIC_BYTES
+  }
+
+  setMagicBytes(newMagic: string) {
+    if (newMagic.length !== 2) {
+      throw new Error('Invalid magic bytes')
+    }
+    this.MAGIC_BYTES = newMagic
   }
 
   /**
