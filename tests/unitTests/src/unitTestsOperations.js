@@ -1153,7 +1153,7 @@ function transactionTests() {
   })
 
   test('use alternative magic bytes', (t) => {
-    t.plan(12)
+    t.plan(24)
     setupMocks()
 
     const ns = new transactions.BlockstackNamespace('hello')
@@ -1215,8 +1215,8 @@ function transactionTests() {
         for (let i = 0; i < txs.length; i++) {
           const tx = btc.Transaction.fromHex(txs[i])
           const nullOut = tx.outs[0].script
-          t.equal(Buffer.from(nullOut).toString().substring(2, 4),
-                  network.defaults.MAINNET_DEFAULT.getMagicBytes())
+          t.equal(network.defaults.MAINNET_DEFAULT.getMagicBytes(), 'di')
+          t.equal(Buffer.from(nullOut).toString().substring(2, 4), 'di')
         }
       })
       .then(() => network.defaults.MAINNET_DEFAULT.setMagicBytes('id'))
