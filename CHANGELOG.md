@@ -4,7 +4,12 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [18.1.0] - 2018-10-024
+## [18.1.1] - 2018-11-01
+
+### Added
+- Support for scoped authentication tokens. This allows a Gaia auth token to only be valid for certain 'scopes' of a user's gaia hub.
+
+## [18.1.0] - 2018-10-24
 
 ### Added
 - The `BlockstackWallet` class in `blockstack.js` supports generating
