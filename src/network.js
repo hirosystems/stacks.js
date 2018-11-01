@@ -86,17 +86,6 @@ export class BlockstackNetwork {
     return this.coerceAddress('1111111111111111111114oLvT2')
   }
 
-  getMagicBytes(): string {
-    return this.MAGIC_BYTES
-  }
-
-  setMagicBytes(newMagic: string) {
-    if (newMagic.length !== 2) {
-      throw new Error('Invalid magic bytes')
-    }
-    this.MAGIC_BYTES = newMagic
-  }
-
   /**
    * Get the price of a name via the legacy /v1/prices API endpoint.
    * @param {String} fullyQualifiedName the name to query

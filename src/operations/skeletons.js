@@ -152,7 +152,7 @@ function makeTXbuilder() {
 
 function opEncode(opcode: string): string {
   // NOTE: must *always* a 3-character string
-  const res = `${config.network.getMagicBytes()}${opcode}`
+  const res = `${config.network.MAGIC_BYTES}${opcode}`
   if (res.length !== 3) {
     throw new Error('Runtime error: invalid MAGIC_BYTES')
   }

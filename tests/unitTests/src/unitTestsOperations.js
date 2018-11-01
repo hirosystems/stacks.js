@@ -1165,8 +1165,9 @@ function transactionTests() {
     ns.setNonalphaDiscount(10)
     ns.setNoVowelDiscount(10)
 
-    Promise.resolve().then(() => network.defaults.MAINNET_DEFAULT.setMagicBytes('di'))
-      .then(() => Promise.all([
+    Promise.resolve().then(() => {
+      network.defaults.MAINNET_DEFAULT.MAGIC_BYTES = 'di'
+      return Promise.all([
         transactions.makeNamespacePreorder('hello',
                                            testAddresses[3].address,
                                            testAddresses[2].skHex),
@@ -1210,16 +1211,16 @@ function transactionTests() {
                                        'hello world!',
                                        testAddresses[4].skHex)
       ])
-      )
+    })
       .then((txs) => {
         for (let i = 0; i < txs.length; i++) {
           const tx = btc.Transaction.fromHex(txs[i])
           const nullOut = tx.outs[0].script
-          t.equal(network.defaults.MAINNET_DEFAULT.getMagicBytes(), 'di')
+          t.equal(network.defaults.MAINNET_DEFAULT.MAGIC_BYTES, 'di')
           t.equal(Buffer.from(nullOut).toString().substring(2, 4), 'di')
         }
       })
-      .then(() => network.defaults.MAINNET_DEFAULT.setMagicBytes('id'))
+      .then(() => { network.defaults.MAINNET_DEFAULT.MAGIC_BYTES = 'id' })
   })
         
   test(`broadcastTransaction:
