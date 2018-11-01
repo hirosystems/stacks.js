@@ -97,6 +97,15 @@ export function makeV1GaiaAuthToken(hubInfo: Object,
   return `v1:${token}`
 }
 
+/**
+ * 
+ * @param {string} gaiaHubUrl - the Gaia hub URL you want to connect to
+ * @param {string} challengeSignerHex - a private key used for signing an auth token
+ * @param {string} associationToken - an optional association token to add to your auth token
+ * @param {string} scopes - an optional array of scopes to include which will only allow
+ * this auth token to be used under your specified scopes
+ * @return {Promise} a promise that resolves to a gaia hub config object
+ */
 export function connectToGaiaHub(gaiaHubUrl: string,
                                  challengeSignerHex: string,
                                  associationToken?: string,
