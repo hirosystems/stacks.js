@@ -529,7 +529,7 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
         )
       } else {
         // no more entries -- end of data
-        return Promise.resolve(fileCount)
+        return Promise.resolve(fileCount + entries.length)
       }
     })
 }
