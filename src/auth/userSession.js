@@ -26,6 +26,11 @@ import {
   putFileImpl,
   listFilesImpl
 } from '../storage'
+
+import type {
+  PutFileOptions
+} from '../storage'
+
 import {
   nextHour
 } from '../utils'
@@ -269,10 +274,7 @@ export class UserSession {
    * @return {Promise} that resolves if the operation succeed and rejects
    * if it failed
    */
-  putFile(path: string, content: string | Buffer, options?:{
-    encrypt?: boolean | string,
-    sign?: boolean
-    }) {
+  putFile(path: string, content: string | Buffer, options?: PutFileOptions) {
     return putFileImpl(this, path, content, options)
   }
 

@@ -67,7 +67,10 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
   }
 }
 
-function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string, hubUrl: string): string {
+function makeV1GaiaAuthToken(hubInfo: Object,
+                             signerKeyHex: string,
+                             hubUrl: string,
+                             associationToken?: string): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
                          && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
@@ -82,21 +85,36 @@ function makeV1GaiaAuthToken(hubInfo: Object, signerKeyHex: string, hubUrl: stri
     gaiaChallenge: challengeText,
     hubUrl,
     iss,
-    salt
+    salt,
+    associationToken
   }
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
 }
 
-export function connectToGaiaHub(gaiaHubUrl: string,
-                                 challengeSignerHex: string): Promise<GaiaHubConfig> {
+export function connectToGaiaHub(caller: UserSession,
+                                 gaiaHubUrl: string,
+                                 challengeSignerHex: string,
+                                 associationToken?: string): Promise<GaiaHubConfig> {
+  if (!associationToken) {
+    // maybe given in local storage?
+    try {
+      const userData = caller.loadUserData()
+      if (userData && userData.gaiaAssociationToken) {
+        associationToken = userData.gaiaAssociationToken
+      }
+    } catch (e) {
+      associationToken = undefined
+    }
+  }
+
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   return fetch(`${gaiaHubUrl}/hub_info`)
     .then(response => response.json())
     .then((hubInfo) => {
       const readURL = hubInfo.read_url_prefix
-      const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl)
+      const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
       const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
                                         + (challengeSignerHex.length === 64 ? '01' : '')))
       return {
@@ -127,7 +145,10 @@ export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubC
     userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
   }
 
-  return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey)
+  return connectToGaiaHub(caller,
+                          userData.hubUrl,
+                          userData.appPrivateKey,
+                          userData.associationToken)
     .then((gaiaConfig) => {
       userData.gaiaHubConfig = gaiaConfig
       return gaiaConfig

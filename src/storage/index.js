@@ -20,6 +20,12 @@ import { Logger } from '../logger'
 
 import type { UserSession } from '../auth/userSession'
 
+export type PutFileOptions = {
+  encrypt?: boolean | string,
+  sign?: boolean,
+  contentType?: string
+}
+
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
 /**
@@ -383,24 +389,26 @@ export function getFileImpl(caller: UserSession, path: string, options?: {
  *                                                  or the provided public key
  * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
  *                                         the app private key
+ * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  * @private
  */
-export function putFileImpl(caller: UserSession, path: string, content: string | Buffer, options?: {
-  encrypt?: boolean | string,
-  sign?: boolean
-  }) {
+export function putFileImpl(caller: UserSession,
+                            path: string,
+                            content: string | Buffer,
+                            options?: PutFileOptions) {
   const defaults = {
     encrypt: true,
-    sign: false
+    sign: false,
+    contentType: ''
   }
 
   const opt = Object.assign({}, defaults, options)
 
-  let contentType = 'text/plain'
-  if (typeof (content) !== 'string') {
-    contentType = 'application/octet-stream'
+  let { contentType } = opt
+  if (!contentType) {
+    contentType = (typeof (content) === 'string') ? 'text/plain' : 'application/octet-stream'
   }
 
   // First, let's figure out if we need to get public/private keys,

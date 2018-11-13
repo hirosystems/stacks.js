@@ -1,6 +1,7 @@
 /* @flow */
 
 import bitcoinjs from 'bitcoinjs-lib'
+import BigInteger from 'bigi'
 
 import {
   addUTXOsToFund, DUST_MINIMUM,
@@ -12,8 +13,9 @@ import {
   makeRevokeSkeleton, makeNamespacePreorderSkeleton,
   makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
   makeNameImportSkeleton, makeAnnounceSkeleton,
-  BlockstackNamespace
+  makeTokenTransferSkeleton, BlockstackNamespace
 } from './skeletons'
+
 import { config } from '../config'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
 import { TransactionSigner, PubkeyHashSigner } from './signers'
@@ -24,7 +26,8 @@ const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
 function addOwnerInput(utxos: Object,
                        ownerAddress: string,
                        txB: bitcoinjs.TransactionBuilder,
-                       addChangeOut: boolean = true) {
+                       addChangeOut: boolean = true
+) {
   // add an owner UTXO and a change out.
   if (utxos.length <= 0) {
     throw new Error('Owner has no UTXOs for UPDATE.')
@@ -41,7 +44,8 @@ function addOwnerInput(utxos: Object,
 
 function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: string,
                          utxos: Array<{value: number, tx_hash: string, tx_output_n: number}>,
-                         feeRate: number, inAmounts: number, changeIndex: number | null = null) {
+                         feeRate: number, inAmounts: number, changeIndex: number | null = null
+) {
   // change index for the payer.
   if (changeIndex === null) {
     changeIndex = txB.addOutput(paymentAddress, DUST_MINIMUM)
@@ -55,7 +59,8 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
 }
 
 function returnTransactionHex(txB: bitcoinjs.TransactionBuilder,
-                              buildIncomplete?: boolean = false) {
+                              buildIncomplete?: boolean = false
+) {
   if (buildIncomplete) {
     return txB.buildIncomplete().toHex()
   } else {
@@ -88,7 +93,8 @@ function getTransactionSigner(input: string | TransactionSigner): TransactionSig
 function estimatePreorder(fullyQualifiedName: string,
                           destinationAddress: string,
                           paymentAddress: string,
-                          paymentUtxos: number = 1) : Promise<number> {
+                          paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
   const preorderPromise = network.getNamePrice(fullyQualifiedName)
     .then(namePrice => makePreorderSkeleton(
@@ -122,7 +128,8 @@ function estimateRegister(fullyQualifiedName: string,
                           registerAddress: string,
                           paymentAddress: string,
                           includingZonefile: boolean = false,
-                          paymentUtxos: number = 1) : Promise<number> {
+                          paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
 
   let valueHash
@@ -157,7 +164,8 @@ function estimateRegister(fullyQualifiedName: string,
 function estimateUpdate(fullyQualifiedName: string,
                         ownerAddress: string,
                         paymentAddress: string,
-                        paymentUtxos: number = 1) : Promise<number> {
+                        paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
 
   const updateTX = makeUpdateSkeleton(
@@ -190,7 +198,8 @@ function estimateTransfer(fullyQualifiedName: string,
                           destinationAddress: string,
                           ownerAddress: string,
                           paymentAddress: string,
-                          paymentUtxos: number = 1) : Promise<number> {
+                          paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
 
   const transferTX = makeTransferSkeleton(fullyQualifiedName, dummyConsensusHash,
@@ -225,7 +234,8 @@ function estimateRenewal(fullyQualifiedName: string,
                          ownerAddress: string,
                          paymentAddress: string,
                          includingZonefile: boolean = false,
-                         paymentUtxos: number = 1) : Promise<number> {
+                         paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
 
   let valueHash
@@ -263,7 +273,8 @@ function estimateRenewal(fullyQualifiedName: string,
 function estimateRevoke(fullyQualifiedName: string,
                         ownerAddress: string,
                         paymentAddress: string,
-                        paymentUtxos: number = 1) : Promise<number>  {
+                        paymentUtxos: number = 1
+) : Promise<number>  {
   const network = config.network
   const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
 
@@ -294,7 +305,8 @@ function estimateRevoke(fullyQualifiedName: string,
 function estimateNamespacePreorder(namespaceID: string,
                                    revealAddress: string,
                                    paymentAddress: string,
-                                   paymentUtxos: number = 1) : Promise<number> {
+                                   paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
 
   const preorderPromise = network.getNamespacePrice(namespaceID)
@@ -329,7 +341,8 @@ function estimateNamespacePreorder(namespaceID: string,
 function estimateNamespaceReveal(namespace: BlockstackNamespace,
                                  revealAddress: string,
                                  paymentAddress: string,
-                                 paymentUtxos: number = 1) : Promise<number> {
+                                 paymentUtxos: number = 1
+) : Promise<number> {
   const network = config.network
   const revealTX = makeNamespaceRevealSkeleton(namespace, revealAddress)
 
@@ -352,7 +365,8 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
  * @private
  */
 function estimateNamespaceReady(namespaceID: string,
-                                revealUtxos: number = 1) : Promise<number> {
+                                revealUtxos: number = 1
+) : Promise<number> {
   const network = config.network
   const readyTX = makeNamespaceReadySkeleton(namespaceID)
 
@@ -378,7 +392,8 @@ function estimateNamespaceReady(namespaceID: string,
 function estimateNameImport(name: string,
                             recipientAddr: string,
                             zonefileHash: string,
-                            importUtxos: number = 1) : Promise<number> {
+                            importUtxos: number = 1
+) : Promise<number> {
   const network = config.network
   const importTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
 
@@ -400,7 +415,8 @@ function estimateNameImport(name: string,
  * @private
  */
 function estimateAnnounce(messageHash: string,
-                          senderUtxos: number = 1) : Promise<number> {
+                          senderUtxos: number = 1
+) : Promise<number> {
   const network = config.network
   const announceTX = makeAnnounceSkeleton(messageHash)
 
@@ -408,6 +424,39 @@ function estimateAnnounce(messageHash: string,
     .then((feeRate) => {
       const outputsValue = sumOutputValues(announceTX)
       const txFee = feeRate * estimateTXBytes(announceTX, senderUtxos, 1)
+      return txFee + outputsValue
+    })
+}
+
+/**
+ * Estimates the cost of a token-transfer transaction
+ * @param {String} recipientAddress - the recipient of the tokens
+ * @param {String} tokenType - the type of token to spend
+ * @param {Object} tokenAmount - a 64-bit unsigned BigInteger encoding the number of tokens
+ *   to spend
+ * @param {String} scratchArea - an arbitrary string to store with the transaction
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @param {Number} additionalOutputs - the number of outputs we expect to add beyond
+ *  just the recipient output (default = 1, if the token owner is also the bitcoin funder)
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *  fund this token-transfer transaction
+ */
+function estimateTokenTransfer(recipientAddress: string,
+                               tokenType: string,
+                               tokenAmount: BigInteger,
+                               scratchArea: string,
+                               senderUtxos: number = 1,
+                               additionalOutputs: number = 1
+) {
+  const network = config.network
+  const tokenTransferTX = makeTokenTransferSkeleton(
+    recipientAddress, dummyConsensusHash, tokenType, tokenAmount, scratchArea)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(tokenTransferTX)
+      const txFee = feeRate * estimateTXBytes(tokenTransferTX, senderUtxos, additionalOutputs)
       return txFee + outputsValue
     })
 }
@@ -430,7 +479,8 @@ function estimateAnnounce(messageHash: string,
 function makePreorder(fullyQualifiedName: string,
                       destinationAddress: string,
                       paymentKeyIn: string | TransactionSigner,
-                      buildIncomplete?: boolean = false) {
+                      buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const namespace = fullyQualifiedName.split('.').pop()
@@ -487,7 +537,8 @@ function makeUpdate(fullyQualifiedName: string,
                     paymentKeyIn: string | TransactionSigner,
                     zonefile: string,
                     valueHash: string = '',
-                    buildIncomplete?: boolean = false) {
+                    buildIncomplete?: boolean = false
+) {
   const network = config.network
   if (!valueHash && !zonefile) {
     return Promise.reject(
@@ -561,7 +612,8 @@ function makeRegister(fullyQualifiedName: string,
                       paymentKeyIn: string | TransactionSigner,
                       zonefile: ?string = null,
                       valueHash: ?string = null,
-                      buildIncomplete?: boolean = false) {
+                      buildIncomplete?: boolean = false
+) {
   const network = config.network
   if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
@@ -616,7 +668,8 @@ function makeTransfer(fullyQualifiedName: string,
                       ownerKeyIn: string | TransactionSigner,
                       paymentKeyIn: string | TransactionSigner,
                       keepZonefile: boolean = false,
-                      buildIncomplete?: boolean = false) {
+                      buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
@@ -667,7 +720,8 @@ function makeTransfer(fullyQualifiedName: string,
 function makeRevoke(fullyQualifiedName: string,
                     ownerKeyIn: string | TransactionSigner,
                     paymentKeyIn: string | TransactionSigner,
-                    buildIncomplete?: boolean = false) {
+                    buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
@@ -721,7 +775,8 @@ function makeRenewal(fullyQualifiedName: string,
                      paymentKeyIn: string | TransactionSigner,
                      zonefile: ?string = null,
                      valueHash: ?string = null,
-                     buildIncomplete?: boolean = false) {
+                     buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   if (!valueHash && !!zonefile) {
@@ -790,7 +845,8 @@ function makeRenewal(fullyQualifiedName: string,
 function makeNamespacePreorder(namespaceID: string,
                                revealAddress: string,
                                paymentKeyIn: string | TransactionSigner,
-                               buildIncomplete?: boolean = false) {
+                               buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
@@ -800,8 +856,7 @@ function makeNamespacePreorder(namespaceID: string,
                                          network.getNamespacePrice(namespaceID)])
       .then(([consensusHash, namespacePrice]) => makeNamespacePreorderSkeleton(
         namespaceID, consensusHash, preorderAddress, revealAddress,
-        namespacePrice
-      ))
+        namespacePrice))
 
     return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
       .then(([utxos, feeRate, preorderSkeleton]) => {
@@ -837,7 +892,8 @@ function makeNamespacePreorder(namespaceID: string,
 function makeNamespaceReveal(namespace: BlockstackNamespace,
                              revealAddress: string,
                              paymentKeyIn: string | TransactionSigner,
-                             buildIncomplete?: boolean = false) {
+                             buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   if (!namespace.check()) {
@@ -878,7 +934,8 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
  */
 function makeNamespaceReady(namespaceID: string,
                             revealKeyIn: string | TransactionSigner,
-                            buildIncomplete?: boolean = false) {
+                            buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const namespaceReadyTX = makeNamespaceReadySkeleton(namespaceID)
@@ -916,7 +973,8 @@ function makeNameImport(name: string,
                         recipientAddr: string,
                         zonefileHash: string,
                         importerKeyIn: string | TransactionSigner,
-                        buildIncomplete?: boolean = false) {
+                        buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const nameImportTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
@@ -951,7 +1009,8 @@ function makeNameImport(name: string,
  */
 function makeAnnounce(messageHash: string,
                       senderKeyIn: string | TransactionSigner,
-                      buildIncomplete?: boolean = false) {
+                      buildIncomplete?: boolean = false
+) {
   const network = config.network
 
   const announceTX = makeAnnounceSkeleton(messageHash)
@@ -966,6 +1025,68 @@ function makeAnnounce(messageHash: string,
         return signInputs(signingTxB, senderKey)
       })
   )
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
+}
+
+/**
+ * Generates a token-transfer transaction
+ * @param {String} recipientAddress - the address to receive the tokens
+ * @param {String} tokenType - the type of tokens to send
+ * @param {Object} tokenAmount - the BigInteger encoding of an unsigned 64-bit number of
+ *  tokens to send
+ * @param {String} scratchArea - an arbitrary string to include with the transaction
+ * @param {String | TransactionSigner} senderKeyIn - the hex-encoded private key to send
+ *   the tokens
+ * @param {String | TransactionSigner} btcFunderKeyIn - the hex-encoded private key to fund
+ *   the bitcoin fees for the transaction. Optional -- if not passed, will attempt to
+ *   fund with sender key.
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *   indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *   transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * This function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+function makeTokenTransfer(recipientAddress: string, tokenType: string,
+                           tokenAmount: BigInteger, scratchArea: string,
+                           senderKeyIn: string | TransactionSigner,
+                           btcFunderKeyIn?: string | TransactionSigner,
+                           buildIncomplete?: boolean = false
+) {
+  const network = config.network
+  const separateFunder = !!btcFunderKeyIn
+
+  const senderKey = getTransactionSigner(senderKeyIn)
+  const btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey
+
+  const txPromise = network.getConsensusHash()
+    .then(consensusHash =>  makeTokenTransferSkeleton(
+      recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
+
+  return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
+    .then(([senderAddress, btcAddress]) => {
+      const btcUTXOsPromise = separateFunder
+        ? network.getUTXOs(btcAddress) : Promise.resolve([])
+      const networkPromises = [network.getUTXOs(senderAddress),
+                               btcUTXOsPromise,
+                               network.getFeeRate(),
+                               txPromise]
+      return Promise.all(networkPromises)
+        .then(([senderUTXOs, btcUTXOs, feeRate, tokenTransferTX]) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+
+          if (separateFunder) {
+            const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
+            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
+            return signInputs(signingTxB, btcKey,
+                              [{ index: payerInput.index, signer: senderKey }])
+          } else {
+            const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
+            return signInputs(signingTxB, senderKey)
+          }
+        })
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
@@ -996,7 +1117,8 @@ function makeAnnounce(messageHash: string,
 function makeBitcoinSpend(destinationAddress: string,
                           paymentKeyIn: string | TransactionSigner,
                           amount: number,
-                          buildIncomplete?: boolean = false) {
+                          buildIncomplete?: boolean = false
+) {
   if (amount <= 0) {
     return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
   }
@@ -1009,6 +1131,7 @@ function makeBitcoinSpend(destinationAddress: string,
     paymentAddress => Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
       .then(([utxos, feeRate]) => {
         const txB = new bitcoinjs.TransactionBuilder(network.layer1)
+        txB.setVersion(1)
         const destinationIndex = txB.addOutput(destinationAddress, 0)
 
         // will add utxos up to _amount_ and return the amount of leftover _change_
@@ -1063,6 +1186,7 @@ export const transactions = {
   makeBitcoinSpend,
   makeNameImport,
   makeAnnounce,
+  makeTokenTransfer,
   BlockstackNamespace,
   estimatePreorder,
   estimateRegister,
@@ -1074,5 +1198,6 @@ export const transactions = {
   estimateNamespaceReveal,
   estimateNamespaceReady,
   estimateNameImport,
-  estimateAnnounce
+  estimateAnnounce,
+  estimateTokenTransfer
 }

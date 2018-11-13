@@ -8,6 +8,7 @@ import { runStorageTests }      from './unitTestsStorage'
 import { runOperationsTests }   from './unitTestsOperations'
 import { runWalletTests }       from './unitTestsWallet'
 import { runErrorsTests }       from './unitTestsErrors'
+import { runNetworkTests }      from './unitTestsNetwork'
 
 // Utils tests
 runUtilsTests()
@@ -34,3 +35,6 @@ runWalletTests()
 
 // Errors Tests
 runErrorsTests()
+
+// network tests 
+runNetworkTests()
