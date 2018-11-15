@@ -32,13 +32,13 @@ class LinkedIn extends Service {
 
   static getProofIdentity(searchText: string) {
     const $ = cheerio.load(searchText)
-    const profileLink = $('article').find('.post-meta__profile-link')
+    const profileLink = $('.author-profile__view-profile')
 
     if (profileLink !== undefined) {
       if (profileLink.attr('href') === undefined) {
         return ''
       }
-      return profileLink.attr('href').split('/').pop()
+      return profileLink.attr('href').split('/').pop().split('?')[0]
     } else {
       return ''
     }
@@ -46,7 +46,7 @@ class LinkedIn extends Service {
 
   static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
-    const postContent = $('article').find('.commentary')
+    const postContent = $('.share-update-card__update-text')
     let statement = ''
 
     if (postContent !== undefined) {
