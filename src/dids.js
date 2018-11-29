@@ -1,5 +1,5 @@
 import { InvalidDIDError } from './errors'
-
+console.log('test')
 export function makeDIDFromAddress(address) {
   return `did:btc-addr:${address}`
 }

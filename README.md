@@ -19,9 +19,9 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
     $ npm install blockstack
 
 OR
-doesnt work with merge, try push
+
 ```html
-<script src="https://raw.githubusercontent.com/blockstack/blockstack.js/master/dist/blockstack.js"></script>
+<script src="https://s3.amazonaws.com/mini.blockstack.js/blockstack.min.js"></script>
 ```
 
 ## About
