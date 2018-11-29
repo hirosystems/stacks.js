@@ -1,5 +1,5 @@
 import { InvalidDIDError } from './errors'
-console.log('test')
+
 export function makeDIDFromAddress(address) {
   return `did:btc-addr:${address}`
 }
@@ -10,7 +10,7 @@ export function makeDIDFromPublicKey(publicKey) {
 
 export function getDIDType(decentralizedID) {
   const didParts = decentralizedID.split(':')
-  
+
   if (didParts.length !== 3) {
     throw new InvalidDIDError('Decentralized IDs must have 3 parts')
   }

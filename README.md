@@ -21,7 +21,7 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 OR
 
 ```html
-<script src="https://s3.amazonaws.com/mini.blockstack.js/blockstack.min.js"></script>
+<script src="https://s3.amazonaws.com/mini.blockstack.js/mini-blockstack-js/blockstack.min.js"></script>
 ```
 
 ## About
