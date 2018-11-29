@@ -18,6 +18,10 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
     $ npm install blockstack
 
+    OR
+
+    $ <script src="https://raw.githubusercontent.com/blockstack/blockstack.js/master/dist/blockstack.js"></script>
+
 ## About
 
 Blockstack JS is a library for profiles/identity, authentication, and storage.
