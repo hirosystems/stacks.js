@@ -18,9 +18,11 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 
     $ npm install blockstack
 
-    OR
+OR
 
-    $ <script src="https://raw.githubusercontent.com/blockstack/blockstack.js/master/dist/blockstack.js"></script>
+```html
+<script src="https://raw.githubusercontent.com/blockstack/blockstack.js/master/dist/blockstack.js"></script>
+```
 
 ## About
 
