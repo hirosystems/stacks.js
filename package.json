@@ -1,15 +1,14 @@
 {
   "name": "blockstack",
-  "version": "18.1.0",
+  "version": "18.1.1",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "scripts": {
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "uglify": "./node_modules/.bin/uglifyjs ./dist/blockstack.es5.js --compress --mangle reserved=['BigInteger','ECPair','Point'] --output ./dist/blockstack.min.js",
+    "terse": "./node_modules/.bin/terser --compress --mangle reserved=['BigInteger','ECPair','Point'] --output ./dist/blockstack.min.js ./dist/blockstack.js",
     "compile": "rm -rf lib; babel src -d lib",
     "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; rm -rf test/operationsTests/lib; babel tests/unitTests/src -d tests/unitTests/lib; babel tests/authTests/src -d tests/authTests/lib; babel tests/operationsTests/src -d tests/operationsTests/lib;",
-    "transpile": "./node_modules/.bin/babel ./dist/blockstack.js --out-file ./dist/blockstack.es5.js",
     "prepare": "npm run compile",
     "prepublishOnly": "npm run build",
     "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
@@ -17,7 +16,7 @@
     "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
     "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
-    "build": "npm run build-documentation && npm run compile && npm run browserify && npm run transpile && npm run uglify",
+    "build": "npm run build-documentation && npm run compile && npm run browserify && npm run terse",
     "flow": "flow",
     "lint": "eslint src && eslint tests",
     "test": "nyc --reporter=text npm run unit-test",
@@ -106,7 +105,7 @@
     "sinon": "^4.2.1",
     "tape": "^4.6.3",
     "tape-promise": "^2.0.1",
-    "uglify-js": "^3.4.9"
+    "terser": "^3.10.12"
   },
   "dependencies": {
     "ajv": "^4.11.5",
