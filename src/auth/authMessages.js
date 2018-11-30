@@ -43,6 +43,9 @@ type AuthMetadata = {
  * @param {Array<String>} scopes - the permissions this app is requesting
  * @param {String} appDomain - the origin of this app
  * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
  * @return {String} the authentication request
  */
 export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTransitKey(),
@@ -50,9 +53,10 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
                                 manifestURI: string = `${window.location.origin}/manifest.json`,
                                 scopes: Array<String> = DEFAULT_SCOPE,
                                 appDomain: string = window.location.origin,
-                                expiresAt: number = nextHour().getTime()): string {
+                                expiresAt: number = nextHour().getTime(),
+                                extraParams: Object = {}): string {
   /* Create the payload */
-  const payload = {
+  const payload = Object.assign({}, extraParams, {
     jti: makeUUID4(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
@@ -65,7 +69,7 @@ export function makeAuthRequest(transitPrivateKey: string = generateAndStoreTran
     do_not_include_profile: true,
     supports_hub_url: true,
     scopes
-  }
+  })
 
   Logger.info(`blockstack.js: generating v${VERSION} auth request`)
 
