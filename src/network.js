@@ -11,6 +11,9 @@ type UTXO = { value?: number,
               tx_hash: string,
               tx_output_n: number }
 
+const MICROSTACKS_PER_SATOSHI_NUM = 650
+const MICROSTACKS_PER_SATOSHI_DEN = 15
+
 const SATOSHIS_PER_BTC = 1e8
 const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
@@ -227,16 +230,28 @@ export class BlockstackNetwork {
   /**
    * Get the price of a name.
    * @param {String} fullyQualifiedName the name to query
+   * @param {boolean} forceStacks - return stacks price, even if natively BTC
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }, where
    *   .units encodes the cryptocurrency units to pay (e.g. BTC, STACKS), and
    *   .amount encodes the number of units, in the smallest denominiated amount
-   *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
+   *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS,
    *   .amount will be microStacks)
    */
-  getNamePrice(fullyQualifiedName: string) : Promise<*> {
-    // handle v1 or v2 
+  getNamePrice(fullyQualifiedName: string, forceStacks?: boolean = false) : Promise<*> {
+    // handle v1 or v2
     return Promise.resolve().then(() => this.getNamePriceV2(fullyQualifiedName))
       .catch(() => this.getNamePriceV1(fullyQualifiedName))
+      .then((nativePrice) => {
+        if (forceStacks && nativePrice.units === 'BTC') {
+          return {
+            units: 'STACKS',
+            amount: nativePrice.amount.multiply(bigi.valueOf(MICROSTACKS_PER_SATOSHI_NUM))
+              .divide(bigi.valueOf(MICROSTACKS_PER_SATOSHI_DEN)).add(bigi.ONE)
+          }
+        } else {
+          return nativePrice
+        }
+      })
   }
 
   /**

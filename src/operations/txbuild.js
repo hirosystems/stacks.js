@@ -471,6 +471,7 @@ function estimateTokenTransfer(recipientAddress: string,
  * @param {boolean} buildIncomplete - optional boolean, defaults to false,
  * indicating whether the function should attempt to return an unsigned (or not fully signed)
  * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @param {boolean} forceStacks - use stacks price, even if natively BTC
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
@@ -479,7 +480,8 @@ function estimateTokenTransfer(recipientAddress: string,
 function makePreorder(fullyQualifiedName: string,
                       destinationAddress: string,
                       paymentKeyIn: string | TransactionSigner,
-                      buildIncomplete?: boolean = false
+                      buildIncomplete?: boolean = false,
+                      forceStacks?: boolean = false
 ) {
   const network = config.network
 
@@ -489,7 +491,7 @@ function makePreorder(fullyQualifiedName: string,
 
   return paymentKey.getAddress().then((preorderAddress) => {
     const preorderPromise = Promise.all([network.getConsensusHash(),
-                                         network.getNamePrice(fullyQualifiedName),
+                                         network.getNamePrice(fullyQualifiedName, forceStacks),
                                          network.getNamespaceBurnAddress(namespace)])
       .then(([consensusHash, namePrice, burnAddress]) => makePreorderSkeleton(
         fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
