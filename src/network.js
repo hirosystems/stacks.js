@@ -310,7 +310,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to the WHOIS-like information 
    */
   getNameInfo(fullyQualifiedName: string) {
-    console.log(this.blockstackAPIUrl)
+    Logger.debug(this.blockstackAPIUrl)
     const nameLookupURL = `${this.blockstackAPIUrl}/v1/names/${fullyQualifiedName}`
     return fetch(nameLookupURL)
       .then((resp) => {
@@ -323,7 +323,7 @@ export class BlockstackNetwork {
         }
       })
       .then((nameInfo) => {
-        console.log(`nameInfo: ${JSON.stringify(nameInfo)}`)
+        Logger.debug(`nameInfo: ${JSON.stringify(nameInfo)}`)
         // the returned address _should_ be in the correct network ---
         //  blockstackd gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
