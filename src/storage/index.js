@@ -381,7 +381,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
 
   let { contentType } = opt
   if (!contentType) {
-    contentType = (typeof (content) === 'string') ? 'text/plain' : 'application/octet-stream'
+    contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
   }
 
   // First, let's figure out if we need to get public/private keys,
