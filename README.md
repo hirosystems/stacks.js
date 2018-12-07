@@ -66,7 +66,7 @@ functionality so that we can make sure your contribution can be included!
 
 ## Maintainer
 
-This repository is maintained by [larry.id](https://explorer.blockstack.org/name/larry.id).
+This repository is maintained by [yukan.id](https://explorer.blockstack.org/name/yukan.id).
 
 ## Testing
 
