@@ -104357,6 +104357,7 @@ function (_Error) {
 
     _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "parameter", void 0);
 
+    _this.message = error.message;
     _this.code = error.code;
     _this.parameter = error.parameter ? error.parameter : null;
     return _this;
