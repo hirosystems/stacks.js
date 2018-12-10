@@ -7,10 +7,10 @@ import {
   uploadToGaiaHub, getFullReadUrl,
   connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
   getBucketUrl
-} from '../../../lib/storage/hub'
-import { getFile, encryptContent, decryptContent } from '../../../lib/storage'
-import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
-import { getPublicKeyFromPrivate } from '../../../lib/keys'
+} from '../../../src/storage/hub'
+import { getFile, encryptContent, decryptContent } from '../../../src/storage'
+import { BLOCKSTACK_STORAGE_LABEL } from '../../../src/auth/authConstants'
+import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 class LocalStorage {
   constructor() {
@@ -54,7 +54,7 @@ export function runStorageTests() {
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -84,7 +84,7 @@ export function runStorageTests() {
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
     const getFullReadUrl2 = sinon.stub().resolves(fullReadUrl)
 
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl2 }
     })
 
@@ -270,7 +270,7 @@ export function runStorageTests() {
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
 
@@ -299,10 +299,10 @@ export function runStorageTests() {
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -351,10 +351,10 @@ export function runStorageTests() {
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -402,10 +402,10 @@ export function runStorageTests() {
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -468,10 +468,10 @@ export function runStorageTests() {
       }
     )
 
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl },
       '../profiles': { lookupProfile }
     })
@@ -580,10 +580,10 @@ export function runStorageTests() {
       }
     )
 
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFile } = proxyquire('../../../lib/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl },
       '../profiles': { lookupProfile }
     })
@@ -682,7 +682,7 @@ export function runStorageTests() {
       url_prefix: 'gaia.testblockstack.org/hub/'
     }
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFile } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection }
     })
 
@@ -876,7 +876,7 @@ export function runStorageTests() {
 
     const lookupProfile = sinon.stub().resolves(profile)
 
-    const { getUserAppFileUrl } = proxyquire('../../../lib/storage', {
+    const { getUserAppFileUrl } = proxyquire('../../../src/storage', {
       '../profiles': { lookupProfile }
     })
 
@@ -911,7 +911,7 @@ export function runStorageTests() {
     })
 
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
-    const { listFiles } = proxyquire('../../../lib/storage', {
+    const { listFiles } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection }
     })
 

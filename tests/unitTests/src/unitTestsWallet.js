@@ -2,7 +2,7 @@ import test from 'tape-promise/tape'
 
 import {
   BlockstackWallet
-} from '../../../lib'
+} from '../../../src'
 
 function testsBlockstackWallet() {
   const testSeedHex = 'f17a104387a5b9c67d7c1c17a1a4724a16fdf830e5bbd6fdd214c0e08d9530aeb'

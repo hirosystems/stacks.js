@@ -4,7 +4,7 @@ import elliptic from 'elliptic'
 import {
   encryptECIES, decryptECIES, getHexFromBN, signECDSA,
   verifyECDSA,  encryptMnemonic, decryptMnemonic
-} from '../../../lib/encryption'
+} from '../../../src/encryption'
 
 
 export function runEncryptionTests() {

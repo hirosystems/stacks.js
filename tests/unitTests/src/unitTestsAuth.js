@@ -24,9 +24,9 @@ import {
   signUserOut,
   config,
   loadUserData
-} from '../../../lib'
+} from '../../../src'
 
-import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../lib/auth/authConstants'
+import { BLOCKSTACK_APP_PRIVATE_KEY_LABEL } from '../../../src/auth/authConstants'
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
 

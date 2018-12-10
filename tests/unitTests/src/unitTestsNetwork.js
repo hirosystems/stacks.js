@@ -2,7 +2,7 @@ import test from 'tape'
 import FetchMock from 'fetch-mock'
 import bigi from 'bigi'
 
-import { network } from '../../../lib'
+import { network } from '../../../src'
 
 const mynet = new network.BlockstackNetwork(
   'https://core.blockstack.org',

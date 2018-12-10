@@ -4,7 +4,7 @@
 import {
   getCoreSession,
   makeAuthRequest
-} from '../../../lib'
+} from '../../../src'
 
 const assert = require('assert')
 const jsontokens = require('jsontokens')
