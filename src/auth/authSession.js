@@ -67,7 +67,7 @@ export function sendCoreSessionRequest(coreHost: string,
                                        corePort: number,
                                        coreAuthRequest: string,
                                        apiPassword: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     if (!apiPassword) {
       reject('Missing API password')
       return null

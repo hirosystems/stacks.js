@@ -77,7 +77,7 @@ export function doPublicKeysMatchIssuer(token: string) {
  */
 export function doPublicKeysMatchUsername(token: string,
                                           nameLookupURL: string) {
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     const payload = decodeToken(token).payload
 
     if (!payload.username) {
@@ -212,7 +212,7 @@ export function isRedirectUriValid(token: string) {
  *  @private
  */
 export function verifyAuthRequest(token: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<boolean>((resolve, reject) => {
     if (decodeToken(token).header.alg === 'none') {
       reject('Token must be signed in order to be verified')
     }
@@ -243,7 +243,7 @@ export function verifyAuthRequest(token: string) {
  * @private
  */
 export function verifyAuthRequestAndLoadManifest(token: string) {
-  return new Promise((resolve, reject) => verifyAuthRequest(token)
+  return new Promise<any>((resolve, reject) => verifyAuthRequest(token)
     .then((valid) => {
       if (valid) {
         return fetchAppManifest(token)
@@ -269,7 +269,7 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
  * @private
  */
 export function verifyAuthResponse(token: string, nameLookupURL: string) {
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     Promise.all([
       isExpirationDateValid(token),
       isIssuanceDateValid(token),

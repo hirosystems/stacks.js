@@ -5,12 +5,11 @@ import {
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
   BLOCKSTACK_GAIA_HUB_LABEL, type GaiaHubConfig
 } from './hub'
-// export { type GaiaHubConfig } from './hub'
 
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
 } from '../encryption'
-import { loadUserData } from '../auth'
+import { loadUserData } from '../auth/authApp'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 

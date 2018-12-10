@@ -1,6 +1,63 @@
-export * from './auth'
-export * from './profiles'
-export * from './storage'
+export {
+  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
+  getAuthResponseToken, isSignInPending,
+  handlePendingSignIn, loadUserData, signUserOut,
+  generateAndStoreTransitKey, getTransitKey
+} from './auth/authApp'
+
+export {
+  makeAuthRequest, makeAuthResponse
+} from './auth/authMessages'
+
+export {
+  getAuthRequestFromURL, fetchAppManifest, redirectUserToApp
+} from './auth/authProvider'
+
+export {
+  makeCoreSessionRequest, sendCoreSessionRequest, getCoreSession
+} from './auth/authSession'
+
+export {
+  verifyAuthRequest, verifyAuthResponse,
+  isExpirationDateValid, isIssuanceDateValid, doPublicKeysMatchUsername,
+  doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
+  isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
+} from './auth/authVerification'
+
+export {
+  Profile
+} from './profiles/profile'
+
+export { 
+  Person, Organization, CreativeWork, resolveZoneFileToPerson
+} from './profiles/profileSchemas'
+
+export {
+  signProfileToken, wrapProfileToken, verifyProfileToken, extractProfile
+} from './profiles/profileTokens'
+
+export {
+  validateProofs
+} from './profiles/profileProofs'
+
+export {
+  profileServices, containsValidProofStatement, containsValidAddressProofStatement
+} from './profiles/services'
+
+export {
+  makeProfileZoneFile, getTokenFileUrl, resolveZoneFileToProfile
+} from './profiles/profileZoneFiles'
+
+export {
+  lookupProfile
+} from './profiles/profileLookup'
+
+export { 
+  BLOCKSTACK_GAIA_HUB_LABEL, getUserAppFileUrl, getAppBucketUrl, 
+  connectToGaiaHub, uploadToGaiaHub, 
+  listFiles, deleteFile, putFile, getFile, 
+  decryptContent, encryptContent
+} from './storage'
 
 export {
   makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID

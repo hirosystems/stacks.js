@@ -23,7 +23,7 @@ export function validateProofs(profile: Object,
   if (profile.hasOwnProperty('account')) {
     accounts = profile.account
   } else {
-    return new Promise((resolve) => {
+    return new Promise<Array<any>>((resolve) => {
       resolve([])
     })
   }

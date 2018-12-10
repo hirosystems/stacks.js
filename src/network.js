@@ -257,7 +257,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to the number of blocks
    */
   getGracePeriod() {
-    return new Promise(resolve => resolve(5000))
+    return new Promise<number>(resolve => resolve(5000))
   }
 
   /**
