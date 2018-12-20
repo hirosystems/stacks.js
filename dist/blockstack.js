@@ -344,7 +344,7 @@ var _encryption = require('../encryption');
 
 var _logger = require('../logger');
 
-var VERSION = '1.3.0';
+var VERSION = '1.3.1';
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -363,6 +363,9 @@ var VERSION = '1.3.0';
  * @param {Array<String>} scopes - the permissions this app is requesting
  * @param {String} appDomain - the origin of this app
  * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
  * @return {String} the authentication request
  */
 function makeAuthRequest() {
@@ -372,9 +375,10 @@ function makeAuthRequest() {
   var scopes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _authConstants.DEFAULT_SCOPE;
   var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
   var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _index.nextHour)().getTime();
+  var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
 
   /* Create the payload */
-  var payload = {
+  var payload = Object.assign({}, extraParams, {
     jti: (0, _index.makeUUID4)(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
@@ -387,7 +391,7 @@ function makeAuthRequest() {
     do_not_include_profile: true,
     supports_hub_url: true,
     scopes: scopes
-  };
+  });
 
   _logger.Logger.info('blockstack.js: generating v' + VERSION + ' auth request');
 
@@ -13027,7 +13031,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -13052,7 +13056,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -54283,7 +54287,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -54307,7 +54311,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -62625,7 +62629,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -62653,7 +62657,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -75739,7 +75743,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -75763,7 +75767,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"

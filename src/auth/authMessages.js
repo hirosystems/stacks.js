@@ -19,7 +19,7 @@ import { encryptECIES, decryptECIES } from '../encryption'
 
 import { Logger } from '../logger'
 
-const VERSION = '1.3.0'
+const VERSION = '1.3.1'
 
 type AuthMetadata = {
   email: ?string,
