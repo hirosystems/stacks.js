@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If `window` and `window.location` is not set (e.g., you are running outside
   a browser context), `getFile` is now usable for multi-player reads.
 
+## [18.2.0] - 2018-12-20
+
+### Added
+
+- Added an extra parameter to `makeAuthRequest`, called `extraParams`. This is a wildcard object, 
+and all keys and values included in this argument will be included in the `payload` of
+an `authRequest`.
+- `authRequest` version bumped to `1.3.1` from `1.3.0`.
+
 ## [18.1.0] - 2018-10-24
 
 ### Added

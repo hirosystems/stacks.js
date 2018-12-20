@@ -49,6 +49,8 @@ export class BlockstackNetwork {
 
   btc: BitcoinNetwork
 
+  MAGIC_BYTES: string
+
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork,
               network: Object = bitcoinjs.networks.bitcoin) {
@@ -60,6 +62,7 @@ export class BlockstackNetwork {
     this.DUST_MINIMUM = 5500
     this.includeUtxoMap = {}
     this.excludeUtxoSet = []
+    this.MAGIC_BYTES = 'id'
   }
 
   coerceAddress(address: string) {
