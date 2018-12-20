@@ -8614,7 +8614,7 @@ function putFile(path, content, options) {
   var contentType = opt.contentType;
 
   if (!contentType) {
-    contentType = typeof content === 'string' ? 'text/plain' : 'application/octet-stream';
+    contentType = typeof content === 'string' ? 'text/plain; charset=utf-8' : 'application/octet-stream';
   }
 
   // First, let's figure out if we need to get public/private keys,
@@ -13031,7 +13031,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -13056,7 +13056,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -54287,7 +54287,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -54311,7 +54311,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -62629,7 +62629,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -62657,7 +62657,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -75743,7 +75743,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -75767,7 +75767,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
