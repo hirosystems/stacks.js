@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If `window` and `window.location` is not set (e.g., you are running outside
   a browser context), `getFile` is now usable for multi-player reads.
 
-## [18.1.0] - 2018-10-024
+## [18.1.0] - 2018-10-24
 
 ### Added
 - The `BlockstackWallet` class in `blockstack.js` supports generating
