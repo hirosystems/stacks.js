@@ -1,3 +1,19 @@
+import queryString from 'query-string'
+
+// HACK - Redirect back to the authentication flow when the protocol-echo reply is detected.
+// Putting in here so it executes ASAP. There is probably a better place to put this.
+const queryDict = queryString.parse(location.search)
+// If echoReply is in the query string then this page was only opened to signal
+// the originating tab that the protocol handler is installed. 
+if (queryDict.echoReply) {
+  // Use localStorage to notify originated tab that protocol handler is available and working.
+  const echoReplyKey = `echo-reply-${queryDict.echoReply}`
+  window.localStorage.setItem(echoReplyKey, 'success')
+  // Redirect back to the localhost auth url, as opposed to another protocol launch.
+  // This will re-use the same tab rather than creating another useless one.
+  window.location = decodeURIComponent(queryDict.authContinuation)
+}
+
 export {
   isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
   getAuthResponseToken, isSignInPending,

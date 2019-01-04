@@ -1,7 +1,7 @@
 /* @flow */
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import protocolCheck from 'custom-protocol-detection-blockstack'
+// import protocolCheck from 'custom-protocol-detection-blockstack'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID, makeECPrivateKey } from '../index'
@@ -33,7 +33,7 @@ const DEFAULT_PROFILE = {
  * @return {String} the hex encoded private key
  * @private
  */
-export function getTransitKey() : string {
+export function getTransitKey(): string {
   const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
   return ((transitKey: any): string)
 }
@@ -84,23 +84,33 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
     return
   }
 
-  function successCallback() {
-    Logger.info('protocol handler detected')
-    // protocolCheck should open the link for us
-  }
-
-  function failCallback() {
-    Logger.warn('protocol handler not detected')
+  // Wait 2000ms for custom protocol to auth otherwise redirect to web auth.
+  const redirectToWebAuthTimer = window.setTimeout(() => {
+    // Custom protocol handler not detected. Redirect to web auth..
     window.location = httpsURI
-  }
+  }, 2000)
 
-  function unsupportedBrowserCallback() {
-    // Safari is unsupported by protocolCheck
-    Logger.warn('can not detect custom protocols on this browser')
-    window.location = protocolURI
+  // Listen for the custom protocol echo reply using localStorage as a cross-window communication technique.
+  const echoReplyID = Math.random().toString(36).substr(2, 9)
+  const echoReplyKey = `echo-reply-${echoReplyID}`
+  const replyEventListener = (event) => {
+    if (event.key === echoReplyKey) {
+      // Custom protocol worked. Cancel the web auth timer and other cleanup.
+      window.clearTimeout(redirectToWebAuthTimer)
+      window.removeEventListener('storage', replyEventListener)
+      window.localStorage.removeItem(echoReplyKey)
+    }
   }
+  window.addEventListener('storage', replyEventListener, false)
 
-  protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
+  // Use iframe for launching the protocol rather than window.location since
+  // it prevents browsers from opening prompts or blank tabs.
+  const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
+  // window.location = locationSrc
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = locationSrc
+  document.body.appendChild(iframe)
 }
 
 /**
