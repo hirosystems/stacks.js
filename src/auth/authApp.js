@@ -1,7 +1,6 @@
 /* @flow */
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import protocolCheck from 'custom-protocol-detection-blockstack'
 import { makeAuthRequest, verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID, makeECPrivateKey } from '../index'
@@ -74,7 +73,6 @@ export function isUserSignedIn() {
 export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRequest(),
                                                 blockstackIDHost: string =
                                                 DEFAULT_BLOCKSTACK_HOST) {
-  const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
   // If they're on a mobile OS, always redirect them to HTTPS site
@@ -84,23 +82,49 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
     return
   }
 
-  function successCallback() {
-    Logger.info('protocol handler detected')
-    // protocolCheck should open the link for us
-  }
-
-  function failCallback() {
-    Logger.warn('protocol handler not detected')
+  // Wait 2000ms for custom protocol to auth otherwise redirect to web auth.
+  const redirectToWebAuthTimer = window.setTimeout(() => {
+    // Custom protocol handler not detected. Redirect to web auth..
+    Logger.info('Protocol handler not detected. Redirecting to https auth.')
     window.location = httpsURI
-  }
+  }, 2000)
 
-  function unsupportedBrowserCallback() {
-    // Safari is unsupported by protocolCheck
-    Logger.warn('can not detect custom protocols on this browser')
-    window.location = protocolURI
-  }
+  // Create a unique ID used for this protocol detection attempt.
+  const echoReplyID = Math.random().toString(36).substr(2, 9)
+  const echoReplyKey = `echo-reply-${echoReplyID}`
 
-  protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
+  // Use localStorage as a reliable cross-window communication method.
+  // Create the storage entry to signal a protocol detection attempt for the
+  // next browser window to check.
+  window.localStorage.setItem(echoReplyKey, 'pending')
+
+  // Listen for the custom protocol echo reply via localStorage update event.
+  window.addEventListener('storage', function replyEventListener(event) {
+    if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
+      // Custom protocol worked, cancel the web auth redirect timer.
+      window.clearTimeout(redirectToWebAuthTimer)
+      Logger.info('Protocol handler detected.')
+      // Clean up event listener and localStorage.
+      window.removeEventListener('storage', replyEventListener)
+      window.localStorage.removeItem(echoReplyKey)
+    }
+  }, false)
+
+  // Use iframe technique for launching the protocol URI rather than setting `window.location`.
+  // This method prevents browsers like Safari, Opera, Firefox from showing error prompts
+  // about unknown protocol handler when app is not installed, and avoids an empty
+  // browser tab when the app is installed.
+  Logger.info('Attempting protocol launch via iframe injection.')
+  const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = locationSrc
+  // Flow complains without this check.
+  if (document.body) {
+    document.body.appendChild(iframe)
+  } else {
+    Logger.error('document.body is null when attempting iframe injection for protoocol URI launch')
+  }
 }
 
 /**
