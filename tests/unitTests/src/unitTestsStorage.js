@@ -838,6 +838,40 @@ export function runStorageTests() {
       })
   })
 
+  test('connectToGaiaHub with extraParams', (t) => {
+    t.plan(7)
+    const hubServer = 'hub.testblockstack.org'
+
+    const hubInfo = {
+      read_url_prefix: 'gaia.testblockstack.org',
+      challenge_text: 'please-sign',
+      latest_auth_version: 'v1'
+    }
+
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const address = '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+    const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
+
+    FetchMock.get(`${hubServer}/hub_info`,
+                  JSON.stringify(hubInfo))
+
+    connectToGaiaHub(hubServer, privateKey, undefined, { testInfo: 'asdf' })
+      .then((config) => {
+        t.ok(config, 'Config returned by connectToGaiaHub()')
+        t.equal(hubInfo.read_url_prefix, config.url_prefix)
+        t.equal(address, config.address)
+        t.equal(hubServer, config.server)
+        const jsonTokenPart = config.token.slice('v1:'.length)
+        const verified = new TokenVerifier('ES256K', publicKey)
+          .verify(jsonTokenPart)
+        t.ok(verified, 'Verified token')
+
+        const { payload } = decodeToken(jsonTokenPart)
+        t.equal(hubServer, payload.hubUrl, 'Intended hubUrl')
+        t.equal(payload.testInfo, 'asdf', 'Extra params are included in payload')
+      })
+  })
+
   test('getBucketUrl', (t) => {
     t.plan(2)
     const hubServer = 'hub2.testblockstack.org'
