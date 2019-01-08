@@ -3,7 +3,7 @@
   "version": "18.2.0",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
-  "types": "src/types.d.ts",
+  "types": "lib/types.d.ts",
   "scripts": {
     "typescript": "tsc -p tsconfig.json",
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
