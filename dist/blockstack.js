@@ -8118,6 +8118,7 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
 
   _logger.Logger.debug('uploadToGaiaHub: uploading ' + filename + ' to ' + hubConfig.server);
+  console.log(hubConfig.token);
   return fetch(hubConfig.server + '/store/' + hubConfig.address + '/' + filename, {
     method: 'POST',
     headers: {
@@ -8128,7 +8129,7 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
   }).then(function (response) {
     return response.text();
   }).then(function (responseText) {
-    return JSON.parse(responseText);
+    console.log(responseText);return JSON.parse(responseText);
   }).then(function (responseJSON) {
     return responseJSON.publicURL;
   });

@@ -704,6 +704,48 @@ export function runStorageTests() {
       .catch(() => t.ok(true, 'Should have rejected promise'))
   })
 
+  test('putFile gets a new gaia config and tries again', (t) => {
+    t.plan(3)
+    const path = 'file.json'
+    const fullWriteUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
+    const invalidHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
+      server: 'https://hub.testblockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const validHubConfig = Object.assign({}, invalidHubConfig, {
+      token: 'valid'
+    })
+
+    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(invalidHubConfig)
+    const setLocalGaiaHubConnection = sinon.stub().resolves(validHubConfig)
+    const { putFile } = proxyquire('../../../lib/storage', {
+      './hub': {
+        getOrSetLocalGaiaHubConnection,
+        setLocalGaiaHubConnection
+      }
+    })
+
+    FetchMock.post(fullWriteUrl, (url, { headers }) => {
+      console.log(url, headers)
+      if (headers.Authorization === 'bearer ') {
+        t.ok(true, 'tries with invalid token')
+        return 421
+      } else if (headers.Authorization === 'bearer valid') {
+        t.ok(true, 'Tries with valid hub config')
+        return {
+          status: 200,
+          body: JSON.stringify({ publicURL: 'readURL' })
+        }
+      }
+      return 421
+    })
+    putFile(path, 'hello world', { encrypt: false })
+      .then(() => t.ok(true, 'Request should pass'))
+  })
+
   test('fetch404null', (t) => {
     t.plan(2)
     const config = {
