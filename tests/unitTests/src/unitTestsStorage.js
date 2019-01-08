@@ -681,9 +681,14 @@ export function runStorageTests() {
       token: '',
       url_prefix: 'gaia.testblockstack.org/hub/'
     }
+
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
+    const setLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
     const { putFile } = proxyquire('../../../lib/storage', {
-      './hub': { getOrSetLocalGaiaHubConnection }
+      './hub': { 
+        getOrSetLocalGaiaHubConnection, 
+        setLocalGaiaHubConnection
+      }
     })
 
     FetchMock.post(`${fullReadUrl}`, { status: 404, body: 'Not found.' })
