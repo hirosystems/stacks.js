@@ -8118,7 +8118,6 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
 
   _logger.Logger.debug('uploadToGaiaHub: uploading ' + filename + ' to ' + hubConfig.server);
-  console.log(hubConfig.token);
   return fetch(hubConfig.server + '/store/' + hubConfig.address + '/' + filename, {
     method: 'POST',
     headers: {
@@ -8127,9 +8126,13 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
     },
     body: contents
   }).then(function (response) {
-    return response.text();
+    if (response.ok) {
+      return response.text();
+    } else {
+      throw new Error('Error when uploading to Gaia hub');
+    }
   }).then(function (responseText) {
-    console.log(responseText);return JSON.parse(responseText);
+    return JSON.parse(responseText);
   }).then(function (responseJSON) {
     return responseJSON.publicURL;
   });
@@ -8687,8 +8690,9 @@ function putFile(path, content, options) {
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
     return new Promise(function (resolve, reject) {
-      (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType).then(resolve).catch(function () {
-        (0, _hub.setLocalGaiaHubConnection)().then(function (freshHubConfig) {
+      (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType).then(resolve).catch(function (error) {
+        console.log(error);
+        return (0, _hub.setLocalGaiaHubConnection)().then(function (freshHubConfig) {
           return (0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType).then(resolve).catch(reject);
         });
       });
