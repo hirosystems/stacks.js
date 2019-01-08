@@ -31,7 +31,13 @@ export function uploadToGaiaHub(filename: string, contents: any,
                  },
                  body: contents
                })
-    .then(response => response.text())
+    .then((response) => {
+      if (response.ok) {
+        return response.text()
+      } else {
+        throw new Error('Error when uploading to Gaia hub')
+      }
+    })
     .then(responseText => JSON.parse(responseText))
     .then(responseJSON => responseJSON.publicURL)
 }

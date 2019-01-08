@@ -732,7 +732,7 @@ export function runStorageTests() {
       console.log(url, headers)
       if (headers.Authorization === 'bearer ') {
         t.ok(true, 'tries with invalid token')
-        return 421
+        return 401
       } else if (headers.Authorization === 'bearer valid') {
         t.ok(true, 'Tries with valid hub config')
         return {
@@ -740,7 +740,7 @@ export function runStorageTests() {
           body: JSON.stringify({ publicURL: 'readURL' })
         }
       }
-      return 421
+      return 401
     })
     putFile(path, 'hello world', { encrypt: false })
       .then(() => t.ok(true, 'Request should pass'))
