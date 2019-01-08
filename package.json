@@ -3,7 +3,9 @@
   "version": "18.2.0",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
+  "types": "src/types.d.ts",
   "scripts": {
+    "typescript": "tsc -p tsconfig.json",
     "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
     "compile": "rm -rf lib; babel src -d lib",
@@ -15,7 +17,7 @@
     "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
     "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
     "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
-    "build": "npm run build-documentation && npm run compile && npm run browserify",
+    "build": "npm run build-documentation && npm run compile && npm run browserify && cp src/types.d.ts lib/types.d.ts",
     "flow": "flow",
     "lint": "eslint src && eslint tests",
     "test": "nyc --reporter=text npm run unit-test",
@@ -78,6 +80,7 @@
     }
   ],
   "devDependencies": {
+    "@types/node": "^10.12.18",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.5",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -103,7 +106,8 @@
     "proxyquire": "^1.8.0",
     "sinon": "^4.2.1",
     "tape": "^4.6.3",
-    "tape-promise": "^2.0.1"
+    "tape-promise": "^2.0.1",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "ajv": "^4.11.5",
