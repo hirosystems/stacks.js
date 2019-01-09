@@ -4,6 +4,15 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [18.2.1] - 2018-01-08
+
+### Added
+
+- Added automatic retry logic to `putFile` in the case of a failed storage call. This might be
+the case if there have been any token revokations. This new logic will catch the first failed write,
+construct (and cache) a new Gaia token, and then attempt the write again. This allows tokens
+to be revoked without any hiccups from a user experience standpoint.
+
 ## [18.2.0] - 2018-12-20
 
 ### Added
