@@ -1665,6 +1665,9 @@ var UserSession = exports.UserSession = function () {
      * under the hood.*
      * @param {string} transitKey - hex-encoded transit key
      * @param {Number} expiresAt - the time at which this request is no longer valid
+     * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+     * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+     * by special authenticators.
      * @return {String} the authentication request
      * @private
      */
@@ -1673,6 +1676,7 @@ var UserSession = exports.UserSession = function () {
     key: 'makeAuthRequest',
     value: function makeAuthRequest(transitKey) {
       var expiresAt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _utils.nextHour)().getTime();
+      var extraParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       var appConfig = this.appConfig;
 
@@ -1683,7 +1687,7 @@ var UserSession = exports.UserSession = function () {
       var manifestURI = appConfig.manifestURI();
       var scopes = appConfig.scopes;
       var appDomain = appConfig.appDomain;
-      return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt);
+      return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
     }
 
     /**

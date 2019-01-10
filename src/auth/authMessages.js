@@ -57,12 +57,12 @@ export function generateTransitKey() {
  * @return {String} the authentication request
  * @private
  */
-export function makeAuthRequestImpl(transitPrivateKey: string = generateAndStoreTransitKey(),
-                                    redirectURI: string = `${window.location.origin}/`,
-                                    manifestURI: string = `${window.location.origin}/manifest.json`,
-                                    scopes: Array<String> = DEFAULT_SCOPE,
+export function makeAuthRequestImpl(transitPrivateKey: string,
+                                    redirectURI: string,
+                                    manifestURI: string,
+                                    scopes: Array<string>,
                                     appDomain: string = window.location.origin,
-                                    expiresAt: number = nextHour().getTime(),
+                                    expiresAt: number,
                                     extraParams: Object = {}): string {
   /* Create the payload */
   const payload = Object.assign({}, extraParams, {

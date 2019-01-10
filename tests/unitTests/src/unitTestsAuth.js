@@ -98,15 +98,12 @@ export function runAuthTests() {
 
   test('make and verify auth request with extraParams', (t) => {
     t.plan(4)
-    global.window.location = {
-      origin: 'http://localhost:3000',
-      hostname: 'localhost',
-      host: 'localhost:3000',
-      href: 'http://localhost:3000/signin'
-    }
 
-    const authRequest = makeAuthRequest(
-      privateKey, undefined, undefined, undefined, undefined, undefined, { myCustomParam: 'asdf' }
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+
+    const authRequest = blockstack.makeAuthRequest(
+      privateKey, undefined, { myCustomParam: 'asdf' }
     )
     t.ok(authRequest, 'auth request should have been created')
 

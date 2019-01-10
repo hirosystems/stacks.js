@@ -712,6 +712,8 @@ export function runStorageTests() {
 
   test('putFile gets a new gaia config and tries again', (t) => {
     t.plan(3)
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
     const path = 'file.json'
     const fullWriteUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
     const invalidHubConfig = {
@@ -727,7 +729,7 @@ export function runStorageTests() {
 
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(invalidHubConfig)
     const setLocalGaiaHubConnection = sinon.stub().resolves(validHubConfig)
-    const { putFile } = proxyquire('../../../lib/storage', {
+    const { putFileImpl } = proxyquire('../../../lib/storage', {
       './hub': {
         getOrSetLocalGaiaHubConnection,
         setLocalGaiaHubConnection
@@ -748,7 +750,7 @@ export function runStorageTests() {
       }
       return 401
     })
-    putFile(path, 'hello world', { encrypt: false })
+    putFileImpl(blockstack, path, 'hello world', { encrypt: false })
       .then(() => t.ok(true, 'Request should pass'))
   })
 

@@ -137,11 +137,15 @@ export class UserSession {
    * under the hood.*
    * @param {string} transitKey - hex-encoded transit key
    * @param {Number} expiresAt - the time at which this request is no longer valid
+   * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+   * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+   * by special authenticators.
    * @return {String} the authentication request
    * @private
    */
   makeAuthRequest(transitKey: string,
-                  expiresAt: number = nextHour().getTime()): string {
+                  expiresAt: number = nextHour().getTime(),
+                  extraParams: Object = {}): string {
     const appConfig = this.appConfig
 
     if (!appConfig) {
@@ -151,7 +155,8 @@ export class UserSession {
     const manifestURI = appConfig.manifestURI()
     const scopes = appConfig.scopes
     const appDomain = appConfig.appDomain
-    return makeAuthRequestImpl(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt)
+    return makeAuthRequestImpl(transitKey, redirectURI, manifestURI,
+                               scopes, appDomain, expiresAt, extraParams)
   }
 
   /**
