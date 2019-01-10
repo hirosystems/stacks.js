@@ -1,9 +1,9 @@
 /* @flow */
 
 import {
-  getOrSetLocalGaiaHubConnection, getFullReadUrl,
-  connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
-  BLOCKSTACK_GAIA_HUB_LABEL, type GaiaHubConfig
+  getOrSetLocalGaiaHubConnection, getFullReadUrl, setLocalGaiaHubConnection,
+  connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
+  type GaiaHubConfig
 } from './hub'
 // export { type GaiaHubConfig } from './hub'
 
@@ -408,7 +408,7 @@ export function putFileImpl(caller: UserSession,
 
   let { contentType } = opt
   if (!contentType) {
-    contentType = (typeof (content) === 'string') ? 'text/plain' : 'application/octet-stream'
+    contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
   }
 
   // First, let's figure out if we need to get public/private keys,
@@ -441,10 +441,21 @@ export function putFileImpl(caller: UserSession,
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
     return getOrSetLocalGaiaHubConnection(caller)
-      .then(gaiaHubConfig => Promise.all([
+      .then(gaiaHubConfig => new Promise((resolve, reject) => Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                        signatureContent, gaiaHubConfig, 'application/json')]))
+                        signatureContent, gaiaHubConfig, 'application/json')
+      ])
+        .then(resolve)
+        .catch(() => {
+          setLocalGaiaHubConnection(caller)
+            .then(freshHubConfig => Promise.all([
+              uploadToGaiaHub(path, content, freshHubConfig, contentType),
+              uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                              signatureContent, freshHubConfig, 'application/json')
+            ])
+              .then(resolve).catch(reject))
+        })))
       .then(fileUrls => fileUrls[0])
   }
 
@@ -464,7 +475,15 @@ export function putFileImpl(caller: UserSession,
     contentType = 'application/json'
   }
   return getOrSetLocalGaiaHubConnection(caller)
-    .then(gaiaHubConfig => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
+    .then(gaiaHubConfig => new Promise((resolve, reject) => {
+      uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
+        .then(resolve)
+        .catch(() => {
+          setLocalGaiaHubConnection(caller)
+            .then(freshHubConfig => uploadToGaiaHub(path, content, freshHubConfig, contentType)
+              .then(resolve).catch(reject))
+        })
+    }))
 }
 
 /**

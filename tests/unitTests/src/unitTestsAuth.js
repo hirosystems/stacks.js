@@ -96,6 +96,31 @@ export function runAuthTests() {
       })
   })
 
+  test('make and verify auth request with extraParams', (t) => {
+    t.plan(4)
+    global.window.location = {
+      origin: 'http://localhost:3000',
+      hostname: 'localhost',
+      host: 'localhost:3000',
+      href: 'http://localhost:3000/signin'
+    }
+
+    const authRequest = makeAuthRequest(
+      privateKey, undefined, undefined, undefined, undefined, undefined, { myCustomParam: 'asdf' }
+    )
+    t.ok(authRequest, 'auth request should have been created')
+
+    const decodedToken = decodeToken(authRequest)
+    t.ok(decodedToken, 'auth request token should have been decoded')
+
+    t.equal(decodedToken.payload.myCustomParam, 'asdf', 'custom param from extraParams is included in payload')
+
+    verifyAuthRequest(authRequest)
+      .then((verified) => {
+        t.true(verified, 'auth request should be verified')
+      })
+  })
+
   test('invalid auth request - signature not verified', (t) => {
     t.plan(3)
 
