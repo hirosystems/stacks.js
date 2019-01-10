@@ -5,10 +5,11 @@ import sinon from 'sinon'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import {
   uploadToGaiaHub, getFullReadUrl,
-  connectToGaiaHub,
+  connectToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL,
   getBucketUrl
 } from '../../../lib/storage/hub'
-import { getFileImpl, encryptContentImpl } from '../../../lib/storage'
+import { getFileImpl, encryptContent, decryptContent } from '../../../lib/storage'
+import { BLOCKSTACK_STORAGE_LABEL } from '../../../lib/auth/authConstants'
 import { getPublicKeyFromPrivate } from '../../../lib/keys'
 
 import { UserSession, AppConfig } from '../../../lib'
@@ -240,6 +241,8 @@ export function runStorageTests() {
     t.ok(ciphertext)
     const deciphered = blockstack.decryptContent(ciphertext)
     t.equal(content, deciphered)
+    // put back whatever was inside before
+    window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
   })
 
   test('encrypt & decrypt content -- specify key', (t) => {
@@ -337,7 +340,8 @@ export function runStorageTests() {
 
   test('putFile & getFile encrypted, not signed', (t) => {
     t.plan(2)
-
+    // save any previous content
+    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -428,11 +432,15 @@ export function runStorageTests() {
         // read and decrypt the file
         getFileImpl(blockstack, path, decryptOptions).then((readContent) => {
           t.equal(readContent, fileContent)
+          // put back whatever was inside before
+          window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
         })
       })
   })
 
   test('putFile & getFile encrypted, signed', (t) => {
+    // save any previous content
+    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -536,6 +544,8 @@ export function runStorageTests() {
   })
 
   test('putFile & getFile unencrypted, signed', (t) => {
+    // save any previous content
+    const oldContent = window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -671,6 +681,8 @@ export function runStorageTests() {
         t.fail('Unexpected error!')
       })
       .then(() => {
+        // put back whatever was inside before
+        window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, oldContent)
         t.end()
       })
   })

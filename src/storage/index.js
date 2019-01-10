@@ -1,15 +1,16 @@
 /* @flow */
 
 import {
-  getOrSetLocalGaiaHubConnection, getFullReadUrl,
-  connectToGaiaHub, uploadToGaiaHub, getBucketUrl,
-  BLOCKSTACK_GAIA_HUB_LABEL, type GaiaHubConfig
+  getOrSetLocalGaiaHubConnection, getFullReadUrl, setLocalGaiaHubConnection,
+  connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
+  type GaiaHubConfig
 } from './hub'
 // export { type GaiaHubConfig } from './hub'
 
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
 } from '../encryption'
+import { loadUserData } from '../auth'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 import {
@@ -71,7 +72,6 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @param {String} options.publicKey - the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPrivateKey.
  * @return {String} Stringified ciphertext object
- * @private
  */
 export function encryptContentImpl(caller: UserSession,
                                    content: string | Buffer,
@@ -408,7 +408,7 @@ export function putFileImpl(caller: UserSession,
 
   let { contentType } = opt
   if (!contentType) {
-    contentType = (typeof (content) === 'string') ? 'text/plain' : 'application/octet-stream'
+    contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
   }
 
   // First, let's figure out if we need to get public/private keys,
@@ -441,10 +441,21 @@ export function putFileImpl(caller: UserSession,
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
     return getOrSetLocalGaiaHubConnection(caller)
-      .then(gaiaHubConfig => Promise.all([
+      .then(gaiaHubConfig => new Promise((resolve, reject) => Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                        signatureContent, gaiaHubConfig, 'application/json')]))
+                        signatureContent, gaiaHubConfig, 'application/json')
+      ])
+        .then(resolve)
+        .catch(() => {
+          setLocalGaiaHubConnection()
+            .then(freshHubConfig => Promise.all([
+              uploadToGaiaHub(path, content, freshHubConfig, contentType),
+              uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                              signatureContent, freshHubConfig, 'application/json')
+            ])
+              .then(resolve).catch(reject))
+        })))
       .then(fileUrls => fileUrls[0])
   }
 
@@ -464,7 +475,15 @@ export function putFileImpl(caller: UserSession,
     contentType = 'application/json'
   }
   return getOrSetLocalGaiaHubConnection(caller)
-    .then(gaiaHubConfig => uploadToGaiaHub(path, content, gaiaHubConfig, contentType))
+    .then(gaiaHubConfig => new Promise((resolve, reject) => {
+      uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
+        .then(resolve)
+        .catch(() => {
+          setLocalGaiaHubConnection(caller)
+            .then(freshHubConfig => uploadToGaiaHub(path, content, freshHubConfig, contentType)
+              .then(resolve).catch(reject))
+        })
+    }))
 }
 
 /**
@@ -476,6 +495,17 @@ export function putFileImpl(caller: UserSession,
  */
 export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
   return getBucketUrl(gaiaHubUrl, appPrivateKey)
+}
+
+/**
+ * Deletes the specified file from the app's data store. Currently not implemented.
+ * @param {String} path - the path to the file to delete
+ * @returns {Promise} that resolves when the file has been removed
+ * or rejects with an error
+ * @private
+ */
+export function deleteFile(path: string) {
+  Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
 }
 
 /**
@@ -545,7 +575,7 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
         )
       } else {
         // no more entries -- end of data
-        return Promise.resolve(fileCount)
+        return Promise.resolve(fileCount + entries.length)
       }
     })
 }
