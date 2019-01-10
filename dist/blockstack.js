@@ -344,7 +344,7 @@ var _encryption = require('../encryption');
 
 var _logger = require('../logger');
 
-var VERSION = '1.3.0';
+var VERSION = '1.3.1';
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -363,6 +363,9 @@ var VERSION = '1.3.0';
  * @param {Array<String>} scopes - the permissions this app is requesting
  * @param {String} appDomain - the origin of this app
  * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
  * @return {String} the authentication request
  */
 function makeAuthRequest() {
@@ -372,9 +375,10 @@ function makeAuthRequest() {
   var scopes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _authConstants.DEFAULT_SCOPE;
   var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
   var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _index.nextHour)().getTime();
+  var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
 
   /* Create the payload */
-  var payload = {
+  var payload = Object.assign({}, extraParams, {
     jti: (0, _index.makeUUID4)(),
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
@@ -387,7 +391,7 @@ function makeAuthRequest() {
     do_not_include_profile: true,
     supports_hub_url: true,
     scopes: scopes
-  };
+  });
 
   _logger.Logger.info('blockstack.js: generating v' + VERSION + ' auth request');
 
@@ -2324,6 +2328,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
     this.DUST_MINIMUM = 5500;
     this.includeUtxoMap = {};
     this.excludeUtxoSet = [];
+    this.MAGIC_BYTES = 'id';
   }
 
   _createClass(BlockstackNetwork, [{
@@ -4055,6 +4060,15 @@ function makeTXbuilder() {
   return txb;
 }
 
+function opEncode(opcode) {
+  // NOTE: must *always* a 3-character string
+  var res = '' + _config.config.network.MAGIC_BYTES + opcode;
+  if (res.length !== 3) {
+    throw new Error('Runtime error: invalid MAGIC_BYTES');
+  }
+  return res;
+}
+
 function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burn) {
   var registerAddress = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
 
@@ -4091,7 +4105,7 @@ function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress
 
   var opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66;
   var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
-  opReturnBuffer.write('id?', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode('?'), 0, 3, 'ascii');
   hashed.copy(opReturnBuffer, 3);
   opReturnBuffer.write(consensusHash, 23, 16, 'hex');
 
@@ -4179,7 +4193,7 @@ function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
     payload = Buffer.from(fullyQualifiedName, 'ascii');
   }
 
-  var opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload]);
+  var opReturnBuffer = Buffer.concat([Buffer.from(opEncode(':'), 'ascii'), payload]);
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
   var tx = makeTXbuilder();
 
@@ -4260,7 +4274,7 @@ function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
     keepChar = '>';
   }
 
-  opRet.write('id>', 0, 3, 'ascii');
+  opRet.write(opEncode('>'), 0, 3, 'ascii');
   opRet.write(keepChar, 3, 1, 'ascii');
 
   var hashed = (0, _utils.hash128)(Buffer.from(fullyQualifiedName, 'ascii'));
@@ -4301,7 +4315,7 @@ function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
 
   var hashedName = (0, _utils.hash128)(Buffer.concat([nameBuff, consensusBuff]));
 
-  opRet.write('id+', 0, 3, 'ascii');
+  opRet.write(opEncode('+'), 0, 3, 'ascii');
   hashedName.copy(opRet, 3);
   opRet.write(valueHash, 19, 20, 'hex');
 
@@ -4333,7 +4347,7 @@ function makeRevokeSkeleton(fullyQualifiedName) {
 
   var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
 
-  opRet.write('id~', 0, 3, 'ascii');
+  opRet.write(opEncode('~'), 0, 3, 'ascii');
 
   var opReturnBuffer = Buffer.concat([opRet, nameBuff]);
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
@@ -4387,7 +4401,7 @@ function makeNamespacePreorderSkeleton(namespaceID, consensusHash, preorderAddre
   }
 
   var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
-  opReturnBuffer.write('id*', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode('*'), 0, 3, 'ascii');
   hashed.copy(opReturnBuffer, 3);
   opReturnBuffer.write(consensusHash, 23, 16, 'hex');
 
@@ -4422,7 +4436,7 @@ function makeNamespaceRevealSkeleton(namespace, revealAddress) {
   var hexPayload = namespace.toHexPayload();
 
   var opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2);
-  opReturnBuffer.write('id&', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode('&'), 0, 3, 'ascii');
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
@@ -4443,7 +4457,7 @@ function makeNamespaceReadySkeleton(namespaceID) {
     output 0: namespace ready code
    */
   var opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1);
-  opReturnBuffer.write('id!', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode('!'), 0, 3, 'ascii');
   opReturnBuffer.write('.' + namespaceID, 3, namespaceID.length + 1, 'ascii');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
@@ -4470,7 +4484,7 @@ function makeNameImportSkeleton(name, recipientAddr, zonefileHash) {
 
   var network = _config.config.network;
   var opReturnBuffer = Buffer.alloc(3 + name.length);
-  opReturnBuffer.write('id;', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode(';'), 0, 3, 'ascii');
   opReturnBuffer.write(name, 3, name.length, 'ascii');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
@@ -4498,7 +4512,7 @@ function makeAnnounceSkeleton(messageHash) {
   }
 
   var opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2);
-  opReturnBuffer.write('id#', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode('#'), 0, 3, 'ascii');
   opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex');
 
   var nullOutput = _bitcoinjsLib2.default.payments.embed({ data: [opReturnBuffer] }).output;
@@ -4536,7 +4550,7 @@ function makeTokenTransferSkeleton(recipientAddress, consensusHash, tokenType, t
 
   var tokenValueHexPadded = ('0000000000000000' + tokenValueHex).slice(-16);
 
-  opReturnBuffer.write('id$', 0, 3, 'ascii');
+  opReturnBuffer.write(opEncode('$'), 0, 3, 'ascii');
   opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex');
   opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex');
   opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex');
@@ -8112,7 +8126,11 @@ function uploadToGaiaHub(filename, contents, hubConfig) {
     },
     body: contents
   }).then(function (response) {
-    return response.text();
+    if (response.ok) {
+      return response.text();
+    } else {
+      throw new Error('Error when uploading to Gaia hub');
+    }
   }).then(function (responseText) {
     return JSON.parse(responseText);
   }).then(function (responseJSON) {
@@ -8610,7 +8628,7 @@ function putFile(path, content, options) {
   var contentType = opt.contentType;
 
   if (!contentType) {
-    contentType = typeof content === 'string' ? 'text/plain' : 'application/octet-stream';
+    contentType = typeof content === 'string' ? 'text/plain; charset=utf-8' : 'application/octet-stream';
   }
 
   // First, let's figure out if we need to get public/private keys,
@@ -8643,7 +8661,13 @@ function putFile(path, content, options) {
     var signatureObject = (0, _encryption.signECDSA)(privateKey, content);
     var signatureContent = JSON.stringify(signatureObject);
     return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-      return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType), (0, _hub.uploadToGaiaHub)('' + path + SIGNATURE_FILE_SUFFIX, signatureContent, gaiaHubConfig, 'application/json')]);
+      return new Promise(function (resolve, reject) {
+        return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType), (0, _hub.uploadToGaiaHub)('' + path + SIGNATURE_FILE_SUFFIX, signatureContent, gaiaHubConfig, 'application/json')]).then(resolve).catch(function () {
+          (0, _hub.setLocalGaiaHubConnection)().then(function (freshHubConfig) {
+            return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType), (0, _hub.uploadToGaiaHub)('' + path + SIGNATURE_FILE_SUFFIX, signatureContent, freshHubConfig, 'application/json')]).then(resolve).catch(reject);
+          });
+        });
+      });
     }).then(function (fileUrls) {
       return fileUrls[0];
     });
@@ -8665,7 +8689,14 @@ function putFile(path, content, options) {
     contentType = 'application/json';
   }
   return (0, _hub.getOrSetLocalGaiaHubConnection)().then(function (gaiaHubConfig) {
-    return (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType);
+    return new Promise(function (resolve, reject) {
+      (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType).then(resolve).catch(function (error) {
+        console.log(error);
+        return (0, _hub.setLocalGaiaHubConnection)().then(function (freshHubConfig) {
+          return (0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType).then(resolve).catch(reject);
+        });
+      });
+    });
   });
 }
 
@@ -8751,7 +8782,7 @@ function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
       return listFilesLoop(hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback);
     } else {
       // no more entries -- end of data
-      return Promise.resolve(fileCount);
+      return Promise.resolve(fileCount + entries.length);
     }
   });
 }
@@ -13027,7 +13058,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -13052,7 +13083,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -54283,7 +54314,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -54307,7 +54338,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -62625,7 +62656,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -62653,7 +62684,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -75739,7 +75770,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/larry/git/blockstack.js"
+      "/Users/hank/blockstack/js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -75763,7 +75794,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/larry/git/blockstack.js",
+  "_where": "/Users/hank/blockstack/js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
