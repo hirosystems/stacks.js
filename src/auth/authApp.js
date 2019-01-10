@@ -135,7 +135,7 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
     // Browsers often perform an instant blur & focus when the protocol handler is working
     // but not showing any browser prompts, so we want to ignore those instances.
     let isRefocused = false
-    inputPromptTracker.addEventListener('focus', () => isRefocused = true, { once: true, capture: true })
+    inputPromptTracker.addEventListener('focus', () => { isRefocused = true }, { once: true, capture: true })
     setTimeout(() => {
       if (redirectToWebAuthTimer && !isRefocused) {
         Logger.info('Detected possible browser prompt for opening the protocol handler app.')
