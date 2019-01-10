@@ -82,13 +82,6 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
     return
   }
 
-  // Wait 2000ms for custom protocol to auth otherwise redirect to web auth.
-  const redirectToWebAuthTimer = window.setTimeout(() => {
-    // Custom protocol handler not detected. Redirect to web auth..
-    Logger.info('Protocol handler not detected. Redirecting to https auth.')
-    window.location = httpsURI
-  }, 2000)
-
   // Create a unique ID used for this protocol detection attempt.
   const echoReplyID = Math.random().toString(36).substr(2, 9)
   const echoReplyKey = `echo-reply-${echoReplyID}`
@@ -97,26 +90,107 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
   // Create the storage entry to signal a protocol detection attempt for the
   // next browser window to check.
   window.localStorage.setItem(echoReplyKey, 'pending')
+  const cleanUpLocalStorage = () => {
+    window.localStorage.removeItem(echoReplyKey)
+  }
+
+  const detectionTimeout = 1000
+  let redirectToWebAuthTimer = 0
+  const cancelWebAuthRedirectTimer = () => {
+    if (redirectToWebAuthTimer) {
+      window.clearTimeout(redirectToWebAuthTimer)
+      redirectToWebAuthTimer = 0
+    }
+  }
+  const startWebAuthRedirectTimer = (timeout = detectionTimeout) => {
+    // Wait 2000ms for custom protocol to auth otherwise redirect to web auth.
+    cancelWebAuthRedirectTimer()
+    redirectToWebAuthTimer = window.setTimeout(() => {
+      cancelWebAuthRedirectTimer()
+      cleanUpLocalStorage()
+      // Custom protocol handler not detected. Redirect to web auth..
+      Logger.info('Protocol handler not detected, redirecting to web auth...')
+      window.location = httpsURI
+    }, timeout)
+  }
+
+  startWebAuthRedirectTimer()
+
+  const inputPromptTracker = document.createElement('input')
+  inputPromptTracker.type = 'text'
+  // Prevent this element from inherited any css.
+  inputPromptTracker.style.all = 'initial'
+  // Setting display=none on an element prevents them from being focused/blurred.
+  // So hide the element using other properties..
+  inputPromptTracker.style.opacity = '0'
+  inputPromptTracker.style.filter = 'alpha(opacity=0)'
+  inputPromptTracker.style.height = '0'
+  inputPromptTracker.style.width = '0'
+
+  // If the the focus of a page element is immediately changed then this likely indicates 
+  // the protocol handler is installed, and the browser is prompting the user if they want 
+  // to open the application. 
+  const inputBlurredFunc = () => {
+    // Use a timeout of 100ms to ignore instant toggles between blur and focus.
+    // Browsers often perform an instant blur & focus when the protocol handler is working
+    // but not showing any browser prompts, so we want to ignore those instances.
+    let isRefocused = false
+    inputPromptTracker.addEventListener('focus', () => isRefocused = true, { once: true, capture: true })
+    setTimeout(() => {
+      if (redirectToWebAuthTimer && !isRefocused) {
+        Logger.info('Detected possible browser prompt for opening the protocol handler app.')
+        window.clearTimeout(redirectToWebAuthTimer)
+        inputPromptTracker.addEventListener('focus', () => {
+          if (redirectToWebAuthTimer) {
+            Logger.info('Possible browser prompt closed, restarting auth redirect timeout.')
+            startWebAuthRedirectTimer()
+          }
+        }, { once: true, capture: true })
+      }
+    }, 100)
+  }
+  inputPromptTracker.addEventListener('blur', inputBlurredFunc, { once: true, capture: true })
+  setTimeout(() => inputPromptTracker.removeEventListener('blur', inputBlurredFunc), 200)
+  // Flow complains without this check.
+  if (document.body) document.body.appendChild(inputPromptTracker)
+  inputPromptTracker.focus()
+
+  // Detect if document.visibility is immediately changed which is a strong 
+  // indication that the protocol handler is working. We don't know for sure and 
+  // can't predict future browser changes, so only increase the redirect timeout.
+  // This reduces the probability of a false-negative (where local auth works, but 
+  // the original page was redirect to web auth because something took too long),
+  const pageVisibilityChanged = () => {
+    if (document.hidden && redirectToWebAuthTimer) {
+      Logger.info('Detected immediate page visibility change (protocol handler probably working).')
+      startWebAuthRedirectTimer(3000)
+    }
+  }
+  document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
+  setTimeout(() => document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
+
 
   // Listen for the custom protocol echo reply via localStorage update event.
   window.addEventListener('storage', function replyEventListener(event) {
     if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
       // Custom protocol worked, cancel the web auth redirect timer.
-      window.clearTimeout(redirectToWebAuthTimer)
+      cancelWebAuthRedirectTimer()
+      inputPromptTracker.removeEventListener('blur', inputBlurredFunc)
       Logger.info('Protocol handler detected.')
       // Clean up event listener and localStorage.
       window.removeEventListener('storage', replyEventListener)
-      window.localStorage.removeItem(echoReplyKey)
+      cleanUpLocalStorage()
     }
   }, false)
 
   // Use iframe technique for launching the protocol URI rather than setting `window.location`.
   // This method prevents browsers like Safari, Opera, Firefox from showing error prompts
   // about unknown protocol handler when app is not installed, and avoids an empty
-  // browser tab when the app is installed.
+  // browser tab when the app is installed. 
   Logger.info('Attempting protocol launch via iframe injection.')
   const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
   const iframe = document.createElement('iframe')
+  iframe.style.all = 'initial'
   iframe.style.display = 'none'
   iframe.src = locationSrc
   // Flow complains without this check.
