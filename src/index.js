@@ -12,20 +12,17 @@ import queryString from 'query-string'
     return
   }
   // Check if the location query string contains a protocol-echo reply.
+  // If so, this page was only re-opened to signal back the originating 
+  // tab that the protocol handler is installed. 
   const queryDict = queryString.parse(window.location.search)
   if (queryDict.echoReply) {
     // Use localStorage to notify originated tab that protocol handler is available and working.
     const echoReplyKey = `echo-reply-${queryDict.echoReply}`
-    // Check localStorage for a pending protocol detection.
-    // If so, this page was only re-opened to signal back the originating 
-    // tab that the protocol handler is installed. 
-    if (window.localStorage.getItem(echoReplyKey) === 'pending') {
-      // Set the echo-reply result in localStorage for the other window to see.
-      window.localStorage.setItem(echoReplyKey, 'success')
-      // Redirect back to the localhost auth url, as opposed to another protocol launch.
-      // This will re-use the same tab rather than creating another useless one.
-      window.location = decodeURIComponent(queryDict.authContinuation)
-    }
+    // Set the echo-reply result in localStorage for the other window to see.
+    window.localStorage.setItem(echoReplyKey, 'success')
+    // Redirect back to the localhost auth url, as opposed to another protocol launch.
+    // This will re-use the same tab rather than creating another useless one.
+    window.location = decodeURIComponent(queryDict.authContinuation)
   }
 }())
 
