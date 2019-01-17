@@ -69,8 +69,10 @@ export function isUserSignedIn() {
  * The callback that is invoked when the protocol handler was not detected. 
  * @return {void}
  */
-function detectProtocolLaunch(authRequest: string, successCallback: void, failCallback: void) {
-
+function detectProtocolLaunch(
+  authRequest: string, 
+  successCallback: () => void, 
+  failCallback: () => void) {
   // Create a unique ID used for this protocol detection attempt.
   const echoReplyID = Math.random().toString(36).substr(2, 9)
   const echoReplyKeyPrefix = 'echo-reply-'
