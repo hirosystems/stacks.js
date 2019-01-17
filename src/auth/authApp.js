@@ -84,14 +84,30 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
 
   // Create a unique ID used for this protocol detection attempt.
   const echoReplyID = Math.random().toString(36).substr(2, 9)
-  const echoReplyKey = `echo-reply-${echoReplyID}`
+  const echoReplyKeyPrefix = 'echo-reply-'
+  const echoReplyKey = `${echoReplyKeyPrefix}${echoReplyID}`
 
   // Use localStorage as a reliable cross-window communication method.
   // Create the storage entry to signal a protocol detection attempt for the
   // next browser window to check.
-  window.localStorage.setItem(echoReplyKey, 'pending')
+  window.localStorage.setItem(echoReplyKey, Date.now().toString())
   const cleanUpLocalStorage = () => {
-    window.localStorage.removeItem(echoReplyKey)
+    try {
+      window.localStorage.removeItem(echoReplyKey)
+      // Also clear out any stale echo-reply keys older than 1 hour.
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const storageKey = window.localStorage.key(i)
+        if (storageKey.startsWith(echoReplyKeyPrefix)) {
+          const storageValue = window.localStorage.getItem(storageKey)
+          if (storageValue === 'success' || (Date.now() - parseInt(storageValue, 10)) > 3600000) {
+            window.localStorage.removeItem(storageKey)
+          }
+        }
+      }
+    } catch (err) {
+      Logger.error('Exception cleaning up echo-reply entries in localStorage')
+      Logger.error(err)
+    }
   }
 
   const detectionTimeout = 1000
