@@ -22,7 +22,9 @@ import queryString from 'query-string'
     window.localStorage.setItem(echoReplyKey, 'success')
     // Redirect back to the localhost auth url, as opposed to another protocol launch.
     // This will re-use the same tab rather than creating another useless one.
-    window.location = decodeURIComponent(queryDict.authContinuation)
+    window.setTimeout(() => {
+      window.location = decodeURIComponent(queryDict.authContinuation)
+    }, 10)
   }
 }())
 

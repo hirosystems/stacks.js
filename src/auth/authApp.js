@@ -110,14 +110,24 @@ function detectProtocolLaunch(
     }
   }
   const startWebAuthRedirectTimer = (timeout = detectionTimeout) => {
-    // Wait 2000ms for custom protocol to auth otherwise redirect to web auth.
     cancelWebAuthRedirectTimer()
     redirectToWebAuthTimer = window.setTimeout(() => {
-      cancelWebAuthRedirectTimer()
-      cleanUpLocalStorage()
-      // Custom protocol handler not detected. Redirect to web auth..
-      Logger.info('Protocol handler not detected')
-      failCallback()
+      if (redirectToWebAuthTimer) {
+        cancelWebAuthRedirectTimer()
+        let nextFunc
+        if (window.localStorage.getItem(echoReplyKey) === 'success') {
+          Logger.info('Protocol echo reply detected.')
+          nextFunc = successCallback
+        } else {
+          Logger.info('Protocol handler not detected.')
+          nextFunc = failCallback
+        }
+        failCallback = () => {}
+        successCallback = () => {}
+        cleanUpLocalStorage()
+        // Briefly wait since localStorage changes can sometimes be ignored when immediately redirected.
+        setTimeout(() => nextFunc(), 100)
+      }
     }, timeout)
   }
 
@@ -183,11 +193,15 @@ function detectProtocolLaunch(
       // Custom protocol worked, cancel the web auth redirect timer.
       cancelWebAuthRedirectTimer()
       inputPromptTracker.removeEventListener('blur', inputBlurredFunc)
-      Logger.info('Protocol echo reply detected.')
+      Logger.info('Protocol echo reply detected from localStorage event.')
       // Clean up event listener and localStorage.
       window.removeEventListener('storage', replyEventListener)
+      const nextFunc = successCallback
+      successCallback = () => {}
+      failCallback = () => {}
       cleanUpLocalStorage()
-      successCallback()
+      // Briefly wait since localStorage changes can sometimes be ignored when immediately redirected.
+      setTimeout(() => nextFunc(), 100)
     }
   }, false)
 
