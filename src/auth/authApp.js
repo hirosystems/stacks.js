@@ -125,7 +125,8 @@ function detectProtocolLaunch(
         failCallback = () => {}
         successCallback = () => {}
         cleanUpLocalStorage()
-        // Briefly wait since localStorage changes can sometimes be ignored when immediately redirected.
+        // Briefly wait since localStorage changes can 
+        // sometimes be ignored when immediately redirected.
         setTimeout(() => nextFunc(), 100)
       }
     }, timeout)
@@ -200,7 +201,8 @@ function detectProtocolLaunch(
       successCallback = () => {}
       failCallback = () => {}
       cleanUpLocalStorage()
-      // Briefly wait since localStorage changes can sometimes be ignored when immediately redirected.
+      // Briefly wait since localStorage changes can sometimes 
+      // be ignored when immediately redirected.
       setTimeout(() => nextFunc(), 100)
     }
   }, false)
