@@ -1,12 +1,9 @@
 # Maintainers
 This repo is currently maintained by Ken Liao (@yknl). 
 
-# Pull Request Reviewers
-Hank Stoever (@hstove)
-Aaron Blankstein (@kantai)
-Matthew Little (@zone117x)
+# Pull Request 
 
-# Submitting Pull Requests
+## Submitting
 This repository uses the [git flow branching mode](http://nvie.com/posts/a-successful-git-branching-model/).
 
 The latest released code as deployed to npm is in `master` and the latest delivered development
@@ -22,9 +19,21 @@ Pull request requirements:
 4. The code should contain [flow static type annotations](https://flow.org)
 5. Contain tests that cover any and all new functionality or code changes.
 6. Describe how the new functionality can be tested manually.
-7. Document any new features or endpoints, and describe how developers would be expected to interact with them.
+7. Document any new features or endpoints, and describe how developers would be expected to interact with them. 
 8. PR authors should agree to our contributor's agreement.
 
+## Reviewers
+Ken Liao (@yknl)
+Hank Stoever (@hstove)
+Aaron Blankstein (@kantai)
+Matthew Little (@zone117x)
+
+All pull requests require at least 2 reviewer approvals before it can be merged.
+
+# Documentation
+Documentation in this repo is automatically generated from code comments via `documentation.js`. It is the responsibility of the pull request author to verify documentation builds correctly. 
+
+# Issues
 Github issues marked [help-wanted](https://github.com/blockstack/blockstack.js/labels/help-wanted)
 are great places to start. Please ask in a github issue or slack before embarking
 on larger issues that aren't labeled as help wanted or adding additional
