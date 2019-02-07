@@ -1,6 +1,12 @@
 # Maintainers
 This repo is currently maintained by Ken Liao (@yknl). 
 
+# Issues
+Github issues marked [help-wanted](https://github.com/blockstack/blockstack.js/labels/help-wanted)
+are great places to start. Please ask in a github issue or slack before embarking
+on larger issues that aren't labeled as help wanted or adding additional
+functionality so that we can make sure your contribution can be included!
+
 # Pull Request 
 
 ## Submitting
@@ -32,12 +38,6 @@ All pull requests require at least 2 reviewer approvals before it can be merged.
 
 # Documentation
 Documentation in this repo is automatically generated from code comments via `documentation.js`. It is the responsibility of the pull request author to verify documentation builds correctly. 
-
-# Issues
-Github issues marked [help-wanted](https://github.com/blockstack/blockstack.js/labels/help-wanted)
-are great places to start. Please ask in a github issue or slack before embarking
-on larger issues that aren't labeled as help wanted or adding additional
-functionality so that we can make sure your contribution can be included!
 
 # Reviewing Pull Requests
 A PR reviewer is responsible for ensuring the following:
