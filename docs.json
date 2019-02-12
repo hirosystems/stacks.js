@@ -5589,22 +5589,22 @@
     ],
     "loc": {
       "start": {
-        "line": 106,
+        "line": 265,
         "column": 0
       },
       "end": {
-        "line": 127,
+        "line": 286,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 128,
+          "line": 287,
           "column": 0
         },
         "end": {
-          "line": 135,
+          "line": 294,
           "column": 1
         }
       },
@@ -5922,22 +5922,22 @@
     ],
     "loc": {
       "start": {
-        "line": 146,
+        "line": 305,
         "column": 0
       },
       "end": {
-        "line": 149,
+        "line": 308,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 150,
+          "line": 309,
           "column": 0
         },
         "end": {
-          "line": 152,
+          "line": 311,
           "column": 1
         }
       },
@@ -6196,22 +6196,22 @@
     ],
     "loc": {
       "start": {
-        "line": 155,
+        "line": 314,
         "column": 0
       },
       "end": {
-        "line": 166,
+        "line": 325,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 167,
+          "line": 326,
           "column": 0
         },
         "end": {
-          "line": 274,
+          "line": 433,
           "column": 1
         }
       },
@@ -6601,22 +6601,22 @@
     ],
     "loc": {
       "start": {
-        "line": 276,
+        "line": 435,
         "column": 0
       },
       "end": {
-        "line": 279,
+        "line": 438,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 280,
+          "line": 439,
           "column": 0
         },
         "end": {
-          "line": 282,
+          "line": 441,
           "column": 1
         }
       },
@@ -6773,22 +6773,22 @@
     ],
     "loc": {
       "start": {
-        "line": 54,
+        "line": 53,
         "column": 0
       },
       "end": {
-        "line": 57,
+        "line": 56,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 58,
+          "line": 57,
           "column": 0
         },
         "end": {
-          "line": 60,
+          "line": 59,
           "column": 1
         }
       },
@@ -7010,22 +7010,22 @@
     ],
     "loc": {
       "start": {
-        "line": 284,
+        "line": 443,
         "column": 0
       },
       "end": {
-        "line": 288,
+        "line": 447,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 289,
+          "line": 448,
           "column": 0
         },
         "end": {
-          "line": 296,
+          "line": 455,
           "column": 1
         }
       },
@@ -8066,22 +8066,22 @@
     ],
     "loc": {
       "start": {
-        "line": 41,
+        "line": 40,
         "column": 0
       },
       "end": {
-        "line": 47,
+        "line": 46,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 48,
+          "line": 47,
           "column": 0
         },
         "end": {
-          "line": 52,
+          "line": 51,
           "column": 1
         }
       },
@@ -8371,22 +8371,22 @@
     ],
     "loc": {
       "start": {
-        "line": 62,
+        "line": 228,
         "column": 0
       },
       "end": {
-        "line": 73,
+        "line": 239,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 74,
+          "line": 240,
           "column": 0
         },
         "end": {
-          "line": 104,
+          "line": 263,
           "column": 1
         }
       },
@@ -8653,22 +8653,22 @@
     ],
     "loc": {
       "start": {
-        "line": 137,
+        "line": 296,
         "column": 0
       },
       "end": {
-        "line": 140,
+        "line": 299,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 141,
+          "line": 300,
           "column": 0
         },
         "end": {
-          "line": 144,
+          "line": 303,
           "column": 1
         }
       },
@@ -14796,7 +14796,7 @@
           "column": 0
         },
         "end": {
-          "line": 441,
+          "line": 460,
           "column": 1
         }
       },
@@ -16262,22 +16262,22 @@
     ],
     "loc": {
       "start": {
-        "line": 443,
+        "line": 462,
         "column": 0
       },
       "end": {
-        "line": 449,
+        "line": 468,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 450,
+          "line": 469,
           "column": 0
         },
         "end": {
-          "line": 452,
+          "line": 471,
           "column": 1
         }
       },
@@ -16976,6 +16976,360 @@
           "children": [
             {
               "type": "text",
+              "value": "Detects if the native auth-browser is installed and is successfully \nlaunched via a custom protocol URI.",
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 2,
+                  "column": 36,
+                  "offset": 104
+                },
+                "indent": [
+                  1
+                ]
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 2,
+              "column": 36,
+              "offset": 104
+            },
+            "indent": [
+              1
+            ]
+          }
+        }
+      ],
+      "position": {
+        "start": {
+          "line": 1,
+          "column": 1,
+          "offset": 0
+        },
+        "end": {
+          "line": 2,
+          "column": 36,
+          "offset": 104
+        }
+      }
+    },
+    "tags": [
+      {
+        "title": "param",
+        "description": "The encoded authRequest to be used as a query param in the custom URI.",
+        "lineNumber": 3,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "authRequest"
+      },
+      {
+        "title": "param",
+        "description": "The callback that is invoked when the protocol handler was detected.",
+        "lineNumber": 5,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "successCallback"
+      },
+      {
+        "title": "param",
+        "description": "The callback that is invoked when the protocol handler was not detected.",
+        "lineNumber": 7,
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        },
+        "name": "failCallback"
+      },
+      {
+        "title": "return",
+        "description": null,
+        "lineNumber": 9,
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "loc": {
+      "start": {
+        "line": 61,
+        "column": 0
+      },
+      "end": {
+        "line": 71,
+        "column": 3
+      }
+    },
+    "context": {
+      "loc": {
+        "start": {
+          "line": 72,
+          "column": 0
+        },
+        "end": {
+          "line": 226,
+          "column": 1
+        }
+      },
+      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+    },
+    "augments": [],
+    "examples": [],
+    "params": [
+      {
+        "title": "param",
+        "name": "authRequest",
+        "lineNumber": 3,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The encoded authRequest to be used as a query param in the custom URI.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 71,
+                      "offset": 70
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 71,
+                  "offset": 70
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 71,
+              "offset": 70
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "successCallback",
+        "lineNumber": 5,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The callback that is invoked when the protocol handler was detected.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 69,
+                      "offset": 68
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 69,
+                  "offset": 68
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 69,
+              "offset": 68
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      },
+      {
+        "title": "param",
+        "name": "failCallback",
+        "lineNumber": 7,
+        "description": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "The callback that is invoked when the protocol handler was not detected.",
+                  "position": {
+                    "start": {
+                      "line": 1,
+                      "column": 1,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 1,
+                      "column": 73,
+                      "offset": 72
+                    },
+                    "indent": []
+                  }
+                }
+              ],
+              "position": {
+                "start": {
+                  "line": 1,
+                  "column": 1,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 1,
+                  "column": 73,
+                  "offset": 72
+                },
+                "indent": []
+              }
+            }
+          ],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 73,
+              "offset": 72
+            }
+          }
+        },
+        "type": {
+          "type": "NameExpression",
+          "name": "String"
+        }
+      }
+    ],
+    "properties": [],
+    "returns": [
+      {
+        "description": {
+          "type": "root",
+          "children": [],
+          "position": {
+            "start": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            },
+            "end": {
+              "line": 1,
+              "column": 1,
+              "offset": 0
+            }
+          }
+        },
+        "title": "returns",
+        "type": {
+          "type": "NameExpression",
+          "name": "void"
+        }
+      }
+    ],
+    "sees": [],
+    "throws": [],
+    "todos": [],
+    "name": "detectProtocolLaunch",
+    "kind": "function",
+    "members": {
+      "global": [],
+      "inner": [],
+      "instance": [],
+      "events": [],
+      "static": []
+    },
+    "path": [
+      {
+        "name": "detectProtocolLaunch",
+        "kind": "function"
+      }
+    ],
+    "namespace": "detectProtocolLaunch"
+  },
+  {
+    "description": {
+      "type": "root",
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
               "value": "Get the price of a name.",
               "position": {
                 "start": {
@@ -17043,22 +17397,22 @@
     ],
     "loc": {
       "start": {
-        "line": 224,
+        "line": 227,
         "column": 2
       },
       "end": {
-        "line": 232,
+        "line": 235,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 233,
+          "line": 236,
           "column": 2
         },
         "end": {
-          "line": 237,
+          "line": 240,
           "column": 3
         }
       },
@@ -17300,22 +17654,22 @@
     ],
     "loc": {
       "start": {
-        "line": 239,
+        "line": 242,
         "column": 2
       },
       "end": {
-        "line": 247,
+        "line": 250,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 248,
+          "line": 251,
           "column": 2
         },
         "end": {
-          "line": 252,
+          "line": 255,
           "column": 3
         }
       },
@@ -17551,22 +17905,22 @@
     ],
     "loc": {
       "start": {
-        "line": 254,
+        "line": 257,
         "column": 2
       },
       "end": {
-        "line": 258,
+        "line": 261,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 259,
+          "line": 262,
           "column": 2
         },
         "end": {
-          "line": 261,
+          "line": 264,
           "column": 3
         }
       },
@@ -17736,22 +18090,22 @@
     ],
     "loc": {
       "start": {
-        "line": 263,
+        "line": 266,
         "column": 2
       },
       "end": {
-        "line": 267,
+        "line": 270,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 268,
+          "line": 271,
           "column": 2
         },
         "end": {
-          "line": 273,
+          "line": 276,
           "column": 3
         }
       },
@@ -17987,22 +18341,22 @@
     ],
     "loc": {
       "start": {
-        "line": 275,
+        "line": 278,
         "column": 2
       },
       "end": {
-        "line": 280,
+        "line": 283,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 281,
+          "line": 284,
           "column": 2
         },
         "end": {
-          "line": 304,
+          "line": 307,
           "column": 3
         }
       },
@@ -18238,22 +18592,22 @@
     ],
     "loc": {
       "start": {
-        "line": 306,
+        "line": 309,
         "column": 2
       },
       "end": {
-        "line": 311,
+        "line": 314,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 312,
+          "line": 315,
           "column": 2
         },
         "end": {
-          "line": 333,
+          "line": 336,
           "column": 3
         }
       },
@@ -18485,22 +18839,22 @@
     ],
     "loc": {
       "start": {
-        "line": 335,
+        "line": 338,
         "column": 2
       },
       "end": {
-        "line": 339,
+        "line": 342,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 340,
+          "line": 343,
           "column": 2
         },
         "end": {
-          "line": 364,
+          "line": 367,
           "column": 3
         }
       },
@@ -18736,22 +19090,22 @@
     ],
     "loc": {
       "start": {
-        "line": 366,
+        "line": 369,
         "column": 2
       },
       "end": {
-        "line": 371,
+        "line": 374,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 372,
+          "line": 375,
           "column": 2
         },
         "end": {
-          "line": 389,
+          "line": 392,
           "column": 3
         }
       },
@@ -18997,22 +19351,22 @@
     ],
     "loc": {
       "start": {
-        "line": 391,
+        "line": 394,
         "column": 2
       },
       "end": {
-        "line": 398,
+        "line": 401,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 399,
+          "line": 402,
           "column": 2
         },
         "end": {
-          "line": 418,
+          "line": 421,
           "column": 3
         }
       },
@@ -19319,22 +19673,22 @@
     ],
     "loc": {
       "start": {
-        "line": 421,
+        "line": 424,
         "column": 2
       },
       "end": {
-        "line": 427,
+        "line": 430,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 428,
+          "line": 431,
           "column": 2
         },
         "end": {
-          "line": 453,
+          "line": 456,
           "column": 3
         }
       },
@@ -19647,22 +20001,22 @@
     ],
     "loc": {
       "start": {
-        "line": 455,
+        "line": 458,
         "column": 2
       },
       "end": {
-        "line": 463,
+        "line": 466,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 464,
+          "line": 467,
           "column": 2
         },
         "end": {
-          "line": 488,
+          "line": 491,
           "column": 3
         }
       },
@@ -19959,22 +20313,22 @@
     ],
     "loc": {
       "start": {
-        "line": 490,
+        "line": 493,
         "column": 2
       },
       "end": {
-        "line": 495,
+        "line": 498,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 496,
+          "line": 499,
           "column": 2
         },
         "end": {
-          "line": 513,
+          "line": 516,
           "column": 3
         }
       },
@@ -20224,22 +20578,22 @@
     ],
     "loc": {
       "start": {
-        "line": 515,
+        "line": 518,
         "column": 2
       },
       "end": {
-        "line": 522,
+        "line": 525,
         "column": 5
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 523,
+          "line": 526,
           "column": 2
         },
         "end": {
-          "line": 545,
+          "line": 548,
           "column": 3
         }
       },
@@ -20469,623 +20823,6 @@
           "children": [
             {
               "type": "text",
-              "value": "Estimates the cost of a token-transfer transaction",
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 51,
-                  "offset": 50
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 51,
-              "offset": 50
-            },
-            "indent": []
-          }
-        }
-      ],
-      "position": {
-        "start": {
-          "line": 1,
-          "column": 1,
-          "offset": 0
-        },
-        "end": {
-          "line": 1,
-          "column": 51,
-          "offset": 50
-        }
-      }
-    },
-    "tags": [
-      {
-        "title": "param",
-        "description": "the recipient of the tokens",
-        "lineNumber": 2,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "recipientAddress"
-      },
-      {
-        "title": "param",
-        "description": "the type of token to spend",
-        "lineNumber": 3,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "tokenType"
-      },
-      {
-        "title": "param",
-        "description": "a 64-bit unsigned BigInteger encoding the number of tokens\n  to spend",
-        "lineNumber": 4,
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        },
-        "name": "tokenAmount"
-      },
-      {
-        "title": "param",
-        "description": "an arbitrary string to store with the transaction",
-        "lineNumber": 6,
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        },
-        "name": "scratchArea"
-      },
-      {
-        "title": "param",
-        "description": "the number of utxos we expect will\n be required from the importer address",
-        "lineNumber": 7,
-        "type": {
-          "type": "NameExpression",
-          "name": "Number"
-        },
-        "name": "senderUtxos"
-      },
-      {
-        "title": "param",
-        "description": "the number of outputs we expect to add beyond\n just the recipient output (default = 1, if the token owner is also the bitcoin funder)",
-        "lineNumber": 9,
-        "type": {
-          "type": "NameExpression",
-          "name": "Number"
-        },
-        "name": "additionalOutputs"
-      },
-      {
-        "title": "returns",
-        "description": "a promise which resolves to the satoshi cost to\n fund this token-transfer transaction",
-        "lineNumber": 11,
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "loc": {
-      "start": {
-        "line": 431,
-        "column": 0
-      },
-      "end": {
-        "line": 444,
-        "column": 3
-      }
-    },
-    "context": {
-      "loc": {
-        "start": {
-          "line": 445,
-          "column": 0
-        },
-        "end": {
-          "line": 462,
-          "column": 1
-        }
-      },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/operations/txbuild.js"
-    },
-    "augments": [],
-    "examples": [],
-    "params": [
-      {
-        "title": "param",
-        "name": "recipientAddress",
-        "lineNumber": 2,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the recipient of the tokens",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 28,
-                      "offset": 27
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 28,
-                  "offset": 27
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 28,
-              "offset": 27
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "tokenType",
-        "lineNumber": 3,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the type of token to spend",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 27,
-                      "offset": 26
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 27,
-                  "offset": 26
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 27,
-              "offset": 26
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "tokenAmount",
-        "lineNumber": 4,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "a 64-bit unsigned BigInteger encoding the number of tokens\n  to spend",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 11,
-                      "offset": 69
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 11,
-                  "offset": 69
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 11,
-              "offset": 69
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Object"
-        }
-      },
-      {
-        "title": "param",
-        "name": "scratchArea",
-        "lineNumber": 6,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "an arbitrary string to store with the transaction",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 1,
-                      "column": 50,
-                      "offset": 49
-                    },
-                    "indent": []
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 1,
-                  "column": 50,
-                  "offset": 49
-                },
-                "indent": []
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 1,
-              "column": 50,
-              "offset": 49
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "String"
-        }
-      },
-      {
-        "title": "param",
-        "name": "senderUtxos",
-        "lineNumber": 7,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the number of utxos we expect will\n be required from the importer address",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 39,
-                      "offset": 73
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 39,
-                  "offset": 73
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 39,
-              "offset": 73
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Number"
-        },
-        "default": "1"
-      },
-      {
-        "title": "param",
-        "name": "additionalOutputs",
-        "lineNumber": 9,
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "the number of outputs we expect to add beyond\n just the recipient output (default = 1, if the token owner is also the bitcoin funder)",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 88,
-                      "offset": 133
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 88,
-                  "offset": 133
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 88,
-              "offset": 133
-            }
-          }
-        },
-        "type": {
-          "type": "NameExpression",
-          "name": "Number"
-        },
-        "default": "1"
-      }
-    ],
-    "properties": [],
-    "returns": [
-      {
-        "description": {
-          "type": "root",
-          "children": [
-            {
-              "type": "paragraph",
-              "children": [
-                {
-                  "type": "text",
-                  "value": "a promise which resolves to the satoshi cost to\n fund this token-transfer transaction",
-                  "position": {
-                    "start": {
-                      "line": 1,
-                      "column": 1,
-                      "offset": 0
-                    },
-                    "end": {
-                      "line": 2,
-                      "column": 38,
-                      "offset": 85
-                    },
-                    "indent": [
-                      1
-                    ]
-                  }
-                }
-              ],
-              "position": {
-                "start": {
-                  "line": 1,
-                  "column": 1,
-                  "offset": 0
-                },
-                "end": {
-                  "line": 2,
-                  "column": 38,
-                  "offset": 85
-                },
-                "indent": [
-                  1
-                ]
-              }
-            }
-          ],
-          "position": {
-            "start": {
-              "line": 1,
-              "column": 1,
-              "offset": 0
-            },
-            "end": {
-              "line": 2,
-              "column": 38,
-              "offset": 85
-            }
-          }
-        },
-        "title": "returns",
-        "type": {
-          "type": "NameExpression",
-          "name": "Promise"
-        }
-      }
-    ],
-    "sees": [],
-    "throws": [],
-    "todos": [],
-    "name": "estimateTokenTransfer",
-    "kind": "function",
-    "members": {
-      "global": [],
-      "inner": [],
-      "instance": [],
-      "events": [],
-      "static": []
-    },
-    "path": [
-      {
-        "name": "estimateTokenTransfer",
-        "kind": "function"
-      }
-    ],
-    "namespace": "estimateTokenTransfer"
-  },
-  {
-    "description": {
-      "type": "root",
-      "children": [
-        {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
               "value": "List the set of files in this application's Gaia storage bucket.",
               "position": {
                 "start": {
@@ -21153,22 +20890,22 @@
     ],
     "loc": {
       "start": {
-        "line": 537,
+        "line": 556,
         "column": 0
       },
       "end": {
-        "line": 542,
+        "line": 561,
         "column": 3
       }
     },
     "context": {
       "loc": {
         "start": {
-          "line": 543,
+          "line": 562,
           "column": 0
         },
         "end": {
-          "line": 546,
+          "line": 565,
           "column": 1
         }
       },

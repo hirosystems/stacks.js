@@ -5188,6 +5188,7 @@ function estimateAnnounce(messageHash) {
  *  just the recipient output (default = 1, if the token owner is also the bitcoin funder)
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this token-transfer transaction
+ * @private
  */
 function estimateTokenTransfer(recipientAddress, tokenType, tokenAmount, scratchArea) {
   var senderUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
@@ -13257,7 +13258,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -13282,7 +13283,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -30913,6 +30914,9 @@ const types = require('./types')
 const wif = require('wif')
 
 const NETWORKS = require('./networks')
+
+// TODO: why is the function name toJSON weird?
+function isPoint (x) { return ecc.isPoint(x) }
 const isOptions = typeforce.maybe(typeforce.compile({
   compressed: types.maybe(types.Boolean),
   network: types.maybe(types.Network)
@@ -30962,7 +30966,7 @@ function fromPrivateKey (buffer, options) {
 }
 
 function fromPublicKey (buffer, options) {
-  typeforce(ecc.isPoint, buffer)
+  typeforce(isPoint, buffer)
   typeforce(isOptions, options)
   return new ECPair(null, buffer, options)
 }
@@ -31082,7 +31086,7 @@ function p2data (a, opts) {
     !a.data &&
     !a.output
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   typef({
     network: typef.maybe(typef.Object),
@@ -31191,7 +31195,7 @@ function p2ms (a, opts) {
     !(a.pubkeys && a.m !== undefined) &&
     !a.signatures
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   function isAcceptableSignature (x) {
     return bscript.isCanonicalScriptSignature(x) || (opts.allowIncomplete && (x === OPS.OP_0))
@@ -31307,13 +31311,13 @@ function p2ms (a, opts) {
 module.exports = p2ms
 
 },{"../networks":93,"../script":103,"./lazy":96,"bitcoin-ops":84,"tiny-secp256k1":468,"typeforce":495}],98:[function(require,module,exports){
-const lazy = require('./lazy')
-const typef = require('typeforce')
-const OPS = require('bitcoin-ops')
-const ecc = require('tiny-secp256k1')
+let lazy = require('./lazy')
+let typef = require('typeforce')
+let OPS = require('bitcoin-ops')
+let ecc = require('tiny-secp256k1')
 
-const bscript = require('../script')
-const BITCOIN_NETWORK = require('../networks').bitcoin
+let bscript = require('../script')
+let BITCOIN_NETWORK = require('../networks').bitcoin
 
 // input: {signature}
 // output: {pubKey} OP_CHECKSIG
@@ -31325,7 +31329,7 @@ function p2pk (a, opts) {
     !a.input &&
     !a.signature
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   typef({
     network: typef.maybe(typef.Object),
@@ -31336,10 +31340,10 @@ function p2pk (a, opts) {
     input: typef.maybe(typef.Buffer)
   }, a)
 
-  const _chunks = lazy.value(function () { return bscript.decompile(a.input) })
+  let _chunks = lazy.value(function () { return bscript.decompile(a.input) })
 
-  const network = a.network || BITCOIN_NETWORK
-  const o = { network }
+  let network = a.network || BITCOIN_NETWORK
+  let o = { network }
 
   lazy.prop(o, 'output', function () {
     if (!a.pubkey) return
@@ -31367,19 +31371,22 @@ function p2pk (a, opts) {
 
   // extended validation
   if (opts.validate) {
+    if (a.pubkey && a.output) {
+      if (!a.pubkey.equals(o.pubkey)) throw new TypeError('Pubkey mismatch')
+    }
+
     if (a.output) {
       if (a.output[a.output.length - 1] !== OPS.OP_CHECKSIG) throw new TypeError('Output is invalid')
       if (!ecc.isPoint(o.pubkey)) throw new TypeError('Output pubkey is invalid')
-      if (a.pubkey && !a.pubkey.equals(o.pubkey)) throw new TypeError('Pubkey mismatch')
     }
 
     if (a.signature) {
-      if (a.input && !a.input.equals(o.input)) throw new TypeError('Signature mismatch')
+      if (a.input && !a.input.equals(o.input)) throw new TypeError('Input mismatch')
     }
 
     if (a.input) {
       if (_chunks().length !== 1) throw new TypeError('Input is invalid')
-      if (!bscript.isCanonicalScriptSignature(o.signature)) throw new TypeError('Input has invalid signature')
+      if (!bscript.isCanonicalScriptSignature(_chunks()[0])) throw new TypeError('Input has invalid signature')
     }
   }
 
@@ -31410,7 +31417,7 @@ function p2pkh (a, opts) {
     !a.pubkey &&
     !a.input
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   typef({
     network: typef.maybe(typef.Object),
@@ -31498,19 +31505,18 @@ function p2pkh (a, opts) {
         a.output[23] !== OPS.OP_EQUALVERIFY ||
         a.output[24] !== OPS.OP_CHECKSIG) throw new TypeError('Output is invalid')
 
-      const hash2 = a.output.slice(3, 23)
-      if (hash && !hash.equals(hash2)) throw new TypeError('Hash mismatch')
-      else hash = hash2
+      if (hash && !hash.equals(a.output.slice(3, 23))) throw new TypeError('Hash mismatch')
+      else hash = a.output.slice(3, 23)
     }
 
     if (a.pubkey) {
-      const pkh = bcrypto.hash160(a.pubkey)
+      let pkh = bcrypto.hash160(a.pubkey)
       if (hash && !hash.equals(pkh)) throw new TypeError('Hash mismatch')
       else hash = pkh
     }
 
     if (a.input) {
-      const chunks = _chunks()
+      let chunks = _chunks()
       if (chunks.length !== 2) throw new TypeError('Input is invalid')
       if (!bscript.isCanonicalScriptSignature(chunks[0])) throw new TypeError('Input has invalid signature')
       if (!ecc.isPoint(chunks[1])) throw new TypeError('Input has invalid pubkey')
@@ -31518,7 +31524,7 @@ function p2pkh (a, opts) {
       if (a.signature && !a.signature.equals(chunks[0])) throw new TypeError('Signature mismatch')
       if (a.pubkey && !a.pubkey.equals(chunks[1])) throw new TypeError('Pubkey mismatch')
 
-      const pkh = bcrypto.hash160(chunks[1])
+      let pkh = bcrypto.hash160(chunks[1])
       if (hash && !hash.equals(pkh)) throw new TypeError('Hash mismatch')
     }
   }
@@ -31559,7 +31565,7 @@ function p2sh (a, opts) {
     !a.redeem &&
     !a.input
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   typef({
     network: typef.maybe(typef.Object),
@@ -31591,7 +31597,7 @@ function p2sh (a, opts) {
   const _redeem = lazy.value(function () {
     const chunks = _chunks()
     return {
-      network,
+      network: network,
       output: chunks[chunks.length - 1],
       input: bscript.compile(chunks.slice(0, -1)),
       witness: a.witness || []
@@ -31644,7 +31650,7 @@ function p2sh (a, opts) {
     if (a.address) {
       if (_address().version !== network.scriptHash) throw new TypeError('Invalid version or Network mismatch')
       if (_address().hash.length !== 20) throw new TypeError('Invalid address')
-      hash = _address().hash
+      else hash = _address().hash
     }
 
     if (a.hash) {
@@ -31658,7 +31664,6 @@ function p2sh (a, opts) {
         a.output[0] !== OPS.OP_HASH160 ||
         a.output[1] !== 0x14 ||
         a.output[22] !== OPS.OP_EQUAL) throw new TypeError('Output is invalid')
-
       const hash2 = a.output.slice(2, 22)
       if (hash && !hash.equals(hash2)) throw new TypeError('Hash mismatch')
       else hash = hash2
@@ -31699,10 +31704,9 @@ function p2sh (a, opts) {
 
     if (a.redeem) {
       if (a.redeem.network && a.redeem.network !== network) throw new TypeError('Network mismatch')
-      if (a.input) {
-        const redeem = _redeem()
-        if (a.redeem.output && !a.redeem.output.equals(redeem.output)) throw new TypeError('Redeem.output mismatch')
-        if (a.redeem.input && !a.redeem.input.equals(redeem.input)) throw new TypeError('Redeem.input mismatch')
+      if (o.redeem) {
+        if (a.redeem.output && !a.redeem.output.equals(o.redeem.output)) throw new TypeError('Redeem.output mismatch')
+        if (a.redeem.input && !a.redeem.input.equals(o.redeem.input)) throw new TypeError('Redeem.input mismatch')
       }
 
       checkRedeem(a.redeem)
@@ -31747,7 +31751,7 @@ function p2wpkh (a, opts) {
     !a.pubkey &&
     !a.witness
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   typef({
     address: typef.maybe(typef.String),
@@ -31819,6 +31823,7 @@ function p2wpkh (a, opts) {
       if (network && network.bech32 !== _address().prefix) throw new TypeError('Invalid prefix or Network mismatch')
       if (_address().version !== 0x00) throw new TypeError('Invalid address version')
       if (_address().data.length !== 20) throw new TypeError('Invalid address data')
+      // if (hash && !hash.equals(_address().data)) throw new TypeError('Hash mismatch')
       hash = _address().data
     }
 
@@ -31893,7 +31898,7 @@ function p2wsh (a, opts) {
     !a.redeem &&
     !a.witness
   ) throw new TypeError('Not enough data')
-  opts = Object.assign({ validate: true }, opts || {})
+  opts = opts || { validate: true }
 
   typef({
     network: typef.maybe(typef.Object),
@@ -31987,7 +31992,7 @@ function p2wsh (a, opts) {
       if (_address().prefix !== network.bech32) throw new TypeError('Invalid prefix or Network mismatch')
       if (_address().version !== 0x00) throw new TypeError('Invalid address version')
       if (_address().data.length !== 32) throw new TypeError('Invalid address data')
-      hash = _address().data
+      else hash = _address().data
     }
 
     if (a.hash) {
@@ -54509,7 +54514,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -54533,7 +54538,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -62623,7 +62628,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -62651,7 +62656,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -75737,7 +75742,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/hank/blockstack/js"
+      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -75761,7 +75766,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/hank/blockstack/js",
+  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
