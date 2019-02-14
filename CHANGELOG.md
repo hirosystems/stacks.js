@@ -4,6 +4,17 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [18.3.0] - 2018-01-29
+
+### Changed
+
+- New method for auth protocol handler detection. This should fix sign in flows for 
+most major web browsers and operating systems with both the native browser installed and
+not installed. 
+- NOTE: If you're using this version of blockstack.js with an old version of the native 
+browser, the app will (1) open an auth handler in the native browser and (2) also redirect 
+the original tab to browser.blockstack.org. 
+
 ## [18.2.1] - 2018-01-08
 
 ### Added

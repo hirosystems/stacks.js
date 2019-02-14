@@ -1,7 +1,6 @@
 /* @flow */
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import protocolCheck from 'custom-protocol-detection-blockstack'
 import { verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID } from '../index'
@@ -168,6 +167,173 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
 }
 
 /**
+ * Detects if the native auth-browser is installed and is successfully 
+ * launched via a custom protocol URI. 
+ * @param {String} authRequest
+ * The encoded authRequest to be used as a query param in the custom URI. 
+ * @param {String} successCallback
+ * The callback that is invoked when the protocol handler was detected. 
+ * @param {String} failCallback
+ * The callback that is invoked when the protocol handler was not detected. 
+ * @return {void}
+ */
+function detectProtocolLaunch(
+  authRequest: string, 
+  successCallback: () => void, 
+  failCallback: () => void) {
+  // Create a unique ID used for this protocol detection attempt.
+  const echoReplyID = Math.random().toString(36).substr(2, 9)
+  const echoReplyKeyPrefix = 'echo-reply-'
+  const echoReplyKey = `${echoReplyKeyPrefix}${echoReplyID}`
+
+  // Use localStorage as a reliable cross-window communication method.
+  // Create the storage entry to signal a protocol detection attempt for the
+  // next browser window to check.
+  window.localStorage.setItem(echoReplyKey, Date.now().toString())
+  const cleanUpLocalStorage = () => {
+    try {
+      window.localStorage.removeItem(echoReplyKey)
+      // Also clear out any stale echo-reply keys older than 1 hour.
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const storageKey = window.localStorage.key(i)
+        if (storageKey.startsWith(echoReplyKeyPrefix)) {
+          const storageValue = window.localStorage.getItem(storageKey)
+          if (storageValue === 'success' || (Date.now() - parseInt(storageValue, 10)) > 3600000) {
+            window.localStorage.removeItem(storageKey)
+          }
+        }
+      }
+    } catch (err) {
+      Logger.error('Exception cleaning up echo-reply entries in localStorage')
+      Logger.error(err)
+    }
+  }
+
+  const detectionTimeout = 1000
+  let redirectToWebAuthTimer = 0
+  const cancelWebAuthRedirectTimer = () => {
+    if (redirectToWebAuthTimer) {
+      window.clearTimeout(redirectToWebAuthTimer)
+      redirectToWebAuthTimer = 0
+    }
+  }
+  const startWebAuthRedirectTimer = (timeout = detectionTimeout) => {
+    cancelWebAuthRedirectTimer()
+    redirectToWebAuthTimer = window.setTimeout(() => {
+      if (redirectToWebAuthTimer) {
+        cancelWebAuthRedirectTimer()
+        let nextFunc
+        if (window.localStorage.getItem(echoReplyKey) === 'success') {
+          Logger.info('Protocol echo reply detected.')
+          nextFunc = successCallback
+        } else {
+          Logger.info('Protocol handler not detected.')
+          nextFunc = failCallback
+        }
+        failCallback = () => {}
+        successCallback = () => {}
+        cleanUpLocalStorage()
+        // Briefly wait since localStorage changes can 
+        // sometimes be ignored when immediately redirected.
+        setTimeout(() => nextFunc(), 100)
+      }
+    }, timeout)
+  }
+
+  startWebAuthRedirectTimer()
+
+  const inputPromptTracker = document.createElement('input')
+  inputPromptTracker.type = 'text'
+  // Prevent this element from inherited any css.
+  inputPromptTracker.style.all = 'initial'
+  // Setting display=none on an element prevents them from being focused/blurred.
+  // So hide the element using other properties..
+  inputPromptTracker.style.opacity = '0'
+  inputPromptTracker.style.filter = 'alpha(opacity=0)'
+  inputPromptTracker.style.height = '0'
+  inputPromptTracker.style.width = '0'
+
+  // If the the focus of a page element is immediately changed then this likely indicates 
+  // the protocol handler is installed, and the browser is prompting the user if they want 
+  // to open the application. 
+  const inputBlurredFunc = () => {
+    // Use a timeout of 100ms to ignore instant toggles between blur and focus.
+    // Browsers often perform an instant blur & focus when the protocol handler is working
+    // but not showing any browser prompts, so we want to ignore those instances.
+    let isRefocused = false
+    inputPromptTracker.addEventListener('focus', () => { isRefocused = true }, { once: true, capture: true })
+    setTimeout(() => {
+      if (redirectToWebAuthTimer && !isRefocused) {
+        Logger.info('Detected possible browser prompt for opening the protocol handler app.')
+        window.clearTimeout(redirectToWebAuthTimer)
+        inputPromptTracker.addEventListener('focus', () => {
+          if (redirectToWebAuthTimer) {
+            Logger.info('Possible browser prompt closed, restarting auth redirect timeout.')
+            startWebAuthRedirectTimer()
+          }
+        }, { once: true, capture: true })
+      }
+    }, 100)
+  }
+  inputPromptTracker.addEventListener('blur', inputBlurredFunc, { once: true, capture: true })
+  setTimeout(() => inputPromptTracker.removeEventListener('blur', inputBlurredFunc), 200)
+  // Flow complains without this check.
+  if (document.body) document.body.appendChild(inputPromptTracker)
+  inputPromptTracker.focus()
+  
+  // Detect if document.visibility is immediately changed which is a strong 
+  // indication that the protocol handler is working. We don't know for sure and 
+  // can't predict future browser changes, so only increase the redirect timeout.
+  // This reduces the probability of a false-negative (where local auth works, but 
+  // the original page was redirect to web auth because something took too long),
+  const pageVisibilityChanged = () => {
+    if (document.hidden && redirectToWebAuthTimer) {
+      Logger.info('Detected immediate page visibility change (protocol handler probably working).')
+      startWebAuthRedirectTimer(3000)
+    }
+  }
+  document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
+  setTimeout(() => document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
+
+
+  // Listen for the custom protocol echo reply via localStorage update event.
+  window.addEventListener('storage', function replyEventListener(event) {
+    if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
+      // Custom protocol worked, cancel the web auth redirect timer.
+      cancelWebAuthRedirectTimer()
+      inputPromptTracker.removeEventListener('blur', inputBlurredFunc)
+      Logger.info('Protocol echo reply detected from localStorage event.')
+      // Clean up event listener and localStorage.
+      window.removeEventListener('storage', replyEventListener)
+      const nextFunc = successCallback
+      successCallback = () => {}
+      failCallback = () => {}
+      cleanUpLocalStorage()
+      // Briefly wait since localStorage changes can sometimes 
+      // be ignored when immediately redirected.
+      setTimeout(() => nextFunc(), 100)
+    }
+  }, false)
+
+  // Use iframe technique for launching the protocol URI rather than setting `window.location`.
+  // This method prevents browsers like Safari, Opera, Firefox from showing error prompts
+  // about unknown protocol handler when app is not installed, and avoids an empty
+  // browser tab when the app is installed. 
+  Logger.info('Attempting protocol launch via iframe injection.')
+  const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
+  const iframe = document.createElement('iframe')
+  iframe.style.all = 'initial'
+  iframe.style.display = 'none'
+  iframe.src = locationSrc
+  // Flow complains without this check.
+  if (document.body) {
+    document.body.appendChild(iframe)
+  } else {
+    Logger.error('document.body is null when attempting iframe injection for protoocol URI launch')
+  }
+}
+
+/**
  * Redirects the user to the Blockstack browser to approve the sign in request
  * given.
  *
@@ -182,9 +348,9 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
  * @private
  */
 export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
-                                                    authRequest: string) {
-  const protocolURI = `${BLOCKSTACK_HANDLER}:${authRequest}`
-
+                                                    authRequest: string,
+                                                    blockstackIDHost: string = 
+                                                    DEFAULT_BLOCKSTACK_HOST) {
   let httpsURI = `${DEFAULT_BLOCKSTACK_HOST}?authRequest=${authRequest}`
 
   if (caller.appConfig
@@ -201,7 +367,7 @@ export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
 
   function successCallback() {
     Logger.info('protocol handler detected')
-    // protocolCheck should open the link for us
+    // The detection function should open the link for us
   }
 
   function failCallback() {
@@ -209,13 +375,7 @@ export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
     window.location = httpsURI
   }
 
-  function unsupportedBrowserCallback() {
-    // Safari is unsupported by protocolCheck
-    Logger.warn('can not detect custom protocols on this browser')
-    window.location = protocolURI
-  }
-
-  protocolCheck(protocolURI, failCallback, successCallback, unsupportedBrowserCallback)
+  detectProtocolLaunch(authRequest, successCallback, failCallback)
 }
 
 /**

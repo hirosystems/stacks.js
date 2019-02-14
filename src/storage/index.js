@@ -183,7 +183,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
- * key to use for encryption. If not provided, will use user's appPrivateKey.
+ * key to use for encryption. If not provided, will use user's appPublicKey.
  * @return {String} Stringified ciphertext object
  * @private
  */
@@ -499,7 +499,7 @@ export function getFileImpl(caller: UserSession, path: string, options?: {
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
- * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
  *                                                  or the provided public key
  * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
  *                                         the app private key
