@@ -32,10 +32,10 @@ const DEFAULT_PROFILE = {
  * @return {Boolean} `true` if the user is signed in, `false` if not.
  */
 export function isUserSignedIn() {
-  console.warn(`DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in \
-the next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method isUserSignedIn().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method isUserSignedIn().')
+  const userSession = new this.UserSession()
   return userSession.isUserSignedIn()
 }
 
@@ -54,10 +54,10 @@ instance method isUserSignedIn().`)
 export function redirectToSignInWithAuthRequest(authRequest: string,
                                                 blockstackIDHost: string =
                                                 DEFAULT_BLOCKSTACK_HOST) {
-  console.warn(`DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will \
-be deprecated in the next major release of blockstack.js. Create an instance of UserSession \
-and call the instance method redirectToSignInWithAuthRequest().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will '
+    + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession '
+    + 'and call the instance method redirectToSignInWithAuthRequest().')
+  const userSession = new this.UserSession()
   userSession.redirectToSignInWithAuthRequest(authRequest, blockstackIDHost)
 }
 
@@ -83,25 +83,27 @@ and call the instance method redirectToSignInWithAuthRequest().`)
  * An array of strings indicating which permissions this app is requesting.
  * @return {void}
  */
-export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`,
-                                 manifestURI: string = `${window.location.origin}/manifest.json`,
-                                 scopes: Array<string> = DEFAULT_SCOPE) {
-  console.warn(`DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the \
-next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method redirectToSignIn().`)
-    const userSession = new blockstack.UserSession()
-    userSession.redirectToSignIn()
+/* eslint-disable no-unused-vars */
+export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
+                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
+                                 scopes: Array<string> = DEFAULT_SCOPE) { 
+  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method redirectToSignIn().')
+  const userSession = new this.UserSession()
+  userSession.redirectToSignIn()
 }
+/* eslint-enable no-unused-vars */
 
 /**
  * Check if there is a authentication request that hasn't been handled.
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
 export function isSignInPending() {
-  console.warn(`DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the \
-next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method isSignInPending().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method isSignInPending().')
+  const userSession = new this.UserSession()
   return userSession.isSignInPending()
 }
 
@@ -117,17 +119,19 @@ instance method isSignInPending().`)
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export function handlePendingSignIn(nameLookupURL: string = '',
-                                    authResponseToken: string = getAuthResponseToken(),
-                                    transitKey: string = '') {
-  console.warn(`DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the \
-next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method handlePendingSignIn().`)
-  console.warn(`DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and \
-transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.`)
-  const userSession = new blockstack.UserSession()
+/* eslint-disable no-unused-vars, no-use-before-define */
+export function handlePendingSignIn(nameLookupURL: string = '', 
+                                    authResponseToken: string = getAuthResponseToken(), 
+                                    transitKey: string = '') { 
+  console.warn('DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method handlePendingSignIn().')
+  console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and '
+    + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.')
+  const userSession = new this.UserSession()
   userSession.handlePendingSignIn(authResponseToken)
 }
+/* eslint-enable no-unused-vars */
 
 /**
  * Retrieve the authentication token from the URL query
@@ -143,10 +147,10 @@ function getAuthResponseToken(): string {
  * @return {Object} User data object.
  */
 export function loadUserData() {
-  console.warn(`DEPRECATION WARNING: The static loadUserData() function will be deprecated in the \
-next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method loadUserData().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method loadUserData().')
+  const userSession = new this.UserSession()
   return userSession.loadUserData()
 }
 
@@ -155,15 +159,13 @@ instance method loadUserData().`)
  * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
  * @return {void}
  */
-export function signUserOut(redirectURL: ?string = null) {
-  console.warn(`DEPRECATION WARNING: The static signUserOut() function will be deprecated in the \
-next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method signUserOut().`)
-  const userSession = new blockstack.UserSession()
+export function signUserOut(redirectURL: ?string = null) { // eslint-disable-line no-unused-vars
+  console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method signUserOut().')
+  const userSession = new this.UserSession()
   return userSession.signUserOut()
 }
-
-
 
 /**
  * Redirects the user to the Blockstack browser to approve the sign in request

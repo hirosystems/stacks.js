@@ -38,10 +38,10 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
  * @return {String} Stringified ciphertext object
  */
 export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
-  console.warn(`DEPRECATION WARNING: The static encryptContent() function will be deprecated in \
-the next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method encryptContent().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method encryptContent().')
+  const userSession = new this.UserSession()
   return userSession.encryptContent(content, options)
 }
 
@@ -55,10 +55,10 @@ instance method encryptContent().`)
  * @return {String|Buffer} decrypted content.
  */
 export function decryptContent(content: string, options?: {privateKey?: ?string}) {
-  console.warn(`DEPRECATION WARNING: The static decryptContent() function will be deprecated in \
-the next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method decryptContent().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method decryptContent().')
+  const userSession = new this.UserSession()
   return userSession.decryptContent(content, options)
 }
 
@@ -85,10 +85,10 @@ export function getFile(path: string, options?: {
     app?: string,
     zoneFileLookupURL?: ?string
   }) {
-  console.warn(`DEPRECATION WARNING: The static getFile() function will be deprecated in \
-the next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method getFile().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method getFile().')
+  const userSession = new this.UserSession()
   return userSession.getFile(path, options)
 }
 
@@ -110,10 +110,10 @@ export function putFile(path: string, content: string | Buffer, options?: {
   sign?: boolean,
   contentType?: string
   }) {
-  console.warn(`DEPRECATION WARNING: The static putFile() function will be deprecated in \
-the next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method putFile().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method putFile().')
+  const userSession = new this.UserSession()
   return userSession.putFile(path, content, options)
 }
 
@@ -124,10 +124,10 @@ instance method putFile().`)
  * @return {Promise} that resolves to the number of files listed
  */
 export function listFiles(callback: (name: string) => boolean) : Promise<number> {
-  console.warn(`DEPRECATION WARNING: The static listFiles() function will be deprecated in \
-the next major release of blockstack.js. Create an instance of UserSession and call the \
-instance method listFiles().`)
-  const userSession = new blockstack.UserSession()
+  console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method listFiles().')
+  const userSession = new this.UserSession()
   return userSession.listFiles(callback)
 }
 
@@ -141,12 +141,6 @@ instance method listFiles().`)
 export function deleteFile(path: string) {
   Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
 }
-
-
-
-
-
-
 
 /**
  * Fetch the public read URL of a user file for the specified app.
