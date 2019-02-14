@@ -28,6 +28,126 @@ export type PutFileOptions = {
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
+
+/**
+ * Encrypts the data provided with the app public key.
+ * @param {String|Buffer} content - data to encrypt
+ * @param {Object} [options=null] - options object
+ * @param {String} options.publicKey - the hex string of the ECDSA public
+ * key to use for encryption. If not provided, will use user's appPublicKey.
+ * @return {String} Stringified ciphertext object
+ */
+export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
+  console.warn(`DEPRECATION WARNING: The static encryptContent() function will be deprecated in \
+the next major release of blockstack.js. Create an instance of UserSession and call the \
+instance method encryptContent().`)
+  const userSession = new blockstack.UserSession()
+  return userSession.encryptContent(content, options)
+}
+
+/**
+ * Decrypts data encrypted with `encryptContent` with the
+ * transit private key.
+ * @param {String|Buffer} content - encrypted content.
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
+ * @return {String|Buffer} decrypted content.
+ */
+export function decryptContent(content: string, options?: {privateKey?: ?string}) {
+  console.warn(`DEPRECATION WARNING: The static decryptContent() function will be deprecated in \
+the next major release of blockstack.js. Create an instance of UserSession and call the \
+instance method decryptContent().`)
+  const userSession = new blockstack.UserSession()
+  return userSession.decryptContent(content, options)
+}
+
+/**
+ * Retrieves the specified file from the app's data store.
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {Boolean} options.verify - Whether the content should be verified, only to be used
+ * when `putFile` was set to `sign = true`
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise} that resolves to the raw data in the file
+ * or rejects with an error
+ */
+export function getFile(path: string, options?: {
+    decrypt?: boolean,
+    verify?: boolean,
+    username?: string,
+    app?: string,
+    zoneFileLookupURL?: ?string
+  }) {
+  console.warn(`DEPRECATION WARNING: The static getFile() function will be deprecated in \
+the next major release of blockstack.js. Create an instance of UserSession and call the \
+instance method getFile().`)
+  const userSession = new blockstack.UserSession()
+  return userSession.getFile(path, options)
+}
+
+/**
+ * Stores the data provided in the app's data store to to the file specified.
+ * @param {String} path - the path to store the data in
+ * @param {String|Buffer} content - the data to store in the file
+ * @param {Object} [options=null] - options object
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
+ *                                                  or the provided public key
+ * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+ *                                         the app private key
+ * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
+export function putFile(path: string, content: string | Buffer, options?: {
+  encrypt?: boolean | string,
+  sign?: boolean,
+  contentType?: string
+  }) {
+  console.warn(`DEPRECATION WARNING: The static putFile() function will be deprecated in \
+the next major release of blockstack.js. Create an instance of UserSession and call the \
+instance method putFile().`)
+  const userSession = new blockstack.UserSession()
+  return userSession.putFile(path, content, options)
+}
+
+/**
+ * List the set of files in this application's Gaia storage bucket.
+ * @param {function} callback - a callback to invoke on each named file that
+ * returns `true` to continue the listing operation or `false` to end it
+ * @return {Promise} that resolves to the number of files listed
+ */
+export function listFiles(callback: (name: string) => boolean) : Promise<number> {
+  console.warn(`DEPRECATION WARNING: The static listFiles() function will be deprecated in \
+the next major release of blockstack.js. Create an instance of UserSession and call the \
+instance method listFiles().`)
+  const userSession = new blockstack.UserSession()
+  return userSession.listFiles(callback)
+}
+
+/**
+ * Deletes the specified file from the app's data store. Currently not implemented.
+ * @param {String} path - the path to the file to delete
+ * @returns {Promise} that resolves when the file has been removed
+ * or rejects with an error
+ * @private
+ */
+export function deleteFile(path: string) {
+  Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
+}
+
+
+
+
+
+
+
 /**
  * Fetch the public read URL of a user file for the specified app.
  * @param {String} path - the path to the file to read

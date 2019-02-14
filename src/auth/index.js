@@ -17,3 +17,7 @@ export {
   doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
   isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
 } from './authVerification'
+export {
+  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
+  isSignInPending, handlePendingSignIn, loadUserData, signUserOut
+} from './authApp'

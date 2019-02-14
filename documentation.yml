@@ -6,6 +6,13 @@ toc:
   - SessionDataStore
   - InstanceDataStore
   - LocalStorageStore
+  - isUserSignedIn
+  - redirectToSignIn
+  - redirectToSignInWithAuthRequest
+  - isSignInPending
+  - handlePendingSignIn
+  - loadUserData
+  - signUserOut
   - name: Profiles
     file: src/profiles/README.md
   - extractProfile
@@ -19,3 +26,8 @@ toc:
     file: src/storage/README.md
   - getAppBucketUrl
   - getUserAppFileUrl
+  - getFile
+  - putFile
+  - encryptContent
+  - decryptContent
+  - listFiles
