@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>blockstack 19.0.0-alpha.4 | Documentation</title>
+  <title>blockstack 19.0.0-alpha.5 | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -15,7 +15,7 @@
       <div id='split-left' class='overflow-auto fs0 height-viewport-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>blockstack</h3>
-          <div class='mb1'><code>19.0.0-alpha.4</code></div>
+          <div class='mb1'><code>19.0.0-alpha.5</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -472,6 +472,16 @@
               
                 
                 <li><a
+                  href='#detectprotocollaunch'
+                  class="">
+                  detectProtocolLaunch
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
                   href='#getnameprice'
                   class="">
                   getNamePrice
@@ -595,16 +605,6 @@
                   href='#getaccountbalance'
                   class="">
                   getAccountBalance
-                  
-                </a>
-                
-                </li>
-              
-                
-                <li><a
-                  href='#estimatetokentransfer'
-                  class="">
-                  estimateTokenTransfer
                   
                 </a>
                 
@@ -5374,6 +5374,95 @@ returns
   
   <div class='clearfix'>
     
+    <h3 class='fl m0' id='detectprotocollaunch'>
+      detectProtocolLaunch
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Detects if the native auth-browser is installed and is successfully
+launched via a custom protocol URI.</p>
+
+ 
+  
+    <div class='pre p1 fill-light mt0'>detectProtocolLaunch(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, successCallback: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, failCallback: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
+   
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>authRequest</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    The encoded authRequest to be used as a query param in the custom URI.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>successCallback</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    The callback that is invoked when the protocol handler was detected.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>failCallback</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    The callback that is invoked when the protocol handler was not detected.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>void</code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
     <h3 class='fl m0' id='getnameprice'>
       getNamePrice
     </h3>
@@ -6304,127 +6393,6 @@ tokens of this type, then 0 will be returned.</p>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         a promise that resolves to a BigInteger that encodes the number of tokens
 held by this account.
-
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-        
-          
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='estimatetokentransfer'>
-      estimateTokenTransfer
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Estimates the cost of a token-transfer transaction</p>
-
- 
-  
-    <div class='pre p1 fill-light mt0'>estimateTokenTransfer(recipientAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, tokenType: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, tokenAmount: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, scratchArea: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, senderUtxos: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>, additionalOutputs: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>recipientAddress</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the recipient of the tokens
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>tokenType</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    the type of token to spend
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>tokenAmount</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    a 64-bit unsigned BigInteger encoding the number of tokens
-to spend
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>scratchArea</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    an arbitrary string to store with the transaction
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>senderUtxos</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
-            = <code>1</code>)</code>
-	    the number of utxos we expect will
-be required from the importer address
-
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>additionalOutputs</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
-            = <code>1</code>)</code>
-	    the number of outputs we expect to add beyond
-just the recipient output (default = 1, if the token owner is also the bitcoin funder)
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        a promise which resolves to the satoshi cost to
-fund this token-transfer transaction
 
       
     

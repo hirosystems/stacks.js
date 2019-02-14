@@ -348,9 +348,7 @@ function detectProtocolLaunch(
  * @private
  */
 export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
-                                                    authRequest: string,
-                                                    blockstackIDHost: string = 
-                                                    DEFAULT_BLOCKSTACK_HOST) {
+                                                    authRequest: string) {
   let httpsURI = `${DEFAULT_BLOCKSTACK_HOST}?authRequest=${authRequest}`
 
   if (caller.appConfig
