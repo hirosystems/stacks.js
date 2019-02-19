@@ -9155,6 +9155,7 @@ exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
 exports.uploadToGaiaHub = uploadToGaiaHub;
 exports.getFullReadUrl = getFullReadUrl;
 exports.connectToGaiaHub = connectToGaiaHub;
+exports.connectToGaiaHubImpl = connectToGaiaHubImpl;
 exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
 exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
 exports.getBucketUrl = getBucketUrl;
@@ -9252,7 +9253,12 @@ function makeV1GaiaAuthToken(hubInfo, signerKeyHex, hubUrl, associationToken) {
   return 'v1:' + token;
 }
 
-function connectToGaiaHub(caller, gaiaHubUrl, challengeSignerHex, associationToken) {
+function connectToGaiaHub(gaiaHubUrl, challengeSignerHex, associationToken) {
+  var userSession = new this.UserSession();
+  return connectToGaiaHubImpl(userSession, gaiaHubUrl, challengeSignerHex, associationToken);
+}
+
+function connectToGaiaHubImpl(caller, gaiaHubUrl, challengeSignerHex, associationToken) {
   if (!associationToken) {
     // maybe given in local storage?
     try {
@@ -9301,7 +9307,7 @@ function setLocalGaiaHubConnection(caller) {
     userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
   }
 
-  return connectToGaiaHub(caller, userData.hubUrl, userData.appPrivateKey, userData.associationToken).then(function (gaiaConfig) {
+  return connectToGaiaHubImpl(caller, userData.hubUrl, userData.appPrivateKey, userData.associationToken).then(function (gaiaConfig) {
     userData.gaiaHubConfig = gaiaConfig;
     return gaiaConfig;
   });
