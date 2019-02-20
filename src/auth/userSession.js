@@ -62,10 +62,9 @@ export class UserSession {
     let runningInBrowser = true
 
     if (typeof window === 'undefined') {
+      Logger.debug(`UserSession: not running in browser`)
       runningInBrowser = false
     }
-
-    Logger.debug(`UserSession: runningInBrowser: ${runningInBrowser ? 'yes' : 'no'}`)
 
     if (options && options.appConfig) {
       this.appConfig = options.appConfig
