@@ -62,7 +62,7 @@ export class UserSession {
     let runningInBrowser = true
 
     if (typeof window === 'undefined') {
-      Logger.debug(`UserSession: not running in browser`)
+      Logger.debug('UserSession: not running in browser')
       runningInBrowser = false
     }
 

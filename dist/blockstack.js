@@ -1968,10 +1968,9 @@ var UserSession = exports.UserSession = function () {
     var runningInBrowser = true;
 
     if (typeof window === 'undefined') {
+      _logger.Logger.debug('UserSession: not running in browser');
       runningInBrowser = false;
     }
-
-    _logger.Logger.debug('UserSession: runningInBrowser: ' + (runningInBrowser ? 'yes' : 'no'));
 
     if (options && options.appConfig) {
       this.appConfig = options.appConfig;
