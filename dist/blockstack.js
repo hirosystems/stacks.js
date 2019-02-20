@@ -308,6 +308,44 @@ function signUserOut() {
 }
 
 /**
+ * Generates an authentication request that can be sent to the Blockstack
+ * browser for the user to approve sign in. This authentication request can
+ * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * method.
+ *
+ * *Note: This method should only be used if you want to roll your own authentication
+ * flow. Typically you'd use `redirectToSignIn` which takes care of this
+ * under the hood.*
+ *
+ * @param  {String} transitPrivateKey - hex encoded transit private key
+ * @param {String} redirectURI - location to redirect user to after sign in approval
+ * @param {String} manifestURI - location of this app's manifest file
+ * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {String} appDomain - the origin of this app
+ * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
+ * @return {String} the authentication request
+ */
+// export function makeAuthRequest(transitPrivateKey: string,
+//                                 redirectURI: string,
+//                                 manifestURI: string,
+//                                 scopes: Array<string>,
+//                                 appDomain: string = window.location.origin,
+//                                 expiresAt: number,
+//                                 extraParams: Object = {}): string {
+//   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
+//     + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
+//   const userSession = new this.UserSession()
+//   const transitKey = (transitPrivateKey == null) 
+//     ? userSession.generateAndStoreTransitKey() : transitPrivateKey
+
+//   return makeAuthRequestImpl(transitKey, redirectURI, manifestURI,
+//                              scopes, appDomain, expiresAt, extraParams)
+// }
+
+/**
  * Detects if the native auth-browser is installed and is successfully 
  * launched via a custom protocol URI. 
  * @param {String} authRequest
@@ -9155,7 +9193,6 @@ exports.BLOCKSTACK_GAIA_HUB_LABEL = undefined;
 exports.uploadToGaiaHub = uploadToGaiaHub;
 exports.getFullReadUrl = getFullReadUrl;
 exports.connectToGaiaHub = connectToGaiaHub;
-exports.connectToGaiaHubImpl = connectToGaiaHubImpl;
 exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
 exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
 exports.getBucketUrl = getBucketUrl;
@@ -9182,6 +9219,7 @@ var _errors = require('../errors');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import { UserSession } from '../auth/userSession'
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
 
 function uploadToGaiaHub(filename, contents, hubConfig) {
@@ -9254,23 +9292,6 @@ function makeV1GaiaAuthToken(hubInfo, signerKeyHex, hubUrl, associationToken) {
 }
 
 function connectToGaiaHub(gaiaHubUrl, challengeSignerHex, associationToken) {
-  var userSession = new this.UserSession();
-  return connectToGaiaHubImpl(userSession, gaiaHubUrl, challengeSignerHex, associationToken);
-}
-
-function connectToGaiaHubImpl(caller, gaiaHubUrl, challengeSignerHex, associationToken) {
-  if (!associationToken) {
-    // maybe given in local storage?
-    try {
-      var userData = caller.loadUserData();
-      if (userData && userData.gaiaAssociationToken) {
-        associationToken = userData.gaiaAssociationToken;
-      }
-    } catch (e) {
-      associationToken = undefined;
-    }
-  }
-
   _logger.Logger.debug('connectToGaiaHub: ' + gaiaHubUrl + '/hub_info');
 
   return fetch(gaiaHubUrl + '/hub_info').then(function (response) {
@@ -9307,7 +9328,7 @@ function setLocalGaiaHubConnection(caller) {
     userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
   }
 
-  return connectToGaiaHubImpl(caller, userData.hubUrl, userData.appPrivateKey, userData.associationToken).then(function (gaiaConfig) {
+  return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey, userData.associationToken).then(function (gaiaConfig) {
     userData.gaiaHubConfig = gaiaConfig;
     return gaiaConfig;
   });

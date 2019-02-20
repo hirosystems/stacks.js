@@ -101,26 +101,6 @@ function makeV1GaiaAuthToken(hubInfo: Object,
 export function connectToGaiaHub(gaiaHubUrl: string,
                                  challengeSignerHex: string,
                                  associationToken?: string): Promise<GaiaHubConfig> {
-  const userSession = new this.UserSession()
-  return connectToGaiaHubImpl(userSession, gaiaHubUrl, challengeSignerHex, associationToken)
-}
-
-export function connectToGaiaHubImpl(caller: UserSession,
-                                      gaiaHubUrl: string,
-                                      challengeSignerHex: string,
-                                      associationToken?: string): Promise<GaiaHubConfig> {
-  if (!associationToken) {
-    // maybe given in local storage?
-    try {
-      const userData = caller.loadUserData()
-      if (userData && userData.gaiaAssociationToken) {
-        associationToken = userData.gaiaAssociationToken
-      }
-    } catch (e) {
-      associationToken = undefined
-    }
-  }
-
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   return fetch(`${gaiaHubUrl}/hub_info`)
@@ -158,10 +138,9 @@ export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubC
     userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
   }
 
-  return connectToGaiaHubImpl(caller,
-                            userData.hubUrl,
-                            userData.appPrivateKey,
-                            userData.associationToken)
+  return connectToGaiaHub(userData.hubUrl,
+                          userData.appPrivateKey,
+                          userData.associationToken)
     .then((gaiaConfig) => {
       userData.gaiaHubConfig = gaiaConfig
       return gaiaConfig

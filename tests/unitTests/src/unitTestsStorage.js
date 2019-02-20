@@ -705,7 +705,7 @@ export function runStorageTests() {
     const gaiaHubUrl = 'https://potato.hub.farm'
     const signer = '01010101'
     FetchMock.get('https://potato.hub.farm/hub_info', { status: 421, body: 'Nope.' })
-    connectToGaiaHub(blockstack, gaiaHubUrl, signer)
+    connectToGaiaHub(gaiaHubUrl, signer)
       .then(() => t.ok(false, 'Should not have returned'))
       .catch(() => t.ok(true, 'Should have rejected promise'))
   })
@@ -841,7 +841,7 @@ export function runStorageTests() {
       appPrivateKey: privateKey
     } // manually set for testing
 
-    connectToGaiaHub(blockstack, hubServer, privateKey)
+    connectToGaiaHub(hubServer, privateKey)
       .then((config) => {
         t.ok(config, 'Config returned by connectToGaiaHub()')
         t.equal(hubInfo.read_url_prefix, config.url_prefix)
@@ -894,7 +894,7 @@ export function runStorageTests() {
       appPrivateKey: privateKey
     } // manually set for testing
 
-    connectToGaiaHub(blockstack, hubServer, privateKey, gaiaAssociationToken)
+    connectToGaiaHub(hubServer, privateKey, gaiaAssociationToken)
       .then((config) => {
         t.ok(config, 'Config returned by connectToGaiaHub()')
         t.equal(hubInfo.read_url_prefix, config.url_prefix)
