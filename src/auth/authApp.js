@@ -5,7 +5,7 @@ import { verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
 import { getAddressFromDID } from '../index'
 import { InvalidStateError, LoginFailedError } from '../errors'
-import { decryptPrivateKey } from './authMessages'
+import { decryptPrivateKey, makeAuthRequestImpl } from './authMessages'
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
@@ -164,6 +164,44 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
     + 'instance method signUserOut().')
   const userSession = new this.UserSession()
   return userSession.signUserOut()
+}
+
+/**
+ * Generates an authentication request that can be sent to the Blockstack
+ * browser for the user to approve sign in. This authentication request can
+ * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * method.
+ *
+ * *Note: This method should only be used if you want to roll your own authentication
+ * flow. Typically you'd use `redirectToSignIn` which takes care of this
+ * under the hood.*
+ *
+ * @param  {String} transitPrivateKey - hex encoded transit private key
+ * @param {String} redirectURI - location to redirect user to after sign in approval
+ * @param {String} manifestURI - location of this app's manifest file
+ * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {String} appDomain - the origin of this app
+ * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
+ * @return {String} the authentication request
+ */
+export function makeAuthRequest(transitPrivateKey: string,
+                                redirectURI: string,
+                                manifestURI: string,
+                                scopes: Array<string>,
+                                appDomain: string = window.location.origin,
+                                expiresAt: number,
+                                extraParams: Object = {}): string {
+  console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
+    + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
+  const userSession = new this.UserSession()
+  const transitKey = (transitPrivateKey == null) 
+    ? userSession.generateAndStoreTransitKey() : transitPrivateKey
+
+  return makeAuthRequestImpl(transitKey, redirectURI, manifestURI,
+                             scopes, appDomain, expiresAt, extraParams)
 }
 
 /**

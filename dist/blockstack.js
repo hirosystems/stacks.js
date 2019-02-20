@@ -139,6 +139,7 @@ exports.isSignInPending = isSignInPending;
 exports.handlePendingSignIn = handlePendingSignIn;
 exports.loadUserData = loadUserData;
 exports.signUserOut = signUserOut;
+exports.makeAuthRequest = makeAuthRequest;
 exports.redirectToSignInWithAuthRequestImpl = redirectToSignInWithAuthRequestImpl;
 exports.redirectToSignInImpl = redirectToSignInImpl;
 exports.handlePendingSignInImpl = handlePendingSignInImpl;
@@ -328,22 +329,17 @@ function signUserOut() {
  * by special authenticators.
  * @return {String} the authentication request
  */
-// export function makeAuthRequest(transitPrivateKey: string,
-//                                 redirectURI: string,
-//                                 manifestURI: string,
-//                                 scopes: Array<string>,
-//                                 appDomain: string = window.location.origin,
-//                                 expiresAt: number,
-//                                 extraParams: Object = {}): string {
-//   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
-//     + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
-//   const userSession = new this.UserSession()
-//   const transitKey = (transitPrivateKey == null) 
-//     ? userSession.generateAndStoreTransitKey() : transitPrivateKey
+function makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes) {
+  var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
+  var expiresAt = arguments[5];
+  var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
 
-//   return makeAuthRequestImpl(transitKey, redirectURI, manifestURI,
-//                              scopes, appDomain, expiresAt, extraParams)
-// }
+  console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the ' + 'next major release of blockstack.js. Use UserSession to configure your auth request.');
+  var userSession = new this.UserSession();
+  var transitKey = transitPrivateKey == null ? userSession.generateAndStoreTransitKey() : transitPrivateKey;
+
+  return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
+}
 
 /**
  * Detects if the native auth-browser is installed and is successfully 
@@ -9219,7 +9215,6 @@ var _errors = require('../errors');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import { UserSession } from '../auth/userSession'
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
 
 function uploadToGaiaHub(filename, contents, hubConfig) {
