@@ -365,10 +365,8 @@ function detectProtocolLaunch(
  * @private
  */
 export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
-                                                    authRequest: string,
-                                                    blockstackIDHost: string =
-                                                    DEFAULT_BLOCKSTACK_HOST) {
-  let httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
+                                                    authRequest: string) {
+  let httpsURI = `${DEFAULT_BLOCKSTACK_HOST}?authRequest=${authRequest}`
 
   if (caller.appConfig
       && caller.appConfig.authenticatorURL) {
@@ -577,6 +575,8 @@ export function redirectToSignInWithAuthRequest(authRequest: string,
 
   const sessionAuthRequest = (authRequest == null) 
     ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest
+  
+  userSession.appConfig.authenticatorURL = blockstackIDHost
 
-  redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest, blockstackIDHost)
+  redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest)
 }

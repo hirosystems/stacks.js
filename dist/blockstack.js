@@ -512,9 +512,7 @@ function detectProtocolLaunch(authRequest, successCallback, failCallback) {
  * @private
  */
 function redirectToSignInWithAuthRequestImpl(caller, authRequest) {
-  var blockstackIDHost = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_BLOCKSTACK_HOST;
-
-  var httpsURI = blockstackIDHost + '?authRequest=' + authRequest;
+  var httpsURI = _authConstants.DEFAULT_BLOCKSTACK_HOST + '?authRequest=' + authRequest;
 
   if (caller.appConfig && caller.appConfig.authenticatorURL) {
     httpsURI = caller.appConfig.authenticatorURL + '?authRequest=' + authRequest;
@@ -710,7 +708,9 @@ function redirectToSignInWithAuthRequest(authRequest) {
 
   var sessionAuthRequest = authRequest == null ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest;
 
-  redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest, blockstackIDHost);
+  userSession.appConfig.authenticatorURL = blockstackIDHost;
+
+  redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest);
 }
 },{"../config":12,"../errors":15,"../index":16,"../logger":18,"../profiles":26,"../utils":50,"./authConstants":3,"./authMessages":4,"./index":8,"jsontokens":387,"query-string":453}],3:[function(require,module,exports){
 'use strict';
