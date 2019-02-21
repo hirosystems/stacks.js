@@ -204,7 +204,10 @@ function redirectToSignInWithAuthRequest(authRequest) {
 
   console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will ' + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession ' + 'and call the instance method redirectToSignInWithAuthRequest().');
   var userSession = new this.UserSession();
-  userSession.redirectToSignInWithAuthRequest(authRequest, blockstackIDHost);
+
+  var sessionAuthRequest = authRequest == null ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest;
+
+  userSession.redirectToSignInWithAuthRequest(sessionAuthRequest, blockstackIDHost);
 }
 
 /**

@@ -57,7 +57,11 @@ export function redirectToSignInWithAuthRequest(authRequest: string,
     + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession '
     + 'and call the instance method redirectToSignInWithAuthRequest().')
   const userSession = new this.UserSession()
-  userSession.redirectToSignInWithAuthRequest(authRequest, blockstackIDHost)
+
+  const sessionAuthRequest = (authRequest == null) 
+    ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest
+
+  userSession.redirectToSignInWithAuthRequest(sessionAuthRequest, blockstackIDHost)
 }
 
 /**
