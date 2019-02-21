@@ -167,7 +167,8 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method signUserOut().')
   const userSession = new this.UserSession()
-  return userSession.signUserOut()
+  userSession.signUserOut()
+  window.location = redirectURL
 }
 
 /**

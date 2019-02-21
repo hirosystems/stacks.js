@@ -308,7 +308,8 @@ function signUserOut() {
   // eslint-disable-line no-unused-vars
   console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method signUserOut().');
   var userSession = new this.UserSession();
-  return userSession.signUserOut();
+  userSession.signUserOut();
+  window.location = redirectURL;
 }
 
 /**
