@@ -252,7 +252,7 @@ function handlePendingSignIn() {
   console.warn('DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method handlePendingSignIn().');
   console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and ' + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.');
   var userSession = new this.UserSession();
-  userSession.handlePendingSignIn(authResponseToken);
+  return userSession.handlePendingSignIn(authResponseToken);
 }
 /* eslint-enable no-unused-vars */
 

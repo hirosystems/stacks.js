@@ -106,7 +106,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
   console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and '
     + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.')
   const userSession = new this.UserSession()
-  userSession.handlePendingSignIn(authResponseToken)
+  return userSession.handlePendingSignIn(authResponseToken)
 }
 /* eslint-enable no-unused-vars */
 
