@@ -234,14 +234,14 @@ export function verifyAuthRequest(token: string) {
  * @private
  */
 export function verifyAuthRequestAndLoadManifest(token: string) {
-  return verifyAuthRequest(token)
+  return Promise.resolve().then(() => verifyAuthRequest(token)
     .then((valid) => {
       if (valid) {
         return fetchAppManifest(token)
       } else {
         return Promise.reject()
       }
-    })
+    }))
 }
 
 /**

@@ -1441,12 +1441,14 @@ function verifyAuthRequest(token) {
  * @private
  */
 function verifyAuthRequestAndLoadManifest(token) {
-  return verifyAuthRequest(token).then(function (valid) {
-    if (valid) {
-      return (0, _.fetchAppManifest)(token);
-    } else {
-      return Promise.reject();
-    }
+  return Promise.resolve().then(function () {
+    return verifyAuthRequest(token).then(function (valid) {
+      if (valid) {
+        return (0, _.fetchAppManifest)(token);
+      } else {
+        return Promise.reject();
+      }
+    });
   });
 }
 
