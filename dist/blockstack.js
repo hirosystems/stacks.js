@@ -165,6 +165,8 @@ var _authConstants = require('./authConstants');
 
 var _profiles = require('../profiles');
 
+var _userSession = require('./userSession');
+
 var _config = require('../config');
 
 var _logger = require('../logger');
@@ -180,10 +182,9 @@ var DEFAULT_PROFILE = {
    * @method isUserSignedIn
    * @return {Boolean} `true` if the user is signed in, `false` if not.
    */
-};
-function isUserSignedIn() {
+};function isUserSignedIn() {
   console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method isUserSignedIn().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.isUserSignedIn();
 }
 
@@ -216,7 +217,7 @@ function redirectToSignIn() {
   var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_SCOPE;
 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method redirectToSignIn().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   userSession.redirectToSignIn();
 }
 /* eslint-enable no-unused-vars */
@@ -227,7 +228,7 @@ function redirectToSignIn() {
  */
 function isSignInPending() {
   console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method isSignInPending().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.isSignInPending();
 }
 
@@ -251,7 +252,7 @@ function handlePendingSignIn() {
 
   console.warn('DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method handlePendingSignIn().');
   console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and ' + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.handlePendingSignIn(authResponseToken);
 }
 /* eslint-enable no-unused-vars */
@@ -271,7 +272,7 @@ function getAuthResponseToken() {
  */
 function loadUserData() {
   console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method loadUserData().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.loadUserData();
 }
 
@@ -284,7 +285,7 @@ function signUserOut() {
   var redirectURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   // eslint-disable-line no-unused-vars
   console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method signUserOut().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   userSession.signUserOut();
   window.location = redirectURL;
 }
@@ -316,7 +317,7 @@ function makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes) {
   var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
 
   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the ' + 'next major release of blockstack.js. Use UserSession to configure your auth request.');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   var transitKey = transitPrivateKey == null ? userSession.generateAndStoreTransitKey() : transitPrivateKey;
 
   return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
@@ -704,7 +705,7 @@ function redirectToSignInWithAuthRequest(authRequest) {
   var blockstackIDHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _authConstants.DEFAULT_BLOCKSTACK_HOST;
 
   console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will ' + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession ' + 'and call the instance method redirectToSignInWithAuthRequest().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
 
   var sessionAuthRequest = authRequest == null ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest;
 
@@ -712,7 +713,7 @@ function redirectToSignInWithAuthRequest(authRequest) {
 
   redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest);
 }
-},{"../config":12,"../errors":15,"../index":16,"../logger":18,"../profiles":26,"../utils":50,"./authConstants":3,"./authMessages":4,"./index":8,"jsontokens":387,"query-string":453}],3:[function(require,module,exports){
+},{"../config":12,"../errors":15,"../index":16,"../logger":18,"../profiles":26,"../utils":50,"./authConstants":3,"./authMessages":4,"./index":8,"./userSession":11,"jsontokens":387,"query-string":453}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1112,40 +1113,33 @@ function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
  * @private
  */
 function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
-  return new Promise(function (resolve, reject) {
+  return Promise.resolve().then(function () {
     if (!apiPassword) {
-      reject('Missing API password');
-      return null;
+      throw new Error('Missing API password');
     }
-
+  }).then(function () {
     var options = {
       headers: {
         Authorization: 'bearer ' + apiPassword
       }
     };
-
     var url = 'http://' + coreHost + ':' + corePort + '/v1/auth?authRequest=' + coreAuthRequest;
-
-    return fetch(url, options).then(function (response) {
-      if (!response.ok) {
-        reject('HTTP status not OK');
-        throw new Error('HTTP status not OK');
-      }
-      return response.text();
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJson) {
-      var token = responseJson.token;
-      if (!token) {
-        reject('Failed to get Core session token');
-        return null;
-      }
-      resolve(token);
-      return token;
-    }).catch(function (error) {
-      console.error(error);
-      reject('Invalid Core response: not JSON');
-    });
+    return fetch(url, options);
+  }).then(function (response) {
+    if (!response.ok) {
+      throw new Error('HTTP status not OK');
+    }
+    return response.text();
+  }).then(function (responseText) {
+    var responseJson = JSON.parse(responseText);
+    var token = responseJson.token;
+    if (!token) {
+      throw new Error('Failed to get Core session token');
+    }
+    return token;
+  }).catch(function (error) {
+    console.error(error);
+    throw new Error('Invalid Core response: not JSON');
   });
 }
 
@@ -1297,50 +1291,41 @@ function doPublicKeysMatchIssuer(token) {
  * @private
  */
 function doPublicKeysMatchUsername(token, nameLookupURL) {
-  return new Promise(function (resolve) {
+  return Promise.resolve().then(function () {
     var payload = (0, _jsontokens.decodeToken)(token).payload;
 
     if (!payload.username) {
-      resolve(true);
-      return;
+      return true;
     }
 
     if (payload.username === null) {
-      resolve(true);
-      return;
+      return true;
     }
 
     if (nameLookupURL === null) {
-      resolve(false);
-      return;
+      return false;
     }
 
     var username = payload.username;
     var url = nameLookupURL.replace(/\/$/, '') + '/' + username;
-
-    try {
-      fetch(url).then(function (response) {
-        return response.text();
-      }).then(function (responseText) {
-        return JSON.parse(responseText);
-      }).then(function (responseJSON) {
-        if (responseJSON.hasOwnProperty('address')) {
-          var nameOwningAddress = responseJSON.address;
-          var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
-          if (nameOwningAddress === addressFromIssuer) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
+    return fetch(url).then(function (response) {
+      return response.text();
+    }).then(function (responseText) {
+      var responseJSON = JSON.parse(responseText);
+      if (responseJSON.hasOwnProperty('address')) {
+        var nameOwningAddress = responseJSON.address;
+        var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
+        if (nameOwningAddress === addressFromIssuer) {
+          return true;
         } else {
-          resolve(false);
+          return false;
         }
-      }).catch(function () {
-        resolve(false);
-      });
-    } catch (e) {
-      resolve(false);
-    }
+      } else {
+        return false;
+      }
+    });
+  }).catch(function () {
+    return false;
   });
 }
 
@@ -1432,18 +1417,18 @@ function isRedirectUriValid(token) {
  *  @private
  */
 function verifyAuthRequest(token) {
-  return new Promise(function (resolve, reject) {
+  return Promise.resolve().then(function () {
     if ((0, _jsontokens.decodeToken)(token).header.alg === 'none') {
-      reject('Token must be signed in order to be verified');
+      throw new Error('Token must be signed in order to be verified');
     }
-
-    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), isManifestUriValid(token), isRedirectUriValid(token)]).then(function (values) {
-      if (values.every(Boolean)) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
+  }).then(function () {
+    return Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), isManifestUriValid(token), isRedirectUriValid(token)]);
+  }).then(function (values) {
+    if (values.every(Boolean)) {
+      return true;
+    } else {
+      return false;
+    }
   });
 }
 
@@ -1456,19 +1441,12 @@ function verifyAuthRequest(token) {
  * @private
  */
 function verifyAuthRequestAndLoadManifest(token) {
-  return new Promise(function (resolve, reject) {
-    return verifyAuthRequest(token).then(function (valid) {
-      if (valid) {
-        return (0, _.fetchAppManifest)(token).then(function (appManifest) {
-          resolve(appManifest);
-        }).catch(function (err) {
-          reject(err);
-        });
-      } else {
-        reject();
-        return Promise.reject();
-      }
-    });
+  return verifyAuthRequest(token).then(function (valid) {
+    if (valid) {
+      return (0, _.fetchAppManifest)(token);
+    } else {
+      return Promise.reject();
+    }
   });
 }
 
@@ -1481,14 +1459,12 @@ function verifyAuthRequestAndLoadManifest(token) {
  * @private
  */
 function verifyAuthResponse(token, nameLookupURL) {
-  return new Promise(function (resolve) {
-    Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
-      if (values.every(Boolean)) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
+  return Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
+    if (values.every(Boolean)) {
+      return true;
+    } else {
+      return false;
+    }
   });
 }
 },{".":8,"../index":16,"jsontokens":387}],8:[function(require,module,exports){
@@ -3667,9 +3643,7 @@ var BlockstackNetwork = exports.BlockstackNetwork = function () {
   }, {
     key: 'getGracePeriod',
     value: function getGracePeriod() {
-      return new Promise(function (resolve) {
-        return resolve(5000);
-      });
+      return Promise.resolve(5000);
     }
 
     /**
@@ -7378,9 +7352,7 @@ function validateProofs(profile, ownerAddress) {
   if (profile.hasOwnProperty('account')) {
     accounts = profile.account;
   } else {
-    return new Promise(function (resolve) {
-      resolve([]);
-    });
+    return Promise.resolve([]);
   }
 
   accounts.forEach(function (account) {
@@ -9214,6 +9186,8 @@ var _index = require('../index');
 
 var _authConstants = require('../auth/authConstants');
 
+var _userSession = require('../auth/userSession');
+
 var _logger = require('../logger');
 
 var _errors = require('../errors');
@@ -9221,7 +9195,6 @@ var _errors = require('../errors');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var BLOCKSTACK_GAIA_HUB_LABEL = exports.BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
-
 function uploadToGaiaHub(filename, contents, hubConfig) {
   var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
 
@@ -9366,7 +9339,7 @@ function getBucketUrl(gaiaHubUrl, appPrivateKey) {
   });
 }
 }).call(this,require("buffer").Buffer)
-},{"../auth/authConstants":3,"../errors":15,"../index":16,"../logger":18,"../utils":50,"bitcoinjs-lib":96,"buffer":183,"crypto":192,"jsontokens":387}],49:[function(require,module,exports){
+},{"../auth/authConstants":3,"../auth/userSession":11,"../errors":15,"../index":16,"../logger":18,"../utils":50,"bitcoinjs-lib":96,"buffer":183,"crypto":192,"jsontokens":387}],49:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -9404,6 +9377,8 @@ var _errors = require('../errors');
 
 var _logger = require('../logger');
 
+var _userSession = require('../auth/userSession');
+
 var SIGNATURE_FILE_SUFFIX = '.sig';
 
 /**
@@ -9416,7 +9391,7 @@ var SIGNATURE_FILE_SUFFIX = '.sig';
  */
 function encryptContent(content, options) {
   console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method encryptContent().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.encryptContent(content, options);
 }
 
@@ -9431,7 +9406,7 @@ function encryptContent(content, options) {
  */
 function decryptContent(content, options) {
   console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method decryptContent().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.decryptContent(content, options);
 }
 
@@ -9453,7 +9428,7 @@ function decryptContent(content, options) {
  */
 function getFile(path, options) {
   console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method getFile().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.getFile(path, options);
 }
 
@@ -9472,7 +9447,7 @@ function getFile(path, options) {
  */
 function putFile(path, content, options) {
   console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method putFile().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.putFile(path, content, options);
 }
 
@@ -9484,7 +9459,7 @@ function putFile(path, content, options) {
  */
 function listFiles(callback) {
   console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method listFiles().');
-  var userSession = new this.UserSession();
+  var userSession = new _userSession.UserSession();
   return userSession.listFiles(callback);
 }
 
@@ -10000,7 +9975,7 @@ exports.connectToGaiaHub = _hub.connectToGaiaHub;
 exports.uploadToGaiaHub = _hub.uploadToGaiaHub;
 exports.BLOCKSTACK_GAIA_HUB_LABEL = _hub.BLOCKSTACK_GAIA_HUB_LABEL;
 }).call(this,require("buffer").Buffer)
-},{"../encryption":14,"../errors":15,"../keys":17,"../logger":18,"../profiles":26,"./hub":48,"buffer":183}],50:[function(require,module,exports){
+},{"../auth/userSession":11,"../encryption":14,"../errors":15,"../keys":17,"../logger":18,"../profiles":26,"./hub":48,"buffer":183}],50:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -14255,7 +14230,7 @@ module.exports={
   "_args": [
     [
       "bigi@1.4.2",
-      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+      "/Users/matt/Projects/blockstack.js"
     ]
   ],
   "_from": "bigi@1.4.2",
@@ -14280,7 +14255,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_spec": "1.4.2",
-  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
+  "_where": "/Users/matt/Projects/blockstack.js",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
@@ -55511,7 +55486,7 @@ module.exports={
   "_args": [
     [
       "cheerio@0.22.0",
-      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+      "/Users/matt/Projects/blockstack.js"
     ]
   ],
   "_from": "cheerio@0.22.0",
@@ -55535,7 +55510,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
   "_spec": "0.22.0",
-  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
+  "_where": "/Users/matt/Projects/blockstack.js",
   "author": {
     "name": "Matt Mueller",
     "email": "mattmuelle@gmail.com",
@@ -63625,7 +63600,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+      "/Users/matt/Projects/blockstack.js"
     ]
   ],
   "_from": "elliptic@6.4.0",
@@ -63653,7 +63628,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
+  "_where": "/Users/matt/Projects/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -76739,7 +76714,7 @@ module.exports={
   "_args": [
     [
       "elliptic@5.2.1",
-      "/Users/Yukan/Desktop/work/blockstack/blockstack.js"
+      "/Users/matt/Projects/blockstack.js"
     ]
   ],
   "_from": "elliptic@5.2.1",
@@ -76763,7 +76738,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-5.2.1.tgz",
   "_spec": "5.2.1",
-  "_where": "/Users/Yukan/Desktop/work/blockstack/blockstack.js",
+  "_where": "/Users/matt/Projects/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
