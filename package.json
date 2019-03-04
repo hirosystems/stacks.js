@@ -20,7 +20,8 @@
     "lint": "eslint src && eslint tests",
     "test": "NODE_ENV=test nyc npm run unit-test",
     "documentation": "documentation",
-    "build-documentation": "documentation build src --config ./documentation.yml --format html --output docs && documentation build src --config ./documentation.yml --format json --output docs.json"
+    "build-documentation": "documentation build src --config ./documentation.yml --format html --output docs && documentation build src --config ./documentation.yml --format json --output docs.json",
+    "codecovUpload": "codecov"
   },
   "repository": {
     "type": "git",
@@ -89,6 +90,7 @@
     "babel-plugin-istanbul": "^5.1.1",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
+    "codecov": "^3.2.0",
     "documentation": "^9.3.0",
     "eslint": "^5.15.0",
     "eslint-config-airbnb": "^17.1.0",
