@@ -3,6 +3,7 @@
   "version": "19.0.0-alpha.5",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
+  "browser": "dist/blockstack.js",
   "scripts": {
     "browserify": "rm -rf ./dist/blockstack.js && browserify src/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "browserify src/index.js --debug --standalone blockstack -o ./tests/browserTests/bundle.js",
