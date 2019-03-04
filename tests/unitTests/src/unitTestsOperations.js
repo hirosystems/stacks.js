@@ -1152,6 +1152,77 @@ function transactionTests() {
       .catch((err) => { console.log(err.stack); throw err })
   })
 
+  test('use alternative magic bytes', (t) => {
+    t.plan(24)
+    setupMocks()
+
+    const ns = new transactions.BlockstackNamespace('hello')
+    ns.setVersion(3)
+    ns.setLifetime(52595)
+    ns.setCoeff(4)
+    ns.setBase(4)
+    ns.setBuckets([6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+    ns.setNonalphaDiscount(10)
+    ns.setNoVowelDiscount(10)
+
+    Promise.resolve().then(() => {
+      network.defaults.MAINNET_DEFAULT.MAGIC_BYTES = 'di'
+      return Promise.all([
+        transactions.makeNamespacePreorder('hello',
+                                           testAddresses[3].address,
+                                           testAddresses[2].skHex),
+        transactions.makeNamespaceReveal(ns,
+                                         testAddresses[3].address,
+                                         testAddresses[2].skHex),
+        transactions.makeNameImport(
+          'import.hello', '151nahdGD9Dxd7xpwPeBECn5iEi4Thb7Rv',
+          'cabdbc18ece9ffb6a7378faa4ac4ce58dcaaf575', testAddresses[3].skHex
+        ),
+        transactions.makeNamespaceReady('hello',
+                                        testAddresses[3].skHex),
+        transactions.makePreorder('foo.test',
+                                  testAddresses[0].address,
+                                  testAddresses[1].skHex),
+        transactions.makeRegister('foo.test',
+                                  testAddresses[0].address,
+                                  testAddresses[1].skHex, 'hello world'),
+        transactions.makeUpdate('foo.test',
+                                testAddresses[0].skHex,
+                                testAddresses[1].skHex,
+                                'hello world'),
+        transactions.makeTransfer('foo.test',
+                                  testAddresses[2].address,
+                                  testAddresses[0].skHex,
+                                  testAddresses[1].skHex),
+        transactions.makeRenewal('foo.test',
+                                 testAddresses[2].address,
+                                 testAddresses[0].skHex,
+                                 testAddresses[1].skHex,
+                                 'hello world'),
+        transactions.makeRevoke('foo.test',
+                                testAddresses[0].skHex,
+                                testAddresses[1].skHex),
+        transactions.makeAnnounce(
+          '53bb740c47435a51b07ecf0b9e086a2ad3c12c1d', testAddresses[3].skHex
+        ),
+        transactions.makeTokenTransfer(testAddresses[1].address,
+                                       'STACKS',
+                                       bigi.fromByteArrayUnsigned('123'),
+                                       'hello world!',
+                                       testAddresses[4].skHex)
+      ])
+    })
+      .then((txs) => {
+        for (let i = 0; i < txs.length; i++) {
+          const tx = btc.Transaction.fromHex(txs[i])
+          const nullOut = tx.outs[0].script
+          t.equal(network.defaults.MAINNET_DEFAULT.MAGIC_BYTES, 'di')
+          t.equal(Buffer.from(nullOut).toString().substring(2, 4), 'di')
+        }
+      })
+      .then(() => { network.defaults.MAINNET_DEFAULT.MAGIC_BYTES = 'id' })
+  })
+        
   test(`broadcastTransaction:
     send via broadcast service with transaction to watch with default confs`, (t) => {
     t.plan(1)

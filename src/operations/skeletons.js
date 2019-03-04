@@ -150,6 +150,15 @@ function makeTXbuilder() {
   return txb
 }
 
+function opEncode(opcode: string): string {
+  // NOTE: must *always* a 3-character string
+  const res = `${config.network.MAGIC_BYTES}${opcode}`
+  if (res.length !== 3) {
+    throw new Error('Runtime error: invalid MAGIC_BYTES')
+  }
+  return res
+}
+
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
   burnAddress : string, burn: AmountType,
@@ -188,7 +197,7 @@ export function makePreorderSkeleton(
 
   const opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
-  opReturnBuffer.write('id?', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode('?'), 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
@@ -282,7 +291,7 @@ export function makeRegisterSkeleton(
     payload = Buffer.from(fullyQualifiedName, 'ascii')
   }
 
-  const opReturnBuffer = Buffer.concat([Buffer.from('id:', 'ascii'), payload])
+  const opReturnBuffer = Buffer.concat([Buffer.from(opEncode(':'), 'ascii'), payload])
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
@@ -381,7 +390,7 @@ export function makeTransferSkeleton(
     keepChar = '>'
   }
 
-  opRet.write('id>', 0, 3, 'ascii')
+  opRet.write(opEncode('>'), 0, 3, 'ascii')
   opRet.write(keepChar, 3, 1, 'ascii')
 
   const hashed = hash128(Buffer.from(fullyQualifiedName, 'ascii'))
@@ -429,7 +438,7 @@ export function makeUpdateSkeleton(
     [nameBuff, consensusBuff]
   ))
 
-  opRet.write('id+', 0, 3, 'ascii')
+  opRet.write(opEncode('+'), 0, 3, 'ascii')
   hashedName.copy(opRet, 3)
   opRet.write(valueHash, 19, 20, 'hex')
 
@@ -464,7 +473,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
 
-  opRet.write('id~', 0, 3, 'ascii')
+  opRet.write(opEncode('~'), 0, 3, 'ascii')
 
   const opReturnBuffer = Buffer.concat([opRet, nameBuff])
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
@@ -527,7 +536,7 @@ export function makeNamespacePreorderSkeleton(
   }
 
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
-  opReturnBuffer.write('id*', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode('*'), 0, 3, 'ascii')
   hashed.copy(opReturnBuffer, 3)
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
@@ -566,7 +575,7 @@ export function makeNamespaceRevealSkeleton(
   const hexPayload = namespace.toHexPayload()
 
   const opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2)
-  opReturnBuffer.write('id&', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode('&'), 0, 3, 'ascii')
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
@@ -590,7 +599,7 @@ export function makeNamespaceReadySkeleton(namespaceID: string) {
    output 0: namespace ready code
    */
   const opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1)
-  opReturnBuffer.write('id!', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode('!'), 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
@@ -620,7 +629,7 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
 
   const network = config.network
   const opReturnBuffer = Buffer.alloc(3 + name.length)
-  opReturnBuffer.write('id;', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode(';'), 0, 3, 'ascii')
   opReturnBuffer.write(name, 3, name.length, 'ascii')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
@@ -653,7 +662,7 @@ export function makeAnnounceSkeleton(messageHash: string) {
   }
 
   const opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2)
-  opReturnBuffer.write('id#', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode('#'), 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex')
 
   const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
@@ -696,7 +705,7 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
 
   const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
 
-  opReturnBuffer.write('id$', 0, 3, 'ascii')
+  opReturnBuffer.write(opEncode('$'), 0, 3, 'ascii')
   opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex')
   opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex')
   opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex')

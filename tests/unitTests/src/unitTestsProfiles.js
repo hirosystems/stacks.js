@@ -222,10 +222,10 @@ function testSchemas() {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk'
     }
 
+    FetchMock.restore()
     FetchMock.get('http://potato:6270/v1/names/ryan.id', mockZonefile)
     FetchMock.get('https://core.blockstack.org/v1/names/ryan.id', mockZonefile)
     FetchMock.get(sampleTokenFiles.ryan.url, sampleTokenFiles.ryan.body)
-
     lookupProfile(name, zoneFileLookupURL)
       .then((profile) => {
         t.ok(profile, 'zonefile resolves to profile with zoneFileLookupUrl specified')

@@ -1,6 +1,6 @@
 import { network } from './network'
 
-const config = { 
+const config = {
   network: network.defaults.MAINNET_DEFAULT,
   logLevel: 'debug'
 }
