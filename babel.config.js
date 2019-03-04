@@ -16,8 +16,7 @@ module.exports = function (api) {
       [
         "@babel/preset-env",
         {
-          "useBuiltIns": "entry",
-          "modules": "umd"
+          "useBuiltIns": "entry"
         }
       ]
     ],

@@ -92004,196 +92004,2147 @@ function getZoneFileTemplate() {
 ';
 }
 },{}],502:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/defineProperty", "./authConstants"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/defineProperty"), require("./authConstants"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.defineProperty, global.authConstants);
-    global.appConfig = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _defineProperty2, _authConstants) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.AppConfig = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.AppConfig = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _authConstants = require("./authConstants");
+
+/**
+ * Configuration data for the current app.
+ *
+ * On browser platforms, creating an instance of this
+ * class without any arguments will use
+ * `window.location.origin` as the app domain.
+ * On non-browser platforms, you need to
+ * specify an app domain as the first argument.
+ * @type {AppConfig}
+ */
+var AppConfig =
+/*#__PURE__*/
+function () {
+  /**
+   * Blockstack apps are uniquely identified by their app domain.
+   * @type {string}
+   */
 
   /**
-   * Configuration data for the current app.
-   *
-   * On browser platforms, creating an instance of this
-   * class without any arguments will use
-   * `window.location.origin` as the app domain.
-   * On non-browser platforms, you need to
-   * specify an app domain as the first argument.
-   * @type {AppConfig}
+   * An array of string representing permissions requested by the app.
+   * @type {[Array<string>}
    */
-  var AppConfig =
-  /*#__PURE__*/
-  function () {
-    /**
-     * Blockstack apps are uniquely identified by their app domain.
-     * @type {string}
-     */
 
-    /**
-     * An array of string representing permissions requested by the app.
-     * @type {[Array<string>}
-     */
+  /**
+   * Path on app domain to redirect users to after authentication. The
+   * authentication response token will be postpended in a query.
+   * @type {string}
+   */
 
-    /**
-     * Path on app domain to redirect users to after authentication. The
-     * authentication response token will be postpended in a query.
-     * @type {string}
-     */
+  /**
+   * Path relative to app domain of app's manifest file.
+   *
+   * This file needs to have CORS headers set so that it can be fetched
+   * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.
+   * @type {string}
+   */
 
-    /**
-     * Path relative to app domain of app's manifest file.
-     *
-     * This file needs to have CORS headers set so that it can be fetched
-     * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.
-     * @type {string}
-     */
+  /**
+   * The URL of Blockstack core node to use for this app. If this is
+   * `null`, the core node specified by the user or default core node
+   * will be used.
+   * @type {string}
+   */
 
-    /**
-     * The URL of Blockstack core node to use for this app. If this is
-     * `null`, the core node specified by the user or default core node
-     * will be used.
-     * @type {string}
-     */
+  /**
+   * The URL of a web-based Blockstack Authenticator to use in the event
+   * the user doesn't have Blockstack installed on their machine. If this
+   * is not specified, the current default in this library will be used.
+   * @type {string}
+   */
 
-    /**
-     * The URL of a web-based Blockstack Authenticator to use in the event
-     * the user doesn't have Blockstack installed on their machine. If this
-     * is not specified, the current default in this library will be used.
-     * @type {string}
-     */
+  /**
+   * @param {Array<string>} scopes - permissions this app is requesting
+   * @param {string} appDomain - the app domain
+   * @param {string} redirectPath - path on app domain to redirect users to after authentication
+   * @param {string} manifestPath - path relative to app domain of app's manifest file
+   * @param {string} coreNode - override the default or user selected core node
+   * @param {string} authenticatorURL - the web-based fall back authenticator
+   */
+  function AppConfig() {
+    var scopes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _authConstants.DEFAULT_SCOPE.slice();
+    var appDomain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin;
+    var redirectPath = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+    var manifestPath = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/manifest.json';
+    var coreNode = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+    var authenticatorURL = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _authConstants.DEFAULT_BLOCKSTACK_HOST;
+    (0, _classCallCheck2.default)(this, AppConfig);
+    (0, _defineProperty2.default)(this, "appDomain", void 0);
+    (0, _defineProperty2.default)(this, "scopes", void 0);
+    (0, _defineProperty2.default)(this, "redirectPath", void 0);
+    (0, _defineProperty2.default)(this, "manifestPath", void 0);
+    (0, _defineProperty2.default)(this, "coreNode", void 0);
+    (0, _defineProperty2.default)(this, "authenticatorURL", void 0);
+    this.appDomain = appDomain;
+    this.scopes = scopes;
+    this.redirectPath = redirectPath;
+    this.manifestPath = manifestPath;
 
-    /**
-     * @param {Array<string>} scopes - permissions this app is requesting
-     * @param {string} appDomain - the app domain
-     * @param {string} redirectPath - path on app domain to redirect users to after authentication
-     * @param {string} manifestPath - path relative to app domain of app's manifest file
-     * @param {string} coreNode - override the default or user selected core node
-     * @param {string} authenticatorURL - the web-based fall back authenticator
-     */
-    function AppConfig() {
-      var scopes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _authConstants.DEFAULT_SCOPE.slice();
-      var appDomain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.origin;
-      var redirectPath = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-      var manifestPath = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/manifest.json';
-      var coreNode = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-      var authenticatorURL = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : _authConstants.DEFAULT_BLOCKSTACK_HOST;
-      (0, _classCallCheck2.default)(this, AppConfig);
-      (0, _defineProperty2.default)(this, "appDomain", void 0);
-      (0, _defineProperty2.default)(this, "scopes", void 0);
-      (0, _defineProperty2.default)(this, "redirectPath", void 0);
-      (0, _defineProperty2.default)(this, "manifestPath", void 0);
-      (0, _defineProperty2.default)(this, "coreNode", void 0);
-      (0, _defineProperty2.default)(this, "authenticatorURL", void 0);
-      this.appDomain = appDomain;
-      this.scopes = scopes;
-      this.redirectPath = redirectPath;
-      this.manifestPath = manifestPath;
+    if (!coreNode) {
+      this.coreNode = _authConstants.DEFAULT_CORE_NODE;
+    } else {
+      this.coreNode = coreNode;
+    }
 
-      if (!coreNode) {
-        this.coreNode = _authConstants.DEFAULT_CORE_NODE;
-      } else {
-        this.coreNode = coreNode;
-      }
+    this.authenticatorURL = authenticatorURL;
+  }
+  /**
+   * The location to which the authenticator should
+   * redirect the user.
+   * @returns {string} - URI
+   */
 
-      this.authenticatorURL = authenticatorURL;
+
+  (0, _createClass2.default)(AppConfig, [{
+    key: "redirectURI",
+    value: function redirectURI() {
+      return "".concat(this.appDomain).concat(this.redirectPath);
     }
     /**
-     * The location to which the authenticator should
-     * redirect the user.
+     * The location of the app's manifest file.
      * @returns {string} - URI
      */
 
+  }, {
+    key: "manifestURI",
+    value: function manifestURI() {
+      return "".concat(this.appDomain).concat(this.manifestPath);
+    }
+  }]);
+  return AppConfig;
+}();
 
-    (0, _createClass2.default)(AppConfig, [{
-      key: "redirectURI",
-      value: function redirectURI() {
-        return "".concat(this.appDomain).concat(this.redirectPath);
-      }
-      /**
-       * The location of the app's manifest file.
-       * @returns {string} - URI
-       */
-
-    }, {
-      key: "manifestURI",
-      value: function manifestURI() {
-        return "".concat(this.appDomain).concat(this.manifestPath);
-      }
-    }]);
-    return AppConfig;
-  }();
-
-  _exports.AppConfig = AppConfig;
-});
+exports.AppConfig = AppConfig;
 
 },{"./authConstants":504,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11}],503:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "query-string", "jsontokens", "./index", "../utils", "../index", "../errors", "./authMessages", "./authConstants", "../profiles", "./userSession", "../config", "../logger"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("query-string"), require("jsontokens"), require("./index"), require("../utils"), require("../index"), require("../errors"), require("./authMessages"), require("./authConstants"), require("../profiles"), require("./userSession"), require("../config"), require("../logger"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.queryString, global.jsontokens, global.index, global.utils, global.index, global.errors, global.authMessages, global.authConstants, global.profiles, global.userSession, global.config, global.logger);
-    global.authApp = mod.exports;
-  }
-})(this, function (_exports, _queryString, _jsontokens, _index, _utils, _index2, _errors, _authMessages, _authConstants, _profiles, _userSession, _config, _logger) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.isUserSignedIn = isUserSignedIn;
-  _exports.redirectToSignIn = redirectToSignIn;
-  _exports.isSignInPending = isSignInPending;
-  _exports.handlePendingSignIn = handlePendingSignIn;
-  _exports.loadUserData = loadUserData;
-  _exports.signUserOut = signUserOut;
-  _exports.makeAuthRequest = makeAuthRequest;
-  _exports.redirectToSignInWithAuthRequestImpl = redirectToSignInWithAuthRequestImpl;
-  _exports.redirectToSignInImpl = redirectToSignInImpl;
-  _exports.handlePendingSignInImpl = handlePendingSignInImpl;
-  _exports.loadUserDataImpl = loadUserDataImpl;
-  _exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
-  _queryString = _interopRequireDefault(_queryString);
-  var DEFAULT_PROFILE = {
-    '@type': 'Person',
-    '@context': 'http://schema.org'
-    /**
-     * Check if a user is currently signed in.
-     * @method isUserSignedIn
-     * @return {Boolean} `true` if the user is signed in, `false` if not.
-     */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isUserSignedIn = isUserSignedIn;
+exports.redirectToSignIn = redirectToSignIn;
+exports.isSignInPending = isSignInPending;
+exports.handlePendingSignIn = handlePendingSignIn;
+exports.loadUserData = loadUserData;
+exports.signUserOut = signUserOut;
+exports.makeAuthRequest = makeAuthRequest;
+exports.redirectToSignInWithAuthRequestImpl = redirectToSignInWithAuthRequestImpl;
+exports.redirectToSignInImpl = redirectToSignInImpl;
+exports.handlePendingSignInImpl = handlePendingSignInImpl;
+exports.loadUserDataImpl = loadUserDataImpl;
+exports.redirectToSignInWithAuthRequest = redirectToSignInWithAuthRequest;
 
+var _queryString = _interopRequireDefault(require("query-string"));
+
+var _jsontokens = require("jsontokens");
+
+var _index = require("./index");
+
+var _utils = require("../utils");
+
+var _index2 = require("../index");
+
+var _errors = require("../errors");
+
+var _authMessages = require("./authMessages");
+
+var _authConstants = require("./authConstants");
+
+var _profiles = require("../profiles");
+
+var _userSession = require("./userSession");
+
+var _config = require("../config");
+
+var _logger = require("../logger");
+
+var DEFAULT_PROFILE = {
+  '@type': 'Person',
+  '@context': 'http://schema.org'
+  /**
+   * Check if a user is currently signed in.
+   * @method isUserSignedIn
+   * @return {Boolean} `true` if the user is signed in, `false` if not.
+   */
+
+};
+
+function isUserSignedIn() {
+  console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method isUserSignedIn().');
+  var userSession = new _userSession.UserSession();
+  return userSession.isUserSignedIn();
+}
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
+ * Most applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ *
+ * @param {String} [redirectURI=`${window.location.origin}/`]
+ * The location to which the identity provider will redirect the user after
+ * the user approves sign in.
+ * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * Location of the manifest file.
+ * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * this app's data store.
+ * An array of strings indicating which permissions this app is requesting.
+ * @return {void}
+ */
+
+/* eslint-disable no-unused-vars */
+
+
+function redirectToSignIn() {
+  var redirectURI = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "".concat(window.location.origin, "/");
+  var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "".concat(window.location.origin, "/manifest.json");
+  var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_SCOPE;
+  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method redirectToSignIn().');
+  var userSession = new _userSession.UserSession();
+  userSession.redirectToSignIn();
+}
+/* eslint-enable no-unused-vars */
+
+/**
+ * Check if there is a authentication request that hasn't been handled.
+ * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
+ */
+
+
+function isSignInPending() {
+  console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method isSignInPending().');
+  var userSession = new _userSession.UserSession();
+  return userSession.isSignInPending();
+}
+/**
+ * Try to process any pending sign in request by returning a `Promise` that resolves
+ * to the user data object if the sign in succeeds.
+ *
+ * @param {String} nameLookupURL - the endpoint against which to verify public
+ * keys match claimed username
+ * @param {String} authResponseToken - the signed authentication response token
+ * @param {String} transitKey - the transit private key that corresponds to the transit public key
+ * that was provided in the authentication request
+ * @return {Promise} that resolves to the user data object if successful and rejects
+ * if handling the sign in request fails or there was no pending sign in request.
+ */
+
+/* eslint-disable no-unused-vars, no-use-before-define */
+
+
+function handlePendingSignIn() {
+  var nameLookupURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var authResponseToken = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : getAuthResponseToken();
+  var transitKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  console.warn('DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method handlePendingSignIn().');
+  console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and ' + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.');
+  var userSession = new _userSession.UserSession();
+  return userSession.handlePendingSignIn(authResponseToken);
+}
+/* eslint-enable no-unused-vars */
+
+/**
+ * Retrieve the authentication token from the URL query
+ * @return {String} the authentication token if it exists otherwise `null`
+ */
+
+
+function getAuthResponseToken() {
+  var queryDict = _queryString.default.parse(location.search);
+
+  return queryDict.authResponse ? queryDict.authResponse : '';
+}
+/**
+ * Retrieves the user data object. The user's profile is stored in the key `profile`.
+ * @return {Object} User data object.
+ */
+
+
+function loadUserData() {
+  console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method loadUserData().');
+  var userSession = new _userSession.UserSession();
+  return userSession.loadUserData();
+}
+/**
+ * Sign the user out and optionally redirect to given location.
+ * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
+ * @return {void}
+ */
+
+
+function signUserOut() {
+  var redirectURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  // eslint-disable-line no-unused-vars
+  console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method signUserOut().');
+  var userSession = new _userSession.UserSession();
+  userSession.signUserOut();
+  window.location = redirectURL;
+}
+/**
+ * Generates an authentication request that can be sent to the Blockstack
+ * browser for the user to approve sign in. This authentication request can
+ * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * method.
+ *
+ * *Note: This method should only be used if you want to roll your own authentication
+ * flow. Typically you'd use `redirectToSignIn` which takes care of this
+ * under the hood.*
+ *
+ * @param  {String} transitPrivateKey - hex encoded transit private key
+ * @param {String} redirectURI - location to redirect user to after sign in approval
+ * @param {String} manifestURI - location of this app's manifest file
+ * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {String} appDomain - the origin of this app
+ * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
+ * @return {String} the authentication request
+ */
+
+
+function makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes) {
+  var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
+  var expiresAt = arguments.length > 5 ? arguments[5] : undefined;
+  var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
+  console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the ' + 'next major release of blockstack.js. Use UserSession to configure your auth request.');
+  var userSession = new _userSession.UserSession();
+  var transitKey = transitPrivateKey == null ? userSession.generateAndStoreTransitKey() : transitPrivateKey;
+  return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
+}
+/**
+ * Detects if the native auth-browser is installed and is successfully 
+ * launched via a custom protocol URI. 
+ * @param {String} authRequest
+ * The encoded authRequest to be used as a query param in the custom URI. 
+ * @param {String} successCallback
+ * The callback that is invoked when the protocol handler was detected. 
+ * @param {String} failCallback
+ * The callback that is invoked when the protocol handler was not detected. 
+ * @return {void}
+ */
+
+
+function detectProtocolLaunch(authRequest, successCallback, failCallback) {
+  // Create a unique ID used for this protocol detection attempt.
+  var echoReplyID = Math.random().toString(36).substr(2, 9);
+  var echoReplyKeyPrefix = 'echo-reply-';
+  var echoReplyKey = "".concat(echoReplyKeyPrefix).concat(echoReplyID); // Use localStorage as a reliable cross-window communication method.
+  // Create the storage entry to signal a protocol detection attempt for the
+  // next browser window to check.
+
+  window.localStorage.setItem(echoReplyKey, Date.now().toString());
+
+  var cleanUpLocalStorage = function cleanUpLocalStorage() {
+    try {
+      window.localStorage.removeItem(echoReplyKey); // Also clear out any stale echo-reply keys older than 1 hour.
+
+      for (var i = 0; i < window.localStorage.length; i++) {
+        var storageKey = window.localStorage.key(i);
+
+        if (storageKey.startsWith(echoReplyKeyPrefix)) {
+          var storageValue = window.localStorage.getItem(storageKey);
+
+          if (storageValue === 'success' || Date.now() - parseInt(storageValue, 10) > 3600000) {
+            window.localStorage.removeItem(storageKey);
+          }
+        }
+      }
+    } catch (err) {
+      _logger.Logger.error('Exception cleaning up echo-reply entries in localStorage');
+
+      _logger.Logger.error(err);
+    }
   };
 
-  function isUserSignedIn() {
-    console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method isUserSignedIn().');
-    var userSession = new _userSession.UserSession();
-    return userSession.isUserSignedIn();
+  var detectionTimeout = 1000;
+  var redirectToWebAuthTimer = 0;
+
+  var cancelWebAuthRedirectTimer = function cancelWebAuthRedirectTimer() {
+    if (redirectToWebAuthTimer) {
+      window.clearTimeout(redirectToWebAuthTimer);
+      redirectToWebAuthTimer = 0;
+    }
+  };
+
+  var startWebAuthRedirectTimer = function startWebAuthRedirectTimer() {
+    var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : detectionTimeout;
+    cancelWebAuthRedirectTimer();
+    redirectToWebAuthTimer = window.setTimeout(function () {
+      if (redirectToWebAuthTimer) {
+        cancelWebAuthRedirectTimer();
+        var nextFunc;
+
+        if (window.localStorage.getItem(echoReplyKey) === 'success') {
+          _logger.Logger.info('Protocol echo reply detected.');
+
+          nextFunc = successCallback;
+        } else {
+          _logger.Logger.info('Protocol handler not detected.');
+
+          nextFunc = failCallback;
+        }
+
+        failCallback = function failCallback() {};
+
+        successCallback = function successCallback() {};
+
+        cleanUpLocalStorage(); // Briefly wait since localStorage changes can 
+        // sometimes be ignored when immediately redirected.
+
+        setTimeout(function () {
+          return nextFunc();
+        }, 100);
+      }
+    }, timeout);
+  };
+
+  startWebAuthRedirectTimer();
+  var inputPromptTracker = document.createElement('input');
+  inputPromptTracker.type = 'text'; // Prevent this element from inherited any css.
+
+  inputPromptTracker.style.all = 'initial'; // Setting display=none on an element prevents them from being focused/blurred.
+  // So hide the element using other properties..
+
+  inputPromptTracker.style.opacity = '0';
+  inputPromptTracker.style.filter = 'alpha(opacity=0)';
+  inputPromptTracker.style.height = '0';
+  inputPromptTracker.style.width = '0'; // If the the focus of a page element is immediately changed then this likely indicates 
+  // the protocol handler is installed, and the browser is prompting the user if they want 
+  // to open the application. 
+
+  var inputBlurredFunc = function inputBlurredFunc() {
+    // Use a timeout of 100ms to ignore instant toggles between blur and focus.
+    // Browsers often perform an instant blur & focus when the protocol handler is working
+    // but not showing any browser prompts, so we want to ignore those instances.
+    var isRefocused = false;
+    inputPromptTracker.addEventListener('focus', function () {
+      isRefocused = true;
+    }, {
+      once: true,
+      capture: true
+    });
+    setTimeout(function () {
+      if (redirectToWebAuthTimer && !isRefocused) {
+        _logger.Logger.info('Detected possible browser prompt for opening the protocol handler app.');
+
+        window.clearTimeout(redirectToWebAuthTimer);
+        inputPromptTracker.addEventListener('focus', function () {
+          if (redirectToWebAuthTimer) {
+            _logger.Logger.info('Possible browser prompt closed, restarting auth redirect timeout.');
+
+            startWebAuthRedirectTimer();
+          }
+        }, {
+          once: true,
+          capture: true
+        });
+      }
+    }, 100);
+  };
+
+  inputPromptTracker.addEventListener('blur', inputBlurredFunc, {
+    once: true,
+    capture: true
+  });
+  setTimeout(function () {
+    return inputPromptTracker.removeEventListener('blur', inputBlurredFunc);
+  }, 200); // Flow complains without this check.
+
+  if (document.body) document.body.appendChild(inputPromptTracker);
+  inputPromptTracker.focus(); // Detect if document.visibility is immediately changed which is a strong 
+  // indication that the protocol handler is working. We don't know for sure and 
+  // can't predict future browser changes, so only increase the redirect timeout.
+  // This reduces the probability of a false-negative (where local auth works, but 
+  // the original page was redirect to web auth because something took too long),
+
+  var pageVisibilityChanged = function pageVisibilityChanged() {
+    if (document.hidden && redirectToWebAuthTimer) {
+      _logger.Logger.info('Detected immediate page visibility change (protocol handler probably working).');
+
+      startWebAuthRedirectTimer(3000);
+    }
+  };
+
+  document.addEventListener('visibilitychange', pageVisibilityChanged, {
+    once: true,
+    capture: true
+  });
+  setTimeout(function () {
+    return document.removeEventListener('visibilitychange', pageVisibilityChanged);
+  }, 500); // Listen for the custom protocol echo reply via localStorage update event.
+
+  window.addEventListener('storage', function replyEventListener(event) {
+    if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
+      // Custom protocol worked, cancel the web auth redirect timer.
+      cancelWebAuthRedirectTimer();
+      inputPromptTracker.removeEventListener('blur', inputBlurredFunc);
+
+      _logger.Logger.info('Protocol echo reply detected from localStorage event.'); // Clean up event listener and localStorage.
+
+
+      window.removeEventListener('storage', replyEventListener);
+      var nextFunc = successCallback;
+
+      successCallback = function successCallback() {};
+
+      failCallback = function failCallback() {};
+
+      cleanUpLocalStorage(); // Briefly wait since localStorage changes can sometimes 
+      // be ignored when immediately redirected.
+
+      setTimeout(function () {
+        return nextFunc();
+      }, 100);
+    }
+  }, false); // Use iframe technique for launching the protocol URI rather than setting `window.location`.
+  // This method prevents browsers like Safari, Opera, Firefox from showing error prompts
+  // about unknown protocol handler when app is not installed, and avoids an empty
+  // browser tab when the app is installed. 
+
+  _logger.Logger.info('Attempting protocol launch via iframe injection.');
+
+  var locationSrc = "".concat(_utils.BLOCKSTACK_HANDLER, ":").concat(authRequest, "&echo=").concat(echoReplyID);
+  var iframe = document.createElement('iframe');
+  iframe.style.all = 'initial';
+  iframe.style.display = 'none';
+  iframe.src = locationSrc; // Flow complains without this check.
+
+  if (document.body) {
+    document.body.appendChild(iframe);
+  } else {
+    _logger.Logger.error('document.body is null when attempting iframe injection for protoocol URI launch');
   }
+}
+/**
+ * Redirects the user to the Blockstack browser to approve the sign in request
+ * given.
+ *
+ * The user is redirected to the `blockstackIDHost` if the `blockstack:`
+ * protocol handler is not detected. Please note that the protocol handler detection
+ * does not work on all browsers.
+ * @param  {UserSession} caller - the instance calling this method
+ * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
+ * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
+ *                                     protocol handler is not detected
+ * @return {void}
+ * @private
+ */
+
+
+function redirectToSignInWithAuthRequestImpl(caller, authRequest) {
+  var httpsURI = "".concat(_authConstants.DEFAULT_BLOCKSTACK_HOST, "?authRequest=").concat(authRequest);
+
+  if (caller.appConfig && caller.appConfig.authenticatorURL) {
+    httpsURI = "".concat(caller.appConfig.authenticatorURL, "?authRequest=").concat(authRequest);
+  } // If they're on a mobile OS, always redirect them to HTTPS site
+
+
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+    _logger.Logger.info('detected mobile OS, sending to https');
+
+    window.location = httpsURI;
+    return;
+  }
+
+  function successCallback() {
+    _logger.Logger.info('protocol handler detected'); // The detection function should open the link for us
+
+  }
+
+  function failCallback() {
+    _logger.Logger.warn('protocol handler not detected');
+
+    window.location = httpsURI;
+  }
+
+  detectProtocolLaunch(authRequest, successCallback, failCallback);
+}
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
+ * Most web applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `makeAuthRequest`,
+ * and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ * @param {UserSession} caller - the instance calling this function
+ * @return {void}
+ * @private
+ */
+
+
+function redirectToSignInImpl(caller) {
+  var transitKey = caller.generateAndStoreTransitKey();
+  var authRequest = caller.makeAuthRequest(transitKey);
+  redirectToSignInWithAuthRequestImpl(caller, authRequest);
+}
+/**
+ * Try to process any pending sign in request by returning a `Promise` that resolves
+ * to the user data object if the sign in succeeds.
+ *
+ * @param {UserSession} caller - the instance calling this function
+ * @param {String} authResponseToken - the signed authentication response token
+ * @return {Promise} that resolves to the user data object if successful and rejects
+ * if handling the sign in request fails or there was no pending sign in request.
+ * @private
+ */
+
+
+function handlePendingSignInImpl(caller, authResponseToken) {
+  var transitKey = caller.store.getSessionData().transitKey;
+  var coreNodeSessionValue = caller.store.getSessionData().coreNode;
+  var nameLookupURL = null;
+
+  if (!coreNodeSessionValue) {
+    var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
+
+    if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.3.0') && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
+      // override globally
+      _logger.Logger.info("Overriding ".concat(_config.config.network.blockstackAPIUrl, " ") + "with ".concat(tokenPayload.blockstackAPIUrl));
+
+      _config.config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl;
+    }
+
+    nameLookupURL = "".concat(_config.config.network.blockstackAPIUrl).concat(_authConstants.NAME_LOOKUP_PATH);
+  } else {
+    nameLookupURL = "".concat(coreNodeSessionValue).concat(_authConstants.NAME_LOOKUP_PATH);
+  }
+
+  return (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
+    if (!isValid) {
+      throw new _errors.LoginFailedError('Invalid authentication response.');
+    }
+
+    var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload; // TODO: real version handling
+
+    var appPrivateKey = tokenPayload.private_key;
+    var coreSessionToken = tokenPayload.core_token;
+
+    if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.1.0')) {
+      if (transitKey !== undefined && transitKey != null) {
+        if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
+          try {
+            appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, tokenPayload.private_key);
+          } catch (e) {
+            _logger.Logger.warn('Failed decryption of appPrivateKey, will try to use as given');
+
+            try {
+              (0, _utils.hexStringToECPair)(tokenPayload.private_key);
+            } catch (ecPairError) {
+              throw new _errors.LoginFailedError('Failed decrypting appPrivateKey. Usually means' + ' that the transit key has changed during login.');
+            }
+          }
+        }
+
+        if (coreSessionToken !== undefined && coreSessionToken !== null) {
+          try {
+            coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
+          } catch (e) {
+            _logger.Logger.info('Failed decryption of coreSessionToken, will try to use as given');
+          }
+        }
+      } else {
+        throw new _errors.LoginFailedError('Authenticating with protocol > 1.1.0 requires transit' + ' key, and none found.');
+      }
+    }
+
+    var hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+    var gaiaAssociationToken;
+
+    if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
+      hubUrl = tokenPayload.hubUrl;
+    }
+
+    if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.3.0') && tokenPayload.associationToken !== null && tokenPayload.associationToken !== undefined) {
+      gaiaAssociationToken = tokenPayload.associationToken;
+    }
+
+    var userData = {
+      username: tokenPayload.username,
+      profile: tokenPayload.profile,
+      decentralizedID: tokenPayload.iss,
+      identityAddress: (0, _index2.getAddressFromDID)(tokenPayload.iss),
+      appPrivateKey: appPrivateKey,
+      coreSessionToken: coreSessionToken,
+      authResponseToken: authResponseToken,
+      hubUrl: hubUrl,
+      gaiaAssociationToken: gaiaAssociationToken
+    };
+    var profileURL = tokenPayload.profile_url;
+
+    if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
+      return fetch(profileURL).then(function (response) {
+        if (!response.ok) {
+          // return blank profile if we fail to fetch
+          userData.profile = Object.assign({}, DEFAULT_PROFILE);
+          var sessionData = caller.store.getSessionData();
+          sessionData.userData = userData;
+          caller.store.setSessionData(sessionData);
+          return userData;
+        } else {
+          return response.text().then(function (responseText) {
+            return JSON.parse(responseText);
+          }).then(function (wrappedProfile) {
+            return (0, _profiles.extractProfile)(wrappedProfile[0].token);
+          }).then(function (profile) {
+            var sessionData = caller.store.getSessionData();
+            userData.profile = profile;
+            sessionData.userData = userData;
+            caller.store.setSessionData(sessionData);
+            return userData;
+          });
+        }
+      });
+    } else {
+      var sessionData = caller.store.getSessionData();
+      userData.profile = tokenPayload.profile;
+      sessionData.userData = userData;
+      caller.store.setSessionData(sessionData);
+      return userData;
+    }
+  });
+}
+/**
+ * Retrieves the user data object. The user's profile is stored in the key `profile`.
+ *
+ *  @param {UserSession} caller - the instance calling this function
+ *  @return {Object} User data object.
+ *  @private
+ */
+
+
+function loadUserDataImpl(caller) {
+  var userData = caller.store.getSessionData().userData;
+
+  if (!userData) {
+    throw new _errors.InvalidStateError('No user data found. Did the user sign in?');
+  }
+
+  return userData;
+}
+/**
+ * Redirects the user to the Blockstack browser to approve the sign in request
+ * given.
+ *
+ * The user is redirected to the `blockstackIDHost` if the `blockstack:`
+ * protocol handler is not detected. Please note that the protocol handler detection
+ * does not work on all browsers.
+ * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
+ * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
+ *                                     protocol handler is not detected
+ * @return {void}
+ */
+
+
+function redirectToSignInWithAuthRequest(authRequest) {
+  var blockstackIDHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _authConstants.DEFAULT_BLOCKSTACK_HOST;
+  console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will ' + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession ' + 'and call the instance method redirectToSignInWithAuthRequest().');
+  var userSession = new _userSession.UserSession();
+  var sessionAuthRequest = authRequest == null ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest;
+  userSession.appConfig.authenticatorURL = blockstackIDHost;
+  redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest);
+}
+
+},{"../config":513,"../errors":516,"../index":517,"../logger":519,"../profiles":527,"../utils":551,"./authConstants":504,"./authMessages":505,"./index":509,"./userSession":512,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],504:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.LOCALSTORAGE_SESSION_KEY = exports.NAME_LOOKUP_PATH = exports.DEFAULT_CORE_NODE = exports.BLOCKSTACK_DEFAULT_GAIA_HUB_URL = exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = exports.DEFAULT_SCOPE = exports.DEFAULT_BLOCKSTACK_HOST = exports.BLOCKSTACK_STORAGE_LABEL = exports.BLOCKSTACK_HANDLER = void 0;
+var BLOCKSTACK_HANDLER = 'blockstack';
+exports.BLOCKSTACK_HANDLER = BLOCKSTACK_HANDLER;
+var BLOCKSTACK_STORAGE_LABEL = 'blockstack';
+exports.BLOCKSTACK_STORAGE_LABEL = BLOCKSTACK_STORAGE_LABEL;
+var DEFAULT_BLOCKSTACK_HOST = 'https://browser.blockstack.org/auth';
+exports.DEFAULT_BLOCKSTACK_HOST = DEFAULT_BLOCKSTACK_HOST;
+var DEFAULT_SCOPE = ['store_write'];
+exports.DEFAULT_SCOPE = DEFAULT_SCOPE;
+var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
+exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = BLOCKSTACK_APP_PRIVATE_KEY_LABEL;
+var BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';
+exports.BLOCKSTACK_DEFAULT_GAIA_HUB_URL = BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+var DEFAULT_CORE_NODE = 'https://core.blockstack.org';
+exports.DEFAULT_CORE_NODE = DEFAULT_CORE_NODE;
+var NAME_LOOKUP_PATH = '/v1/names';
+exports.NAME_LOOKUP_PATH = NAME_LOOKUP_PATH;
+var LOCALSTORAGE_SESSION_KEY = 'blockstack-session';
+exports.LOCALSTORAGE_SESSION_KEY = LOCALSTORAGE_SESSION_KEY;
+
+},{}],505:[function(require,module,exports){
+(function (Buffer){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.generateTransitKey = generateTransitKey;
+exports.makeAuthRequestImpl = makeAuthRequestImpl;
+exports.encryptPrivateKey = encryptPrivateKey;
+exports.decryptPrivateKey = decryptPrivateKey;
+exports.makeAuthResponse = makeAuthResponse;
+
+require("cross-fetch/polyfill");
+
+var _jsontokens = require("jsontokens");
+
+var _index = require("../index");
+
+var _encryption = require("../encryption");
+
+var _logger = require("../logger");
+
+var VERSION = '1.3.1';
+
+/**
+ * Generates a ECDSA keypair to
+ * use as the ephemeral app transit private key
+ * @param {SessionData} session - session object in which key will be stored
+ * @return {String} the hex encoded private key
+ * @private
+ */
+function generateTransitKey() {
+  var transitKey = (0, _index.makeECPrivateKey)();
+  return transitKey;
+}
+/**
+ * Generates an authentication request that can be sent to the Blockstack
+ * browser for the user to approve sign in. This authentication request can
+ * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * method.
+ *
+ * *Note: This method should only be used if you want to roll your own authentication
+ * flow. Typically you'd use `redirectToSignIn` which takes care of this
+ * under the hood.*
+ *
+ * @param  {String} transitPrivateKey - hex encoded transit private key
+ * @param {String} redirectURI - location to redirect user to after sign in approval
+ * @param {String} manifestURI - location of this app's manifest file
+ * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {String} appDomain - the origin of this app
+ * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
+ * @return {String} the authentication request
+ * @private
+ */
+
+
+function makeAuthRequestImpl(transitPrivateKey, redirectURI, manifestURI, scopes) {
+  var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
+  var expiresAt = arguments.length > 5 ? arguments[5] : undefined;
+  var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
+
+  /* Create the payload */
+  var payload = Object.assign({}, extraParams, {
+    jti: (0, _index.makeUUID4)(),
+    iat: Math.floor(new Date().getTime() / 1000),
+    // JWT times are in seconds
+    exp: Math.floor(expiresAt / 1000),
+    // JWT times are in seconds
+    iss: null,
+    public_keys: [],
+    domain_name: appDomain,
+    manifest_uri: manifestURI,
+    redirect_uri: redirectURI,
+    version: VERSION,
+    do_not_include_profile: true,
+    supports_hub_url: true,
+    scopes: scopes
+  });
+
+  _logger.Logger.info("blockstack.js: generating v".concat(VERSION, " auth request"));
+  /* Convert the private key to a public key to an issuer */
+
+
+  var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(transitPrivateKey);
+
+  payload.public_keys = [publicKey];
+  var address = (0, _index.publicKeyToAddress)(publicKey);
+  payload.iss = (0, _index.makeDIDFromAddress)(address);
+  /* Sign and return the token */
+
+  var tokenSigner = new _jsontokens.TokenSigner('ES256k', transitPrivateKey);
+  var token = tokenSigner.sign(payload);
+  return token;
+}
+/**
+ * Encrypts the private key for decryption by the given
+ * public key.
+ * @param  {String} publicKey  [description]
+ * @param  {String} privateKey [description]
+ * @return {String} hex encoded ciphertext
+ * @private
+ */
+
+
+function encryptPrivateKey(publicKey, privateKey) {
+  var encryptedObj = (0, _encryption.encryptECIES)(publicKey, privateKey);
+  var encryptedJSON = JSON.stringify(encryptedObj);
+  return new Buffer(encryptedJSON).toString('hex');
+}
+/**
+ * Decrypts the hex encrypted private key
+ * @param  {String} privateKey  the private key corresponding to the public
+ * key for which the ciphertext was encrypted
+ * @param  {String} hexedEncrypted the ciphertext
+ * @return {String}  the decrypted private key
+ * @throws {Error} if unable to decrypt
+ *
+ * @private
+ */
+
+
+function decryptPrivateKey(privateKey, hexedEncrypted) {
+  var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
+  var encryptedObj = JSON.parse(unhexedString);
+  var decrypted = (0, _encryption.decryptECIES)(privateKey, encryptedObj);
+
+  if (typeof decrypted !== 'string') {
+    throw new Error('Unable to correctly decrypt private key');
+  } else {
+    return decrypted;
+  }
+}
+/**
+ * Generates a signed authentication response token for an app. This
+ * token is sent back to apps which use contents to access the
+ * resources and data requested by the app.
+ *
+ * @param  {String} privateKey the identity key of the Blockstack ID generating
+ * the authentication response
+ * @param  {Object} profile the profile object for the Blockstack ID
+ * @param  {String} username the username of the Blockstack ID if any, otherwise `null`
+ * @param  {AuthMetadata} metadata an object containing metadata sent as part of the authentication
+ * response including `email` if requested and available and a URL to the profile
+ * @param  {String} coreToken core session token when responding to a legacy auth request
+ * or `null` for current direct to gaia authentication requests
+ * @param  {String} appPrivateKey the application private key. This private key is
+ * unique and specific for every Blockstack ID and application combination.
+ * @param  {Number} expiresAt an integer in the same format as
+ * `new Date().getTime()`, milliseconds since the Unix epoch
+ * @param {String} transitPublicKey the public key provide by the app
+ * in its authentication request with which secrets will be encrypted
+ * @param {String} hubUrl URL to the write path of the user's Gaia hub
+ * @param {String} blockstackAPIUrl URL to the API endpoint to use
+ * @param {String} associationToken JWT that binds the app key to the identity key
+ * @return {String} signed and encoded authentication response token
+ * @private
+ */
+
+
+function makeAuthResponse(privateKey) {
+  var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var username = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var metadata = arguments.length > 3 ? arguments[3] : undefined;
+  var coreToken = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var appPrivateKey = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var expiresAt = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (0, _index.nextMonth)().getTime();
+  var transitPublicKey = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
+  var hubUrl = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : null;
+  var blockstackAPIUrl = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : null;
+  var associationToken = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : null;
+
+  /* Convert the private key to a public key to an issuer */
+  var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(privateKey);
+
+  var address = (0, _index.publicKeyToAddress)(publicKey);
+  /* See if we should encrypt with the transit key */
+
+  var privateKeyPayload = appPrivateKey;
+  var coreTokenPayload = coreToken;
+  var additionalProperties = {};
+
+  if (appPrivateKey !== undefined && appPrivateKey !== null) {
+    _logger.Logger.info("blockstack.js: generating v".concat(VERSION, " auth response"));
+
+    if (transitPublicKey !== undefined && transitPublicKey !== null) {
+      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
+
+      if (coreToken !== undefined && coreToken !== null) {
+        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
+      }
+    }
+
+    additionalProperties = {
+      email: metadata.email ? metadata.email : null,
+      profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      hubUrl: hubUrl,
+      blockstackAPIUrl: blockstackAPIUrl,
+      associationToken: associationToken,
+      version: VERSION
+    };
+  } else {
+    _logger.Logger.info('blockstack.js: generating legacy auth response');
+  }
+  /* Create the payload */
+
+
+  var payload = Object.assign({}, {
+    jti: (0, _index.makeUUID4)(),
+    iat: Math.floor(new Date().getTime() / 1000),
+    // JWT times are in seconds
+    exp: Math.floor(expiresAt / 1000),
+    // JWT times are in seconds
+    iss: (0, _index.makeDIDFromAddress)(address),
+    private_key: privateKeyPayload,
+    public_keys: [publicKey],
+    profile: profile,
+    username: username,
+    core_token: coreTokenPayload
+  }, additionalProperties);
+  /* Sign and return the token */
+
+  var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
+  return tokenSigner.sign(payload);
+}
+
+}).call(this,require("buffer").Buffer)
+},{"../encryption":515,"../index":517,"../logger":519,"buffer":149,"cross-fetch/polyfill":168,"jsontokens":266}],506:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getAuthRequestFromURL = getAuthRequestFromURL;
+exports.fetchAppManifest = fetchAppManifest;
+exports.redirectUserToApp = redirectUserToApp;
+
+var _queryString = _interopRequireDefault(require("query-string"));
+
+var _jsontokens = require("jsontokens");
+
+var _index = require("../index");
+
+var _utils = require("../utils");
+
+var _logger = require("../logger");
+
+/**
+ * Retrieves the authentication request from the query string
+ * @return {String|null} the authentication request or `null` if
+ * the query string parameter `authRequest` is not found
+ * @private
+ */
+function getAuthRequestFromURL() {
+  var queryDict = _queryString.default.parse(location.search);
+
+  if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
+    return queryDict.authRequest.split("".concat(_utils.BLOCKSTACK_HANDLER, ":")).join('');
+  } else {
+    return null;
+  }
+}
+/**
+ * Fetches the contents of the manifest file specified in the authentication request
+ *
+ * @param  {String} authRequest encoded and signed authentication request
+ * @return {Promise<Object|String>} Returns a `Promise` that resolves to the JSON
+ * object manifest file unless there's an error in which case rejects with an error
+ * message.
+ * @private
+ */
+
+
+function fetchAppManifest(authRequest) {
+  return new Promise(function (resolve, reject) {
+    if (!authRequest) {
+      reject('Invalid auth request');
+    } else {
+      var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
+      var manifestURI = payload.manifest_uri;
+
+      try {
+        _logger.Logger.debug("Fetching manifest from ".concat(manifestURI));
+
+        fetch(manifestURI).then(function (response) {
+          return response.text();
+        }).then(function (responseText) {
+          return JSON.parse(responseText);
+        }).then(function (responseJSON) {
+          resolve(responseJSON);
+        }).catch(function (e) {
+          _logger.Logger.debug(e.stack);
+
+          reject('Could not fetch manifest.json');
+        });
+      } catch (e) {
+        _logger.Logger.debug(e.stack);
+
+        reject('Could not fetch manifest.json');
+      }
+    }
+  });
+}
+/**
+ * Redirect the user's browser to the app using the `redirect_uri`
+ * specified in the authentication request, passing the authentication
+ * response token as a query parameter.
+ *
+ * @param {String} authRequest  encoded and signed authentication request token
+ * @param  {String} authResponse encoded and signed authentication response token
+ * @return {void}
+ * @throws {Error} if there is no redirect uri
+ * @private
+ */
+
+
+function redirectUserToApp(authRequest, authResponse) {
+  var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
+  var redirectURI = payload.redirect_uri;
+
+  _logger.Logger.debug(redirectURI);
+
+  if (redirectURI) {
+    redirectURI = (0, _index.updateQueryStringParameter)(redirectURI, 'authResponse', authResponse);
+  } else {
+    throw new Error('Invalid redirect URI');
+  }
+
+  window.location = redirectURI;
+}
+
+},{"../index":517,"../logger":519,"../utils":551,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],507:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.makeCoreSessionRequest = makeCoreSessionRequest;
+exports.sendCoreSessionRequest = sendCoreSessionRequest;
+exports.getCoreSession = getCoreSession;
+
+var _jsontokens = require("jsontokens");
+
+require("cross-fetch/polyfill");
+
+/**
+ * Create an authentication token to be sent to the Core API server
+ * in order to generate a Core session JWT.
+ *
+ * @param {String} appDomain  The unique application identifier (e.g. foo.app, www.foo.com, etc).
+ * @param {Array} appMethods  The list of API methods this application will need.
+ * @param {String} appPrivateKey  The application-specific private key
+ * @param {String|null} blockchainID  This is the blockchain ID of the requester
+ * @param {String} thisDevice Identifier of the current device
+ *
+ * @return {String} a JWT signed by the app's private key
+ * @deprecated
+ * @private
+ */
+function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
+  var blockchainID = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var thisDevice = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+
+  if (thisDevice === null) {
+    thisDevice = '.default';
+  }
+
+  var appPublicKey = _jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey);
+
+  var appPublicKeys = [{
+    public_key: appPublicKey,
+    device_id: thisDevice
+  }];
+  var authBody = {
+    version: 1,
+    blockchain_id: blockchainID,
+    app_private_key: appPrivateKey,
+    app_domain: appDomain,
+    methods: appMethods,
+    app_public_keys: appPublicKeys,
+    device_id: thisDevice // make token
+
+  };
+  var tokenSigner = new _jsontokens.TokenSigner('ES256k', appPrivateKey);
+  var token = tokenSigner.sign(authBody);
+  return token;
+}
+/**
+ * Send Core a request for a session token.
+ *
+ * @param {String} coreHost host name of the core node
+ * @param {Number} corePort port number of the core node
+ * @param {String} coreAuthRequest  a signed JWT encoding the authentication request
+ * @param {String} apiPassword the API password for Core
+ *
+ * @return {Promise} the resolves to a JWT signed with the Core API server's private key
+ * that authorizes the bearer to carry out the requested operations and rejects
+ * with an error message otherwise
+ * @deprecated
+ * @private
+ */
+
+
+function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
+  return Promise.resolve().then(function () {
+    if (!apiPassword) {
+      throw new Error('Missing API password');
+    }
+  }).then(function () {
+    var options = {
+      headers: {
+        Authorization: "bearer ".concat(apiPassword)
+      }
+    };
+    var url = "http://".concat(coreHost, ":").concat(corePort, "/v1/auth?authRequest=").concat(coreAuthRequest);
+    return fetch(url, options);
+  }).then(function (response) {
+    if (!response.ok) {
+      throw new Error('HTTP status not OK');
+    }
+
+    return response.text();
+  }).then(function (responseText) {
+    var responseJson = JSON.parse(responseText);
+    var token = responseJson.token;
+
+    if (!token) {
+      throw new Error('Failed to get Core session token');
+    }
+
+    return token;
+  }).catch(function (error) {
+    console.error(error);
+    throw new Error('Invalid Core response: not JSON');
+  });
+}
+/**
+ * Get a core session token.  Generate an auth request, sign it, send it to Core,
+ * and get back a session token.
+ *
+ * @param {String} coreHost Core API server's hostname
+ * @param {Number} corePort Core API server's port number
+ * @param {String} apiPassword core api password
+ * @param  {String} appPrivateKey Application's private key
+ * @param  {String} blockchainId blockchain ID of the user signing in.
+ * `null` if user has no blockchain ID
+ * @param {String} authRequest authentication request token
+ * @param {String} deviceId identifier for the current device
+ *
+ * @return {Promise} a Promise that resolves to a Core session token or rejects
+ * with an error message.
+ * @deprecated
+ * @private
+ */
+
+
+function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
+  var blockchainId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var deviceId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '0';
+
+  if (!authRequest) {
+    return Promise.reject('No authRequest provided');
+  }
+
+  var payload = null;
+  var authRequestObject = null;
+
+  try {
+    authRequestObject = (0, _jsontokens.decodeToken)(authRequest);
+
+    if (!authRequestObject) {
+      return Promise.reject('Invalid authRequest in URL query string');
+    }
+
+    if (!authRequestObject.payload) {
+      return Promise.reject('Invalid authRequest in URL query string');
+    }
+
+    payload = authRequestObject.payload;
+  } catch (e) {
+    console.error(e.stack);
+    return Promise.reject('Failed to parse authRequest in URL');
+  }
+
+  var appDomain = payload.domain_name;
+
+  if (!appDomain) {
+    return Promise.reject('No domain_name in authRequest');
+  }
+
+  var appMethods = payload.scopes;
+  var coreAuthRequest = makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainId, deviceId);
+  return sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword);
+}
+
+},{"cross-fetch/polyfill":168,"jsontokens":266}],508:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.doSignaturesMatchPublicKeys = doSignaturesMatchPublicKeys;
+exports.doPublicKeysMatchIssuer = doPublicKeysMatchIssuer;
+exports.doPublicKeysMatchUsername = doPublicKeysMatchUsername;
+exports.isIssuanceDateValid = isIssuanceDateValid;
+exports.isExpirationDateValid = isExpirationDateValid;
+exports.isManifestUriValid = isManifestUriValid;
+exports.isRedirectUriValid = isRedirectUriValid;
+exports.verifyAuthRequest = verifyAuthRequest;
+exports.verifyAuthRequestAndLoadManifest = verifyAuthRequestAndLoadManifest;
+exports.verifyAuthResponse = verifyAuthResponse;
+
+var _jsontokens = require("jsontokens");
+
+var _index = require("../index");
+
+var _ = require(".");
+
+/**
+ * Checks if the ES256k signature on passed `token` match the claimed public key
+ * in the payload key `public_keys`.
+ *
+ * @param  {String} token encoded and signed authentication token
+ * @return {Boolean} Returns `true` if the signature matches the claimed public key
+ * @throws {Error} if `token` contains multiple public keys
+ * @private
+ */
+function doSignaturesMatchPublicKeys(token) {
+  var payload = (0, _jsontokens.decodeToken)(token).payload;
+  var publicKeys = payload.public_keys;
+
+  if (publicKeys.length === 1) {
+    var publicKey = publicKeys[0];
+
+    try {
+      var tokenVerifier = new _jsontokens.TokenVerifier('ES256k', publicKey);
+      var signatureVerified = tokenVerifier.verify(token);
+
+      if (signatureVerified) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  } else {
+    throw new Error('Multiple public keys are not supported');
+  }
+}
+/**
+ * Makes sure that the identity address portion of
+ * the decentralized identifier passed in the issuer `iss`
+ * key of the token matches the public key
+ *
+ * @param  {String} token encoded and signed authentication token
+ * @return {Boolean} if the identity address and public keys match
+ * @throws {Error} if ` token` has multiple public keys
+ * @private
+ */
+
+
+function doPublicKeysMatchIssuer(token) {
+  var payload = (0, _jsontokens.decodeToken)(token).payload;
+  var publicKeys = payload.public_keys;
+  var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
+
+  if (publicKeys.length === 1) {
+    var addressFromPublicKeys = (0, _index.publicKeyToAddress)(publicKeys[0]);
+
+    if (addressFromPublicKeys === addressFromIssuer) {
+      return true;
+    }
+  } else {
+    throw new Error('Multiple public keys are not supported');
+  }
+
+  return false;
+}
+/**
+ * Looks up the identity address that owns the claimed username
+ * in `token` using the lookup endpoint provided in `nameLookupURL`
+ * to determine if the username is owned by the identity address
+ * that matches the claimed public key
+ *
+ * @param  {String} token  encoded and signed authentication token
+ * @param  {String} nameLookupURL a URL to the name lookup endpoint of the Blockstack Core API
+ * @return {Promise<Boolean>} returns a `Promise` that resolves to
+ * `true` if the username is owned by the public key, otherwise the
+ * `Promise` resolves to `false`
+ * @private
+ */
+
+
+function doPublicKeysMatchUsername(token, nameLookupURL) {
+  return Promise.resolve().then(function () {
+    var payload = (0, _jsontokens.decodeToken)(token).payload;
+
+    if (!payload.username) {
+      return true;
+    }
+
+    if (payload.username === null) {
+      return true;
+    }
+
+    if (nameLookupURL === null) {
+      return false;
+    }
+
+    var username = payload.username;
+    var url = "".concat(nameLookupURL.replace(/\/$/, ''), "/").concat(username);
+    return fetch(url).then(function (response) {
+      return response.text();
+    }).then(function (responseText) {
+      var responseJSON = JSON.parse(responseText);
+
+      if (responseJSON.hasOwnProperty('address')) {
+        var nameOwningAddress = responseJSON.address;
+        var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
+
+        if (nameOwningAddress === addressFromIssuer) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    });
+  }).catch(function () {
+    return false;
+  });
+}
+/**
+ * Checks if the if the token issuance time and date is after the
+ * current time and date.
+ *
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if the token was issued after the current time,
+ * otherwise returns `false`
+ * @private
+ */
+
+
+function isIssuanceDateValid(token) {
+  var payload = (0, _jsontokens.decodeToken)(token).payload;
+
+  if (payload.iat) {
+    if (typeof payload.iat !== 'number') {
+      return false;
+    }
+
+    var issuedAt = new Date(payload.iat * 1000); // JWT times are in seconds
+
+    if (new Date().getTime() < issuedAt.getTime()) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    return true;
+  }
+}
+/**
+ * Checks if the expiration date of the `token` is before the current time
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if the `token` has not yet expired, `false`
+ * if the `token` has expired
+ *
+ * @private
+ */
+
+
+function isExpirationDateValid(token) {
+  var payload = (0, _jsontokens.decodeToken)(token).payload;
+
+  if (payload.exp) {
+    if (typeof payload.exp !== 'number') {
+      return false;
+    }
+
+    var expiresAt = new Date(payload.exp * 1000); // JWT times are in seconds
+
+    if (new Date().getTime() > expiresAt.getTime()) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    return true;
+  }
+}
+/**
+ * Makes sure the `manifest_uri` is a same origin absolute URL.
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if valid, otherwise `false`
+ * @private
+ */
+
+
+function isManifestUriValid(token) {
+  var payload = (0, _jsontokens.decodeToken)(token).payload;
+  return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.manifest_uri);
+}
+/**
+ * Makes sure the `redirect_uri` is a same origin absolute URL.
+ * @param  {String}  token encoded and signed authentication token
+ * @return {Boolean} `true` if valid, otherwise `false`
+ * @private
+ */
+
+
+function isRedirectUriValid(token) {
+  var payload = (0, _jsontokens.decodeToken)(token).payload;
+  return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.redirect_uri);
+}
+/**
+ * Verify authentication request is valid. This function performs a number
+ * of checks on the authentication request token:
+ * * Checks that `token` has a valid issuance date & is not expired
+ * * Checks that `token` has a valid signature that matches the public key it claims
+ * * Checks that both the manifest and redirect URLs are absolute and conform to
+ * the same origin policy
+ *
+ * @param  {String} token encoded and signed authentication request token
+ * @return {Promise} that resolves to true if the auth request
+ *  is valid and false if it does not. It rejects with a String if the
+ *  token is not signed
+ *  @private
+ */
+
+
+function verifyAuthRequest(token) {
+  return Promise.resolve().then(function () {
+    if ((0, _jsontokens.decodeToken)(token).header.alg === 'none') {
+      throw new Error('Token must be signed in order to be verified');
+    }
+  }).then(function () {
+    return Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), isManifestUriValid(token), isRedirectUriValid(token)]);
+  }).then(function (values) {
+    if (values.every(Boolean)) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+}
+/**
+ * Verify the authentication request is valid and
+ * fetch the app manifest file if valid. Otherwise, reject the promise.
+ * @param  {String} token encoded and signed authentication request token
+ * @return {Promise} that resolves to the app manifest file in JSON format
+ * or rejects if the auth request or app manifest file is invalid
+ * @private
+ */
+
+
+function verifyAuthRequestAndLoadManifest(token) {
+  return Promise.resolve().then(function () {
+    return verifyAuthRequest(token).then(function (valid) {
+      if (valid) {
+        return (0, _.fetchAppManifest)(token);
+      } else {
+        return Promise.reject();
+      }
+    });
+  });
+}
+/**
+ * Verify the authentication response is valid
+ * @param {String} token the authentication response token
+ * @param {String} nameLookupURL the url use to verify owner of a username
+ * @return {Promise} that resolves to true if auth response
+ * is valid and false if it does not
+ * @private
+ */
+
+
+function verifyAuthResponse(token, nameLookupURL) {
+  return Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
+    if (values.every(Boolean)) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+}
+
+},{".":509,"../index":517,"jsontokens":266}],509:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "AppConfig", {
+  enumerable: true,
+  get: function get() {
+    return _appConfig.AppConfig;
+  }
+});
+Object.defineProperty(exports, "makeAuthResponse", {
+  enumerable: true,
+  get: function get() {
+    return _authMessages.makeAuthResponse;
+  }
+});
+Object.defineProperty(exports, "getAuthRequestFromURL", {
+  enumerable: true,
+  get: function get() {
+    return _authProvider.getAuthRequestFromURL;
+  }
+});
+Object.defineProperty(exports, "fetchAppManifest", {
+  enumerable: true,
+  get: function get() {
+    return _authProvider.fetchAppManifest;
+  }
+});
+Object.defineProperty(exports, "redirectUserToApp", {
+  enumerable: true,
+  get: function get() {
+    return _authProvider.redirectUserToApp;
+  }
+});
+Object.defineProperty(exports, "makeCoreSessionRequest", {
+  enumerable: true,
+  get: function get() {
+    return _authSession.makeCoreSessionRequest;
+  }
+});
+Object.defineProperty(exports, "sendCoreSessionRequest", {
+  enumerable: true,
+  get: function get() {
+    return _authSession.sendCoreSessionRequest;
+  }
+});
+Object.defineProperty(exports, "getCoreSession", {
+  enumerable: true,
+  get: function get() {
+    return _authSession.getCoreSession;
+  }
+});
+Object.defineProperty(exports, "verifyAuthRequest", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.verifyAuthRequest;
+  }
+});
+Object.defineProperty(exports, "verifyAuthResponse", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.verifyAuthResponse;
+  }
+});
+Object.defineProperty(exports, "isExpirationDateValid", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.isExpirationDateValid;
+  }
+});
+Object.defineProperty(exports, "isIssuanceDateValid", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.isIssuanceDateValid;
+  }
+});
+Object.defineProperty(exports, "doPublicKeysMatchUsername", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.doPublicKeysMatchUsername;
+  }
+});
+Object.defineProperty(exports, "doPublicKeysMatchIssuer", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.doPublicKeysMatchIssuer;
+  }
+});
+Object.defineProperty(exports, "doSignaturesMatchPublicKeys", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.doSignaturesMatchPublicKeys;
+  }
+});
+Object.defineProperty(exports, "isManifestUriValid", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.isManifestUriValid;
+  }
+});
+Object.defineProperty(exports, "isRedirectUriValid", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.isRedirectUriValid;
+  }
+});
+Object.defineProperty(exports, "verifyAuthRequestAndLoadManifest", {
+  enumerable: true,
+  get: function get() {
+    return _authVerification.verifyAuthRequestAndLoadManifest;
+  }
+});
+Object.defineProperty(exports, "isUserSignedIn", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.isUserSignedIn;
+  }
+});
+Object.defineProperty(exports, "redirectToSignIn", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.redirectToSignIn;
+  }
+});
+Object.defineProperty(exports, "redirectToSignInWithAuthRequest", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.redirectToSignInWithAuthRequest;
+  }
+});
+Object.defineProperty(exports, "isSignInPending", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.isSignInPending;
+  }
+});
+Object.defineProperty(exports, "handlePendingSignIn", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.handlePendingSignIn;
+  }
+});
+Object.defineProperty(exports, "loadUserData", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.loadUserData;
+  }
+});
+Object.defineProperty(exports, "signUserOut", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.signUserOut;
+  }
+});
+
+var _appConfig = require("./appConfig");
+
+var _authMessages = require("./authMessages");
+
+var _authProvider = require("./authProvider");
+
+var _authSession = require("./authSession");
+
+var _authVerification = require("./authVerification");
+
+var _authApp = require("./authApp");
+
+},{"./appConfig":502,"./authApp":503,"./authMessages":505,"./authProvider":506,"./authSession":507,"./authVerification":508}],510:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SessionData = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _errors = require("../errors");
+
+var SESSION_VERSION = '1.0.0';
+
+var SessionData =
+/*#__PURE__*/
+function () {
+  // required after sign in
+  // required after sign in
+  // required after sign in
+  // using this in place of
+  // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
+  function SessionData(options) {
+    (0, _classCallCheck2.default)(this, SessionData);
+    (0, _defineProperty2.default)(this, "version", void 0);
+    (0, _defineProperty2.default)(this, "appPrivateKey", void 0);
+    (0, _defineProperty2.default)(this, "identityAddress", void 0);
+    (0, _defineProperty2.default)(this, "username", void 0);
+    (0, _defineProperty2.default)(this, "coreNode", void 0);
+    (0, _defineProperty2.default)(this, "hubUrl", void 0);
+    (0, _defineProperty2.default)(this, "transitKey", void 0);
+    (0, _defineProperty2.default)(this, "userData", void 0);
+    (0, _defineProperty2.default)(this, "gaiaHubConfig", void 0);
+    this.version = SESSION_VERSION;
+    this.appPrivateKey = options.appPrivateKey;
+    this.identityAddress = options.identityAddress;
+    this.username = options.username;
+    this.coreNode = options.coreNode;
+    this.hubUrl = options.hubUrl;
+    this.userData = options.userData;
+    this.transitKey = options.transitKey; // initializing Gaia connection requires a network request
+    // so we'll defer it until the first time it's needed
+
+    this.gaiaHubConfig = null;
+  }
+
+  (0, _createClass2.default)(SessionData, [{
+    key: "getGaiaHubConfig",
+    value: function getGaiaHubConfig() {
+      return this.gaiaHubConfig;
+    }
+  }, {
+    key: "setGaiaHubConfig",
+    value: function setGaiaHubConfig(config) {
+      this.gaiaHubConfig = config;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      return JSON.stringify(this);
+    }
+  }], [{
+    key: "fromJSON",
+    value: function fromJSON(json) {
+      if (json.version !== SESSION_VERSION) {
+        throw new _errors.InvalidStateError("JSON data version ".concat(json.version, " not supported by SessionData"));
+      }
+
+      var options = {
+        appPrivateKey: json.appPrivateKey,
+        identityAddress: json.identityAddress,
+        username: json.username,
+        coreNode: json.coreNode,
+        hubUrl: json.hubUrl,
+        userData: json.userData,
+        transitKey: json.transitKey
+      };
+      return new SessionData(options);
+    }
+  }]);
+  return SessionData;
+}();
+
+exports.SessionData = SessionData;
+
+},{"../errors":516,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11}],511:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.LocalStorageStore = exports.InstanceDataStore = exports.SessionDataStore = void 0;
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _sessionData = require("./sessionData");
+
+var _authConstants = require("./authConstants");
+
+var _errors = require("../errors");
+
+// import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage/hub'
+// import { Logger } from '../logger'
+
+/**
+ * An abstract class representing the SessionDataStore interface.
+ * @type {SessionData}
+ */
+var SessionDataStore =
+/*#__PURE__*/
+function () {
+  function SessionDataStore(sessionOptions) {
+    (0, _classCallCheck2.default)(this, SessionDataStore);
+
+    if (sessionOptions) {
+      var newSessionData = new _sessionData.SessionData(sessionOptions);
+      this.setSessionData(newSessionData);
+    }
+  }
+
+  (0, _createClass2.default)(SessionDataStore, [{
+    key: "getSessionData",
+    value: function getSessionData() {
+      throw new Error('Abstract class');
+    }
+    /* eslint-disable */
+
+  }, {
+    key: "setSessionData",
+    value: function setSessionData(session) {
+      throw new Error('Abstract class');
+    }
+  }, {
+    key: "deleteSessionData",
+    value: function deleteSessionData() {
+      throw new Error('Abstract class');
+    }
+    /* eslint-enable */
+
+  }]);
+  return SessionDataStore;
+}();
+/**
+ * Stores session data in the instance of this class.
+ * @type {InstanceDataStore}
+ */
+
+
+exports.SessionDataStore = SessionDataStore;
+
+var InstanceDataStore =
+/*#__PURE__*/
+function (_SessionDataStore) {
+  (0, _inherits2.default)(InstanceDataStore, _SessionDataStore);
+
+  function InstanceDataStore(sessionOptions) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, InstanceDataStore);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InstanceDataStore).call(this, sessionOptions));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "sessionData", void 0);
+
+    if (!_this.sessionData) {
+      _this.setSessionData(new _sessionData.SessionData({}));
+    }
+
+    return _this;
+  }
+
+  (0, _createClass2.default)(InstanceDataStore, [{
+    key: "getSessionData",
+    value: function getSessionData() {
+      if (!this.sessionData) {
+        throw new _errors.NoSessionDataError('No session data was found.');
+      }
+
+      return this.sessionData;
+    }
+  }, {
+    key: "setSessionData",
+    value: function setSessionData(session) {
+      this.sessionData = session;
+      return true;
+    }
+  }, {
+    key: "deleteSessionData",
+    value: function deleteSessionData() {
+      this.setSessionData(new _sessionData.SessionData({}));
+      return true;
+    }
+  }]);
+  return InstanceDataStore;
+}(SessionDataStore);
+/**
+ * Stores session data in browser a localStorage entry.
+ * @type {LocalStorageStore}
+ */
+
+
+exports.InstanceDataStore = InstanceDataStore;
+
+var LocalStorageStore =
+/*#__PURE__*/
+function (_SessionDataStore2) {
+  (0, _inherits2.default)(LocalStorageStore, _SessionDataStore2);
+
+  function LocalStorageStore(sessionOptions) {
+    var _this2;
+
+    (0, _classCallCheck2.default)(this, LocalStorageStore);
+    _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LocalStorageStore).call(this, sessionOptions));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this2), "key", void 0);
+
+    if (sessionOptions && sessionOptions.storeOptions && sessionOptions.storeOptions.localStorageKey && sessionOptions.storeOptions.localStorageKey instanceof String) {
+      _this2.key = sessionOptions.storeOptions.localStorageKey;
+    } else {
+      _this2.key = _authConstants.LOCALSTORAGE_SESSION_KEY;
+    }
+
+    var data = localStorage.getItem(_this2.key);
+
+    if (!data) {
+      var sessionData = new _sessionData.SessionData({});
+
+      _this2.setSessionData(sessionData);
+    }
+
+    return _this2;
+  }
+
+  (0, _createClass2.default)(LocalStorageStore, [{
+    key: "getSessionData",
+    value: function getSessionData() {
+      var data = localStorage.getItem(this.key);
+
+      if (!data) {
+        throw new _errors.NoSessionDataError('No session data was found in localStorage');
+      }
+
+      var dataJSON = JSON.parse(data);
+      return _sessionData.SessionData.fromJSON(dataJSON);
+    }
+  }, {
+    key: "setSessionData",
+    value: function setSessionData(session) {
+      localStorage.setItem(this.key, session.toString());
+      return true;
+    }
+  }, {
+    key: "deleteSessionData",
+    value: function deleteSessionData() {
+      localStorage.removeItem(this.key);
+      this.setSessionData(new _sessionData.SessionData({}));
+      return true;
+    } // checkForLegacyDataAndMigrate(): Promise<SessionData> {
+    //   const legacyTransitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
+    //   const legacyGaiaConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL)
+    //   const legacyUserData = localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
+    //
+    //
+    //   if (legacyTransitKey) {
+    //     localStorage.removeItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
+    //   }
+    //
+    //
+    //
+    // }
+
+  }]);
+  return LocalStorageStore;
+}(SessionDataStore);
+
+exports.LocalStorageStore = LocalStorageStore;
+
+},{"../errors":516,"./authConstants":504,"./sessionData":510,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],512:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.UserSession = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _queryString = _interopRequireDefault(require("query-string"));
+
+var _appConfig = require("./appConfig");
+
+var _sessionStore = require("./sessionStore");
+
+var _authApp = require("./authApp");
+
+var _authMessages = require("./authMessages");
+
+var _storage = require("../storage");
+
+var _utils = require("../utils");
+
+var _errors = require("../errors");
+
+var _logger = require("../logger");
+
+/**
+ * Represents an instance of a signed in user for a particular app.
+ *
+ * A signed in user has access to two major pieces of information
+ * about the user, the user's private key for that app and the location
+ * of the user's gaia storage bucket for the app.
+ *
+ * A user can be signed in either directly through the interactive
+ * sign in process or by directly providing the app private key.
+ * @type {UserSession}
+ */
+var UserSession =
+/*#__PURE__*/
+function () {
+  function UserSession(options) {
+    (0, _classCallCheck2.default)(this, UserSession);
+    (0, _defineProperty2.default)(this, "appConfig", void 0);
+    (0, _defineProperty2.default)(this, "store", void 0);
+    var runningInBrowser = true;
+
+    if (typeof window === 'undefined') {
+      _logger.Logger.debug('UserSession: not running in browser');
+
+      runningInBrowser = false;
+    }
+
+    if (options && options.appConfig) {
+      this.appConfig = options.appConfig;
+    } else if (runningInBrowser) {
+      this.appConfig = new _appConfig.AppConfig();
+    } else {
+      throw new _errors.MissingParameterError('You need to specify options.appConfig');
+    }
+
+    if (options && options.sessionStore) {
+      this.store = options.sessionStore;
+    } else if (runningInBrowser) {
+      if (options) {
+        this.store = new _sessionStore.LocalStorageStore(options.sessionOptions);
+      } else {
+        this.store = new _sessionStore.LocalStorageStore();
+      }
+    } else if (options) {
+      this.store = new _sessionStore.InstanceDataStore(options.sessionOptions);
+    } else {
+      this.store = new _sessionStore.InstanceDataStore();
+    }
+  }
+  /* AUTHENTICATION */
+
   /**
    * Generates an authentication request and redirects the user to the Blockstack
    * browser to approve the sign in request.
@@ -92204,8624 +94155,6812 @@ function getZoneFileTemplate() {
    * Most applications should use this
    * method for sign in unless they require more fine grained control over how the
    * authentication request is generated. If your app falls into this category,
-   * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
-   *
-   * @param {String} [redirectURI=`${window.location.origin}/`]
-   * The location to which the identity provider will redirect the user after
-   * the user approves sign in.
-   * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
-   * Location of the manifest file.
-   * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
-   * this app's data store.
-   * An array of strings indicating which permissions this app is requesting.
-   * @return {void}
-   */
-
-  /* eslint-disable no-unused-vars */
-
-
-  function redirectToSignIn() {
-    var redirectURI = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "".concat(window.location.origin, "/");
-    var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "".concat(window.location.origin, "/manifest.json");
-    var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_SCOPE;
-    console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method redirectToSignIn().');
-    var userSession = new _userSession.UserSession();
-    userSession.redirectToSignIn();
-  }
-  /* eslint-enable no-unused-vars */
-
-  /**
-   * Check if there is a authentication request that hasn't been handled.
-   * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
-   */
-
-
-  function isSignInPending() {
-    console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method isSignInPending().');
-    var userSession = new _userSession.UserSession();
-    return userSession.isSignInPending();
-  }
-  /**
-   * Try to process any pending sign in request by returning a `Promise` that resolves
-   * to the user data object if the sign in succeeds.
-   *
-   * @param {String} nameLookupURL - the endpoint against which to verify public
-   * keys match claimed username
-   * @param {String} authResponseToken - the signed authentication response token
-   * @param {String} transitKey - the transit private key that corresponds to the transit public key
-   * that was provided in the authentication request
-   * @return {Promise} that resolves to the user data object if successful and rejects
-   * if handling the sign in request fails or there was no pending sign in request.
-   */
-
-  /* eslint-disable no-unused-vars, no-use-before-define */
-
-
-  function handlePendingSignIn() {
-    var nameLookupURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var authResponseToken = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : getAuthResponseToken();
-    var transitKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-    console.warn('DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method handlePendingSignIn().');
-    console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and ' + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.');
-    var userSession = new _userSession.UserSession();
-    return userSession.handlePendingSignIn(authResponseToken);
-  }
-  /* eslint-enable no-unused-vars */
-
-  /**
-   * Retrieve the authentication token from the URL query
-   * @return {String} the authentication token if it exists otherwise `null`
-   */
-
-
-  function getAuthResponseToken() {
-    var queryDict = _queryString.default.parse(location.search);
-
-    return queryDict.authResponse ? queryDict.authResponse : '';
-  }
-  /**
-   * Retrieves the user data object. The user's profile is stored in the key `profile`.
-   * @return {Object} User data object.
-   */
-
-
-  function loadUserData() {
-    console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method loadUserData().');
-    var userSession = new _userSession.UserSession();
-    return userSession.loadUserData();
-  }
-  /**
-   * Sign the user out and optionally redirect to given location.
-   * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
-   * @return {void}
-   */
-
-
-  function signUserOut() {
-    var redirectURL = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-    // eslint-disable-line no-unused-vars
-    console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method signUserOut().');
-    var userSession = new _userSession.UserSession();
-    userSession.signUserOut();
-    window.location = redirectURL;
-  }
-  /**
-   * Generates an authentication request that can be sent to the Blockstack
-   * browser for the user to approve sign in. This authentication request can
-   * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
-   * method.
-   *
-   * *Note: This method should only be used if you want to roll your own authentication
-   * flow. Typically you'd use `redirectToSignIn` which takes care of this
-   * under the hood.*
-   *
-   * @param  {String} transitPrivateKey - hex encoded transit private key
-   * @param {String} redirectURI - location to redirect user to after sign in approval
-   * @param {String} manifestURI - location of this app's manifest file
-   * @param {Array<String>} scopes - the permissions this app is requesting
-   * @param {String} appDomain - the origin of this app
-   * @param {Number} expiresAt - the time at which this request is no longer valid
-   * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
-   * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
-   * by special authenticators.
-   * @return {String} the authentication request
-   */
-
-
-  function makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes) {
-    var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
-    var expiresAt = arguments.length > 5 ? arguments[5] : undefined;
-    var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
-    console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the ' + 'next major release of blockstack.js. Use UserSession to configure your auth request.');
-    var userSession = new _userSession.UserSession();
-    var transitKey = transitPrivateKey == null ? userSession.generateAndStoreTransitKey() : transitPrivateKey;
-    return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
-  }
-  /**
-   * Detects if the native auth-browser is installed and is successfully 
-   * launched via a custom protocol URI. 
-   * @param {String} authRequest
-   * The encoded authRequest to be used as a query param in the custom URI. 
-   * @param {String} successCallback
-   * The callback that is invoked when the protocol handler was detected. 
-   * @param {String} failCallback
-   * The callback that is invoked when the protocol handler was not detected. 
-   * @return {void}
-   */
-
-
-  function detectProtocolLaunch(authRequest, successCallback, failCallback) {
-    // Create a unique ID used for this protocol detection attempt.
-    var echoReplyID = Math.random().toString(36).substr(2, 9);
-    var echoReplyKeyPrefix = 'echo-reply-';
-    var echoReplyKey = "".concat(echoReplyKeyPrefix).concat(echoReplyID); // Use localStorage as a reliable cross-window communication method.
-    // Create the storage entry to signal a protocol detection attempt for the
-    // next browser window to check.
-
-    window.localStorage.setItem(echoReplyKey, Date.now().toString());
-
-    var cleanUpLocalStorage = function cleanUpLocalStorage() {
-      try {
-        window.localStorage.removeItem(echoReplyKey); // Also clear out any stale echo-reply keys older than 1 hour.
-
-        for (var i = 0; i < window.localStorage.length; i++) {
-          var storageKey = window.localStorage.key(i);
-
-          if (storageKey.startsWith(echoReplyKeyPrefix)) {
-            var storageValue = window.localStorage.getItem(storageKey);
-
-            if (storageValue === 'success' || Date.now() - parseInt(storageValue, 10) > 3600000) {
-              window.localStorage.removeItem(storageKey);
-            }
-          }
-        }
-      } catch (err) {
-        _logger.Logger.error('Exception cleaning up echo-reply entries in localStorage');
-
-        _logger.Logger.error(err);
-      }
-    };
-
-    var detectionTimeout = 1000;
-    var redirectToWebAuthTimer = 0;
-
-    var cancelWebAuthRedirectTimer = function cancelWebAuthRedirectTimer() {
-      if (redirectToWebAuthTimer) {
-        window.clearTimeout(redirectToWebAuthTimer);
-        redirectToWebAuthTimer = 0;
-      }
-    };
-
-    var startWebAuthRedirectTimer = function startWebAuthRedirectTimer() {
-      var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : detectionTimeout;
-      cancelWebAuthRedirectTimer();
-      redirectToWebAuthTimer = window.setTimeout(function () {
-        if (redirectToWebAuthTimer) {
-          cancelWebAuthRedirectTimer();
-          var nextFunc;
-
-          if (window.localStorage.getItem(echoReplyKey) === 'success') {
-            _logger.Logger.info('Protocol echo reply detected.');
-
-            nextFunc = successCallback;
-          } else {
-            _logger.Logger.info('Protocol handler not detected.');
-
-            nextFunc = failCallback;
-          }
-
-          failCallback = function failCallback() {};
-
-          successCallback = function successCallback() {};
-
-          cleanUpLocalStorage(); // Briefly wait since localStorage changes can 
-          // sometimes be ignored when immediately redirected.
-
-          setTimeout(function () {
-            return nextFunc();
-          }, 100);
-        }
-      }, timeout);
-    };
-
-    startWebAuthRedirectTimer();
-    var inputPromptTracker = document.createElement('input');
-    inputPromptTracker.type = 'text'; // Prevent this element from inherited any css.
-
-    inputPromptTracker.style.all = 'initial'; // Setting display=none on an element prevents them from being focused/blurred.
-    // So hide the element using other properties..
-
-    inputPromptTracker.style.opacity = '0';
-    inputPromptTracker.style.filter = 'alpha(opacity=0)';
-    inputPromptTracker.style.height = '0';
-    inputPromptTracker.style.width = '0'; // If the the focus of a page element is immediately changed then this likely indicates 
-    // the protocol handler is installed, and the browser is prompting the user if they want 
-    // to open the application. 
-
-    var inputBlurredFunc = function inputBlurredFunc() {
-      // Use a timeout of 100ms to ignore instant toggles between blur and focus.
-      // Browsers often perform an instant blur & focus when the protocol handler is working
-      // but not showing any browser prompts, so we want to ignore those instances.
-      var isRefocused = false;
-      inputPromptTracker.addEventListener('focus', function () {
-        isRefocused = true;
-      }, {
-        once: true,
-        capture: true
-      });
-      setTimeout(function () {
-        if (redirectToWebAuthTimer && !isRefocused) {
-          _logger.Logger.info('Detected possible browser prompt for opening the protocol handler app.');
-
-          window.clearTimeout(redirectToWebAuthTimer);
-          inputPromptTracker.addEventListener('focus', function () {
-            if (redirectToWebAuthTimer) {
-              _logger.Logger.info('Possible browser prompt closed, restarting auth redirect timeout.');
-
-              startWebAuthRedirectTimer();
-            }
-          }, {
-            once: true,
-            capture: true
-          });
-        }
-      }, 100);
-    };
-
-    inputPromptTracker.addEventListener('blur', inputBlurredFunc, {
-      once: true,
-      capture: true
-    });
-    setTimeout(function () {
-      return inputPromptTracker.removeEventListener('blur', inputBlurredFunc);
-    }, 200); // Flow complains without this check.
-
-    if (document.body) document.body.appendChild(inputPromptTracker);
-    inputPromptTracker.focus(); // Detect if document.visibility is immediately changed which is a strong 
-    // indication that the protocol handler is working. We don't know for sure and 
-    // can't predict future browser changes, so only increase the redirect timeout.
-    // This reduces the probability of a false-negative (where local auth works, but 
-    // the original page was redirect to web auth because something took too long),
-
-    var pageVisibilityChanged = function pageVisibilityChanged() {
-      if (document.hidden && redirectToWebAuthTimer) {
-        _logger.Logger.info('Detected immediate page visibility change (protocol handler probably working).');
-
-        startWebAuthRedirectTimer(3000);
-      }
-    };
-
-    document.addEventListener('visibilitychange', pageVisibilityChanged, {
-      once: true,
-      capture: true
-    });
-    setTimeout(function () {
-      return document.removeEventListener('visibilitychange', pageVisibilityChanged);
-    }, 500); // Listen for the custom protocol echo reply via localStorage update event.
-
-    window.addEventListener('storage', function replyEventListener(event) {
-      if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
-        // Custom protocol worked, cancel the web auth redirect timer.
-        cancelWebAuthRedirectTimer();
-        inputPromptTracker.removeEventListener('blur', inputBlurredFunc);
-
-        _logger.Logger.info('Protocol echo reply detected from localStorage event.'); // Clean up event listener and localStorage.
-
-
-        window.removeEventListener('storage', replyEventListener);
-        var nextFunc = successCallback;
-
-        successCallback = function successCallback() {};
-
-        failCallback = function failCallback() {};
-
-        cleanUpLocalStorage(); // Briefly wait since localStorage changes can sometimes 
-        // be ignored when immediately redirected.
-
-        setTimeout(function () {
-          return nextFunc();
-        }, 100);
-      }
-    }, false); // Use iframe technique for launching the protocol URI rather than setting `window.location`.
-    // This method prevents browsers like Safari, Opera, Firefox from showing error prompts
-    // about unknown protocol handler when app is not installed, and avoids an empty
-    // browser tab when the app is installed. 
-
-    _logger.Logger.info('Attempting protocol launch via iframe injection.');
-
-    var locationSrc = "".concat(_utils.BLOCKSTACK_HANDLER, ":").concat(authRequest, "&echo=").concat(echoReplyID);
-    var iframe = document.createElement('iframe');
-    iframe.style.all = 'initial';
-    iframe.style.display = 'none';
-    iframe.src = locationSrc; // Flow complains without this check.
-
-    if (document.body) {
-      document.body.appendChild(iframe);
-    } else {
-      _logger.Logger.error('document.body is null when attempting iframe injection for protoocol URI launch');
-    }
-  }
-  /**
-   * Redirects the user to the Blockstack browser to approve the sign in request
-   * given.
-   *
-   * The user is redirected to the `blockstackIDHost` if the `blockstack:`
-   * protocol handler is not detected. Please note that the protocol handler detection
-   * does not work on all browsers.
-   * @param  {UserSession} caller - the instance calling this method
-   * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
-   * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
-   *                                     protocol handler is not detected
-   * @return {void}
-   * @private
-   */
-
-
-  function redirectToSignInWithAuthRequestImpl(caller, authRequest) {
-    var httpsURI = "".concat(_authConstants.DEFAULT_BLOCKSTACK_HOST, "?authRequest=").concat(authRequest);
-
-    if (caller.appConfig && caller.appConfig.authenticatorURL) {
-      httpsURI = "".concat(caller.appConfig.authenticatorURL, "?authRequest=").concat(authRequest);
-    } // If they're on a mobile OS, always redirect them to HTTPS site
-
-
-    if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
-      _logger.Logger.info('detected mobile OS, sending to https');
-
-      window.location = httpsURI;
-      return;
-    }
-
-    function successCallback() {
-      _logger.Logger.info('protocol handler detected'); // The detection function should open the link for us
-
-    }
-
-    function failCallback() {
-      _logger.Logger.warn('protocol handler not detected');
-
-      window.location = httpsURI;
-    }
-
-    detectProtocolLaunch(authRequest, successCallback, failCallback);
-  }
-  /**
-   * Generates an authentication request and redirects the user to the Blockstack
-   * browser to approve the sign in request.
-   *
-   * Please note that this requires that the web browser properly handles the
-   * `blockstack:` URL protocol handler.
-   *
-   * Most web applications should use this
-   * method for sign in unless they require more fine grained control over how the
-   * authentication request is generated. If your app falls into this category,
-   * use `makeAuthRequest`,
+   * use `generateAndStoreTransitKey`, `makeAuthRequest`,
    * and `redirectToSignInWithAuthRequest` to build your own sign in process.
-   * @param {UserSession} caller - the instance calling this function
-   * @return {void}
-   * @private
-   */
-
-
-  function redirectToSignInImpl(caller) {
-    var transitKey = caller.generateAndStoreTransitKey();
-    var authRequest = caller.makeAuthRequest(transitKey);
-    redirectToSignInWithAuthRequestImpl(caller, authRequest);
-  }
-  /**
-   * Try to process any pending sign in request by returning a `Promise` that resolves
-   * to the user data object if the sign in succeeds.
    *
-   * @param {UserSession} caller - the instance calling this function
-   * @param {String} authResponseToken - the signed authentication response token
-   * @return {Promise} that resolves to the user data object if successful and rejects
-   * if handling the sign in request fails or there was no pending sign in request.
-   * @private
-   */
-
-
-  function handlePendingSignInImpl(caller, authResponseToken) {
-    var transitKey = caller.store.getSessionData().transitKey;
-    var coreNodeSessionValue = caller.store.getSessionData().coreNode;
-    var nameLookupURL = null;
-
-    if (!coreNodeSessionValue) {
-      var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload;
-
-      if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.3.0') && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
-        // override globally
-        _logger.Logger.info("Overriding ".concat(_config.config.network.blockstackAPIUrl, " ") + "with ".concat(tokenPayload.blockstackAPIUrl));
-
-        _config.config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl;
-      }
-
-      nameLookupURL = "".concat(_config.config.network.blockstackAPIUrl).concat(_authConstants.NAME_LOOKUP_PATH);
-    } else {
-      nameLookupURL = "".concat(coreNodeSessionValue).concat(_authConstants.NAME_LOOKUP_PATH);
-    }
-
-    return (0, _index.verifyAuthResponse)(authResponseToken, nameLookupURL).then(function (isValid) {
-      if (!isValid) {
-        throw new _errors.LoginFailedError('Invalid authentication response.');
-      }
-
-      var tokenPayload = (0, _jsontokens.decodeToken)(authResponseToken).payload; // TODO: real version handling
-
-      var appPrivateKey = tokenPayload.private_key;
-      var coreSessionToken = tokenPayload.core_token;
-
-      if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.1.0')) {
-        if (transitKey !== undefined && transitKey != null) {
-          if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
-            try {
-              appPrivateKey = (0, _authMessages.decryptPrivateKey)(transitKey, tokenPayload.private_key);
-            } catch (e) {
-              _logger.Logger.warn('Failed decryption of appPrivateKey, will try to use as given');
-
-              try {
-                (0, _utils.hexStringToECPair)(tokenPayload.private_key);
-              } catch (ecPairError) {
-                throw new _errors.LoginFailedError('Failed decrypting appPrivateKey. Usually means' + ' that the transit key has changed during login.');
-              }
-            }
-          }
-
-          if (coreSessionToken !== undefined && coreSessionToken !== null) {
-            try {
-              coreSessionToken = (0, _authMessages.decryptPrivateKey)(transitKey, coreSessionToken);
-            } catch (e) {
-              _logger.Logger.info('Failed decryption of coreSessionToken, will try to use as given');
-            }
-          }
-        } else {
-          throw new _errors.LoginFailedError('Authenticating with protocol > 1.1.0 requires transit' + ' key, and none found.');
-        }
-      }
-
-      var hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
-      var gaiaAssociationToken;
-
-      if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.2.0') && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
-        hubUrl = tokenPayload.hubUrl;
-      }
-
-      if ((0, _utils.isLaterVersion)(tokenPayload.version, '1.3.0') && tokenPayload.associationToken !== null && tokenPayload.associationToken !== undefined) {
-        gaiaAssociationToken = tokenPayload.associationToken;
-      }
-
-      var userData = {
-        username: tokenPayload.username,
-        profile: tokenPayload.profile,
-        decentralizedID: tokenPayload.iss,
-        identityAddress: (0, _index2.getAddressFromDID)(tokenPayload.iss),
-        appPrivateKey: appPrivateKey,
-        coreSessionToken: coreSessionToken,
-        authResponseToken: authResponseToken,
-        hubUrl: hubUrl,
-        gaiaAssociationToken: gaiaAssociationToken
-      };
-      var profileURL = tokenPayload.profile_url;
-
-      if ((userData.profile === null || userData.profile === undefined) && profileURL !== undefined && profileURL !== null) {
-        return fetch(profileURL).then(function (response) {
-          if (!response.ok) {
-            // return blank profile if we fail to fetch
-            userData.profile = Object.assign({}, DEFAULT_PROFILE);
-            var sessionData = caller.store.getSessionData();
-            sessionData.userData = userData;
-            caller.store.setSessionData(sessionData);
-            return userData;
-          } else {
-            return response.text().then(function (responseText) {
-              return JSON.parse(responseText);
-            }).then(function (wrappedProfile) {
-              return (0, _profiles.extractProfile)(wrappedProfile[0].token);
-            }).then(function (profile) {
-              var sessionData = caller.store.getSessionData();
-              userData.profile = profile;
-              sessionData.userData = userData;
-              caller.store.setSessionData(sessionData);
-              return userData;
-            });
-          }
-        });
-      } else {
-        var sessionData = caller.store.getSessionData();
-        userData.profile = tokenPayload.profile;
-        sessionData.userData = userData;
-        caller.store.setSessionData(sessionData);
-        return userData;
-      }
-    });
-  }
-  /**
-   * Retrieves the user data object. The user's profile is stored in the key `profile`.
-   *
-   *  @param {UserSession} caller - the instance calling this function
-   *  @return {Object} User data object.
-   *  @private
-   */
-
-
-  function loadUserDataImpl(caller) {
-    var userData = caller.store.getSessionData().userData;
-
-    if (!userData) {
-      throw new _errors.InvalidStateError('No user data found. Did the user sign in?');
-    }
-
-    return userData;
-  }
-  /**
-   * Redirects the user to the Blockstack browser to approve the sign in request
-   * given.
-   *
-   * The user is redirected to the `blockstackIDHost` if the `blockstack:`
-   * protocol handler is not detected. Please note that the protocol handler detection
-   * does not work on all browsers.
-   * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
-   * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
-   *                                     protocol handler is not detected
    * @return {void}
    */
 
 
-  function redirectToSignInWithAuthRequest(authRequest) {
-    var blockstackIDHost = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _authConstants.DEFAULT_BLOCKSTACK_HOST;
-    console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will ' + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession ' + 'and call the instance method redirectToSignInWithAuthRequest().');
-    var userSession = new _userSession.UserSession();
-    var sessionAuthRequest = authRequest == null ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest;
-    userSession.appConfig.authenticatorURL = blockstackIDHost;
-    redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest);
-  }
-});
-
-},{"../config":513,"../errors":516,"../index":517,"../logger":519,"../profiles":527,"../utils":551,"./authConstants":504,"./authMessages":505,"./index":509,"./userSession":512,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],504:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports);
-    global.authConstants = mod.exports;
-  }
-})(this, function (_exports) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.LOCALSTORAGE_SESSION_KEY = _exports.NAME_LOOKUP_PATH = _exports.DEFAULT_CORE_NODE = _exports.BLOCKSTACK_DEFAULT_GAIA_HUB_URL = _exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = _exports.DEFAULT_SCOPE = _exports.DEFAULT_BLOCKSTACK_HOST = _exports.BLOCKSTACK_STORAGE_LABEL = _exports.BLOCKSTACK_HANDLER = void 0;
-  var BLOCKSTACK_HANDLER = 'blockstack';
-  _exports.BLOCKSTACK_HANDLER = BLOCKSTACK_HANDLER;
-  var BLOCKSTACK_STORAGE_LABEL = 'blockstack';
-  _exports.BLOCKSTACK_STORAGE_LABEL = BLOCKSTACK_STORAGE_LABEL;
-  var DEFAULT_BLOCKSTACK_HOST = 'https://browser.blockstack.org/auth';
-  _exports.DEFAULT_BLOCKSTACK_HOST = DEFAULT_BLOCKSTACK_HOST;
-  var DEFAULT_SCOPE = ['store_write'];
-  _exports.DEFAULT_SCOPE = DEFAULT_SCOPE;
-  var BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key';
-  _exports.BLOCKSTACK_APP_PRIVATE_KEY_LABEL = BLOCKSTACK_APP_PRIVATE_KEY_LABEL;
-  var BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';
-  _exports.BLOCKSTACK_DEFAULT_GAIA_HUB_URL = BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
-  var DEFAULT_CORE_NODE = 'https://core.blockstack.org';
-  _exports.DEFAULT_CORE_NODE = DEFAULT_CORE_NODE;
-  var NAME_LOOKUP_PATH = '/v1/names';
-  _exports.NAME_LOOKUP_PATH = NAME_LOOKUP_PATH;
-  var LOCALSTORAGE_SESSION_KEY = 'blockstack-session';
-  _exports.LOCALSTORAGE_SESSION_KEY = LOCALSTORAGE_SESSION_KEY;
-});
-
-},{}],505:[function(require,module,exports){
-(function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "cross-fetch/polyfill", "jsontokens", "../index", "../encryption", "../logger"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("cross-fetch/polyfill"), require("jsontokens"), require("../index"), require("../encryption"), require("../logger"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.polyfill, global.jsontokens, global.index, global.encryption, global.logger);
-    global.authMessages = mod.exports;
-  }
-})(this, function (_exports, _polyfill, _jsontokens, _index, _encryption, _logger) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.generateTransitKey = generateTransitKey;
-  _exports.makeAuthRequestImpl = makeAuthRequestImpl;
-  _exports.encryptPrivateKey = encryptPrivateKey;
-  _exports.decryptPrivateKey = decryptPrivateKey;
-  _exports.makeAuthResponse = makeAuthResponse;
-  var VERSION = '1.3.1';
-
-  /**
-   * Generates a ECDSA keypair to
-   * use as the ephemeral app transit private key
-   * @param {SessionData} session - session object in which key will be stored
-   * @return {String} the hex encoded private key
-   * @private
-   */
-  function generateTransitKey() {
-    var transitKey = (0, _index.makeECPrivateKey)();
-    return transitKey;
-  }
-  /**
-   * Generates an authentication request that can be sent to the Blockstack
-   * browser for the user to approve sign in. This authentication request can
-   * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
-   * method.
-   *
-   * *Note: This method should only be used if you want to roll your own authentication
-   * flow. Typically you'd use `redirectToSignIn` which takes care of this
-   * under the hood.*
-   *
-   * @param  {String} transitPrivateKey - hex encoded transit private key
-   * @param {String} redirectURI - location to redirect user to after sign in approval
-   * @param {String} manifestURI - location of this app's manifest file
-   * @param {Array<String>} scopes - the permissions this app is requesting
-   * @param {String} appDomain - the origin of this app
-   * @param {Number} expiresAt - the time at which this request is no longer valid
-   * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
-   * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
-   * by special authenticators.
-   * @return {String} the authentication request
-   * @private
-   */
-
-
-  function makeAuthRequestImpl(transitPrivateKey, redirectURI, manifestURI, scopes) {
-    var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
-    var expiresAt = arguments.length > 5 ? arguments[5] : undefined;
-    var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
-
-    /* Create the payload */
-    var payload = Object.assign({}, extraParams, {
-      jti: (0, _index.makeUUID4)(),
-      iat: Math.floor(new Date().getTime() / 1000),
-      // JWT times are in seconds
-      exp: Math.floor(expiresAt / 1000),
-      // JWT times are in seconds
-      iss: null,
-      public_keys: [],
-      domain_name: appDomain,
-      manifest_uri: manifestURI,
-      redirect_uri: redirectURI,
-      version: VERSION,
-      do_not_include_profile: true,
-      supports_hub_url: true,
-      scopes: scopes
-    });
-
-    _logger.Logger.info("blockstack.js: generating v".concat(VERSION, " auth request"));
-    /* Convert the private key to a public key to an issuer */
-
-
-    var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(transitPrivateKey);
-
-    payload.public_keys = [publicKey];
-    var address = (0, _index.publicKeyToAddress)(publicKey);
-    payload.iss = (0, _index.makeDIDFromAddress)(address);
-    /* Sign and return the token */
-
-    var tokenSigner = new _jsontokens.TokenSigner('ES256k', transitPrivateKey);
-    var token = tokenSigner.sign(payload);
-    return token;
-  }
-  /**
-   * Encrypts the private key for decryption by the given
-   * public key.
-   * @param  {String} publicKey  [description]
-   * @param  {String} privateKey [description]
-   * @return {String} hex encoded ciphertext
-   * @private
-   */
-
-
-  function encryptPrivateKey(publicKey, privateKey) {
-    var encryptedObj = (0, _encryption.encryptECIES)(publicKey, privateKey);
-    var encryptedJSON = JSON.stringify(encryptedObj);
-    return new Buffer(encryptedJSON).toString('hex');
-  }
-  /**
-   * Decrypts the hex encrypted private key
-   * @param  {String} privateKey  the private key corresponding to the public
-   * key for which the ciphertext was encrypted
-   * @param  {String} hexedEncrypted the ciphertext
-   * @return {String}  the decrypted private key
-   * @throws {Error} if unable to decrypt
-   *
-   * @private
-   */
-
-
-  function decryptPrivateKey(privateKey, hexedEncrypted) {
-    var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
-    var encryptedObj = JSON.parse(unhexedString);
-    var decrypted = (0, _encryption.decryptECIES)(privateKey, encryptedObj);
-
-    if (typeof decrypted !== 'string') {
-      throw new Error('Unable to correctly decrypt private key');
-    } else {
-      return decrypted;
+  (0, _createClass2.default)(UserSession, [{
+    key: "redirectToSignIn",
+    value: function redirectToSignIn() {
+      return (0, _authApp.redirectToSignInImpl)(this);
     }
-  }
-  /**
-   * Generates a signed authentication response token for an app. This
-   * token is sent back to apps which use contents to access the
-   * resources and data requested by the app.
-   *
-   * @param  {String} privateKey the identity key of the Blockstack ID generating
-   * the authentication response
-   * @param  {Object} profile the profile object for the Blockstack ID
-   * @param  {String} username the username of the Blockstack ID if any, otherwise `null`
-   * @param  {AuthMetadata} metadata an object containing metadata sent as part of the authentication
-   * response including `email` if requested and available and a URL to the profile
-   * @param  {String} coreToken core session token when responding to a legacy auth request
-   * or `null` for current direct to gaia authentication requests
-   * @param  {String} appPrivateKey the application private key. This private key is
-   * unique and specific for every Blockstack ID and application combination.
-   * @param  {Number} expiresAt an integer in the same format as
-   * `new Date().getTime()`, milliseconds since the Unix epoch
-   * @param {String} transitPublicKey the public key provide by the app
-   * in its authentication request with which secrets will be encrypted
-   * @param {String} hubUrl URL to the write path of the user's Gaia hub
-   * @param {String} blockstackAPIUrl URL to the API endpoint to use
-   * @param {String} associationToken JWT that binds the app key to the identity key
-   * @return {String} signed and encoded authentication response token
-   * @private
-   */
-
-
-  function makeAuthResponse(privateKey) {
-    var profile = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var username = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var metadata = arguments.length > 3 ? arguments[3] : undefined;
-    var coreToken = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-    var appPrivateKey = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-    var expiresAt = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (0, _index.nextMonth)().getTime();
-    var transitPublicKey = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
-    var hubUrl = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : null;
-    var blockstackAPIUrl = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : null;
-    var associationToken = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : null;
-
-    /* Convert the private key to a public key to an issuer */
-    var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(privateKey);
-
-    var address = (0, _index.publicKeyToAddress)(publicKey);
-    /* See if we should encrypt with the transit key */
-
-    var privateKeyPayload = appPrivateKey;
-    var coreTokenPayload = coreToken;
-    var additionalProperties = {};
-
-    if (appPrivateKey !== undefined && appPrivateKey !== null) {
-      _logger.Logger.info("blockstack.js: generating v".concat(VERSION, " auth response"));
-
-      if (transitPublicKey !== undefined && transitPublicKey !== null) {
-        privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey);
-
-        if (coreToken !== undefined && coreToken !== null) {
-          coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken);
-        }
-      }
-
-      additionalProperties = {
-        email: metadata.email ? metadata.email : null,
-        profile_url: metadata.profileUrl ? metadata.profileUrl : null,
-        hubUrl: hubUrl,
-        blockstackAPIUrl: blockstackAPIUrl,
-        associationToken: associationToken,
-        version: VERSION
-      };
-    } else {
-      _logger.Logger.info('blockstack.js: generating legacy auth response');
-    }
-    /* Create the payload */
-
-
-    var payload = Object.assign({}, {
-      jti: (0, _index.makeUUID4)(),
-      iat: Math.floor(new Date().getTime() / 1000),
-      // JWT times are in seconds
-      exp: Math.floor(expiresAt / 1000),
-      // JWT times are in seconds
-      iss: (0, _index.makeDIDFromAddress)(address),
-      private_key: privateKeyPayload,
-      public_keys: [publicKey],
-      profile: profile,
-      username: username,
-      core_token: coreTokenPayload
-    }, additionalProperties);
-    /* Sign and return the token */
-
-    var tokenSigner = new _jsontokens.TokenSigner('ES256k', privateKey);
-    return tokenSigner.sign(payload);
-  }
-});
-
-}).call(this,require("buffer").Buffer)
-},{"../encryption":515,"../index":517,"../logger":519,"buffer":149,"cross-fetch/polyfill":168,"jsontokens":266}],506:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "query-string", "jsontokens", "../index", "../utils", "../logger"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("query-string"), require("jsontokens"), require("../index"), require("../utils"), require("../logger"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.queryString, global.jsontokens, global.index, global.utils, global.logger);
-    global.authProvider = mod.exports;
-  }
-})(this, function (_exports, _queryString, _jsontokens, _index, _utils, _logger) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.getAuthRequestFromURL = getAuthRequestFromURL;
-  _exports.fetchAppManifest = fetchAppManifest;
-  _exports.redirectUserToApp = redirectUserToApp;
-  _queryString = _interopRequireDefault(_queryString);
-
-  /**
-   * Retrieves the authentication request from the query string
-   * @return {String|null} the authentication request or `null` if
-   * the query string parameter `authRequest` is not found
-   * @private
-   */
-  function getAuthRequestFromURL() {
-    var queryDict = _queryString.default.parse(location.search);
-
-    if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
-      return queryDict.authRequest.split("".concat(_utils.BLOCKSTACK_HANDLER, ":")).join('');
-    } else {
-      return null;
-    }
-  }
-  /**
-   * Fetches the contents of the manifest file specified in the authentication request
-   *
-   * @param  {String} authRequest encoded and signed authentication request
-   * @return {Promise<Object|String>} Returns a `Promise` that resolves to the JSON
-   * object manifest file unless there's an error in which case rejects with an error
-   * message.
-   * @private
-   */
-
-
-  function fetchAppManifest(authRequest) {
-    return new Promise(function (resolve, reject) {
-      if (!authRequest) {
-        reject('Invalid auth request');
-      } else {
-        var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
-        var manifestURI = payload.manifest_uri;
-
-        try {
-          _logger.Logger.debug("Fetching manifest from ".concat(manifestURI));
-
-          fetch(manifestURI).then(function (response) {
-            return response.text();
-          }).then(function (responseText) {
-            return JSON.parse(responseText);
-          }).then(function (responseJSON) {
-            resolve(responseJSON);
-          }).catch(function (e) {
-            _logger.Logger.debug(e.stack);
-
-            reject('Could not fetch manifest.json');
-          });
-        } catch (e) {
-          _logger.Logger.debug(e.stack);
-
-          reject('Could not fetch manifest.json');
-        }
-      }
-    });
-  }
-  /**
-   * Redirect the user's browser to the app using the `redirect_uri`
-   * specified in the authentication request, passing the authentication
-   * response token as a query parameter.
-   *
-   * @param {String} authRequest  encoded and signed authentication request token
-   * @param  {String} authResponse encoded and signed authentication response token
-   * @return {void}
-   * @throws {Error} if there is no redirect uri
-   * @private
-   */
-
-
-  function redirectUserToApp(authRequest, authResponse) {
-    var payload = (0, _jsontokens.decodeToken)(authRequest).payload;
-    var redirectURI = payload.redirect_uri;
-
-    _logger.Logger.debug(redirectURI);
-
-    if (redirectURI) {
-      redirectURI = (0, _index.updateQueryStringParameter)(redirectURI, 'authResponse', authResponse);
-    } else {
-      throw new Error('Invalid redirect URI');
-    }
-
-    window.location = redirectURI;
-  }
-});
-
-},{"../index":517,"../logger":519,"../utils":551,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],507:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "jsontokens", "cross-fetch/polyfill"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("jsontokens"), require("cross-fetch/polyfill"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.jsontokens, global.polyfill);
-    global.authSession = mod.exports;
-  }
-})(this, function (_exports, _jsontokens, _polyfill) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.makeCoreSessionRequest = makeCoreSessionRequest;
-  _exports.sendCoreSessionRequest = sendCoreSessionRequest;
-  _exports.getCoreSession = getCoreSession;
-
-  /**
-   * Create an authentication token to be sent to the Core API server
-   * in order to generate a Core session JWT.
-   *
-   * @param {String} appDomain  The unique application identifier (e.g. foo.app, www.foo.com, etc).
-   * @param {Array} appMethods  The list of API methods this application will need.
-   * @param {String} appPrivateKey  The application-specific private key
-   * @param {String|null} blockchainID  This is the blockchain ID of the requester
-   * @param {String} thisDevice Identifier of the current device
-   *
-   * @return {String} a JWT signed by the app's private key
-   * @deprecated
-   * @private
-   */
-  function makeCoreSessionRequest(appDomain, appMethods, appPrivateKey) {
-    var blockchainID = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    var thisDevice = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-
-    if (thisDevice === null) {
-      thisDevice = '.default';
-    }
-
-    var appPublicKey = _jsontokens.SECP256K1Client.derivePublicKey(appPrivateKey);
-
-    var appPublicKeys = [{
-      public_key: appPublicKey,
-      device_id: thisDevice
-    }];
-    var authBody = {
-      version: 1,
-      blockchain_id: blockchainID,
-      app_private_key: appPrivateKey,
-      app_domain: appDomain,
-      methods: appMethods,
-      app_public_keys: appPublicKeys,
-      device_id: thisDevice // make token
-
-    };
-    var tokenSigner = new _jsontokens.TokenSigner('ES256k', appPrivateKey);
-    var token = tokenSigner.sign(authBody);
-    return token;
-  }
-  /**
-   * Send Core a request for a session token.
-   *
-   * @param {String} coreHost host name of the core node
-   * @param {Number} corePort port number of the core node
-   * @param {String} coreAuthRequest  a signed JWT encoding the authentication request
-   * @param {String} apiPassword the API password for Core
-   *
-   * @return {Promise} the resolves to a JWT signed with the Core API server's private key
-   * that authorizes the bearer to carry out the requested operations and rejects
-   * with an error message otherwise
-   * @deprecated
-   * @private
-   */
-
-
-  function sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword) {
-    return Promise.resolve().then(function () {
-      if (!apiPassword) {
-        throw new Error('Missing API password');
-      }
-    }).then(function () {
-      var options = {
-        headers: {
-          Authorization: "bearer ".concat(apiPassword)
-        }
-      };
-      var url = "http://".concat(coreHost, ":").concat(corePort, "/v1/auth?authRequest=").concat(coreAuthRequest);
-      return fetch(url, options);
-    }).then(function (response) {
-      if (!response.ok) {
-        throw new Error('HTTP status not OK');
-      }
-
-      return response.text();
-    }).then(function (responseText) {
-      var responseJson = JSON.parse(responseText);
-      var token = responseJson.token;
-
-      if (!token) {
-        throw new Error('Failed to get Core session token');
-      }
-
-      return token;
-    }).catch(function (error) {
-      console.error(error);
-      throw new Error('Invalid Core response: not JSON');
-    });
-  }
-  /**
-   * Get a core session token.  Generate an auth request, sign it, send it to Core,
-   * and get back a session token.
-   *
-   * @param {String} coreHost Core API server's hostname
-   * @param {Number} corePort Core API server's port number
-   * @param {String} apiPassword core api password
-   * @param  {String} appPrivateKey Application's private key
-   * @param  {String} blockchainId blockchain ID of the user signing in.
-   * `null` if user has no blockchain ID
-   * @param {String} authRequest authentication request token
-   * @param {String} deviceId identifier for the current device
-   *
-   * @return {Promise} a Promise that resolves to a Core session token or rejects
-   * with an error message.
-   * @deprecated
-   * @private
-   */
-
-
-  function getCoreSession(coreHost, corePort, apiPassword, appPrivateKey) {
-    var blockchainId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-    var authRequest = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-    var deviceId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : '0';
-
-    if (!authRequest) {
-      return Promise.reject('No authRequest provided');
-    }
-
-    var payload = null;
-    var authRequestObject = null;
-
-    try {
-      authRequestObject = (0, _jsontokens.decodeToken)(authRequest);
-
-      if (!authRequestObject) {
-        return Promise.reject('Invalid authRequest in URL query string');
-      }
-
-      if (!authRequestObject.payload) {
-        return Promise.reject('Invalid authRequest in URL query string');
-      }
-
-      payload = authRequestObject.payload;
-    } catch (e) {
-      console.error(e.stack);
-      return Promise.reject('Failed to parse authRequest in URL');
-    }
-
-    var appDomain = payload.domain_name;
-
-    if (!appDomain) {
-      return Promise.reject('No domain_name in authRequest');
-    }
-
-    var appMethods = payload.scopes;
-    var coreAuthRequest = makeCoreSessionRequest(appDomain, appMethods, appPrivateKey, blockchainId, deviceId);
-    return sendCoreSessionRequest(coreHost, corePort, coreAuthRequest, apiPassword);
-  }
-});
-
-},{"cross-fetch/polyfill":168,"jsontokens":266}],508:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "jsontokens", "../index", "."], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("jsontokens"), require("../index"), require("."));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.jsontokens, global.index, global._);
-    global.authVerification = mod.exports;
-  }
-})(this, function (_exports, _jsontokens, _index, _) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.doSignaturesMatchPublicKeys = doSignaturesMatchPublicKeys;
-  _exports.doPublicKeysMatchIssuer = doPublicKeysMatchIssuer;
-  _exports.doPublicKeysMatchUsername = doPublicKeysMatchUsername;
-  _exports.isIssuanceDateValid = isIssuanceDateValid;
-  _exports.isExpirationDateValid = isExpirationDateValid;
-  _exports.isManifestUriValid = isManifestUriValid;
-  _exports.isRedirectUriValid = isRedirectUriValid;
-  _exports.verifyAuthRequest = verifyAuthRequest;
-  _exports.verifyAuthRequestAndLoadManifest = verifyAuthRequestAndLoadManifest;
-  _exports.verifyAuthResponse = verifyAuthResponse;
-
-  /**
-   * Checks if the ES256k signature on passed `token` match the claimed public key
-   * in the payload key `public_keys`.
-   *
-   * @param  {String} token encoded and signed authentication token
-   * @return {Boolean} Returns `true` if the signature matches the claimed public key
-   * @throws {Error} if `token` contains multiple public keys
-   * @private
-   */
-  function doSignaturesMatchPublicKeys(token) {
-    var payload = (0, _jsontokens.decodeToken)(token).payload;
-    var publicKeys = payload.public_keys;
-
-    if (publicKeys.length === 1) {
-      var publicKey = publicKeys[0];
-
-      try {
-        var tokenVerifier = new _jsontokens.TokenVerifier('ES256k', publicKey);
-        var signatureVerified = tokenVerifier.verify(token);
-
-        if (signatureVerified) {
-          return true;
-        } else {
-          return false;
-        }
-      } catch (e) {
-        return false;
-      }
-    } else {
-      throw new Error('Multiple public keys are not supported');
-    }
-  }
-  /**
-   * Makes sure that the identity address portion of
-   * the decentralized identifier passed in the issuer `iss`
-   * key of the token matches the public key
-   *
-   * @param  {String} token encoded and signed authentication token
-   * @return {Boolean} if the identity address and public keys match
-   * @throws {Error} if ` token` has multiple public keys
-   * @private
-   */
-
-
-  function doPublicKeysMatchIssuer(token) {
-    var payload = (0, _jsontokens.decodeToken)(token).payload;
-    var publicKeys = payload.public_keys;
-    var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
-
-    if (publicKeys.length === 1) {
-      var addressFromPublicKeys = (0, _index.publicKeyToAddress)(publicKeys[0]);
-
-      if (addressFromPublicKeys === addressFromIssuer) {
-        return true;
-      }
-    } else {
-      throw new Error('Multiple public keys are not supported');
-    }
-
-    return false;
-  }
-  /**
-   * Looks up the identity address that owns the claimed username
-   * in `token` using the lookup endpoint provided in `nameLookupURL`
-   * to determine if the username is owned by the identity address
-   * that matches the claimed public key
-   *
-   * @param  {String} token  encoded and signed authentication token
-   * @param  {String} nameLookupURL a URL to the name lookup endpoint of the Blockstack Core API
-   * @return {Promise<Boolean>} returns a `Promise` that resolves to
-   * `true` if the username is owned by the public key, otherwise the
-   * `Promise` resolves to `false`
-   * @private
-   */
-
-
-  function doPublicKeysMatchUsername(token, nameLookupURL) {
-    return Promise.resolve().then(function () {
-      var payload = (0, _jsontokens.decodeToken)(token).payload;
-
-      if (!payload.username) {
-        return true;
-      }
-
-      if (payload.username === null) {
-        return true;
-      }
-
-      if (nameLookupURL === null) {
-        return false;
-      }
-
-      var username = payload.username;
-      var url = "".concat(nameLookupURL.replace(/\/$/, ''), "/").concat(username);
-      return fetch(url).then(function (response) {
-        return response.text();
-      }).then(function (responseText) {
-        var responseJSON = JSON.parse(responseText);
-
-        if (responseJSON.hasOwnProperty('address')) {
-          var nameOwningAddress = responseJSON.address;
-          var addressFromIssuer = (0, _index.getAddressFromDID)(payload.iss);
-
-          if (nameOwningAddress === addressFromIssuer) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      });
-    }).catch(function () {
-      return false;
-    });
-  }
-  /**
-   * Checks if the if the token issuance time and date is after the
-   * current time and date.
-   *
-   * @param  {String}  token encoded and signed authentication token
-   * @return {Boolean} `true` if the token was issued after the current time,
-   * otherwise returns `false`
-   * @private
-   */
-
-
-  function isIssuanceDateValid(token) {
-    var payload = (0, _jsontokens.decodeToken)(token).payload;
-
-    if (payload.iat) {
-      if (typeof payload.iat !== 'number') {
-        return false;
-      }
-
-      var issuedAt = new Date(payload.iat * 1000); // JWT times are in seconds
-
-      if (new Date().getTime() < issuedAt.getTime()) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return true;
-    }
-  }
-  /**
-   * Checks if the expiration date of the `token` is before the current time
-   * @param  {String}  token encoded and signed authentication token
-   * @return {Boolean} `true` if the `token` has not yet expired, `false`
-   * if the `token` has expired
-   *
-   * @private
-   */
-
-
-  function isExpirationDateValid(token) {
-    var payload = (0, _jsontokens.decodeToken)(token).payload;
-
-    if (payload.exp) {
-      if (typeof payload.exp !== 'number') {
-        return false;
-      }
-
-      var expiresAt = new Date(payload.exp * 1000); // JWT times are in seconds
-
-      if (new Date().getTime() > expiresAt.getTime()) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return true;
-    }
-  }
-  /**
-   * Makes sure the `manifest_uri` is a same origin absolute URL.
-   * @param  {String}  token encoded and signed authentication token
-   * @return {Boolean} `true` if valid, otherwise `false`
-   * @private
-   */
-
-
-  function isManifestUriValid(token) {
-    var payload = (0, _jsontokens.decodeToken)(token).payload;
-    return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.manifest_uri);
-  }
-  /**
-   * Makes sure the `redirect_uri` is a same origin absolute URL.
-   * @param  {String}  token encoded and signed authentication token
-   * @return {Boolean} `true` if valid, otherwise `false`
-   * @private
-   */
-
-
-  function isRedirectUriValid(token) {
-    var payload = (0, _jsontokens.decodeToken)(token).payload;
-    return (0, _index.isSameOriginAbsoluteUrl)(payload.domain_name, payload.redirect_uri);
-  }
-  /**
-   * Verify authentication request is valid. This function performs a number
-   * of checks on the authentication request token:
-   * * Checks that `token` has a valid issuance date & is not expired
-   * * Checks that `token` has a valid signature that matches the public key it claims
-   * * Checks that both the manifest and redirect URLs are absolute and conform to
-   * the same origin policy
-   *
-   * @param  {String} token encoded and signed authentication request token
-   * @return {Promise} that resolves to true if the auth request
-   *  is valid and false if it does not. It rejects with a String if the
-   *  token is not signed
-   *  @private
-   */
-
-
-  function verifyAuthRequest(token) {
-    return Promise.resolve().then(function () {
-      if ((0, _jsontokens.decodeToken)(token).header.alg === 'none') {
-        throw new Error('Token must be signed in order to be verified');
-      }
-    }).then(function () {
-      return Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), isManifestUriValid(token), isRedirectUriValid(token)]);
-    }).then(function (values) {
-      if (values.every(Boolean)) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-  }
-  /**
-   * Verify the authentication request is valid and
-   * fetch the app manifest file if valid. Otherwise, reject the promise.
-   * @param  {String} token encoded and signed authentication request token
-   * @return {Promise} that resolves to the app manifest file in JSON format
-   * or rejects if the auth request or app manifest file is invalid
-   * @private
-   */
-
-
-  function verifyAuthRequestAndLoadManifest(token) {
-    return Promise.resolve().then(function () {
-      return verifyAuthRequest(token).then(function (valid) {
-        if (valid) {
-          return (0, _.fetchAppManifest)(token);
-        } else {
-          return Promise.reject();
-        }
-      });
-    });
-  }
-  /**
-   * Verify the authentication response is valid
-   * @param {String} token the authentication response token
-   * @param {String} nameLookupURL the url use to verify owner of a username
-   * @return {Promise} that resolves to true if auth response
-   * is valid and false if it does not
-   * @private
-   */
-
-
-  function verifyAuthResponse(token, nameLookupURL) {
-    return Promise.all([isExpirationDateValid(token), isIssuanceDateValid(token), doSignaturesMatchPublicKeys(token), doPublicKeysMatchIssuer(token), doPublicKeysMatchUsername(token, nameLookupURL)]).then(function (values) {
-      if (values.every(Boolean)) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-  }
-});
-
-},{".":509,"../index":517,"jsontokens":266}],509:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./appConfig", "./authMessages", "./authProvider", "./authSession", "./authVerification", "./authApp"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./appConfig"), require("./authMessages"), require("./authProvider"), require("./authSession"), require("./authVerification"), require("./authApp"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.appConfig, global.authMessages, global.authProvider, global.authSession, global.authVerification, global.authApp);
-    global.index = mod.exports;
-  }
-})(this, function (_exports, _appConfig, _authMessages, _authProvider, _authSession, _authVerification, _authApp) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(_exports, "AppConfig", {
-    enumerable: true,
-    get: function get() {
-      return _appConfig.AppConfig;
-    }
-  });
-  Object.defineProperty(_exports, "makeAuthResponse", {
-    enumerable: true,
-    get: function get() {
-      return _authMessages.makeAuthResponse;
-    }
-  });
-  Object.defineProperty(_exports, "getAuthRequestFromURL", {
-    enumerable: true,
-    get: function get() {
-      return _authProvider.getAuthRequestFromURL;
-    }
-  });
-  Object.defineProperty(_exports, "fetchAppManifest", {
-    enumerable: true,
-    get: function get() {
-      return _authProvider.fetchAppManifest;
-    }
-  });
-  Object.defineProperty(_exports, "redirectUserToApp", {
-    enumerable: true,
-    get: function get() {
-      return _authProvider.redirectUserToApp;
-    }
-  });
-  Object.defineProperty(_exports, "makeCoreSessionRequest", {
-    enumerable: true,
-    get: function get() {
-      return _authSession.makeCoreSessionRequest;
-    }
-  });
-  Object.defineProperty(_exports, "sendCoreSessionRequest", {
-    enumerable: true,
-    get: function get() {
-      return _authSession.sendCoreSessionRequest;
-    }
-  });
-  Object.defineProperty(_exports, "getCoreSession", {
-    enumerable: true,
-    get: function get() {
-      return _authSession.getCoreSession;
-    }
-  });
-  Object.defineProperty(_exports, "verifyAuthRequest", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.verifyAuthRequest;
-    }
-  });
-  Object.defineProperty(_exports, "verifyAuthResponse", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.verifyAuthResponse;
-    }
-  });
-  Object.defineProperty(_exports, "isExpirationDateValid", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.isExpirationDateValid;
-    }
-  });
-  Object.defineProperty(_exports, "isIssuanceDateValid", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.isIssuanceDateValid;
-    }
-  });
-  Object.defineProperty(_exports, "doPublicKeysMatchUsername", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.doPublicKeysMatchUsername;
-    }
-  });
-  Object.defineProperty(_exports, "doPublicKeysMatchIssuer", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.doPublicKeysMatchIssuer;
-    }
-  });
-  Object.defineProperty(_exports, "doSignaturesMatchPublicKeys", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.doSignaturesMatchPublicKeys;
-    }
-  });
-  Object.defineProperty(_exports, "isManifestUriValid", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.isManifestUriValid;
-    }
-  });
-  Object.defineProperty(_exports, "isRedirectUriValid", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.isRedirectUriValid;
-    }
-  });
-  Object.defineProperty(_exports, "verifyAuthRequestAndLoadManifest", {
-    enumerable: true,
-    get: function get() {
-      return _authVerification.verifyAuthRequestAndLoadManifest;
-    }
-  });
-  Object.defineProperty(_exports, "isUserSignedIn", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.isUserSignedIn;
-    }
-  });
-  Object.defineProperty(_exports, "redirectToSignIn", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.redirectToSignIn;
-    }
-  });
-  Object.defineProperty(_exports, "redirectToSignInWithAuthRequest", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.redirectToSignInWithAuthRequest;
-    }
-  });
-  Object.defineProperty(_exports, "isSignInPending", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.isSignInPending;
-    }
-  });
-  Object.defineProperty(_exports, "handlePendingSignIn", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.handlePendingSignIn;
-    }
-  });
-  Object.defineProperty(_exports, "loadUserData", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.loadUserData;
-    }
-  });
-  Object.defineProperty(_exports, "signUserOut", {
-    enumerable: true,
-    get: function get() {
-      return _authApp.signUserOut;
-    }
-  });
-});
-
-},{"./appConfig":502,"./authApp":503,"./authMessages":505,"./authProvider":506,"./authSession":507,"./authVerification":508}],510:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/defineProperty", "../errors"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/defineProperty"), require("../errors"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.defineProperty, global.errors);
-    global.sessionData = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _defineProperty2, _errors) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.SessionData = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  var SESSION_VERSION = '1.0.0';
-
-  var SessionData =
-  /*#__PURE__*/
-  function () {
-    // required after sign in
-    // required after sign in
-    // required after sign in
-    // using this in place of
-    // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-    function SessionData(options) {
-      (0, _classCallCheck2.default)(this, SessionData);
-      (0, _defineProperty2.default)(this, "version", void 0);
-      (0, _defineProperty2.default)(this, "appPrivateKey", void 0);
-      (0, _defineProperty2.default)(this, "identityAddress", void 0);
-      (0, _defineProperty2.default)(this, "username", void 0);
-      (0, _defineProperty2.default)(this, "coreNode", void 0);
-      (0, _defineProperty2.default)(this, "hubUrl", void 0);
-      (0, _defineProperty2.default)(this, "transitKey", void 0);
-      (0, _defineProperty2.default)(this, "userData", void 0);
-      (0, _defineProperty2.default)(this, "gaiaHubConfig", void 0);
-      this.version = SESSION_VERSION;
-      this.appPrivateKey = options.appPrivateKey;
-      this.identityAddress = options.identityAddress;
-      this.username = options.username;
-      this.coreNode = options.coreNode;
-      this.hubUrl = options.hubUrl;
-      this.userData = options.userData;
-      this.transitKey = options.transitKey; // initializing Gaia connection requires a network request
-      // so we'll defer it until the first time it's needed
-
-      this.gaiaHubConfig = null;
-    }
-
-    (0, _createClass2.default)(SessionData, [{
-      key: "getGaiaHubConfig",
-      value: function getGaiaHubConfig() {
-        return this.gaiaHubConfig;
-      }
-    }, {
-      key: "setGaiaHubConfig",
-      value: function setGaiaHubConfig(config) {
-        this.gaiaHubConfig = config;
-      }
-    }, {
-      key: "toString",
-      value: function toString() {
-        return JSON.stringify(this);
-      }
-    }], [{
-      key: "fromJSON",
-      value: function fromJSON(json) {
-        if (json.version !== SESSION_VERSION) {
-          throw new _errors.InvalidStateError("JSON data version ".concat(json.version, " not supported by SessionData"));
-        }
-
-        var options = {
-          appPrivateKey: json.appPrivateKey,
-          identityAddress: json.identityAddress,
-          username: json.username,
-          coreNode: json.coreNode,
-          hubUrl: json.hubUrl,
-          userData: json.userData,
-          transitKey: json.transitKey
-        };
-        return new SessionData(options);
-      }
-    }]);
-    return SessionData;
-  }();
-
-  _exports.SessionData = SessionData;
-});
-
-},{"../errors":516,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11}],511:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/assertThisInitialized", "@babel/runtime/helpers/inherits", "@babel/runtime/helpers/defineProperty", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "./sessionData", "./authConstants", "../errors"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/assertThisInitialized"), require("@babel/runtime/helpers/inherits"), require("@babel/runtime/helpers/defineProperty"), require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("./sessionData"), require("./authConstants"), require("../errors"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.possibleConstructorReturn, global.getPrototypeOf, global.assertThisInitialized, global.inherits, global.defineProperty, global.classCallCheck, global.createClass, global.sessionData, global.authConstants, global.errors);
-    global.sessionStore = mod.exports;
-  }
-})(this, function (_exports, _possibleConstructorReturn2, _getPrototypeOf2, _assertThisInitialized2, _inherits2, _defineProperty2, _classCallCheck2, _createClass2, _sessionData, _authConstants, _errors) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.LocalStorageStore = _exports.InstanceDataStore = _exports.SessionDataStore = void 0;
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _assertThisInitialized2 = _interopRequireDefault(_assertThisInitialized2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-
-  // import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage/hub'
-  // import { Logger } from '../logger'
-
-  /**
-   * An abstract class representing the SessionDataStore interface.
-   * @type {SessionData}
-   */
-  var SessionDataStore =
-  /*#__PURE__*/
-  function () {
-    function SessionDataStore(sessionOptions) {
-      (0, _classCallCheck2.default)(this, SessionDataStore);
-
-      if (sessionOptions) {
-        var newSessionData = new _sessionData.SessionData(sessionOptions);
-        this.setSessionData(newSessionData);
-      }
-    }
-
-    (0, _createClass2.default)(SessionDataStore, [{
-      key: "getSessionData",
-      value: function getSessionData() {
-        throw new Error('Abstract class');
-      }
-      /* eslint-disable */
-
-    }, {
-      key: "setSessionData",
-      value: function setSessionData(session) {
-        throw new Error('Abstract class');
-      }
-    }, {
-      key: "deleteSessionData",
-      value: function deleteSessionData() {
-        throw new Error('Abstract class');
-      }
-      /* eslint-enable */
-
-    }]);
-    return SessionDataStore;
-  }();
-  /**
-   * Stores session data in the instance of this class.
-   * @type {InstanceDataStore}
-   */
-
-
-  _exports.SessionDataStore = SessionDataStore;
-
-  var InstanceDataStore =
-  /*#__PURE__*/
-  function (_SessionDataStore) {
-    (0, _inherits2.default)(InstanceDataStore, _SessionDataStore);
-
-    function InstanceDataStore(sessionOptions) {
-      var _this;
-
-      (0, _classCallCheck2.default)(this, InstanceDataStore);
-      _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InstanceDataStore).call(this, sessionOptions));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "sessionData", void 0);
-
-      if (!_this.sessionData) {
-        _this.setSessionData(new _sessionData.SessionData({}));
-      }
-
-      return _this;
-    }
-
-    (0, _createClass2.default)(InstanceDataStore, [{
-      key: "getSessionData",
-      value: function getSessionData() {
-        if (!this.sessionData) {
-          throw new _errors.NoSessionDataError('No session data was found.');
-        }
-
-        return this.sessionData;
-      }
-    }, {
-      key: "setSessionData",
-      value: function setSessionData(session) {
-        this.sessionData = session;
-        return true;
-      }
-    }, {
-      key: "deleteSessionData",
-      value: function deleteSessionData() {
-        this.setSessionData(new _sessionData.SessionData({}));
-        return true;
-      }
-    }]);
-    return InstanceDataStore;
-  }(SessionDataStore);
-  /**
-   * Stores session data in browser a localStorage entry.
-   * @type {LocalStorageStore}
-   */
-
-
-  _exports.InstanceDataStore = InstanceDataStore;
-
-  var LocalStorageStore =
-  /*#__PURE__*/
-  function (_SessionDataStore2) {
-    (0, _inherits2.default)(LocalStorageStore, _SessionDataStore2);
-
-    function LocalStorageStore(sessionOptions) {
-      var _this2;
-
-      (0, _classCallCheck2.default)(this, LocalStorageStore);
-      _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LocalStorageStore).call(this, sessionOptions));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this2), "key", void 0);
-
-      if (sessionOptions && sessionOptions.storeOptions && sessionOptions.storeOptions.localStorageKey && sessionOptions.storeOptions.localStorageKey instanceof String) {
-        _this2.key = sessionOptions.storeOptions.localStorageKey;
-      } else {
-        _this2.key = _authConstants.LOCALSTORAGE_SESSION_KEY;
-      }
-
-      var data = localStorage.getItem(_this2.key);
-
-      if (!data) {
-        var sessionData = new _sessionData.SessionData({});
-
-        _this2.setSessionData(sessionData);
-      }
-
-      return _this2;
-    }
-
-    (0, _createClass2.default)(LocalStorageStore, [{
-      key: "getSessionData",
-      value: function getSessionData() {
-        var data = localStorage.getItem(this.key);
-
-        if (!data) {
-          throw new _errors.NoSessionDataError('No session data was found in localStorage');
-        }
-
-        var dataJSON = JSON.parse(data);
-        return _sessionData.SessionData.fromJSON(dataJSON);
-      }
-    }, {
-      key: "setSessionData",
-      value: function setSessionData(session) {
-        localStorage.setItem(this.key, session.toString());
-        return true;
-      }
-    }, {
-      key: "deleteSessionData",
-      value: function deleteSessionData() {
-        localStorage.removeItem(this.key);
-        this.setSessionData(new _sessionData.SessionData({}));
-        return true;
-      } // checkForLegacyDataAndMigrate(): Promise<SessionData> {
-      //   const legacyTransitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
-      //   const legacyGaiaConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL)
-      //   const legacyUserData = localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
-      //
-      //
-      //   if (legacyTransitKey) {
-      //     localStorage.removeItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
-      //   }
-      //
-      //
-      //
-      // }
-
-    }]);
-    return LocalStorageStore;
-  }(SessionDataStore);
-
-  _exports.LocalStorageStore = LocalStorageStore;
-});
-
-},{"../errors":516,"./authConstants":504,"./sessionData":510,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],512:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/defineProperty", "query-string", "./appConfig", "./sessionStore", "./authApp", "./authMessages", "../storage", "../utils", "../errors", "../logger"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/defineProperty"), require("query-string"), require("./appConfig"), require("./sessionStore"), require("./authApp"), require("./authMessages"), require("../storage"), require("../utils"), require("../errors"), require("../logger"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.defineProperty, global.queryString, global.appConfig, global.sessionStore, global.authApp, global.authMessages, global.storage, global.utils, global.errors, global.logger);
-    global.userSession = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _defineProperty2, _queryString, _appConfig, _sessionStore, _authApp, _authMessages, _storage, _utils, _errors, _logger) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.UserSession = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  _queryString = _interopRequireDefault(_queryString);
-
-  /**
-   * Represents an instance of a signed in user for a particular app.
-   *
-   * A signed in user has access to two major pieces of information
-   * about the user, the user's private key for that app and the location
-   * of the user's gaia storage bucket for the app.
-   *
-   * A user can be signed in either directly through the interactive
-   * sign in process or by directly providing the app private key.
-   * @type {UserSession}
-   */
-  var UserSession =
-  /*#__PURE__*/
-  function () {
-    function UserSession(options) {
-      (0, _classCallCheck2.default)(this, UserSession);
-      (0, _defineProperty2.default)(this, "appConfig", void 0);
-      (0, _defineProperty2.default)(this, "store", void 0);
-      var runningInBrowser = true;
-
-      if (typeof window === 'undefined') {
-        _logger.Logger.debug('UserSession: not running in browser');
-
-        runningInBrowser = false;
-      }
-
-      if (options && options.appConfig) {
-        this.appConfig = options.appConfig;
-      } else if (runningInBrowser) {
-        this.appConfig = new _appConfig.AppConfig();
-      } else {
-        throw new _errors.MissingParameterError('You need to specify options.appConfig');
-      }
-
-      if (options && options.sessionStore) {
-        this.store = options.sessionStore;
-      } else if (runningInBrowser) {
-        if (options) {
-          this.store = new _sessionStore.LocalStorageStore(options.sessionOptions);
-        } else {
-          this.store = new _sessionStore.LocalStorageStore();
-        }
-      } else if (options) {
-        this.store = new _sessionStore.InstanceDataStore(options.sessionOptions);
-      } else {
-        this.store = new _sessionStore.InstanceDataStore();
-      }
-    }
-    /* AUTHENTICATION */
-
     /**
-     * Generates an authentication request and redirects the user to the Blockstack
-     * browser to approve the sign in request.
+     * Redirects the user to the Blockstack browser to approve the sign in request
+     * given.
      *
-     * Please note that this requires that the web browser properly handles the
-     * `blockstack:` URL protocol handler.
-     *
-     * Most applications should use this
-     * method for sign in unless they require more fine grained control over how the
-     * authentication request is generated. If your app falls into this category,
-     * use `generateAndStoreTransitKey`, `makeAuthRequest`,
-     * and `redirectToSignInWithAuthRequest` to build your own sign in process.
-     *
+     * The user is redirected to the authenticator URL specified in the `AppConfig`
+     * if the `blockstack:` protocol handler is not detected.
+     * Please note that the protocol handler detection
+     * does not work on all browsers.
+     * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
      * @return {void}
      */
 
+  }, {
+    key: "redirectToSignInWithAuthRequest",
+    value: function redirectToSignInWithAuthRequest(authRequest) {
+      return (0, _authApp.redirectToSignInWithAuthRequestImpl)(this, authRequest);
+    }
+    /**
+     * Generates an authentication request that can be sent to the Blockstack
+     * browser for the user to approve sign in. This authentication request can
+     * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+     * method.
+     *
+     * *Note: This method should only be used if you want to roll your own authentication
+     * flow. Typically you'd use `redirectToSignIn` which takes care of this
+     * under the hood.*
+     * @param {string} transitKey - hex-encoded transit key
+     * @param {Number} expiresAt - the time at which this request is no longer valid
+     * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+     * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+     * by special authenticators.
+     * @return {String} the authentication request
+     * @private
+     */
 
-    (0, _createClass2.default)(UserSession, [{
-      key: "redirectToSignIn",
-      value: function redirectToSignIn() {
-        return (0, _authApp.redirectToSignInImpl)(this);
+  }, {
+    key: "makeAuthRequest",
+    value: function makeAuthRequest(transitKey) {
+      var expiresAt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _utils.nextHour)().getTime();
+      var extraParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var appConfig = this.appConfig;
+
+      if (!appConfig) {
+        throw new _errors.InvalidStateError('Missing AppConfig');
       }
-      /**
-       * Redirects the user to the Blockstack browser to approve the sign in request
-       * given.
-       *
-       * The user is redirected to the authenticator URL specified in the `AppConfig`
-       * if the `blockstack:` protocol handler is not detected.
-       * Please note that the protocol handler detection
-       * does not work on all browsers.
-       * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
-       * @return {void}
-       */
 
-    }, {
-      key: "redirectToSignInWithAuthRequest",
-      value: function redirectToSignInWithAuthRequest(authRequest) {
-        return (0, _authApp.redirectToSignInWithAuthRequestImpl)(this, authRequest);
-      }
-      /**
-       * Generates an authentication request that can be sent to the Blockstack
-       * browser for the user to approve sign in. This authentication request can
-       * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
-       * method.
-       *
-       * *Note: This method should only be used if you want to roll your own authentication
-       * flow. Typically you'd use `redirectToSignIn` which takes care of this
-       * under the hood.*
-       * @param {string} transitKey - hex-encoded transit key
-       * @param {Number} expiresAt - the time at which this request is no longer valid
-       * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
-       * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
-       * by special authenticators.
-       * @return {String} the authentication request
-       * @private
-       */
+      var redirectURI = appConfig.redirectURI();
+      var manifestURI = appConfig.manifestURI();
+      var scopes = appConfig.scopes;
+      var appDomain = appConfig.appDomain;
+      return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
+    }
+    /**
+     * Generates a ECDSA keypair to
+     * use as the ephemeral app transit private key
+     * and store in the session
+     * @return {String} the hex encoded private key
+     *
+     */
 
-    }, {
-      key: "makeAuthRequest",
-      value: function makeAuthRequest(transitKey) {
-        var expiresAt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _utils.nextHour)().getTime();
-        var extraParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-        var appConfig = this.appConfig;
+  }, {
+    key: "generateAndStoreTransitKey",
+    value: function generateAndStoreTransitKey() {
+      var sessionData = this.store.getSessionData();
+      var transitKey = (0, _authMessages.generateTransitKey)();
+      sessionData.transitKey = transitKey;
+      this.store.setSessionData(sessionData);
+      return transitKey;
+    }
+    /**
+     * Retrieve the authentication token from the URL query
+     * @return {String} the authentication token if it exists otherwise `null`
+     */
 
-        if (!appConfig) {
-          throw new _errors.InvalidStateError('Missing AppConfig');
-        }
+  }, {
+    key: "getAuthResponseToken",
+    value: function getAuthResponseToken() {
+      var queryDict = _queryString.default.parse(location.search);
 
-        var redirectURI = appConfig.redirectURI();
-        var manifestURI = appConfig.manifestURI();
-        var scopes = appConfig.scopes;
-        var appDomain = appConfig.appDomain;
-        return (0, _authMessages.makeAuthRequestImpl)(transitKey, redirectURI, manifestURI, scopes, appDomain, expiresAt, extraParams);
-      }
-      /**
-       * Generates a ECDSA keypair to
-       * use as the ephemeral app transit private key
-       * and store in the session
-       * @return {String} the hex encoded private key
-       *
-       */
+      return queryDict.authResponse ? queryDict.authResponse : '';
+    }
+    /**
+     * Check if there is a authentication request that hasn't been handled.
+     * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
+     */
 
-    }, {
-      key: "generateAndStoreTransitKey",
-      value: function generateAndStoreTransitKey() {
-        var sessionData = this.store.getSessionData();
-        var transitKey = (0, _authMessages.generateTransitKey)();
-        sessionData.transitKey = transitKey;
-        this.store.setSessionData(sessionData);
-        return transitKey;
-      }
-      /**
-       * Retrieve the authentication token from the URL query
-       * @return {String} the authentication token if it exists otherwise `null`
-       */
+  }, {
+    key: "isSignInPending",
+    value: function isSignInPending() {
+      return !!this.getAuthResponseToken();
+    }
+    /**
+     * Check if a user is currently signed in.
+     * @return {Boolean} `true` if the user is signed in, `false` if not.
+     */
 
-    }, {
-      key: "getAuthResponseToken",
-      value: function getAuthResponseToken() {
-        var queryDict = _queryString.default.parse(location.search);
+  }, {
+    key: "isUserSignedIn",
+    value: function isUserSignedIn() {
+      return !!this.store.getSessionData().userData;
+    }
+    /**
+     * Try to process any pending sign in request by returning a `Promise` that resolves
+     * to the user data object if the sign in succeeds.
+     *
+     * @param {String} authResponseToken - the signed authentication response token
+     * @return {Promise} that resolves to the user data object if successful and rejects
+     * if handling the sign in request fails or there was no pending sign in request.
+     */
 
-        return queryDict.authResponse ? queryDict.authResponse : '';
-      }
-      /**
-       * Check if there is a authentication request that hasn't been handled.
-       * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
-       */
+  }, {
+    key: "handlePendingSignIn",
+    value: function handlePendingSignIn() {
+      var authResponseToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getAuthResponseToken();
+      return (0, _authApp.handlePendingSignInImpl)(this, authResponseToken);
+    }
+    /**
+     * Retrieves the user data object. The user's profile is stored in the key `profile`.
+     * @return {Object} User data object.
+     */
 
-    }, {
-      key: "isSignInPending",
-      value: function isSignInPending() {
-        return !!this.getAuthResponseToken();
-      }
-      /**
-       * Check if a user is currently signed in.
-       * @return {Boolean} `true` if the user is signed in, `false` if not.
-       */
+  }, {
+    key: "loadUserData",
+    value: function loadUserData() {
+      return (0, _authApp.loadUserDataImpl)(this);
+    }
+    /**
+     * Sign the user out
+     * @return {void}
+     */
 
-    }, {
-      key: "isUserSignedIn",
-      value: function isUserSignedIn() {
-        return !!this.store.getSessionData().userData;
-      }
-      /**
-       * Try to process any pending sign in request by returning a `Promise` that resolves
-       * to the user data object if the sign in succeeds.
-       *
-       * @param {String} authResponseToken - the signed authentication response token
-       * @return {Promise} that resolves to the user data object if successful and rejects
-       * if handling the sign in request fails or there was no pending sign in request.
-       */
+  }, {
+    key: "signUserOut",
+    value: function signUserOut() {
+      this.store.deleteSessionData();
+    } //
+    //
+    // /* PROFILES */
+    // extractProfile
+    // wrapProfileToken
+    // signProfileToken
+    // verifyProfileToken
+    // validateProofs
+    // lookupProfile
 
-    }, {
-      key: "handlePendingSignIn",
-      value: function handlePendingSignIn() {
-        var authResponseToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getAuthResponseToken();
-        return (0, _authApp.handlePendingSignInImpl)(this, authResponseToken);
-      }
-      /**
-       * Retrieves the user data object. The user's profile is stored in the key `profile`.
-       * @return {Object} User data object.
-       */
+    /* STORAGE */
 
-    }, {
-      key: "loadUserData",
-      value: function loadUserData() {
-        return (0, _authApp.loadUserDataImpl)(this);
-      }
-      /**
-       * Sign the user out
-       * @return {void}
-       */
+    /**
+     * Encrypts the data provided with the app public key.
+     * @param {String|Buffer} content - data to encrypt
+     * @param {Object} [options=null] - options object
+     * @param {String} options.publicKey - the hex string of the ECDSA public
+     * key to use for encryption. If not provided, will use user's appPrivateKey.
+     * @return {String} Stringified ciphertext object
+     */
 
-    }, {
-      key: "signUserOut",
-      value: function signUserOut() {
-        this.store.deleteSessionData();
-      } //
-      //
-      // /* PROFILES */
-      // extractProfile
-      // wrapProfileToken
-      // signProfileToken
-      // verifyProfileToken
-      // validateProofs
-      // lookupProfile
+  }, {
+    key: "encryptContent",
+    value: function encryptContent(content, options) {
+      return (0, _storage.encryptContentImpl)(this, content, options);
+    }
+    /**
+     * Decrypts data encrypted with `encryptContent` with the
+     * transit private key.
+     * @param {String|Buffer} content - encrypted content.
+     * @param {Object} [options=null] - options object
+     * @param {String} options.privateKey - the hex string of the ECDSA private
+     * key to use for decryption. If not provided, will use user's appPrivateKey.
+     * @return {String|Buffer} decrypted content.
+     */
 
-      /* STORAGE */
+  }, {
+    key: "decryptContent",
+    value: function decryptContent(content, options) {
+      return (0, _storage.decryptContentImpl)(this, content, options);
+    }
+    /**
+     * Stores the data provided in the app's data store to to the file specified.
+     * @param {String} path - the path to store the data in
+     * @param {String|Buffer} content - the data to store in the file
+     * @param {Object} [options=null] - options object
+     * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
+     *                                                  or the provided public key
+     * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+     *                                         the app private key
+     * @return {Promise} that resolves if the operation succeed and rejects
+     * if it failed
+     */
 
-      /**
-       * Encrypts the data provided with the app public key.
-       * @param {String|Buffer} content - data to encrypt
-       * @param {Object} [options=null] - options object
-       * @param {String} options.publicKey - the hex string of the ECDSA public
-       * key to use for encryption. If not provided, will use user's appPrivateKey.
-       * @return {String} Stringified ciphertext object
-       */
+  }, {
+    key: "putFile",
+    value: function putFile(path, content, options) {
+      return (0, _storage.putFileImpl)(this, path, content, options);
+    }
+    /**
+     * Retrieves the specified file from the app's data store.
+     * @param {String} path - the path to the file to read
+     * @param {Object} [options=null] - options object
+     * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
+     * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+     * @param {Boolean} options.verify - Whether the content should be verified, only to be used
+     * when `putFile` was set to `sign = true`
+     * @param {String} options.app - the app to lookup for multi-player storage -
+     * defaults to current origin
+     * @param {String} [options.zoneFileLookupURL=null] - The URL
+     * to use for zonefile lookup. If falsey, this will use the
+     * blockstack.js's getNameInfo function instead.
+     * @returns {Promise} that resolves to the raw data in the file
+     * or rejects with an error
+     */
 
-    }, {
-      key: "encryptContent",
-      value: function encryptContent(content, options) {
-        return (0, _storage.encryptContentImpl)(this, content, options);
-      }
-      /**
-       * Decrypts data encrypted with `encryptContent` with the
-       * transit private key.
-       * @param {String|Buffer} content - encrypted content.
-       * @param {Object} [options=null] - options object
-       * @param {String} options.privateKey - the hex string of the ECDSA private
-       * key to use for decryption. If not provided, will use user's appPrivateKey.
-       * @return {String|Buffer} decrypted content.
-       */
+  }, {
+    key: "getFile",
+    value: function getFile(path, options) {
+      return (0, _storage.getFileImpl)(this, path, options);
+    }
+    /**
+     * List the set of files in this application's Gaia storage bucket.
+     * @param {function} callback - a callback to invoke on each named file that
+     * returns `true` to continue the listing operation or `false` to end it
+     * @return {Promise} that resolves to the number of files listed
+     */
 
-    }, {
-      key: "decryptContent",
-      value: function decryptContent(content, options) {
-        return (0, _storage.decryptContentImpl)(this, content, options);
-      }
-      /**
-       * Stores the data provided in the app's data store to to the file specified.
-       * @param {String} path - the path to store the data in
-       * @param {String|Buffer} content - the data to store in the file
-       * @param {Object} [options=null] - options object
-       * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app private key
-       *                                                  or the provided public key
-       * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
-       *                                         the app private key
-       * @return {Promise} that resolves if the operation succeed and rejects
-       * if it failed
-       */
+  }, {
+    key: "listFiles",
+    value: function listFiles(callback) {
+      return (0, _storage.listFilesImpl)(this, callback);
+    }
+    /**
+     * Deletes the specified file from the app's data store. Currently not implemented.
+     * @param {String} path - the path to the file to delete
+     * @returns {Promise} that resolves when the file has been removed
+     * or rejects with an error
+     * @private
+     */
 
-    }, {
-      key: "putFile",
-      value: function putFile(path, content, options) {
-        return (0, _storage.putFileImpl)(this, path, content, options);
-      }
-      /**
-       * Retrieves the specified file from the app's data store.
-       * @param {String} path - the path to the file to read
-       * @param {Object} [options=null] - options object
-       * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
-       * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
-       * @param {Boolean} options.verify - Whether the content should be verified, only to be used
-       * when `putFile` was set to `sign = true`
-       * @param {String} options.app - the app to lookup for multi-player storage -
-       * defaults to current origin
-       * @param {String} [options.zoneFileLookupURL=null] - The URL
-       * to use for zonefile lookup. If falsey, this will use the
-       * blockstack.js's getNameInfo function instead.
-       * @returns {Promise} that resolves to the raw data in the file
-       * or rejects with an error
-       */
+  }, {
+    key: "deleteFile",
+    value: function deleteFile(path) {
+      Promise.reject(new Error("Delete of ".concat(path, " not supported by gaia hubs")));
+    }
+  }]);
+  return UserSession;
+}();
 
-    }, {
-      key: "getFile",
-      value: function getFile(path, options) {
-        return (0, _storage.getFileImpl)(this, path, options);
-      }
-      /**
-       * List the set of files in this application's Gaia storage bucket.
-       * @param {function} callback - a callback to invoke on each named file that
-       * returns `true` to continue the listing operation or `false` to end it
-       * @return {Promise} that resolves to the number of files listed
-       */
-
-    }, {
-      key: "listFiles",
-      value: function listFiles(callback) {
-        return (0, _storage.listFilesImpl)(this, callback);
-      }
-      /**
-       * Deletes the specified file from the app's data store. Currently not implemented.
-       * @param {String} path - the path to the file to delete
-       * @returns {Promise} that resolves when the file has been removed
-       * or rejects with an error
-       * @private
-       */
-
-    }, {
-      key: "deleteFile",
-      value: function deleteFile(path) {
-        Promise.reject(new Error("Delete of ".concat(path, " not supported by gaia hubs")));
-      }
-    }]);
-    return UserSession;
-  }();
-
-  _exports.UserSession = UserSession;
-});
+exports.UserSession = UserSession;
 
 },{"../errors":516,"../logger":519,"../storage":550,"../utils":551,"./appConfig":502,"./authApp":503,"./authMessages":505,"./sessionStore":511,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"query-string":421}],513:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./network"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./network"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.network);
-    global.config = mod.exports;
-  }
-})(this, function (_exports, _network) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.config = void 0;
-  var config = {
-    network: _network.network.defaults.MAINNET_DEFAULT,
-    logLevel: 'debug'
-  };
-  _exports.config = config;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.config = void 0;
+
+var _network = require("./network");
+
+var config = {
+  network: _network.network.defaults.MAINNET_DEFAULT,
+  logLevel: 'debug'
+};
+exports.config = config;
 
 },{"./network":520}],514:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./errors"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./errors"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.errors);
-    global.dids = mod.exports;
-  }
-})(this, function (_exports, _errors) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.makeDIDFromAddress = makeDIDFromAddress;
-  _exports.makeDIDFromPublicKey = makeDIDFromPublicKey;
-  _exports.getDIDType = getDIDType;
-  _exports.getAddressFromDID = getAddressFromDID;
-
-  function makeDIDFromAddress(address) {
-    return "did:btc-addr:".concat(address);
-  }
-
-  function makeDIDFromPublicKey(publicKey) {
-    return "did:ecdsa-pub:".concat(publicKey);
-  }
-
-  function getDIDType(decentralizedID) {
-    var didParts = decentralizedID.split(':');
-
-    if (didParts.length !== 3) {
-      throw new _errors.InvalidDIDError('Decentralized IDs must have 3 parts');
-    }
-
-    if (didParts[0].toLowerCase() !== 'did') {
-      throw new _errors.InvalidDIDError('Decentralized IDs must start with "did"');
-    }
-
-    return didParts[1].toLowerCase();
-  }
-
-  function getAddressFromDID(decentralizedID) {
-    var didType = getDIDType(decentralizedID);
-
-    if (didType === 'btc-addr') {
-      return decentralizedID.split(':')[2];
-    } else {
-      return null;
-    }
-  }
-  /*
-  export function getPublicKeyOrAddressFromDID(decentralizedID) {
-    const didParts = decentralizedID.split(':')
-  
-    if (didParts.length !== 3) {
-      throw new InvalidDIDError('Decentralized IDs must have 3 parts')
-    }
-  
-    if (didParts[0].toLowerCase() !== 'did') {
-      throw new InvalidDIDError('Decentralized IDs must start with "did"')
-    }
-  
-    if (didParts[1].toLowerCase() === 'ecdsa-pub') {
-      return didParts[2]
-    } else if (didParts[1].toLowerCase() === 'btc-addr') {
-      return didParts[2]
-    } else {
-      throw new InvalidDIDError('Decentralized ID format not supported')
-    }
-  }
-  */
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.makeDIDFromAddress = makeDIDFromAddress;
+exports.makeDIDFromPublicKey = makeDIDFromPublicKey;
+exports.getDIDType = getDIDType;
+exports.getAddressFromDID = getAddressFromDID;
+
+var _errors = require("./errors");
+
+function makeDIDFromAddress(address) {
+  return "did:btc-addr:".concat(address);
+}
+
+function makeDIDFromPublicKey(publicKey) {
+  return "did:ecdsa-pub:".concat(publicKey);
+}
+
+function getDIDType(decentralizedID) {
+  var didParts = decentralizedID.split(':');
+
+  if (didParts.length !== 3) {
+    throw new _errors.InvalidDIDError('Decentralized IDs must have 3 parts');
+  }
+
+  if (didParts[0].toLowerCase() !== 'did') {
+    throw new _errors.InvalidDIDError('Decentralized IDs must start with "did"');
+  }
+
+  return didParts[1].toLowerCase();
+}
+
+function getAddressFromDID(decentralizedID) {
+  var didType = getDIDType(decentralizedID);
+
+  if (didType === 'btc-addr') {
+    return decentralizedID.split(':')[2];
+  } else {
+    return null;
+  }
+}
+/*
+export function getPublicKeyOrAddressFromDID(decentralizedID) {
+  const didParts = decentralizedID.split(':')
+
+  if (didParts.length !== 3) {
+    throw new InvalidDIDError('Decentralized IDs must have 3 parts')
+  }
+
+  if (didParts[0].toLowerCase() !== 'did') {
+    throw new InvalidDIDError('Decentralized IDs must start with "did"')
+  }
+
+  if (didParts[1].toLowerCase() === 'ecdsa-pub') {
+    return didParts[2]
+  } else if (didParts[1].toLowerCase() === 'btc-addr') {
+    return didParts[2]
+  } else {
+    throw new InvalidDIDError('Decentralized ID format not supported')
+  }
+}
+*/
 
 },{"./errors":516}],515:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/inherits", "@babel/runtime/helpers/wrapNativeSuper", "elliptic", "crypto", "bip39", "triplesec", "./keys"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/inherits"), require("@babel/runtime/helpers/wrapNativeSuper"), require("elliptic"), require("crypto"), require("bip39"), require("triplesec"), require("./keys"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.possibleConstructorReturn, global.getPrototypeOf, global.inherits, global.wrapNativeSuper, global.elliptic, global.crypto, global.bip39, global.triplesec, global.keys);
-    global.encryption = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _possibleConstructorReturn2, _getPrototypeOf2, _inherits2, _wrapNativeSuper2, _elliptic, _crypto, _bip, _triplesec, _keys) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.getHexFromBN = getHexFromBN;
-  _exports.encryptECIES = encryptECIES;
-  _exports.decryptECIES = decryptECIES;
-  _exports.signECDSA = signECDSA;
-  _exports.verifyECDSA = verifyECDSA;
-  _exports.encryptMnemonic = encryptMnemonic;
-  _exports.decryptMnemonic = decryptMnemonic;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _wrapNativeSuper2 = _interopRequireDefault(_wrapNativeSuper2);
-  _crypto = _interopRequireDefault(_crypto);
-  _bip = _interopRequireDefault(_bip);
-  _triplesec = _interopRequireDefault(_triplesec);
-  var ecurve = new _elliptic.ec('secp256k1');
-
-  function aes256CbcEncrypt(iv, key, plaintext) {
-    var cipher = _crypto.default.createCipheriv('aes-256-cbc', key, iv);
-
-    return Buffer.concat([cipher.update(plaintext), cipher.final()]);
-  }
-
-  function aes256CbcDecrypt(iv, key, ciphertext) {
-    var cipher = _crypto.default.createDecipheriv('aes-256-cbc', key, iv);
-
-    return Buffer.concat([cipher.update(ciphertext), cipher.final()]);
-  }
-
-  function hmacSha256(key, content) {
-    return _crypto.default.createHmac('sha256', key).update(content).digest();
-  }
-
-  function equalConstTime(b1, b2) {
-    if (b1.length !== b2.length) {
-      return false;
-    }
-
-    var res = 0;
-
-    for (var i = 0; i < b1.length; i++) {
-      res |= b1[i] ^ b2[i]; // jshint ignore:line
-    }
-
-    return res === 0;
-  }
-
-  function sharedSecretToKeys(sharedSecret) {
-    // generate mac and encryption key from shared secret
-    var hashedSecret = _crypto.default.createHash('sha512').update(sharedSecret).digest();
-
-    return {
-      encryptionKey: hashedSecret.slice(0, 32),
-      hmacKey: hashedSecret.slice(32)
-    };
-  }
-
-  function getHexFromBN(bnInput) {
-    var hexOut = bnInput.toString('hex');
-
-    if (hexOut.length === 64) {
-      return hexOut;
-    } else if (hexOut.length < 64) {
-      // pad with leading zeros
-      // the padStart function would require node 9
-      var padding = '0'.repeat(64 - hexOut.length);
-      return "".concat(padding).concat(hexOut);
-    } else {
-      throw new Error('Generated a > 32-byte BN for encryption. Failing.');
-    }
-  }
-  /**
-   * Encrypt content to elliptic curve publicKey using ECIES
-   * @param {String} publicKey - secp256k1 public key hex string
-   * @param {String | Buffer} content - content to encrypt
-   * @return {Object} Object containing (hex encoded):
-   *  iv (initialization vector), cipherText (cipher text),
-   *  mac (message authentication code), ephemeral public key
-   *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
-   *  @private
-   */
-
-
-  function encryptECIES(publicKey, content) {
-    var isString = typeof content === 'string';
-    var plainText = Buffer.from(content); // always copy to buffer
-
-    var ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
-    var ephemeralSK = ecurve.genKeyPair();
-    var ephemeralPK = ephemeralSK.getPublic();
-    var sharedSecret = ephemeralSK.derive(ecPK);
-    var sharedSecretHex = getHexFromBN(sharedSecret);
-    var sharedKeys = sharedSecretToKeys(new Buffer(sharedSecretHex, 'hex'));
-
-    var initializationVector = _crypto.default.randomBytes(16);
-
-    var cipherText = aes256CbcEncrypt(initializationVector, sharedKeys.encryptionKey, plainText);
-    var macData = Buffer.concat([initializationVector, new Buffer(ephemeralPK.encodeCompressed()), cipherText]);
-    var mac = hmacSha256(sharedKeys.hmacKey, macData);
-    return {
-      iv: initializationVector.toString('hex'),
-      ephemeralPK: ephemeralPK.encodeCompressed('hex'),
-      cipherText: cipherText.toString('hex'),
-      mac: mac.toString('hex'),
-      wasString: isString
-    };
-  }
-  /**
-   * Decrypt content encrypted using ECIES
-   * @param {String} privateKey - secp256k1 private key hex string
-   * @param {Object} cipherObject - object to decrypt, should contain:
-   *  iv (initialization vector), cipherText (cipher text),
-   *  mac (message authentication code), ephemeralPublicKey
-   *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
-   * @return {Buffer} plaintext
-   * @throws {Error} if unable to decrypt
-   * @private
-   */
-
-
-  function decryptECIES(privateKey, cipherObject) {
-    var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
-    var ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
-    var sharedSecret = ecSK.derive(ephemeralPK);
-    var sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex');
-    var sharedKeys = sharedSecretToKeys(sharedSecretBuffer);
-    var ivBuffer = new Buffer(cipherObject.iv, 'hex');
-    var cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex');
-    var macData = Buffer.concat([ivBuffer, new Buffer(ephemeralPK.encodeCompressed()), cipherTextBuffer]);
-    var actualMac = hmacSha256(sharedKeys.hmacKey, macData);
-    var expectedMac = new Buffer(cipherObject.mac, 'hex');
-
-    if (!equalConstTime(expectedMac, actualMac)) {
-      throw new Error('Decryption failed: failure in MAC check');
-    }
-
-    var plainText = aes256CbcDecrypt(ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer);
-
-    if (cipherObject.wasString) {
-      return plainText.toString();
-    } else {
-      return plainText;
-    }
-  }
-  /**
-   * Sign content using ECDSA
-   * @private
-   * @param {String} privateKey - secp256k1 private key hex string
-   * @param {Object} content - content to sign
-   * @return {Object} contains:
-   * signature - Hex encoded DER signature
-   * public key - Hex encoded private string taken from privateKey
-   * @private
-   */
-
-
-  function signECDSA(privateKey, content) {
-    var contentBuffer = Buffer.from(content);
-    var ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex');
-    var publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
-
-    var contentHash = _crypto.default.createHash('sha256').update(contentBuffer).digest();
-
-    var signature = ecPrivate.sign(contentHash);
-    var signatureString = signature.toDER('hex');
-    return {
-      signature: signatureString,
-      publicKey: publicKey
-    };
-  }
-  /**
-   * Verify content using ECDSA
-   * @param {String | Buffer} content - Content to verify was signed
-   * @param {String} publicKey - secp256k1 private key hex string
-   * @param {String} signature - Hex encoded DER signature
-   * @return {Boolean} returns true when signature matches publickey + content, false if not
-   * @private
-   */
-
-
-  function verifyECDSA(content, publicKey, signature) {
-    var contentBuffer = Buffer.from(content);
-    var ecPublic = ecurve.keyFromPublic(publicKey, 'hex');
-
-    var contentHash = _crypto.default.createHash('sha256').update(contentBuffer).digest();
-
-    return ecPublic.verify(contentHash, signature);
-  }
-  /**
-   * Encrypt a raw mnemonic phrase to be password protected
-   * @param {string} phrase - Raw mnemonic phrase
-   * @param {string} password - Password to encrypt mnemonic with
-   * @return {Promise<Buffer>} The encrypted phrase
-   * @private
-   */
-
-
-  function encryptMnemonic(phrase, password) {
-    return Promise.resolve().then(function () {
-      // must be bip39 mnemonic
-      if (!_bip.default.validateMnemonic(phrase)) {
-        throw new Error('Not a valid bip39 nmemonic');
-      } // normalize plaintext to fixed length byte string
-
-
-      var plaintextNormalized = Buffer.from(_bip.default.mnemonicToEntropy(phrase).toString('hex'), 'hex'); // AES-128-CBC with SHA256 HMAC
-
-      var salt = _crypto.default.randomBytes(16);
-
-      var keysAndIV = _crypto.default.pbkdf2Sync(password, salt, 100000, 48, 'sha512');
-
-      var encKey = keysAndIV.slice(0, 16);
-      var macKey = keysAndIV.slice(16, 32);
-      var iv = keysAndIV.slice(32, 48);
-
-      var cipher = _crypto.default.createCipheriv('aes-128-cbc', encKey, iv);
-
-      var cipherText = cipher.update(plaintextNormalized).toString('hex');
-      cipherText += cipher.final().toString('hex');
-      var hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')]);
-
-      var hmac = _crypto.default.createHmac('sha256', macKey);
-
-      hmac.write(hmacPayload);
-      var hmacDigest = hmac.digest();
-      var payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')]);
-      return payload;
-    });
-  } // Used to distinguish bad password during decrypt vs invalid format
-
-
-  var PasswordError =
-  /*#__PURE__*/
-  function (_Error) {
-    (0, _inherits2.default)(PasswordError, _Error);
-
-    function PasswordError() {
-      (0, _classCallCheck2.default)(this, PasswordError);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(PasswordError).apply(this, arguments));
-    }
-
-    return PasswordError;
-  }((0, _wrapNativeSuper2.default)(Error));
-
-  function decryptMnemonicBuffer(dataBuffer, password) {
-    return Promise.resolve().then(function () {
-      var salt = dataBuffer.slice(0, 16);
-      var hmacSig = dataBuffer.slice(16, 48); // 32 bytes
-
-      var cipherText = dataBuffer.slice(48);
-      var hmacPayload = Buffer.concat([salt, cipherText]);
-
-      var keysAndIV = _crypto.default.pbkdf2Sync(password, salt, 100000, 48, 'sha512');
-
-      var encKey = keysAndIV.slice(0, 16);
-      var macKey = keysAndIV.slice(16, 32);
-      var iv = keysAndIV.slice(32, 48);
-
-      var decipher = _crypto.default.createDecipheriv('aes-128-cbc', encKey, iv);
-
-      var plaintext = decipher.update(cipherText).toString('hex');
-      plaintext += decipher.final().toString('hex');
-
-      var hmac = _crypto.default.createHmac('sha256', macKey);
-
-      hmac.write(hmacPayload);
-      var hmacDigest = hmac.digest(); // hash both hmacSig and hmacDigest so string comparison time
-      // is uncorrelated to the ciphertext
-
-      var hmacSigHash = _crypto.default.createHash('sha256').update(hmacSig).digest().toString('hex');
-
-      var hmacDigestHash = _crypto.default.createHash('sha256').update(hmacDigest).digest().toString('hex');
-
-      if (hmacSigHash !== hmacDigestHash) {
-        // not authentic
-        throw new PasswordError('Wrong password (HMAC mismatch)');
-      }
-
-      var mnemonic = _bip.default.entropyToMnemonic(plaintext);
-
-      if (!_bip.default.validateMnemonic(mnemonic)) {
-        throw new PasswordError('Wrong password (invalid plaintext)');
-      }
-
-      return mnemonic;
-    });
-  }
-  /**
-   * Decrypt legacy triplesec keys
-   * @param {Buffer} dataBuffer - The encrypted key
-   * @param {String} password - Password for data
-   * @return {Promise<Buffer>} Decrypted seed
-   * @private
-   */
-
-
-  function decryptLegacy(dataBuffer, password) {
-    return new Promise(function (resolve, reject) {
-      _triplesec.default.decrypt({
-        key: Buffer.from(password),
-        data: dataBuffer
-      }, function (err, plaintextBuffer) {
-        if (!err) {
-          resolve(plaintextBuffer);
-        } else {
-          reject(err);
-        }
-      });
-    });
-  }
-  /**
-   * Encrypt a raw mnemonic phrase with a password
-   * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
-   * @param {string} password - Password for data
-   * @return {Promise<Buffer>} the raw mnemonic phrase
-   * @private
-   */
-
-
-  function decryptMnemonic(data, password) {
-    var dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex');
-    return decryptMnemonicBuffer(dataBuffer, password).catch(function (err) {
-      // If it was a password error, don't even bother with legacy
-      if (err instanceof PasswordError) {
-        throw err;
-      }
-
-      return decryptLegacy(dataBuffer, password);
-    });
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.getHexFromBN = getHexFromBN;
+exports.encryptECIES = encryptECIES;
+exports.decryptECIES = decryptECIES;
+exports.signECDSA = signECDSA;
+exports.verifyECDSA = verifyECDSA;
+exports.encryptMnemonic = encryptMnemonic;
+exports.decryptMnemonic = decryptMnemonic;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
+
+var _elliptic = require("elliptic");
+
+var _crypto = _interopRequireDefault(require("crypto"));
+
+var _bip = _interopRequireDefault(require("bip39"));
+
+var _triplesec = _interopRequireDefault(require("triplesec"));
+
+var _keys = require("./keys");
+
+var ecurve = new _elliptic.ec('secp256k1');
+
+function aes256CbcEncrypt(iv, key, plaintext) {
+  var cipher = _crypto.default.createCipheriv('aes-256-cbc', key, iv);
+
+  return Buffer.concat([cipher.update(plaintext), cipher.final()]);
+}
+
+function aes256CbcDecrypt(iv, key, ciphertext) {
+  var cipher = _crypto.default.createDecipheriv('aes-256-cbc', key, iv);
+
+  return Buffer.concat([cipher.update(ciphertext), cipher.final()]);
+}
+
+function hmacSha256(key, content) {
+  return _crypto.default.createHmac('sha256', key).update(content).digest();
+}
+
+function equalConstTime(b1, b2) {
+  if (b1.length !== b2.length) {
+    return false;
+  }
+
+  var res = 0;
+
+  for (var i = 0; i < b1.length; i++) {
+    res |= b1[i] ^ b2[i]; // jshint ignore:line
+  }
+
+  return res === 0;
+}
+
+function sharedSecretToKeys(sharedSecret) {
+  // generate mac and encryption key from shared secret
+  var hashedSecret = _crypto.default.createHash('sha512').update(sharedSecret).digest();
+
+  return {
+    encryptionKey: hashedSecret.slice(0, 32),
+    hmacKey: hashedSecret.slice(32)
+  };
+}
+
+function getHexFromBN(bnInput) {
+  var hexOut = bnInput.toString('hex');
+
+  if (hexOut.length === 64) {
+    return hexOut;
+  } else if (hexOut.length < 64) {
+    // pad with leading zeros
+    // the padStart function would require node 9
+    var padding = '0'.repeat(64 - hexOut.length);
+    return "".concat(padding).concat(hexOut);
+  } else {
+    throw new Error('Generated a > 32-byte BN for encryption. Failing.');
+  }
+}
+/**
+ * Encrypt content to elliptic curve publicKey using ECIES
+ * @param {String} publicKey - secp256k1 public key hex string
+ * @param {String | Buffer} content - content to encrypt
+ * @return {Object} Object containing (hex encoded):
+ *  iv (initialization vector), cipherText (cipher text),
+ *  mac (message authentication code), ephemeral public key
+ *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
+ *  @private
+ */
+
+
+function encryptECIES(publicKey, content) {
+  var isString = typeof content === 'string';
+  var plainText = Buffer.from(content); // always copy to buffer
+
+  var ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic();
+  var ephemeralSK = ecurve.genKeyPair();
+  var ephemeralPK = ephemeralSK.getPublic();
+  var sharedSecret = ephemeralSK.derive(ecPK);
+  var sharedSecretHex = getHexFromBN(sharedSecret);
+  var sharedKeys = sharedSecretToKeys(new Buffer(sharedSecretHex, 'hex'));
+
+  var initializationVector = _crypto.default.randomBytes(16);
+
+  var cipherText = aes256CbcEncrypt(initializationVector, sharedKeys.encryptionKey, plainText);
+  var macData = Buffer.concat([initializationVector, new Buffer(ephemeralPK.encodeCompressed()), cipherText]);
+  var mac = hmacSha256(sharedKeys.hmacKey, macData);
+  return {
+    iv: initializationVector.toString('hex'),
+    ephemeralPK: ephemeralPK.encodeCompressed('hex'),
+    cipherText: cipherText.toString('hex'),
+    mac: mac.toString('hex'),
+    wasString: isString
+  };
+}
+/**
+ * Decrypt content encrypted using ECIES
+ * @param {String} privateKey - secp256k1 private key hex string
+ * @param {Object} cipherObject - object to decrypt, should contain:
+ *  iv (initialization vector), cipherText (cipher text),
+ *  mac (message authentication code), ephemeralPublicKey
+ *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
+ * @return {Buffer} plaintext
+ * @throws {Error} if unable to decrypt
+ * @private
+ */
+
+
+function decryptECIES(privateKey, cipherObject) {
+  var ecSK = ecurve.keyFromPrivate(privateKey, 'hex');
+  var ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic();
+  var sharedSecret = ecSK.derive(ephemeralPK);
+  var sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex');
+  var sharedKeys = sharedSecretToKeys(sharedSecretBuffer);
+  var ivBuffer = new Buffer(cipherObject.iv, 'hex');
+  var cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex');
+  var macData = Buffer.concat([ivBuffer, new Buffer(ephemeralPK.encodeCompressed()), cipherTextBuffer]);
+  var actualMac = hmacSha256(sharedKeys.hmacKey, macData);
+  var expectedMac = new Buffer(cipherObject.mac, 'hex');
+
+  if (!equalConstTime(expectedMac, actualMac)) {
+    throw new Error('Decryption failed: failure in MAC check');
+  }
+
+  var plainText = aes256CbcDecrypt(ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer);
+
+  if (cipherObject.wasString) {
+    return plainText.toString();
+  } else {
+    return plainText;
+  }
+}
+/**
+ * Sign content using ECDSA
+ * @private
+ * @param {String} privateKey - secp256k1 private key hex string
+ * @param {Object} content - content to sign
+ * @return {Object} contains:
+ * signature - Hex encoded DER signature
+ * public key - Hex encoded private string taken from privateKey
+ * @private
+ */
+
+
+function signECDSA(privateKey, content) {
+  var contentBuffer = Buffer.from(content);
+  var ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex');
+  var publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
+
+  var contentHash = _crypto.default.createHash('sha256').update(contentBuffer).digest();
+
+  var signature = ecPrivate.sign(contentHash);
+  var signatureString = signature.toDER('hex');
+  return {
+    signature: signatureString,
+    publicKey: publicKey
+  };
+}
+/**
+ * Verify content using ECDSA
+ * @param {String | Buffer} content - Content to verify was signed
+ * @param {String} publicKey - secp256k1 private key hex string
+ * @param {String} signature - Hex encoded DER signature
+ * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @private
+ */
+
+
+function verifyECDSA(content, publicKey, signature) {
+  var contentBuffer = Buffer.from(content);
+  var ecPublic = ecurve.keyFromPublic(publicKey, 'hex');
+
+  var contentHash = _crypto.default.createHash('sha256').update(contentBuffer).digest();
+
+  return ecPublic.verify(contentHash, signature);
+}
+/**
+ * Encrypt a raw mnemonic phrase to be password protected
+ * @param {string} phrase - Raw mnemonic phrase
+ * @param {string} password - Password to encrypt mnemonic with
+ * @return {Promise<Buffer>} The encrypted phrase
+ * @private
+ */
+
+
+function encryptMnemonic(phrase, password) {
+  return Promise.resolve().then(function () {
+    // must be bip39 mnemonic
+    if (!_bip.default.validateMnemonic(phrase)) {
+      throw new Error('Not a valid bip39 nmemonic');
+    } // normalize plaintext to fixed length byte string
+
+
+    var plaintextNormalized = Buffer.from(_bip.default.mnemonicToEntropy(phrase).toString('hex'), 'hex'); // AES-128-CBC with SHA256 HMAC
+
+    var salt = _crypto.default.randomBytes(16);
+
+    var keysAndIV = _crypto.default.pbkdf2Sync(password, salt, 100000, 48, 'sha512');
+
+    var encKey = keysAndIV.slice(0, 16);
+    var macKey = keysAndIV.slice(16, 32);
+    var iv = keysAndIV.slice(32, 48);
+
+    var cipher = _crypto.default.createCipheriv('aes-128-cbc', encKey, iv);
+
+    var cipherText = cipher.update(plaintextNormalized).toString('hex');
+    cipherText += cipher.final().toString('hex');
+    var hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')]);
+
+    var hmac = _crypto.default.createHmac('sha256', macKey);
+
+    hmac.write(hmacPayload);
+    var hmacDigest = hmac.digest();
+    var payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')]);
+    return payload;
+  });
+} // Used to distinguish bad password during decrypt vs invalid format
+
+
+var PasswordError =
+/*#__PURE__*/
+function (_Error) {
+  (0, _inherits2.default)(PasswordError, _Error);
+
+  function PasswordError() {
+    (0, _classCallCheck2.default)(this, PasswordError);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(PasswordError).apply(this, arguments));
+  }
+
+  return PasswordError;
+}((0, _wrapNativeSuper2.default)(Error));
+
+function decryptMnemonicBuffer(dataBuffer, password) {
+  return Promise.resolve().then(function () {
+    var salt = dataBuffer.slice(0, 16);
+    var hmacSig = dataBuffer.slice(16, 48); // 32 bytes
+
+    var cipherText = dataBuffer.slice(48);
+    var hmacPayload = Buffer.concat([salt, cipherText]);
+
+    var keysAndIV = _crypto.default.pbkdf2Sync(password, salt, 100000, 48, 'sha512');
+
+    var encKey = keysAndIV.slice(0, 16);
+    var macKey = keysAndIV.slice(16, 32);
+    var iv = keysAndIV.slice(32, 48);
+
+    var decipher = _crypto.default.createDecipheriv('aes-128-cbc', encKey, iv);
+
+    var plaintext = decipher.update(cipherText).toString('hex');
+    plaintext += decipher.final().toString('hex');
+
+    var hmac = _crypto.default.createHmac('sha256', macKey);
+
+    hmac.write(hmacPayload);
+    var hmacDigest = hmac.digest(); // hash both hmacSig and hmacDigest so string comparison time
+    // is uncorrelated to the ciphertext
+
+    var hmacSigHash = _crypto.default.createHash('sha256').update(hmacSig).digest().toString('hex');
+
+    var hmacDigestHash = _crypto.default.createHash('sha256').update(hmacDigest).digest().toString('hex');
+
+    if (hmacSigHash !== hmacDigestHash) {
+      // not authentic
+      throw new PasswordError('Wrong password (HMAC mismatch)');
+    }
+
+    var mnemonic = _bip.default.entropyToMnemonic(plaintext);
+
+    if (!_bip.default.validateMnemonic(mnemonic)) {
+      throw new PasswordError('Wrong password (invalid plaintext)');
+    }
+
+    return mnemonic;
+  });
+}
+/**
+ * Decrypt legacy triplesec keys
+ * @param {Buffer} dataBuffer - The encrypted key
+ * @param {String} password - Password for data
+ * @return {Promise<Buffer>} Decrypted seed
+ * @private
+ */
+
+
+function decryptLegacy(dataBuffer, password) {
+  return new Promise(function (resolve, reject) {
+    _triplesec.default.decrypt({
+      key: Buffer.from(password),
+      data: dataBuffer
+    }, function (err, plaintextBuffer) {
+      if (!err) {
+        resolve(plaintextBuffer);
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+/**
+ * Encrypt a raw mnemonic phrase with a password
+ * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
+ * @param {string} password - Password for data
+ * @return {Promise<Buffer>} the raw mnemonic phrase
+ * @private
+ */
+
+
+function decryptMnemonic(data, password) {
+  var dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex');
+  return decryptMnemonicBuffer(dataBuffer, password).catch(function (err) {
+    // If it was a password error, don't even bother with legacy
+    if (err instanceof PasswordError) {
+      throw err;
+    }
+
+    return decryptLegacy(dataBuffer, password);
+  });
+}
 
 }).call(this,require("buffer").Buffer)
 },{"./keys":518,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/wrapNativeSuper":21,"bip39":55,"buffer":149,"crypto":169,"elliptic":201,"triplesec":468}],516:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/assertThisInitialized", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/get", "@babel/runtime/helpers/inherits", "@babel/runtime/helpers/wrapNativeSuper", "@babel/runtime/helpers/defineProperty"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/assertThisInitialized"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/get"), require("@babel/runtime/helpers/inherits"), require("@babel/runtime/helpers/wrapNativeSuper"), require("@babel/runtime/helpers/defineProperty"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.assertThisInitialized, global.getPrototypeOf, global.get, global.inherits, global.wrapNativeSuper, global.defineProperty);
-    global.errors = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _assertThisInitialized2, _getPrototypeOf2, _get2, _inherits2, _wrapNativeSuper2, _defineProperty2) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.NoSessionDataError = _exports.InvalidStateError = _exports.SignatureVerificationError = _exports.LoginFailedError = _exports.InvalidAmountError = _exports.NotEnoughFundsError = _exports.InvalidDIDError = _exports.RemoteServiceError = _exports.MissingParameterError = _exports.InvalidParameterError = _exports.BlockstackError = _exports.ERROR_CODES = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _assertThisInitialized2 = _interopRequireDefault(_assertThisInitialized2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _get2 = _interopRequireDefault(_get2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _wrapNativeSuper2 = _interopRequireDefault(_wrapNativeSuper2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  var ERROR_CODES = {
-    MISSING_PARAMETER: 'missing_parameter',
-    REMOTE_SERVICE_ERROR: 'remote_service_error',
-    INVALID_STATE: 'invalid_state',
-    NO_SESSION_DATA: 'no_session_data',
-    UNKNOWN: 'unknown'
-  };
-  _exports.ERROR_CODES = ERROR_CODES;
-  Object.freeze(ERROR_CODES);
-
-  var BlockstackError =
-  /*#__PURE__*/
-  function (_Error) {
-    (0, _inherits2.default)(BlockstackError, _Error);
-
-    function BlockstackError(error) {
-      var _this;
-
-      (0, _classCallCheck2.default)(this, BlockstackError);
-      _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(BlockstackError).call(this, error.message));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "message", void 0);
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "code", void 0);
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "parameter", void 0);
-      _this.message = error.message;
-      _this.code = error.code;
-      _this.parameter = error.parameter ? error.parameter : null;
-      return _this;
-    }
-
-    (0, _createClass2.default)(BlockstackError, [{
-      key: "toString",
-      value: function toString() {
-        return "".concat((0, _get2.default)((0, _getPrototypeOf2.default)(BlockstackError.prototype), "toString", this).call(this), "\n    code: ").concat(this.code, " param: ").concat(this.parameter ? this.parameter : 'n/a');
-      }
-    }]);
-    return BlockstackError;
-  }((0, _wrapNativeSuper2.default)(Error));
-
-  _exports.BlockstackError = BlockstackError;
-
-  var InvalidParameterError =
-  /*#__PURE__*/
-  function (_BlockstackError) {
-    (0, _inherits2.default)(InvalidParameterError, _BlockstackError);
-
-    function InvalidParameterError(parameter) {
-      var _this2;
-
-      var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      (0, _classCallCheck2.default)(this, InvalidParameterError);
-      _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidParameterError).call(this, {
-        code: 'missing_parameter',
-        message: message,
-        parameter: ''
-      }));
-      _this2.name = 'MissingParametersError';
-      return _this2;
-    }
-
-    return InvalidParameterError;
-  }(BlockstackError);
-
-  _exports.InvalidParameterError = InvalidParameterError;
-
-  var MissingParameterError =
-  /*#__PURE__*/
-  function (_BlockstackError2) {
-    (0, _inherits2.default)(MissingParameterError, _BlockstackError2);
-
-    function MissingParameterError(parameter) {
-      var _this3;
-
-      var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      (0, _classCallCheck2.default)(this, MissingParameterError);
-      _this3 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(MissingParameterError).call(this, {
-        code: ERROR_CODES.MISSING_PARAMETER,
-        message: message,
-        parameter: parameter
-      }));
-      _this3.name = 'MissingParametersError';
-      return _this3;
-    }
-
-    return MissingParameterError;
-  }(BlockstackError);
-
-  _exports.MissingParameterError = MissingParameterError;
-
-  var RemoteServiceError =
-  /*#__PURE__*/
-  function (_BlockstackError3) {
-    (0, _inherits2.default)(RemoteServiceError, _BlockstackError3);
-
-    function RemoteServiceError(response) {
-      var _this4;
-
-      var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      (0, _classCallCheck2.default)(this, RemoteServiceError);
-      _this4 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(RemoteServiceError).call(this, {
-        code: ERROR_CODES.REMOTE_SERVICE_ERROR,
-        message: message
-      }));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this4), "response", void 0);
-      _this4.response = response;
-      return _this4;
-    }
-
-    return RemoteServiceError;
-  }(BlockstackError);
-
-  _exports.RemoteServiceError = RemoteServiceError;
-
-  var InvalidDIDError =
-  /*#__PURE__*/
-  function (_BlockstackError4) {
-    (0, _inherits2.default)(InvalidDIDError, _BlockstackError4);
-
-    function InvalidDIDError() {
-      var _this5;
-
-      var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-      (0, _classCallCheck2.default)(this, InvalidDIDError);
-      _this5 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidDIDError).call(this, {
-        code: 'invalid_did_error',
-        message: message
-      }));
-      _this5.name = 'InvalidDIDError';
-      return _this5;
-    }
-
-    return InvalidDIDError;
-  }(BlockstackError);
-
-  _exports.InvalidDIDError = InvalidDIDError;
-
-  var NotEnoughFundsError =
-  /*#__PURE__*/
-  function (_BlockstackError5) {
-    (0, _inherits2.default)(NotEnoughFundsError, _BlockstackError5);
-
-    function NotEnoughFundsError(leftToFund) {
-      var _this6;
-
-      (0, _classCallCheck2.default)(this, NotEnoughFundsError);
-      var message = "Not enough UTXOs to fund. Left to fund: ".concat(leftToFund);
-      _this6 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(NotEnoughFundsError).call(this, {
-        code: 'not_enough_error',
-        message: message
-      }));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this6), "leftToFund", void 0);
-      _this6.leftToFund = leftToFund;
-      _this6.name = 'NotEnoughFundsError';
-      _this6.message = message;
-      return _this6;
-    }
-
-    return NotEnoughFundsError;
-  }(BlockstackError);
-
-  _exports.NotEnoughFundsError = NotEnoughFundsError;
-
-  var InvalidAmountError =
-  /*#__PURE__*/
-  function (_BlockstackError6) {
-    (0, _inherits2.default)(InvalidAmountError, _BlockstackError6);
-
-    function InvalidAmountError(fees, specifiedAmount) {
-      var _this7;
-
-      (0, _classCallCheck2.default)(this, InvalidAmountError);
-      var message = "Not enough coin to fund fees transaction fees. Fees would be ".concat(fees, ",") + " specified spend is  ".concat(specifiedAmount);
-      _this7 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidAmountError).call(this, {
-        code: 'invalid_amount_error',
-        message: message
-      }));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this7), "fees", void 0);
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this7), "specifiedAmount", void 0);
-      _this7.specifiedAmount = specifiedAmount;
-      _this7.fees = fees;
-      _this7.name = 'InvalidAmountError';
-      _this7.message = message;
-      return _this7;
-    }
-
-    return InvalidAmountError;
-  }(BlockstackError);
-
-  _exports.InvalidAmountError = InvalidAmountError;
-
-  var LoginFailedError =
-  /*#__PURE__*/
-  function (_BlockstackError7) {
-    (0, _inherits2.default)(LoginFailedError, _BlockstackError7);
-
-    function LoginFailedError(reason) {
-      var _this8;
-
-      (0, _classCallCheck2.default)(this, LoginFailedError);
-      var message = "Failed to login: ".concat(reason);
-      _this8 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LoginFailedError).call(this, {
-        code: 'login_failed',
-        message: message
-      }));
-      _this8.message = message;
-      _this8.name = 'LoginFailedError';
-      return _this8;
-    }
-
-    return LoginFailedError;
-  }(BlockstackError);
-
-  _exports.LoginFailedError = LoginFailedError;
-
-  var SignatureVerificationError =
-  /*#__PURE__*/
-  function (_BlockstackError8) {
-    (0, _inherits2.default)(SignatureVerificationError, _BlockstackError8);
-
-    function SignatureVerificationError(reason) {
-      var _this9;
-
-      (0, _classCallCheck2.default)(this, SignatureVerificationError);
-      var message = "Failed to verify signature: ".concat(reason);
-      _this9 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(SignatureVerificationError).call(this, {
-        code: 'signature_verification_failure',
-        message: message
-      }));
-      _this9.message = message;
-      _this9.name = 'SignatureVerificationError';
-      return _this9;
-    }
-
-    return SignatureVerificationError;
-  }(BlockstackError);
-
-  _exports.SignatureVerificationError = SignatureVerificationError;
-
-  var InvalidStateError =
-  /*#__PURE__*/
-  function (_BlockstackError9) {
-    (0, _inherits2.default)(InvalidStateError, _BlockstackError9);
-
-    function InvalidStateError(message) {
-      var _this10;
-
-      (0, _classCallCheck2.default)(this, InvalidStateError);
-      _this10 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidStateError).call(this, {
-        code: ERROR_CODES.INVALID_STATE,
-        message: message
-      }));
-      _this10.message = message;
-      _this10.name = 'InvalidStateError';
-      return _this10;
-    }
-
-    return InvalidStateError;
-  }(BlockstackError);
-
-  _exports.InvalidStateError = InvalidStateError;
-
-  var NoSessionDataError =
-  /*#__PURE__*/
-  function (_BlockstackError10) {
-    (0, _inherits2.default)(NoSessionDataError, _BlockstackError10);
-
-    function NoSessionDataError(message) {
-      var _this11;
-
-      (0, _classCallCheck2.default)(this, NoSessionDataError);
-      _this11 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(NoSessionDataError).call(this, {
-        code: ERROR_CODES.INVALID_STATE,
-        message: message
-      }));
-      _this11.message = message;
-      _this11.name = 'NoSessionDataError';
-      return _this11;
-    }
-
-    return NoSessionDataError;
-  }(BlockstackError);
-
-  _exports.NoSessionDataError = NoSessionDataError;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.NoSessionDataError = exports.InvalidStateError = exports.SignatureVerificationError = exports.LoginFailedError = exports.InvalidAmountError = exports.NotEnoughFundsError = exports.InvalidDIDError = exports.RemoteServiceError = exports.MissingParameterError = exports.InvalidParameterError = exports.BlockstackError = exports.ERROR_CODES = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var ERROR_CODES = {
+  MISSING_PARAMETER: 'missing_parameter',
+  REMOTE_SERVICE_ERROR: 'remote_service_error',
+  INVALID_STATE: 'invalid_state',
+  NO_SESSION_DATA: 'no_session_data',
+  UNKNOWN: 'unknown'
+};
+exports.ERROR_CODES = ERROR_CODES;
+Object.freeze(ERROR_CODES);
+
+var BlockstackError =
+/*#__PURE__*/
+function (_Error) {
+  (0, _inherits2.default)(BlockstackError, _Error);
+
+  function BlockstackError(error) {
+    var _this;
+
+    (0, _classCallCheck2.default)(this, BlockstackError);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(BlockstackError).call(this, error.message));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "message", void 0);
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "code", void 0);
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "parameter", void 0);
+    _this.message = error.message;
+    _this.code = error.code;
+    _this.parameter = error.parameter ? error.parameter : null;
+    return _this;
+  }
+
+  (0, _createClass2.default)(BlockstackError, [{
+    key: "toString",
+    value: function toString() {
+      return "".concat((0, _get2.default)((0, _getPrototypeOf2.default)(BlockstackError.prototype), "toString", this).call(this), "\n    code: ").concat(this.code, " param: ").concat(this.parameter ? this.parameter : 'n/a');
+    }
+  }]);
+  return BlockstackError;
+}((0, _wrapNativeSuper2.default)(Error));
+
+exports.BlockstackError = BlockstackError;
+
+var InvalidParameterError =
+/*#__PURE__*/
+function (_BlockstackError) {
+  (0, _inherits2.default)(InvalidParameterError, _BlockstackError);
+
+  function InvalidParameterError(parameter) {
+    var _this2;
+
+    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    (0, _classCallCheck2.default)(this, InvalidParameterError);
+    _this2 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidParameterError).call(this, {
+      code: 'missing_parameter',
+      message: message,
+      parameter: ''
+    }));
+    _this2.name = 'MissingParametersError';
+    return _this2;
+  }
+
+  return InvalidParameterError;
+}(BlockstackError);
+
+exports.InvalidParameterError = InvalidParameterError;
+
+var MissingParameterError =
+/*#__PURE__*/
+function (_BlockstackError2) {
+  (0, _inherits2.default)(MissingParameterError, _BlockstackError2);
+
+  function MissingParameterError(parameter) {
+    var _this3;
+
+    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    (0, _classCallCheck2.default)(this, MissingParameterError);
+    _this3 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(MissingParameterError).call(this, {
+      code: ERROR_CODES.MISSING_PARAMETER,
+      message: message,
+      parameter: parameter
+    }));
+    _this3.name = 'MissingParametersError';
+    return _this3;
+  }
+
+  return MissingParameterError;
+}(BlockstackError);
+
+exports.MissingParameterError = MissingParameterError;
+
+var RemoteServiceError =
+/*#__PURE__*/
+function (_BlockstackError3) {
+  (0, _inherits2.default)(RemoteServiceError, _BlockstackError3);
+
+  function RemoteServiceError(response) {
+    var _this4;
+
+    var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    (0, _classCallCheck2.default)(this, RemoteServiceError);
+    _this4 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(RemoteServiceError).call(this, {
+      code: ERROR_CODES.REMOTE_SERVICE_ERROR,
+      message: message
+    }));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this4), "response", void 0);
+    _this4.response = response;
+    return _this4;
+  }
+
+  return RemoteServiceError;
+}(BlockstackError);
+
+exports.RemoteServiceError = RemoteServiceError;
+
+var InvalidDIDError =
+/*#__PURE__*/
+function (_BlockstackError4) {
+  (0, _inherits2.default)(InvalidDIDError, _BlockstackError4);
+
+  function InvalidDIDError() {
+    var _this5;
+
+    var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    (0, _classCallCheck2.default)(this, InvalidDIDError);
+    _this5 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidDIDError).call(this, {
+      code: 'invalid_did_error',
+      message: message
+    }));
+    _this5.name = 'InvalidDIDError';
+    return _this5;
+  }
+
+  return InvalidDIDError;
+}(BlockstackError);
+
+exports.InvalidDIDError = InvalidDIDError;
+
+var NotEnoughFundsError =
+/*#__PURE__*/
+function (_BlockstackError5) {
+  (0, _inherits2.default)(NotEnoughFundsError, _BlockstackError5);
+
+  function NotEnoughFundsError(leftToFund) {
+    var _this6;
+
+    (0, _classCallCheck2.default)(this, NotEnoughFundsError);
+    var message = "Not enough UTXOs to fund. Left to fund: ".concat(leftToFund);
+    _this6 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(NotEnoughFundsError).call(this, {
+      code: 'not_enough_error',
+      message: message
+    }));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this6), "leftToFund", void 0);
+    _this6.leftToFund = leftToFund;
+    _this6.name = 'NotEnoughFundsError';
+    _this6.message = message;
+    return _this6;
+  }
+
+  return NotEnoughFundsError;
+}(BlockstackError);
+
+exports.NotEnoughFundsError = NotEnoughFundsError;
+
+var InvalidAmountError =
+/*#__PURE__*/
+function (_BlockstackError6) {
+  (0, _inherits2.default)(InvalidAmountError, _BlockstackError6);
+
+  function InvalidAmountError(fees, specifiedAmount) {
+    var _this7;
+
+    (0, _classCallCheck2.default)(this, InvalidAmountError);
+    var message = "Not enough coin to fund fees transaction fees. Fees would be ".concat(fees, ",") + " specified spend is  ".concat(specifiedAmount);
+    _this7 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidAmountError).call(this, {
+      code: 'invalid_amount_error',
+      message: message
+    }));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this7), "fees", void 0);
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this7), "specifiedAmount", void 0);
+    _this7.specifiedAmount = specifiedAmount;
+    _this7.fees = fees;
+    _this7.name = 'InvalidAmountError';
+    _this7.message = message;
+    return _this7;
+  }
+
+  return InvalidAmountError;
+}(BlockstackError);
+
+exports.InvalidAmountError = InvalidAmountError;
+
+var LoginFailedError =
+/*#__PURE__*/
+function (_BlockstackError7) {
+  (0, _inherits2.default)(LoginFailedError, _BlockstackError7);
+
+  function LoginFailedError(reason) {
+    var _this8;
+
+    (0, _classCallCheck2.default)(this, LoginFailedError);
+    var message = "Failed to login: ".concat(reason);
+    _this8 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LoginFailedError).call(this, {
+      code: 'login_failed',
+      message: message
+    }));
+    _this8.message = message;
+    _this8.name = 'LoginFailedError';
+    return _this8;
+  }
+
+  return LoginFailedError;
+}(BlockstackError);
+
+exports.LoginFailedError = LoginFailedError;
+
+var SignatureVerificationError =
+/*#__PURE__*/
+function (_BlockstackError8) {
+  (0, _inherits2.default)(SignatureVerificationError, _BlockstackError8);
+
+  function SignatureVerificationError(reason) {
+    var _this9;
+
+    (0, _classCallCheck2.default)(this, SignatureVerificationError);
+    var message = "Failed to verify signature: ".concat(reason);
+    _this9 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(SignatureVerificationError).call(this, {
+      code: 'signature_verification_failure',
+      message: message
+    }));
+    _this9.message = message;
+    _this9.name = 'SignatureVerificationError';
+    return _this9;
+  }
+
+  return SignatureVerificationError;
+}(BlockstackError);
+
+exports.SignatureVerificationError = SignatureVerificationError;
+
+var InvalidStateError =
+/*#__PURE__*/
+function (_BlockstackError9) {
+  (0, _inherits2.default)(InvalidStateError, _BlockstackError9);
+
+  function InvalidStateError(message) {
+    var _this10;
+
+    (0, _classCallCheck2.default)(this, InvalidStateError);
+    _this10 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InvalidStateError).call(this, {
+      code: ERROR_CODES.INVALID_STATE,
+      message: message
+    }));
+    _this10.message = message;
+    _this10.name = 'InvalidStateError';
+    return _this10;
+  }
+
+  return InvalidStateError;
+}(BlockstackError);
+
+exports.InvalidStateError = InvalidStateError;
+
+var NoSessionDataError =
+/*#__PURE__*/
+function (_BlockstackError10) {
+  (0, _inherits2.default)(NoSessionDataError, _BlockstackError10);
+
+  function NoSessionDataError(message) {
+    var _this11;
+
+    (0, _classCallCheck2.default)(this, NoSessionDataError);
+    _this11 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(NoSessionDataError).call(this, {
+      code: ERROR_CODES.INVALID_STATE,
+      message: message
+    }));
+    _this11.message = message;
+    _this11.name = 'NoSessionDataError';
+    return _this11;
+  }
+
+  return NoSessionDataError;
+}(BlockstackError);
+
+exports.NoSessionDataError = NoSessionDataError;
 
 },{"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/wrapNativeSuper":21}],517:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/typeof", "query-string", "./auth", "./profiles", "./storage", "./dids", "./keys", "./utils", "./operations", "./wallet", "./network", "jsontokens", "./config", "./encryption", "./auth/userSession"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/typeof"), require("query-string"), require("./auth"), require("./profiles"), require("./storage"), require("./dids"), require("./keys"), require("./utils"), require("./operations"), require("./wallet"), require("./network"), require("jsontokens"), require("./config"), require("./encryption"), require("./auth/userSession"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global._typeof, global.queryString, global.auth, global.profiles, global.storage, global.dids, global.keys, global.utils, global.operations, global.wallet, global.network, global.jsontokens, global.config, global.encryption, global.userSession);
-    global.index = mod.exports;
-  }
-})(this, function (_exports, _typeof2, _queryString, _auth, _profiles, _storage, _dids, _keys, _utils, _operations, _wallet, _network, _jsontokens, _config, _encryption, _userSession) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  var _exportNames = {
-    makeDIDFromAddress: true,
-    makeDIDFromPublicKey: true,
-    getDIDType: true,
-    getAddressFromDID: true,
-    getEntropy: true,
-    makeECPrivateKey: true,
-    publicKeyToAddress: true,
-    getPublicKeyFromPrivate: true,
-    nextYear: true,
-    nextMonth: true,
-    nextHour: true,
-    makeUUID4: true,
-    updateQueryStringParameter: true,
-    isLaterVersion: true,
-    isSameOriginAbsoluteUrl: true,
-    hexStringToECPair: true,
-    ecPairToHexString: true,
-    ecPairToAddress: true,
-    transactions: true,
-    safety: true,
-    TransactionSigner: true,
-    PubkeyHashSigner: true,
-    addUTXOsToFund: true,
-    estimateTXBytes: true,
-    BlockstackWallet: true,
-    IdentityKeyPair: true,
-    network: true,
-    decodeToken: true,
-    config: true,
-    encryptMnemonic: true,
-    decryptMnemonic: true,
-    UserSession: true
-  };
-  Object.defineProperty(_exports, "makeDIDFromAddress", {
-    enumerable: true,
-    get: function get() {
-      return _dids.makeDIDFromAddress;
-    }
-  });
-  Object.defineProperty(_exports, "makeDIDFromPublicKey", {
-    enumerable: true,
-    get: function get() {
-      return _dids.makeDIDFromPublicKey;
-    }
-  });
-  Object.defineProperty(_exports, "getDIDType", {
-    enumerable: true,
-    get: function get() {
-      return _dids.getDIDType;
-    }
-  });
-  Object.defineProperty(_exports, "getAddressFromDID", {
-    enumerable: true,
-    get: function get() {
-      return _dids.getAddressFromDID;
-    }
-  });
-  Object.defineProperty(_exports, "getEntropy", {
-    enumerable: true,
-    get: function get() {
-      return _keys.getEntropy;
-    }
-  });
-  Object.defineProperty(_exports, "makeECPrivateKey", {
-    enumerable: true,
-    get: function get() {
-      return _keys.makeECPrivateKey;
-    }
-  });
-  Object.defineProperty(_exports, "publicKeyToAddress", {
-    enumerable: true,
-    get: function get() {
-      return _keys.publicKeyToAddress;
-    }
-  });
-  Object.defineProperty(_exports, "getPublicKeyFromPrivate", {
-    enumerable: true,
-    get: function get() {
-      return _keys.getPublicKeyFromPrivate;
-    }
-  });
-  Object.defineProperty(_exports, "nextYear", {
-    enumerable: true,
-    get: function get() {
-      return _utils.nextYear;
-    }
-  });
-  Object.defineProperty(_exports, "nextMonth", {
-    enumerable: true,
-    get: function get() {
-      return _utils.nextMonth;
-    }
-  });
-  Object.defineProperty(_exports, "nextHour", {
-    enumerable: true,
-    get: function get() {
-      return _utils.nextHour;
-    }
-  });
-  Object.defineProperty(_exports, "makeUUID4", {
-    enumerable: true,
-    get: function get() {
-      return _utils.makeUUID4;
-    }
-  });
-  Object.defineProperty(_exports, "updateQueryStringParameter", {
-    enumerable: true,
-    get: function get() {
-      return _utils.updateQueryStringParameter;
-    }
-  });
-  Object.defineProperty(_exports, "isLaterVersion", {
-    enumerable: true,
-    get: function get() {
-      return _utils.isLaterVersion;
-    }
-  });
-  Object.defineProperty(_exports, "isSameOriginAbsoluteUrl", {
-    enumerable: true,
-    get: function get() {
-      return _utils.isSameOriginAbsoluteUrl;
-    }
-  });
-  Object.defineProperty(_exports, "hexStringToECPair", {
-    enumerable: true,
-    get: function get() {
-      return _utils.hexStringToECPair;
-    }
-  });
-  Object.defineProperty(_exports, "ecPairToHexString", {
-    enumerable: true,
-    get: function get() {
-      return _utils.ecPairToHexString;
-    }
-  });
-  Object.defineProperty(_exports, "ecPairToAddress", {
-    enumerable: true,
-    get: function get() {
-      return _utils.ecPairToAddress;
-    }
-  });
-  Object.defineProperty(_exports, "transactions", {
-    enumerable: true,
-    get: function get() {
-      return _operations.transactions;
-    }
-  });
-  Object.defineProperty(_exports, "safety", {
-    enumerable: true,
-    get: function get() {
-      return _operations.safety;
-    }
-  });
-  Object.defineProperty(_exports, "TransactionSigner", {
-    enumerable: true,
-    get: function get() {
-      return _operations.TransactionSigner;
-    }
-  });
-  Object.defineProperty(_exports, "PubkeyHashSigner", {
-    enumerable: true,
-    get: function get() {
-      return _operations.PubkeyHashSigner;
-    }
-  });
-  Object.defineProperty(_exports, "addUTXOsToFund", {
-    enumerable: true,
-    get: function get() {
-      return _operations.addUTXOsToFund;
-    }
-  });
-  Object.defineProperty(_exports, "estimateTXBytes", {
-    enumerable: true,
-    get: function get() {
-      return _operations.estimateTXBytes;
-    }
-  });
-  Object.defineProperty(_exports, "BlockstackWallet", {
-    enumerable: true,
-    get: function get() {
-      return _wallet.BlockstackWallet;
-    }
-  });
-  Object.defineProperty(_exports, "IdentityKeyPair", {
-    enumerable: true,
-    get: function get() {
-      return _wallet.IdentityKeyPair;
-    }
-  });
-  Object.defineProperty(_exports, "network", {
-    enumerable: true,
-    get: function get() {
-      return _network.network;
-    }
-  });
-  Object.defineProperty(_exports, "decodeToken", {
-    enumerable: true,
-    get: function get() {
-      return _jsontokens.decodeToken;
-    }
-  });
-  Object.defineProperty(_exports, "config", {
-    enumerable: true,
-    get: function get() {
-      return _config.config;
-    }
-  });
-  Object.defineProperty(_exports, "encryptMnemonic", {
-    enumerable: true,
-    get: function get() {
-      return _encryption.encryptMnemonic;
-    }
-  });
-  Object.defineProperty(_exports, "decryptMnemonic", {
-    enumerable: true,
-    get: function get() {
-      return _encryption.decryptMnemonic;
-    }
-  });
-  Object.defineProperty(_exports, "UserSession", {
-    enumerable: true,
-    get: function get() {
-      return _userSession.UserSession;
-    }
-  });
-  _typeof2 = _interopRequireDefault(_typeof2);
-  _queryString = _interopRequireDefault(_queryString);
-  Object.keys(_auth).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _auth[key];
-      }
-    });
-  });
-  Object.keys(_profiles).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _profiles[key];
-      }
-    });
-  });
-  Object.keys(_storage).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _storage[key];
-      }
-    });
-  });
-
-  // TODO: Putting in here so it executes ASAP. There is probably a better place to put this.
-  // Note: This prototype is designed to work as a drop-in-replacement (non-breaking upgrade)
-  // for apps using blockstack.js. That requires doing this hacky global & immediate detection. 
-  // A more proper approach would require developers to call an additional blockstack.js method 
-  // for invoking this detection method.
-  (function protocolEchoReplyDetection() {
-    // Check that the `window` APIs exist
-    if ((typeof window === "undefined" ? "undefined" : (0, _typeof2.default)(window)) !== 'object' || !window.location || !window.localStorage) {
-      // Exit detection function - we are not running in a browser environment.
-      return;
-    } // Check if the location query string contains a protocol-echo reply.
-    // If so, this page was only re-opened to signal back the originating 
-    // tab that the protocol handler is installed. 
-
-
-    var queryDict = _queryString.default.parse(window.location.search);
-
-    if (queryDict.echoReply) {
-      // Use localStorage to notify originated tab that protocol handler is available and working.
-      var echoReplyKey = "echo-reply-".concat(queryDict.echoReply); // Set the echo-reply result in localStorage for the other window to see.
-
-      window.localStorage.setItem(echoReplyKey, 'success'); // Redirect back to the localhost auth url, as opposed to another protocol launch.
-      // This will re-use the same tab rather than creating another useless one.
-
-      window.setTimeout(function () {
-        window.location = decodeURIComponent(queryDict.authContinuation);
-      }, 10);
-    }
-  })();
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+var _exportNames = {
+  makeDIDFromAddress: true,
+  makeDIDFromPublicKey: true,
+  getDIDType: true,
+  getAddressFromDID: true,
+  getEntropy: true,
+  makeECPrivateKey: true,
+  publicKeyToAddress: true,
+  getPublicKeyFromPrivate: true,
+  nextYear: true,
+  nextMonth: true,
+  nextHour: true,
+  makeUUID4: true,
+  updateQueryStringParameter: true,
+  isLaterVersion: true,
+  isSameOriginAbsoluteUrl: true,
+  hexStringToECPair: true,
+  ecPairToHexString: true,
+  ecPairToAddress: true,
+  transactions: true,
+  safety: true,
+  TransactionSigner: true,
+  PubkeyHashSigner: true,
+  addUTXOsToFund: true,
+  estimateTXBytes: true,
+  BlockstackWallet: true,
+  IdentityKeyPair: true,
+  network: true,
+  decodeToken: true,
+  config: true,
+  encryptMnemonic: true,
+  decryptMnemonic: true,
+  UserSession: true
+};
+Object.defineProperty(exports, "makeDIDFromAddress", {
+  enumerable: true,
+  get: function get() {
+    return _dids.makeDIDFromAddress;
+  }
+});
+Object.defineProperty(exports, "makeDIDFromPublicKey", {
+  enumerable: true,
+  get: function get() {
+    return _dids.makeDIDFromPublicKey;
+  }
+});
+Object.defineProperty(exports, "getDIDType", {
+  enumerable: true,
+  get: function get() {
+    return _dids.getDIDType;
+  }
+});
+Object.defineProperty(exports, "getAddressFromDID", {
+  enumerable: true,
+  get: function get() {
+    return _dids.getAddressFromDID;
+  }
+});
+Object.defineProperty(exports, "getEntropy", {
+  enumerable: true,
+  get: function get() {
+    return _keys.getEntropy;
+  }
+});
+Object.defineProperty(exports, "makeECPrivateKey", {
+  enumerable: true,
+  get: function get() {
+    return _keys.makeECPrivateKey;
+  }
+});
+Object.defineProperty(exports, "publicKeyToAddress", {
+  enumerable: true,
+  get: function get() {
+    return _keys.publicKeyToAddress;
+  }
+});
+Object.defineProperty(exports, "getPublicKeyFromPrivate", {
+  enumerable: true,
+  get: function get() {
+    return _keys.getPublicKeyFromPrivate;
+  }
+});
+Object.defineProperty(exports, "nextYear", {
+  enumerable: true,
+  get: function get() {
+    return _utils.nextYear;
+  }
+});
+Object.defineProperty(exports, "nextMonth", {
+  enumerable: true,
+  get: function get() {
+    return _utils.nextMonth;
+  }
+});
+Object.defineProperty(exports, "nextHour", {
+  enumerable: true,
+  get: function get() {
+    return _utils.nextHour;
+  }
+});
+Object.defineProperty(exports, "makeUUID4", {
+  enumerable: true,
+  get: function get() {
+    return _utils.makeUUID4;
+  }
+});
+Object.defineProperty(exports, "updateQueryStringParameter", {
+  enumerable: true,
+  get: function get() {
+    return _utils.updateQueryStringParameter;
+  }
+});
+Object.defineProperty(exports, "isLaterVersion", {
+  enumerable: true,
+  get: function get() {
+    return _utils.isLaterVersion;
+  }
+});
+Object.defineProperty(exports, "isSameOriginAbsoluteUrl", {
+  enumerable: true,
+  get: function get() {
+    return _utils.isSameOriginAbsoluteUrl;
+  }
+});
+Object.defineProperty(exports, "hexStringToECPair", {
+  enumerable: true,
+  get: function get() {
+    return _utils.hexStringToECPair;
+  }
+});
+Object.defineProperty(exports, "ecPairToHexString", {
+  enumerable: true,
+  get: function get() {
+    return _utils.ecPairToHexString;
+  }
+});
+Object.defineProperty(exports, "ecPairToAddress", {
+  enumerable: true,
+  get: function get() {
+    return _utils.ecPairToAddress;
+  }
+});
+Object.defineProperty(exports, "transactions", {
+  enumerable: true,
+  get: function get() {
+    return _operations.transactions;
+  }
+});
+Object.defineProperty(exports, "safety", {
+  enumerable: true,
+  get: function get() {
+    return _operations.safety;
+  }
+});
+Object.defineProperty(exports, "TransactionSigner", {
+  enumerable: true,
+  get: function get() {
+    return _operations.TransactionSigner;
+  }
+});
+Object.defineProperty(exports, "PubkeyHashSigner", {
+  enumerable: true,
+  get: function get() {
+    return _operations.PubkeyHashSigner;
+  }
+});
+Object.defineProperty(exports, "addUTXOsToFund", {
+  enumerable: true,
+  get: function get() {
+    return _operations.addUTXOsToFund;
+  }
+});
+Object.defineProperty(exports, "estimateTXBytes", {
+  enumerable: true,
+  get: function get() {
+    return _operations.estimateTXBytes;
+  }
+});
+Object.defineProperty(exports, "BlockstackWallet", {
+  enumerable: true,
+  get: function get() {
+    return _wallet.BlockstackWallet;
+  }
+});
+Object.defineProperty(exports, "IdentityKeyPair", {
+  enumerable: true,
+  get: function get() {
+    return _wallet.IdentityKeyPair;
+  }
+});
+Object.defineProperty(exports, "network", {
+  enumerable: true,
+  get: function get() {
+    return _network.network;
+  }
+});
+Object.defineProperty(exports, "decodeToken", {
+  enumerable: true,
+  get: function get() {
+    return _jsontokens.decodeToken;
+  }
+});
+Object.defineProperty(exports, "config", {
+  enumerable: true,
+  get: function get() {
+    return _config.config;
+  }
+});
+Object.defineProperty(exports, "encryptMnemonic", {
+  enumerable: true,
+  get: function get() {
+    return _encryption.encryptMnemonic;
+  }
+});
+Object.defineProperty(exports, "decryptMnemonic", {
+  enumerable: true,
+  get: function get() {
+    return _encryption.decryptMnemonic;
+  }
+});
+Object.defineProperty(exports, "UserSession", {
+  enumerable: true,
+  get: function get() {
+    return _userSession.UserSession;
+  }
+});
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
+var _queryString = _interopRequireDefault(require("query-string"));
+
+var _auth = require("./auth");
+
+Object.keys(_auth).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _auth[key];
+    }
+  });
+});
+
+var _profiles = require("./profiles");
+
+Object.keys(_profiles).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _profiles[key];
+    }
+  });
+});
+
+var _storage = require("./storage");
+
+Object.keys(_storage).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _storage[key];
+    }
+  });
+});
+
+var _dids = require("./dids");
+
+var _keys = require("./keys");
+
+var _utils = require("./utils");
+
+var _operations = require("./operations");
+
+var _wallet = require("./wallet");
+
+var _network = require("./network");
+
+var _jsontokens = require("jsontokens");
+
+var _config = require("./config");
+
+var _encryption = require("./encryption");
+
+var _userSession = require("./auth/userSession");
+
+// TODO: Putting in here so it executes ASAP. There is probably a better place to put this.
+// Note: This prototype is designed to work as a drop-in-replacement (non-breaking upgrade)
+// for apps using blockstack.js. That requires doing this hacky global & immediate detection. 
+// A more proper approach would require developers to call an additional blockstack.js method 
+// for invoking this detection method.
+(function protocolEchoReplyDetection() {
+  // Check that the `window` APIs exist
+  if ((typeof window === "undefined" ? "undefined" : (0, _typeof2.default)(window)) !== 'object' || !window.location || !window.localStorage) {
+    // Exit detection function - we are not running in a browser environment.
+    return;
+  } // Check if the location query string contains a protocol-echo reply.
+  // If so, this page was only re-opened to signal back the originating 
+  // tab that the protocol handler is installed. 
+
+
+  var queryDict = _queryString.default.parse(window.location.search);
+
+  if (queryDict.echoReply) {
+    // Use localStorage to notify originated tab that protocol handler is available and working.
+    var echoReplyKey = "echo-reply-".concat(queryDict.echoReply); // Set the echo-reply result in localStorage for the other window to see.
+
+    window.localStorage.setItem(echoReplyKey, 'success'); // Redirect back to the localhost auth url, as opposed to another protocol launch.
+    // This will re-use the same tab rather than creating another useless one.
+
+    window.setTimeout(function () {
+      window.location = decodeURIComponent(queryDict.authContinuation);
+    }, 10);
+  }
+})();
 
 },{"./auth":509,"./auth/userSession":512,"./config":513,"./dids":514,"./encryption":515,"./keys":518,"./network":520,"./operations":521,"./profiles":527,"./storage":550,"./utils":551,"./wallet":552,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/typeof":20,"jsontokens":266,"query-string":421}],518:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "crypto", "bitcoinjs-lib"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("crypto"), require("bitcoinjs-lib"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.crypto, global.bitcoinjsLib);
-    global.keys = mod.exports;
-  }
-})(this, function (_exports, _crypto, _bitcoinjsLib) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.getEntropy = getEntropy;
-  _exports.makeECPrivateKey = makeECPrivateKey;
-  _exports.publicKeyToAddress = publicKeyToAddress;
-  _exports.getPublicKeyFromPrivate = getPublicKeyFromPrivate;
-
-  function getEntropy(numberOfBytes) {
-    if (!numberOfBytes) {
-      numberOfBytes = 32;
-    }
-
-    return (0, _crypto.randomBytes)(numberOfBytes);
-  }
-
-  function makeECPrivateKey() {
-    var keyPair = new _bitcoinjsLib.ECPair.makeRandom({
-      rng: getEntropy
-    });
-    return keyPair.privateKey.toString('hex');
-  }
-
-  function publicKeyToAddress(publicKey) {
-    var publicKeyBuffer = Buffer.from(publicKey, 'hex');
-
-    var publicKeyHash160 = _bitcoinjsLib.crypto.hash160(publicKeyBuffer);
-
-    var address = _bitcoinjsLib.address.toBase58Check(publicKeyHash160, 0x00);
-
-    return address;
-  }
-
-  function getPublicKeyFromPrivate(privateKey) {
-    var keyPair = _bitcoinjsLib.ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'));
-
-    return keyPair.publicKey.toString('hex');
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.getEntropy = getEntropy;
+exports.makeECPrivateKey = makeECPrivateKey;
+exports.publicKeyToAddress = publicKeyToAddress;
+exports.getPublicKeyFromPrivate = getPublicKeyFromPrivate;
+
+var _crypto = require("crypto");
+
+var _bitcoinjsLib = require("bitcoinjs-lib");
+
+function getEntropy(numberOfBytes) {
+  if (!numberOfBytes) {
+    numberOfBytes = 32;
+  }
+
+  return (0, _crypto.randomBytes)(numberOfBytes);
+}
+
+function makeECPrivateKey() {
+  var keyPair = new _bitcoinjsLib.ECPair.makeRandom({
+    rng: getEntropy
+  });
+  return keyPair.privateKey.toString('hex');
+}
+
+function publicKeyToAddress(publicKey) {
+  var publicKeyBuffer = Buffer.from(publicKey, 'hex');
+
+  var publicKeyHash160 = _bitcoinjsLib.crypto.hash160(publicKeyBuffer);
+
+  var address = _bitcoinjsLib.address.toBase58Check(publicKeyHash160, 0x00);
+
+  return address;
+}
+
+function getPublicKeyFromPrivate(privateKey) {
+  var keyPair = _bitcoinjsLib.ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'));
+
+  return keyPair.publicKey.toString('hex');
+}
 
 }).call(this,require("buffer").Buffer)
 },{"bitcoinjs-lib":73,"buffer":149,"crypto":169}],519:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "./config"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("./config"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.config);
-    global.logger = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _config) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Logger = _exports.levels = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  var levels = ['debug', 'info', 'warn', 'error', 'none'];
-  _exports.levels = levels;
-  var levelToInt = {};
-  var intToLevel = {};
-
-  for (var index = 0; index < levels.length; index++) {
-    var level = levels[index];
-    levelToInt[level] = index;
-    intToLevel[index] = level;
-  }
-
-  var Logger =
-  /*#__PURE__*/
-  function () {
-    function Logger() {
-      (0, _classCallCheck2.default)(this, Logger);
-    }
-
-    (0, _createClass2.default)(Logger, null, [{
-      key: "error",
-      value: function error(message) {
-        if (!this.shouldLog('error')) return;
-        console.error(this.logMessage('error', message));
-      }
-    }, {
-      key: "warn",
-      value: function warn(message) {
-        if (!this.shouldLog('warn')) return;
-        console.warn(this.logMessage('warn', message));
-      }
-    }, {
-      key: "info",
-      value: function info(message) {
-        if (!this.shouldLog('info')) return;
-        console.log(this.logMessage('info', message));
-      }
-    }, {
-      key: "debug",
-      value: function debug(message) {
-        if (!this.shouldLog('debug')) return;
-        console.log(this.logMessage('debug', message));
-      }
-    }, {
-      key: "logMessage",
-      value: function logMessage(level, message) {
-        return "[".concat(level.toUpperCase(), "] ").concat(message);
-      }
-    }, {
-      key: "shouldLog",
-      value: function shouldLog(level) {
-        var currentLevel = levelToInt[_config.config.logLevel];
-        return currentLevel <= levelToInt[level];
-      }
-    }]);
-    return Logger;
-  }();
-
-  _exports.Logger = Logger;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.Logger = exports.levels = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _config = require("./config");
+
+var levels = ['debug', 'info', 'warn', 'error', 'none'];
+exports.levels = levels;
+var levelToInt = {};
+var intToLevel = {};
+
+for (var index = 0; index < levels.length; index++) {
+  var level = levels[index];
+  levelToInt[level] = index;
+  intToLevel[index] = level;
+}
+
+var Logger =
+/*#__PURE__*/
+function () {
+  function Logger() {
+    (0, _classCallCheck2.default)(this, Logger);
+  }
+
+  (0, _createClass2.default)(Logger, null, [{
+    key: "error",
+    value: function error(message) {
+      if (!this.shouldLog('error')) return;
+      console.error(this.logMessage('error', message));
+    }
+  }, {
+    key: "warn",
+    value: function warn(message) {
+      if (!this.shouldLog('warn')) return;
+      console.warn(this.logMessage('warn', message));
+    }
+  }, {
+    key: "info",
+    value: function info(message) {
+      if (!this.shouldLog('info')) return;
+      console.log(this.logMessage('info', message));
+    }
+  }, {
+    key: "debug",
+    value: function debug(message) {
+      if (!this.shouldLog('debug')) return;
+      console.log(this.logMessage('debug', message));
+    }
+  }, {
+    key: "logMessage",
+    value: function logMessage(level, message) {
+      return "[".concat(level.toUpperCase(), "] ").concat(message);
+    }
+  }, {
+    key: "shouldLog",
+    value: function shouldLog(level) {
+      var currentLevel = levelToInt[_config.config.logLevel];
+      return currentLevel <= levelToInt[level];
+    }
+  }]);
+  return Logger;
+}();
+
+exports.Logger = Logger;
 
 },{"./config":513,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11}],520:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/assertThisInitialized", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/inherits", "@babel/runtime/helpers/slicedToArray", "@babel/runtime/helpers/defineProperty", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "bitcoinjs-lib", "form-data", "bigi", "ripemd160", "./errors", "./logger"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/assertThisInitialized"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/inherits"), require("@babel/runtime/helpers/slicedToArray"), require("@babel/runtime/helpers/defineProperty"), require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("bitcoinjs-lib"), require("form-data"), require("bigi"), require("ripemd160"), require("./errors"), require("./logger"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.assertThisInitialized, global.possibleConstructorReturn, global.getPrototypeOf, global.inherits, global.slicedToArray, global.defineProperty, global.classCallCheck, global.createClass, global.bitcoinjsLib, global.formData, global.bigi, global.ripemd160, global.errors, global.logger);
-    global.network = mod.exports;
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.network = exports.BlockchainInfoApi = exports.InsightClient = exports.BitcoindAPI = exports.LocalRegtest = exports.BlockstackNetwork = exports.BitcoinNetwork = void 0;
+
+var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _bitcoinjsLib = _interopRequireDefault(require("bitcoinjs-lib"));
+
+var _formData = _interopRequireDefault(require("form-data"));
+
+var _bigi = _interopRequireDefault(require("bigi"));
+
+var _ripemd = _interopRequireDefault(require("ripemd160"));
+
+var _errors = require("./errors");
+
+var _logger = require("./logger");
+
+var SATOSHIS_PER_BTC = 1e8;
+var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
+var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
+var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
+
+var BitcoinNetwork =
+/*#__PURE__*/
+function () {
+  function BitcoinNetwork() {
+    (0, _classCallCheck2.default)(this, BitcoinNetwork);
   }
-})(this, function (_exports, _assertThisInitialized2, _possibleConstructorReturn2, _getPrototypeOf2, _inherits2, _slicedToArray2, _defineProperty2, _classCallCheck2, _createClass2, _bitcoinjsLib, _formData, _bigi, _ripemd, _errors, _logger) {
-  "use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.network = _exports.BlockchainInfoApi = _exports.InsightClient = _exports.BitcoindAPI = _exports.LocalRegtest = _exports.BlockstackNetwork = _exports.BitcoinNetwork = void 0;
-  _assertThisInitialized2 = _interopRequireDefault(_assertThisInitialized2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _slicedToArray2 = _interopRequireDefault(_slicedToArray2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _bitcoinjsLib = _interopRequireDefault(_bitcoinjsLib);
-  _formData = _interopRequireDefault(_formData);
-  _bigi = _interopRequireDefault(_bigi);
-  _ripemd = _interopRequireDefault(_ripemd);
-  var SATOSHIS_PER_BTC = 1e8;
-  var TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file';
-  var TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration';
-  var TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction';
-
-  var BitcoinNetwork =
-  /*#__PURE__*/
-  function () {
-    function BitcoinNetwork() {
-      (0, _classCallCheck2.default)(this, BitcoinNetwork);
+  (0, _createClass2.default)(BitcoinNetwork, [{
+    key: "broadcastTransaction",
+    value: function broadcastTransaction(transaction) {
+      return Promise.reject(new Error("Not implemented, broadcastTransaction(".concat(transaction, ")")));
     }
-
-    (0, _createClass2.default)(BitcoinNetwork, [{
-      key: "broadcastTransaction",
-      value: function broadcastTransaction(transaction) {
-        return Promise.reject(new Error("Not implemented, broadcastTransaction(".concat(transaction, ")")));
-      }
-    }, {
-      key: "getBlockHeight",
-      value: function getBlockHeight() {
-        return Promise.reject(new Error('Not implemented, getBlockHeight()'));
-      }
-    }, {
-      key: "getTransactionInfo",
-      value: function getTransactionInfo(txid) {
-        return Promise.reject(new Error("Not implemented, getTransactionInfo(".concat(txid, ")")));
-      }
-    }, {
-      key: "getNetworkedUTXOs",
-      value: function getNetworkedUTXOs(address) {
-        return Promise.reject(new Error("Not implemented, getNetworkedUTXOs(".concat(address, ")")));
-      }
-    }]);
-    return BitcoinNetwork;
-  }();
-
-  _exports.BitcoinNetwork = BitcoinNetwork;
-
-  var BlockstackNetwork =
-  /*#__PURE__*/
-  function () {
-    function BlockstackNetwork(apiUrl, broadcastServiceUrl, bitcoinAPI) {
-      var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib.default.networks.bitcoin;
-      (0, _classCallCheck2.default)(this, BlockstackNetwork);
-      (0, _defineProperty2.default)(this, "blockstackAPIUrl", void 0);
-      (0, _defineProperty2.default)(this, "broadcastServiceUrl", void 0);
-      (0, _defineProperty2.default)(this, "layer1", void 0);
-      (0, _defineProperty2.default)(this, "DUST_MINIMUM", void 0);
-      (0, _defineProperty2.default)(this, "includeUtxoMap", void 0);
-      (0, _defineProperty2.default)(this, "excludeUtxoSet", void 0);
-      (0, _defineProperty2.default)(this, "btc", void 0);
-      (0, _defineProperty2.default)(this, "MAGIC_BYTES", void 0);
-      this.blockstackAPIUrl = apiUrl;
-      this.broadcastServiceUrl = broadcastServiceUrl;
-      this.layer1 = network;
-      this.btc = bitcoinAPI;
-      this.DUST_MINIMUM = 5500;
-      this.includeUtxoMap = {};
-      this.excludeUtxoSet = [];
-      this.MAGIC_BYTES = 'id';
+  }, {
+    key: "getBlockHeight",
+    value: function getBlockHeight() {
+      return Promise.reject(new Error('Not implemented, getBlockHeight()'));
     }
+  }, {
+    key: "getTransactionInfo",
+    value: function getTransactionInfo(txid) {
+      return Promise.reject(new Error("Not implemented, getTransactionInfo(".concat(txid, ")")));
+    }
+  }, {
+    key: "getNetworkedUTXOs",
+    value: function getNetworkedUTXOs(address) {
+      return Promise.reject(new Error("Not implemented, getNetworkedUTXOs(".concat(address, ")")));
+    }
+  }]);
+  return BitcoinNetwork;
+}();
 
-    (0, _createClass2.default)(BlockstackNetwork, [{
-      key: "coerceAddress",
-      value: function coerceAddress(address) {
-        var _bitcoinjs$address$fr = _bitcoinjsLib.default.address.fromBase58Check(address),
-            hash = _bitcoinjs$address$fr.hash,
-            version = _bitcoinjs$address$fr.version;
+exports.BitcoinNetwork = BitcoinNetwork;
 
-        var scriptHashes = [_bitcoinjsLib.default.networks.bitcoin.scriptHash, _bitcoinjsLib.default.networks.testnet.scriptHash];
-        var pubKeyHashes = [_bitcoinjsLib.default.networks.bitcoin.pubKeyHash, _bitcoinjsLib.default.networks.testnet.pubKeyHash];
-        var coercedVersion;
+var BlockstackNetwork =
+/*#__PURE__*/
+function () {
+  function BlockstackNetwork(apiUrl, broadcastServiceUrl, bitcoinAPI) {
+    var network = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _bitcoinjsLib.default.networks.bitcoin;
+    (0, _classCallCheck2.default)(this, BlockstackNetwork);
+    (0, _defineProperty2.default)(this, "blockstackAPIUrl", void 0);
+    (0, _defineProperty2.default)(this, "broadcastServiceUrl", void 0);
+    (0, _defineProperty2.default)(this, "layer1", void 0);
+    (0, _defineProperty2.default)(this, "DUST_MINIMUM", void 0);
+    (0, _defineProperty2.default)(this, "includeUtxoMap", void 0);
+    (0, _defineProperty2.default)(this, "excludeUtxoSet", void 0);
+    (0, _defineProperty2.default)(this, "btc", void 0);
+    (0, _defineProperty2.default)(this, "MAGIC_BYTES", void 0);
+    this.blockstackAPIUrl = apiUrl;
+    this.broadcastServiceUrl = broadcastServiceUrl;
+    this.layer1 = network;
+    this.btc = bitcoinAPI;
+    this.DUST_MINIMUM = 5500;
+    this.includeUtxoMap = {};
+    this.excludeUtxoSet = [];
+    this.MAGIC_BYTES = 'id';
+  }
 
-        if (scriptHashes.indexOf(version) >= 0) {
-          coercedVersion = this.layer1.scriptHash;
-        } else if (pubKeyHashes.indexOf(version) >= 0) {
-          coercedVersion = this.layer1.pubKeyHash;
-        } else {
-          throw new Error("Unrecognized address version number ".concat(version, " in ").concat(address));
+  (0, _createClass2.default)(BlockstackNetwork, [{
+    key: "coerceAddress",
+    value: function coerceAddress(address) {
+      var _bitcoinjs$address$fr = _bitcoinjsLib.default.address.fromBase58Check(address),
+          hash = _bitcoinjs$address$fr.hash,
+          version = _bitcoinjs$address$fr.version;
+
+      var scriptHashes = [_bitcoinjsLib.default.networks.bitcoin.scriptHash, _bitcoinjsLib.default.networks.testnet.scriptHash];
+      var pubKeyHashes = [_bitcoinjsLib.default.networks.bitcoin.pubKeyHash, _bitcoinjsLib.default.networks.testnet.pubKeyHash];
+      var coercedVersion;
+
+      if (scriptHashes.indexOf(version) >= 0) {
+        coercedVersion = this.layer1.scriptHash;
+      } else if (pubKeyHashes.indexOf(version) >= 0) {
+        coercedVersion = this.layer1.pubKeyHash;
+      } else {
+        throw new Error("Unrecognized address version number ".concat(version, " in ").concat(address));
+      }
+
+      return _bitcoinjsLib.default.address.toBase58Check(hash, coercedVersion);
+    }
+  }, {
+    key: "getDefaultBurnAddress",
+    value: function getDefaultBurnAddress() {
+      return this.coerceAddress('1111111111111111111114oLvT2');
+    }
+    /**
+     * Get the price of a name via the legacy /v1/prices API endpoint.
+     * @param {String} fullyQualifiedName the name to query
+     * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
+     * @private
+     */
+
+  }, {
+    key: "getNamePriceV1",
+    value: function getNamePriceV1(fullyQualifiedName) {
+      var _this = this;
+
+      // legacy code path
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/prices/names/").concat(fullyQualifiedName)).then(function (resp) {
+        if (!resp.ok) {
+          throw new Error("Failed to query name price for ".concat(fullyQualifiedName));
         }
 
-        return _bitcoinjsLib.default.address.toBase58Check(hash, coercedVersion);
-      }
-    }, {
-      key: "getDefaultBurnAddress",
-      value: function getDefaultBurnAddress() {
-        return this.coerceAddress('1111111111111111111114oLvT2');
-      }
-      /**
-       * Get the price of a name via the legacy /v1/prices API endpoint.
-       * @param {String} fullyQualifiedName the name to query
-       * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
-       * @private
-       */
-
-    }, {
-      key: "getNamePriceV1",
-      value: function getNamePriceV1(fullyQualifiedName) {
-        var _this = this;
-
-        // legacy code path
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/prices/names/").concat(fullyQualifiedName)).then(function (resp) {
-          if (!resp.ok) {
-            throw new Error("Failed to query name price for ".concat(fullyQualifiedName));
-          }
-
-          return resp;
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (resp) {
-          return resp.name_price;
-        }).then(function (namePrice) {
-          if (!namePrice || !namePrice.satoshis) {
-            throw new Error("Failed to get price for ".concat(fullyQualifiedName, ". Does the namespace exist?"));
-          }
-
-          if (namePrice.satoshis < _this.DUST_MINIMUM) {
-            namePrice.satoshis = _this.DUST_MINIMUM;
-          }
-
-          var result = {
-            units: 'BTC',
-            amount: _bigi.default.fromByteArrayUnsigned(String(namePrice.satoshis))
-          };
-          return result;
-        });
-      }
-      /**
-       * Get the price of a namespace via the legacy /v1/prices API endpoint.
-       * @param {String} namespaceID the namespace to query
-       * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
-       * @private
-       */
-
-    }, {
-      key: "getNamespacePriceV1",
-      value: function getNamespacePriceV1(namespaceID) {
-        var _this2 = this;
-
-        // legacy code path
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/prices/namespaces/").concat(namespaceID)).then(function (resp) {
-          if (!resp.ok) {
-            throw new Error("Failed to query name price for ".concat(namespaceID));
-          }
-
-          return resp;
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (namespacePrice) {
-          if (!namespacePrice || !namespacePrice.satoshis) {
-            throw new Error("Failed to get price for ".concat(namespaceID));
-          }
-
-          if (namespacePrice.satoshis < _this2.DUST_MINIMUM) {
-            namespacePrice.satoshis = _this2.DUST_MINIMUM;
-          }
-
-          var result = {
-            units: 'BTC',
-            amount: _bigi.default.fromByteArrayUnsigned(String(namespacePrice.satoshis))
-          };
-          return result;
-        });
-      }
-      /**
-       * Get the price of a name via the /v2/prices API endpoint.
-       * @param {String} fullyQualifiedName the name to query
-       * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
-       * @private
-       */
-
-    }, {
-      key: "getNamePriceV2",
-      value: function getNamePriceV2(fullyQualifiedName) {
-        var _this3 = this;
-
-        return fetch("".concat(this.blockstackAPIUrl, "/v2/prices/names/").concat(fullyQualifiedName)).then(function (resp) {
-          if (resp.status !== 200) {
-            // old core node 
-            throw new Error('The upstream node does not handle the /v2/ price namespace');
-          }
-
-          return resp;
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (resp) {
-          return resp.name_price;
-        }).then(function (namePrice) {
-          if (!namePrice) {
-            throw new Error("Failed to get price for ".concat(fullyQualifiedName, ". Does the namespace exist?"));
-          }
-
-          var result = {
-            units: namePrice.units,
-            amount: _bigi.default.fromByteArrayUnsigned(namePrice.amount)
-          };
-
-          if (namePrice.units === 'BTC') {
-            // must be at least dust-minimum
-            var dustMin = _bigi.default.fromByteArrayUnsigned(String(_this3.DUST_MINIMUM));
-
-            if (result.amount.compareTo(dustMin) < 0) {
-              result.amount = dustMin;
-            }
-          }
-
-          return result;
-        });
-      }
-      /**
-       * Get the price of a namespace via the /v2/prices API endpoint.
-       * @param {String} namespaceID the namespace to query
-       * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
-       * @private
-       */
-
-    }, {
-      key: "getNamespacePriceV2",
-      value: function getNamespacePriceV2(namespaceID) {
-        var _this4 = this;
-
-        return fetch("".concat(this.blockstackAPIUrl, "/v2/prices/namespaces/").concat(namespaceID)).then(function (resp) {
-          if (resp.status !== 200) {
-            // old core node 
-            throw new Error('The upstream node does not handle the /v2/ price namespace');
-          }
-
-          return resp;
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (namespacePrice) {
-          if (!namespacePrice) {
-            throw new Error("Failed to get price for ".concat(namespaceID));
-          }
-
-          var result = {
-            units: namespacePrice.units,
-            amount: _bigi.default.fromByteArrayUnsigned(namespacePrice.amount)
-          };
-
-          if (namespacePrice.units === 'BTC') {
-            // must be at least dust-minimum
-            var dustMin = _bigi.default.fromByteArrayUnsigned(String(_this4.DUST_MINIMUM));
-
-            if (result.amount.compareTo(dustMin) < 0) {
-              result.amount = dustMin;
-            }
-          }
-
-          return result;
-        });
-      }
-      /**
-       * Get the price of a name.
-       * @param {String} fullyQualifiedName the name to query
-       * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }, where
-       *   .units encodes the cryptocurrency units to pay (e.g. BTC, STACKS), and
-       *   .amount encodes the number of units, in the smallest denominiated amount
-       *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
-       *   .amount will be microStacks)
-       */
-
-    }, {
-      key: "getNamePrice",
-      value: function getNamePrice(fullyQualifiedName) {
-        var _this5 = this;
-
-        // handle v1 or v2 
-        return Promise.resolve().then(function () {
-          return _this5.getNamePriceV2(fullyQualifiedName);
-        }).catch(function () {
-          return _this5.getNamePriceV1(fullyQualifiedName);
-        });
-      }
-      /**
-       * Get the price of a namespace
-       * @param {String} namespaceID the namespace to query
-       * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }, where
-       *   .units encodes the cryptocurrency units to pay (e.g. BTC, STACKS), and
-       *   .amount encodes the number of units, in the smallest denominiated amount
-       *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
-       *   .amount will be microStacks)
-       */
-
-    }, {
-      key: "getNamespacePrice",
-      value: function getNamespacePrice(namespaceID) {
-        var _this6 = this;
-
-        // handle v1 or v2 
-        return Promise.resolve().then(function () {
-          return _this6.getNamespacePriceV2(namespaceID);
-        }).catch(function () {
-          return _this6.getNamespacePriceV1(namespaceID);
-        });
-      }
-      /**
-       * How many blocks can pass between a name expiring and the name being able to be
-       * re-registered by a different owner?
-       * @return {Promise} a promise to the number of blocks
-       */
-
-    }, {
-      key: "getGracePeriod",
-      value: function getGracePeriod() {
-        return Promise.resolve(5000);
-      }
-      /**
-       * Get the names -- both on-chain and off-chain -- owned by an address.
-       * @param {String} address the blockchain address (the hash of the owner public key)
-       * @return {Promise} a promise that resolves to a list of names (Strings)
-       */
-
-    }, {
-      key: "getNamesOwned",
-      value: function getNamesOwned(address) {
-        var networkAddress = this.coerceAddress(address);
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/addresses/bitcoin/").concat(networkAddress)).then(function (resp) {
-          return resp.json();
-        }).then(function (obj) {
-          return obj.names;
-        });
-      }
-      /**
-       * Get the blockchain address to which a name's registration fee must be sent
-       * (the address will depend on the namespace in which it is registered.)
-       * @param {String} namespace the namespace ID
-       * @return {Promise} a promise that resolves to an address (String)
-       */
-
-    }, {
-      key: "getNamespaceBurnAddress",
-      value: function getNamespaceBurnAddress(namespace) {
-        var _this7 = this;
-
-        return Promise.all([fetch("".concat(this.blockstackAPIUrl, "/v1/namespaces/").concat(namespace)), this.getBlockHeight()]).then(function (_ref) {
-          var _ref2 = (0, _slicedToArray2.default)(_ref, 2),
-              resp = _ref2[0],
-              blockHeight = _ref2[1];
-
-          if (resp.status === 404) {
-            throw new Error("No such namespace '".concat(namespace, "'"));
-          } else {
-            return Promise.all([resp.json(), blockHeight]);
-          }
-        }).then(function (_ref3) {
-          var _ref4 = (0, _slicedToArray2.default)(_ref3, 2),
-              namespaceInfo = _ref4[0],
-              blockHeight = _ref4[1];
-
-          var address = _this7.getDefaultBurnAddress();
-
-          if (namespaceInfo.version === 2) {
-            // pay-to-namespace-creator if this namespace is less than 1 year old
-            if (namespaceInfo.reveal_block + 52595 >= blockHeight) {
-              address = namespaceInfo.address;
-            }
-          }
-
-          return address;
-        }).then(function (address) {
-          return _this7.coerceAddress(address);
-        });
-      }
-      /**
-       * Get WHOIS-like information for a name, including the address that owns it,
-       * the block at which it expires, and the zone file anchored to it (if available).
-       * @param {String} fullyQualifiedName the name to query.  Can be on-chain of off-chain.
-       * @return {Promise} a promise that resolves to the WHOIS-like information 
-       */
-
-    }, {
-      key: "getNameInfo",
-      value: function getNameInfo(fullyQualifiedName) {
-        var _this8 = this;
-
-        _logger.Logger.debug(this.blockstackAPIUrl);
-
-        var nameLookupURL = "".concat(this.blockstackAPIUrl, "/v1/names/").concat(fullyQualifiedName);
-        return fetch(nameLookupURL).then(function (resp) {
-          if (resp.status === 404) {
-            throw new Error('Name not found');
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (nameInfo) {
-          _logger.Logger.debug("nameInfo: ".concat(JSON.stringify(nameInfo))); // the returned address _should_ be in the correct network ---
-          //  blockstackd gets into trouble because it tries to coerce back to mainnet
-          //  and the regtest transaction generation libraries want to use testnet addresses
-
-
-          if (nameInfo.address) {
-            return Object.assign({}, nameInfo, {
-              address: _this8.coerceAddress(nameInfo.address)
-            });
-          } else {
-            return nameInfo;
-          }
-        });
-      }
-      /**
-       * Get the pricing parameters and creation history of a namespace.
-       * @param {String} namespaceID the namespace to query
-       * @return {Promise} a promise that resolves to the namespace information.
-       */
-
-    }, {
-      key: "getNamespaceInfo",
-      value: function getNamespaceInfo(namespaceID) {
-        var _this9 = this;
-
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/namespaces/").concat(namespaceID)).then(function (resp) {
-          if (resp.status === 404) {
-            throw new Error('Namespace not found');
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (namespaceInfo) {
-          // the returned address _should_ be in the correct network ---
-          //  blockstackd gets into trouble because it tries to coerce back to mainnet
-          //  and the regtest transaction generation libraries want to use testnet addresses
-          if (namespaceInfo.address && namespaceInfo.recipient_address) {
-            return Object.assign({}, namespaceInfo, {
-              address: _this9.coerceAddress(namespaceInfo.address),
-              recipient_address: _this9.coerceAddress(namespaceInfo.recipient_address)
-            });
-          } else {
-            return namespaceInfo;
-          }
-        });
-      }
-      /**
-       * Get a zone file, given its hash.  Throws an exception if the zone file
-       * obtained does not match the hash.
-       * @param {String} zonefileHash the ripemd160(sha256) hash of the zone file
-       * @return {Promise} a promise that resolves to the zone file's text
-       */
-
-    }, {
-      key: "getZonefile",
-      value: function getZonefile(zonefileHash) {
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/zonefiles/").concat(zonefileHash)).then(function (resp) {
-          if (resp.status === 200) {
-            return resp.text().then(function (body) {
-              var sha256 = _bitcoinjsLib.default.crypto.sha256(body);
-
-              var h = new _ripemd.default().update(sha256).digest('hex');
-
-              if (h !== zonefileHash) {
-                throw new Error("Zone file contents hash to ".concat(h, ", not ").concat(zonefileHash));
-              }
-
-              return body;
-            });
-          } else {
-            throw new Error("Bad response status: ".concat(resp.status));
-          }
-        });
-      }
-      /**
-       * Get the status of an account for a particular token holding.  This includes its total number of
-       * expenditures and credits, lockup times, last txid, and so on.
-       * @param {String} address the account
-       * @param {String} tokenType the token type to query
-       * @return {Promise} a promise that resolves to an object representing the state of the account
-       *   for this token
-       */
-
-    }, {
-      key: "getAccountStatus",
-      value: function getAccountStatus(address, tokenType) {
-        var _this10 = this;
-
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/").concat(tokenType, "/status")).then(function (resp) {
-          if (resp.status === 404) {
-            throw new Error('Account not found');
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (accountStatus) {
-          // coerce all addresses, and convert credit/debit to biginteger
-          var formattedStatus = Object.assign({}, accountStatus, {
-            address: _this10.coerceAddress(accountStatus.address),
-            debit_value: _bigi.default.fromByteArrayUnsigned(String(accountStatus.debit_value)),
-            credit_value: _bigi.default.fromByteArrayUnsigned(String(accountStatus.credit_value))
-          });
-          return formattedStatus;
-        });
-      }
-      /**
-       * Get a page of an account's transaction history.
-       * @param {String} address the account's address
-       * @param {number} page the page number.  Page 0 is the most recent transactions
-       * @return {Promise} a promise that resolves to an Array of Objects, where each Object encodes
-       *   states of the account at various block heights (e.g. prior balances, txids, etc)
-       */
-
-    }, {
-      key: "getAccountHistoryPage",
-      value: function getAccountHistoryPage(address, page) {
-        var _this11 = this;
-
-        var url = "".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/history?page=").concat(page);
-        return fetch(url).then(function (resp) {
-          if (resp.status === 404) {
-            throw new Error('Account not found');
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (historyList) {
-          if (historyList.error) {
-            throw new Error("Unable to get account history page: ".concat(historyList.error));
-          } // coerse all addresses and convert to bigint
-
-
-          return historyList.map(function (histEntry) {
-            histEntry.address = _this11.coerceAddress(histEntry.address);
-            histEntry.debit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.debit_value));
-            histEntry.credit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.credit_value));
-            return histEntry;
-          });
-        });
-      }
-      /**
-       * Get the state(s) of an account at a particular block height.  This includes the state of the
-       * account beginning with this block's transactions, as well as all of the states the account
-       * passed through when this block was processed (if any).
-       * @param {String} address the account's address
-       * @param {Integer} blockHeight the block to query
-       * @return {Promise} a promise that resolves to an Array of Objects, where each Object encodes
-       *   states of the account at this block.
-       */
-
-    }, {
-      key: "getAccountAt",
-      value: function getAccountAt(address, blockHeight) {
-        var _this12 = this;
-
-        var url = "".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/history/").concat(blockHeight);
-        return fetch(url).then(function (resp) {
-          if (resp.status === 404) {
-            throw new Error('Account not found');
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (historyList) {
-          if (historyList.error) {
-            throw new Error("Unable to get historic account state: ".concat(historyList.error));
-          } // coerce all addresses 
-
-
-          return historyList.map(function (histEntry) {
-            histEntry.address = _this12.coerceAddress(histEntry.address);
-            histEntry.debit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.debit_value));
-            histEntry.credit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.credit_value));
-            return histEntry;
-          });
-        });
-      }
-      /**
-       * Get the set of token types that this account owns
-       * @param {String} address the account's address
-       * @return {Promise} a promise that resolves to an Array of Strings, where each item encodes the 
-       *   type of token this account holds (excluding the underlying blockchain's tokens)
-       */
-
-    }, {
-      key: "getAccountTokens",
-      value: function getAccountTokens(address) {
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/tokens")).then(function (resp) {
-          if (resp.status === 404) {
-            throw new Error('Account not found');
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (tokenList) {
-          if (tokenList.error) {
-            throw new Error("Unable to get token list: ".concat(tokenList.error));
-          }
-
-          return tokenList;
-        });
-      }
-      /**
-       * Get the number of tokens owned by an account.  If the account does not exist or has no
-       * tokens of this type, then 0 will be returned.
-       * @param {String} address the account's address
-       * @param {String} tokenType the type of token to query.
-       * @return {Promise} a promise that resolves to a BigInteger that encodes the number of tokens 
-       *   held by this account.
-       */
-
-    }, {
-      key: "getAccountBalance",
-      value: function getAccountBalance(address, tokenType) {
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/").concat(tokenType, "/balance")).then(function (resp) {
-          if (resp.status === 404) {
-            // talking to an older blockstack core node without the accounts API
-            return Promise.resolve().then(function () {
-              return _bigi.default.fromByteArrayUnsigned('0');
-            });
-          } else if (resp.status !== 200) {
-            throw new Error("Bad response status: ".concat(resp.status));
-          } else {
-            return resp.json();
-          }
-        }).then(function (tokenBalance) {
-          if (tokenBalance.error) {
-            throw new Error("Unable to get account balance: ".concat(tokenBalance.error));
-          }
-
-          var balance = '0';
-
-          if (tokenBalance && tokenBalance.balance) {
-            balance = tokenBalance.balance;
-          }
-
-          return _bigi.default.fromByteArrayUnsigned(balance);
-        });
-      }
-      /**
-       * Performs a POST request to the given URL
-       * @param  {String} endpoint  the name of
-       * @param  {String} body [description]
-       * @return {Promise<Object|Error>} Returns a `Promise` that resolves to the object requested.
-       * In the event of an error, it rejects with:
-       * * a `RemoteServiceError` if there is a problem
-       * with the transaction broadcast service
-       * * `MissingParameterError` if you call the function without a required
-       * parameter
-       *
-       * @private
-       */
-
-    }, {
-      key: "broadcastServiceFetchHelper",
-      value: function broadcastServiceFetchHelper(endpoint, body) {
-        var requestHeaders = {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
+        return resp;
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (resp) {
+        return resp.name_price;
+      }).then(function (namePrice) {
+        if (!namePrice || !namePrice.satoshis) {
+          throw new Error("Failed to get price for ".concat(fullyQualifiedName, ". Does the namespace exist?"));
+        }
+
+        if (namePrice.satoshis < _this.DUST_MINIMUM) {
+          namePrice.satoshis = _this.DUST_MINIMUM;
+        }
+
+        var result = {
+          units: 'BTC',
+          amount: _bigi.default.fromByteArrayUnsigned(String(namePrice.satoshis))
         };
-        var options = {
-          method: 'POST',
-          headers: requestHeaders,
-          body: JSON.stringify(body)
+        return result;
+      });
+    }
+    /**
+     * Get the price of a namespace via the legacy /v1/prices API endpoint.
+     * @param {String} namespaceID the namespace to query
+     * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
+     * @private
+     */
+
+  }, {
+    key: "getNamespacePriceV1",
+    value: function getNamespacePriceV1(namespaceID) {
+      var _this2 = this;
+
+      // legacy code path
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/prices/namespaces/").concat(namespaceID)).then(function (resp) {
+        if (!resp.ok) {
+          throw new Error("Failed to query name price for ".concat(namespaceID));
+        }
+
+        return resp;
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (namespacePrice) {
+        if (!namespacePrice || !namespacePrice.satoshis) {
+          throw new Error("Failed to get price for ".concat(namespaceID));
+        }
+
+        if (namespacePrice.satoshis < _this2.DUST_MINIMUM) {
+          namespacePrice.satoshis = _this2.DUST_MINIMUM;
+        }
+
+        var result = {
+          units: 'BTC',
+          amount: _bigi.default.fromByteArrayUnsigned(String(namespacePrice.satoshis))
         };
-        var url = "".concat(this.broadcastServiceUrl, "/v1/broadcast/").concat(endpoint);
-        return fetch(url, options).then(function (response) {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new _errors.RemoteServiceError(response);
+        return result;
+      });
+    }
+    /**
+     * Get the price of a name via the /v2/prices API endpoint.
+     * @param {String} fullyQualifiedName the name to query
+     * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
+     * @private
+     */
+
+  }, {
+    key: "getNamePriceV2",
+    value: function getNamePriceV2(fullyQualifiedName) {
+      var _this3 = this;
+
+      return fetch("".concat(this.blockstackAPIUrl, "/v2/prices/names/").concat(fullyQualifiedName)).then(function (resp) {
+        if (resp.status !== 200) {
+          // old core node 
+          throw new Error('The upstream node does not handle the /v2/ price namespace');
+        }
+
+        return resp;
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (resp) {
+        return resp.name_price;
+      }).then(function (namePrice) {
+        if (!namePrice) {
+          throw new Error("Failed to get price for ".concat(fullyQualifiedName, ". Does the namespace exist?"));
+        }
+
+        var result = {
+          units: namePrice.units,
+          amount: _bigi.default.fromByteArrayUnsigned(namePrice.amount)
+        };
+
+        if (namePrice.units === 'BTC') {
+          // must be at least dust-minimum
+          var dustMin = _bigi.default.fromByteArrayUnsigned(String(_this3.DUST_MINIMUM));
+
+          if (result.amount.compareTo(dustMin) < 0) {
+            result.amount = dustMin;
           }
-        });
-      }
-      /**
-      * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
-      * transaction until a second transaction has a certain number of confirmations.
-      *
-      * @param  {string} transaction the hex-encoded transaction to broadcast
-      * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
-      * the specified number of confirmations before broadcasting the `transaction`
-      * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
-      * before broadcasting `transaction`.
-      * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
-      * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
-      *
-      * In the event of an error, it rejects with:
-      * * a `RemoteServiceError` if there is a problem
-      *   with the transaction broadcast service
-      * * `MissingParameterError` if you call the function without a required
-      *   parameter
-      * @private
-      */
-
-    }, {
-      key: "broadcastTransaction",
-      value: function broadcastTransaction(transaction) {
-        var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var confirmations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 6;
-
-        if (!transaction) {
-          var error = new _errors.MissingParameterError('transaction');
-          return Promise.reject(error);
         }
 
-        if (!confirmations && confirmations !== 0) {
-          var _error = new _errors.MissingParameterError('confirmations');
+        return result;
+      });
+    }
+    /**
+     * Get the price of a namespace via the /v2/prices API endpoint.
+     * @param {String} namespaceID the namespace to query
+     * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
+     * @private
+     */
 
-          return Promise.reject(_error);
+  }, {
+    key: "getNamespacePriceV2",
+    value: function getNamespacePriceV2(namespaceID) {
+      var _this4 = this;
+
+      return fetch("".concat(this.blockstackAPIUrl, "/v2/prices/namespaces/").concat(namespaceID)).then(function (resp) {
+        if (resp.status !== 200) {
+          // old core node 
+          throw new Error('The upstream node does not handle the /v2/ price namespace');
         }
 
-        if (transactionToWatch === null) {
-          return this.btc.broadcastTransaction(transaction);
+        return resp;
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (namespacePrice) {
+        if (!namespacePrice) {
+          throw new Error("Failed to get price for ".concat(namespaceID));
+        }
+
+        var result = {
+          units: namespacePrice.units,
+          amount: _bigi.default.fromByteArrayUnsigned(namespacePrice.amount)
+        };
+
+        if (namespacePrice.units === 'BTC') {
+          // must be at least dust-minimum
+          var dustMin = _bigi.default.fromByteArrayUnsigned(String(_this4.DUST_MINIMUM));
+
+          if (result.amount.compareTo(dustMin) < 0) {
+            result.amount = dustMin;
+          }
+        }
+
+        return result;
+      });
+    }
+    /**
+     * Get the price of a name.
+     * @param {String} fullyQualifiedName the name to query
+     * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }, where
+     *   .units encodes the cryptocurrency units to pay (e.g. BTC, STACKS), and
+     *   .amount encodes the number of units, in the smallest denominiated amount
+     *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
+     *   .amount will be microStacks)
+     */
+
+  }, {
+    key: "getNamePrice",
+    value: function getNamePrice(fullyQualifiedName) {
+      var _this5 = this;
+
+      // handle v1 or v2 
+      return Promise.resolve().then(function () {
+        return _this5.getNamePriceV2(fullyQualifiedName);
+      }).catch(function () {
+        return _this5.getNamePriceV1(fullyQualifiedName);
+      });
+    }
+    /**
+     * Get the price of a namespace
+     * @param {String} namespaceID the namespace to query
+     * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }, where
+     *   .units encodes the cryptocurrency units to pay (e.g. BTC, STACKS), and
+     *   .amount encodes the number of units, in the smallest denominiated amount
+     *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
+     *   .amount will be microStacks)
+     */
+
+  }, {
+    key: "getNamespacePrice",
+    value: function getNamespacePrice(namespaceID) {
+      var _this6 = this;
+
+      // handle v1 or v2 
+      return Promise.resolve().then(function () {
+        return _this6.getNamespacePriceV2(namespaceID);
+      }).catch(function () {
+        return _this6.getNamespacePriceV1(namespaceID);
+      });
+    }
+    /**
+     * How many blocks can pass between a name expiring and the name being able to be
+     * re-registered by a different owner?
+     * @return {Promise} a promise to the number of blocks
+     */
+
+  }, {
+    key: "getGracePeriod",
+    value: function getGracePeriod() {
+      return Promise.resolve(5000);
+    }
+    /**
+     * Get the names -- both on-chain and off-chain -- owned by an address.
+     * @param {String} address the blockchain address (the hash of the owner public key)
+     * @return {Promise} a promise that resolves to a list of names (Strings)
+     */
+
+  }, {
+    key: "getNamesOwned",
+    value: function getNamesOwned(address) {
+      var networkAddress = this.coerceAddress(address);
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/addresses/bitcoin/").concat(networkAddress)).then(function (resp) {
+        return resp.json();
+      }).then(function (obj) {
+        return obj.names;
+      });
+    }
+    /**
+     * Get the blockchain address to which a name's registration fee must be sent
+     * (the address will depend on the namespace in which it is registered.)
+     * @param {String} namespace the namespace ID
+     * @return {Promise} a promise that resolves to an address (String)
+     */
+
+  }, {
+    key: "getNamespaceBurnAddress",
+    value: function getNamespaceBurnAddress(namespace) {
+      var _this7 = this;
+
+      return Promise.all([fetch("".concat(this.blockstackAPIUrl, "/v1/namespaces/").concat(namespace)), this.getBlockHeight()]).then(function (_ref) {
+        var _ref2 = (0, _slicedToArray2.default)(_ref, 2),
+            resp = _ref2[0],
+            blockHeight = _ref2[1];
+
+        if (resp.status === 404) {
+          throw new Error("No such namespace '".concat(namespace, "'"));
         } else {
-          /*
-           * POST /v1/broadcast/transaction
-           * Request body:
-           * JSON.stringify({
-           *  transaction,
-           *  transactionToWatch,
-           *  confirmations
-           * })
-           */
-          var endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT;
-          var requestBody = {
-            transaction: transaction,
-            transactionToWatch: transactionToWatch,
-            confirmations: confirmations
-          };
-          return this.broadcastServiceFetchHelper(endpoint, requestBody);
+          return Promise.all([resp.json(), blockHeight]);
         }
-      }
-      /**
-       * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
-       *
-       * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-       * @param  {String} transactionToWatch the hex transaction id of the transaction
-       * to watch for confirmation before broadcasting the zone file to the Atlas network
-       * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
-       * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
-       *
-       * In the event of an error, it rejects with:
-       * * a `RemoteServiceError` if there is a problem
-       *   with the transaction broadcast service
-       * * `MissingParameterError` if you call the function without a required
-       *   parameter
-       * @private
-       */
+      }).then(function (_ref3) {
+        var _ref4 = (0, _slicedToArray2.default)(_ref3, 2),
+            namespaceInfo = _ref4[0],
+            blockHeight = _ref4[1];
 
-    }, {
-      key: "broadcastZoneFile",
-      value: function broadcastZoneFile(zoneFile) {
-        var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var address = _this7.getDefaultBurnAddress();
 
-        if (!zoneFile) {
-          return Promise.reject(new _errors.MissingParameterError('zoneFile'));
-        } // TODO: validate zonefile
+        if (namespaceInfo.version === 2) {
+          // pay-to-namespace-creator if this namespace is less than 1 year old
+          if (namespaceInfo.reveal_block + 52595 >= blockHeight) {
+            address = namespaceInfo.address;
+          }
+        }
 
+        return address;
+      }).then(function (address) {
+        return _this7.coerceAddress(address);
+      });
+    }
+    /**
+     * Get WHOIS-like information for a name, including the address that owns it,
+     * the block at which it expires, and the zone file anchored to it (if available).
+     * @param {String} fullyQualifiedName the name to query.  Can be on-chain of off-chain.
+     * @return {Promise} a promise that resolves to the WHOIS-like information 
+     */
 
-        if (transactionToWatch) {
-          // broadcast via transaction broadcast service
+  }, {
+    key: "getNameInfo",
+    value: function getNameInfo(fullyQualifiedName) {
+      var _this8 = this;
 
-          /*
-           * POST /v1/broadcast/zone-file
-           * Request body:
-           * JSON.stringify({
-           *  zoneFile,
-           *  transactionToWatch
-           * })
-           */
-          var requestBody = {
-            zoneFile: zoneFile,
-            transactionToWatch: transactionToWatch
-          };
-          var endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT;
-          return this.broadcastServiceFetchHelper(endpoint, requestBody);
+      _logger.Logger.debug(this.blockstackAPIUrl);
+
+      var nameLookupURL = "".concat(this.blockstackAPIUrl, "/v1/names/").concat(fullyQualifiedName);
+      return fetch(nameLookupURL).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Name not found');
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
         } else {
-          // broadcast via core endpoint
-          // zone file is two words but core's api treats it as one word 'zonefile'
-          var _requestBody = {
-            zonefile: zoneFile
-          };
-          return fetch("".concat(this.blockstackAPIUrl, "/v1/zonefile/"), {
-            method: 'POST',
-            body: JSON.stringify(_requestBody),
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }).then(function (resp) {
-            var json = resp.json();
-            return json.then(function (respObj) {
-              if (respObj.hasOwnProperty('error')) {
-                throw new _errors.RemoteServiceError(resp);
-              }
+          return resp.json();
+        }
+      }).then(function (nameInfo) {
+        _logger.Logger.debug("nameInfo: ".concat(JSON.stringify(nameInfo))); // the returned address _should_ be in the correct network ---
+        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  and the regtest transaction generation libraries want to use testnet addresses
 
-              return respObj.servers;
-            });
+
+        if (nameInfo.address) {
+          return Object.assign({}, nameInfo, {
+            address: _this8.coerceAddress(nameInfo.address)
           });
+        } else {
+          return nameInfo;
         }
-      }
-      /**
-       * Sends the preorder and registration transactions and zone file
-       * for a Blockstack name registration
-       * along with the to the transaction broadcast service.
-       *
-       * The transaction broadcast:
-       *
-       * * immediately broadcasts the preorder transaction
-       * * broadcasts the register transactions after the preorder transaction
-       * has an appropriate number of confirmations
-       * * broadcasts the zone file to the Atlas network after the register transaction
-       * has an appropriate number of confirmations
-       *
-       * @param  {String} preorderTransaction the hex-encoded, signed preorder transaction generated
-       * using the `makePreorder` function
-       * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
-       * using the `makeRegister` function
-       * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
-       * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
-       * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
-       *
-       * In the event of an error, it rejects with:
-       * * a `RemoteServiceError` if there is a problem
-       *   with the transaction broadcast service
-       * * `MissingParameterError` if you call the function without a required
-       *   parameter
-       * @private
-       */
+      });
+    }
+    /**
+     * Get the pricing parameters and creation history of a namespace.
+     * @param {String} namespaceID the namespace to query
+     * @return {Promise} a promise that resolves to the namespace information.
+     */
 
-    }, {
-      key: "broadcastNameRegistration",
-      value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
+  }, {
+    key: "getNamespaceInfo",
+    value: function getNamespaceInfo(namespaceID) {
+      var _this9 = this;
+
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/namespaces/").concat(namespaceID)).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Namespace not found');
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
+        } else {
+          return resp.json();
+        }
+      }).then(function (namespaceInfo) {
+        // the returned address _should_ be in the correct network ---
+        //  blockstackd gets into trouble because it tries to coerce back to mainnet
+        //  and the regtest transaction generation libraries want to use testnet addresses
+        if (namespaceInfo.address && namespaceInfo.recipient_address) {
+          return Object.assign({}, namespaceInfo, {
+            address: _this9.coerceAddress(namespaceInfo.address),
+            recipient_address: _this9.coerceAddress(namespaceInfo.recipient_address)
+          });
+        } else {
+          return namespaceInfo;
+        }
+      });
+    }
+    /**
+     * Get a zone file, given its hash.  Throws an exception if the zone file
+     * obtained does not match the hash.
+     * @param {String} zonefileHash the ripemd160(sha256) hash of the zone file
+     * @return {Promise} a promise that resolves to the zone file's text
+     */
+
+  }, {
+    key: "getZonefile",
+    value: function getZonefile(zonefileHash) {
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/zonefiles/").concat(zonefileHash)).then(function (resp) {
+        if (resp.status === 200) {
+          return resp.text().then(function (body) {
+            var sha256 = _bitcoinjsLib.default.crypto.sha256(body);
+
+            var h = new _ripemd.default().update(sha256).digest('hex');
+
+            if (h !== zonefileHash) {
+              throw new Error("Zone file contents hash to ".concat(h, ", not ").concat(zonefileHash));
+            }
+
+            return body;
+          });
+        } else {
+          throw new Error("Bad response status: ".concat(resp.status));
+        }
+      });
+    }
+    /**
+     * Get the status of an account for a particular token holding.  This includes its total number of
+     * expenditures and credits, lockup times, last txid, and so on.
+     * @param {String} address the account
+     * @param {String} tokenType the token type to query
+     * @return {Promise} a promise that resolves to an object representing the state of the account
+     *   for this token
+     */
+
+  }, {
+    key: "getAccountStatus",
+    value: function getAccountStatus(address, tokenType) {
+      var _this10 = this;
+
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/").concat(tokenType, "/status")).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Account not found');
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
+        } else {
+          return resp.json();
+        }
+      }).then(function (accountStatus) {
+        // coerce all addresses, and convert credit/debit to biginteger
+        var formattedStatus = Object.assign({}, accountStatus, {
+          address: _this10.coerceAddress(accountStatus.address),
+          debit_value: _bigi.default.fromByteArrayUnsigned(String(accountStatus.debit_value)),
+          credit_value: _bigi.default.fromByteArrayUnsigned(String(accountStatus.credit_value))
+        });
+        return formattedStatus;
+      });
+    }
+    /**
+     * Get a page of an account's transaction history.
+     * @param {String} address the account's address
+     * @param {number} page the page number.  Page 0 is the most recent transactions
+     * @return {Promise} a promise that resolves to an Array of Objects, where each Object encodes
+     *   states of the account at various block heights (e.g. prior balances, txids, etc)
+     */
+
+  }, {
+    key: "getAccountHistoryPage",
+    value: function getAccountHistoryPage(address, page) {
+      var _this11 = this;
+
+      var url = "".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/history?page=").concat(page);
+      return fetch(url).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Account not found');
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
+        } else {
+          return resp.json();
+        }
+      }).then(function (historyList) {
+        if (historyList.error) {
+          throw new Error("Unable to get account history page: ".concat(historyList.error));
+        } // coerse all addresses and convert to bigint
+
+
+        return historyList.map(function (histEntry) {
+          histEntry.address = _this11.coerceAddress(histEntry.address);
+          histEntry.debit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.debit_value));
+          histEntry.credit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.credit_value));
+          return histEntry;
+        });
+      });
+    }
+    /**
+     * Get the state(s) of an account at a particular block height.  This includes the state of the
+     * account beginning with this block's transactions, as well as all of the states the account
+     * passed through when this block was processed (if any).
+     * @param {String} address the account's address
+     * @param {Integer} blockHeight the block to query
+     * @return {Promise} a promise that resolves to an Array of Objects, where each Object encodes
+     *   states of the account at this block.
+     */
+
+  }, {
+    key: "getAccountAt",
+    value: function getAccountAt(address, blockHeight) {
+      var _this12 = this;
+
+      var url = "".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/history/").concat(blockHeight);
+      return fetch(url).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Account not found');
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
+        } else {
+          return resp.json();
+        }
+      }).then(function (historyList) {
+        if (historyList.error) {
+          throw new Error("Unable to get historic account state: ".concat(historyList.error));
+        } // coerce all addresses 
+
+
+        return historyList.map(function (histEntry) {
+          histEntry.address = _this12.coerceAddress(histEntry.address);
+          histEntry.debit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.debit_value));
+          histEntry.credit_value = _bigi.default.fromByteArrayUnsigned(String(histEntry.credit_value));
+          return histEntry;
+        });
+      });
+    }
+    /**
+     * Get the set of token types that this account owns
+     * @param {String} address the account's address
+     * @return {Promise} a promise that resolves to an Array of Strings, where each item encodes the 
+     *   type of token this account holds (excluding the underlying blockchain's tokens)
+     */
+
+  }, {
+    key: "getAccountTokens",
+    value: function getAccountTokens(address) {
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/tokens")).then(function (resp) {
+        if (resp.status === 404) {
+          throw new Error('Account not found');
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
+        } else {
+          return resp.json();
+        }
+      }).then(function (tokenList) {
+        if (tokenList.error) {
+          throw new Error("Unable to get token list: ".concat(tokenList.error));
+        }
+
+        return tokenList;
+      });
+    }
+    /**
+     * Get the number of tokens owned by an account.  If the account does not exist or has no
+     * tokens of this type, then 0 will be returned.
+     * @param {String} address the account's address
+     * @param {String} tokenType the type of token to query.
+     * @return {Promise} a promise that resolves to a BigInteger that encodes the number of tokens 
+     *   held by this account.
+     */
+
+  }, {
+    key: "getAccountBalance",
+    value: function getAccountBalance(address, tokenType) {
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/accounts/").concat(address, "/").concat(tokenType, "/balance")).then(function (resp) {
+        if (resp.status === 404) {
+          // talking to an older blockstack core node without the accounts API
+          return Promise.resolve().then(function () {
+            return _bigi.default.fromByteArrayUnsigned('0');
+          });
+        } else if (resp.status !== 200) {
+          throw new Error("Bad response status: ".concat(resp.status));
+        } else {
+          return resp.json();
+        }
+      }).then(function (tokenBalance) {
+        if (tokenBalance.error) {
+          throw new Error("Unable to get account balance: ".concat(tokenBalance.error));
+        }
+
+        var balance = '0';
+
+        if (tokenBalance && tokenBalance.balance) {
+          balance = tokenBalance.balance;
+        }
+
+        return _bigi.default.fromByteArrayUnsigned(balance);
+      });
+    }
+    /**
+     * Performs a POST request to the given URL
+     * @param  {String} endpoint  the name of
+     * @param  {String} body [description]
+     * @return {Promise<Object|Error>} Returns a `Promise` that resolves to the object requested.
+     * In the event of an error, it rejects with:
+     * * a `RemoteServiceError` if there is a problem
+     * with the transaction broadcast service
+     * * `MissingParameterError` if you call the function without a required
+     * parameter
+     *
+     * @private
+     */
+
+  }, {
+    key: "broadcastServiceFetchHelper",
+    value: function broadcastServiceFetchHelper(endpoint, body) {
+      var requestHeaders = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      };
+      var options = {
+        method: 'POST',
+        headers: requestHeaders,
+        body: JSON.stringify(body)
+      };
+      var url = "".concat(this.broadcastServiceUrl, "/v1/broadcast/").concat(endpoint);
+      return fetch(url, options).then(function (response) {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new _errors.RemoteServiceError(response);
+        }
+      });
+    }
+    /**
+    * Broadcasts a signed bitcoin transaction to the network optionally waiting to broadcast the
+    * transaction until a second transaction has a certain number of confirmations.
+    *
+    * @param  {string} transaction the hex-encoded transaction to broadcast
+    * @param  {string} transactionToWatch the hex transaction id of the transaction to watch for
+    * the specified number of confirmations before broadcasting the `transaction`
+    * @param  {number} confirmations the number of confirmations `transactionToWatch` must have
+    * before broadcasting `transaction`.
+    * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+    * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+    *
+    * In the event of an error, it rejects with:
+    * * a `RemoteServiceError` if there is a problem
+    *   with the transaction broadcast service
+    * * `MissingParameterError` if you call the function without a required
+    *   parameter
+    * @private
+    */
+
+  }, {
+    key: "broadcastTransaction",
+    value: function broadcastTransaction(transaction) {
+      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var confirmations = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 6;
+
+      if (!transaction) {
+        var error = new _errors.MissingParameterError('transaction');
+        return Promise.reject(error);
+      }
+
+      if (!confirmations && confirmations !== 0) {
+        var _error = new _errors.MissingParameterError('confirmations');
+
+        return Promise.reject(_error);
+      }
+
+      if (transactionToWatch === null) {
+        return this.btc.broadcastTransaction(transaction);
+      } else {
         /*
-           * POST /v1/broadcast/registration
-           * Request body:
-           * JSON.stringify({
-           * preorderTransaction,
-           * registerTransaction,
-           * zoneFile
-           * })
-           */
-        if (!preorderTransaction) {
-          var error = new _errors.MissingParameterError('preorderTransaction');
-          return Promise.reject(error);
-        }
-
-        if (!registerTransaction) {
-          var _error2 = new _errors.MissingParameterError('registerTransaction');
-
-          return Promise.reject(_error2);
-        }
-
-        if (!zoneFile) {
-          var _error3 = new _errors.MissingParameterError('zoneFile');
-
-          return Promise.reject(_error3);
-        }
-
+         * POST /v1/broadcast/transaction
+         * Request body:
+         * JSON.stringify({
+         *  transaction,
+         *  transactionToWatch,
+         *  confirmations
+         * })
+         */
+        var endpoint = TX_BROADCAST_SERVICE_TX_ENDPOINT;
         var requestBody = {
-          preorderTransaction: preorderTransaction,
-          registerTransaction: registerTransaction,
-          zoneFile: zoneFile
+          transaction: transaction,
+          transactionToWatch: transactionToWatch,
+          confirmations: confirmations
         };
-        var endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT;
         return this.broadcastServiceFetchHelper(endpoint, requestBody);
       }
-    }, {
-      key: "getFeeRate",
-      value: function getFeeRate() {
-        return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended').then(function (resp) {
-          return resp.json();
-        }).then(function (rates) {
-          return Math.floor(rates.fastestFee);
-        });
-      }
-    }, {
-      key: "countDustOutputs",
-      value: function countDustOutputs() {
-        throw new Error('Not implemented.');
-      }
-    }, {
-      key: "getUTXOs",
-      value: function getUTXOs(address) {
-        var _this13 = this;
-
-        return this.getNetworkedUTXOs(address).then(function (networkedUTXOs) {
-          var returnSet = networkedUTXOs.concat();
-
-          if (_this13.includeUtxoMap.hasOwnProperty(address)) {
-            returnSet = networkedUTXOs.concat(_this13.includeUtxoMap[address]);
-          } // aaron: I am *well* aware this is O(n)*O(m) runtime
-          //    however, clients should clear the exclude set periodically
-
-
-          var excludeSet = _this13.excludeUtxoSet;
-          returnSet = returnSet.filter(function (utxo) {
-            var inExcludeSet = excludeSet.reduce(function (inSet, utxoToCheck) {
-              return inSet || utxoToCheck.tx_hash === utxo.tx_hash && utxoToCheck.tx_output_n === utxo.tx_output_n;
-            }, false);
-            return !inExcludeSet;
-          });
-          return returnSet;
-        });
-      }
-      /**
-       * This will modify the network's utxo set to include UTXOs
-       *  from the given transaction and exclude UTXOs *spent* in
-       *  that transaction
-       * @param {String} txHex - the hex-encoded transaction to use
-       * @return {void} no return value, this modifies the UTXO config state
-       * @private
-       */
-
-    }, {
-      key: "modifyUTXOSetFrom",
-      value: function modifyUTXOSetFrom(txHex) {
-        var _this14 = this;
-
-        var tx = _bitcoinjsLib.default.Transaction.fromHex(txHex);
-
-        var excludeSet = this.excludeUtxoSet.concat();
-        tx.ins.forEach(function (utxoUsed) {
-          var reverseHash = Buffer.from(utxoUsed.hash);
-          reverseHash.reverse();
-          excludeSet.push({
-            tx_hash: reverseHash.toString('hex'),
-            tx_output_n: utxoUsed.index
-          });
-        });
-        this.excludeUtxoSet = excludeSet;
-        var txHash = tx.getHash().reverse().toString('hex');
-        tx.outs.forEach(function (utxoCreated, txOutputN) {
-          var isNullData = function isNullData(script) {
-            try {
-              _bitcoinjsLib.default.payments.embed({
-                output: script
-              }, {
-                validate: true
-              });
-
-              return true;
-            } catch (_) {
-              return false;
-            }
-          };
-
-          if (isNullData(utxoCreated.script)) {
-            return;
-          }
-
-          var address = _bitcoinjsLib.default.address.fromOutputScript(utxoCreated.script, _this14.layer1);
-
-          var includeSet = [];
-
-          if (_this14.includeUtxoMap.hasOwnProperty(address)) {
-            includeSet = includeSet.concat(_this14.includeUtxoMap[address]);
-          }
-
-          includeSet.push({
-            tx_hash: txHash,
-            confirmations: 0,
-            value: utxoCreated.value,
-            tx_output_n: txOutputN
-          });
-          _this14.includeUtxoMap[address] = includeSet;
-        });
-      }
-    }, {
-      key: "resetUTXOs",
-      value: function resetUTXOs(address) {
-        delete this.includeUtxoMap[address];
-        this.excludeUtxoSet = [];
-      }
-    }, {
-      key: "getConsensusHash",
-      value: function getConsensusHash() {
-        return fetch("".concat(this.blockstackAPIUrl, "/v1/blockchains/bitcoin/consensus")).then(function (resp) {
-          return resp.json();
-        }).then(function (x) {
-          return x.consensus_hash;
-        });
-      }
-    }, {
-      key: "getTransactionInfo",
-      value: function getTransactionInfo(txHash) {
-        return this.btc.getTransactionInfo(txHash);
-      }
-    }, {
-      key: "getBlockHeight",
-      value: function getBlockHeight() {
-        return this.btc.getBlockHeight();
-      }
-    }, {
-      key: "getNetworkedUTXOs",
-      value: function getNetworkedUTXOs(address) {
-        return this.btc.getNetworkedUTXOs(address);
-      }
-    }]);
-    return BlockstackNetwork;
-  }();
-
-  _exports.BlockstackNetwork = BlockstackNetwork;
-
-  var LocalRegtest =
-  /*#__PURE__*/
-  function (_BlockstackNetwork) {
-    (0, _inherits2.default)(LocalRegtest, _BlockstackNetwork);
-
-    function LocalRegtest(apiUrl, broadcastServiceUrl, bitcoinAPI) {
-      (0, _classCallCheck2.default)(this, LocalRegtest);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LocalRegtest).call(this, apiUrl, broadcastServiceUrl, bitcoinAPI, _bitcoinjsLib.default.networks.testnet));
     }
+    /**
+     * Broadcasts a zone file to the Atlas network via the transaction broadcast service.
+     *
+     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+     * @param  {String} transactionToWatch the hex transaction id of the transaction
+     * to watch for confirmation before broadcasting the zone file to the Atlas network
+     * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+     * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+     *
+     * In the event of an error, it rejects with:
+     * * a `RemoteServiceError` if there is a problem
+     *   with the transaction broadcast service
+     * * `MissingParameterError` if you call the function without a required
+     *   parameter
+     * @private
+     */
 
-    (0, _createClass2.default)(LocalRegtest, [{
-      key: "getFeeRate",
-      value: function getFeeRate() {
-        return Promise.resolve(Math.floor(0.00001000 * SATOSHIS_PER_BTC));
-      }
-    }]);
-    return LocalRegtest;
-  }(BlockstackNetwork);
+  }, {
+    key: "broadcastZoneFile",
+    value: function broadcastZoneFile(zoneFile) {
+      var transactionToWatch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-  _exports.LocalRegtest = LocalRegtest;
+      if (!zoneFile) {
+        return Promise.reject(new _errors.MissingParameterError('zoneFile'));
+      } // TODO: validate zonefile
 
-  var BitcoindAPI =
-  /*#__PURE__*/
-  function (_BitcoinNetwork) {
-    (0, _inherits2.default)(BitcoindAPI, _BitcoinNetwork);
 
-    function BitcoindAPI(bitcoindUrl, bitcoindCredentials) {
-      var _this15;
+      if (transactionToWatch) {
+        // broadcast via transaction broadcast service
 
-      (0, _classCallCheck2.default)(this, BitcoindAPI);
-      _this15 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(BitcoindAPI).call(this));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this15), "bitcoindUrl", void 0);
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this15), "bitcoindCredentials", void 0);
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this15), "importedBefore", void 0);
-      _this15.bitcoindUrl = bitcoindUrl;
-      _this15.bitcoindCredentials = bitcoindCredentials;
-      _this15.importedBefore = {};
-      return _this15;
-    }
-
-    (0, _createClass2.default)(BitcoindAPI, [{
-      key: "broadcastTransaction",
-      value: function broadcastTransaction(transaction) {
-        var jsonRPC = {
-          jsonrpc: '1.0',
-          method: 'sendrawtransaction',
-          params: [transaction]
+        /*
+         * POST /v1/broadcast/zone-file
+         * Request body:
+         * JSON.stringify({
+         *  zoneFile,
+         *  transactionToWatch
+         * })
+         */
+        var requestBody = {
+          zoneFile: zoneFile,
+          transactionToWatch: transactionToWatch
         };
-        var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
-        var headers = {
-          Authorization: "Basic ".concat(authString)
+        var endpoint = TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT;
+        return this.broadcastServiceFetchHelper(endpoint, requestBody);
+      } else {
+        // broadcast via core endpoint
+        // zone file is two words but core's api treats it as one word 'zonefile'
+        var _requestBody = {
+          zonefile: zoneFile
         };
-        return fetch(this.bitcoindUrl, {
+        return fetch("".concat(this.blockstackAPIUrl, "/v1/zonefile/"), {
           method: 'POST',
-          body: JSON.stringify(jsonRPC),
-          headers: headers
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (respObj) {
-          return respObj.result;
-        });
-      }
-    }, {
-      key: "getBlockHeight",
-      value: function getBlockHeight() {
-        var jsonRPC = {
-          jsonrpc: '1.0',
-          method: 'getblockcount'
-        };
-        var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
-        var headers = {
-          Authorization: "Basic ".concat(authString)
-        };
-        return fetch(this.bitcoindUrl, {
-          method: 'POST',
-          body: JSON.stringify(jsonRPC),
-          headers: headers
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (respObj) {
-          return respObj.result;
-        });
-      }
-    }, {
-      key: "getTransactionInfo",
-      value: function getTransactionInfo(txHash) {
-        var _this16 = this;
-
-        var jsonRPC = {
-          jsonrpc: '1.0',
-          method: 'gettransaction',
-          params: [txHash]
-        };
-        var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
-        var headers = {
-          Authorization: "Basic ".concat(authString)
-        };
-        return fetch(this.bitcoindUrl, {
-          method: 'POST',
-          body: JSON.stringify(jsonRPC),
-          headers: headers
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (respObj) {
-          return respObj.result;
-        }).then(function (txInfo) {
-          return txInfo.blockhash;
-        }).then(function (blockhash) {
-          var jsonRPCBlock = {
-            jsonrpc: '1.0',
-            method: 'getblockheader',
-            params: [blockhash]
-          };
-          headers.Authorization = "Basic ".concat(authString);
-          return fetch(_this16.bitcoindUrl, {
-            method: 'POST',
-            body: JSON.stringify(jsonRPCBlock),
-            headers: headers
-          });
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (respObj) {
-          if (!respObj || !respObj.result) {
-            // unconfirmed 
-            throw new Error('Unconfirmed transaction');
-          } else {
-            return {
-              block_height: respObj.result.height
-            };
-          }
-        });
-      }
-    }, {
-      key: "getNetworkedUTXOs",
-      value: function getNetworkedUTXOs(address) {
-        var _this17 = this;
-
-        var jsonRPCImport = {
-          jsonrpc: '1.0',
-          method: 'importaddress',
-          params: [address]
-        };
-        var jsonRPCUnspent = {
-          jsonrpc: '1.0',
-          method: 'listunspent',
-          params: [0, 9999999, [address]]
-        };
-        var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
-        var headers = {
-          Authorization: "Basic ".concat(authString)
-        };
-        var importPromise = this.importedBefore[address] ? Promise.resolve() : fetch(this.bitcoindUrl, {
-          method: 'POST',
-          body: JSON.stringify(jsonRPCImport),
-          headers: headers
-        }).then(function () {
-          _this17.importedBefore[address] = true;
-        });
-        return importPromise.then(function () {
-          return fetch(_this17.bitcoindUrl, {
-            method: 'POST',
-            body: JSON.stringify(jsonRPCUnspent),
-            headers: headers
-          });
-        }).then(function (resp) {
-          return resp.json();
-        }).then(function (x) {
-          return x.result;
-        }).then(function (utxos) {
-          return utxos.map(function (x) {
-            return Object({
-              value: Math.round(x.amount * SATOSHIS_PER_BTC),
-              confirmations: x.confirmations,
-              tx_hash: x.txid,
-              tx_output_n: x.vout
-            });
-          });
-        });
-      }
-    }]);
-    return BitcoindAPI;
-  }(BitcoinNetwork);
-
-  _exports.BitcoindAPI = BitcoindAPI;
-
-  var InsightClient =
-  /*#__PURE__*/
-  function (_BitcoinNetwork2) {
-    (0, _inherits2.default)(InsightClient, _BitcoinNetwork2);
-
-    function InsightClient() {
-      var _this18;
-
-      var insightUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://utxo.technofractal.com/';
-      (0, _classCallCheck2.default)(this, InsightClient);
-      _this18 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InsightClient).call(this));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this18), "apiUrl", void 0);
-      _this18.apiUrl = insightUrl;
-      return _this18;
-    }
-
-    (0, _createClass2.default)(InsightClient, [{
-      key: "broadcastTransaction",
-      value: function broadcastTransaction(transaction) {
-        var jsonData = {
-          tx: transaction
-        };
-        return fetch("".concat(this.apiUrl, "/tx/send"), {
-          method: 'POST',
+          body: JSON.stringify(_requestBody),
           headers: {
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(jsonData)
-        }).then(function (resp) {
-          return resp.json();
-        });
-      }
-    }, {
-      key: "getBlockHeight",
-      value: function getBlockHeight() {
-        return fetch("".concat(this.apiUrl, "/status")).then(function (resp) {
-          return resp.json();
-        }).then(function (status) {
-          return status.blocks;
-        });
-      }
-    }, {
-      key: "getTransactionInfo",
-      value: function getTransactionInfo(txHash) {
-        var _this19 = this;
-
-        return fetch("".concat(this.apiUrl, "/tx/").concat(txHash)).then(function (resp) {
-          return resp.json();
-        }).then(function (transactionInfo) {
-          if (transactionInfo.error) {
-            throw new Error("Error finding transaction: ".concat(transactionInfo.error));
           }
-
-          return fetch("".concat(_this19.apiUrl, "/block/").concat(transactionInfo.blockHash));
         }).then(function (resp) {
-          return resp.json();
-        }).then(function (blockInfo) {
-          return {
-            block_height: blockInfo.height
-          };
-        });
-      }
-    }, {
-      key: "getNetworkedUTXOs",
-      value: function getNetworkedUTXOs(address) {
-        return fetch("".concat(this.apiUrl, "/addr/").concat(address, "/utxo")).then(function (resp) {
-          return resp.json();
-        }).then(function (utxos) {
-          return utxos.map(function (x) {
-            return {
-              value: x.satoshis,
-              confirmations: x.confirmations,
-              tx_hash: x.txid,
-              tx_output_n: x.vout
-            };
-          });
-        });
-      }
-    }]);
-    return InsightClient;
-  }(BitcoinNetwork);
-
-  _exports.InsightClient = InsightClient;
-
-  var BlockchainInfoApi =
-  /*#__PURE__*/
-  function (_BitcoinNetwork3) {
-    (0, _inherits2.default)(BlockchainInfoApi, _BitcoinNetwork3);
-
-    function BlockchainInfoApi() {
-      var _this20;
-
-      var blockchainInfoUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://blockchain.info';
-      (0, _classCallCheck2.default)(this, BlockchainInfoApi);
-      _this20 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(BlockchainInfoApi).call(this));
-      (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this20), "utxoProviderUrl", void 0);
-      _this20.utxoProviderUrl = blockchainInfoUrl;
-      return _this20;
-    }
-
-    (0, _createClass2.default)(BlockchainInfoApi, [{
-      key: "getBlockHeight",
-      value: function getBlockHeight() {
-        return fetch("".concat(this.utxoProviderUrl, "/latestblock?cors=true")).then(function (resp) {
-          return resp.json();
-        }).then(function (blockObj) {
-          return blockObj.height;
-        });
-      }
-    }, {
-      key: "getNetworkedUTXOs",
-      value: function getNetworkedUTXOs(address) {
-        return fetch("".concat(this.utxoProviderUrl, "/unspent?format=json&active=").concat(address, "&cors=true")).then(function (resp) {
-          if (resp.status === 500) {
-            _logger.Logger.debug('UTXO provider 500 usually means no UTXOs: returning []');
-
-            return {
-              unspent_outputs: []
-            };
-          } else {
-            return resp.json();
-          }
-        }).then(function (utxoJSON) {
-          return utxoJSON.unspent_outputs;
-        }).then(function (utxoList) {
-          return utxoList.map(function (utxo) {
-            var utxoOut = {
-              value: utxo.value,
-              tx_output_n: utxo.tx_output_n,
-              confirmations: utxo.confirmations,
-              tx_hash: utxo.tx_hash_big_endian
-            };
-            return utxoOut;
-          });
-        });
-      }
-    }, {
-      key: "getTransactionInfo",
-      value: function getTransactionInfo(txHash) {
-        return fetch("".concat(this.utxoProviderUrl, "/rawtx/").concat(txHash, "?cors=true")).then(function (resp) {
-          if (resp.status === 200) {
-            return resp.json();
-          } else {
-            throw new Error("Could not lookup transaction info for '".concat(txHash, "'. Server error."));
-          }
-        }).then(function (respObj) {
-          return {
-            block_height: respObj.block_height
-          };
-        });
-      }
-    }, {
-      key: "broadcastTransaction",
-      value: function broadcastTransaction(transaction) {
-        var form = new _formData.default();
-        form.append('tx', transaction);
-        return fetch("".concat(this.utxoProviderUrl, "/pushtx?cors=true"), {
-          method: 'POST',
-          body: form
-        }).then(function (resp) {
-          var text = resp.text();
-          return text.then(function (respText) {
-            if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
-              var txHash = _bitcoinjsLib.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
-
-
-              return txHash;
-            } else {
-              throw new _errors.RemoteServiceError(resp, "Broadcast transaction failed with message: ".concat(respText));
+          var json = resp.json();
+          return json.then(function (respObj) {
+            if (respObj.hasOwnProperty('error')) {
+              throw new _errors.RemoteServiceError(resp);
             }
+
+            return respObj.servers;
           });
         });
       }
-    }]);
-    return BlockchainInfoApi;
-  }(BitcoinNetwork);
-
-  _exports.BlockchainInfoApi = BlockchainInfoApi;
-  var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:16269', new BitcoindAPI('http://localhost:18332/', {
-    username: 'blockstack',
-    password: 'blockstacksystem'
-  }));
-  var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://broadcast.blockstack.org', new BlockchainInfoApi());
-  var network = {
-    BlockstackNetwork: BlockstackNetwork,
-    LocalRegtest: LocalRegtest,
-    BlockchainInfoApi: BlockchainInfoApi,
-    BitcoindAPI: BitcoindAPI,
-    InsightClient: InsightClient,
-    defaults: {
-      LOCAL_REGTEST: LOCAL_REGTEST,
-      MAINNET_DEFAULT: MAINNET_DEFAULT
     }
-  };
-  _exports.network = network;
-});
+    /**
+     * Sends the preorder and registration transactions and zone file
+     * for a Blockstack name registration
+     * along with the to the transaction broadcast service.
+     *
+     * The transaction broadcast:
+     *
+     * * immediately broadcasts the preorder transaction
+     * * broadcasts the register transactions after the preorder transaction
+     * has an appropriate number of confirmations
+     * * broadcasts the zone file to the Atlas network after the register transaction
+     * has an appropriate number of confirmations
+     *
+     * @param  {String} preorderTransaction the hex-encoded, signed preorder transaction generated
+     * using the `makePreorder` function
+     * @param  {String} registerTransaction the hex-encoded, signed register transaction generated
+     * using the `makeRegister` function
+     * @param  {String} zoneFile the zone file to be broadcast to the Atlas network
+     * @return {Promise<Object|Error>} Returns a Promise that resolves to an object with a
+     * `transaction_hash` key containing the transaction hash of the broadcasted transaction.
+     *
+     * In the event of an error, it rejects with:
+     * * a `RemoteServiceError` if there is a problem
+     *   with the transaction broadcast service
+     * * `MissingParameterError` if you call the function without a required
+     *   parameter
+     * @private
+     */
+
+  }, {
+    key: "broadcastNameRegistration",
+    value: function broadcastNameRegistration(preorderTransaction, registerTransaction, zoneFile) {
+      /*
+         * POST /v1/broadcast/registration
+         * Request body:
+         * JSON.stringify({
+         * preorderTransaction,
+         * registerTransaction,
+         * zoneFile
+         * })
+         */
+      if (!preorderTransaction) {
+        var error = new _errors.MissingParameterError('preorderTransaction');
+        return Promise.reject(error);
+      }
+
+      if (!registerTransaction) {
+        var _error2 = new _errors.MissingParameterError('registerTransaction');
+
+        return Promise.reject(_error2);
+      }
+
+      if (!zoneFile) {
+        var _error3 = new _errors.MissingParameterError('zoneFile');
+
+        return Promise.reject(_error3);
+      }
+
+      var requestBody = {
+        preorderTransaction: preorderTransaction,
+        registerTransaction: registerTransaction,
+        zoneFile: zoneFile
+      };
+      var endpoint = TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT;
+      return this.broadcastServiceFetchHelper(endpoint, requestBody);
+    }
+  }, {
+    key: "getFeeRate",
+    value: function getFeeRate() {
+      return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended').then(function (resp) {
+        return resp.json();
+      }).then(function (rates) {
+        return Math.floor(rates.fastestFee);
+      });
+    }
+  }, {
+    key: "countDustOutputs",
+    value: function countDustOutputs() {
+      throw new Error('Not implemented.');
+    }
+  }, {
+    key: "getUTXOs",
+    value: function getUTXOs(address) {
+      var _this13 = this;
+
+      return this.getNetworkedUTXOs(address).then(function (networkedUTXOs) {
+        var returnSet = networkedUTXOs.concat();
+
+        if (_this13.includeUtxoMap.hasOwnProperty(address)) {
+          returnSet = networkedUTXOs.concat(_this13.includeUtxoMap[address]);
+        } // aaron: I am *well* aware this is O(n)*O(m) runtime
+        //    however, clients should clear the exclude set periodically
+
+
+        var excludeSet = _this13.excludeUtxoSet;
+        returnSet = returnSet.filter(function (utxo) {
+          var inExcludeSet = excludeSet.reduce(function (inSet, utxoToCheck) {
+            return inSet || utxoToCheck.tx_hash === utxo.tx_hash && utxoToCheck.tx_output_n === utxo.tx_output_n;
+          }, false);
+          return !inExcludeSet;
+        });
+        return returnSet;
+      });
+    }
+    /**
+     * This will modify the network's utxo set to include UTXOs
+     *  from the given transaction and exclude UTXOs *spent* in
+     *  that transaction
+     * @param {String} txHex - the hex-encoded transaction to use
+     * @return {void} no return value, this modifies the UTXO config state
+     * @private
+     */
+
+  }, {
+    key: "modifyUTXOSetFrom",
+    value: function modifyUTXOSetFrom(txHex) {
+      var _this14 = this;
+
+      var tx = _bitcoinjsLib.default.Transaction.fromHex(txHex);
+
+      var excludeSet = this.excludeUtxoSet.concat();
+      tx.ins.forEach(function (utxoUsed) {
+        var reverseHash = Buffer.from(utxoUsed.hash);
+        reverseHash.reverse();
+        excludeSet.push({
+          tx_hash: reverseHash.toString('hex'),
+          tx_output_n: utxoUsed.index
+        });
+      });
+      this.excludeUtxoSet = excludeSet;
+      var txHash = tx.getHash().reverse().toString('hex');
+      tx.outs.forEach(function (utxoCreated, txOutputN) {
+        var isNullData = function isNullData(script) {
+          try {
+            _bitcoinjsLib.default.payments.embed({
+              output: script
+            }, {
+              validate: true
+            });
+
+            return true;
+          } catch (_) {
+            return false;
+          }
+        };
+
+        if (isNullData(utxoCreated.script)) {
+          return;
+        }
+
+        var address = _bitcoinjsLib.default.address.fromOutputScript(utxoCreated.script, _this14.layer1);
+
+        var includeSet = [];
+
+        if (_this14.includeUtxoMap.hasOwnProperty(address)) {
+          includeSet = includeSet.concat(_this14.includeUtxoMap[address]);
+        }
+
+        includeSet.push({
+          tx_hash: txHash,
+          confirmations: 0,
+          value: utxoCreated.value,
+          tx_output_n: txOutputN
+        });
+        _this14.includeUtxoMap[address] = includeSet;
+      });
+    }
+  }, {
+    key: "resetUTXOs",
+    value: function resetUTXOs(address) {
+      delete this.includeUtxoMap[address];
+      this.excludeUtxoSet = [];
+    }
+  }, {
+    key: "getConsensusHash",
+    value: function getConsensusHash() {
+      return fetch("".concat(this.blockstackAPIUrl, "/v1/blockchains/bitcoin/consensus")).then(function (resp) {
+        return resp.json();
+      }).then(function (x) {
+        return x.consensus_hash;
+      });
+    }
+  }, {
+    key: "getTransactionInfo",
+    value: function getTransactionInfo(txHash) {
+      return this.btc.getTransactionInfo(txHash);
+    }
+  }, {
+    key: "getBlockHeight",
+    value: function getBlockHeight() {
+      return this.btc.getBlockHeight();
+    }
+  }, {
+    key: "getNetworkedUTXOs",
+    value: function getNetworkedUTXOs(address) {
+      return this.btc.getNetworkedUTXOs(address);
+    }
+  }]);
+  return BlockstackNetwork;
+}();
+
+exports.BlockstackNetwork = BlockstackNetwork;
+
+var LocalRegtest =
+/*#__PURE__*/
+function (_BlockstackNetwork) {
+  (0, _inherits2.default)(LocalRegtest, _BlockstackNetwork);
+
+  function LocalRegtest(apiUrl, broadcastServiceUrl, bitcoinAPI) {
+    (0, _classCallCheck2.default)(this, LocalRegtest);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LocalRegtest).call(this, apiUrl, broadcastServiceUrl, bitcoinAPI, _bitcoinjsLib.default.networks.testnet));
+  }
+
+  (0, _createClass2.default)(LocalRegtest, [{
+    key: "getFeeRate",
+    value: function getFeeRate() {
+      return Promise.resolve(Math.floor(0.00001000 * SATOSHIS_PER_BTC));
+    }
+  }]);
+  return LocalRegtest;
+}(BlockstackNetwork);
+
+exports.LocalRegtest = LocalRegtest;
+
+var BitcoindAPI =
+/*#__PURE__*/
+function (_BitcoinNetwork) {
+  (0, _inherits2.default)(BitcoindAPI, _BitcoinNetwork);
+
+  function BitcoindAPI(bitcoindUrl, bitcoindCredentials) {
+    var _this15;
+
+    (0, _classCallCheck2.default)(this, BitcoindAPI);
+    _this15 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(BitcoindAPI).call(this));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this15), "bitcoindUrl", void 0);
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this15), "bitcoindCredentials", void 0);
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this15), "importedBefore", void 0);
+    _this15.bitcoindUrl = bitcoindUrl;
+    _this15.bitcoindCredentials = bitcoindCredentials;
+    _this15.importedBefore = {};
+    return _this15;
+  }
+
+  (0, _createClass2.default)(BitcoindAPI, [{
+    key: "broadcastTransaction",
+    value: function broadcastTransaction(transaction) {
+      var jsonRPC = {
+        jsonrpc: '1.0',
+        method: 'sendrawtransaction',
+        params: [transaction]
+      };
+      var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
+      var headers = {
+        Authorization: "Basic ".concat(authString)
+      };
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
+        body: JSON.stringify(jsonRPC),
+        headers: headers
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (respObj) {
+        return respObj.result;
+      });
+    }
+  }, {
+    key: "getBlockHeight",
+    value: function getBlockHeight() {
+      var jsonRPC = {
+        jsonrpc: '1.0',
+        method: 'getblockcount'
+      };
+      var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
+      var headers = {
+        Authorization: "Basic ".concat(authString)
+      };
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
+        body: JSON.stringify(jsonRPC),
+        headers: headers
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (respObj) {
+        return respObj.result;
+      });
+    }
+  }, {
+    key: "getTransactionInfo",
+    value: function getTransactionInfo(txHash) {
+      var _this16 = this;
+
+      var jsonRPC = {
+        jsonrpc: '1.0',
+        method: 'gettransaction',
+        params: [txHash]
+      };
+      var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
+      var headers = {
+        Authorization: "Basic ".concat(authString)
+      };
+      return fetch(this.bitcoindUrl, {
+        method: 'POST',
+        body: JSON.stringify(jsonRPC),
+        headers: headers
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (respObj) {
+        return respObj.result;
+      }).then(function (txInfo) {
+        return txInfo.blockhash;
+      }).then(function (blockhash) {
+        var jsonRPCBlock = {
+          jsonrpc: '1.0',
+          method: 'getblockheader',
+          params: [blockhash]
+        };
+        headers.Authorization = "Basic ".concat(authString);
+        return fetch(_this16.bitcoindUrl, {
+          method: 'POST',
+          body: JSON.stringify(jsonRPCBlock),
+          headers: headers
+        });
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (respObj) {
+        if (!respObj || !respObj.result) {
+          // unconfirmed 
+          throw new Error('Unconfirmed transaction');
+        } else {
+          return {
+            block_height: respObj.result.height
+          };
+        }
+      });
+    }
+  }, {
+    key: "getNetworkedUTXOs",
+    value: function getNetworkedUTXOs(address) {
+      var _this17 = this;
+
+      var jsonRPCImport = {
+        jsonrpc: '1.0',
+        method: 'importaddress',
+        params: [address]
+      };
+      var jsonRPCUnspent = {
+        jsonrpc: '1.0',
+        method: 'listunspent',
+        params: [0, 9999999, [address]]
+      };
+      var authString = Buffer.from("".concat(this.bitcoindCredentials.username, ":").concat(this.bitcoindCredentials.password)).toString('base64');
+      var headers = {
+        Authorization: "Basic ".concat(authString)
+      };
+      var importPromise = this.importedBefore[address] ? Promise.resolve() : fetch(this.bitcoindUrl, {
+        method: 'POST',
+        body: JSON.stringify(jsonRPCImport),
+        headers: headers
+      }).then(function () {
+        _this17.importedBefore[address] = true;
+      });
+      return importPromise.then(function () {
+        return fetch(_this17.bitcoindUrl, {
+          method: 'POST',
+          body: JSON.stringify(jsonRPCUnspent),
+          headers: headers
+        });
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (x) {
+        return x.result;
+      }).then(function (utxos) {
+        return utxos.map(function (x) {
+          return Object({
+            value: Math.round(x.amount * SATOSHIS_PER_BTC),
+            confirmations: x.confirmations,
+            tx_hash: x.txid,
+            tx_output_n: x.vout
+          });
+        });
+      });
+    }
+  }]);
+  return BitcoindAPI;
+}(BitcoinNetwork);
+
+exports.BitcoindAPI = BitcoindAPI;
+
+var InsightClient =
+/*#__PURE__*/
+function (_BitcoinNetwork2) {
+  (0, _inherits2.default)(InsightClient, _BitcoinNetwork2);
+
+  function InsightClient() {
+    var _this18;
+
+    var insightUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://utxo.technofractal.com/';
+    (0, _classCallCheck2.default)(this, InsightClient);
+    _this18 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(InsightClient).call(this));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this18), "apiUrl", void 0);
+    _this18.apiUrl = insightUrl;
+    return _this18;
+  }
+
+  (0, _createClass2.default)(InsightClient, [{
+    key: "broadcastTransaction",
+    value: function broadcastTransaction(transaction) {
+      var jsonData = {
+        tx: transaction
+      };
+      return fetch("".concat(this.apiUrl, "/tx/send"), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonData)
+      }).then(function (resp) {
+        return resp.json();
+      });
+    }
+  }, {
+    key: "getBlockHeight",
+    value: function getBlockHeight() {
+      return fetch("".concat(this.apiUrl, "/status")).then(function (resp) {
+        return resp.json();
+      }).then(function (status) {
+        return status.blocks;
+      });
+    }
+  }, {
+    key: "getTransactionInfo",
+    value: function getTransactionInfo(txHash) {
+      var _this19 = this;
+
+      return fetch("".concat(this.apiUrl, "/tx/").concat(txHash)).then(function (resp) {
+        return resp.json();
+      }).then(function (transactionInfo) {
+        if (transactionInfo.error) {
+          throw new Error("Error finding transaction: ".concat(transactionInfo.error));
+        }
+
+        return fetch("".concat(_this19.apiUrl, "/block/").concat(transactionInfo.blockHash));
+      }).then(function (resp) {
+        return resp.json();
+      }).then(function (blockInfo) {
+        return {
+          block_height: blockInfo.height
+        };
+      });
+    }
+  }, {
+    key: "getNetworkedUTXOs",
+    value: function getNetworkedUTXOs(address) {
+      return fetch("".concat(this.apiUrl, "/addr/").concat(address, "/utxo")).then(function (resp) {
+        return resp.json();
+      }).then(function (utxos) {
+        return utxos.map(function (x) {
+          return {
+            value: x.satoshis,
+            confirmations: x.confirmations,
+            tx_hash: x.txid,
+            tx_output_n: x.vout
+          };
+        });
+      });
+    }
+  }]);
+  return InsightClient;
+}(BitcoinNetwork);
+
+exports.InsightClient = InsightClient;
+
+var BlockchainInfoApi =
+/*#__PURE__*/
+function (_BitcoinNetwork3) {
+  (0, _inherits2.default)(BlockchainInfoApi, _BitcoinNetwork3);
+
+  function BlockchainInfoApi() {
+    var _this20;
+
+    var blockchainInfoUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https://blockchain.info';
+    (0, _classCallCheck2.default)(this, BlockchainInfoApi);
+    _this20 = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(BlockchainInfoApi).call(this));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this20), "utxoProviderUrl", void 0);
+    _this20.utxoProviderUrl = blockchainInfoUrl;
+    return _this20;
+  }
+
+  (0, _createClass2.default)(BlockchainInfoApi, [{
+    key: "getBlockHeight",
+    value: function getBlockHeight() {
+      return fetch("".concat(this.utxoProviderUrl, "/latestblock?cors=true")).then(function (resp) {
+        return resp.json();
+      }).then(function (blockObj) {
+        return blockObj.height;
+      });
+    }
+  }, {
+    key: "getNetworkedUTXOs",
+    value: function getNetworkedUTXOs(address) {
+      return fetch("".concat(this.utxoProviderUrl, "/unspent?format=json&active=").concat(address, "&cors=true")).then(function (resp) {
+        if (resp.status === 500) {
+          _logger.Logger.debug('UTXO provider 500 usually means no UTXOs: returning []');
+
+          return {
+            unspent_outputs: []
+          };
+        } else {
+          return resp.json();
+        }
+      }).then(function (utxoJSON) {
+        return utxoJSON.unspent_outputs;
+      }).then(function (utxoList) {
+        return utxoList.map(function (utxo) {
+          var utxoOut = {
+            value: utxo.value,
+            tx_output_n: utxo.tx_output_n,
+            confirmations: utxo.confirmations,
+            tx_hash: utxo.tx_hash_big_endian
+          };
+          return utxoOut;
+        });
+      });
+    }
+  }, {
+    key: "getTransactionInfo",
+    value: function getTransactionInfo(txHash) {
+      return fetch("".concat(this.utxoProviderUrl, "/rawtx/").concat(txHash, "?cors=true")).then(function (resp) {
+        if (resp.status === 200) {
+          return resp.json();
+        } else {
+          throw new Error("Could not lookup transaction info for '".concat(txHash, "'. Server error."));
+        }
+      }).then(function (respObj) {
+        return {
+          block_height: respObj.block_height
+        };
+      });
+    }
+  }, {
+    key: "broadcastTransaction",
+    value: function broadcastTransaction(transaction) {
+      var form = new _formData.default();
+      form.append('tx', transaction);
+      return fetch("".concat(this.utxoProviderUrl, "/pushtx?cors=true"), {
+        method: 'POST',
+        body: form
+      }).then(function (resp) {
+        var text = resp.text();
+        return text.then(function (respText) {
+          if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
+            var txHash = _bitcoinjsLib.default.Transaction.fromHex(transaction).getHash().reverse().toString('hex'); // big_endian
+
+
+            return txHash;
+          } else {
+            throw new _errors.RemoteServiceError(resp, "Broadcast transaction failed with message: ".concat(respText));
+          }
+        });
+      });
+    }
+  }]);
+  return BlockchainInfoApi;
+}(BitcoinNetwork);
+
+exports.BlockchainInfoApi = BlockchainInfoApi;
+var LOCAL_REGTEST = new LocalRegtest('http://localhost:16268', 'http://localhost:16269', new BitcoindAPI('http://localhost:18332/', {
+  username: 'blockstack',
+  password: 'blockstacksystem'
+}));
+var MAINNET_DEFAULT = new BlockstackNetwork('https://core.blockstack.org', 'https://broadcast.blockstack.org', new BlockchainInfoApi());
+var network = {
+  BlockstackNetwork: BlockstackNetwork,
+  LocalRegtest: LocalRegtest,
+  BlockchainInfoApi: BlockchainInfoApi,
+  BitcoindAPI: BitcoindAPI,
+  InsightClient: InsightClient,
+  defaults: {
+    LOCAL_REGTEST: LOCAL_REGTEST,
+    MAINNET_DEFAULT: MAINNET_DEFAULT
+  }
+};
+exports.network = network;
 
 }).call(this,require("buffer").Buffer)
 },{"./errors":516,"./logger":519,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/slicedToArray":18,"bigi":51,"bitcoinjs-lib":73,"buffer":149,"form-data":227,"ripemd160":442}],521:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./skeletons", "./txbuild", "./utils", "./signers", "./safety"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./skeletons"), require("./txbuild"), require("./utils"), require("./signers"), require("./safety"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.skeletons, global.txbuild, global.utils, global.signers, global.safety);
-    global.index = mod.exports;
-  }
-})(this, function (_exports, _skeletons, _txbuild, _utils, _signers, _safety) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  var _exportNames = {
-    makePreorderSkeleton: true,
-    transactions: true,
-    safety: true
-  };
-  Object.defineProperty(_exports, "makePreorderSkeleton", {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var _exportNames = {
+  makePreorderSkeleton: true,
+  transactions: true,
+  safety: true
+};
+Object.defineProperty(exports, "makePreorderSkeleton", {
+  enumerable: true,
+  get: function get() {
+    return _skeletons.makePreorderSkeleton;
+  }
+});
+Object.defineProperty(exports, "transactions", {
+  enumerable: true,
+  get: function get() {
+    return _txbuild.transactions;
+  }
+});
+Object.defineProperty(exports, "safety", {
+  enumerable: true,
+  get: function get() {
+    return _safety.safety;
+  }
+});
+
+var _skeletons = require("./skeletons");
+
+var _txbuild = require("./txbuild");
+
+var _utils = require("./utils");
+
+Object.keys(_utils).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
-      return _skeletons.makePreorderSkeleton;
+      return _utils[key];
     }
-  });
-  Object.defineProperty(_exports, "transactions", {
-    enumerable: true,
-    get: function get() {
-      return _txbuild.transactions;
-    }
-  });
-  Object.defineProperty(_exports, "safety", {
-    enumerable: true,
-    get: function get() {
-      return _safety.safety;
-    }
-  });
-  Object.keys(_utils).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _utils[key];
-      }
-    });
-  });
-  Object.keys(_signers).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-    Object.defineProperty(_exports, key, {
-      enumerable: true,
-      get: function get() {
-        return _signers[key];
-      }
-    });
   });
 });
+
+var _signers = require("./signers");
+
+Object.keys(_signers).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _signers[key];
+    }
+  });
+});
+
+var _safety = require("./safety");
 
 },{"./safety":522,"./signers":523,"./skeletons":524,"./txbuild":525,"./utils":526}],522:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/slicedToArray", "../config"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/slicedToArray"), require("../config"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.slicedToArray, global.config);
-    global.safety = mod.exports;
-  }
-})(this, function (_exports, _slicedToArray2, _config) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.safety = void 0;
-  _slicedToArray2 = _interopRequireDefault(_slicedToArray2);
-
-  function isNameValid() {
-    var fullyQualifiedName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var NAME_PART_RULE = /^[a-z0-9\-_+]+$/;
-    var LENGTH_MAX_NAME = 37;
-
-    if (!fullyQualifiedName || fullyQualifiedName.length > LENGTH_MAX_NAME) {
-      return Promise.resolve(false);
-    }
-
-    var nameParts = fullyQualifiedName.split('.');
-
-    if (nameParts.length !== 2) {
-      return Promise.resolve(false);
-    }
-
-    return Promise.resolve(nameParts.reduce(function (agg, namePart) {
-      if (!agg) {
-        return false;
-      } else {
-        return NAME_PART_RULE.test(namePart);
-      }
-    }, true));
-  }
-
-  function isNamespaceValid(namespaceID) {
-    var NAMESPACE_RULE = /^[a-z0-9\-_]{1,19}$/;
-    return Promise.resolve(namespaceID.match(NAMESPACE_RULE) !== null);
-  }
-
-  function isNameAvailable(fullyQualifiedName) {
-    return _config.config.network.getNameInfo(fullyQualifiedName).then(function () {
-      return false;
-    }).catch(function (e) {
-      if (e.message === 'Name not found') {
-        return true;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function isNamespaceAvailable(namespaceID) {
-    return _config.config.network.getNamespaceInfo(namespaceID).then(function () {
-      return false;
-    }).catch(function (e) {
-      if (e.message === 'Namespace not found') {
-        return true;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function ownsName(fullyQualifiedName, ownerAddress) {
-    return _config.config.network.getNameInfo(fullyQualifiedName).then(function (nameInfo) {
-      return nameInfo.address === ownerAddress;
-    }).catch(function (e) {
-      if (e.message === 'Name not found') {
-        return false;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function revealedNamespace(namespaceID, revealAddress) {
-    return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
-      return namespaceInfo.recipient_address === revealAddress;
-    }).catch(function (e) {
-      if (e.message === 'Namespace not found') {
-        return false;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function namespaceIsReady(namespaceID) {
-    return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
-      return namespaceInfo.ready;
-    }).catch(function (e) {
-      if (e.message === 'Namespace not found') {
-        return false;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function namespaceIsRevealed(namespaceID) {
-    return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
-      return !namespaceInfo.ready;
-    }).catch(function (e) {
-      if (e.message === 'Namespace not found') {
-        return false;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function isInGracePeriod(fullyQualifiedName) {
-    var network = _config.config.network;
-    return Promise.all([network.getNameInfo(fullyQualifiedName), network.getBlockHeight(), network.getGracePeriod(fullyQualifiedName)]).then(function (_ref) {
-      var _ref2 = (0, _slicedToArray2.default)(_ref, 3),
-          nameInfo = _ref2[0],
-          blockHeight = _ref2[1],
-          gracePeriod = _ref2[2];
-
-      var expiresAt = nameInfo.expire_block;
-      return blockHeight >= expiresAt && blockHeight < gracePeriod + expiresAt;
-    }).catch(function (e) {
-      if (e.message === 'Name not found') {
-        return false;
-      } else {
-        throw e;
-      }
-    });
-  }
-
-  function addressCanReceiveName(address) {
-    return _config.config.network.getNamesOwned(address).then(function (names) {
-      return Promise.all(names.map(function (name) {
-        return isNameValid(name);
-      })).then(function (validNames) {
-        return validNames.filter(function (nameValid) {
-          return nameValid;
-        }).length < 25;
-      });
-    });
-  }
-
-  function isAccountSpendable(address, tokenType, blockHeight) {
-    return _config.config.network.getAccountStatus(address, tokenType).then(function (accountStatus) {
-      return accountStatus.transfer_send_block_id >= blockHeight;
-    });
-  }
-
-  var safety = {
-    addressCanReceiveName: addressCanReceiveName,
-    isInGracePeriod: isInGracePeriod,
-    ownsName: ownsName,
-    isNameAvailable: isNameAvailable,
-    isNameValid: isNameValid,
-    isNamespaceValid: isNamespaceValid,
-    isNamespaceAvailable: isNamespaceAvailable,
-    revealedNamespace: revealedNamespace,
-    namespaceIsReady: namespaceIsReady,
-    namespaceIsRevealed: namespaceIsRevealed,
-    isAccountSpendable: isAccountSpendable
-  };
-  _exports.safety = safety;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.safety = void 0;
+
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+
+var _config = require("../config");
+
+function isNameValid() {
+  var fullyQualifiedName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+  var NAME_PART_RULE = /^[a-z0-9\-_+]+$/;
+  var LENGTH_MAX_NAME = 37;
+
+  if (!fullyQualifiedName || fullyQualifiedName.length > LENGTH_MAX_NAME) {
+    return Promise.resolve(false);
+  }
+
+  var nameParts = fullyQualifiedName.split('.');
+
+  if (nameParts.length !== 2) {
+    return Promise.resolve(false);
+  }
+
+  return Promise.resolve(nameParts.reduce(function (agg, namePart) {
+    if (!agg) {
+      return false;
+    } else {
+      return NAME_PART_RULE.test(namePart);
+    }
+  }, true));
+}
+
+function isNamespaceValid(namespaceID) {
+  var NAMESPACE_RULE = /^[a-z0-9\-_]{1,19}$/;
+  return Promise.resolve(namespaceID.match(NAMESPACE_RULE) !== null);
+}
+
+function isNameAvailable(fullyQualifiedName) {
+  return _config.config.network.getNameInfo(fullyQualifiedName).then(function () {
+    return false;
+  }).catch(function (e) {
+    if (e.message === 'Name not found') {
+      return true;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function isNamespaceAvailable(namespaceID) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function () {
+    return false;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return true;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function ownsName(fullyQualifiedName, ownerAddress) {
+  return _config.config.network.getNameInfo(fullyQualifiedName).then(function (nameInfo) {
+    return nameInfo.address === ownerAddress;
+  }).catch(function (e) {
+    if (e.message === 'Name not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function revealedNamespace(namespaceID, revealAddress) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
+    return namespaceInfo.recipient_address === revealAddress;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function namespaceIsReady(namespaceID) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
+    return namespaceInfo.ready;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function namespaceIsRevealed(namespaceID) {
+  return _config.config.network.getNamespaceInfo(namespaceID).then(function (namespaceInfo) {
+    return !namespaceInfo.ready;
+  }).catch(function (e) {
+    if (e.message === 'Namespace not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function isInGracePeriod(fullyQualifiedName) {
+  var network = _config.config.network;
+  return Promise.all([network.getNameInfo(fullyQualifiedName), network.getBlockHeight(), network.getGracePeriod(fullyQualifiedName)]).then(function (_ref) {
+    var _ref2 = (0, _slicedToArray2.default)(_ref, 3),
+        nameInfo = _ref2[0],
+        blockHeight = _ref2[1],
+        gracePeriod = _ref2[2];
+
+    var expiresAt = nameInfo.expire_block;
+    return blockHeight >= expiresAt && blockHeight < gracePeriod + expiresAt;
+  }).catch(function (e) {
+    if (e.message === 'Name not found') {
+      return false;
+    } else {
+      throw e;
+    }
+  });
+}
+
+function addressCanReceiveName(address) {
+  return _config.config.network.getNamesOwned(address).then(function (names) {
+    return Promise.all(names.map(function (name) {
+      return isNameValid(name);
+    })).then(function (validNames) {
+      return validNames.filter(function (nameValid) {
+        return nameValid;
+      }).length < 25;
+    });
+  });
+}
+
+function isAccountSpendable(address, tokenType, blockHeight) {
+  return _config.config.network.getAccountStatus(address, tokenType).then(function (accountStatus) {
+    return accountStatus.transfer_send_block_id >= blockHeight;
+  });
+}
+
+var safety = {
+  addressCanReceiveName: addressCanReceiveName,
+  isInGracePeriod: isInGracePeriod,
+  ownsName: ownsName,
+  isNameAvailable: isNameAvailable,
+  isNameValid: isNameValid,
+  isNamespaceValid: isNamespaceValid,
+  isNamespaceAvailable: isNamespaceAvailable,
+  revealedNamespace: revealedNamespace,
+  namespaceIsReady: namespaceIsReady,
+  namespaceIsRevealed: namespaceIsRevealed,
+  isAccountSpendable: isAccountSpendable
+};
+exports.safety = safety;
 
 },{"../config":513,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18}],523:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/defineProperty", "bitcoinjs-lib", "../utils"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/defineProperty"), require("bitcoinjs-lib"), require("../utils"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.defineProperty, global.bitcoinjsLib, global.utils);
-    global.signers = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _defineProperty2, _bitcoinjsLib, _utils) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.PubkeyHashSigner = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  _bitcoinjsLib = _interopRequireDefault(_bitcoinjsLib);
-
-  /**
-   * Class representing a transaction signer for pubkeyhash addresses
-   * (a.k.a. single-sig addresses)
-   * @private
-   */
-  var PubkeyHashSigner =
-  /*#__PURE__*/
-  function () {
-    function PubkeyHashSigner(ecPair) {
-      (0, _classCallCheck2.default)(this, PubkeyHashSigner);
-      (0, _defineProperty2.default)(this, "ecPair", void 0);
-      this.ecPair = ecPair;
-    }
-
-    (0, _createClass2.default)(PubkeyHashSigner, [{
-      key: "signerVersion",
-      value: function signerVersion() {
-        return 1;
-      }
-    }, {
-      key: "getAddress",
-      value: function getAddress() {
-        var _this = this;
-
-        return Promise.resolve().then(function () {
-          return (0, _utils.ecPairToAddress)(_this.ecPair);
-        });
-      }
-    }, {
-      key: "signTransaction",
-      value: function signTransaction(transaction, inputIndex) {
-        var _this2 = this;
-
-        return Promise.resolve().then(function () {
-          transaction.sign(inputIndex, _this2.ecPair);
-        });
-      }
-    }], [{
-      key: "fromHexString",
-      value: function fromHexString(keyHex) {
-        return new PubkeyHashSigner((0, _utils.hexStringToECPair)(keyHex));
-      }
-    }]);
-    return PubkeyHashSigner;
-  }();
-
-  _exports.PubkeyHashSigner = PubkeyHashSigner;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.PubkeyHashSigner = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _bitcoinjsLib = _interopRequireDefault(require("bitcoinjs-lib"));
+
+var _utils = require("../utils");
+
+/**
+ * Class representing a transaction signer for pubkeyhash addresses
+ * (a.k.a. single-sig addresses)
+ * @private
+ */
+var PubkeyHashSigner =
+/*#__PURE__*/
+function () {
+  function PubkeyHashSigner(ecPair) {
+    (0, _classCallCheck2.default)(this, PubkeyHashSigner);
+    (0, _defineProperty2.default)(this, "ecPair", void 0);
+    this.ecPair = ecPair;
+  }
+
+  (0, _createClass2.default)(PubkeyHashSigner, [{
+    key: "signerVersion",
+    value: function signerVersion() {
+      return 1;
+    }
+  }, {
+    key: "getAddress",
+    value: function getAddress() {
+      var _this = this;
+
+      return Promise.resolve().then(function () {
+        return (0, _utils.ecPairToAddress)(_this.ecPair);
+      });
+    }
+  }, {
+    key: "signTransaction",
+    value: function signTransaction(transaction, inputIndex) {
+      var _this2 = this;
+
+      return Promise.resolve().then(function () {
+        transaction.sign(inputIndex, _this2.ecPair);
+      });
+    }
+  }], [{
+    key: "fromHexString",
+    value: function fromHexString(keyHex) {
+      return new PubkeyHashSigner((0, _utils.hexStringToECPair)(keyHex));
+    }
+  }]);
+  return PubkeyHashSigner;
+}();
+
+exports.PubkeyHashSigner = PubkeyHashSigner;
 
 },{"../utils":551,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73}],524:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/defineProperty", "bitcoinjs-lib", "bigi", "./utils", "../config"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/defineProperty"), require("bitcoinjs-lib"), require("bigi"), require("./utils"), require("../config"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.defineProperty, global.bitcoinjsLib, global.bigi, global.utils, global.config);
-    global.skeletons = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _defineProperty2, _bitcoinjsLib, _bigi, _utils, _config) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.makePreorderSkeleton = makePreorderSkeleton;
-  _exports.makeRegisterSkeleton = makeRegisterSkeleton;
-  _exports.makeRenewalSkeleton = makeRenewalSkeleton;
-  _exports.makeTransferSkeleton = makeTransferSkeleton;
-  _exports.makeUpdateSkeleton = makeUpdateSkeleton;
-  _exports.makeRevokeSkeleton = makeRevokeSkeleton;
-  _exports.makeNamespacePreorderSkeleton = makeNamespacePreorderSkeleton;
-  _exports.makeNamespaceRevealSkeleton = makeNamespaceRevealSkeleton;
-  _exports.makeNamespaceReadySkeleton = makeNamespaceReadySkeleton;
-  _exports.makeNameImportSkeleton = makeNameImportSkeleton;
-  _exports.makeAnnounceSkeleton = makeAnnounceSkeleton;
-  _exports.makeTokenTransferSkeleton = makeTokenTransferSkeleton;
-  _exports.BlockstackNamespace = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  _bitcoinjsLib = _interopRequireDefault(_bitcoinjsLib);
-  _bigi = _interopRequireDefault(_bigi);
-
-  // todo : add name length / character verification
-  var BlockstackNamespace =
-  /*#__PURE__*/
-  function () {
-    function BlockstackNamespace(namespaceID) {
-      (0, _classCallCheck2.default)(this, BlockstackNamespace);
-      (0, _defineProperty2.default)(this, "namespaceID", void 0);
-      (0, _defineProperty2.default)(this, "version", void 0);
-      (0, _defineProperty2.default)(this, "lifetime", void 0);
-      (0, _defineProperty2.default)(this, "coeff", void 0);
-      (0, _defineProperty2.default)(this, "base", void 0);
-      (0, _defineProperty2.default)(this, "buckets", void 0);
-      (0, _defineProperty2.default)(this, "nonalphaDiscount", void 0);
-      (0, _defineProperty2.default)(this, "noVowelDiscount", void 0);
-
-      if (namespaceID.length > 19) {
-        throw new Error('Namespace ID too long (19 chars max)');
-      }
-
-      if (!namespaceID.match('[0123456789abcdefghijklmnopqrstuvwxyz_-]+')) {
-        throw new Error('Namespace ID can only use characters 0123456789abcdefghijklmnopqrstuvwxyz-_');
-      }
-
-      this.namespaceID = namespaceID;
-      this.version = -1;
-      this.lifetime = -1;
-      this.coeff = -1;
-      this.base = -1;
-      this.buckets = [-1];
-      this.nonalphaDiscount = -1;
-      this.noVowelDiscount = -1;
-    }
-
-    (0, _createClass2.default)(BlockstackNamespace, [{
-      key: "check",
-      value: function check() {
-        try {
-          this.setVersion(this.version);
-          this.setLifetime(this.lifetime);
-          this.setCoeff(this.coeff);
-          this.setBase(this.base);
-          this.setBuckets(this.buckets);
-          this.setNonalphaDiscount(this.nonalphaDiscount);
-          this.setNoVowelDiscount(this.noVowelDiscount);
-          return true;
-        } catch (e) {
-          return false;
-        }
-      }
-    }, {
-      key: "setVersion",
-      value: function setVersion(version) {
-        if (version < 0 || version > Math.pow(2, 16) - 1) {
-          throw new Error('Invalid version: must be a 16-bit number');
-        }
-
-        this.version = version;
-      }
-    }, {
-      key: "setLifetime",
-      value: function setLifetime(lifetime) {
-        if (lifetime < 0 || lifetime > Math.pow(2, 32) - 1) {
-          throw new Error('Invalid lifetime: must be a 32-bit number');
-        }
-
-        this.lifetime = lifetime;
-      }
-    }, {
-      key: "setCoeff",
-      value: function setCoeff(coeff) {
-        if (coeff < 0 || coeff > 255) {
-          throw new Error('Invalid coeff: must be an 8-bit number');
-        }
-
-        this.coeff = coeff;
-      }
-    }, {
-      key: "setBase",
-      value: function setBase(base) {
-        if (base < 0 || base > 255) {
-          throw new Error('Invalid base: must be an 8-bit number');
-        }
-
-        this.base = base;
-      }
-    }, {
-      key: "setBuckets",
-      value: function setBuckets(buckets) {
-        if (buckets.length !== 16) {
-          throw new Error('Invalid buckets: must have 16 entries');
-        }
-
-        for (var i = 0; i < buckets.length; i++) {
-          if (buckets[i] < 0 || buckets[i] > 15) {
-            throw new Error('Invalid buckets: must be 4-bit numbers');
-          }
-        }
-
-        this.buckets = buckets.slice(0);
-      }
-    }, {
-      key: "setNonalphaDiscount",
-      value: function setNonalphaDiscount(nonalphaDiscount) {
-        if (nonalphaDiscount <= 0 || nonalphaDiscount > 15) {
-          throw new Error('Invalid nonalphaDiscount: must be a positive 4-bit number');
-        }
-
-        this.nonalphaDiscount = nonalphaDiscount;
-      }
-    }, {
-      key: "setNoVowelDiscount",
-      value: function setNoVowelDiscount(noVowelDiscount) {
-        if (noVowelDiscount <= 0 || noVowelDiscount > 15) {
-          throw new Error('Invalid noVowelDiscount: must be a positive 4-bit number');
-        }
-
-        this.noVowelDiscount = noVowelDiscount;
-      }
-    }, {
-      key: "toHexPayload",
-      value: function toHexPayload() {
-        var lifeHex = "00000000".concat(this.lifetime.toString(16)).slice(-8);
-        var coeffHex = "00".concat(this.coeff.toString(16)).slice(-2);
-        var baseHex = "00".concat(this.base.toString(16)).slice(-2);
-        var bucketHex = this.buckets.map(function (b) {
-          return b.toString(16);
-        }).reduce(function (b1, b2) {
-          return b1 + b2;
-        }, '');
-        var discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16);
-        var versionHex = "0000".concat(this.version.toString(16)).slice(-4);
-        var namespaceIDHex = new Buffer(this.namespaceID).toString('hex');
-        return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex;
-      }
-    }]);
-    return BlockstackNamespace;
-  }();
-
-  _exports.BlockstackNamespace = BlockstackNamespace;
-
-  function asAmountV2(amount) {
-    // convert an AmountType v1 or v2 to an AmountTypeV2.
-    // the "units" of a v1 amount type are always 'BTC'
-    if (typeof amount === 'number') {
-      return {
-        units: 'BTC',
-        amount: _bigi.default.fromByteArrayUnsigned(String(amount))
-      };
-    } else {
-      return {
-        units: amount.units,
-        amount: amount.amount
-      };
-    }
-  }
-
-  function makeTXbuilder() {
-    var txb = new _bitcoinjsLib.default.TransactionBuilder(_config.config.network.layer1);
-    txb.setVersion(1);
-    return txb;
-  }
-
-  function opEncode(opcode) {
-    // NOTE: must *always* a 3-character string
-    var res = "".concat(_config.config.network.MAGIC_BYTES).concat(opcode);
-
-    if (res.length !== 3) {
-      throw new Error('Runtime error: invalid MAGIC_BYTES');
-    }
-
-    return res;
-  }
-
-  function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burn) {
-    var registerAddress = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-    // Returns a preorder tx skeleton.
-    //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
-    //                    2. the Preorder's change address (5500 satoshi minimum)
-    //                    3. the BURN
-    //
-    // 0     2  3                                     23             39          47            66
-    // |-----|--|--------------------------------------|--------------|-----------|-------------|
-    // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash token burn  token type
-    //                                                                 (optional)   (optional)
-    //
-    // output 0: name preorder code
-    // output 1: preorder address
-    // output 2: burn address
-    //
-    // Returns an unsigned serialized transaction.
-    var burnAmount = asAmountV2(burn);
-    var network = _config.config.network;
-    var nameBuff = Buffer.from((0, _utils.decodeB40)(fullyQualifiedName), 'hex'); // base40
-
-    var scriptPublicKey = _bitcoinjsLib.default.address.toOutputScript(preorderAddress, network.layer1);
-
-    var dataBuffers = [nameBuff, scriptPublicKey];
-
-    if (!!registerAddress) {
-      var registerBuff = Buffer.from(registerAddress, 'ascii');
-      dataBuffers.push(registerBuff);
-    }
-
-    var dataBuff = Buffer.concat(dataBuffers);
-    var hashed = (0, _utils.hash160)(dataBuff);
-    var opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66;
-    var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
-    opReturnBuffer.write(opEncode('?'), 0, 3, 'ascii');
-    hashed.copy(opReturnBuffer, 3);
-    opReturnBuffer.write(consensusHash, 23, 16, 'hex');
-
-    if (burnAmount.units !== 'BTC') {
-      var burnHex = burnAmount.amount.toHex();
-
-      if (burnHex.length > 16) {
-        // exceeds 2**64; can't fit
-        throw new Error("Cannot preorder '".concat(fullyQualifiedName, "': cannot fit price into 8 bytes"));
-      }
-
-      var paddedBurnHex = "0000000000000000".concat(burnHex).slice(-16);
-      opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex');
-      opReturnBuffer.write(burnAmount.units, 47, burnAmount.units.length, 'ascii');
-    }
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
-
-    if (burnAmount.units === 'BTC') {
-      var btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16);
-      tx.addOutput(burnAddress, btcBurnAmount);
-    } else {
-      tx.addOutput(burnAddress, _utils.DUST_MINIMUM);
-    }
-
-    return tx.buildIncomplete();
-  }
-
-  function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
-    var valueHash = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var burnTokenAmountHex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    // Returns a register tx skeleton.
-    //   with 2 outputs : 1. The register OP_RETURN
-    //                    2. The owner address (can be different from REGISTER address on renewals)
-    // You MUST make the first input a UTXO from the current OWNER *or* the
-    //   funder of the PREORDER
-    // in the case of a renewal, this would need to be modified to include a change address
-    //  as output (3) before the burn output (4)
-
-    /*
-      Formats
-       No zonefile hash, and pay with BTC:
-       0    2  3                                  39
-      |----|--|----------------------------------|
-      magic op   name.ns_id (up to 37 bytes)
-        With zonefile hash, and pay with BTC:
-       0    2  3                                  39                  59
-      |----|--|----------------------------------|-------------------|
-      magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
-       output 0: name registration code
-      output 1: owner address
-    */
-    var payload;
-
-    if (!!burnTokenAmountHex && !valueHash) {
-      // empty value hash
-      valueHash = '0000000000000000000000000000000000000000';
-    }
-
-    if (!!valueHash) {
-      if (valueHash.length !== 40) {
-        throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded');
-      }
-
-      if (!!burnTokenAmountHex) {
-        if (burnTokenAmountHex.length !== 16) {
-          throw new Error('Burn field length incorrect.  Expecting 8-bytes, hex-encoded');
-        }
-      }
-
-      var payloadLen = burnTokenAmountHex ? 65 : 57;
-      payload = Buffer.alloc(payloadLen, 0);
-      payload.write(fullyQualifiedName, 0, 37, 'ascii');
-      payload.write(valueHash, 37, 20, 'hex');
-
-      if (!!burnTokenAmountHex) {
-        payload.write(burnTokenAmountHex, 57, 8, 'hex');
-      }
-    } else {
-      payload = Buffer.from(fullyQualifiedName, 'ascii');
-    }
-
-    var opReturnBuffer = Buffer.concat([Buffer.from(opEncode(':'), 'ascii'), payload]);
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    tx.addOutput(ownerAddress, _utils.DUST_MINIMUM);
-    return tx.buildIncomplete();
-  }
-
-  function makeRenewalSkeleton(fullyQualifiedName, nextOwnerAddress, lastOwnerAddress, burnAddress, burn) {
-    var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-
-    /*
-      Formats
-       No zonefile hash, and pay with BTC:
-       0    2  3                                  39
-      |----|--|----------------------------------|
-      magic op   name.ns_id (up to 37 bytes)
-        With zonefile hash, and pay with BTC:
-       0    2  3                                  39                  59
-      |----|--|----------------------------------|-------------------|
-      magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
-       With renewal payment in a token:
-     (for register, tokens burned is not included)
-     (for renew, tokens burned is the number of tokens to burn)
-      0    2  3                                  39                  59                            67
-     |----|--|----------------------------------|-------------------|------------------------------|
-     magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (big-endian)
-      output 0: renewal code
-     output 1: new owner address
-     output 2: current owner address
-     output 3: burn address
-    */
-    var burnAmount = asAmountV2(burn);
-    var network = _config.config.network;
-    var burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount;
-    var burnBTCAmount = burnAmount.units === 'BTC' ? parseInt(burnAmount.amount.toHex(), 16) : _utils.DUST_MINIMUM;
-    var burnTokenHex = null;
-
-    if (!!burnTokenAmount) {
-      var burnHex = burnTokenAmount.toHex();
-
-      if (burnHex.length > 16) {
-        // exceeds 2**64; can't fit 
-        throw new Error("Cannot renew '".concat(fullyQualifiedName, "': cannot fit price into 8 bytes"));
-      }
-
-      burnTokenHex = "0000000000000000".concat(burnHex).slice(-16);
-    }
-
-    var registerTX = makeRegisterSkeleton(fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex);
-
-    var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(registerTX, network.layer1);
-
-    txB.addOutput(lastOwnerAddress, _utils.DUST_MINIMUM);
-    txB.addOutput(burnAddress, burnBTCAmount);
-    return txB.buildIncomplete();
-  }
-
-  function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
-    var keepZonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    // Returns a transfer tx skeleton.
-    //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
-    //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
-    //
-    // You MUST make the first input a UTXO from the current OWNER
-    //
-    // Returns an unsigned serialized transaction.
-
-    /*
-      Format
-       0     2  3    4                   20              36
-      |-----|--|----|-------------------|---------------|
-      magic op keep  hash128(name.ns_id) consensus hash
-               data?
-       output 0: transfer code
-      output 1: new owner
-    */
-    var opRet = Buffer.alloc(36);
-    var keepChar = '~';
-
-    if (keepZonefile) {
-      keepChar = '>';
-    }
-
-    opRet.write(opEncode('>'), 0, 3, 'ascii');
-    opRet.write(keepChar, 3, 1, 'ascii');
-    var hashed = (0, _utils.hash128)(Buffer.from(fullyQualifiedName, 'ascii'));
-    hashed.copy(opRet, 4);
-    opRet.write(consensusHash, 20, 16, 'hex');
-
-    var opRetPayload = _bitcoinjsLib.default.payments.embed({
-      data: [opRet]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(opRetPayload, 0);
-    tx.addOutput(newOwner, _utils.DUST_MINIMUM);
-    return tx.buildIncomplete();
-  }
-
-  function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
-    // Returns an update tx skeleton.
-    //   with 1 output : 1. the Blockstack update OP_RETURN
-    //
-    // You MUST make the first input a UTXO from the current OWNER
-    //
-    // Returns an unsigned serialized transaction.
-    //
-    // output 0: the revoke code
-
-    /*
-      Format:
-       0     2  3                                   19                      39
-      |-----|--|-----------------------------------|-----------------------|
-      magic op  hash128(name.ns_id,consensus hash) hash160(data)
-       output 0: update code
-    */
-    var opRet = Buffer.alloc(39);
-    var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
-    var consensusBuff = Buffer.from(consensusHash, 'ascii');
-    var hashedName = (0, _utils.hash128)(Buffer.concat([nameBuff, consensusBuff]));
-    opRet.write(opEncode('+'), 0, 3, 'ascii');
-    hashedName.copy(opRet, 3);
-    opRet.write(valueHash, 19, 20, 'hex');
-
-    var opRetPayload = _bitcoinjsLib.default.payments.embed({
-      data: [opRet]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(opRetPayload, 0);
-    return tx.buildIncomplete();
-  }
-
-  function makeRevokeSkeleton(fullyQualifiedName) {
-    // Returns a revoke tx skeleton
-    //    with 1 output: 1. the Blockstack revoke OP_RETURN
-    //
-    // You MUST make the first input a UTXO from the current OWNER
-    //
-    // Returns an unsigned serialized transaction
-
-    /*
-     Format:
-      0    2  3                             39
-     |----|--|-----------------------------|
-     magic op   name.ns_id (37 bytes)
-      output 0: the revoke code
-    */
-    var opRet = Buffer.alloc(3);
-    var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
-    opRet.write(opEncode('~'), 0, 3, 'ascii');
-    var opReturnBuffer = Buffer.concat([opRet, nameBuff]);
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    return tx.buildIncomplete();
-  }
-
-  function makeNamespacePreorderSkeleton(namespaceID, consensusHash, preorderAddress, registerAddress, burn) {
-    // Returns a namespace preorder tx skeleton.
-    // Returns an unsigned serialized transaction.
-
-    /*
-     Formats:
-      Without STACKS:
-      0     2   3                                      23               39
-     |-----|---|--------------------------------------|----------------|
-     magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash
-       with STACKs:
-      0     2   3                                      23               39                         47
-     |-----|---|--------------------------------------|----------------|--------------------------|
-     magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (big-endian)
-      output 0: namespace preorder code
-     output 1: change address
-     otuput 2: burn address
-    */
-    var burnAmount = asAmountV2(burn);
-
-    if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
-      throw new Error("Invalid burnUnits ".concat(burnAmount.units));
-    }
-
-    var network = _config.config.network;
-    var burnAddress = network.getDefaultBurnAddress();
-    var namespaceIDBuff = Buffer.from((0, _utils.decodeB40)(namespaceID), 'hex'); // base40
-
-    var scriptPublicKey = _bitcoinjsLib.default.address.toOutputScript(preorderAddress, network.layer1);
-
-    var registerBuff = Buffer.from(registerAddress, 'ascii');
-    var dataBuffers = [namespaceIDBuff, scriptPublicKey, registerBuff];
-    var dataBuff = Buffer.concat(dataBuffers);
-    var hashed = (0, _utils.hash160)(dataBuff);
-    var btcBurnAmount = _utils.DUST_MINIMUM;
-    var opReturnBufferLen = 39;
-
-    if (burnAmount.units === 'STACKS') {
-      opReturnBufferLen = 47;
-    } else {
-      btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16);
-    }
-
-    var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
-    opReturnBuffer.write(opEncode('*'), 0, 3, 'ascii');
-    hashed.copy(opReturnBuffer, 3);
-    opReturnBuffer.write(consensusHash, 23, 16, 'hex');
-
-    if (burnAmount.units === 'STACKS') {
-      var burnHex = burnAmount.amount.toHex();
-      var paddedBurnHex = "0000000000000000".concat(burnHex).slice(-16);
-      opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex');
-    }
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
-    tx.addOutput(burnAddress, btcBurnAmount);
-    return tx.buildIncomplete();
-  }
-
-  function makeNamespaceRevealSkeleton(namespace, revealAddress) {
-    /*
-     Format:
-      0     2   3    7     8     9    10   11   12   13   14    15    16    17       18      20     39
-     |-----|---|----|-----|-----|----|----|----|----|----|-----|-----|-----|--------|-------|-------|
-     magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
-                                                    bucket exponents        no-vowel
-                                                                            discounts
-     
-     output 0: namespace reveal code
-     output 1: reveal address
-    */
-    var hexPayload = namespace.toHexPayload();
-    var opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2);
-    opReturnBuffer.write(opEncode('&'), 0, 3, 'ascii');
-    opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex');
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    tx.addOutput(revealAddress, _utils.DUST_MINIMUM);
-    return tx.buildIncomplete();
-  }
-
-  function makeNamespaceReadySkeleton(namespaceID) {
-    /*
-     Format:
-      0     2  3  4           23
-     |-----|--|--|------------|
-     magic op  .  ns_id
-      output 0: namespace ready code
-     */
-    var opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1);
-    opReturnBuffer.write(opEncode('!'), 0, 3, 'ascii');
-    opReturnBuffer.write(".".concat(namespaceID), 3, namespaceID.length + 1, 'ascii');
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    return tx.buildIncomplete();
-  }
-
-  function makeNameImportSkeleton(name, recipientAddr, zonefileHash) {
-    /*
-     Format:
-       0    2  3                             39
-      |----|--|-----------------------------|
-      magic op   name.ns_id (37 bytes)
-      Output 0: the OP_RETURN
-     Output 1: the recipient
-     Output 2: the zonefile hash
-    */
-    if (zonefileHash.length !== 40) {
-      throw new Error('Invalid zonefile hash: must be 20 bytes hex-encoded');
-    }
-
-    var network = _config.config.network;
-    var opReturnBuffer = Buffer.alloc(3 + name.length);
-    opReturnBuffer.write(opEncode(';'), 0, 3, 'ascii');
-    opReturnBuffer.write(name, 3, name.length, 'ascii');
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-
-    var zonefileHashB58 = _bitcoinjsLib.default.address.toBase58Check(new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash);
-
-    tx.addOutput(nullOutput, 0);
-    tx.addOutput(recipientAddr, _utils.DUST_MINIMUM);
-    tx.addOutput(zonefileHashB58, _utils.DUST_MINIMUM);
-    return tx.buildIncomplete();
-  }
-
-  function makeAnnounceSkeleton(messageHash) {
-    /*
-      Format:
-       0    2  3                             23
-      |----|--|-----------------------------|
-      magic op   message hash (160-bit)
-       output 0: the OP_RETURN
-    */
-    if (messageHash.length !== 40) {
-      throw new Error('Invalid message hash: must be 20 bytes hex-encoded');
-    }
-
-    var opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2);
-    opReturnBuffer.write(opEncode('#'), 0, 3, 'ascii');
-    opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex');
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    return tx.buildIncomplete();
-  }
-
-  function makeTokenTransferSkeleton(recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea) {
-    /*
-     Format:
-       0     2  3              19         38          46                        80
-      |-----|--|--------------|----------|-----------|-------------------------|
-      magic op  consensus_hash token_type amount (BE) scratch area
-                               (ns_id)
-       output 0: token transfer code
-      output 1: recipient address
-    */
-    if (scratchArea.length > 34) {
-      throw new Error('Invalid scratch area: must be no more than 34 bytes');
-    }
-
-    var opReturnBuffer = Buffer.alloc(46 + scratchArea.length);
-    var tokenTypeHex = new Buffer(tokenType).toString('hex');
-    var tokenTypeHexPadded = "00000000000000000000000000000000000000".concat(tokenTypeHex).slice(-38);
-    var tokenValueHex = tokenAmount.toHex();
-
-    if (tokenValueHex.length > 16) {
-      // exceeds 2**64; can't fit
-      throw new Error("Cannot send tokens: cannot fit ".concat(tokenAmount.toString(), " into 8 bytes"));
-    }
-
-    var tokenValueHexPadded = "0000000000000000".concat(tokenValueHex).slice(-16);
-    opReturnBuffer.write(opEncode('$'), 0, 3, 'ascii');
-    opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex');
-    opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex');
-    opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex');
-    opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii');
-
-    var nullOutput = _bitcoinjsLib.default.payments.embed({
-      data: [opReturnBuffer]
-    }).output;
-
-    var tx = makeTXbuilder();
-    tx.addOutput(nullOutput, 0);
-    tx.addOutput(recipientAddress, _utils.DUST_MINIMUM);
-    return tx.buildIncomplete();
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.makePreorderSkeleton = makePreorderSkeleton;
+exports.makeRegisterSkeleton = makeRegisterSkeleton;
+exports.makeRenewalSkeleton = makeRenewalSkeleton;
+exports.makeTransferSkeleton = makeTransferSkeleton;
+exports.makeUpdateSkeleton = makeUpdateSkeleton;
+exports.makeRevokeSkeleton = makeRevokeSkeleton;
+exports.makeNamespacePreorderSkeleton = makeNamespacePreorderSkeleton;
+exports.makeNamespaceRevealSkeleton = makeNamespaceRevealSkeleton;
+exports.makeNamespaceReadySkeleton = makeNamespaceReadySkeleton;
+exports.makeNameImportSkeleton = makeNameImportSkeleton;
+exports.makeAnnounceSkeleton = makeAnnounceSkeleton;
+exports.makeTokenTransferSkeleton = makeTokenTransferSkeleton;
+exports.BlockstackNamespace = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _bitcoinjsLib = _interopRequireDefault(require("bitcoinjs-lib"));
+
+var _bigi = _interopRequireDefault(require("bigi"));
+
+var _utils = require("./utils");
+
+var _config = require("../config");
+
+// todo : add name length / character verification
+var BlockstackNamespace =
+/*#__PURE__*/
+function () {
+  function BlockstackNamespace(namespaceID) {
+    (0, _classCallCheck2.default)(this, BlockstackNamespace);
+    (0, _defineProperty2.default)(this, "namespaceID", void 0);
+    (0, _defineProperty2.default)(this, "version", void 0);
+    (0, _defineProperty2.default)(this, "lifetime", void 0);
+    (0, _defineProperty2.default)(this, "coeff", void 0);
+    (0, _defineProperty2.default)(this, "base", void 0);
+    (0, _defineProperty2.default)(this, "buckets", void 0);
+    (0, _defineProperty2.default)(this, "nonalphaDiscount", void 0);
+    (0, _defineProperty2.default)(this, "noVowelDiscount", void 0);
+
+    if (namespaceID.length > 19) {
+      throw new Error('Namespace ID too long (19 chars max)');
+    }
+
+    if (!namespaceID.match('[0123456789abcdefghijklmnopqrstuvwxyz_-]+')) {
+      throw new Error('Namespace ID can only use characters 0123456789abcdefghijklmnopqrstuvwxyz-_');
+    }
+
+    this.namespaceID = namespaceID;
+    this.version = -1;
+    this.lifetime = -1;
+    this.coeff = -1;
+    this.base = -1;
+    this.buckets = [-1];
+    this.nonalphaDiscount = -1;
+    this.noVowelDiscount = -1;
+  }
+
+  (0, _createClass2.default)(BlockstackNamespace, [{
+    key: "check",
+    value: function check() {
+      try {
+        this.setVersion(this.version);
+        this.setLifetime(this.lifetime);
+        this.setCoeff(this.coeff);
+        this.setBase(this.base);
+        this.setBuckets(this.buckets);
+        this.setNonalphaDiscount(this.nonalphaDiscount);
+        this.setNoVowelDiscount(this.noVowelDiscount);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+  }, {
+    key: "setVersion",
+    value: function setVersion(version) {
+      if (version < 0 || version > Math.pow(2, 16) - 1) {
+        throw new Error('Invalid version: must be a 16-bit number');
+      }
+
+      this.version = version;
+    }
+  }, {
+    key: "setLifetime",
+    value: function setLifetime(lifetime) {
+      if (lifetime < 0 || lifetime > Math.pow(2, 32) - 1) {
+        throw new Error('Invalid lifetime: must be a 32-bit number');
+      }
+
+      this.lifetime = lifetime;
+    }
+  }, {
+    key: "setCoeff",
+    value: function setCoeff(coeff) {
+      if (coeff < 0 || coeff > 255) {
+        throw new Error('Invalid coeff: must be an 8-bit number');
+      }
+
+      this.coeff = coeff;
+    }
+  }, {
+    key: "setBase",
+    value: function setBase(base) {
+      if (base < 0 || base > 255) {
+        throw new Error('Invalid base: must be an 8-bit number');
+      }
+
+      this.base = base;
+    }
+  }, {
+    key: "setBuckets",
+    value: function setBuckets(buckets) {
+      if (buckets.length !== 16) {
+        throw new Error('Invalid buckets: must have 16 entries');
+      }
+
+      for (var i = 0; i < buckets.length; i++) {
+        if (buckets[i] < 0 || buckets[i] > 15) {
+          throw new Error('Invalid buckets: must be 4-bit numbers');
+        }
+      }
+
+      this.buckets = buckets.slice(0);
+    }
+  }, {
+    key: "setNonalphaDiscount",
+    value: function setNonalphaDiscount(nonalphaDiscount) {
+      if (nonalphaDiscount <= 0 || nonalphaDiscount > 15) {
+        throw new Error('Invalid nonalphaDiscount: must be a positive 4-bit number');
+      }
+
+      this.nonalphaDiscount = nonalphaDiscount;
+    }
+  }, {
+    key: "setNoVowelDiscount",
+    value: function setNoVowelDiscount(noVowelDiscount) {
+      if (noVowelDiscount <= 0 || noVowelDiscount > 15) {
+        throw new Error('Invalid noVowelDiscount: must be a positive 4-bit number');
+      }
+
+      this.noVowelDiscount = noVowelDiscount;
+    }
+  }, {
+    key: "toHexPayload",
+    value: function toHexPayload() {
+      var lifeHex = "00000000".concat(this.lifetime.toString(16)).slice(-8);
+      var coeffHex = "00".concat(this.coeff.toString(16)).slice(-2);
+      var baseHex = "00".concat(this.base.toString(16)).slice(-2);
+      var bucketHex = this.buckets.map(function (b) {
+        return b.toString(16);
+      }).reduce(function (b1, b2) {
+        return b1 + b2;
+      }, '');
+      var discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16);
+      var versionHex = "0000".concat(this.version.toString(16)).slice(-4);
+      var namespaceIDHex = new Buffer(this.namespaceID).toString('hex');
+      return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex;
+    }
+  }]);
+  return BlockstackNamespace;
+}();
+
+exports.BlockstackNamespace = BlockstackNamespace;
+
+function asAmountV2(amount) {
+  // convert an AmountType v1 or v2 to an AmountTypeV2.
+  // the "units" of a v1 amount type are always 'BTC'
+  if (typeof amount === 'number') {
+    return {
+      units: 'BTC',
+      amount: _bigi.default.fromByteArrayUnsigned(String(amount))
+    };
+  } else {
+    return {
+      units: amount.units,
+      amount: amount.amount
+    };
+  }
+}
+
+function makeTXbuilder() {
+  var txb = new _bitcoinjsLib.default.TransactionBuilder(_config.config.network.layer1);
+  txb.setVersion(1);
+  return txb;
+}
+
+function opEncode(opcode) {
+  // NOTE: must *always* a 3-character string
+  var res = "".concat(_config.config.network.MAGIC_BYTES).concat(opcode);
+
+  if (res.length !== 3) {
+    throw new Error('Runtime error: invalid MAGIC_BYTES');
+  }
+
+  return res;
+}
+
+function makePreorderSkeleton(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, burn) {
+  var registerAddress = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  // Returns a preorder tx skeleton.
+  //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
+  //                    2. the Preorder's change address (5500 satoshi minimum)
+  //                    3. the BURN
+  //
+  // 0     2  3                                     23             39          47            66
+  // |-----|--|--------------------------------------|--------------|-----------|-------------|
+  // magic op  hash160(fqn,scriptPubkey,registerAddr) consensus hash token burn  token type
+  //                                                                 (optional)   (optional)
+  //
+  // output 0: name preorder code
+  // output 1: preorder address
+  // output 2: burn address
+  //
+  // Returns an unsigned serialized transaction.
+  var burnAmount = asAmountV2(burn);
+  var network = _config.config.network;
+  var nameBuff = Buffer.from((0, _utils.decodeB40)(fullyQualifiedName), 'hex'); // base40
+
+  var scriptPublicKey = _bitcoinjsLib.default.address.toOutputScript(preorderAddress, network.layer1);
+
+  var dataBuffers = [nameBuff, scriptPublicKey];
+
+  if (!!registerAddress) {
+    var registerBuff = Buffer.from(registerAddress, 'ascii');
+    dataBuffers.push(registerBuff);
+  }
+
+  var dataBuff = Buffer.concat(dataBuffers);
+  var hashed = (0, _utils.hash160)(dataBuff);
+  var opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66;
+  var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
+  opReturnBuffer.write(opEncode('?'), 0, 3, 'ascii');
+  hashed.copy(opReturnBuffer, 3);
+  opReturnBuffer.write(consensusHash, 23, 16, 'hex');
+
+  if (burnAmount.units !== 'BTC') {
+    var burnHex = burnAmount.amount.toHex();
+
+    if (burnHex.length > 16) {
+      // exceeds 2**64; can't fit
+      throw new Error("Cannot preorder '".concat(fullyQualifiedName, "': cannot fit price into 8 bytes"));
+    }
+
+    var paddedBurnHex = "0000000000000000".concat(burnHex).slice(-16);
+    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex');
+    opReturnBuffer.write(burnAmount.units, 47, burnAmount.units.length, 'ascii');
+  }
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
+
+  if (burnAmount.units === 'BTC') {
+    var btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16);
+    tx.addOutput(burnAddress, btcBurnAmount);
+  } else {
+    tx.addOutput(burnAddress, _utils.DUST_MINIMUM);
+  }
+
+  return tx.buildIncomplete();
+}
+
+function makeRegisterSkeleton(fullyQualifiedName, ownerAddress) {
+  var valueHash = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var burnTokenAmountHex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  // Returns a register tx skeleton.
+  //   with 2 outputs : 1. The register OP_RETURN
+  //                    2. The owner address (can be different from REGISTER address on renewals)
+  // You MUST make the first input a UTXO from the current OWNER *or* the
+  //   funder of the PREORDER
+  // in the case of a renewal, this would need to be modified to include a change address
+  //  as output (3) before the burn output (4)
+
+  /*
+    Formats
+     No zonefile hash, and pay with BTC:
+     0    2  3                                  39
+    |----|--|----------------------------------|
+    magic op   name.ns_id (up to 37 bytes)
+      With zonefile hash, and pay with BTC:
+     0    2  3                                  39                  59
+    |----|--|----------------------------------|-------------------|
+    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
+     output 0: name registration code
+    output 1: owner address
+  */
+  var payload;
+
+  if (!!burnTokenAmountHex && !valueHash) {
+    // empty value hash
+    valueHash = '0000000000000000000000000000000000000000';
+  }
+
+  if (!!valueHash) {
+    if (valueHash.length !== 40) {
+      throw new Error('Value hash length incorrect. Expecting 20-bytes, hex-encoded');
+    }
+
+    if (!!burnTokenAmountHex) {
+      if (burnTokenAmountHex.length !== 16) {
+        throw new Error('Burn field length incorrect.  Expecting 8-bytes, hex-encoded');
+      }
+    }
+
+    var payloadLen = burnTokenAmountHex ? 65 : 57;
+    payload = Buffer.alloc(payloadLen, 0);
+    payload.write(fullyQualifiedName, 0, 37, 'ascii');
+    payload.write(valueHash, 37, 20, 'hex');
+
+    if (!!burnTokenAmountHex) {
+      payload.write(burnTokenAmountHex, 57, 8, 'hex');
+    }
+  } else {
+    payload = Buffer.from(fullyQualifiedName, 'ascii');
+  }
+
+  var opReturnBuffer = Buffer.concat([Buffer.from(opEncode(':'), 'ascii'), payload]);
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(ownerAddress, _utils.DUST_MINIMUM);
+  return tx.buildIncomplete();
+}
+
+function makeRenewalSkeleton(fullyQualifiedName, nextOwnerAddress, lastOwnerAddress, burnAddress, burn) {
+  var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+
+  /*
+    Formats
+     No zonefile hash, and pay with BTC:
+     0    2  3                                  39
+    |----|--|----------------------------------|
+    magic op   name.ns_id (up to 37 bytes)
+      With zonefile hash, and pay with BTC:
+     0    2  3                                  39                  59
+    |----|--|----------------------------------|-------------------|
+    magic op   name.ns_id (37 bytes, 0-padded)     zone file hash
+     With renewal payment in a token:
+   (for register, tokens burned is not included)
+   (for renew, tokens burned is the number of tokens to burn)
+    0    2  3                                  39                  59                            67
+   |----|--|----------------------------------|-------------------|------------------------------|
+   magic op   name.ns_id (37 bytes, 0-padded)     zone file hash    tokens burned (big-endian)
+    output 0: renewal code
+   output 1: new owner address
+   output 2: current owner address
+   output 3: burn address
+  */
+  var burnAmount = asAmountV2(burn);
+  var network = _config.config.network;
+  var burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount;
+  var burnBTCAmount = burnAmount.units === 'BTC' ? parseInt(burnAmount.amount.toHex(), 16) : _utils.DUST_MINIMUM;
+  var burnTokenHex = null;
+
+  if (!!burnTokenAmount) {
+    var burnHex = burnTokenAmount.toHex();
+
+    if (burnHex.length > 16) {
+      // exceeds 2**64; can't fit 
+      throw new Error("Cannot renew '".concat(fullyQualifiedName, "': cannot fit price into 8 bytes"));
+    }
+
+    burnTokenHex = "0000000000000000".concat(burnHex).slice(-16);
+  }
+
+  var registerTX = makeRegisterSkeleton(fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex);
+
+  var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(registerTX, network.layer1);
+
+  txB.addOutput(lastOwnerAddress, _utils.DUST_MINIMUM);
+  txB.addOutput(burnAddress, burnBTCAmount);
+  return txB.buildIncomplete();
+}
+
+function makeTransferSkeleton(fullyQualifiedName, consensusHash, newOwner) {
+  var keepZonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  // Returns a transfer tx skeleton.
+  //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
+  //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
+  //
+  // You MUST make the first input a UTXO from the current OWNER
+  //
+  // Returns an unsigned serialized transaction.
+
+  /*
+    Format
+     0     2  3    4                   20              36
+    |-----|--|----|-------------------|---------------|
+    magic op keep  hash128(name.ns_id) consensus hash
+             data?
+     output 0: transfer code
+    output 1: new owner
+  */
+  var opRet = Buffer.alloc(36);
+  var keepChar = '~';
+
+  if (keepZonefile) {
+    keepChar = '>';
+  }
+
+  opRet.write(opEncode('>'), 0, 3, 'ascii');
+  opRet.write(keepChar, 3, 1, 'ascii');
+  var hashed = (0, _utils.hash128)(Buffer.from(fullyQualifiedName, 'ascii'));
+  hashed.copy(opRet, 4);
+  opRet.write(consensusHash, 20, 16, 'hex');
+
+  var opRetPayload = _bitcoinjsLib.default.payments.embed({
+    data: [opRet]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(opRetPayload, 0);
+  tx.addOutput(newOwner, _utils.DUST_MINIMUM);
+  return tx.buildIncomplete();
+}
+
+function makeUpdateSkeleton(fullyQualifiedName, consensusHash, valueHash) {
+  // Returns an update tx skeleton.
+  //   with 1 output : 1. the Blockstack update OP_RETURN
+  //
+  // You MUST make the first input a UTXO from the current OWNER
+  //
+  // Returns an unsigned serialized transaction.
+  //
+  // output 0: the revoke code
+
+  /*
+    Format:
+     0     2  3                                   19                      39
+    |-----|--|-----------------------------------|-----------------------|
+    magic op  hash128(name.ns_id,consensus hash) hash160(data)
+     output 0: update code
+  */
+  var opRet = Buffer.alloc(39);
+  var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
+  var consensusBuff = Buffer.from(consensusHash, 'ascii');
+  var hashedName = (0, _utils.hash128)(Buffer.concat([nameBuff, consensusBuff]));
+  opRet.write(opEncode('+'), 0, 3, 'ascii');
+  hashedName.copy(opRet, 3);
+  opRet.write(valueHash, 19, 20, 'hex');
+
+  var opRetPayload = _bitcoinjsLib.default.payments.embed({
+    data: [opRet]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(opRetPayload, 0);
+  return tx.buildIncomplete();
+}
+
+function makeRevokeSkeleton(fullyQualifiedName) {
+  // Returns a revoke tx skeleton
+  //    with 1 output: 1. the Blockstack revoke OP_RETURN
+  //
+  // You MUST make the first input a UTXO from the current OWNER
+  //
+  // Returns an unsigned serialized transaction
+
+  /*
+   Format:
+    0    2  3                             39
+   |----|--|-----------------------------|
+   magic op   name.ns_id (37 bytes)
+    output 0: the revoke code
+  */
+  var opRet = Buffer.alloc(3);
+  var nameBuff = Buffer.from(fullyQualifiedName, 'ascii');
+  opRet.write(opEncode('~'), 0, 3, 'ascii');
+  var opReturnBuffer = Buffer.concat([opRet, nameBuff]);
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  return tx.buildIncomplete();
+}
+
+function makeNamespacePreorderSkeleton(namespaceID, consensusHash, preorderAddress, registerAddress, burn) {
+  // Returns a namespace preorder tx skeleton.
+  // Returns an unsigned serialized transaction.
+
+  /*
+   Formats:
+    Without STACKS:
+    0     2   3                                      23               39
+   |-----|---|--------------------------------------|----------------|
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash
+     with STACKs:
+    0     2   3                                      23               39                         47
+   |-----|---|--------------------------------------|----------------|--------------------------|
+   magic op  hash(ns_id,script_pubkey,reveal_addr)   consensus hash    token fee (big-endian)
+    output 0: namespace preorder code
+   output 1: change address
+   otuput 2: burn address
+  */
+  var burnAmount = asAmountV2(burn);
+
+  if (burnAmount.units !== 'BTC' && burnAmount.units !== 'STACKS') {
+    throw new Error("Invalid burnUnits ".concat(burnAmount.units));
+  }
+
+  var network = _config.config.network;
+  var burnAddress = network.getDefaultBurnAddress();
+  var namespaceIDBuff = Buffer.from((0, _utils.decodeB40)(namespaceID), 'hex'); // base40
+
+  var scriptPublicKey = _bitcoinjsLib.default.address.toOutputScript(preorderAddress, network.layer1);
+
+  var registerBuff = Buffer.from(registerAddress, 'ascii');
+  var dataBuffers = [namespaceIDBuff, scriptPublicKey, registerBuff];
+  var dataBuff = Buffer.concat(dataBuffers);
+  var hashed = (0, _utils.hash160)(dataBuff);
+  var btcBurnAmount = _utils.DUST_MINIMUM;
+  var opReturnBufferLen = 39;
+
+  if (burnAmount.units === 'STACKS') {
+    opReturnBufferLen = 47;
+  } else {
+    btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16);
+  }
+
+  var opReturnBuffer = Buffer.alloc(opReturnBufferLen);
+  opReturnBuffer.write(opEncode('*'), 0, 3, 'ascii');
+  hashed.copy(opReturnBuffer, 3);
+  opReturnBuffer.write(consensusHash, 23, 16, 'hex');
+
+  if (burnAmount.units === 'STACKS') {
+    var burnHex = burnAmount.amount.toHex();
+    var paddedBurnHex = "0000000000000000".concat(burnHex).slice(-16);
+    opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex');
+  }
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(preorderAddress, _utils.DUST_MINIMUM);
+  tx.addOutput(burnAddress, btcBurnAmount);
+  return tx.buildIncomplete();
+}
+
+function makeNamespaceRevealSkeleton(namespace, revealAddress) {
+  /*
+   Format:
+    0     2   3    7     8     9    10   11   12   13   14    15    16    17       18      20     39
+   |-----|---|----|-----|-----|----|----|----|----|----|-----|-----|-----|--------|-------|-------|
+   magic  op  life coeff. base 1-2  3-4  5-6  7-8  9-10 11-12 13-14 15-16 nonalpha version  ns ID
+                                                  bucket exponents        no-vowel
+                                                                          discounts
+   
+   output 0: namespace reveal code
+   output 1: reveal address
+  */
+  var hexPayload = namespace.toHexPayload();
+  var opReturnBuffer = Buffer.alloc(3 + hexPayload.length / 2);
+  opReturnBuffer.write(opEncode('&'), 0, 3, 'ascii');
+  opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex');
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(revealAddress, _utils.DUST_MINIMUM);
+  return tx.buildIncomplete();
+}
+
+function makeNamespaceReadySkeleton(namespaceID) {
+  /*
+   Format:
+    0     2  3  4           23
+   |-----|--|--|------------|
+   magic op  .  ns_id
+    output 0: namespace ready code
+   */
+  var opReturnBuffer = Buffer.alloc(3 + namespaceID.length + 1);
+  opReturnBuffer.write(opEncode('!'), 0, 3, 'ascii');
+  opReturnBuffer.write(".".concat(namespaceID), 3, namespaceID.length + 1, 'ascii');
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  return tx.buildIncomplete();
+}
+
+function makeNameImportSkeleton(name, recipientAddr, zonefileHash) {
+  /*
+   Format:
+     0    2  3                             39
+    |----|--|-----------------------------|
+    magic op   name.ns_id (37 bytes)
+    Output 0: the OP_RETURN
+   Output 1: the recipient
+   Output 2: the zonefile hash
+  */
+  if (zonefileHash.length !== 40) {
+    throw new Error('Invalid zonefile hash: must be 20 bytes hex-encoded');
+  }
+
+  var network = _config.config.network;
+  var opReturnBuffer = Buffer.alloc(3 + name.length);
+  opReturnBuffer.write(opEncode(';'), 0, 3, 'ascii');
+  opReturnBuffer.write(name, 3, name.length, 'ascii');
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+
+  var zonefileHashB58 = _bitcoinjsLib.default.address.toBase58Check(new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash);
+
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(recipientAddr, _utils.DUST_MINIMUM);
+  tx.addOutput(zonefileHashB58, _utils.DUST_MINIMUM);
+  return tx.buildIncomplete();
+}
+
+function makeAnnounceSkeleton(messageHash) {
+  /*
+    Format:
+     0    2  3                             23
+    |----|--|-----------------------------|
+    magic op   message hash (160-bit)
+     output 0: the OP_RETURN
+  */
+  if (messageHash.length !== 40) {
+    throw new Error('Invalid message hash: must be 20 bytes hex-encoded');
+  }
+
+  var opReturnBuffer = Buffer.alloc(3 + messageHash.length / 2);
+  opReturnBuffer.write(opEncode('#'), 0, 3, 'ascii');
+  opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex');
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  return tx.buildIncomplete();
+}
+
+function makeTokenTransferSkeleton(recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea) {
+  /*
+   Format:
+     0     2  3              19         38          46                        80
+    |-----|--|--------------|----------|-----------|-------------------------|
+    magic op  consensus_hash token_type amount (BE) scratch area
+                             (ns_id)
+     output 0: token transfer code
+    output 1: recipient address
+  */
+  if (scratchArea.length > 34) {
+    throw new Error('Invalid scratch area: must be no more than 34 bytes');
+  }
+
+  var opReturnBuffer = Buffer.alloc(46 + scratchArea.length);
+  var tokenTypeHex = new Buffer(tokenType).toString('hex');
+  var tokenTypeHexPadded = "00000000000000000000000000000000000000".concat(tokenTypeHex).slice(-38);
+  var tokenValueHex = tokenAmount.toHex();
+
+  if (tokenValueHex.length > 16) {
+    // exceeds 2**64; can't fit
+    throw new Error("Cannot send tokens: cannot fit ".concat(tokenAmount.toString(), " into 8 bytes"));
+  }
+
+  var tokenValueHexPadded = "0000000000000000".concat(tokenValueHex).slice(-16);
+  opReturnBuffer.write(opEncode('$'), 0, 3, 'ascii');
+  opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex');
+  opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex');
+  opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex');
+  opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii');
+
+  var nullOutput = _bitcoinjsLib.default.payments.embed({
+    data: [opReturnBuffer]
+  }).output;
+
+  var tx = makeTXbuilder();
+  tx.addOutput(nullOutput, 0);
+  tx.addOutput(recipientAddress, _utils.DUST_MINIMUM);
+  return tx.buildIncomplete();
+}
 
 }).call(this,require("buffer").Buffer)
 },{"../config":513,"./utils":526,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"bigi":51,"bitcoinjs-lib":73,"buffer":149}],525:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/slicedToArray", "bitcoinjs-lib", "bigi", "./utils", "./skeletons", "../config", "../errors", "./signers"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/slicedToArray"), require("bitcoinjs-lib"), require("bigi"), require("./utils"), require("./skeletons"), require("../config"), require("../errors"), require("./signers"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.slicedToArray, global.bitcoinjsLib, global.bigi, global.utils, global.skeletons, global.config, global.errors, global.signers);
-    global.txbuild = mod.exports;
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.transactions = void 0;
+
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+
+var _bitcoinjsLib = _interopRequireDefault(require("bitcoinjs-lib"));
+
+var _bigi = _interopRequireDefault(require("bigi"));
+
+var _utils = require("./utils");
+
+var _skeletons = require("./skeletons");
+
+var _config = require("../config");
+
+var _errors = require("../errors");
+
+var _signers = require("./signers");
+
+var dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+var dummyZonefileHash = 'ffffffffffffffffffffffffffffffffffffffff';
+
+function addOwnerInput(utxos, ownerAddress, txB) {
+  var addChangeOut = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
+  // add an owner UTXO and a change out.
+  if (utxos.length <= 0) {
+    throw new Error('Owner has no UTXOs for UPDATE.');
   }
-})(this, function (_exports, _slicedToArray2, _bitcoinjsLib, _bigi, _utils, _skeletons, _config, _errors, _signers) {
-  "use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
+  utxos.sort(function (a, b) {
+    return a.value - b.value;
   });
-  _exports.transactions = void 0;
-  _slicedToArray2 = _interopRequireDefault(_slicedToArray2);
-  _bitcoinjsLib = _interopRequireDefault(_bitcoinjsLib);
-  _bigi = _interopRequireDefault(_bigi);
-  var dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-  var dummyZonefileHash = 'ffffffffffffffffffffffffffffffffffffffff';
+  var ownerUTXO = utxos[0];
+  var ownerInput = txB.addInput(ownerUTXO.tx_hash, ownerUTXO.tx_output_n);
 
-  function addOwnerInput(utxos, ownerAddress, txB) {
-    var addChangeOut = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
-
-    // add an owner UTXO and a change out.
-    if (utxos.length <= 0) {
-      throw new Error('Owner has no UTXOs for UPDATE.');
-    }
-
-    utxos.sort(function (a, b) {
-      return a.value - b.value;
-    });
-    var ownerUTXO = utxos[0];
-    var ownerInput = txB.addInput(ownerUTXO.tx_hash, ownerUTXO.tx_output_n);
-
-    if (addChangeOut) {
-      txB.addOutput(ownerAddress, ownerUTXO.value);
-    }
-
-    return {
-      index: ownerInput,
-      value: ownerUTXO.value
-    };
+  if (addChangeOut) {
+    txB.addOutput(ownerAddress, ownerUTXO.value);
   }
 
-  function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
-    var changeIndex = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  return {
+    index: ownerInput,
+    value: ownerUTXO.value
+  };
+}
 
-    // change index for the payer.
-    if (changeIndex === null) {
-      changeIndex = txB.addOutput(paymentAddress, _utils.DUST_MINIMUM);
-    } // fund the transaction fee.
+function fundTransaction(txB, paymentAddress, utxos, feeRate, inAmounts) {
+  var changeIndex = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+
+  // change index for the payer.
+  if (changeIndex === null) {
+    changeIndex = txB.addOutput(paymentAddress, _utils.DUST_MINIMUM);
+  } // fund the transaction fee.
 
 
-    var txFee = (0, _utils.estimateTXBytes)(txB, 0, 0) * feeRate;
-    var outAmounts = (0, _utils.sumOutputValues)(txB);
-    var change = (0, _utils.addUTXOsToFund)(txB, utxos, txFee + outAmounts - inAmounts, feeRate);
-    txB.__tx.outs[changeIndex].value += change;
-    return txB;
+  var txFee = (0, _utils.estimateTXBytes)(txB, 0, 0) * feeRate;
+  var outAmounts = (0, _utils.sumOutputValues)(txB);
+  var change = (0, _utils.addUTXOsToFund)(txB, utxos, txFee + outAmounts - inAmounts, feeRate);
+  txB.__tx.outs[changeIndex].value += change;
+  return txB;
+}
+
+function returnTransactionHex(txB) {
+  var buildIncomplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  if (buildIncomplete) {
+    return txB.buildIncomplete().toHex();
+  } else {
+    return txB.build().toHex();
+  }
+}
+
+function getTransactionSigner(input) {
+  if (typeof input === 'string') {
+    return _signers.PubkeyHashSigner.fromHexString(input);
+  } else {
+    return input;
+  }
+}
+/**
+ * Estimates cost of a preorder transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to preorder
+ * @param {String} destinationAddress - the address to receive the name (this
+ *    must be passed as the 'registrationAddress' in the register transaction)
+ * @param {String} paymentAddress - the address funding the preorder
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the preorder. This includes a 5500 satoshi dust output for the preorder.
+ *    Even though this is a change output, the payer must supply enough funds
+ *    to generate this output, so we include it in the cost.
+ * @private
+ */
+
+
+function estimatePreorder(fullyQualifiedName, destinationAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var network = _config.config.network;
+  var preorderPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
+    return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, dummyConsensusHash, paymentAddress, network.getDefaultBurnAddress(), namePrice, destinationAddress);
+  });
+  return Promise.all([network.getFeeRate(), preorderPromise]).then(function (_ref) {
+    var _ref2 = (0, _slicedToArray2.default)(_ref, 2),
+        feeRate = _ref2[0],
+        preorderTX = _ref2[1];
+
+    var outputsValue = (0, _utils.sumOutputValues)(preorderTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, paymentUtxos, 0);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates cost of a register transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to register
+ * @param {String} registerAddress - the address to receive the name
+ * @param {String} paymentAddress - the address funding the register
+ * @param {Boolean} includingZonefile - whether or not we will broadcast
+ *    a zonefile hash as part  of the register
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the register.
+ * @private
+ */
+
+
+function estimateRegister(fullyQualifiedName, registerAddress, paymentAddress) {
+  var includingZonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var paymentUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+  var network = _config.config.network;
+  var valueHash;
+
+  if (includingZonefile) {
+    valueHash = dummyZonefileHash;
   }
 
-  function returnTransactionHex(txB) {
-    var buildIncomplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var registerTX = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, valueHash);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(registerTX); // 1 additional output for payer change
 
-    if (buildIncomplete) {
-      return txB.buildIncomplete().toHex();
-    } else {
-      return txB.build().toHex();
-    }
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(registerTX, paymentUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates cost of an update transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to update
+ * @param {String} ownerAddress - the owner of the name
+ * @param {String} paymentAddress - the address funding the update
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the update.
+ * @private
+ */
+
+
+function estimateUpdate(fullyQualifiedName, ownerAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var network = _config.config.network;
+  var updateTX = (0, _skeletons.makeUpdateSkeleton)(fullyQualifiedName, dummyConsensusHash, dummyZonefileHash);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(updateTX); // 1 additional input for the owner
+    // 2 additional outputs for owner / payer change
+
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(updateTX, 1 + paymentUtxos, 2);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates cost of an transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to transfer
+ * @param {String} destinationAddress - the next owner of the name
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress - the address funding the transfer
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the transfer.
+ * @private
+ */
+
+
+function estimateTransfer(fullyQualifiedName, destinationAddress, ownerAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+  var network = _config.config.network;
+  var transferTX = (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, dummyConsensusHash, destinationAddress);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(transferTX); // 1 additional input for the owner
+    // 2 additional outputs for owner / payer change
+
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(transferTX, 1 + paymentUtxos, 2);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates cost of an transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to renew
+ * @param {String} destinationAddress - the next owner of the name
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress - the address funding the transfer
+ * @param {Boolean} includingZonefile - whether or not we will broadcast a zonefile hash
+      in the renewal operation
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the transfer.
+ * @private
+ */
+
+
+function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, paymentAddress) {
+  var includingZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  var paymentUtxos = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
+  var network = _config.config.network;
+  var valueHash;
+
+  if (includingZonefile) {
+    valueHash = dummyZonefileHash;
   }
 
-  function getTransactionSigner(input) {
-    if (typeof input === 'string') {
-      return _signers.PubkeyHashSigner.fromHexString(input);
-    } else {
-      return input;
-    }
+  var renewalPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
+    return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, network.getDefaultBurnAddress(), namePrice, valueHash);
+  });
+  return Promise.all([network.getFeeRate(), renewalPromise]).then(function (_ref3) {
+    var _ref4 = (0, _slicedToArray2.default)(_ref3, 2),
+        feeRate = _ref4[0],
+        renewalTX = _ref4[1];
+
+    var outputsValue = (0, _utils.sumOutputValues)(renewalTX); // 1 additional input for the owner
+    // and renewal skeleton includes all outputs for owner change, but not for payer change.
+
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(renewalTX, 1 + paymentUtxos, 1);
+    return txFee + outputsValue - 5500; // don't count the dust change for old owner.
+  });
+}
+/**
+ * Estimates cost of a revoke transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to revoke
+ * @param {String} ownerAddress - the current owner of the name
+ * @param {String} paymentAddress  the address funding the revoke
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund the
+ *    revoke.
+ * @private
+ */
+
+
+function estimateRevoke(fullyQualifiedName, ownerAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var network = _config.config.network;
+  var revokeTX = (0, _skeletons.makeRevokeSkeleton)(fullyQualifiedName);
+  return Promise.all([network.getFeeRate()]).then(function (_ref5) {
+    var _ref6 = (0, _slicedToArray2.default)(_ref5, 1),
+        feeRate = _ref6[0];
+
+    var outputsValue = (0, _utils.sumOutputValues)(revokeTX); // 1 additional input for owner
+    // 1 additional output for payer change
+
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(revokeTX, 1 + paymentUtxos, 2);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates cost of a namespace preorder transaction for a namespace
+ * @param {String} namespaceID - the namespace to preorder
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String} paymentAddress - the address funding the preorder
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address.
+ * @returns {Promise} - a promise which resolves to the satoshi cost to fund
+ *    the preorder. This includes a 5500 satoshi dust output for the preorder.
+ *    Even though this is a change output, the payer must supply enough funds
+ *    to generate this output, so we include it in the cost.
+ * @private
+ */
+
+
+function estimateNamespacePreorder(namespaceID, revealAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var network = _config.config.network;
+  var preorderPromise = network.getNamespacePrice(namespaceID).then(function (namespacePrice) {
+    return (0, _skeletons.makeNamespacePreorderSkeleton)(namespaceID, dummyConsensusHash, paymentAddress, revealAddress, namespacePrice);
+  });
+  return Promise.all([network.getFeeRate(), preorderPromise]).then(function (_ref7) {
+    var _ref8 = (0, _slicedToArray2.default)(_ref7, 2),
+        feeRate = _ref8[0],
+        preorderTX = _ref8[1];
+
+    var outputsValue = (0, _utils.sumOutputValues)(preorderTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, paymentUtxos, 0);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates cost of a namesapce reveal transaction for a namespace
+ * @param {BlockstackNamespace} namespace - the namespace to reveal
+ * @param {String} revealAddress - the address to receive the namespace
+ *    (this must have been passed as 'revealAddress' to a prior namespace
+ *    preorder)
+ * @param {String} paymentAddress - the address that pays for this transaction
+ * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
+ *    from the payment address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *    fund the reveal.  This includes a 5500 satoshi dust output for the
+ *    preorder.  Even though this is a change output, the payer must have
+ *    enough funds to generate this output, so we include it in the cost.
+ * @private
+ */
+
+
+function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
+  var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var network = _config.config.network;
+  var revealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(revealTX); // 1 additional output for payer change
+
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(revealTX, paymentUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates the cost of a namespace-ready transaction for a namespace
+ * @param {String} namespaceID - the namespace to ready
+ * @param {Number} revealUtxos - the number of UTXOs we expect will
+ *  be required from the reveal address
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *  fund this namespacey-ready transaction.
+ * @private
+ */
+
+
+function estimateNamespaceReady(namespaceID) {
+  var revealUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  var network = _config.config.network;
+  var readyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(readyTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(readyTX, revealUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates the cost of a name-import transaction
+ * @param {String} name - the fully-qualified name
+ * @param {String} recipientAddr - the recipient
+ * @param {String} zonefileHash - the zone file hash
+ * @param {Number} importUtxos - the number of UTXOs we expect will
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost
+ *  to fund this name-import transaction
+ * @private
+ */
+
+
+function estimateNameImport(name, recipientAddr, zonefileHash) {
+  var importUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  var network = _config.config.network;
+  var importTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(importTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(importTX, importUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates the cost of an announce transaction
+ * @param {String} messageHash - the hash of the message
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @returns {Promise} - a promise which resolves to the satoshi cost
+ *  to fund this announce transaction
+ * @private
+ */
+
+
+function estimateAnnounce(messageHash) {
+  var senderUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  var network = _config.config.network;
+  var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(announceTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(announceTX, senderUtxos, 1);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Estimates the cost of a token-transfer transaction
+ * @param {String} recipientAddress - the recipient of the tokens
+ * @param {String} tokenType - the type of token to spend
+ * @param {Object} tokenAmount - a 64-bit unsigned BigInteger encoding the number of tokens
+ *   to spend
+ * @param {String} scratchArea - an arbitrary string to store with the transaction
+ * @param {Number} senderUtxos - the number of utxos we expect will
+ *  be required from the importer address
+ * @param {Number} additionalOutputs - the number of outputs we expect to add beyond
+ *  just the recipient output (default = 1, if the token owner is also the bitcoin funder)
+ * @returns {Promise} - a promise which resolves to the satoshi cost to
+ *  fund this token-transfer transaction
+ * @private
+ */
+
+
+function estimateTokenTransfer(recipientAddress, tokenType, tokenAmount, scratchArea) {
+  var senderUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+  var additionalOutputs = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
+  var network = _config.config.network;
+  var tokenTransferTX = (0, _skeletons.makeTokenTransferSkeleton)(recipientAddress, dummyConsensusHash, tokenType, tokenAmount, scratchArea);
+  return network.getFeeRate().then(function (feeRate) {
+    var outputsValue = (0, _utils.sumOutputValues)(tokenTransferTX);
+    var txFee = feeRate * (0, _utils.estimateTXBytes)(tokenTransferTX, senderUtxos, additionalOutputs);
+    return txFee + outputsValue;
+  });
+}
+/**
+ * Generates a preorder transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to pre-order
+ * @param {String} destinationAddress - the address to receive the name (this
+ *    must be passed as the 'registrationAddress' in the register transaction)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction or a transaction signer object
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+
+
+function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var network = _config.config.network;
+  var namespace = fullyQualifiedName.split('.').pop();
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  return paymentKey.getAddress().then(function (preorderAddress) {
+    var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref9) {
+      var _ref10 = (0, _slicedToArray2.default)(_ref9, 3),
+          consensusHash = _ref10[0],
+          namePrice = _ref10[1],
+          burnAddress = _ref10[2];
+
+      return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, destinationAddress);
+    });
+    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref11) {
+      var _ref12 = (0, _slicedToArray2.default)(_ref11, 3),
+          utxos = _ref12[0],
+          feeRate = _ref12[1],
+          preorderSkeleton = _ref12[2];
+
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
+
+      txB.setVersion(1);
+      var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
+
+      var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
+    }).then(function (signingTxB) {
+      return returnTransactionHex(signingTxB, buildIncomplete);
+    });
+  });
+}
+/**
+ * Generates an update transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to update
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of the
+ *    owner key, or a transaction signer object. This will provide one
+ *    UTXO input, and also recieve a dust output.
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string, or a
+ *    transaction signer object, of the private key used to fund the
+ *    transaction's txfees
+ * @param {String} zonefile - the zonefile data to update (this will be hashed
+ *    to include in the transaction), the zonefile itself must be published
+ *    after the UPDATE propagates.
+ * @param {String} valueHash - if given, this is the hash to store (instead of
+ *    zonefile).  zonefile will be ignored if this is given.
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+
+
+function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
+  var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
+  var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+  var network = _config.config.network;
+
+  if (!valueHash && !zonefile) {
+    return Promise.reject(new Error('Need zonefile or valueHash arguments'));
   }
-  /**
-   * Estimates cost of a preorder transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to preorder
-   * @param {String} destinationAddress - the address to receive the name (this
-   *    must be passed as the 'registrationAddress' in the register transaction)
-   * @param {String} paymentAddress - the address funding the preorder
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund
-   *    the preorder. This includes a 5500 satoshi dust output for the preorder.
-   *    Even though this is a change output, the payer must supply enough funds
-   *    to generate this output, so we include it in the cost.
-   * @private
-   */
 
-
-  function estimatePreorder(fullyQualifiedName, destinationAddress, paymentAddress) {
-    var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var network = _config.config.network;
-    var preorderPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
-      return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, dummyConsensusHash, paymentAddress, network.getDefaultBurnAddress(), namePrice, destinationAddress);
-    });
-    return Promise.all([network.getFeeRate(), preorderPromise]).then(function (_ref) {
-      var _ref2 = (0, _slicedToArray2.default)(_ref, 2),
-          feeRate = _ref2[0],
-          preorderTX = _ref2[1];
-
-      var outputsValue = (0, _utils.sumOutputValues)(preorderTX);
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, paymentUtxos, 0);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates cost of a register transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to register
-   * @param {String} registerAddress - the address to receive the name
-   * @param {String} paymentAddress - the address funding the register
-   * @param {Boolean} includingZonefile - whether or not we will broadcast
-   *    a zonefile hash as part  of the register
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund
-   *    the register.
-   * @private
-   */
-
-
-  function estimateRegister(fullyQualifiedName, registerAddress, paymentAddress) {
-    var includingZonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var paymentUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
-    var network = _config.config.network;
-    var valueHash;
-
-    if (includingZonefile) {
-      valueHash = dummyZonefileHash;
-    }
-
-    var registerTX = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, valueHash);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(registerTX); // 1 additional output for payer change
-
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(registerTX, paymentUtxos, 1);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates cost of an update transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to update
-   * @param {String} ownerAddress - the owner of the name
-   * @param {String} paymentAddress - the address funding the update
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund
-   *    the update.
-   * @private
-   */
-
-
-  function estimateUpdate(fullyQualifiedName, ownerAddress, paymentAddress) {
-    var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var network = _config.config.network;
-    var updateTX = (0, _skeletons.makeUpdateSkeleton)(fullyQualifiedName, dummyConsensusHash, dummyZonefileHash);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(updateTX); // 1 additional input for the owner
-      // 2 additional outputs for owner / payer change
-
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(updateTX, 1 + paymentUtxos, 2);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates cost of an transfer transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to transfer
-   * @param {String} destinationAddress - the next owner of the name
-   * @param {String} ownerAddress - the current owner of the name
-   * @param {String} paymentAddress - the address funding the transfer
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund
-   *    the transfer.
-   * @private
-   */
-
-
-  function estimateTransfer(fullyQualifiedName, destinationAddress, ownerAddress, paymentAddress) {
-    var paymentUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
-    var network = _config.config.network;
-    var transferTX = (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, dummyConsensusHash, destinationAddress);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(transferTX); // 1 additional input for the owner
-      // 2 additional outputs for owner / payer change
-
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(transferTX, 1 + paymentUtxos, 2);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates cost of an transfer transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to renew
-   * @param {String} destinationAddress - the next owner of the name
-   * @param {String} ownerAddress - the current owner of the name
-   * @param {String} paymentAddress - the address funding the transfer
-   * @param {Boolean} includingZonefile - whether or not we will broadcast a zonefile hash
-        in the renewal operation
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund
-   *    the transfer.
-   * @private
-   */
-
-
-  function estimateRenewal(fullyQualifiedName, destinationAddress, ownerAddress, paymentAddress) {
-    var includingZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-    var paymentUtxos = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
-    var network = _config.config.network;
-    var valueHash;
-
-    if (includingZonefile) {
-      valueHash = dummyZonefileHash;
-    }
-
-    var renewalPromise = network.getNamePrice(fullyQualifiedName).then(function (namePrice) {
-      return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, network.getDefaultBurnAddress(), namePrice, valueHash);
-    });
-    return Promise.all([network.getFeeRate(), renewalPromise]).then(function (_ref3) {
-      var _ref4 = (0, _slicedToArray2.default)(_ref3, 2),
-          feeRate = _ref4[0],
-          renewalTX = _ref4[1];
-
-      var outputsValue = (0, _utils.sumOutputValues)(renewalTX); // 1 additional input for the owner
-      // and renewal skeleton includes all outputs for owner change, but not for payer change.
-
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(renewalTX, 1 + paymentUtxos, 1);
-      return txFee + outputsValue - 5500; // don't count the dust change for old owner.
-    });
-  }
-  /**
-   * Estimates cost of a revoke transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to revoke
-   * @param {String} ownerAddress - the current owner of the name
-   * @param {String} paymentAddress  the address funding the revoke
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund the
-   *    revoke.
-   * @private
-   */
-
-
-  function estimateRevoke(fullyQualifiedName, ownerAddress, paymentAddress) {
-    var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var network = _config.config.network;
-    var revokeTX = (0, _skeletons.makeRevokeSkeleton)(fullyQualifiedName);
-    return Promise.all([network.getFeeRate()]).then(function (_ref5) {
-      var _ref6 = (0, _slicedToArray2.default)(_ref5, 1),
-          feeRate = _ref6[0];
-
-      var outputsValue = (0, _utils.sumOutputValues)(revokeTX); // 1 additional input for owner
-      // 1 additional output for payer change
-
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(revokeTX, 1 + paymentUtxos, 2);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates cost of a namespace preorder transaction for a namespace
-   * @param {String} namespaceID - the namespace to preorder
-   * @param {String} revealAddress - the address to receive the namespace (this
-   *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
-   * @param {String} paymentAddress - the address funding the preorder
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address.
-   * @returns {Promise} - a promise which resolves to the satoshi cost to fund
-   *    the preorder. This includes a 5500 satoshi dust output for the preorder.
-   *    Even though this is a change output, the payer must supply enough funds
-   *    to generate this output, so we include it in the cost.
-   * @private
-   */
-
-
-  function estimateNamespacePreorder(namespaceID, revealAddress, paymentAddress) {
-    var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var network = _config.config.network;
-    var preorderPromise = network.getNamespacePrice(namespaceID).then(function (namespacePrice) {
-      return (0, _skeletons.makeNamespacePreorderSkeleton)(namespaceID, dummyConsensusHash, paymentAddress, revealAddress, namespacePrice);
-    });
-    return Promise.all([network.getFeeRate(), preorderPromise]).then(function (_ref7) {
-      var _ref8 = (0, _slicedToArray2.default)(_ref7, 2),
-          feeRate = _ref8[0],
-          preorderTX = _ref8[1];
-
-      var outputsValue = (0, _utils.sumOutputValues)(preorderTX);
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(preorderTX, paymentUtxos, 0);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates cost of a namesapce reveal transaction for a namespace
-   * @param {BlockstackNamespace} namespace - the namespace to reveal
-   * @param {String} revealAddress - the address to receive the namespace
-   *    (this must have been passed as 'revealAddress' to a prior namespace
-   *    preorder)
-   * @param {String} paymentAddress - the address that pays for this transaction
-   * @param {Number} paymentUtxos - the number of UTXOs we expect will be required
-   *    from the payment address
-   * @returns {Promise} - a promise which resolves to the satoshi cost to
-   *    fund the reveal.  This includes a 5500 satoshi dust output for the
-   *    preorder.  Even though this is a change output, the payer must have
-   *    enough funds to generate this output, so we include it in the cost.
-   * @private
-   */
-
-
-  function estimateNamespaceReveal(namespace, revealAddress, paymentAddress) {
-    var paymentUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var network = _config.config.network;
-    var revealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(revealTX); // 1 additional output for payer change
-
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(revealTX, paymentUtxos, 1);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates the cost of a namespace-ready transaction for a namespace
-   * @param {String} namespaceID - the namespace to ready
-   * @param {Number} revealUtxos - the number of UTXOs we expect will
-   *  be required from the reveal address
-   * @returns {Promise} - a promise which resolves to the satoshi cost to
-   *  fund this namespacey-ready transaction.
-   * @private
-   */
-
-
-  function estimateNamespaceReady(namespaceID) {
-    var revealUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-    var network = _config.config.network;
-    var readyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(readyTX);
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(readyTX, revealUtxos, 1);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates the cost of a name-import transaction
-   * @param {String} name - the fully-qualified name
-   * @param {String} recipientAddr - the recipient
-   * @param {String} zonefileHash - the zone file hash
-   * @param {Number} importUtxos - the number of UTXOs we expect will
-   *  be required from the importer address
-   * @returns {Promise} - a promise which resolves to the satoshi cost
-   *  to fund this name-import transaction
-   * @private
-   */
-
-
-  function estimateNameImport(name, recipientAddr, zonefileHash) {
-    var importUtxos = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-    var network = _config.config.network;
-    var importTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(importTX);
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(importTX, importUtxos, 1);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates the cost of an announce transaction
-   * @param {String} messageHash - the hash of the message
-   * @param {Number} senderUtxos - the number of utxos we expect will
-   *  be required from the importer address
-   * @returns {Promise} - a promise which resolves to the satoshi cost
-   *  to fund this announce transaction
-   * @private
-   */
-
-
-  function estimateAnnounce(messageHash) {
-    var senderUtxos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-    var network = _config.config.network;
-    var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(announceTX);
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(announceTX, senderUtxos, 1);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Estimates the cost of a token-transfer transaction
-   * @param {String} recipientAddress - the recipient of the tokens
-   * @param {String} tokenType - the type of token to spend
-   * @param {Object} tokenAmount - a 64-bit unsigned BigInteger encoding the number of tokens
-   *   to spend
-   * @param {String} scratchArea - an arbitrary string to store with the transaction
-   * @param {Number} senderUtxos - the number of utxos we expect will
-   *  be required from the importer address
-   * @param {Number} additionalOutputs - the number of outputs we expect to add beyond
-   *  just the recipient output (default = 1, if the token owner is also the bitcoin funder)
-   * @returns {Promise} - a promise which resolves to the satoshi cost to
-   *  fund this token-transfer transaction
-   * @private
-   */
-
-
-  function estimateTokenTransfer(recipientAddress, tokenType, tokenAmount, scratchArea) {
-    var senderUtxos = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
-    var additionalOutputs = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 1;
-    var network = _config.config.network;
-    var tokenTransferTX = (0, _skeletons.makeTokenTransferSkeleton)(recipientAddress, dummyConsensusHash, tokenType, tokenAmount, scratchArea);
-    return network.getFeeRate().then(function (feeRate) {
-      var outputsValue = (0, _utils.sumOutputValues)(tokenTransferTX);
-      var txFee = feeRate * (0, _utils.estimateTXBytes)(tokenTransferTX, senderUtxos, additionalOutputs);
-      return txFee + outputsValue;
-    });
-  }
-  /**
-   * Generates a preorder transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to pre-order
-   * @param {String} destinationAddress - the address to receive the name (this
-   *    must be passed as the 'registrationAddress' in the register transaction)
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string of
-   *    the private key used to fund the transaction or a transaction signer object
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   * indicating whether the function should attempt to return an unsigned (or not fully signed)
-   * transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
-
-
-  function makePreorder(fullyQualifiedName, destinationAddress, paymentKeyIn) {
-    var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var network = _config.config.network;
-    var namespace = fullyQualifiedName.split('.').pop();
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    return paymentKey.getAddress().then(function (preorderAddress) {
-      var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref9) {
-        var _ref10 = (0, _slicedToArray2.default)(_ref9, 3),
-            consensusHash = _ref10[0],
-            namePrice = _ref10[1],
-            burnAddress = _ref10[2];
-
-        return (0, _skeletons.makePreorderSkeleton)(fullyQualifiedName, consensusHash, preorderAddress, burnAddress, namePrice, destinationAddress);
-      });
-      return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref11) {
-        var _ref12 = (0, _slicedToArray2.default)(_ref11, 3),
-            utxos = _ref12[0],
-            feeRate = _ref12[1],
-            preorderSkeleton = _ref12[2];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
-
-        txB.setVersion(1);
-        var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
-
-        var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
-        return (0, _utils.signInputs)(signingTxB, paymentKey);
-      }).then(function (signingTxB) {
-        return returnTransactionHex(signingTxB, buildIncomplete);
-      });
-    });
-  }
-  /**
-   * Generates an update transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to update
-   * @param {String | TransactionSigner} ownerKeyIn - a hex string of the
-   *    owner key, or a transaction signer object. This will provide one
-   *    UTXO input, and also recieve a dust output.
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string, or a
-   *    transaction signer object, of the private key used to fund the
-   *    transaction's txfees
-   * @param {String} zonefile - the zonefile data to update (this will be hashed
-   *    to include in the transaction), the zonefile itself must be published
-   *    after the UPDATE propagates.
-   * @param {String} valueHash - if given, this is the hash to store (instead of
-   *    zonefile).  zonefile will be ignored if this is given.
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *    indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *    transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
-
-
-  function makeUpdate(fullyQualifiedName, ownerKeyIn, paymentKeyIn, zonefile) {
-    var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '';
-    var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-    var network = _config.config.network;
-
-    if (!valueHash && !zonefile) {
+  if (valueHash.length === 0) {
+    if (!zonefile) {
       return Promise.reject(new Error('Need zonefile or valueHash arguments'));
     }
 
-    if (valueHash.length === 0) {
-      if (!zonefile) {
-        return Promise.reject(new Error('Need zonefile or valueHash arguments'));
+    valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
+  } else if (valueHash.length !== 40) {
+    return Promise.reject(new Error("Invalid valueHash ".concat(valueHash)));
+  }
+
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref13) {
+    var _ref14 = (0, _slicedToArray2.default)(_ref13, 2),
+        ownerAddress = _ref14[0],
+        paymentAddress = _ref14[1];
+
+    var txPromise = network.getConsensusHash().then(function (consensusHash) {
+      return (0, _skeletons.makeUpdateSkeleton)(fullyQualifiedName, consensusHash, valueHash);
+    }).then(function (updateTX) {
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(updateTX, network.layer1);
+
+      txB.setVersion(1);
+      return txB;
+    });
+    return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref15) {
+      var _ref16 = (0, _slicedToArray2.default)(_ref15, 4),
+          txB = _ref16[0],
+          payerUtxos = _ref16[1],
+          ownerUtxos = _ref16[2],
+          feeRate = _ref16[3];
+
+      var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
+      var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{
+        index: ownerInput.index,
+        signer: ownerKey
+      }]);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a register transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to register
+ * @param {String} registerAddress - the address to receive the name (this
+ *    must have been passed as the 'destinationAddress' in the preorder transaction)
+ *    this address will receive a dust UTXO
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key (or a TransactionSigner object) used to fund the
+ *    transaction (this *must* be the same as the payment address used
+ *    to fund the preorder)
+ * @param {String} zonefile - the zonefile data to include (this will be hashed
+ *    to include in the transaction), the zonefile itself must be published
+ *    after the UPDATE propagates.
+ * @param {String} valueHash - the hash of the zone file data to include.
+ *    It will be used instead of zonefile, if given
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+
+
+function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
+  var zonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+  var network = _config.config.network;
+
+  if (!valueHash && !!zonefile) {
+    valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
+  } else if (!!valueHash && valueHash.length !== 40) {
+    return Promise.reject(new Error("Invalid zonefile hash ".concat(valueHash)));
+  }
+
+  var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, valueHash);
+
+  var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1);
+
+  txB.setVersion(1);
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  return paymentKey.getAddress().then(function (paymentAddress) {
+    return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref17) {
+      var _ref18 = (0, _slicedToArray2.default)(_ref17, 2),
+          utxos = _ref18[0],
+          feeRate = _ref18[1];
+
+      var signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0);
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a transfer transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to transfer
+ * @param {String} destinationAddress - the address to receive the name.
+ *    this address will receive a dust UTXO
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of
+ *    the current owner's private key (or a TransactionSigner object)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction (or a
+ *    TransactionSigner object)
+ * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *   indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *   transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+
+
+function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyIn, paymentKeyIn) {
+  var keepZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+  var network = _config.config.network;
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref19) {
+    var _ref20 = (0, _slicedToArray2.default)(_ref19, 2),
+        ownerAddress = _ref20[0],
+        paymentAddress = _ref20[1];
+
+    var txPromise = network.getConsensusHash().then(function (consensusHash) {
+      return (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, consensusHash, destinationAddress, keepZonefile);
+    }).then(function (transferTX) {
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(transferTX, network.layer1);
+
+      txB.setVersion(1);
+      return txB;
+    });
+    return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref21) {
+      var _ref22 = (0, _slicedToArray2.default)(_ref21, 4),
+          txB = _ref22[0],
+          payerUtxos = _ref22[1],
+          ownerUtxos = _ref22[2],
+          feeRate = _ref22[3];
+
+      var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
+      var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{
+        index: ownerInput.index,
+        signer: ownerKey
+      }]);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a revoke transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to revoke
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of
+ *    the current owner's private key (or a TransactionSigner object)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction (or a
+ *    TransactionSigner object)
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+
+
+function makeRevoke(fullyQualifiedName, ownerKeyIn, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var network = _config.config.network;
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref23) {
+    var _ref24 = (0, _slicedToArray2.default)(_ref23, 2),
+        ownerAddress = _ref24[0],
+        paymentAddress = _ref24[1];
+
+    var revokeTX = (0, _skeletons.makeRevokeSkeleton)(fullyQualifiedName);
+
+    var txPromise = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(revokeTX, network.layer1);
+
+    txPromise.setVersion(1);
+    return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref25) {
+      var _ref26 = (0, _slicedToArray2.default)(_ref25, 4),
+          txB = _ref26[0],
+          payerUtxos = _ref26[1],
+          ownerUtxos = _ref26[2],
+          feeRate = _ref26[3];
+
+      var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
+      var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{
+        index: ownerInput.index,
+        signer: ownerKey
+      }]);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a renewal transaction for a domain name.
+ * @param {String} fullyQualifiedName - the name to transfer
+ * @param {String} destinationAddress - the address to receive the name after renewal
+ *    this address will receive a dust UTXO
+ * @param {String | TransactionSigner} ownerKeyIn - a hex string of
+ *    the current owner's private key (or a TransactionSigner object)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the renewal (or a TransactionSigner
+ *    object)
+ * @param {String} zonefile - the zonefile data to include, if given (this will be hashed
+ *    to include in the transaction), the zonefile itself must be published
+ *    after the RENEWAL propagates.
+ * @param {String} valueHash - the raw zone file hash to include (this will be used
+ *    instead of zonefile, if given).
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
+
+
+function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyIn, paymentKeyIn) {
+  var zonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+  var buildIncomplete = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+  var network = _config.config.network;
+
+  if (!valueHash && !!zonefile) {
+    valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
+  }
+
+  var namespace = fullyQualifiedName.split('.').pop();
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  var ownerKey = getTransactionSigner(ownerKeyIn);
+  return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref27) {
+    var _ref28 = (0, _slicedToArray2.default)(_ref27, 2),
+        ownerAddress = _ref28[0],
+        paymentAddress = _ref28[1];
+
+    var txPromise = Promise.all([network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref29) {
+      var _ref30 = (0, _slicedToArray2.default)(_ref29, 2),
+          namePrice = _ref30[0],
+          burnAddress = _ref30[1];
+
+      return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, burnAddress, namePrice, valueHash);
+    }).then(function (tx) {
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(tx, network.layer1);
+
+      txB.setVersion(1);
+      return txB;
+    });
+    return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref31) {
+      var _ref32 = (0, _slicedToArray2.default)(_ref31, 4),
+          txB = _ref32[0],
+          payerUtxos = _ref32[1],
+          ownerUtxos = _ref32[2],
+          feeRate = _ref32[3];
+
+      var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false);
+      var ownerOutput = txB.__tx.outs[2];
+
+      var ownerOutputAddr = _bitcoinjsLib.default.address.fromOutputScript(ownerOutput.script, network.layer1);
+
+      if (ownerOutputAddr !== ownerAddress) {
+        return Promise.reject(new Error("Original owner ".concat(ownerAddress, " should have an output at ") + "index 2 in transaction was ".concat(ownerOutputAddr)));
       }
 
-      valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
-    } else if (valueHash.length !== 40) {
-      return Promise.reject(new Error("Invalid valueHash ".concat(valueHash)));
-    }
+      ownerOutput.value = ownerInput.value;
+      var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
+      return (0, _utils.signInputs)(signingTxB, paymentKey, [{
+        index: ownerInput.index,
+        signer: ownerKey
+      }]);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a namespace preorder transaction for a namespace
+ * @param {String} namespaceID - the namespace to pre-order
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string of
+ *    the private key used to fund the transaction (or a
+ *    TransactionSigner object)
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *    indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *    transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *    this function *does not* perform the requisite safety checks -- please see
+ *    the safety module for those.
+ * @private
+ */
 
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    var ownerKey = getTransactionSigner(ownerKeyIn);
-    return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref13) {
-      var _ref14 = (0, _slicedToArray2.default)(_ref13, 2),
-          ownerAddress = _ref14[0],
-          paymentAddress = _ref14[1];
 
-      var txPromise = network.getConsensusHash().then(function (consensusHash) {
-        return (0, _skeletons.makeUpdateSkeleton)(fullyQualifiedName, consensusHash, valueHash);
-      }).then(function (updateTX) {
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(updateTX, network.layer1);
+function makeNamespacePreorder(namespaceID, revealAddress, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var network = _config.config.network;
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  return paymentKey.getAddress().then(function (preorderAddress) {
+    var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamespacePrice(namespaceID)]).then(function (_ref33) {
+      var _ref34 = (0, _slicedToArray2.default)(_ref33, 2),
+          consensusHash = _ref34[0],
+          namespacePrice = _ref34[1];
 
-        txB.setVersion(1);
-        return txB;
-      });
-      return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref15) {
-        var _ref16 = (0, _slicedToArray2.default)(_ref15, 4),
-            txB = _ref16[0],
-            payerUtxos = _ref16[1],
-            ownerUtxos = _ref16[2],
-            feeRate = _ref16[3];
+      return (0, _skeletons.makeNamespacePreorderSkeleton)(namespaceID, consensusHash, preorderAddress, revealAddress, namespacePrice);
+    });
+    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref35) {
+      var _ref36 = (0, _slicedToArray2.default)(_ref35, 3),
+          utxos = _ref36[0],
+          feeRate = _ref36[1],
+          preorderSkeleton = _ref36[2];
 
-        var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
-        var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
-        return (0, _utils.signInputs)(signingTxB, paymentKey, [{
-          index: ownerInput.index,
-          signer: ownerKey
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
+
+      txB.setVersion(1);
+      var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
+
+      var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
+    }).then(function (signingTxB) {
+      return returnTransactionHex(signingTxB, buildIncomplete);
+    });
+  });
+}
+/**
+ * Generates a namespace reveal transaction for a namespace
+ * @param {BlockstackNamespace} namespace - the namespace to reveal
+ * @param {String} revealAddress - the address to receive the namespace (this
+ *   must be passed as the 'revealAddress' in the namespace-reveal transaction)
+ * @param {String | TransactionSigner} paymentKeyIn - a hex string (or
+ *   a TransactionSigner object) of the private key used to fund the
+ *   transaction
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *   indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *   transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *   this function *does not* perform the requisite safety checks -- please see
+ *   the safety module for those.
+ * @private
+ */
+
+
+function makeNamespaceReveal(namespace, revealAddress, paymentKeyIn) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var network = _config.config.network;
+
+  if (!namespace.check()) {
+    return Promise.reject(new Error('Invalid namespace'));
+  }
+
+  var namespaceRevealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  return paymentKey.getAddress().then(function (preorderAddress) {
+    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()]).then(function (_ref37) {
+      var _ref38 = (0, _slicedToArray2.default)(_ref37, 2),
+          utxos = _ref38[0],
+          feeRate = _ref38[1];
+
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(namespaceRevealTX, network.layer1);
+
+      txB.setVersion(1);
+      var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0);
+      return (0, _utils.signInputs)(signingTxB, paymentKey);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a namespace ready transaction for a namespace
+ * @param {String} namespaceID - the namespace to launch
+ * @param {String | TransactionSigner} revealKeyIn - the private key
+ *  of the 'revealAddress' used to reveal the namespace
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *  indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *  transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ *  this function *does not* perform the requisite safety checks -- please see
+ *  the safety module for those.
+ * @private
+ */
+
+
+function makeNamespaceReady(namespaceID, revealKeyIn) {
+  var buildIncomplete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var network = _config.config.network;
+  var namespaceReadyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
+  var revealKey = getTransactionSigner(revealKeyIn);
+  return revealKey.getAddress().then(function (revealAddress) {
+    return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()]).then(function (_ref39) {
+      var _ref40 = (0, _slicedToArray2.default)(_ref39, 2),
+          utxos = _ref40[0],
+          feeRate = _ref40[1];
+
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1);
+
+      txB.setVersion(1);
+      var signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0);
+      return (0, _utils.signInputs)(signingTxB, revealKey);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a name import transaction for a namespace
+ * @param {String} name - the name to import
+ * @param {String} recipientAddr - the address to receive the name
+ * @param {String} zonefileHash - the hash of the zonefile to give this name
+ * @param {String | TransactionSigner} importerKeyIn - the private key
+ * that pays for the import
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see
+ * the safety module for those.
+ * @private
+ */
+
+
+function makeNameImport(name, recipientAddr, zonefileHash, importerKeyIn) {
+  var buildIncomplete = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  var network = _config.config.network;
+  var nameImportTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
+  var importerKey = getTransactionSigner(importerKeyIn);
+  return importerKey.getAddress().then(function (importerAddress) {
+    return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()]).then(function (_ref41) {
+      var _ref42 = (0, _slicedToArray2.default)(_ref41, 2),
+          utxos = _ref42[0],
+          feeRate = _ref42[1];
+
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(nameImportTX, network.layer1);
+
+      var signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0);
+      return (0, _utils.signInputs)(signingTxB, importerKey);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates an announce transaction
+ * @param {String} messageHash - the hash of the message to send.  Should be
+ *  an already-announced zone file hash
+ * @param {String | TransactionSigner} senderKeyIn - the private key
+ *  that pays for the transaction.  Should be the key that owns the
+ *  name that the message recipients subscribe to
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * this function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+
+
+function makeAnnounce(messageHash, senderKeyIn) {
+  var buildIncomplete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  var network = _config.config.network;
+  var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
+  var senderKey = getTransactionSigner(senderKeyIn);
+  return senderKey.getAddress().then(function (senderAddress) {
+    return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()]).then(function (_ref43) {
+      var _ref44 = (0, _slicedToArray2.default)(_ref43, 2),
+          utxos = _ref44[0],
+          feeRate = _ref44[1];
+
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(announceTX, network.layer1);
+
+      var signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0);
+      return (0, _utils.signInputs)(signingTxB, senderKey);
+    });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a token-transfer transaction
+ * @param {String} recipientAddress - the address to receive the tokens
+ * @param {String} tokenType - the type of tokens to send
+ * @param {Object} tokenAmount - the BigInteger encoding of an unsigned 64-bit number of
+ *  tokens to send
+ * @param {String} scratchArea - an arbitrary string to include with the transaction
+ * @param {String | TransactionSigner} senderKeyIn - the hex-encoded private key to send
+ *   the tokens
+ * @param {String | TransactionSigner} btcFunderKeyIn - the hex-encoded private key to fund
+ *   the bitcoin fees for the transaction. Optional -- if not passed, will attempt to
+ *   fund with sender key.
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ *   indicating whether the function should attempt to return an unsigned (or not fully signed)
+ *   transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * This function does not perform the requisite safety checks -- please see the
+ * safety module for those.
+ * @private
+ */
+
+
+function makeTokenTransfer(recipientAddress, tokenType, tokenAmount, scratchArea, senderKeyIn, btcFunderKeyIn) {
+  var buildIncomplete = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+  var network = _config.config.network;
+  var separateFunder = !!btcFunderKeyIn;
+  var senderKey = getTransactionSigner(senderKeyIn);
+  var btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey;
+  var txPromise = network.getConsensusHash().then(function (consensusHash) {
+    return (0, _skeletons.makeTokenTransferSkeleton)(recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea);
+  });
+  return Promise.all([senderKey.getAddress(), btcKey.getAddress()]).then(function (_ref45) {
+    var _ref46 = (0, _slicedToArray2.default)(_ref45, 2),
+        senderAddress = _ref46[0],
+        btcAddress = _ref46[1];
+
+    var btcUTXOsPromise = separateFunder ? network.getUTXOs(btcAddress) : Promise.resolve([]);
+    var networkPromises = [network.getUTXOs(senderAddress), btcUTXOsPromise, network.getFeeRate(), txPromise];
+    return Promise.all(networkPromises).then(function (_ref47) {
+      var _ref48 = (0, _slicedToArray2.default)(_ref47, 4),
+          senderUTXOs = _ref48[0],
+          btcUTXOs = _ref48[1],
+          feeRate = _ref48[2],
+          tokenTransferTX = _ref48[3];
+
+      var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1);
+
+      if (separateFunder) {
+        var payerInput = addOwnerInput(senderUTXOs, senderAddress, txB);
+        var signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value);
+        return (0, _utils.signInputs)(signingTxB, btcKey, [{
+          index: payerInput.index,
+          signer: senderKey
         }]);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
+      } else {
+        var _signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0);
+
+        return (0, _utils.signInputs)(_signingTxB, senderKey);
+      }
     });
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
+/**
+ * Generates a bitcoin spend to a specified address. This will fund up to `amount`
+ *   of satoshis from the payer's UTXOs. It will generate a change output if and only
+ *   if the amount of leftover change is *greater* than the additional fees associated
+ *   with the extra output. If the requested amount is not enough to fund the transaction's
+ *   associated fees, then this will reject with a InvalidAmountError
+ *
+ * UTXOs are selected largest to smallest, and UTXOs which cannot fund the fees associated
+ *   with their own input will not be included.
+ *
+ * If you specify an amount > the total balance of the payer address, then this will
+ *   generate a maximum spend transaction
+ *
+ * @param {String} destinationAddress - the address to receive the bitcoin payment
+ * @param {String | TransactionSigner} paymentKeyIn - the private key
+ *    used to fund the bitcoin spend
+ * @param {number} amount - the amount in satoshis for the payment address to
+ *    spend in this transaction
+ * @param {boolean} buildIncomplete - optional boolean, defaults to false,
+ * indicating whether the function should attempt to return an unsigned (or not fully signed)
+ * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
+ * @private
+ */
+
+
+function makeBitcoinSpend(destinationAddress, paymentKeyIn, amount) {
+  var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+  if (amount <= 0) {
+    return Promise.reject(new _errors.InvalidParameterError('amount', 'amount must be greater than zero'));
   }
-  /**
-   * Generates a register transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to register
-   * @param {String} registerAddress - the address to receive the name (this
-   *    must have been passed as the 'destinationAddress' in the preorder transaction)
-   *    this address will receive a dust UTXO
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string of
-   *    the private key (or a TransactionSigner object) used to fund the
-   *    transaction (this *must* be the same as the payment address used
-   *    to fund the preorder)
-   * @param {String} zonefile - the zonefile data to include (this will be hashed
-   *    to include in the transaction), the zonefile itself must be published
-   *    after the UPDATE propagates.
-   * @param {String} valueHash - the hash of the zone file data to include.
-   *    It will be used instead of zonefile, if given
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *    indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *    transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
 
+  var network = _config.config.network;
+  var paymentKey = getTransactionSigner(paymentKeyIn);
+  return paymentKey.getAddress().then(function (paymentAddress) {
+    return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref49) {
+      var _ref50 = (0, _slicedToArray2.default)(_ref49, 2),
+          utxos = _ref50[0],
+          feeRate = _ref50[1];
 
-  function makeRegister(fullyQualifiedName, registerAddress, paymentKeyIn) {
-    var zonefile = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    var valueHash = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-    var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-    var network = _config.config.network;
+      var txB = new _bitcoinjsLib.default.TransactionBuilder(network.layer1);
+      txB.setVersion(1);
+      var destinationIndex = txB.addOutput(destinationAddress, 0); // will add utxos up to _amount_ and return the amount of leftover _change_
 
-    if (!valueHash && !!zonefile) {
-      valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
-    } else if (!!valueHash && valueHash.length !== 40) {
-      return Promise.reject(new Error("Invalid zonefile hash ".concat(valueHash)));
-    }
+      var change;
 
-    var registerSkeleton = (0, _skeletons.makeRegisterSkeleton)(fullyQualifiedName, registerAddress, valueHash);
-
-    var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(registerSkeleton, network.layer1);
-
-    txB.setVersion(1);
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    return paymentKey.getAddress().then(function (paymentAddress) {
-      return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref17) {
-        var _ref18 = (0, _slicedToArray2.default)(_ref17, 2),
-            utxos = _ref18[0],
-            feeRate = _ref18[1];
-
-        var signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0);
-        return (0, _utils.signInputs)(signingTxB, paymentKey);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a transfer transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to transfer
-   * @param {String} destinationAddress - the address to receive the name.
-   *    this address will receive a dust UTXO
-   * @param {String | TransactionSigner} ownerKeyIn - a hex string of
-   *    the current owner's private key (or a TransactionSigner object)
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string of
-   *    the private key used to fund the transaction (or a
-   *    TransactionSigner object)
-   * @param {Boolean} keepZonefile - if true, then preserve the name's zone file
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *   indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *   transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
-
-
-  function makeTransfer(fullyQualifiedName, destinationAddress, ownerKeyIn, paymentKeyIn) {
-    var keepZonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-    var buildIncomplete = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-    var network = _config.config.network;
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    var ownerKey = getTransactionSigner(ownerKeyIn);
-    return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref19) {
-      var _ref20 = (0, _slicedToArray2.default)(_ref19, 2),
-          ownerAddress = _ref20[0],
-          paymentAddress = _ref20[1];
-
-      var txPromise = network.getConsensusHash().then(function (consensusHash) {
-        return (0, _skeletons.makeTransferSkeleton)(fullyQualifiedName, consensusHash, destinationAddress, keepZonefile);
-      }).then(function (transferTX) {
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(transferTX, network.layer1);
-
-        txB.setVersion(1);
-        return txB;
-      });
-      return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref21) {
-        var _ref22 = (0, _slicedToArray2.default)(_ref21, 4),
-            txB = _ref22[0],
-            payerUtxos = _ref22[1],
-            ownerUtxos = _ref22[2],
-            feeRate = _ref22[3];
-
-        var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
-        var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
-        return (0, _utils.signInputs)(signingTxB, paymentKey, [{
-          index: ownerInput.index,
-          signer: ownerKey
-        }]);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a revoke transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to revoke
-   * @param {String | TransactionSigner} ownerKeyIn - a hex string of
-   *    the current owner's private key (or a TransactionSigner object)
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string of
-   *    the private key used to fund the transaction (or a
-   *    TransactionSigner object)
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *    indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *    transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
-
-
-  function makeRevoke(fullyQualifiedName, ownerKeyIn, paymentKeyIn) {
-    var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var network = _config.config.network;
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    var ownerKey = getTransactionSigner(ownerKeyIn);
-    return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref23) {
-      var _ref24 = (0, _slicedToArray2.default)(_ref23, 2),
-          ownerAddress = _ref24[0],
-          paymentAddress = _ref24[1];
-
-      var revokeTX = (0, _skeletons.makeRevokeSkeleton)(fullyQualifiedName);
-
-      var txPromise = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(revokeTX, network.layer1);
-
-      txPromise.setVersion(1);
-      return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref25) {
-        var _ref26 = (0, _slicedToArray2.default)(_ref25, 4),
-            txB = _ref26[0],
-            payerUtxos = _ref26[1],
-            ownerUtxos = _ref26[2],
-            feeRate = _ref26[3];
-
-        var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB);
-        var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
-        return (0, _utils.signInputs)(signingTxB, paymentKey, [{
-          index: ownerInput.index,
-          signer: ownerKey
-        }]);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a renewal transaction for a domain name.
-   * @param {String} fullyQualifiedName - the name to transfer
-   * @param {String} destinationAddress - the address to receive the name after renewal
-   *    this address will receive a dust UTXO
-   * @param {String | TransactionSigner} ownerKeyIn - a hex string of
-   *    the current owner's private key (or a TransactionSigner object)
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string of
-   *    the private key used to fund the renewal (or a TransactionSigner
-   *    object)
-   * @param {String} zonefile - the zonefile data to include, if given (this will be hashed
-   *    to include in the transaction), the zonefile itself must be published
-   *    after the RENEWAL propagates.
-   * @param {String} valueHash - the raw zone file hash to include (this will be used
-   *    instead of zonefile, if given).
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *    indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *    transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
-
-
-  function makeRenewal(fullyQualifiedName, destinationAddress, ownerKeyIn, paymentKeyIn) {
-    var zonefile = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-    var valueHash = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-    var buildIncomplete = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
-    var network = _config.config.network;
-
-    if (!valueHash && !!zonefile) {
-      valueHash = (0, _utils.hash160)(Buffer.from(zonefile)).toString('hex');
-    }
-
-    var namespace = fullyQualifiedName.split('.').pop();
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    var ownerKey = getTransactionSigner(ownerKeyIn);
-    return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()]).then(function (_ref27) {
-      var _ref28 = (0, _slicedToArray2.default)(_ref27, 2),
-          ownerAddress = _ref28[0],
-          paymentAddress = _ref28[1];
-
-      var txPromise = Promise.all([network.getNamePrice(fullyQualifiedName), network.getNamespaceBurnAddress(namespace)]).then(function (_ref29) {
-        var _ref30 = (0, _slicedToArray2.default)(_ref29, 2),
-            namePrice = _ref30[0],
-            burnAddress = _ref30[1];
-
-        return (0, _skeletons.makeRenewalSkeleton)(fullyQualifiedName, destinationAddress, ownerAddress, burnAddress, namePrice, valueHash);
-      }).then(function (tx) {
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(tx, network.layer1);
-
-        txB.setVersion(1);
-        return txB;
-      });
-      return Promise.all([txPromise, network.getUTXOs(paymentAddress), network.getUTXOs(ownerAddress), network.getFeeRate()]).then(function (_ref31) {
-        var _ref32 = (0, _slicedToArray2.default)(_ref31, 4),
-            txB = _ref32[0],
-            payerUtxos = _ref32[1],
-            ownerUtxos = _ref32[2],
-            feeRate = _ref32[3];
-
-        var ownerInput = addOwnerInput(ownerUtxos, ownerAddress, txB, false);
-        var ownerOutput = txB.__tx.outs[2];
-
-        var ownerOutputAddr = _bitcoinjsLib.default.address.fromOutputScript(ownerOutput.script, network.layer1);
-
-        if (ownerOutputAddr !== ownerAddress) {
-          return Promise.reject(new Error("Original owner ".concat(ownerAddress, " should have an output at ") + "index 2 in transaction was ".concat(ownerOutputAddr)));
-        }
-
-        ownerOutput.value = ownerInput.value;
-        var signingTxB = fundTransaction(txB, paymentAddress, payerUtxos, feeRate, ownerInput.value);
-        return (0, _utils.signInputs)(signingTxB, paymentKey, [{
-          index: ownerInput.index,
-          signer: ownerKey
-        }]);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a namespace preorder transaction for a namespace
-   * @param {String} namespaceID - the namespace to pre-order
-   * @param {String} revealAddress - the address to receive the namespace (this
-   *    must be passed as the 'revealAddress' in the namespace-reveal transaction)
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string of
-   *    the private key used to fund the transaction (or a
-   *    TransactionSigner object)
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *    indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *    transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *    this function *does not* perform the requisite safety checks -- please see
-   *    the safety module for those.
-   * @private
-   */
-
-
-  function makeNamespacePreorder(namespaceID, revealAddress, paymentKeyIn) {
-    var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var network = _config.config.network;
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    return paymentKey.getAddress().then(function (preorderAddress) {
-      var preorderPromise = Promise.all([network.getConsensusHash(), network.getNamespacePrice(namespaceID)]).then(function (_ref33) {
-        var _ref34 = (0, _slicedToArray2.default)(_ref33, 2),
-            consensusHash = _ref34[0],
-            namespacePrice = _ref34[1];
-
-        return (0, _skeletons.makeNamespacePreorderSkeleton)(namespaceID, consensusHash, preorderAddress, revealAddress, namespacePrice);
-      });
-      return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise]).then(function (_ref35) {
-        var _ref36 = (0, _slicedToArray2.default)(_ref35, 3),
-            utxos = _ref36[0],
-            feeRate = _ref36[1],
-            preorderSkeleton = _ref36[2];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1);
-
-        txB.setVersion(1);
-        var changeIndex = 1; // preorder skeleton always creates a change output at index = 1
-
-        var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex);
-        return (0, _utils.signInputs)(signingTxB, paymentKey);
-      }).then(function (signingTxB) {
-        return returnTransactionHex(signingTxB, buildIncomplete);
-      });
-    });
-  }
-  /**
-   * Generates a namespace reveal transaction for a namespace
-   * @param {BlockstackNamespace} namespace - the namespace to reveal
-   * @param {String} revealAddress - the address to receive the namespace (this
-   *   must be passed as the 'revealAddress' in the namespace-reveal transaction)
-   * @param {String | TransactionSigner} paymentKeyIn - a hex string (or
-   *   a TransactionSigner object) of the private key used to fund the
-   *   transaction
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *   indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *   transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *   this function *does not* perform the requisite safety checks -- please see
-   *   the safety module for those.
-   * @private
-   */
-
-
-  function makeNamespaceReveal(namespace, revealAddress, paymentKeyIn) {
-    var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    var network = _config.config.network;
-
-    if (!namespace.check()) {
-      return Promise.reject(new Error('Invalid namespace'));
-    }
-
-    var namespaceRevealTX = (0, _skeletons.makeNamespaceRevealSkeleton)(namespace, revealAddress);
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    return paymentKey.getAddress().then(function (preorderAddress) {
-      return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()]).then(function (_ref37) {
-        var _ref38 = (0, _slicedToArray2.default)(_ref37, 2),
-            utxos = _ref38[0],
-            feeRate = _ref38[1];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(namespaceRevealTX, network.layer1);
-
-        txB.setVersion(1);
-        var signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0);
-        return (0, _utils.signInputs)(signingTxB, paymentKey);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a namespace ready transaction for a namespace
-   * @param {String} namespaceID - the namespace to launch
-   * @param {String | TransactionSigner} revealKeyIn - the private key
-   *  of the 'revealAddress' used to reveal the namespace
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *  indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *  transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   *  this function *does not* perform the requisite safety checks -- please see
-   *  the safety module for those.
-   * @private
-   */
-
-
-  function makeNamespaceReady(namespaceID, revealKeyIn) {
-    var buildIncomplete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var network = _config.config.network;
-    var namespaceReadyTX = (0, _skeletons.makeNamespaceReadySkeleton)(namespaceID);
-    var revealKey = getTransactionSigner(revealKeyIn);
-    return revealKey.getAddress().then(function (revealAddress) {
-      return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()]).then(function (_ref39) {
-        var _ref40 = (0, _slicedToArray2.default)(_ref39, 2),
-            utxos = _ref40[0],
-            feeRate = _ref40[1];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1);
-
-        txB.setVersion(1);
-        var signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0);
-        return (0, _utils.signInputs)(signingTxB, revealKey);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a name import transaction for a namespace
-   * @param {String} name - the name to import
-   * @param {String} recipientAddr - the address to receive the name
-   * @param {String} zonefileHash - the hash of the zonefile to give this name
-   * @param {String | TransactionSigner} importerKeyIn - the private key
-   * that pays for the import
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   * indicating whether the function should attempt to return an unsigned (or not fully signed)
-   * transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   * this function does not perform the requisite safety checks -- please see
-   * the safety module for those.
-   * @private
-   */
-
-
-  function makeNameImport(name, recipientAddr, zonefileHash, importerKeyIn) {
-    var buildIncomplete = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-    var network = _config.config.network;
-    var nameImportTX = (0, _skeletons.makeNameImportSkeleton)(name, recipientAddr, zonefileHash);
-    var importerKey = getTransactionSigner(importerKeyIn);
-    return importerKey.getAddress().then(function (importerAddress) {
-      return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()]).then(function (_ref41) {
-        var _ref42 = (0, _slicedToArray2.default)(_ref41, 2),
-            utxos = _ref42[0],
-            feeRate = _ref42[1];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(nameImportTX, network.layer1);
-
-        var signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0);
-        return (0, _utils.signInputs)(signingTxB, importerKey);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates an announce transaction
-   * @param {String} messageHash - the hash of the message to send.  Should be
-   *  an already-announced zone file hash
-   * @param {String | TransactionSigner} senderKeyIn - the private key
-   *  that pays for the transaction.  Should be the key that owns the
-   *  name that the message recipients subscribe to
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   * indicating whether the function should attempt to return an unsigned (or not fully signed)
-   * transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   * this function does not perform the requisite safety checks -- please see the
-   * safety module for those.
-   * @private
-   */
-
-
-  function makeAnnounce(messageHash, senderKeyIn) {
-    var buildIncomplete = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var network = _config.config.network;
-    var announceTX = (0, _skeletons.makeAnnounceSkeleton)(messageHash);
-    var senderKey = getTransactionSigner(senderKeyIn);
-    return senderKey.getAddress().then(function (senderAddress) {
-      return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()]).then(function (_ref43) {
-        var _ref44 = (0, _slicedToArray2.default)(_ref43, 2),
-            utxos = _ref44[0],
-            feeRate = _ref44[1];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(announceTX, network.layer1);
-
-        var signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0);
-        return (0, _utils.signInputs)(signingTxB, senderKey);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-  /**
-   * Generates a token-transfer transaction
-   * @param {String} recipientAddress - the address to receive the tokens
-   * @param {String} tokenType - the type of tokens to send
-   * @param {Object} tokenAmount - the BigInteger encoding of an unsigned 64-bit number of
-   *  tokens to send
-   * @param {String} scratchArea - an arbitrary string to include with the transaction
-   * @param {String | TransactionSigner} senderKeyIn - the hex-encoded private key to send
-   *   the tokens
-   * @param {String | TransactionSigner} btcFunderKeyIn - the hex-encoded private key to fund
-   *   the bitcoin fees for the transaction. Optional -- if not passed, will attempt to
-   *   fund with sender key.
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   *   indicating whether the function should attempt to return an unsigned (or not fully signed)
-   *   transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   * This function does not perform the requisite safety checks -- please see the
-   * safety module for those.
-   * @private
-   */
-
-
-  function makeTokenTransfer(recipientAddress, tokenType, tokenAmount, scratchArea, senderKeyIn, btcFunderKeyIn) {
-    var buildIncomplete = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
-    var network = _config.config.network;
-    var separateFunder = !!btcFunderKeyIn;
-    var senderKey = getTransactionSigner(senderKeyIn);
-    var btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey;
-    var txPromise = network.getConsensusHash().then(function (consensusHash) {
-      return (0, _skeletons.makeTokenTransferSkeleton)(recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea);
-    });
-    return Promise.all([senderKey.getAddress(), btcKey.getAddress()]).then(function (_ref45) {
-      var _ref46 = (0, _slicedToArray2.default)(_ref45, 2),
-          senderAddress = _ref46[0],
-          btcAddress = _ref46[1];
-
-      var btcUTXOsPromise = separateFunder ? network.getUTXOs(btcAddress) : Promise.resolve([]);
-      var networkPromises = [network.getUTXOs(senderAddress), btcUTXOsPromise, network.getFeeRate(), txPromise];
-      return Promise.all(networkPromises).then(function (_ref47) {
-        var _ref48 = (0, _slicedToArray2.default)(_ref47, 4),
-            senderUTXOs = _ref48[0],
-            btcUTXOs = _ref48[1],
-            feeRate = _ref48[2],
-            tokenTransferTX = _ref48[3];
-
-        var txB = _bitcoinjsLib.default.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1);
-
-        if (separateFunder) {
-          var payerInput = addOwnerInput(senderUTXOs, senderAddress, txB);
-          var signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value);
-          return (0, _utils.signInputs)(signingTxB, btcKey, [{
-            index: payerInput.index,
-            signer: senderKey
-          }]);
+      try {
+        change = (0, _utils.addUTXOsToFund)(txB, utxos, amount, feeRate, false);
+      } catch (err) {
+        if (err.name === 'NotEnoughFundsError') {
+          // actual amount funded = amount requested - remainder
+          amount -= err.leftToFund;
+          change = 0;
         } else {
-          var _signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0);
-
-          return (0, _utils.signInputs)(_signingTxB, senderKey);
+          throw err;
         }
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
+      }
+
+      var feesToPay = feeRate * (0, _utils.estimateTXBytes)(txB, 0, 0);
+      var feeForChange = feeRate * (0, _utils.estimateTXBytes)(txB, 0, 1) - feesToPay; // it's worthwhile to add a change output
+
+      if (change > feeForChange) {
+        feesToPay += feeForChange;
+        txB.addOutput(paymentAddress, change);
+      } // now let's compute how much output is leftover once we pay the fees.
+
+
+      var outputAmount = amount - feesToPay;
+
+      if (outputAmount < _utils.DUST_MINIMUM) {
+        throw new _errors.InvalidAmountError(feesToPay, amount);
+      } // we need to manually set the output values now
+
+
+      txB.__tx.outs[destinationIndex].value = outputAmount; // ready to sign.
+
+      return (0, _utils.signInputs)(txB, paymentKey);
     });
-  }
-  /**
-   * Generates a bitcoin spend to a specified address. This will fund up to `amount`
-   *   of satoshis from the payer's UTXOs. It will generate a change output if and only
-   *   if the amount of leftover change is *greater* than the additional fees associated
-   *   with the extra output. If the requested amount is not enough to fund the transaction's
-   *   associated fees, then this will reject with a InvalidAmountError
-   *
-   * UTXOs are selected largest to smallest, and UTXOs which cannot fund the fees associated
-   *   with their own input will not be included.
-   *
-   * If you specify an amount > the total balance of the payer address, then this will
-   *   generate a maximum spend transaction
-   *
-   * @param {String} destinationAddress - the address to receive the bitcoin payment
-   * @param {String | TransactionSigner} paymentKeyIn - the private key
-   *    used to fund the bitcoin spend
-   * @param {number} amount - the amount in satoshis for the payment address to
-   *    spend in this transaction
-   * @param {boolean} buildIncomplete - optional boolean, defaults to false,
-   * indicating whether the function should attempt to return an unsigned (or not fully signed)
-   * transaction. Useful for passing around a TX for multi-sig input signing.
-   * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
-   * @private
-   */
+  }).then(function (signingTxB) {
+    return returnTransactionHex(signingTxB, buildIncomplete);
+  });
+}
 
-
-  function makeBitcoinSpend(destinationAddress, paymentKeyIn, amount) {
-    var buildIncomplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
-    if (amount <= 0) {
-      return Promise.reject(new _errors.InvalidParameterError('amount', 'amount must be greater than zero'));
-    }
-
-    var network = _config.config.network;
-    var paymentKey = getTransactionSigner(paymentKeyIn);
-    return paymentKey.getAddress().then(function (paymentAddress) {
-      return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()]).then(function (_ref49) {
-        var _ref50 = (0, _slicedToArray2.default)(_ref49, 2),
-            utxos = _ref50[0],
-            feeRate = _ref50[1];
-
-        var txB = new _bitcoinjsLib.default.TransactionBuilder(network.layer1);
-        txB.setVersion(1);
-        var destinationIndex = txB.addOutput(destinationAddress, 0); // will add utxos up to _amount_ and return the amount of leftover _change_
-
-        var change;
-
-        try {
-          change = (0, _utils.addUTXOsToFund)(txB, utxos, amount, feeRate, false);
-        } catch (err) {
-          if (err.name === 'NotEnoughFundsError') {
-            // actual amount funded = amount requested - remainder
-            amount -= err.leftToFund;
-            change = 0;
-          } else {
-            throw err;
-          }
-        }
-
-        var feesToPay = feeRate * (0, _utils.estimateTXBytes)(txB, 0, 0);
-        var feeForChange = feeRate * (0, _utils.estimateTXBytes)(txB, 0, 1) - feesToPay; // it's worthwhile to add a change output
-
-        if (change > feeForChange) {
-          feesToPay += feeForChange;
-          txB.addOutput(paymentAddress, change);
-        } // now let's compute how much output is leftover once we pay the fees.
-
-
-        var outputAmount = amount - feesToPay;
-
-        if (outputAmount < _utils.DUST_MINIMUM) {
-          throw new _errors.InvalidAmountError(feesToPay, amount);
-        } // we need to manually set the output values now
-
-
-        txB.__tx.outs[destinationIndex].value = outputAmount; // ready to sign.
-
-        return (0, _utils.signInputs)(txB, paymentKey);
-      });
-    }).then(function (signingTxB) {
-      return returnTransactionHex(signingTxB, buildIncomplete);
-    });
-  }
-
-  var transactions = {
-    makeRenewal: makeRenewal,
-    makeUpdate: makeUpdate,
-    makePreorder: makePreorder,
-    makeRegister: makeRegister,
-    makeTransfer: makeTransfer,
-    makeRevoke: makeRevoke,
-    makeNamespacePreorder: makeNamespacePreorder,
-    makeNamespaceReveal: makeNamespaceReveal,
-    makeNamespaceReady: makeNamespaceReady,
-    makeBitcoinSpend: makeBitcoinSpend,
-    makeNameImport: makeNameImport,
-    makeAnnounce: makeAnnounce,
-    makeTokenTransfer: makeTokenTransfer,
-    BlockstackNamespace: _skeletons.BlockstackNamespace,
-    estimatePreorder: estimatePreorder,
-    estimateRegister: estimateRegister,
-    estimateTransfer: estimateTransfer,
-    estimateUpdate: estimateUpdate,
-    estimateRenewal: estimateRenewal,
-    estimateRevoke: estimateRevoke,
-    estimateNamespacePreorder: estimateNamespacePreorder,
-    estimateNamespaceReveal: estimateNamespaceReveal,
-    estimateNamespaceReady: estimateNamespaceReady,
-    estimateNameImport: estimateNameImport,
-    estimateAnnounce: estimateAnnounce,
-    estimateTokenTransfer: estimateTokenTransfer
-  };
-  _exports.transactions = transactions;
-});
+var transactions = {
+  makeRenewal: makeRenewal,
+  makeUpdate: makeUpdate,
+  makePreorder: makePreorder,
+  makeRegister: makeRegister,
+  makeTransfer: makeTransfer,
+  makeRevoke: makeRevoke,
+  makeNamespacePreorder: makeNamespacePreorder,
+  makeNamespaceReveal: makeNamespaceReveal,
+  makeNamespaceReady: makeNamespaceReady,
+  makeBitcoinSpend: makeBitcoinSpend,
+  makeNameImport: makeNameImport,
+  makeAnnounce: makeAnnounce,
+  makeTokenTransfer: makeTokenTransfer,
+  BlockstackNamespace: _skeletons.BlockstackNamespace,
+  estimatePreorder: estimatePreorder,
+  estimateRegister: estimateRegister,
+  estimateTransfer: estimateTransfer,
+  estimateUpdate: estimateUpdate,
+  estimateRenewal: estimateRenewal,
+  estimateRevoke: estimateRevoke,
+  estimateNamespacePreorder: estimateNamespacePreorder,
+  estimateNamespaceReveal: estimateNamespaceReveal,
+  estimateNamespaceReady: estimateNamespaceReady,
+  estimateNameImport: estimateNameImport,
+  estimateAnnounce: estimateAnnounce,
+  estimateTokenTransfer: estimateTokenTransfer
+};
+exports.transactions = transactions;
 
 }).call(this,require("buffer").Buffer)
 },{"../config":513,"../errors":516,"./signers":523,"./skeletons":524,"./utils":526,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18,"bigi":51,"bitcoinjs-lib":73,"buffer":149}],526:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "bitcoinjs-lib", "ripemd160", "bigi", "../errors", "./signers"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("bitcoinjs-lib"), require("ripemd160"), require("bigi"), require("../errors"), require("./signers"));
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.hash160 = hash160;
+exports.hash128 = hash128;
+exports.estimateTXBytes = estimateTXBytes;
+exports.sumOutputValues = sumOutputValues;
+exports.decodeB40 = decodeB40;
+exports.addUTXOsToFund = addUTXOsToFund;
+exports.signInputs = signInputs;
+exports.DUST_MINIMUM = void 0;
+
+var _bitcoinjsLib = _interopRequireDefault(require("bitcoinjs-lib"));
+
+var _ripemd = _interopRequireDefault(require("ripemd160"));
+
+var _bigi = _interopRequireDefault(require("bigi"));
+
+var _errors = require("../errors");
+
+var _signers = require("./signers");
+
+var DUST_MINIMUM = 5500;
+exports.DUST_MINIMUM = DUST_MINIMUM;
+
+function hash160(buff) {
+  var sha256 = _bitcoinjsLib.default.crypto.sha256(buff);
+
+  return new _ripemd.default().update(sha256).digest();
+}
+
+function hash128(buff) {
+  return Buffer.from(_bitcoinjsLib.default.crypto.sha256(buff).slice(0, 16));
+} // COPIED FROM coinselect, because 1 byte matters sometimes.
+// baseline estimates, used to improve performance
+
+
+var TX_EMPTY_SIZE = 4 + 1 + 1 + 4;
+var TX_INPUT_BASE = 32 + 4 + 1 + 4;
+var TX_INPUT_PUBKEYHASH = 107;
+var TX_OUTPUT_BASE = 8 + 1;
+var TX_OUTPUT_PUBKEYHASH = 25;
+
+function inputBytes(input) {
+  if (input && input.script && input.script.length > 0) {
+    return TX_INPUT_BASE + input.script.length;
   } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.bitcoinjsLib, global.ripemd160, global.bigi, global.errors, global.signers);
-    global.utils = mod.exports;
+    return TX_INPUT_BASE + TX_INPUT_PUBKEYHASH;
   }
-})(this, function (_exports, _bitcoinjsLib, _ripemd, _bigi, _errors, _signers) {
-  "use strict";
+}
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+function outputBytes(output) {
+  if (output && output.script && output.script.length > 0) {
+    return TX_OUTPUT_BASE + output.script.length;
+  } else {
+    return TX_OUTPUT_BASE + TX_OUTPUT_PUBKEYHASH;
+  }
+}
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
+function transactionBytes(inputs, outputs) {
+  return TX_EMPTY_SIZE + inputs.reduce(function (a, x) {
+    return a + inputBytes(x);
+  }, 0) + outputs.reduce(function (a, x) {
+    return a + outputBytes(x);
+  }, 0);
+} //
+
+
+function estimateTXBytes(txIn, additionalInputs, additionalOutputs) {
+  var innerTx = txIn;
+
+  if (txIn instanceof _bitcoinjsLib.default.TransactionBuilder) {
+    innerTx = txIn.__tx;
+  }
+
+  var dummyInputs = new Array(additionalInputs);
+  dummyInputs.fill(null);
+  var dummyOutputs = new Array(additionalOutputs);
+  dummyOutputs.fill(null);
+  var inputs = [].concat(innerTx.ins, dummyInputs);
+  var outputs = [].concat(innerTx.outs, dummyOutputs);
+  return transactionBytes(inputs, outputs);
+}
+
+function sumOutputValues(txIn) {
+  var innerTx = txIn;
+
+  if (txIn instanceof _bitcoinjsLib.default.TransactionBuilder) {
+    innerTx = txIn.__tx;
+  }
+
+  return innerTx.outs.reduce(function (agg, x) {
+    return agg + x.value;
+  }, 0);
+}
+
+function decodeB40(input) {
+  // treat input as a base40 integer, and output a hex encoding
+  // of that integer.
+  //
+  //   for each digit of the string, find its location in `characters`
+  //    to get the value of the digit, then multiply by 40^(-index in input)
+  // e.g.,
+  // the 'right-most' character has value: (digit-value) * 40^0
+  //  the next character has value: (digit-value) * 40^1
+  //
+  // hence, we reverse the characters first, and use the index
+  //  to compute the value of each digit, then sum
+  var characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+';
+
+  var base = _bigi.default.valueOf(40);
+
+  var inputDigits = input.split('').reverse();
+  var digitValues = inputDigits.map(function (character, exponent) {
+    return _bigi.default.valueOf(characters.indexOf(character)).multiply(base.pow(_bigi.default.valueOf(exponent)));
   });
-  _exports.hash160 = hash160;
-  _exports.hash128 = hash128;
-  _exports.estimateTXBytes = estimateTXBytes;
-  _exports.sumOutputValues = sumOutputValues;
-  _exports.decodeB40 = decodeB40;
-  _exports.addUTXOsToFund = addUTXOsToFund;
-  _exports.signInputs = signInputs;
-  _exports.DUST_MINIMUM = void 0;
-  _bitcoinjsLib = _interopRequireDefault(_bitcoinjsLib);
-  _ripemd = _interopRequireDefault(_ripemd);
-  _bigi = _interopRequireDefault(_bigi);
-  var DUST_MINIMUM = 5500;
-  _exports.DUST_MINIMUM = DUST_MINIMUM;
+  var sum = digitValues.reduce(function (agg, cur) {
+    return agg.add(cur);
+  }, _bigi.default.ZERO);
+  return sum.toHex();
+}
+/**
+ * Adds UTXOs to fund a transaction
+ * @param {TransactionBuilder} txBuilderIn - a transaction builder object to add the inputs to. this
+ *    object is _always_ mutated. If not enough UTXOs exist to fund, the tx builder object
+ *    will still contain as many inputs as could be found.
+ * @param {Array<{value: number, tx_hash: string, tx_output_n}>} utxos - the utxo set for the
+ *    payer's address.
+ * @param {number} amountToFund - the amount of satoshis to fund in the transaction. the payer's
+ *    utxos will be included to fund up to this amount of *output* and the corresponding *fees*
+ *    for those additional inputs
+ * @param {number} feeRate - the satoshis/byte fee rate to use for fee calculation
+ * @param {boolean} fundNewFees - if true, this function will fund `amountToFund` and any new fees
+ *    associated with including the new inputs.
+ *    if false, this function will fund _at most_ `amountToFund`
+ * @returns {number} - the amount of leftover change (in satoshis)
+ * @private
+ */
 
-  function hash160(buff) {
-    var sha256 = _bitcoinjsLib.default.crypto.sha256(buff);
 
-    return new _ripemd.default().update(sha256).digest();
+function addUTXOsToFund(txBuilderIn, utxos, amountToFund, feeRate) {
+  var fundNewFees = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+
+  if (utxos.length === 0) {
+    throw new _errors.NotEnoughFundsError(amountToFund);
+  } // how much are we increasing fees by adding an input ?
+
+
+  var newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0) - estimateTXBytes(txBuilderIn, 0, 0));
+  var utxoThreshhold = amountToFund;
+
+  if (fundNewFees) {
+    utxoThreshhold += newFees;
   }
 
-  function hash128(buff) {
-    return Buffer.from(_bitcoinjsLib.default.crypto.sha256(buff).slice(0, 16));
-  } // COPIED FROM coinselect, because 1 byte matters sometimes.
-  // baseline estimates, used to improve performance
+  var goodUtxos = utxos.filter(function (utxo) {
+    return utxo.value >= utxoThreshhold;
+  });
 
-
-  var TX_EMPTY_SIZE = 4 + 1 + 1 + 4;
-  var TX_INPUT_BASE = 32 + 4 + 1 + 4;
-  var TX_INPUT_PUBKEYHASH = 107;
-  var TX_OUTPUT_BASE = 8 + 1;
-  var TX_OUTPUT_PUBKEYHASH = 25;
-
-  function inputBytes(input) {
-    if (input && input.script && input.script.length > 0) {
-      return TX_INPUT_BASE + input.script.length;
-    } else {
-      return TX_INPUT_BASE + TX_INPUT_PUBKEYHASH;
-    }
-  }
-
-  function outputBytes(output) {
-    if (output && output.script && output.script.length > 0) {
-      return TX_OUTPUT_BASE + output.script.length;
-    } else {
-      return TX_OUTPUT_BASE + TX_OUTPUT_PUBKEYHASH;
-    }
-  }
-
-  function transactionBytes(inputs, outputs) {
-    return TX_EMPTY_SIZE + inputs.reduce(function (a, x) {
-      return a + inputBytes(x);
-    }, 0) + outputs.reduce(function (a, x) {
-      return a + outputBytes(x);
-    }, 0);
-  } //
-
-
-  function estimateTXBytes(txIn, additionalInputs, additionalOutputs) {
-    var innerTx = txIn;
-
-    if (txIn instanceof _bitcoinjsLib.default.TransactionBuilder) {
-      innerTx = txIn.__tx;
-    }
-
-    var dummyInputs = new Array(additionalInputs);
-    dummyInputs.fill(null);
-    var dummyOutputs = new Array(additionalOutputs);
-    dummyOutputs.fill(null);
-    var inputs = [].concat(innerTx.ins, dummyInputs);
-    var outputs = [].concat(innerTx.outs, dummyOutputs);
-    return transactionBytes(inputs, outputs);
-  }
-
-  function sumOutputValues(txIn) {
-    var innerTx = txIn;
-
-    if (txIn instanceof _bitcoinjsLib.default.TransactionBuilder) {
-      innerTx = txIn.__tx;
-    }
-
-    return innerTx.outs.reduce(function (agg, x) {
-      return agg + x.value;
-    }, 0);
-  }
-
-  function decodeB40(input) {
-    // treat input as a base40 integer, and output a hex encoding
-    // of that integer.
-    //
-    //   for each digit of the string, find its location in `characters`
-    //    to get the value of the digit, then multiply by 40^(-index in input)
-    // e.g.,
-    // the 'right-most' character has value: (digit-value) * 40^0
-    //  the next character has value: (digit-value) * 40^1
-    //
-    // hence, we reverse the characters first, and use the index
-    //  to compute the value of each digit, then sum
-    var characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+';
-
-    var base = _bigi.default.valueOf(40);
-
-    var inputDigits = input.split('').reverse();
-    var digitValues = inputDigits.map(function (character, exponent) {
-      return _bigi.default.valueOf(characters.indexOf(character)).multiply(base.pow(_bigi.default.valueOf(exponent)));
+  if (goodUtxos.length > 0) {
+    goodUtxos.sort(function (a, b) {
+      return a.value - b.value;
     });
-    var sum = digitValues.reduce(function (agg, cur) {
-      return agg.add(cur);
-    }, _bigi.default.ZERO);
-    return sum.toHex();
-  }
-  /**
-   * Adds UTXOs to fund a transaction
-   * @param {TransactionBuilder} txBuilderIn - a transaction builder object to add the inputs to. this
-   *    object is _always_ mutated. If not enough UTXOs exist to fund, the tx builder object
-   *    will still contain as many inputs as could be found.
-   * @param {Array<{value: number, tx_hash: string, tx_output_n}>} utxos - the utxo set for the
-   *    payer's address.
-   * @param {number} amountToFund - the amount of satoshis to fund in the transaction. the payer's
-   *    utxos will be included to fund up to this amount of *output* and the corresponding *fees*
-   *    for those additional inputs
-   * @param {number} feeRate - the satoshis/byte fee rate to use for fee calculation
-   * @param {boolean} fundNewFees - if true, this function will fund `amountToFund` and any new fees
-   *    associated with including the new inputs.
-   *    if false, this function will fund _at most_ `amountToFund`
-   * @returns {number} - the amount of leftover change (in satoshis)
-   * @private
-   */
-
-
-  function addUTXOsToFund(txBuilderIn, utxos, amountToFund, feeRate) {
-    var fundNewFees = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-
-    if (utxos.length === 0) {
-      throw new _errors.NotEnoughFundsError(amountToFund);
-    } // how much are we increasing fees by adding an input ?
-
-
-    var newFees = feeRate * (estimateTXBytes(txBuilderIn, 1, 0) - estimateTXBytes(txBuilderIn, 0, 0));
-    var utxoThreshhold = amountToFund;
+    var selected = goodUtxos[0];
+    var change = selected.value - amountToFund;
 
     if (fundNewFees) {
-      utxoThreshhold += newFees;
+      change -= newFees;
     }
 
-    var goodUtxos = utxos.filter(function (utxo) {
-      return utxo.value >= utxoThreshhold;
+    txBuilderIn.addInput(selected.tx_hash, selected.tx_output_n);
+    return change;
+  } else {
+    utxos.sort(function (a, b) {
+      return b.value - a.value;
     });
+    var largest = utxos[0];
 
-    if (goodUtxos.length > 0) {
-      goodUtxos.sort(function (a, b) {
-        return a.value - b.value;
-      });
-      var selected = goodUtxos[0];
-      var change = selected.value - amountToFund;
-
-      if (fundNewFees) {
-        change -= newFees;
-      }
-
-      txBuilderIn.addInput(selected.tx_hash, selected.tx_output_n);
-      return change;
-    } else {
-      utxos.sort(function (a, b) {
-        return b.value - a.value;
-      });
-      var largest = utxos[0];
-
-      if (newFees >= largest.value) {
-        throw new _errors.NotEnoughFundsError(amountToFund);
-      }
-
-      txBuilderIn.addInput(largest.tx_hash, largest.tx_output_n);
-      var remainToFund = amountToFund - largest.value;
-
-      if (fundNewFees) {
-        remainToFund += newFees;
-      }
-
-      return addUTXOsToFund(txBuilderIn, utxos.slice(1), remainToFund, feeRate, fundNewFees);
+    if (newFees >= largest.value) {
+      throw new _errors.NotEnoughFundsError(amountToFund);
     }
+
+    txBuilderIn.addInput(largest.tx_hash, largest.tx_output_n);
+    var remainToFund = amountToFund - largest.value;
+
+    if (fundNewFees) {
+      remainToFund += newFees;
+    }
+
+    return addUTXOsToFund(txBuilderIn, utxos.slice(1), remainToFund, feeRate, fundNewFees);
+  }
+}
+
+function signInputs(txB, defaultSigner, otherSigners) {
+  var signerArray = txB.__tx.ins.map(function () {
+    return defaultSigner;
+  });
+
+  if (otherSigners) {
+    otherSigners.forEach(function (signerPair) {
+      signerArray[signerPair.index] = signerPair.signer;
+    });
   }
 
-  function signInputs(txB, defaultSigner, otherSigners) {
-    var signerArray = txB.__tx.ins.map(function () {
-      return defaultSigner;
+  var signingPromise = Promise.resolve();
+
+  var _loop = function _loop(i) {
+    signingPromise = signingPromise.then(function () {
+      return signerArray[i].signTransaction(txB, i);
     });
+  };
 
-    if (otherSigners) {
-      otherSigners.forEach(function (signerPair) {
-        signerArray[signerPair.index] = signerPair.signer;
-      });
-    }
-
-    var signingPromise = Promise.resolve();
-
-    var _loop = function _loop(i) {
-      signingPromise = signingPromise.then(function () {
-        return signerArray[i].signTransaction(txB, i);
-      });
-    };
-
-    for (var i = 0; i < txB.__tx.ins.length; i++) {
-      _loop(i);
-    }
-
-    return signingPromise.then(function () {
-      return txB;
-    });
+  for (var i = 0; i < txB.__tx.ins.length; i++) {
+    _loop(i);
   }
-});
+
+  return signingPromise.then(function () {
+    return txB;
+  });
+}
 
 }).call(this,require("buffer").Buffer)
 },{"../errors":516,"./signers":523,"@babel/runtime/helpers/interopRequireDefault":11,"bigi":51,"bitcoinjs-lib":73,"buffer":149,"ripemd160":442}],527:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./profile", "./profileSchemas", "./profileTokens", "./profileProofs", "./services", "./profileZoneFiles", "./profileLookup"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./profile"), require("./profileSchemas"), require("./profileTokens"), require("./profileProofs"), require("./services"), require("./profileZoneFiles"), require("./profileLookup"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.profile, global.profileSchemas, global.profileTokens, global.profileProofs, global.services, global.profileZoneFiles, global.profileLookup);
-    global.index = mod.exports;
-  }
-})(this, function (_exports, _profile, _profileSchemas, _profileTokens, _profileProofs, _services, _profileZoneFiles, _profileLookup) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(_exports, "Profile", {
-    enumerable: true,
-    get: function get() {
-      return _profile.Profile;
-    }
-  });
-  Object.defineProperty(_exports, "Person", {
-    enumerable: true,
-    get: function get() {
-      return _profileSchemas.Person;
-    }
-  });
-  Object.defineProperty(_exports, "Organization", {
-    enumerable: true,
-    get: function get() {
-      return _profileSchemas.Organization;
-    }
-  });
-  Object.defineProperty(_exports, "CreativeWork", {
-    enumerable: true,
-    get: function get() {
-      return _profileSchemas.CreativeWork;
-    }
-  });
-  Object.defineProperty(_exports, "resolveZoneFileToPerson", {
-    enumerable: true,
-    get: function get() {
-      return _profileSchemas.resolveZoneFileToPerson;
-    }
-  });
-  Object.defineProperty(_exports, "signProfileToken", {
-    enumerable: true,
-    get: function get() {
-      return _profileTokens.signProfileToken;
-    }
-  });
-  Object.defineProperty(_exports, "wrapProfileToken", {
-    enumerable: true,
-    get: function get() {
-      return _profileTokens.wrapProfileToken;
-    }
-  });
-  Object.defineProperty(_exports, "verifyProfileToken", {
-    enumerable: true,
-    get: function get() {
-      return _profileTokens.verifyProfileToken;
-    }
-  });
-  Object.defineProperty(_exports, "extractProfile", {
-    enumerable: true,
-    get: function get() {
-      return _profileTokens.extractProfile;
-    }
-  });
-  Object.defineProperty(_exports, "validateProofs", {
-    enumerable: true,
-    get: function get() {
-      return _profileProofs.validateProofs;
-    }
-  });
-  Object.defineProperty(_exports, "profileServices", {
-    enumerable: true,
-    get: function get() {
-      return _services.profileServices;
-    }
-  });
-  Object.defineProperty(_exports, "containsValidProofStatement", {
-    enumerable: true,
-    get: function get() {
-      return _services.containsValidProofStatement;
-    }
-  });
-  Object.defineProperty(_exports, "containsValidAddressProofStatement", {
-    enumerable: true,
-    get: function get() {
-      return _services.containsValidAddressProofStatement;
-    }
-  });
-  Object.defineProperty(_exports, "makeProfileZoneFile", {
-    enumerable: true,
-    get: function get() {
-      return _profileZoneFiles.makeProfileZoneFile;
-    }
-  });
-  Object.defineProperty(_exports, "getTokenFileUrl", {
-    enumerable: true,
-    get: function get() {
-      return _profileZoneFiles.getTokenFileUrl;
-    }
-  });
-  Object.defineProperty(_exports, "resolveZoneFileToProfile", {
-    enumerable: true,
-    get: function get() {
-      return _profileZoneFiles.resolveZoneFileToProfile;
-    }
-  });
-  Object.defineProperty(_exports, "lookupProfile", {
-    enumerable: true,
-    get: function get() {
-      return _profileLookup.lookupProfile;
-    }
-  });
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+Object.defineProperty(exports, "Profile", {
+  enumerable: true,
+  get: function get() {
+    return _profile.Profile;
+  }
+});
+Object.defineProperty(exports, "Person", {
+  enumerable: true,
+  get: function get() {
+    return _profileSchemas.Person;
+  }
+});
+Object.defineProperty(exports, "Organization", {
+  enumerable: true,
+  get: function get() {
+    return _profileSchemas.Organization;
+  }
+});
+Object.defineProperty(exports, "CreativeWork", {
+  enumerable: true,
+  get: function get() {
+    return _profileSchemas.CreativeWork;
+  }
+});
+Object.defineProperty(exports, "resolveZoneFileToPerson", {
+  enumerable: true,
+  get: function get() {
+    return _profileSchemas.resolveZoneFileToPerson;
+  }
+});
+Object.defineProperty(exports, "signProfileToken", {
+  enumerable: true,
+  get: function get() {
+    return _profileTokens.signProfileToken;
+  }
+});
+Object.defineProperty(exports, "wrapProfileToken", {
+  enumerable: true,
+  get: function get() {
+    return _profileTokens.wrapProfileToken;
+  }
+});
+Object.defineProperty(exports, "verifyProfileToken", {
+  enumerable: true,
+  get: function get() {
+    return _profileTokens.verifyProfileToken;
+  }
+});
+Object.defineProperty(exports, "extractProfile", {
+  enumerable: true,
+  get: function get() {
+    return _profileTokens.extractProfile;
+  }
+});
+Object.defineProperty(exports, "validateProofs", {
+  enumerable: true,
+  get: function get() {
+    return _profileProofs.validateProofs;
+  }
+});
+Object.defineProperty(exports, "profileServices", {
+  enumerable: true,
+  get: function get() {
+    return _services.profileServices;
+  }
+});
+Object.defineProperty(exports, "containsValidProofStatement", {
+  enumerable: true,
+  get: function get() {
+    return _services.containsValidProofStatement;
+  }
+});
+Object.defineProperty(exports, "containsValidAddressProofStatement", {
+  enumerable: true,
+  get: function get() {
+    return _services.containsValidAddressProofStatement;
+  }
+});
+Object.defineProperty(exports, "makeProfileZoneFile", {
+  enumerable: true,
+  get: function get() {
+    return _profileZoneFiles.makeProfileZoneFile;
+  }
+});
+Object.defineProperty(exports, "getTokenFileUrl", {
+  enumerable: true,
+  get: function get() {
+    return _profileZoneFiles.getTokenFileUrl;
+  }
+});
+Object.defineProperty(exports, "resolveZoneFileToProfile", {
+  enumerable: true,
+  get: function get() {
+    return _profileZoneFiles.resolveZoneFileToProfile;
+  }
+});
+Object.defineProperty(exports, "lookupProfile", {
+  enumerable: true,
+  get: function get() {
+    return _profileLookup.lookupProfile;
+  }
+});
+
+var _profile = require("./profile");
+
+var _profileSchemas = require("./profileSchemas");
+
+var _profileTokens = require("./profileTokens");
+
+var _profileProofs = require("./profileProofs");
+
+var _services = require("./services");
+
+var _profileZoneFiles = require("./profileZoneFiles");
+
+var _profileLookup = require("./profileLookup");
 
 },{"./profile":528,"./profileLookup":529,"./profileProofs":530,"./profileSchemas":532,"./profileTokens":538,"./profileZoneFiles":539,"./services":543}],528:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "schema-inspector", "./profileTokens", "./profileProofs", "./profileZoneFiles"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("schema-inspector"), require("./profileTokens"), require("./profileProofs"), require("./profileZoneFiles"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.schemaInspector, global.profileTokens, global.profileProofs, global.profileZoneFiles);
-    global.profile = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _schemaInspector, _profileTokens, _profileProofs, _profileZoneFiles) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Profile = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _schemaInspector = _interopRequireDefault(_schemaInspector);
-  var schemaDefinition = {
-    type: 'object',
-    properties: {
-      '@context': {
-        type: 'string',
-        optional: true
-      },
-      '@type': {
-        type: 'string'
-      }
-    }
-  };
-
-  var Profile =
-  /*#__PURE__*/
-  function () {
-    function Profile() {
-      var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      (0, _classCallCheck2.default)(this, Profile);
-      this._profile = Object.assign({}, {
-        '@context': 'http://schema.org/'
-      }, profile);
-    }
-
-    (0, _createClass2.default)(Profile, [{
-      key: "toJSON",
-      value: function toJSON() {
-        return Object.assign({}, this._profile);
-      }
-    }, {
-      key: "toToken",
-      value: function toToken(privateKey) {
-        return (0, _profileTokens.signProfileToken)(this.toJSON(), privateKey);
-      }
-    }], [{
-      key: "validateSchema",
-      value: function validateSchema(profile) {
-        var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        schemaDefinition.strict = strict;
-        return _schemaInspector.default.validate(schemaDefinition, profile);
-      }
-    }, {
-      key: "fromToken",
-      value: function fromToken(token) {
-        var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
-        return new Profile(profile);
-      }
-    }, {
-      key: "makeZoneFile",
-      value: function makeZoneFile(domainName, tokenFileURL) {
-        return (0, _profileZoneFiles.makeProfileZoneFile)(domainName, tokenFileURL);
-      }
-    }, {
-      key: "validateProofs",
-      value: function validateProofs(domainName) {
-        return (0, _profileProofs.validateProofs)(this.toJSON(), domainName);
-      }
-    }]);
-    return Profile;
-  }();
-
-  _exports.Profile = Profile;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.Profile = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _schemaInspector = _interopRequireDefault(require("schema-inspector"));
+
+var _profileTokens = require("./profileTokens");
+
+var _profileProofs = require("./profileProofs");
+
+var _profileZoneFiles = require("./profileZoneFiles");
+
+var schemaDefinition = {
+  type: 'object',
+  properties: {
+    '@context': {
+      type: 'string',
+      optional: true
+    },
+    '@type': {
+      type: 'string'
+    }
+  }
+};
+
+var Profile =
+/*#__PURE__*/
+function () {
+  function Profile() {
+    var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    (0, _classCallCheck2.default)(this, Profile);
+    this._profile = Object.assign({}, {
+      '@context': 'http://schema.org/'
+    }, profile);
+  }
+
+  (0, _createClass2.default)(Profile, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return Object.assign({}, this._profile);
+    }
+  }, {
+    key: "toToken",
+    value: function toToken(privateKey) {
+      return (0, _profileTokens.signProfileToken)(this.toJSON(), privateKey);
+    }
+  }], [{
+    key: "validateSchema",
+    value: function validateSchema(profile) {
+      var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      schemaDefinition.strict = strict;
+      return _schemaInspector.default.validate(schemaDefinition, profile);
+    }
+  }, {
+    key: "fromToken",
+    value: function fromToken(token) {
+      var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
+      return new Profile(profile);
+    }
+  }, {
+    key: "makeZoneFile",
+    value: function makeZoneFile(domainName, tokenFileURL) {
+      return (0, _profileZoneFiles.makeProfileZoneFile)(domainName, tokenFileURL);
+    }
+  }, {
+    key: "validateProofs",
+    value: function validateProofs(domainName) {
+      return (0, _profileProofs.validateProofs)(this.toJSON(), domainName);
+    }
+  }]);
+  return Profile;
+}();
+
+exports.Profile = Profile;
 
 },{"./profileProofs":530,"./profileTokens":538,"./profileZoneFiles":539,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"schema-inspector":444}],529:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./profileZoneFiles", "../config"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./profileZoneFiles"), require("../config"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.profileZoneFiles, global.config);
-    global.profileLookup = mod.exports;
-  }
-})(this, function (_exports, _profileZoneFiles, _config) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.lookupProfile = lookupProfile;
-
-  /**
-   * Look up a user profile by blockstack ID
-   *
-   * @param {string} username - The Blockstack ID of the profile to look up
-   * @param {string} [zoneFileLookupURL=null] - The URL
-   * to use for zonefile lookup. If falsey, lookupProfile will use the
-   * blockstack.js getNameInfo function.
-   * @returns {Promise} that resolves to a profile object
-   */
-  function lookupProfile(username) {
-    var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-    if (!username) {
-      return Promise.reject();
-    }
-
-    var lookupPromise;
-
-    if (zoneFileLookupURL) {
-      var url = "".concat(zoneFileLookupURL.replace(/\/$/, ''), "/").concat(username);
-      lookupPromise = fetch(url).then(function (response) {
-        return response.json();
-      });
-    } else {
-      lookupPromise = _config.config.network.getNameInfo(username);
-    }
-
-    return lookupPromise.then(function (responseJSON) {
-      if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
-        return (0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address);
-      } else {
-        throw new Error('Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field');
-      }
-    });
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.lookupProfile = lookupProfile;
+
+var _profileZoneFiles = require("./profileZoneFiles");
+
+var _config = require("../config");
+
+/**
+ * Look up a user profile by blockstack ID
+ *
+ * @param {string} username - The Blockstack ID of the profile to look up
+ * @param {string} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, lookupProfile will use the
+ * blockstack.js getNameInfo function.
+ * @returns {Promise} that resolves to a profile object
+ */
+function lookupProfile(username) {
+  var zoneFileLookupURL = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (!username) {
+    return Promise.reject();
+  }
+
+  var lookupPromise;
+
+  if (zoneFileLookupURL) {
+    var url = "".concat(zoneFileLookupURL.replace(/\/$/, ''), "/").concat(username);
+    lookupPromise = fetch(url).then(function (response) {
+      return response.json();
+    });
+  } else {
+    lookupPromise = _config.config.network.getNameInfo(username);
+  }
+
+  return lookupPromise.then(function (responseJSON) {
+    if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
+      return (0, _profileZoneFiles.resolveZoneFileToProfile)(responseJSON.zonefile, responseJSON.address);
+    } else {
+      throw new Error('Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field');
+    }
+  });
+}
 
 },{"../config":513,"./profileZoneFiles":539}],530:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./services"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./services"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.services);
-    global.profileProofs = mod.exports;
-  }
-})(this, function (_exports, _services) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.validateProofs = validateProofs;
-
-  /**
-   * Validates the social proofs in a user's profile. Currently supports validation of 
-   * Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.
-   *
-   * @param {Object} profile The JSON of the profile to be validated
-   * @param {string} ownerAddress The owner bitcoin address to be validated
-   * @param {string} [name=null] The Blockstack name to be validated 
-   * @returns {Promise} that resolves to an array of validated proof objects
-   */
-  function validateProofs(profile, ownerAddress) {
-    var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-    if (!profile) {
-      throw new Error('Profile must not be null');
-    }
-
-    var accounts = [];
-    var proofsToValidate = [];
-
-    if (profile.hasOwnProperty('account')) {
-      accounts = profile.account;
-    } else {
-      return Promise.resolve([]);
-    }
-
-    accounts.forEach(function (account) {
-      // skip if proof service is not supported
-      if (account.hasOwnProperty('service') && !_services.profileServices.hasOwnProperty(account.service)) {
-        return;
-      }
-
-      if (!(account.hasOwnProperty('proofType') && account.proofType === 'http' && account.hasOwnProperty('proofUrl'))) {
-        return;
-      }
-
-      var proof = {
-        service: account.service,
-        proof_url: account.proofUrl,
-        identifier: account.identifier,
-        valid: false
-      };
-      proofsToValidate.push(_services.profileServices[account.service].validateProof(proof, ownerAddress, name));
-    });
-    return Promise.all(proofsToValidate);
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.validateProofs = validateProofs;
+
+var _services = require("./services");
+
+/**
+ * Validates the social proofs in a user's profile. Currently supports validation of 
+ * Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.
+ *
+ * @param {Object} profile The JSON of the profile to be validated
+ * @param {string} ownerAddress The owner bitcoin address to be validated
+ * @param {string} [name=null] The Blockstack name to be validated 
+ * @returns {Promise} that resolves to an array of validated proof objects
+ */
+function validateProofs(profile, ownerAddress) {
+  var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  if (!profile) {
+    throw new Error('Profile must not be null');
+  }
+
+  var accounts = [];
+  var proofsToValidate = [];
+
+  if (profile.hasOwnProperty('account')) {
+    accounts = profile.account;
+  } else {
+    return Promise.resolve([]);
+  }
+
+  accounts.forEach(function (account) {
+    // skip if proof service is not supported
+    if (account.hasOwnProperty('service') && !_services.profileServices.hasOwnProperty(account.service)) {
+      return;
+    }
+
+    if (!(account.hasOwnProperty('proofType') && account.proofType === 'http' && account.hasOwnProperty('proofUrl'))) {
+      return;
+    }
+
+    var proof = {
+      service: account.service,
+      proof_url: account.proofUrl,
+      identifier: account.identifier,
+      valid: false
+    };
+    proofsToValidate.push(_services.profileServices[account.service].validateProof(proof, ownerAddress, name));
+  });
+  return Promise.all(proofsToValidate);
+}
 
 },{"./services":543}],531:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/inherits", "schema-inspector", "../profileTokens", "../profile"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/inherits"), require("schema-inspector"), require("../profileTokens"), require("../profile"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.inherits, global.schemaInspector, global.profileTokens, global.profile);
-    global.creativework = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _inherits2, _schemaInspector, _profileTokens, _profile) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.CreativeWork = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _schemaInspector = _interopRequireDefault(_schemaInspector);
-  var schemaDefinition = {
-    type: 'object',
-    properties: {
-      '@context': {
-        type: 'string',
-        optional: true
-      },
-      '@type': {
-        type: 'string'
-      },
-      '@id': {
-        type: 'string',
-        optional: true
-      }
-    }
-  };
-
-  var CreativeWork =
-  /*#__PURE__*/
-  function (_Profile) {
-    (0, _inherits2.default)(CreativeWork, _Profile);
-
-    function CreativeWork() {
-      var _this;
-
-      var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      (0, _classCallCheck2.default)(this, CreativeWork);
-      _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(CreativeWork).call(this, profile));
-      _this._profile = Object.assign({}, {
-        '@type': 'CreativeWork'
-      }, _this._profile);
-      return _this;
-    }
-
-    (0, _createClass2.default)(CreativeWork, null, [{
-      key: "validateSchema",
-      value: function validateSchema(profile) {
-        var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        schemaDefinition.strict = strict;
-        return _schemaInspector.default.validate(schemaDefinition, profile);
-      }
-    }, {
-      key: "fromToken",
-      value: function fromToken(token) {
-        var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
-        return new CreativeWork(profile);
-      }
-    }]);
-    return CreativeWork;
-  }(_profile.Profile);
-
-  _exports.CreativeWork = CreativeWork;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.CreativeWork = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _schemaInspector = _interopRequireDefault(require("schema-inspector"));
+
+var _profileTokens = require("../profileTokens");
+
+var _profile = require("../profile");
+
+var schemaDefinition = {
+  type: 'object',
+  properties: {
+    '@context': {
+      type: 'string',
+      optional: true
+    },
+    '@type': {
+      type: 'string'
+    },
+    '@id': {
+      type: 'string',
+      optional: true
+    }
+  }
+};
+
+var CreativeWork =
+/*#__PURE__*/
+function (_Profile) {
+  (0, _inherits2.default)(CreativeWork, _Profile);
+
+  function CreativeWork() {
+    var _this;
+
+    var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    (0, _classCallCheck2.default)(this, CreativeWork);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(CreativeWork).call(this, profile));
+    _this._profile = Object.assign({}, {
+      '@type': 'CreativeWork'
+    }, _this._profile);
+    return _this;
+  }
+
+  (0, _createClass2.default)(CreativeWork, null, [{
+    key: "validateSchema",
+    value: function validateSchema(profile) {
+      var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      schemaDefinition.strict = strict;
+      return _schemaInspector.default.validate(schemaDefinition, profile);
+    }
+  }, {
+    key: "fromToken",
+    value: function fromToken(token) {
+      var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
+      return new CreativeWork(profile);
+    }
+  }]);
+  return CreativeWork;
+}(_profile.Profile);
+
+exports.CreativeWork = CreativeWork;
 
 },{"../profile":528,"../profileTokens":538,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],532:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./person", "./organization", "./creativework", "./personLegacy", "./personZoneFiles"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./person"), require("./organization"), require("./creativework"), require("./personLegacy"), require("./personZoneFiles"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.person, global.organization, global.creativework, global.personLegacy, global.personZoneFiles);
-    global.index = mod.exports;
-  }
-})(this, function (_exports, _person, _organization, _creativework, _personLegacy, _personZoneFiles) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(_exports, "Person", {
-    enumerable: true,
-    get: function get() {
-      return _person.Person;
-    }
-  });
-  Object.defineProperty(_exports, "Organization", {
-    enumerable: true,
-    get: function get() {
-      return _organization.Organization;
-    }
-  });
-  Object.defineProperty(_exports, "CreativeWork", {
-    enumerable: true,
-    get: function get() {
-      return _creativework.CreativeWork;
-    }
-  });
-  Object.defineProperty(_exports, "getPersonFromLegacyFormat", {
-    enumerable: true,
-    get: function get() {
-      return _personLegacy.getPersonFromLegacyFormat;
-    }
-  });
-  Object.defineProperty(_exports, "resolveZoneFileToPerson", {
-    enumerable: true,
-    get: function get() {
-      return _personZoneFiles.resolveZoneFileToPerson;
-    }
-  });
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+Object.defineProperty(exports, "Person", {
+  enumerable: true,
+  get: function get() {
+    return _person.Person;
+  }
+});
+Object.defineProperty(exports, "Organization", {
+  enumerable: true,
+  get: function get() {
+    return _organization.Organization;
+  }
+});
+Object.defineProperty(exports, "CreativeWork", {
+  enumerable: true,
+  get: function get() {
+    return _creativework.CreativeWork;
+  }
+});
+Object.defineProperty(exports, "getPersonFromLegacyFormat", {
+  enumerable: true,
+  get: function get() {
+    return _personLegacy.getPersonFromLegacyFormat;
+  }
+});
+Object.defineProperty(exports, "resolveZoneFileToPerson", {
+  enumerable: true,
+  get: function get() {
+    return _personZoneFiles.resolveZoneFileToPerson;
+  }
+});
+
+var _person = require("./person");
+
+var _organization = require("./organization");
+
+var _creativework = require("./creativework");
+
+var _personLegacy = require("./personLegacy");
+
+var _personZoneFiles = require("./personZoneFiles");
 
 },{"./creativework":531,"./organization":533,"./person":534,"./personLegacy":535,"./personZoneFiles":537}],533:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/inherits", "schema-inspector", "../profileTokens", "../profile"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/inherits"), require("schema-inspector"), require("../profileTokens"), require("../profile"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.inherits, global.schemaInspector, global.profileTokens, global.profile);
-    global.organization = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _inherits2, _schemaInspector, _profileTokens, _profile) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Organization = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _schemaInspector = _interopRequireDefault(_schemaInspector);
-  var schemaDefinition = {
-    type: 'object',
-    properties: {
-      '@context': {
-        type: 'string',
-        optional: true
-      },
-      '@type': {
-        type: 'string'
-      },
-      '@id': {
-        type: 'string',
-        optional: true
-      }
-    }
-  };
-
-  var Organization =
-  /*#__PURE__*/
-  function (_Profile) {
-    (0, _inherits2.default)(Organization, _Profile);
-
-    function Organization() {
-      var _this;
-
-      var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      (0, _classCallCheck2.default)(this, Organization);
-      _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Organization).call(this, profile));
-      _this._profile = Object.assign({}, {
-        '@type': 'Organization'
-      }, _this._profile);
-      return _this;
-    }
-
-    (0, _createClass2.default)(Organization, null, [{
-      key: "validateSchema",
-      value: function validateSchema(profile) {
-        var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        schemaDefinition.strict = strict;
-        return _schemaInspector.default.validate(schemaDefinition, profile);
-      }
-    }, {
-      key: "fromToken",
-      value: function fromToken(token) {
-        var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
-        return new Organization(profile);
-      }
-    }]);
-    return Organization;
-  }(_profile.Profile);
-
-  _exports.Organization = Organization;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.Organization = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _schemaInspector = _interopRequireDefault(require("schema-inspector"));
+
+var _profileTokens = require("../profileTokens");
+
+var _profile = require("../profile");
+
+var schemaDefinition = {
+  type: 'object',
+  properties: {
+    '@context': {
+      type: 'string',
+      optional: true
+    },
+    '@type': {
+      type: 'string'
+    },
+    '@id': {
+      type: 'string',
+      optional: true
+    }
+  }
+};
+
+var Organization =
+/*#__PURE__*/
+function (_Profile) {
+  (0, _inherits2.default)(Organization, _Profile);
+
+  function Organization() {
+    var _this;
+
+    var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    (0, _classCallCheck2.default)(this, Organization);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Organization).call(this, profile));
+    _this._profile = Object.assign({}, {
+      '@type': 'Organization'
+    }, _this._profile);
+    return _this;
+  }
+
+  (0, _createClass2.default)(Organization, null, [{
+    key: "validateSchema",
+    value: function validateSchema(profile) {
+      var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      schemaDefinition.strict = strict;
+      return _schemaInspector.default.validate(schemaDefinition, profile);
+    }
+  }, {
+    key: "fromToken",
+    value: function fromToken(token) {
+      var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
+      return new Organization(profile);
+    }
+  }]);
+  return Organization;
+}(_profile.Profile);
+
+exports.Organization = Organization;
 
 },{"../profile":528,"../profileTokens":538,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],534:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/inherits", "schema-inspector", "../profile", "../profileTokens", "./personLegacy", "./personUtils"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/inherits"), require("schema-inspector"), require("../profile"), require("../profileTokens"), require("./personLegacy"), require("./personUtils"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.inherits, global.schemaInspector, global.profile, global.profileTokens, global.personLegacy, global.personUtils);
-    global.person = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _inherits2, _schemaInspector, _profile, _profileTokens, _personLegacy, _personUtils) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Person = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _schemaInspector = _interopRequireDefault(_schemaInspector);
-  var schemaDefinition = {
-    type: 'object',
-    strict: false,
-    properties: {
-      '@context': {
-        type: 'string',
-        optional: true
-      },
-      '@type': {
-        type: 'string'
-      },
-      '@id': {
-        type: 'string',
-        optional: true
-      },
-      name: {
-        type: 'string',
-        optional: true
-      },
-      givenName: {
-        type: 'string',
-        optional: true
-      },
-      familyName: {
-        type: 'string',
-        optional: true
-      },
-      description: {
-        type: 'string',
-        optional: true
-      },
-      image: {
-        type: 'array',
-        optional: true,
-        items: {
-          type: 'object',
-          properties: {
-            '@type': {
-              type: 'string'
-            },
-            name: {
-              type: 'string',
-              optional: true
-            },
-            contentUrl: {
-              type: 'string',
-              optional: true
-            }
-          }
-        }
-      },
-      website: {
-        type: 'array',
-        optional: true,
-        items: {
-          type: 'object',
-          properties: {
-            '@type': {
-              type: 'string'
-            },
-            url: {
-              type: 'string',
-              optional: true
-            }
-          }
-        }
-      },
-      account: {
-        type: 'array',
-        optional: true,
-        items: {
-          type: 'object',
-          properties: {
-            '@type': {
-              type: 'string'
-            },
-            service: {
-              type: 'string',
-              optional: true
-            },
-            identifier: {
-              type: 'string',
-              optional: true
-            },
-            proofType: {
-              type: 'string',
-              optional: true
-            },
-            proofUrl: {
-              type: 'string',
-              optional: true
-            },
-            proofMessage: {
-              type: 'string',
-              optional: true
-            },
-            proofSignature: {
-              type: 'string',
-              optional: true
-            }
-          }
-        }
-      },
-      worksFor: {
-        type: 'array',
-        optional: true,
-        items: {
-          type: 'object',
-          properties: {
-            '@type': {
-              type: 'string'
-            },
-            '@id': {
-              type: 'string',
-              optional: true
-            }
-          }
-        }
-      },
-      knows: {
-        type: 'array',
-        optional: true,
-        items: {
-          type: 'object',
-          properties: {
-            '@type': {
-              type: 'string'
-            },
-            '@id': {
-              type: 'string',
-              optional: true
-            }
-          }
-        }
-      },
-      address: {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Person = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _schemaInspector = _interopRequireDefault(require("schema-inspector"));
+
+var _profile = require("../profile");
+
+var _profileTokens = require("../profileTokens");
+
+var _personLegacy = require("./personLegacy");
+
+var _personUtils = require("./personUtils");
+
+var schemaDefinition = {
+  type: 'object',
+  strict: false,
+  properties: {
+    '@context': {
+      type: 'string',
+      optional: true
+    },
+    '@type': {
+      type: 'string'
+    },
+    '@id': {
+      type: 'string',
+      optional: true
+    },
+    name: {
+      type: 'string',
+      optional: true
+    },
+    givenName: {
+      type: 'string',
+      optional: true
+    },
+    familyName: {
+      type: 'string',
+      optional: true
+    },
+    description: {
+      type: 'string',
+      optional: true
+    },
+    image: {
+      type: 'array',
+      optional: true,
+      items: {
         type: 'object',
-        optional: true,
         properties: {
           '@type': {
             type: 'string'
           },
-          streetAddress: {
+          name: {
             type: 'string',
             optional: true
           },
-          addressLocality: {
-            type: 'string',
-            optional: true
-          },
-          postalCode: {
-            type: 'string',
-            optional: true
-          },
-          addressCountry: {
+          contentUrl: {
             type: 'string',
             optional: true
           }
         }
-      },
-      birthDate: {
-        type: 'string',
-        optional: true
-      },
-      taxID: {
-        type: 'string',
-        optional: true
       }
+    },
+    website: {
+      type: 'array',
+      optional: true,
+      items: {
+        type: 'object',
+        properties: {
+          '@type': {
+            type: 'string'
+          },
+          url: {
+            type: 'string',
+            optional: true
+          }
+        }
+      }
+    },
+    account: {
+      type: 'array',
+      optional: true,
+      items: {
+        type: 'object',
+        properties: {
+          '@type': {
+            type: 'string'
+          },
+          service: {
+            type: 'string',
+            optional: true
+          },
+          identifier: {
+            type: 'string',
+            optional: true
+          },
+          proofType: {
+            type: 'string',
+            optional: true
+          },
+          proofUrl: {
+            type: 'string',
+            optional: true
+          },
+          proofMessage: {
+            type: 'string',
+            optional: true
+          },
+          proofSignature: {
+            type: 'string',
+            optional: true
+          }
+        }
+      }
+    },
+    worksFor: {
+      type: 'array',
+      optional: true,
+      items: {
+        type: 'object',
+        properties: {
+          '@type': {
+            type: 'string'
+          },
+          '@id': {
+            type: 'string',
+            optional: true
+          }
+        }
+      }
+    },
+    knows: {
+      type: 'array',
+      optional: true,
+      items: {
+        type: 'object',
+        properties: {
+          '@type': {
+            type: 'string'
+          },
+          '@id': {
+            type: 'string',
+            optional: true
+          }
+        }
+      }
+    },
+    address: {
+      type: 'object',
+      optional: true,
+      properties: {
+        '@type': {
+          type: 'string'
+        },
+        streetAddress: {
+          type: 'string',
+          optional: true
+        },
+        addressLocality: {
+          type: 'string',
+          optional: true
+        },
+        postalCode: {
+          type: 'string',
+          optional: true
+        },
+        addressCountry: {
+          type: 'string',
+          optional: true
+        }
+      }
+    },
+    birthDate: {
+      type: 'string',
+      optional: true
+    },
+    taxID: {
+      type: 'string',
+      optional: true
     }
-  };
+  }
+};
 
-  var Person =
-  /*#__PURE__*/
-  function (_Profile) {
-    (0, _inherits2.default)(Person, _Profile);
+var Person =
+/*#__PURE__*/
+function (_Profile) {
+  (0, _inherits2.default)(Person, _Profile);
 
-    function Person() {
-      var _this;
+  function Person() {
+    var _this;
 
-      var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      (0, _classCallCheck2.default)(this, Person);
-      _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Person).call(this, profile));
-      _this._profile = Object.assign({}, {
-        '@type': 'Person'
-      }, _this._profile);
-      return _this;
+    var profile = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    (0, _classCallCheck2.default)(this, Person);
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Person).call(this, profile));
+    _this._profile = Object.assign({}, {
+      '@type': 'Person'
+    }, _this._profile);
+    return _this;
+  }
+
+  (0, _createClass2.default)(Person, [{
+    key: "toJSON",
+    value: function toJSON() {
+      return {
+        profile: this.profile(),
+        name: this.name(),
+        givenName: this.givenName(),
+        familyName: this.familyName(),
+        description: this.description(),
+        avatarUrl: this.avatarUrl(),
+        verifiedAccounts: this.verifiedAccounts(),
+        address: this.address(),
+        birthDate: this.birthDate(),
+        connections: this.connections(),
+        organizations: this.organizations()
+      };
     }
+  }, {
+    key: "profile",
+    value: function profile() {
+      return Object.assign({}, this._profile);
+    }
+  }, {
+    key: "name",
+    value: function name() {
+      return (0, _personUtils.getName)(this.profile());
+    }
+  }, {
+    key: "givenName",
+    value: function givenName() {
+      return (0, _personUtils.getGivenName)(this.profile());
+    }
+  }, {
+    key: "familyName",
+    value: function familyName() {
+      return (0, _personUtils.getFamilyName)(this.profile());
+    }
+  }, {
+    key: "description",
+    value: function description() {
+      return (0, _personUtils.getDescription)(this.profile());
+    }
+  }, {
+    key: "avatarUrl",
+    value: function avatarUrl() {
+      return (0, _personUtils.getAvatarUrl)(this.profile());
+    }
+  }, {
+    key: "verifiedAccounts",
+    value: function verifiedAccounts(verifications) {
+      return (0, _personUtils.getVerifiedAccounts)(this.profile(), verifications);
+    }
+  }, {
+    key: "address",
+    value: function address() {
+      return (0, _personUtils.getAddress)(this.profile());
+    }
+  }, {
+    key: "birthDate",
+    value: function birthDate() {
+      return (0, _personUtils.getBirthDate)(this.profile());
+    }
+  }, {
+    key: "connections",
+    value: function connections() {
+      return (0, _personUtils.getConnections)(this.profile());
+    }
+  }, {
+    key: "organizations",
+    value: function organizations() {
+      return (0, _personUtils.getOrganizations)(this.profile());
+    }
+  }], [{
+    key: "validateSchema",
+    value: function validateSchema(profile) {
+      var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      schemaDefinition.strict = strict;
+      return _schemaInspector.default.validate(schemaDefinition, profile);
+    }
+  }, {
+    key: "fromToken",
+    value: function fromToken(token) {
+      var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
+      return new Person(profile);
+    }
+  }, {
+    key: "fromLegacyFormat",
+    value: function fromLegacyFormat(legacyProfile) {
+      var profile = (0, _personLegacy.getPersonFromLegacyFormat)(legacyProfile);
+      return new Person(profile);
+    }
+  }]);
+  return Person;
+}(_profile.Profile);
 
-    (0, _createClass2.default)(Person, [{
-      key: "toJSON",
-      value: function toJSON() {
-        return {
-          profile: this.profile(),
-          name: this.name(),
-          givenName: this.givenName(),
-          familyName: this.familyName(),
-          description: this.description(),
-          avatarUrl: this.avatarUrl(),
-          verifiedAccounts: this.verifiedAccounts(),
-          address: this.address(),
-          birthDate: this.birthDate(),
-          connections: this.connections(),
-          organizations: this.organizations()
-        };
-      }
-    }, {
-      key: "profile",
-      value: function profile() {
-        return Object.assign({}, this._profile);
-      }
-    }, {
-      key: "name",
-      value: function name() {
-        return (0, _personUtils.getName)(this.profile());
-      }
-    }, {
-      key: "givenName",
-      value: function givenName() {
-        return (0, _personUtils.getGivenName)(this.profile());
-      }
-    }, {
-      key: "familyName",
-      value: function familyName() {
-        return (0, _personUtils.getFamilyName)(this.profile());
-      }
-    }, {
-      key: "description",
-      value: function description() {
-        return (0, _personUtils.getDescription)(this.profile());
-      }
-    }, {
-      key: "avatarUrl",
-      value: function avatarUrl() {
-        return (0, _personUtils.getAvatarUrl)(this.profile());
-      }
-    }, {
-      key: "verifiedAccounts",
-      value: function verifiedAccounts(verifications) {
-        return (0, _personUtils.getVerifiedAccounts)(this.profile(), verifications);
-      }
-    }, {
-      key: "address",
-      value: function address() {
-        return (0, _personUtils.getAddress)(this.profile());
-      }
-    }, {
-      key: "birthDate",
-      value: function birthDate() {
-        return (0, _personUtils.getBirthDate)(this.profile());
-      }
-    }, {
-      key: "connections",
-      value: function connections() {
-        return (0, _personUtils.getConnections)(this.profile());
-      }
-    }, {
-      key: "organizations",
-      value: function organizations() {
-        return (0, _personUtils.getOrganizations)(this.profile());
-      }
-    }], [{
-      key: "validateSchema",
-      value: function validateSchema(profile) {
-        var strict = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        schemaDefinition.strict = strict;
-        return _schemaInspector.default.validate(schemaDefinition, profile);
-      }
-    }, {
-      key: "fromToken",
-      value: function fromToken(token) {
-        var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
-        return new Person(profile);
-      }
-    }, {
-      key: "fromLegacyFormat",
-      value: function fromLegacyFormat(legacyProfile) {
-        var profile = (0, _personLegacy.getPersonFromLegacyFormat)(legacyProfile);
-        return new Person(profile);
-      }
-    }]);
-    return Person;
-  }(_profile.Profile);
-
-  _exports.Person = Person;
-});
+exports.Person = Person;
 
 },{"../profile":528,"../profileTokens":538,"./personLegacy":535,"./personUtils":536,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],535:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports);
-    global.personLegacy = mod.exports;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getPersonFromLegacyFormat = getPersonFromLegacyFormat;
+
+function formatAccount(serviceName, data) {
+  var proofUrl;
+
+  if (data.proof && data.proof.url) {
+    proofUrl = data.proof.url;
   }
-})(this, function (_exports) {
-  "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.getPersonFromLegacyFormat = getPersonFromLegacyFormat;
+  return {
+    '@type': 'Account',
+    service: serviceName,
+    identifier: data.username,
+    proofType: 'http',
+    proofUrl: proofUrl
+  };
+}
 
-  function formatAccount(serviceName, data) {
-    var proofUrl;
+function getPersonFromLegacyFormat(profile) {
+  var profileData = {
+    '@type': 'Person'
+  };
 
-    if (data.proof && data.proof.url) {
-      proofUrl = data.proof.url;
+  if (profile) {
+    if (profile.name && profile.name.formatted) {
+      profileData.name = profile.name.formatted;
     }
 
-    return {
-      '@type': 'Account',
-      service: serviceName,
-      identifier: data.username,
-      proofType: 'http',
-      proofUrl: proofUrl
-    };
-  }
+    if (profile.bio) {
+      profileData.description = profile.bio;
+    }
 
-  function getPersonFromLegacyFormat(profile) {
-    var profileData = {
-      '@type': 'Person'
-    };
+    if (profile.location && profile.location.formatted) {
+      profileData.address = {
+        '@type': 'PostalAddress',
+        addressLocality: profile.location.formatted
+      };
+    }
 
-    if (profile) {
-      if (profile.name && profile.name.formatted) {
-        profileData.name = profile.name.formatted;
-      }
+    var images = [];
 
-      if (profile.bio) {
-        profileData.description = profile.bio;
-      }
+    if (profile.avatar && profile.avatar.url) {
+      images.push({
+        '@type': 'ImageObject',
+        name: 'avatar',
+        contentUrl: profile.avatar.url
+      });
+    }
 
-      if (profile.location && profile.location.formatted) {
-        profileData.address = {
-          '@type': 'PostalAddress',
-          addressLocality: profile.location.formatted
-        };
-      }
+    if (profile.cover && profile.cover.url) {
+      images.push({
+        '@type': 'ImageObject',
+        name: 'cover',
+        contentUrl: profile.cover.url
+      });
+    }
 
-      var images = [];
+    if (images.length) {
+      profileData.image = images;
+    }
 
-      if (profile.avatar && profile.avatar.url) {
-        images.push({
-          '@type': 'ImageObject',
-          name: 'avatar',
-          contentUrl: profile.avatar.url
-        });
-      }
+    if (profile.website) {
+      profileData.website = [{
+        '@type': 'WebSite',
+        url: profile.website
+      }];
+    }
 
-      if (profile.cover && profile.cover.url) {
-        images.push({
-          '@type': 'ImageObject',
-          name: 'cover',
-          contentUrl: profile.cover.url
-        });
-      }
+    var accounts = [];
 
-      if (images.length) {
-        profileData.image = images;
-      }
+    if (profile.bitcoin && profile.bitcoin.address) {
+      accounts.push({
+        '@type': 'Account',
+        role: 'payment',
+        service: 'bitcoin',
+        identifier: profile.bitcoin.address
+      });
+    }
 
-      if (profile.website) {
-        profileData.website = [{
-          '@type': 'WebSite',
-          url: profile.website
-        }];
-      }
+    if (profile.twitter && profile.twitter.username) {
+      accounts.push(formatAccount('twitter', profile.twitter));
+    }
 
-      var accounts = [];
+    if (profile.facebook && profile.facebook.username) {
+      accounts.push(formatAccount('facebook', profile.facebook));
+    }
 
-      if (profile.bitcoin && profile.bitcoin.address) {
-        accounts.push({
-          '@type': 'Account',
-          role: 'payment',
-          service: 'bitcoin',
-          identifier: profile.bitcoin.address
-        });
-      }
+    if (profile.github && profile.github.username) {
+      accounts.push(formatAccount('github', profile.github));
+    }
 
-      if (profile.twitter && profile.twitter.username) {
-        accounts.push(formatAccount('twitter', profile.twitter));
-      }
-
-      if (profile.facebook && profile.facebook.username) {
-        accounts.push(formatAccount('facebook', profile.facebook));
-      }
-
-      if (profile.github && profile.github.username) {
-        accounts.push(formatAccount('github', profile.github));
-      }
-
-      if (profile.auth) {
-        if (profile.auth.length > 0) {
-          if (profile.auth[0] && profile.auth[0].publicKeychain) {
-            accounts.push({
-              '@type': 'Account',
-              role: 'key',
-              service: 'bip32',
-              identifier: profile.auth[0].publicKeychain
-            });
-          }
+    if (profile.auth) {
+      if (profile.auth.length > 0) {
+        if (profile.auth[0] && profile.auth[0].publicKeychain) {
+          accounts.push({
+            '@type': 'Account',
+            role: 'key',
+            service: 'bip32',
+            identifier: profile.auth[0].publicKeychain
+          });
         }
       }
-
-      if (profile.pgp && profile.pgp.url) {
-        accounts.push({
-          '@type': 'Account',
-          role: 'key',
-          service: 'pgp',
-          identifier: profile.pgp.fingerprint,
-          contentUrl: profile.pgp.url
-        });
-      }
-
-      profileData.account = accounts;
     }
 
-    return profileData;
+    if (profile.pgp && profile.pgp.url) {
+      accounts.push({
+        '@type': 'Account',
+        role: 'key',
+        service: 'pgp',
+        identifier: profile.pgp.fingerprint,
+        contentUrl: profile.pgp.url
+      });
+    }
+
+    profileData.account = accounts;
   }
-});
+
+  return profileData;
+}
 
 },{}],536:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports);
-    global.personUtils = mod.exports;
-  }
-})(this, function (_exports) {
-  "use strict";
+"use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.getName = getName;
-  _exports.getGivenName = getGivenName;
-  _exports.getFamilyName = getFamilyName;
-  _exports.getDescription = getDescription;
-  _exports.getAvatarUrl = getAvatarUrl;
-  _exports.getVerifiedAccounts = getVerifiedAccounts;
-  _exports.getOrganizations = getOrganizations;
-  _exports.getConnections = getConnections;
-  _exports.getAddress = getAddress;
-  _exports.getBirthDate = getBirthDate;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getName = getName;
+exports.getGivenName = getGivenName;
+exports.getFamilyName = getFamilyName;
+exports.getDescription = getDescription;
+exports.getAvatarUrl = getAvatarUrl;
+exports.getVerifiedAccounts = getVerifiedAccounts;
+exports.getOrganizations = getOrganizations;
+exports.getConnections = getConnections;
+exports.getAddress = getAddress;
+exports.getBirthDate = getBirthDate;
 
-  function getName(profile) {
-    if (!profile) {
-      return null;
-    }
-
-    var name = null;
-
-    if (profile.name) {
-      name = profile.name;
-    } else if (profile.givenName || profile.familyName) {
-      name = '';
-
-      if (profile.givenName) {
-        name = profile.givenName;
-      }
-
-      if (profile.familyName) {
-        name += " ".concat(profile.familyName);
-      }
-    }
-
-    return name;
+function getName(profile) {
+  if (!profile) {
+    return null;
   }
 
-  function getGivenName(profile) {
-    if (!profile) {
-      return null;
-    }
+  var name = null;
 
-    var givenName = null;
+  if (profile.name) {
+    name = profile.name;
+  } else if (profile.givenName || profile.familyName) {
+    name = '';
 
     if (profile.givenName) {
-      givenName = profile.givenName;
-    } else if (profile.name) {
-      var nameParts = profile.name.split(' ');
-      givenName = nameParts.slice(0, -1).join(' ');
+      name = profile.givenName;
     }
-
-    return givenName;
-  }
-
-  function getFamilyName(profile) {
-    if (!profile) {
-      return null;
-    }
-
-    var familyName = null;
 
     if (profile.familyName) {
-      familyName = profile.familyName;
-    } else if (profile.name) {
-      var nameParts = profile.name.split(' ');
-      familyName = nameParts.pop();
+      name += " ".concat(profile.familyName);
     }
-
-    return familyName;
   }
 
-  function getDescription(profile) {
-    if (!profile) {
-      return null;
-    }
+  return name;
+}
 
-    var description = null;
-
-    if (profile.description) {
-      description = profile.description;
-    }
-
-    return description;
+function getGivenName(profile) {
+  if (!profile) {
+    return null;
   }
 
-  function getAvatarUrl(profile) {
-    if (!profile) {
-      return null;
-    }
+  var givenName = null;
 
-    var avatarContentUrl = null;
+  if (profile.givenName) {
+    givenName = profile.givenName;
+  } else if (profile.name) {
+    var nameParts = profile.name.split(' ');
+    givenName = nameParts.slice(0, -1).join(' ');
+  }
 
-    if (profile.image) {
-      profile.image.map(function (image) {
-        if (image.name === 'avatar') {
-          avatarContentUrl = image.contentUrl;
-          return avatarContentUrl;
+  return givenName;
+}
+
+function getFamilyName(profile) {
+  if (!profile) {
+    return null;
+  }
+
+  var familyName = null;
+
+  if (profile.familyName) {
+    familyName = profile.familyName;
+  } else if (profile.name) {
+    var nameParts = profile.name.split(' ');
+    familyName = nameParts.pop();
+  }
+
+  return familyName;
+}
+
+function getDescription(profile) {
+  if (!profile) {
+    return null;
+  }
+
+  var description = null;
+
+  if (profile.description) {
+    description = profile.description;
+  }
+
+  return description;
+}
+
+function getAvatarUrl(profile) {
+  if (!profile) {
+    return null;
+  }
+
+  var avatarContentUrl = null;
+
+  if (profile.image) {
+    profile.image.map(function (image) {
+      if (image.name === 'avatar') {
+        avatarContentUrl = image.contentUrl;
+        return avatarContentUrl;
+      } else {
+        return null;
+      }
+    });
+  }
+
+  return avatarContentUrl;
+}
+
+function getVerifiedAccounts(profile, verifications) {
+  if (!profile) {
+    return null;
+  }
+
+  var filteredAccounts = [];
+
+  if (profile.hasOwnProperty('account') && verifications) {
+    profile.account.map(function (account) {
+      var accountIsValid = false;
+      var proofUrl = null;
+      verifications.map(function (verification) {
+        if (verification.hasOwnProperty('proof_url')) {
+          verification.proofUrl = verification.proof_url;
+        }
+
+        if (verification.valid && verification.service === account.service && verification.identifier === account.identifier && verification.proofUrl) {
+          accountIsValid = true;
+          proofUrl = verification.proofUrl;
+          return true;
         } else {
-          return null;
+          return false;
         }
       });
-    }
 
-    return avatarContentUrl;
-  }
-
-  function getVerifiedAccounts(profile, verifications) {
-    if (!profile) {
-      return null;
-    }
-
-    var filteredAccounts = [];
-
-    if (profile.hasOwnProperty('account') && verifications) {
-      profile.account.map(function (account) {
-        var accountIsValid = false;
-        var proofUrl = null;
-        verifications.map(function (verification) {
-          if (verification.hasOwnProperty('proof_url')) {
-            verification.proofUrl = verification.proof_url;
-          }
-
-          if (verification.valid && verification.service === account.service && verification.identifier === account.identifier && verification.proofUrl) {
-            accountIsValid = true;
-            proofUrl = verification.proofUrl;
-            return true;
-          } else {
-            return false;
-          }
-        });
-
-        if (accountIsValid) {
-          account.proofUrl = proofUrl;
-          filteredAccounts.push(account);
-          return account;
-        } else {
-          return null;
-        }
-      });
-    }
-
-    return filteredAccounts;
-  }
-
-  function getOrganizations(profile) {
-    if (!profile) {
-      return null;
-    }
-
-    var organizations = [];
-
-    if (profile.hasOwnProperty('worksFor')) {
-      return profile.worksFor;
-    }
-
-    return organizations;
-  }
-
-  function getConnections(profile) {
-    if (!profile) {
-      return null;
-    }
-
-    var connections = [];
-
-    if (profile.hasOwnProperty('knows')) {
-      connections = profile.knows;
-    }
-
-    return connections;
-  }
-
-  function getAddress(profile) {
-    if (!profile) {
-      return null;
-    }
-
-    var addressString = null;
-
-    if (profile.hasOwnProperty('address')) {
-      var addressParts = [];
-
-      if (profile.address.hasOwnProperty('streetAddress')) {
-        addressParts.push(profile.address.streetAddress);
+      if (accountIsValid) {
+        account.proofUrl = proofUrl;
+        filteredAccounts.push(account);
+        return account;
+      } else {
+        return null;
       }
-
-      if (profile.address.hasOwnProperty('addressLocality')) {
-        addressParts.push(profile.address.addressLocality);
-      }
-
-      if (profile.address.hasOwnProperty('postalCode')) {
-        addressParts.push(profile.address.postalCode);
-      }
-
-      if (profile.address.hasOwnProperty('addressCountry')) {
-        addressParts.push(profile.address.addressCountry);
-      }
-
-      if (addressParts.length) {
-        addressString = addressParts.join(', ');
-      }
-    }
-
-    return addressString;
+    });
   }
 
-  function getBirthDate(profile) {
-    if (!profile) {
-      return null;
-    }
+  return filteredAccounts;
+}
 
-    var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    var birthDateString = null;
-
-    if (profile.hasOwnProperty('birthDate')) {
-      var date = new Date(profile.birthDate);
-      birthDateString = "".concat(monthNames[date.getMonth()], " ").concat(date.getDate(), ", ").concat(date.getFullYear());
-    }
-
-    return birthDateString;
+function getOrganizations(profile) {
+  if (!profile) {
+    return null;
   }
-});
+
+  var organizations = [];
+
+  if (profile.hasOwnProperty('worksFor')) {
+    return profile.worksFor;
+  }
+
+  return organizations;
+}
+
+function getConnections(profile) {
+  if (!profile) {
+    return null;
+  }
+
+  var connections = [];
+
+  if (profile.hasOwnProperty('knows')) {
+    connections = profile.knows;
+  }
+
+  return connections;
+}
+
+function getAddress(profile) {
+  if (!profile) {
+    return null;
+  }
+
+  var addressString = null;
+
+  if (profile.hasOwnProperty('address')) {
+    var addressParts = [];
+
+    if (profile.address.hasOwnProperty('streetAddress')) {
+      addressParts.push(profile.address.streetAddress);
+    }
+
+    if (profile.address.hasOwnProperty('addressLocality')) {
+      addressParts.push(profile.address.addressLocality);
+    }
+
+    if (profile.address.hasOwnProperty('postalCode')) {
+      addressParts.push(profile.address.postalCode);
+    }
+
+    if (profile.address.hasOwnProperty('addressCountry')) {
+      addressParts.push(profile.address.addressCountry);
+    }
+
+    if (addressParts.length) {
+      addressString = addressParts.join(', ');
+    }
+  }
+
+  return addressString;
+}
+
+function getBirthDate(profile) {
+  if (!profile) {
+    return null;
+  }
+
+  var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var birthDateString = null;
+
+  if (profile.hasOwnProperty('birthDate')) {
+    var date = new Date(profile.birthDate);
+    birthDateString = "".concat(monthNames[date.getMonth()], " ").concat(date.getDate(), ", ").concat(date.getFullYear());
+  }
+
+  return birthDateString;
+}
 
 },{}],537:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "zone-file", "./person", "../profileZoneFiles", "../profileTokens"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("zone-file"), require("./person"), require("../profileZoneFiles"), require("../profileTokens"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.zoneFile, global.person, global.profileZoneFiles, global.profileTokens);
-    global.personZoneFiles = mod.exports;
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.resolveZoneFileToPerson = resolveZoneFileToPerson;
+
+var _zoneFile = require("zone-file");
+
+var _person = require("./person");
+
+var _profileZoneFiles = require("../profileZoneFiles");
+
+var _profileTokens = require("../profileTokens");
+
+function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
+  var zoneFileJson = null;
+
+  try {
+    zoneFileJson = (0, _zoneFile.parseZoneFile)(zoneFile);
+
+    if (!zoneFileJson.hasOwnProperty('$origin')) {
+      zoneFileJson = null;
+      throw new Error('zone file is missing an origin');
+    }
+  } catch (e) {
+    console.error(e);
   }
-})(this, function (_exports, _zoneFile, _person, _profileZoneFiles, _profileTokens) {
-  "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
+  var tokenFileUrl = null;
+
+  if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
+    tokenFileUrl = (0, _profileZoneFiles.getTokenFileUrl)(zoneFileJson);
+  } else {
+    var profile = null;
+
+    try {
+      profile = JSON.parse(zoneFile);
+
+      var person = _person.Person.fromLegacyFormat(profile);
+
+      profile = person.profile();
+    } catch (error) {
+      console.warn(error);
+    }
+
+    callback(profile);
+    return;
+  }
+
+  if (tokenFileUrl) {
+    fetch(tokenFileUrl).then(function (response) {
+      return response.text();
+    }).then(function (responseText) {
+      return JSON.parse(responseText);
+    }).then(function (responseJson) {
+      var tokenRecords = responseJson;
+      var token = tokenRecords[0].token;
+      var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
+      callback(profile);
+    }).catch(function (error) {
+      console.warn(error);
+    });
+  } else {
+    console.warn('Token file url not found');
+    callback({});
+  }
+}
+
+},{"../profileTokens":538,"../profileZoneFiles":539,"./person":534,"zone-file":497}],538:[function(require,module,exports){
+(function (Buffer){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.signProfileToken = signProfileToken;
+exports.wrapProfileToken = wrapProfileToken;
+exports.verifyProfileToken = verifyProfileToken;
+exports.extractProfile = extractProfile;
+
+var _bitcoinjsLib = require("bitcoinjs-lib");
+
+var _jsontokens = require("jsontokens");
+
+var _utils = require("../utils");
+
+/**
+  * Signs a profile token
+  * @param {Object} profile - the JSON of the profile to be signed
+  * @param {String} privateKey - the signing private key
+  * @param {Object} subject - the entity that the information is about
+  * @param {Object} issuer - the entity that is issuing the token
+  * @param {String} signingAlgorithm - the signing algorithm to use
+  * @param {Date} issuedAt - the time of issuance of the token
+  * @param {Date} expiresAt - the time of expiration of the token
+  * @returns {Object} - the signed profile token
+  */
+function signProfileToken(profile, privateKey) {
+  var subject = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var issuer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  var signingAlgorithm = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 'ES256K';
+  var issuedAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : new Date();
+  var expiresAt = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (0, _utils.nextYear)();
+
+  if (signingAlgorithm !== 'ES256K') {
+    throw new Error('Signing algorithm not supported');
+  }
+
+  var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(privateKey);
+
+  if (subject === null) {
+    subject = {
+      publicKey: publicKey
+    };
+  }
+
+  if (issuer === null) {
+    issuer = {
+      publicKey: publicKey
+    };
+  }
+
+  var tokenSigner = new _jsontokens.TokenSigner(signingAlgorithm, privateKey);
+  var payload = {
+    jti: (0, _utils.makeUUID4)(),
+    iat: issuedAt.toISOString(),
+    exp: expiresAt.toISOString(),
+    subject: subject,
+    issuer: issuer,
+    claim: profile
+  };
+  return tokenSigner.sign(payload);
+}
+/**
+  * Wraps a token for a profile token file
+  * @param {String} token - the token to be wrapped
+  * @returns {Object} - including `token` and `decodedToken`
+  */
+
+
+function wrapProfileToken(token) {
+  return {
+    token: token,
+    decodedToken: (0, _jsontokens.decodeToken)(token)
+  };
+}
+/**
+  * Verifies a profile token
+  * @param {String} token - the token to be verified
+  * @param {String} publicKeyOrAddress - the public key or address of the
+  *   keypair that is thought to have signed the token
+  * @returns {Object} - the verified, decoded profile token
+  * @throws {Error} - throws an error if token verification fails
+  */
+
+
+function verifyProfileToken(token, publicKeyOrAddress) {
+  var decodedToken = (0, _jsontokens.decodeToken)(token);
+  var payload = decodedToken.payload; // Inspect and verify the subject
+
+  if (payload.hasOwnProperty('subject')) {
+    if (!payload.subject.hasOwnProperty('publicKey')) {
+      throw new Error('Token doesn\'t have a subject public key');
+    }
+  } else {
+    throw new Error('Token doesn\'t have a subject');
+  } // Inspect and verify the issuer
+
+
+  if (payload.hasOwnProperty('issuer')) {
+    if (!payload.issuer.hasOwnProperty('publicKey')) {
+      throw new Error('Token doesn\'t have an issuer public key');
+    }
+  } else {
+    throw new Error('Token doesn\'t have an issuer');
+  } // Inspect and verify the claim
+
+
+  if (!payload.hasOwnProperty('claim')) {
+    throw new Error('Token doesn\'t have a claim');
+  }
+
+  var issuerPublicKey = payload.issuer.publicKey;
+  var publicKeyBuffer = new Buffer(issuerPublicKey, 'hex');
+
+  var compressedKeyPair = _bitcoinjsLib.ECPair.fromPublicKey(publicKeyBuffer, {
+    compressed: true
   });
-  _exports.resolveZoneFileToPerson = resolveZoneFileToPerson;
 
-  function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
+  var compressedAddress = (0, _utils.ecPairToAddress)(compressedKeyPair);
+
+  var uncompressedKeyPair = _bitcoinjsLib.ECPair.fromPublicKey(publicKeyBuffer, {
+    compressed: false
+  });
+
+  var uncompressedAddress = (0, _utils.ecPairToAddress)(uncompressedKeyPair);
+
+  if (publicKeyOrAddress === issuerPublicKey) {// pass
+  } else if (publicKeyOrAddress === compressedAddress) {// pass
+  } else if (publicKeyOrAddress === uncompressedAddress) {// pass
+  } else {
+    throw new Error('Token issuer public key does not match the verifying value');
+  }
+
+  var tokenVerifier = new _jsontokens.TokenVerifier(decodedToken.header.alg, issuerPublicKey);
+
+  if (!tokenVerifier) {
+    throw new Error('Invalid token verifier');
+  }
+
+  var tokenVerified = tokenVerifier.verify(token);
+
+  if (!tokenVerified) {
+    throw new Error('Token verification failed');
+  }
+
+  return decodedToken;
+}
+/**
+  * Extracts a profile from an encoded token and optionally verifies it,
+  * if `publicKeyOrAddress` is provided.
+  * @param {String} token - the token to be extracted
+  * @param {String} publicKeyOrAddress - the public key or address of the
+  *   keypair that is thought to have signed the token
+  * @returns {Object} - the profile extracted from the encoded token
+  * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
+  */
+
+
+function extractProfile(token) {
+  var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var decodedToken;
+
+  if (publicKeyOrAddress) {
+    decodedToken = verifyProfileToken(token, publicKeyOrAddress);
+  } else {
+    decodedToken = (0, _jsontokens.decodeToken)(token);
+  }
+
+  var profile = {};
+
+  if (decodedToken.hasOwnProperty('payload')) {
+    var payload = decodedToken.payload;
+
+    if (payload.hasOwnProperty('claim')) {
+      profile = decodedToken.payload.claim;
+    }
+  }
+
+  return profile;
+}
+
+}).call(this,require("buffer").Buffer)
+},{"../utils":551,"bitcoinjs-lib":73,"buffer":149,"jsontokens":266}],539:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.makeProfileZoneFile = makeProfileZoneFile;
+exports.getTokenFileUrl = getTokenFileUrl;
+exports.resolveZoneFileToProfile = resolveZoneFileToProfile;
+
+var _zoneFile = require("zone-file");
+
+var _profileTokens = require("./profileTokens");
+
+var _index = require("./index");
+
+var _logger = require("../logger");
+
+function makeProfileZoneFile(origin, tokenFileUrl) {
+  if (tokenFileUrl.indexOf('://') < 0) {
+    throw new Error('Invalid token file url');
+  }
+
+  var urlScheme = tokenFileUrl.split('://')[0];
+  var urlParts = tokenFileUrl.split('://')[1].split('/');
+  var domain = urlParts[0];
+  var pathname = "/".concat(urlParts.slice(1).join('/'));
+  var zoneFile = {
+    $origin: origin,
+    $ttl: 3600,
+    uri: [{
+      name: '_http._tcp',
+      priority: 10,
+      weight: 1,
+      target: "".concat(urlScheme, "://").concat(domain).concat(pathname)
+    }]
+  };
+  var zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n';
+  return (0, _zoneFile.makeZoneFile)(zoneFile, zoneFileTemplate);
+}
+
+function getTokenFileUrl(zoneFileJson) {
+  if (!zoneFileJson.hasOwnProperty('uri')) {
+    return null;
+  }
+
+  if (!Array.isArray(zoneFileJson.uri)) {
+    return null;
+  }
+
+  if (zoneFileJson.uri.length < 1) {
+    return null;
+  }
+
+  var firstUriRecord = zoneFileJson.uri[0];
+
+  if (!firstUriRecord.hasOwnProperty('target')) {
+    return null;
+  }
+
+  var tokenFileUrl = firstUriRecord.target;
+
+  if (tokenFileUrl.startsWith('https')) {// pass
+  } else if (tokenFileUrl.startsWith('http')) {// pass
+  } else {
+    tokenFileUrl = "https://".concat(tokenFileUrl);
+  }
+
+  return tokenFileUrl;
+}
+
+function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
+  return new Promise(function (resolve, reject) {
     var zoneFileJson = null;
 
     try {
@@ -100829,30 +100968,26 @@ function getZoneFileTemplate() {
 
       if (!zoneFileJson.hasOwnProperty('$origin')) {
         zoneFileJson = null;
-        throw new Error('zone file is missing an origin');
       }
     } catch (e) {
-      console.error(e);
+      reject(e);
     }
 
     var tokenFileUrl = null;
 
     if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
-      tokenFileUrl = (0, _profileZoneFiles.getTokenFileUrl)(zoneFileJson);
+      tokenFileUrl = getTokenFileUrl(zoneFileJson);
     } else {
       var profile = null;
 
       try {
         profile = JSON.parse(zoneFile);
-
-        var person = _person.Person.fromLegacyFormat(profile);
-
-        profile = person.profile();
+        profile = _index.Person.fromLegacyFormat(profile).profile();
       } catch (error) {
-        console.warn(error);
+        reject(error);
       }
 
-      callback(profile);
+      resolve(profile);
       return;
     }
 
@@ -100863,2605 +100998,2227 @@ function getZoneFileTemplate() {
         return JSON.parse(responseText);
       }).then(function (responseJson) {
         var tokenRecords = responseJson;
-        var token = tokenRecords[0].token;
-        var profile = (0, _profileTokens.extractProfile)(token, publicKeyOrAddress);
-        callback(profile);
+        var profile = (0, _profileTokens.extractProfile)(tokenRecords[0].token, publicKeyOrAddress);
+        resolve(profile);
       }).catch(function (error) {
-        console.warn(error);
+        _logger.Logger.error("resolveZoneFileToProfile: error fetching token file ".concat(tokenFileUrl), error);
+
+        reject(error);
       });
     } else {
-      console.warn('Token file url not found');
-      callback({});
+      _logger.Logger.debug('Token file url not found. Resolving to blank profile.');
+
+      resolve({});
     }
-  }
-});
-
-},{"../profileTokens":538,"../profileZoneFiles":539,"./person":534,"zone-file":497}],538:[function(require,module,exports){
-(function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "bitcoinjs-lib", "jsontokens", "../utils"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("bitcoinjs-lib"), require("jsontokens"), require("../utils"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.bitcoinjsLib, global.jsontokens, global.utils);
-    global.profileTokens = mod.exports;
-  }
-})(this, function (_exports, _bitcoinjsLib, _jsontokens, _utils) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
   });
-  _exports.signProfileToken = signProfileToken;
-  _exports.wrapProfileToken = wrapProfileToken;
-  _exports.verifyProfileToken = verifyProfileToken;
-  _exports.extractProfile = extractProfile;
-
-  /**
-    * Signs a profile token
-    * @param {Object} profile - the JSON of the profile to be signed
-    * @param {String} privateKey - the signing private key
-    * @param {Object} subject - the entity that the information is about
-    * @param {Object} issuer - the entity that is issuing the token
-    * @param {String} signingAlgorithm - the signing algorithm to use
-    * @param {Date} issuedAt - the time of issuance of the token
-    * @param {Date} expiresAt - the time of expiration of the token
-    * @returns {Object} - the signed profile token
-    */
-  function signProfileToken(profile, privateKey) {
-    var subject = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var issuer = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    var signingAlgorithm = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 'ES256K';
-    var issuedAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : new Date();
-    var expiresAt = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (0, _utils.nextYear)();
-
-    if (signingAlgorithm !== 'ES256K') {
-      throw new Error('Signing algorithm not supported');
-    }
-
-    var publicKey = _jsontokens.SECP256K1Client.derivePublicKey(privateKey);
-
-    if (subject === null) {
-      subject = {
-        publicKey: publicKey
-      };
-    }
-
-    if (issuer === null) {
-      issuer = {
-        publicKey: publicKey
-      };
-    }
-
-    var tokenSigner = new _jsontokens.TokenSigner(signingAlgorithm, privateKey);
-    var payload = {
-      jti: (0, _utils.makeUUID4)(),
-      iat: issuedAt.toISOString(),
-      exp: expiresAt.toISOString(),
-      subject: subject,
-      issuer: issuer,
-      claim: profile
-    };
-    return tokenSigner.sign(payload);
-  }
-  /**
-    * Wraps a token for a profile token file
-    * @param {String} token - the token to be wrapped
-    * @returns {Object} - including `token` and `decodedToken`
-    */
-
-
-  function wrapProfileToken(token) {
-    return {
-      token: token,
-      decodedToken: (0, _jsontokens.decodeToken)(token)
-    };
-  }
-  /**
-    * Verifies a profile token
-    * @param {String} token - the token to be verified
-    * @param {String} publicKeyOrAddress - the public key or address of the
-    *   keypair that is thought to have signed the token
-    * @returns {Object} - the verified, decoded profile token
-    * @throws {Error} - throws an error if token verification fails
-    */
-
-
-  function verifyProfileToken(token, publicKeyOrAddress) {
-    var decodedToken = (0, _jsontokens.decodeToken)(token);
-    var payload = decodedToken.payload; // Inspect and verify the subject
-
-    if (payload.hasOwnProperty('subject')) {
-      if (!payload.subject.hasOwnProperty('publicKey')) {
-        throw new Error('Token doesn\'t have a subject public key');
-      }
-    } else {
-      throw new Error('Token doesn\'t have a subject');
-    } // Inspect and verify the issuer
-
-
-    if (payload.hasOwnProperty('issuer')) {
-      if (!payload.issuer.hasOwnProperty('publicKey')) {
-        throw new Error('Token doesn\'t have an issuer public key');
-      }
-    } else {
-      throw new Error('Token doesn\'t have an issuer');
-    } // Inspect and verify the claim
-
-
-    if (!payload.hasOwnProperty('claim')) {
-      throw new Error('Token doesn\'t have a claim');
-    }
-
-    var issuerPublicKey = payload.issuer.publicKey;
-    var publicKeyBuffer = new Buffer(issuerPublicKey, 'hex');
-
-    var compressedKeyPair = _bitcoinjsLib.ECPair.fromPublicKey(publicKeyBuffer, {
-      compressed: true
-    });
-
-    var compressedAddress = (0, _utils.ecPairToAddress)(compressedKeyPair);
-
-    var uncompressedKeyPair = _bitcoinjsLib.ECPair.fromPublicKey(publicKeyBuffer, {
-      compressed: false
-    });
-
-    var uncompressedAddress = (0, _utils.ecPairToAddress)(uncompressedKeyPair);
-
-    if (publicKeyOrAddress === issuerPublicKey) {// pass
-    } else if (publicKeyOrAddress === compressedAddress) {// pass
-    } else if (publicKeyOrAddress === uncompressedAddress) {// pass
-    } else {
-      throw new Error('Token issuer public key does not match the verifying value');
-    }
-
-    var tokenVerifier = new _jsontokens.TokenVerifier(decodedToken.header.alg, issuerPublicKey);
-
-    if (!tokenVerifier) {
-      throw new Error('Invalid token verifier');
-    }
-
-    var tokenVerified = tokenVerifier.verify(token);
-
-    if (!tokenVerified) {
-      throw new Error('Token verification failed');
-    }
-
-    return decodedToken;
-  }
-  /**
-    * Extracts a profile from an encoded token and optionally verifies it,
-    * if `publicKeyOrAddress` is provided.
-    * @param {String} token - the token to be extracted
-    * @param {String} publicKeyOrAddress - the public key or address of the
-    *   keypair that is thought to have signed the token
-    * @returns {Object} - the profile extracted from the encoded token
-    * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
-    */
-
-
-  function extractProfile(token) {
-    var publicKeyOrAddress = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    var decodedToken;
-
-    if (publicKeyOrAddress) {
-      decodedToken = verifyProfileToken(token, publicKeyOrAddress);
-    } else {
-      decodedToken = (0, _jsontokens.decodeToken)(token);
-    }
-
-    var profile = {};
-
-    if (decodedToken.hasOwnProperty('payload')) {
-      var payload = decodedToken.payload;
-
-      if (payload.hasOwnProperty('claim')) {
-        profile = decodedToken.payload.claim;
-      }
-    }
-
-    return profile;
-  }
-});
-
-}).call(this,require("buffer").Buffer)
-},{"../utils":551,"bitcoinjs-lib":73,"buffer":149,"jsontokens":266}],539:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "zone-file", "./profileTokens", "./index", "../logger"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("zone-file"), require("./profileTokens"), require("./index"), require("../logger"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.zoneFile, global.profileTokens, global.index, global.logger);
-    global.profileZoneFiles = mod.exports;
-  }
-})(this, function (_exports, _zoneFile, _profileTokens, _index, _logger) {
-  "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.makeProfileZoneFile = makeProfileZoneFile;
-  _exports.getTokenFileUrl = getTokenFileUrl;
-  _exports.resolveZoneFileToProfile = resolveZoneFileToProfile;
-
-  function makeProfileZoneFile(origin, tokenFileUrl) {
-    if (tokenFileUrl.indexOf('://') < 0) {
-      throw new Error('Invalid token file url');
-    }
-
-    var urlScheme = tokenFileUrl.split('://')[0];
-    var urlParts = tokenFileUrl.split('://')[1].split('/');
-    var domain = urlParts[0];
-    var pathname = "/".concat(urlParts.slice(1).join('/'));
-    var zoneFile = {
-      $origin: origin,
-      $ttl: 3600,
-      uri: [{
-        name: '_http._tcp',
-        priority: 10,
-        weight: 1,
-        target: "".concat(urlScheme, "://").concat(domain).concat(pathname)
-      }]
-    };
-    var zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n';
-    return (0, _zoneFile.makeZoneFile)(zoneFile, zoneFileTemplate);
-  }
-
-  function getTokenFileUrl(zoneFileJson) {
-    if (!zoneFileJson.hasOwnProperty('uri')) {
-      return null;
-    }
-
-    if (!Array.isArray(zoneFileJson.uri)) {
-      return null;
-    }
-
-    if (zoneFileJson.uri.length < 1) {
-      return null;
-    }
-
-    var firstUriRecord = zoneFileJson.uri[0];
-
-    if (!firstUriRecord.hasOwnProperty('target')) {
-      return null;
-    }
-
-    var tokenFileUrl = firstUriRecord.target;
-
-    if (tokenFileUrl.startsWith('https')) {// pass
-    } else if (tokenFileUrl.startsWith('http')) {// pass
-    } else {
-      tokenFileUrl = "https://".concat(tokenFileUrl);
-    }
-
-    return tokenFileUrl;
-  }
-
-  function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
-    return new Promise(function (resolve, reject) {
-      var zoneFileJson = null;
-
-      try {
-        zoneFileJson = (0, _zoneFile.parseZoneFile)(zoneFile);
-
-        if (!zoneFileJson.hasOwnProperty('$origin')) {
-          zoneFileJson = null;
-        }
-      } catch (e) {
-        reject(e);
-      }
-
-      var tokenFileUrl = null;
-
-      if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
-        tokenFileUrl = getTokenFileUrl(zoneFileJson);
-      } else {
-        var profile = null;
-
-        try {
-          profile = JSON.parse(zoneFile);
-          profile = _index.Person.fromLegacyFormat(profile).profile();
-        } catch (error) {
-          reject(error);
-        }
-
-        resolve(profile);
-        return;
-      }
-
-      if (tokenFileUrl) {
-        fetch(tokenFileUrl).then(function (response) {
-          return response.text();
-        }).then(function (responseText) {
-          return JSON.parse(responseText);
-        }).then(function (responseJson) {
-          var tokenRecords = responseJson;
-          var profile = (0, _profileTokens.extractProfile)(tokenRecords[0].token, publicKeyOrAddress);
-          resolve(profile);
-        }).catch(function (error) {
-          _logger.Logger.error("resolveZoneFileToProfile: error fetching token file ".concat(tokenFileUrl), error);
-
-          reject(error);
-        });
-      } else {
-        _logger.Logger.debug('Token file url not found. Resolving to blank profile.');
-
-        resolve({});
-      }
-    });
-  }
-});
+}
 
 },{"../logger":519,"./index":527,"./profileTokens":538,"zone-file":497}],540:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/get", "@babel/runtime/helpers/inherits", "cheerio", "./service"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/get"), require("@babel/runtime/helpers/inherits"), require("cheerio"), require("./service"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.get, global.inherits, global.cheerio, global.service);
-    global.facebook = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _get2, _inherits2, _cheerio, _service) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Facebook = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _get2 = _interopRequireDefault(_get2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _cheerio = _interopRequireDefault(_cheerio);
-
-  var Facebook =
-  /*#__PURE__*/
-  function (_Service) {
-    (0, _inherits2.default)(Facebook, _Service);
-
-    function Facebook() {
-      (0, _classCallCheck2.default)(this, Facebook);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Facebook).apply(this, arguments));
-    }
-
-    (0, _createClass2.default)(Facebook, null, [{
-      key: "getProofUrl",
-      value: function getProofUrl(proof) {
-        return this.normalizeFacebookUrl(proof);
-      }
-    }, {
-      key: "normalizeFacebookUrl",
-      value: function normalizeFacebookUrl(proof) {
-        var proofUrl = proof.proof_url.toLowerCase();
-        var urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/;
-        proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(Facebook), "prefixScheme", this).call(this, proofUrl);
-
-        if (proofUrl.startsWith('https://facebook.com')) {
-          var tokens = proofUrl.split('https://facebook.com');
-          proofUrl = "https://www.facebook.com".concat(tokens[1]);
-          tokens = proofUrl.split('https://www.facebook.com/')[1].split('/posts/');
-          var postId = tokens[1];
-          proofUrl = "https://www.facebook.com/".concat(proof.identifier, "/posts/").concat(postId);
-        } else if (proofUrl.match(urlRegex)) {
-          var _tokens = proofUrl.split('facebook.com/')[1].split('/posts/');
-
-          var _postId = _tokens[1];
-          proofUrl = "https://www.facebook.com/".concat(proof.identifier, "/posts/").concat(_postId);
-        } else {
-          throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
-        }
-
-        return proofUrl;
-      }
-    }, {
-      key: "getProofStatement",
-      value: function getProofStatement(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var statement = $('meta[name="description"]').attr('content');
-        return statement !== undefined ? statement.trim() : '';
-      }
-    }]);
-    return Facebook;
-  }(_service.Service);
-
-  _exports.Facebook = Facebook;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.Facebook = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _cheerio = _interopRequireDefault(require("cheerio"));
+
+var _service = require("./service");
+
+var Facebook =
+/*#__PURE__*/
+function (_Service) {
+  (0, _inherits2.default)(Facebook, _Service);
+
+  function Facebook() {
+    (0, _classCallCheck2.default)(this, Facebook);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Facebook).apply(this, arguments));
+  }
+
+  (0, _createClass2.default)(Facebook, null, [{
+    key: "getProofUrl",
+    value: function getProofUrl(proof) {
+      return this.normalizeFacebookUrl(proof);
+    }
+  }, {
+    key: "normalizeFacebookUrl",
+    value: function normalizeFacebookUrl(proof) {
+      var proofUrl = proof.proof_url.toLowerCase();
+      var urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/;
+      proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(Facebook), "prefixScheme", this).call(this, proofUrl);
+
+      if (proofUrl.startsWith('https://facebook.com')) {
+        var tokens = proofUrl.split('https://facebook.com');
+        proofUrl = "https://www.facebook.com".concat(tokens[1]);
+        tokens = proofUrl.split('https://www.facebook.com/')[1].split('/posts/');
+        var postId = tokens[1];
+        proofUrl = "https://www.facebook.com/".concat(proof.identifier, "/posts/").concat(postId);
+      } else if (proofUrl.match(urlRegex)) {
+        var _tokens = proofUrl.split('facebook.com/')[1].split('/posts/');
+
+        var _postId = _tokens[1];
+        proofUrl = "https://www.facebook.com/".concat(proof.identifier, "/posts/").concat(_postId);
+      } else {
+        throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+      }
+
+      return proofUrl;
+    }
+  }, {
+    key: "getProofStatement",
+    value: function getProofStatement(searchText) {
+      var $ = _cheerio.default.load(searchText);
+
+      var statement = $('meta[name="description"]').attr('content');
+      return statement !== undefined ? statement.trim() : '';
+    }
+  }]);
+  return Facebook;
+}(_service.Service);
+
+exports.Facebook = Facebook;
 
 },{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],541:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/get", "@babel/runtime/helpers/inherits", "./service"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/get"), require("@babel/runtime/helpers/inherits"), require("./service"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.get, global.inherits, global.service);
-    global.github = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _get2, _inherits2, _service) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Github = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _get2 = _interopRequireDefault(_get2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-
-  var Github =
-  /*#__PURE__*/
-  function (_Service) {
-    (0, _inherits2.default)(Github, _Service);
-
-    function Github() {
-      (0, _classCallCheck2.default)(this, Github);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Github).apply(this, arguments));
-    }
-
-    (0, _createClass2.default)(Github, null, [{
-      key: "getBaseUrls",
-      value: function getBaseUrls() {
-        var baseUrls = ['https://gist.github.com/', 'http://gist.github.com', 'gist.github.com'];
-        return baseUrls;
-      }
-    }, {
-      key: "getProofUrl",
-      value: function getProofUrl(proof) {
-        var baseUrls = this.getBaseUrls();
-        var proofUrl = proof.proof_url.toLowerCase();
-        proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(Github), "prefixScheme", this).call(this, proofUrl);
-
-        for (var i = 0; i < baseUrls.length; i++) {
-          var requiredPrefix = "".concat(baseUrls[i]).concat(proof.identifier).toLowerCase();
-
-          if (proofUrl.startsWith(requiredPrefix)) {
-            var raw = proofUrl.endsWith('/') ? 'raw' : '/raw';
-            return "".concat(proofUrl).concat(raw);
-          }
-        }
-
-        throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
-      }
-    }]);
-    return Github;
-  }(_service.Service);
-
-  _exports.Github = Github;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.Github = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _service = require("./service");
+
+var Github =
+/*#__PURE__*/
+function (_Service) {
+  (0, _inherits2.default)(Github, _Service);
+
+  function Github() {
+    (0, _classCallCheck2.default)(this, Github);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Github).apply(this, arguments));
+  }
+
+  (0, _createClass2.default)(Github, null, [{
+    key: "getBaseUrls",
+    value: function getBaseUrls() {
+      var baseUrls = ['https://gist.github.com/', 'http://gist.github.com', 'gist.github.com'];
+      return baseUrls;
+    }
+  }, {
+    key: "getProofUrl",
+    value: function getProofUrl(proof) {
+      var baseUrls = this.getBaseUrls();
+      var proofUrl = proof.proof_url.toLowerCase();
+      proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(Github), "prefixScheme", this).call(this, proofUrl);
+
+      for (var i = 0; i < baseUrls.length; i++) {
+        var requiredPrefix = "".concat(baseUrls[i]).concat(proof.identifier).toLowerCase();
+
+        if (proofUrl.startsWith(requiredPrefix)) {
+          var raw = proofUrl.endsWith('/') ? 'raw' : '/raw';
+          return "".concat(proofUrl).concat(raw);
+        }
+      }
+
+      throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+    }
+  }]);
+  return Github;
+}(_service.Service);
+
+exports.Github = Github;
 
 },{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],542:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/get", "@babel/runtime/helpers/inherits", "cheerio", "./service"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/get"), require("@babel/runtime/helpers/inherits"), require("cheerio"), require("./service"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.get, global.inherits, global.cheerio, global.service);
-    global.hackerNews = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _get2, _inherits2, _cheerio, _service) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.HackerNews = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _get2 = _interopRequireDefault(_get2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _cheerio = _interopRequireDefault(_cheerio);
-
-  var HackerNews =
-  /*#__PURE__*/
-  function (_Service) {
-    (0, _inherits2.default)(HackerNews, _Service);
-
-    function HackerNews() {
-      (0, _classCallCheck2.default)(this, HackerNews);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(HackerNews).apply(this, arguments));
-    }
-
-    (0, _createClass2.default)(HackerNews, null, [{
-      key: "getBaseUrls",
-      value: function getBaseUrls() {
-        var baseUrls = ['https://news.ycombinator.com/user?id=', 'http://news.ycombinator.com/user?id=', 'news.ycombinator.com/user?id='];
-        return baseUrls;
-      }
-    }, {
-      key: "getProofUrl",
-      value: function getProofUrl(proof) {
-        var baseUrls = this.getBaseUrls();
-        var proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(HackerNews), "prefixScheme", this).call(this, proof.proof_url);
-
-        for (var i = 0; i < baseUrls.length; i++) {
-          if (proofUrl === "".concat(baseUrls[i]).concat(proof.identifier)) {
-            return proofUrl;
-          }
-        }
-
-        throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
-      }
-    }, {
-      key: "getProofStatement",
-      value: function getProofStatement(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var tables = $('#hnmain').children().find('table');
-        var statement = '';
-
-        if (tables.length > 0) {
-          tables.each(function (tableIndex, table) {
-            var rows = $(table).find('tr');
-
-            if (rows.length > 0) {
-              rows.each(function (idx, row) {
-                var heading = $(row).find('td').first().text().trim();
-
-                if (heading === 'about:') {
-                  statement = $(row).find('td').last().text().trim();
-                }
-              });
-            }
-          });
-        }
-
-        return statement;
-      }
-    }]);
-    return HackerNews;
-  }(_service.Service);
-
-  _exports.HackerNews = HackerNews;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.HackerNews = void 0;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],543:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "./facebook", "./github", "./twitter", "./instagram", "./hackerNews", "./linkedIn", "./serviceUtils"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("./facebook"), require("./github"), require("./twitter"), require("./instagram"), require("./hackerNews"), require("./linkedIn"), require("./serviceUtils"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.facebook, global.github, global.twitter, global.instagram, global.hackerNews, global.linkedIn, global.serviceUtils);
-    global.index = mod.exports;
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _cheerio = _interopRequireDefault(require("cheerio"));
+
+var _service = require("./service");
+
+var HackerNews =
+/*#__PURE__*/
+function (_Service) {
+  (0, _inherits2.default)(HackerNews, _Service);
+
+  function HackerNews() {
+    (0, _classCallCheck2.default)(this, HackerNews);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(HackerNews).apply(this, arguments));
   }
-})(this, function (_exports, _facebook, _github, _twitter, _instagram, _hackerNews, _linkedIn, _serviceUtils) {
-  "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  Object.defineProperty(_exports, "containsValidProofStatement", {
-    enumerable: true,
-    get: function get() {
-      return _serviceUtils.containsValidProofStatement;
+  (0, _createClass2.default)(HackerNews, null, [{
+    key: "getBaseUrls",
+    value: function getBaseUrls() {
+      var baseUrls = ['https://news.ycombinator.com/user?id=', 'http://news.ycombinator.com/user?id=', 'news.ycombinator.com/user?id='];
+      return baseUrls;
     }
-  });
-  Object.defineProperty(_exports, "containsValidAddressProofStatement", {
-    enumerable: true,
-    get: function get() {
-      return _serviceUtils.containsValidAddressProofStatement;
-    }
-  });
-  _exports.profileServices = void 0;
-  var profileServices = {
-    facebook: _facebook.Facebook,
-    github: _github.Github,
-    twitter: _twitter.Twitter,
-    instagram: _instagram.Instagram,
-    hackerNews: _hackerNews.HackerNews,
-    linkedIn: _linkedIn.LinkedIn
-  };
-  _exports.profileServices = profileServices;
-});
+  }, {
+    key: "getProofUrl",
+    value: function getProofUrl(proof) {
+      var baseUrls = this.getBaseUrls();
+      var proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(HackerNews), "prefixScheme", this).call(this, proof.proof_url);
 
-},{"./facebook":540,"./github":541,"./hackerNews":542,"./instagram":544,"./linkedIn":545,"./serviceUtils":547,"./twitter":548}],544:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/get", "@babel/runtime/helpers/inherits", "cheerio", "./service"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/get"), require("@babel/runtime/helpers/inherits"), require("cheerio"), require("./service"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.get, global.inherits, global.cheerio, global.service);
-    global.instagram = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _get2, _inherits2, _cheerio, _service) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Instagram = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _get2 = _interopRequireDefault(_get2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _cheerio = _interopRequireDefault(_cheerio);
-
-  var Instagram =
-  /*#__PURE__*/
-  function (_Service) {
-    (0, _inherits2.default)(Instagram, _Service);
-
-    function Instagram() {
-      (0, _classCallCheck2.default)(this, Instagram);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Instagram).apply(this, arguments));
-    }
-
-    (0, _createClass2.default)(Instagram, null, [{
-      key: "getBaseUrls",
-      value: function getBaseUrls() {
-        var baseUrls = ['https://www.instagram.com/', 'https://instagram.com/'];
-        return baseUrls;
-      }
-    }, {
-      key: "getProofUrl",
-      value: function getProofUrl(proof) {
-        var baseUrls = this.getBaseUrls();
-        var normalizedProofUrl = this.normalizeInstagramUrl(proof);
-
-        for (var i = 0; i < baseUrls.length; i++) {
-          if (normalizedProofUrl.startsWith("".concat(baseUrls[i]))) {
-            return normalizedProofUrl;
-          }
-        }
-
-        throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
-      }
-    }, {
-      key: "normalizeInstagramUrl",
-      value: function normalizeInstagramUrl(proof) {
-        var proofUrl = proof.proof_url;
-        proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(Instagram), "prefixScheme", this).call(this, proofUrl);
-
-        if (proofUrl.startsWith('https://instagram.com')) {
-          var tokens = proofUrl.split('https://instagram.com');
-          proofUrl = "https://www.instagram.com".concat(tokens[1]);
-        }
-
-        return proofUrl;
-      }
-    }, {
-      key: "shouldValidateIdentityInBody",
-      value: function shouldValidateIdentityInBody() {
-        return true;
-      }
-    }, {
-      key: "getProofIdentity",
-      value: function getProofIdentity(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var username = $('meta[property="og:description"]').attr('content');
-
-        if (username !== undefined && username.split(':').length > 1) {
-          return username.split(':')[0].match(/(@\w+)/)[0].substr(1);
-        } else {
-          return '';
-        }
-      }
-    }, {
-      key: "getProofStatement",
-      value: function getProofStatement(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var statement = $('meta[property="og:description"]').attr('content');
-
-        if (statement !== undefined && statement.split(':').length > 1) {
-          return statement.split(':')[1].trim().replace('“', '').replace('”', '');
-        } else {
-          return '';
-        }
-      }
-    }]);
-    return Instagram;
-  }(_service.Service);
-
-  _exports.Instagram = Instagram;
-});
-
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],545:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/get", "@babel/runtime/helpers/inherits", "cheerio", "./service"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/get"), require("@babel/runtime/helpers/inherits"), require("cheerio"), require("./service"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.get, global.inherits, global.cheerio, global.service);
-    global.linkedIn = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _get2, _inherits2, _cheerio, _service) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.LinkedIn = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _get2 = _interopRequireDefault(_get2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _cheerio = _interopRequireDefault(_cheerio);
-
-  var LinkedIn =
-  /*#__PURE__*/
-  function (_Service) {
-    (0, _inherits2.default)(LinkedIn, _Service);
-
-    function LinkedIn() {
-      (0, _classCallCheck2.default)(this, LinkedIn);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LinkedIn).apply(this, arguments));
-    }
-
-    (0, _createClass2.default)(LinkedIn, null, [{
-      key: "getBaseUrls",
-      value: function getBaseUrls() {
-        var baseUrls = ['https://www.linkedin.com/feed/update/', 'http://www.linkedin.com/feed/update/', 'www.linkedin.com/feed/update/'];
-        return baseUrls;
-      }
-    }, {
-      key: "getProofUrl",
-      value: function getProofUrl(proof) {
-        var baseUrls = this.getBaseUrls();
-        var proofUrl = proof.proof_url.toLowerCase();
-        proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(LinkedIn), "prefixScheme", this).call(this, proofUrl);
-
-        for (var i = 0; i < baseUrls.length; i++) {
-          if (proofUrl.startsWith("".concat(baseUrls[i]))) {
-            return proofUrl;
-          }
-        }
-
-        throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
-      }
-    }, {
-      key: "shouldValidateIdentityInBody",
-      value: function shouldValidateIdentityInBody() {
-        return true;
-      }
-    }, {
-      key: "getProofIdentity",
-      value: function getProofIdentity(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var profileLink = $('article').find('.post-meta__profile-link');
-
-        if (profileLink !== undefined) {
-          if (profileLink.attr('href') === undefined) {
-            return '';
-          }
-
-          return profileLink.attr('href').split('/').pop();
-        } else {
-          return '';
-        }
-      }
-    }, {
-      key: "getProofStatement",
-      value: function getProofStatement(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var postContent = $('article').find('.commentary');
-        var statement = '';
-
-        if (postContent !== undefined) {
-          statement = postContent.text();
-        }
-
-        return statement;
-      }
-    }]);
-    return LinkedIn;
-  }(_service.Service);
-
-  _exports.LinkedIn = LinkedIn;
-});
-
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],546:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "cross-fetch/polyfill", "./serviceUtils"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("cross-fetch/polyfill"), require("./serviceUtils"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.polyfill, global.serviceUtils);
-    global.service = mod.exports;
-  }
-})(this, function (_exports, _classCallCheck2, _createClass2, _polyfill, _serviceUtils) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Service = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-
-  var Service =
-  /*#__PURE__*/
-  function () {
-    function Service() {
-      (0, _classCallCheck2.default)(this, Service);
-    }
-
-    (0, _createClass2.default)(Service, null, [{
-      key: "validateProof",
-      value: function validateProof(proof, ownerAddress) {
-        var _this = this;
-
-        var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-        var proofUrl;
-        return Promise.resolve().then(function () {
-          proofUrl = _this.getProofUrl(proof);
-          return fetch(proofUrl);
-        }).then(function (res) {
-          if (res.status !== 200) {
-            throw new Error("Proof url ".concat(proofUrl, " returned unexpected http status ").concat(res.status, ".\n              Unable to validate proof."));
-          }
-
-          return res.text();
-        }).then(function (text) {
-          // Validate identity in provided proof body/tags if required
-          if (_this.shouldValidateIdentityInBody() && proof.identifier !== _this.getProofIdentity(text)) {
-            return proof;
-          }
-
-          var proofText = _this.getProofStatement(text);
-
-          proof.valid = (0, _serviceUtils.containsValidProofStatement)(proofText, name) || (0, _serviceUtils.containsValidAddressProofStatement)(proofText, ownerAddress);
-          return proof;
-        }).catch(function (error) {
-          console.error(error);
-          proof.valid = false;
-          return proof;
-        });
-      }
-    }, {
-      key: "getBaseUrls",
-      value: function getBaseUrls() {
-        return [];
-      }
-    }, {
-      key: "getProofIdentity",
-      value: function getProofIdentity(searchText) {
-        return searchText;
-      }
-    }, {
-      key: "getProofStatement",
-      value: function getProofStatement(searchText) {
-        return searchText;
-      }
-    }, {
-      key: "shouldValidateIdentityInBody",
-      value: function shouldValidateIdentityInBody() {
-        return false;
-      }
-    }, {
-      key: "prefixScheme",
-      value: function prefixScheme(proofUrl) {
-        if (!proofUrl.startsWith('https://') && !proofUrl.startsWith('http://')) {
-          return "https://".concat(proofUrl);
-        } else if (proofUrl.startsWith('http://')) {
-          return proofUrl.replace('http://', 'https://');
-        } else {
+      for (var i = 0; i < baseUrls.length; i++) {
+        if (proofUrl === "".concat(baseUrls[i]).concat(proof.identifier)) {
           return proofUrl;
         }
       }
-    }, {
-      key: "getProofUrl",
-      value: function getProofUrl(proof) {
-        var baseUrls = this.getBaseUrls();
-        var proofUrl = proof.proof_url.toLowerCase();
-        proofUrl = this.prefixScheme(proofUrl);
 
-        for (var i = 0; i < baseUrls.length; i++) {
-          var requiredPrefix = "".concat(baseUrls[i]).concat(proof.identifier).toLowerCase();
+      throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+    }
+  }, {
+    key: "getProofStatement",
+    value: function getProofStatement(searchText) {
+      var $ = _cheerio.default.load(searchText);
 
-          if (proofUrl.startsWith(requiredPrefix)) {
-            return proofUrl;
+      var tables = $('#hnmain').children().find('table');
+      var statement = '';
+
+      if (tables.length > 0) {
+        tables.each(function (tableIndex, table) {
+          var rows = $(table).find('tr');
+
+          if (rows.length > 0) {
+            rows.each(function (idx, row) {
+              var heading = $(row).find('td').first().text().trim();
+
+              if (heading === 'about:') {
+                statement = $(row).find('td').last().text().trim();
+              }
+            });
           }
-        }
-
-        throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+        });
       }
-    }]);
-    return Service;
-  }();
 
-  _exports.Service = Service;
+      return statement;
+    }
+  }]);
+  return HackerNews;
+}(_service.Service);
+
+exports.HackerNews = HackerNews;
+
+},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],543:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
-
-},{"./serviceUtils":547,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"cross-fetch/polyfill":168}],547:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports);
-    global.serviceUtils = mod.exports;
+Object.defineProperty(exports, "containsValidProofStatement", {
+  enumerable: true,
+  get: function get() {
+    return _serviceUtils.containsValidProofStatement;
   }
-})(this, function (_exports) {
-  "use strict";
+});
+Object.defineProperty(exports, "containsValidAddressProofStatement", {
+  enumerable: true,
+  get: function get() {
+    return _serviceUtils.containsValidAddressProofStatement;
+  }
+});
+exports.profileServices = void 0;
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.containsValidProofStatement = containsValidProofStatement;
-  _exports.containsValidAddressProofStatement = containsValidAddressProofStatement;
+var _facebook = require("./facebook");
 
-  function containsValidProofStatement(searchText) {
-    var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+var _github = require("./github");
 
-    if (!name) {
-      return false;
+var _twitter = require("./twitter");
+
+var _instagram = require("./instagram");
+
+var _hackerNews = require("./hackerNews");
+
+var _linkedIn = require("./linkedIn");
+
+var _serviceUtils = require("./serviceUtils");
+
+var profileServices = {
+  facebook: _facebook.Facebook,
+  github: _github.Github,
+  twitter: _twitter.Twitter,
+  instagram: _instagram.Instagram,
+  hackerNews: _hackerNews.HackerNews,
+  linkedIn: _linkedIn.LinkedIn
+};
+exports.profileServices = profileServices;
+
+},{"./facebook":540,"./github":541,"./hackerNews":542,"./instagram":544,"./linkedIn":545,"./serviceUtils":547,"./twitter":548}],544:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Instagram = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _cheerio = _interopRequireDefault(require("cheerio"));
+
+var _service = require("./service");
+
+var Instagram =
+/*#__PURE__*/
+function (_Service) {
+  (0, _inherits2.default)(Instagram, _Service);
+
+  function Instagram() {
+    (0, _classCallCheck2.default)(this, Instagram);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Instagram).apply(this, arguments));
+  }
+
+  (0, _createClass2.default)(Instagram, null, [{
+    key: "getBaseUrls",
+    value: function getBaseUrls() {
+      var baseUrls = ['https://www.instagram.com/', 'https://instagram.com/'];
+      return baseUrls;
     }
+  }, {
+    key: "getProofUrl",
+    value: function getProofUrl(proof) {
+      var baseUrls = this.getBaseUrls();
+      var normalizedProofUrl = this.normalizeInstagramUrl(proof);
 
-    searchText = searchText.toLowerCase();
-
-    if (name.split('.').length < 2) {
-      throw new Error('Please provide the fully qualified Blockstack name.');
-    }
-
-    var username = null; // support legacy Blockstack ID proofs
-
-    if (name.endsWith('.id')) {
-      username = name.split('.id')[0];
-    }
-
-    var verificationStyles = username != null ? ["verifying myself: my bitcoin username is +".concat(username), "verifying myself: my bitcoin username is ".concat(username), "verifying myself: my openname is ".concat(username), "verifying that +".concat(username, " is my bitcoin username"), "verifying that ".concat(username, " is my bitcoin username"), "verifying that ".concat(username, " is my openname"), "verifying that +".concat(username, " is my openname"), "verifying i am +".concat(username, " on my passcard"), "verifying that +".concat(username, " is my blockchain id"), "verifying that \"".concat(name, "\" is my blockstack id"), // id
-    "verifying that ".concat(name, " is my blockstack id"), "verifying that &quot;".concat(name, "&quot; is my blockstack id")] : [// only these formats are valid for non-.id tlds
-    "verifying that \"".concat(name, "\" is my blockstack id"), // id
-    "verifying that ".concat(name, " is my blockstack id"), "verifying that &quot;".concat(name, "&quot; is my blockstack id")];
-
-    for (var i = 0; i < verificationStyles.length; i++) {
-      var verificationStyle = verificationStyles[i];
-
-      if (searchText.includes(verificationStyle)) {
-        return true;
+      for (var i = 0; i < baseUrls.length; i++) {
+        if (normalizedProofUrl.startsWith("".concat(baseUrls[i]))) {
+          return normalizedProofUrl;
+        }
       }
-    }
 
-    if (username != null && searchText.includes('verifymyonename') && searchText.includes("+".concat(username))) {
+      throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+    }
+  }, {
+    key: "normalizeInstagramUrl",
+    value: function normalizeInstagramUrl(proof) {
+      var proofUrl = proof.proof_url;
+      proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(Instagram), "prefixScheme", this).call(this, proofUrl);
+
+      if (proofUrl.startsWith('https://instagram.com')) {
+        var tokens = proofUrl.split('https://instagram.com');
+        proofUrl = "https://www.instagram.com".concat(tokens[1]);
+      }
+
+      return proofUrl;
+    }
+  }, {
+    key: "shouldValidateIdentityInBody",
+    value: function shouldValidateIdentityInBody() {
       return true;
     }
+  }, {
+    key: "getProofIdentity",
+    value: function getProofIdentity(searchText) {
+      var $ = _cheerio.default.load(searchText);
 
-    return false;
-  }
+      var username = $('meta[property="og:description"]').attr('content');
 
-  function containsValidAddressProofStatement(proofStatement, address) {
-    proofStatement = proofStatement.split(address)[0].toLowerCase() + address;
-    var verificationStyles = ["verifying my blockstack id is secured with the address ".concat(address)];
-
-    for (var i = 0; i < verificationStyles.length; i++) {
-      var verificationStyle = verificationStyles[i];
-
-      if (proofStatement.includes(verificationStyle)) {
-        return true;
+      if (username !== undefined && username.split(':').length > 1) {
+        return username.split(':')[0].match(/(@\w+)/)[0].substr(1);
+      } else {
+        return '';
       }
     }
+  }, {
+    key: "getProofStatement",
+    value: function getProofStatement(searchText) {
+      var $ = _cheerio.default.load(searchText);
 
-    return false;
-  }
+      var statement = $('meta[property="og:description"]').attr('content');
+
+      if (statement !== undefined && statement.split(':').length > 1) {
+        return statement.split(':')[1].trim().replace('“', '').replace('”', '');
+      } else {
+        return '';
+      }
+    }
+  }]);
+  return Instagram;
+}(_service.Service);
+
+exports.Instagram = Instagram;
+
+},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],545:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.LinkedIn = void 0;
 
-},{}],548:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/possibleConstructorReturn", "@babel/runtime/helpers/getPrototypeOf", "@babel/runtime/helpers/inherits", "cheerio", "./service"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/possibleConstructorReturn"), require("@babel/runtime/helpers/getPrototypeOf"), require("@babel/runtime/helpers/inherits"), require("cheerio"), require("./service"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.classCallCheck, global.createClass, global.possibleConstructorReturn, global.getPrototypeOf, global.inherits, global.cheerio, global.service);
-    global.twitter = mod.exports;
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _cheerio = _interopRequireDefault(require("cheerio"));
+
+var _service = require("./service");
+
+var LinkedIn =
+/*#__PURE__*/
+function (_Service) {
+  (0, _inherits2.default)(LinkedIn, _Service);
+
+  function LinkedIn() {
+    (0, _classCallCheck2.default)(this, LinkedIn);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(LinkedIn).apply(this, arguments));
   }
-})(this, function (_exports, _classCallCheck2, _createClass2, _possibleConstructorReturn2, _getPrototypeOf2, _inherits2, _cheerio, _service) {
-  "use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.Twitter = void 0;
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _possibleConstructorReturn2 = _interopRequireDefault(_possibleConstructorReturn2);
-  _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf2);
-  _inherits2 = _interopRequireDefault(_inherits2);
-  _cheerio = _interopRequireDefault(_cheerio);
-
-  var Twitter =
-  /*#__PURE__*/
-  function (_Service) {
-    (0, _inherits2.default)(Twitter, _Service);
-
-    function Twitter() {
-      (0, _classCallCheck2.default)(this, Twitter);
-      return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Twitter).apply(this, arguments));
+  (0, _createClass2.default)(LinkedIn, null, [{
+    key: "getBaseUrls",
+    value: function getBaseUrls() {
+      var baseUrls = ['https://www.linkedin.com/feed/update/', 'http://www.linkedin.com/feed/update/', 'www.linkedin.com/feed/update/'];
+      return baseUrls;
     }
+  }, {
+    key: "getProofUrl",
+    value: function getProofUrl(proof) {
+      var baseUrls = this.getBaseUrls();
+      var proofUrl = proof.proof_url.toLowerCase();
+      proofUrl = (0, _get2.default)((0, _getPrototypeOf2.default)(LinkedIn), "prefixScheme", this).call(this, proofUrl);
 
-    (0, _createClass2.default)(Twitter, null, [{
-      key: "getBaseUrls",
-      value: function getBaseUrls() {
-        var baseUrls = ['https://twitter.com/', 'http://twitter.com/', 'twitter.com/'];
-        return baseUrls;
-      }
-    }, {
-      key: "getProofStatement",
-      value: function getProofStatement(searchText) {
-        var $ = _cheerio.default.load(searchText);
-
-        var statement = $('meta[property="og:description"]').attr('content');
-
-        if (statement !== undefined) {
-          return statement.trim().replace('“', '').replace('”', '');
-        } else {
-          return '';
+      for (var i = 0; i < baseUrls.length; i++) {
+        if (proofUrl.startsWith("".concat(baseUrls[i]))) {
+          return proofUrl;
         }
       }
-    }]);
-    return Twitter;
-  }(_service.Service);
 
-  _exports.Twitter = Twitter;
+      throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+    }
+  }, {
+    key: "shouldValidateIdentityInBody",
+    value: function shouldValidateIdentityInBody() {
+      return true;
+    }
+  }, {
+    key: "getProofIdentity",
+    value: function getProofIdentity(searchText) {
+      var $ = _cheerio.default.load(searchText);
+
+      var profileLink = $('article').find('.post-meta__profile-link');
+
+      if (profileLink !== undefined) {
+        if (profileLink.attr('href') === undefined) {
+          return '';
+        }
+
+        return profileLink.attr('href').split('/').pop();
+      } else {
+        return '';
+      }
+    }
+  }, {
+    key: "getProofStatement",
+    value: function getProofStatement(searchText) {
+      var $ = _cheerio.default.load(searchText);
+
+      var postContent = $('article').find('.commentary');
+      var statement = '';
+
+      if (postContent !== undefined) {
+        statement = postContent.text();
+      }
+
+      return statement;
+    }
+  }]);
+  return LinkedIn;
+}(_service.Service);
+
+exports.LinkedIn = LinkedIn;
+
+},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],546:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.Service = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+require("cross-fetch/polyfill");
+
+var _serviceUtils = require("./serviceUtils");
+
+var Service =
+/*#__PURE__*/
+function () {
+  function Service() {
+    (0, _classCallCheck2.default)(this, Service);
+  }
+
+  (0, _createClass2.default)(Service, null, [{
+    key: "validateProof",
+    value: function validateProof(proof, ownerAddress) {
+      var _this = this;
+
+      var name = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      var proofUrl;
+      return Promise.resolve().then(function () {
+        proofUrl = _this.getProofUrl(proof);
+        return fetch(proofUrl);
+      }).then(function (res) {
+        if (res.status !== 200) {
+          throw new Error("Proof url ".concat(proofUrl, " returned unexpected http status ").concat(res.status, ".\n              Unable to validate proof."));
+        }
+
+        return res.text();
+      }).then(function (text) {
+        // Validate identity in provided proof body/tags if required
+        if (_this.shouldValidateIdentityInBody() && proof.identifier !== _this.getProofIdentity(text)) {
+          return proof;
+        }
+
+        var proofText = _this.getProofStatement(text);
+
+        proof.valid = (0, _serviceUtils.containsValidProofStatement)(proofText, name) || (0, _serviceUtils.containsValidAddressProofStatement)(proofText, ownerAddress);
+        return proof;
+      }).catch(function (error) {
+        console.error(error);
+        proof.valid = false;
+        return proof;
+      });
+    }
+  }, {
+    key: "getBaseUrls",
+    value: function getBaseUrls() {
+      return [];
+    }
+  }, {
+    key: "getProofIdentity",
+    value: function getProofIdentity(searchText) {
+      return searchText;
+    }
+  }, {
+    key: "getProofStatement",
+    value: function getProofStatement(searchText) {
+      return searchText;
+    }
+  }, {
+    key: "shouldValidateIdentityInBody",
+    value: function shouldValidateIdentityInBody() {
+      return false;
+    }
+  }, {
+    key: "prefixScheme",
+    value: function prefixScheme(proofUrl) {
+      if (!proofUrl.startsWith('https://') && !proofUrl.startsWith('http://')) {
+        return "https://".concat(proofUrl);
+      } else if (proofUrl.startsWith('http://')) {
+        return proofUrl.replace('http://', 'https://');
+      } else {
+        return proofUrl;
+      }
+    }
+  }, {
+    key: "getProofUrl",
+    value: function getProofUrl(proof) {
+      var baseUrls = this.getBaseUrls();
+      var proofUrl = proof.proof_url.toLowerCase();
+      proofUrl = this.prefixScheme(proofUrl);
+
+      for (var i = 0; i < baseUrls.length; i++) {
+        var requiredPrefix = "".concat(baseUrls[i]).concat(proof.identifier).toLowerCase();
+
+        if (proofUrl.startsWith(requiredPrefix)) {
+          return proofUrl;
+        }
+      }
+
+      throw new Error("Proof url ".concat(proof.proof_url, " is not valid for service ").concat(proof.service));
+    }
+  }]);
+  return Service;
+}();
+
+exports.Service = Service;
+
+},{"./serviceUtils":547,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"cross-fetch/polyfill":168}],547:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.containsValidProofStatement = containsValidProofStatement;
+exports.containsValidAddressProofStatement = containsValidAddressProofStatement;
+
+function containsValidProofStatement(searchText) {
+  var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (!name) {
+    return false;
+  }
+
+  searchText = searchText.toLowerCase();
+
+  if (name.split('.').length < 2) {
+    throw new Error('Please provide the fully qualified Blockstack name.');
+  }
+
+  var username = null; // support legacy Blockstack ID proofs
+
+  if (name.endsWith('.id')) {
+    username = name.split('.id')[0];
+  }
+
+  var verificationStyles = username != null ? ["verifying myself: my bitcoin username is +".concat(username), "verifying myself: my bitcoin username is ".concat(username), "verifying myself: my openname is ".concat(username), "verifying that +".concat(username, " is my bitcoin username"), "verifying that ".concat(username, " is my bitcoin username"), "verifying that ".concat(username, " is my openname"), "verifying that +".concat(username, " is my openname"), "verifying i am +".concat(username, " on my passcard"), "verifying that +".concat(username, " is my blockchain id"), "verifying that \"".concat(name, "\" is my blockstack id"), // id
+  "verifying that ".concat(name, " is my blockstack id"), "verifying that &quot;".concat(name, "&quot; is my blockstack id")] : [// only these formats are valid for non-.id tlds
+  "verifying that \"".concat(name, "\" is my blockstack id"), // id
+  "verifying that ".concat(name, " is my blockstack id"), "verifying that &quot;".concat(name, "&quot; is my blockstack id")];
+
+  for (var i = 0; i < verificationStyles.length; i++) {
+    var verificationStyle = verificationStyles[i];
+
+    if (searchText.includes(verificationStyle)) {
+      return true;
+    }
+  }
+
+  if (username != null && searchText.includes('verifymyonename') && searchText.includes("+".concat(username))) {
+    return true;
+  }
+
+  return false;
+}
+
+function containsValidAddressProofStatement(proofStatement, address) {
+  proofStatement = proofStatement.split(address)[0].toLowerCase() + address;
+  var verificationStyles = ["verifying my blockstack id is secured with the address ".concat(address)];
+
+  for (var i = 0; i < verificationStyles.length; i++) {
+    var verificationStyle = verificationStyles[i];
+
+    if (proofStatement.includes(verificationStyle)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+},{}],548:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Twitter = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _cheerio = _interopRequireDefault(require("cheerio"));
+
+var _service = require("./service");
+
+var Twitter =
+/*#__PURE__*/
+function (_Service) {
+  (0, _inherits2.default)(Twitter, _Service);
+
+  function Twitter() {
+    (0, _classCallCheck2.default)(this, Twitter);
+    return (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(Twitter).apply(this, arguments));
+  }
+
+  (0, _createClass2.default)(Twitter, null, [{
+    key: "getBaseUrls",
+    value: function getBaseUrls() {
+      var baseUrls = ['https://twitter.com/', 'http://twitter.com/', 'twitter.com/'];
+      return baseUrls;
+    }
+  }, {
+    key: "getProofStatement",
+    value: function getProofStatement(searchText) {
+      var $ = _cheerio.default.load(searchText);
+
+      var statement = $('meta[property="og:description"]').attr('content');
+
+      if (statement !== undefined) {
+        return statement.trim().replace('“', '').replace('”', '');
+      } else {
+        return '';
+      }
+    }
+  }]);
+  return Twitter;
+}(_service.Service);
+
+exports.Twitter = Twitter;
 
 },{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],549:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "bitcoinjs-lib", "crypto", "jsontokens", "../utils", "../index", "../auth/authConstants", "../auth/userSession", "../logger", "../errors"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("bitcoinjs-lib"), require("crypto"), require("jsontokens"), require("../utils"), require("../index"), require("../auth/authConstants"), require("../auth/userSession"), require("../logger"), require("../errors"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.bitcoinjsLib, global.crypto, global.jsontokens, global.utils, global.index, global.authConstants, global.userSession, global.logger, global.errors);
-    global.hub = mod.exports;
-  }
-})(this, function (_exports, _bitcoinjsLib, _crypto, _jsontokens, _utils, _index, _authConstants, _userSession, _logger, _errors) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.uploadToGaiaHub = uploadToGaiaHub;
-  _exports.getFullReadUrl = getFullReadUrl;
-  _exports.connectToGaiaHub = connectToGaiaHub;
-  _exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
-  _exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
-  _exports.getBucketUrl = getBucketUrl;
-  _exports.BLOCKSTACK_GAIA_HUB_LABEL = void 0;
-  _bitcoinjsLib = _interopRequireDefault(_bitcoinjsLib);
-  _crypto = _interopRequireDefault(_crypto);
-  var BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
-  _exports.BLOCKSTACK_GAIA_HUB_LABEL = BLOCKSTACK_GAIA_HUB_LABEL;
-
-  function uploadToGaiaHub(filename, contents, hubConfig) {
-    var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
-
-    _logger.Logger.debug("uploadToGaiaHub: uploading ".concat(filename, " to ").concat(hubConfig.server));
-
-    return fetch("".concat(hubConfig.server, "/store/").concat(hubConfig.address, "/").concat(filename), {
-      method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: "bearer ".concat(hubConfig.token)
-      },
-      body: contents
-    }).then(function (response) {
-      if (response.ok) {
-        return response.text();
-      } else {
-        throw new Error('Error when uploading to Gaia hub');
-      }
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJSON) {
-      return responseJSON.publicURL;
-    });
-  }
-
-  function getFullReadUrl(filename, hubConfig) {
-    return "".concat(hubConfig.url_prefix).concat(hubConfig.address, "/").concat(filename);
-  }
-
-  function makeLegacyAuthToken(challengeText, signerKeyHex) {
-    // only sign specific legacy auth challenges.
-    var parsedChallenge;
-
-    try {
-      parsedChallenge = JSON.parse(challengeText);
-    } catch (err) {
-      throw new Error('Failed in parsing legacy challenge text from the gaia hub.');
-    }
-
-    if (parsedChallenge[0] === 'gaiahub' && parsedChallenge[3] === 'blockstack_storage_please_sign') {
-      var signer = (0, _index.hexStringToECPair)(signerKeyHex + (signerKeyHex.length === 64 ? '01' : ''));
-
-      var digest = _bitcoinjsLib.default.crypto.sha256(challengeText);
-
-      var signature = signer.sign(digest).toDER().toString('hex');
-      var publickey = (0, _index.getPublicKeyFromPrivate)(signerKeyHex);
-      var token = Buffer.from(JSON.stringify({
-        publickey: publickey,
-        signature: signature
-      })).toString('base64');
-      return token;
-    } else {
-      throw new Error('Failed to connect to legacy gaia hub. If you operate this hub, please update.');
-    }
-  }
-
-  function makeV1GaiaAuthToken(hubInfo, signerKeyHex, hubUrl, associationToken) {
-    var challengeText = hubInfo.challenge_text;
-    var handlesV1Auth = hubInfo.latest_auth_version && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1;
-    var iss = (0, _index.getPublicKeyFromPrivate)(signerKeyHex);
-
-    if (!handlesV1Auth) {
-      return makeLegacyAuthToken(challengeText, signerKeyHex);
-    }
-
-    var salt = _crypto.default.randomBytes(16).toString('hex');
-
-    var payload = {
-      gaiaChallenge: challengeText,
-      hubUrl: hubUrl,
-      iss: iss,
-      salt: salt,
-      associationToken: associationToken
-    };
-    var token = new _jsontokens.TokenSigner('ES256K', signerKeyHex).sign(payload);
-    return "v1:".concat(token);
-  }
-
-  function connectToGaiaHub(gaiaHubUrl, challengeSignerHex, associationToken) {
-    _logger.Logger.debug("connectToGaiaHub: ".concat(gaiaHubUrl, "/hub_info"));
-
-    return fetch("".concat(gaiaHubUrl, "/hub_info")).then(function (response) {
-      return response.json();
-    }).then(function (hubInfo) {
-      var readURL = hubInfo.read_url_prefix;
-      var token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
-      var address = (0, _utils.ecPairToAddress)((0, _index.hexStringToECPair)(challengeSignerHex + (challengeSignerHex.length === 64 ? '01' : '')));
-      return {
-        url_prefix: readURL,
-        address: address,
-        token: token,
-        server: gaiaHubUrl
-      };
-    });
-  }
-  /**
-   * These two functions are app-specific connections to gaia hub,
-   *   they read the user data object for information on setting up
-   *   a hub connection, and store the hub config to localstorage
-   * @param {UserSession} caller - the instance calling this function
-   * @private
-   * @returns {Promise} that resolves to the new gaia hub connection
-   */
-
-
-  function setLocalGaiaHubConnection(caller) {
-    var userData = caller.loadUserData();
-
-    if (!userData) {
-      throw new _errors.InvalidStateError('Missing userData');
-    }
-
-    if (!userData.hubUrl) {
-      userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
-    }
-
-    return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey, userData.associationToken).then(function (gaiaConfig) {
-      userData.gaiaHubConfig = gaiaConfig;
-      return gaiaConfig;
-    });
-  }
-
-  function getOrSetLocalGaiaHubConnection(caller) {
-    var userData = caller.store.getSessionData().userData;
-
-    if (!userData) {
-      throw new _errors.InvalidStateError('Missing userData');
-    }
-
-    var hubConfig = userData.gaiaHubConfig;
-
-    if (hubConfig) {
-      return Promise.resolve(hubConfig);
-    }
-
-    return setLocalGaiaHubConnection(caller);
-  }
-
-  function getBucketUrl(gaiaHubUrl, appPrivateKey) {
-    var challengeSigner;
-
-    try {
-      challengeSigner = _bitcoinjsLib.default.ECPair.fromPrivateKey(new Buffer(appPrivateKey, 'hex'));
-    } catch (e) {
-      return Promise.reject(e);
-    }
-
-    return fetch("".concat(gaiaHubUrl, "/hub_info")).then(function (response) {
-      return response.text();
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJSON) {
-      var readURL = responseJSON.read_url_prefix;
-      var address = (0, _utils.ecPairToAddress)(challengeSigner);
-      var bucketUrl = "".concat(readURL).concat(address, "/");
-      return bucketUrl;
-    });
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.uploadToGaiaHub = uploadToGaiaHub;
+exports.getFullReadUrl = getFullReadUrl;
+exports.connectToGaiaHub = connectToGaiaHub;
+exports.setLocalGaiaHubConnection = setLocalGaiaHubConnection;
+exports.getOrSetLocalGaiaHubConnection = getOrSetLocalGaiaHubConnection;
+exports.getBucketUrl = getBucketUrl;
+exports.BLOCKSTACK_GAIA_HUB_LABEL = void 0;
+
+var _bitcoinjsLib = _interopRequireDefault(require("bitcoinjs-lib"));
+
+var _crypto = _interopRequireDefault(require("crypto"));
+
+var _jsontokens = require("jsontokens");
+
+var _utils = require("../utils");
+
+var _index = require("../index");
+
+var _authConstants = require("../auth/authConstants");
+
+var _userSession = require("../auth/userSession");
+
+var _logger = require("../logger");
+
+var _errors = require("../errors");
+
+var BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config';
+exports.BLOCKSTACK_GAIA_HUB_LABEL = BLOCKSTACK_GAIA_HUB_LABEL;
+
+function uploadToGaiaHub(filename, contents, hubConfig) {
+  var contentType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'application/octet-stream';
+
+  _logger.Logger.debug("uploadToGaiaHub: uploading ".concat(filename, " to ").concat(hubConfig.server));
+
+  return fetch("".concat(hubConfig.server, "/store/").concat(hubConfig.address, "/").concat(filename), {
+    method: 'POST',
+    headers: {
+      'Content-Type': contentType,
+      Authorization: "bearer ".concat(hubConfig.token)
+    },
+    body: contents
+  }).then(function (response) {
+    if (response.ok) {
+      return response.text();
+    } else {
+      throw new Error('Error when uploading to Gaia hub');
+    }
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    return responseJSON.publicURL;
+  });
+}
+
+function getFullReadUrl(filename, hubConfig) {
+  return "".concat(hubConfig.url_prefix).concat(hubConfig.address, "/").concat(filename);
+}
+
+function makeLegacyAuthToken(challengeText, signerKeyHex) {
+  // only sign specific legacy auth challenges.
+  var parsedChallenge;
+
+  try {
+    parsedChallenge = JSON.parse(challengeText);
+  } catch (err) {
+    throw new Error('Failed in parsing legacy challenge text from the gaia hub.');
+  }
+
+  if (parsedChallenge[0] === 'gaiahub' && parsedChallenge[3] === 'blockstack_storage_please_sign') {
+    var signer = (0, _index.hexStringToECPair)(signerKeyHex + (signerKeyHex.length === 64 ? '01' : ''));
+
+    var digest = _bitcoinjsLib.default.crypto.sha256(challengeText);
+
+    var signature = signer.sign(digest).toDER().toString('hex');
+    var publickey = (0, _index.getPublicKeyFromPrivate)(signerKeyHex);
+    var token = Buffer.from(JSON.stringify({
+      publickey: publickey,
+      signature: signature
+    })).toString('base64');
+    return token;
+  } else {
+    throw new Error('Failed to connect to legacy gaia hub. If you operate this hub, please update.');
+  }
+}
+
+function makeV1GaiaAuthToken(hubInfo, signerKeyHex, hubUrl, associationToken) {
+  var challengeText = hubInfo.challenge_text;
+  var handlesV1Auth = hubInfo.latest_auth_version && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1;
+  var iss = (0, _index.getPublicKeyFromPrivate)(signerKeyHex);
+
+  if (!handlesV1Auth) {
+    return makeLegacyAuthToken(challengeText, signerKeyHex);
+  }
+
+  var salt = _crypto.default.randomBytes(16).toString('hex');
+
+  var payload = {
+    gaiaChallenge: challengeText,
+    hubUrl: hubUrl,
+    iss: iss,
+    salt: salt,
+    associationToken: associationToken
+  };
+  var token = new _jsontokens.TokenSigner('ES256K', signerKeyHex).sign(payload);
+  return "v1:".concat(token);
+}
+
+function connectToGaiaHub(gaiaHubUrl, challengeSignerHex, associationToken) {
+  _logger.Logger.debug("connectToGaiaHub: ".concat(gaiaHubUrl, "/hub_info"));
+
+  return fetch("".concat(gaiaHubUrl, "/hub_info")).then(function (response) {
+    return response.json();
+  }).then(function (hubInfo) {
+    var readURL = hubInfo.read_url_prefix;
+    var token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken);
+    var address = (0, _utils.ecPairToAddress)((0, _index.hexStringToECPair)(challengeSignerHex + (challengeSignerHex.length === 64 ? '01' : '')));
+    return {
+      url_prefix: readURL,
+      address: address,
+      token: token,
+      server: gaiaHubUrl
+    };
+  });
+}
+/**
+ * These two functions are app-specific connections to gaia hub,
+ *   they read the user data object for information on setting up
+ *   a hub connection, and store the hub config to localstorage
+ * @param {UserSession} caller - the instance calling this function
+ * @private
+ * @returns {Promise} that resolves to the new gaia hub connection
+ */
+
+
+function setLocalGaiaHubConnection(caller) {
+  var userData = caller.loadUserData();
+
+  if (!userData) {
+    throw new _errors.InvalidStateError('Missing userData');
+  }
+
+  if (!userData.hubUrl) {
+    userData.hubUrl = _authConstants.BLOCKSTACK_DEFAULT_GAIA_HUB_URL;
+  }
+
+  return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey, userData.associationToken).then(function (gaiaConfig) {
+    userData.gaiaHubConfig = gaiaConfig;
+    return gaiaConfig;
+  });
+}
+
+function getOrSetLocalGaiaHubConnection(caller) {
+  var userData = caller.store.getSessionData().userData;
+
+  if (!userData) {
+    throw new _errors.InvalidStateError('Missing userData');
+  }
+
+  var hubConfig = userData.gaiaHubConfig;
+
+  if (hubConfig) {
+    return Promise.resolve(hubConfig);
+  }
+
+  return setLocalGaiaHubConnection(caller);
+}
+
+function getBucketUrl(gaiaHubUrl, appPrivateKey) {
+  var challengeSigner;
+
+  try {
+    challengeSigner = _bitcoinjsLib.default.ECPair.fromPrivateKey(new Buffer(appPrivateKey, 'hex'));
+  } catch (e) {
+    return Promise.reject(e);
+  }
+
+  return fetch("".concat(gaiaHubUrl, "/hub_info")).then(function (response) {
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    var readURL = responseJSON.read_url_prefix;
+    var address = (0, _utils.ecPairToAddress)(challengeSigner);
+    var bucketUrl = "".concat(readURL).concat(address, "/");
+    return bucketUrl;
+  });
+}
 
 }).call(this,require("buffer").Buffer)
 },{"../auth/authConstants":504,"../auth/userSession":512,"../errors":516,"../index":517,"../logger":519,"../utils":551,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73,"buffer":149,"crypto":169,"jsontokens":266}],550:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/helpers/slicedToArray", "./hub", "../encryption", "../keys", "../profiles", "../errors", "../logger", "../auth/userSession"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/helpers/slicedToArray"), require("./hub"), require("../encryption"), require("../keys"), require("../profiles"), require("../errors"), require("../logger"), require("../auth/userSession"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.slicedToArray, global.hub, global.encryption, global.keys, global.profiles, global.errors, global.logger, global.userSession);
-    global.index = mod.exports;
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.encryptContent = encryptContent;
+exports.decryptContent = decryptContent;
+exports.getFile = getFile;
+exports.putFile = putFile;
+exports.listFiles = listFiles;
+exports.deleteFile = deleteFile;
+exports.getUserAppFileUrl = getUserAppFileUrl;
+exports.encryptContentImpl = encryptContentImpl;
+exports.decryptContentImpl = decryptContentImpl;
+exports.getFileImpl = getFileImpl;
+exports.putFileImpl = putFileImpl;
+exports.getAppBucketUrl = getAppBucketUrl;
+exports.listFilesImpl = listFilesImpl;
+Object.defineProperty(exports, "connectToGaiaHub", {
+  enumerable: true,
+  get: function get() {
+    return _hub.connectToGaiaHub;
   }
-})(this, function (_exports, _slicedToArray2, _hub, _encryption, _keys, _profiles, _errors, _logger, _userSession) {
-  "use strict";
-
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.encryptContent = encryptContent;
-  _exports.decryptContent = decryptContent;
-  _exports.getFile = getFile;
-  _exports.putFile = putFile;
-  _exports.listFiles = listFiles;
-  _exports.deleteFile = deleteFile;
-  _exports.getUserAppFileUrl = getUserAppFileUrl;
-  _exports.encryptContentImpl = encryptContentImpl;
-  _exports.decryptContentImpl = decryptContentImpl;
-  _exports.getFileImpl = getFileImpl;
-  _exports.putFileImpl = putFileImpl;
-  _exports.getAppBucketUrl = getAppBucketUrl;
-  _exports.listFilesImpl = listFilesImpl;
-  Object.defineProperty(_exports, "connectToGaiaHub", {
-    enumerable: true,
-    get: function get() {
-      return _hub.connectToGaiaHub;
-    }
-  });
-  Object.defineProperty(_exports, "uploadToGaiaHub", {
-    enumerable: true,
-    get: function get() {
-      return _hub.uploadToGaiaHub;
-    }
-  });
-  Object.defineProperty(_exports, "BLOCKSTACK_GAIA_HUB_LABEL", {
-    enumerable: true,
-    get: function get() {
-      return _hub.BLOCKSTACK_GAIA_HUB_LABEL;
-    }
-  });
-  _slicedToArray2 = _interopRequireDefault(_slicedToArray2);
-  // export { type GaiaHubConfig } from './hub'
-  var SIGNATURE_FILE_SUFFIX = '.sig';
-  /**
-   * Encrypts the data provided with the app public key.
-   * @param {String|Buffer} content - data to encrypt
-   * @param {Object} [options=null] - options object
-   * @param {String} options.publicKey - the hex string of the ECDSA public
-   * key to use for encryption. If not provided, will use user's appPublicKey.
-   * @return {String} Stringified ciphertext object
-   */
-
-  function encryptContent(content, options) {
-    console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method encryptContent().');
-    var userSession = new _userSession.UserSession();
-    return userSession.encryptContent(content, options);
+});
+Object.defineProperty(exports, "uploadToGaiaHub", {
+  enumerable: true,
+  get: function get() {
+    return _hub.uploadToGaiaHub;
   }
-  /**
-   * Decrypts data encrypted with `encryptContent` with the
-   * transit private key.
-   * @param {String|Buffer} content - encrypted content.
-   * @param {Object} [options=null] - options object
-   * @param {String} options.privateKey - the hex string of the ECDSA private
-   * key to use for decryption. If not provided, will use user's appPrivateKey.
-   * @return {String|Buffer} decrypted content.
-   */
-
-
-  function decryptContent(content, options) {
-    console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method decryptContent().');
-    var userSession = new _userSession.UserSession();
-    return userSession.decryptContent(content, options);
+});
+Object.defineProperty(exports, "BLOCKSTACK_GAIA_HUB_LABEL", {
+  enumerable: true,
+  get: function get() {
+    return _hub.BLOCKSTACK_GAIA_HUB_LABEL;
   }
-  /**
-   * Retrieves the specified file from the app's data store.
-   * @param {String} path - the path to the file to read
-   * @param {Object} [options=null] - options object
-   * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
-   * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
-   * @param {Boolean} options.verify - Whether the content should be verified, only to be used
-   * when `putFile` was set to `sign = true`
-   * @param {String} options.app - the app to lookup for multi-player storage -
-   * defaults to current origin
-   * @param {String} [options.zoneFileLookupURL=null] - The URL
-   * to use for zonefile lookup. If falsey, this will use the
-   * blockstack.js's getNameInfo function instead.
-   * @returns {Promise} that resolves to the raw data in the file
-   * or rejects with an error
-   */
+});
+
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+
+var _hub = require("./hub");
+
+var _encryption = require("../encryption");
+
+var _keys = require("../keys");
+
+var _profiles = require("../profiles");
+
+var _errors = require("../errors");
+
+var _logger = require("../logger");
+
+var _userSession = require("../auth/userSession");
+
+// export { type GaiaHubConfig } from './hub'
+var SIGNATURE_FILE_SUFFIX = '.sig';
+/**
+ * Encrypts the data provided with the app public key.
+ * @param {String|Buffer} content - data to encrypt
+ * @param {Object} [options=null] - options object
+ * @param {String} options.publicKey - the hex string of the ECDSA public
+ * key to use for encryption. If not provided, will use user's appPublicKey.
+ * @return {String} Stringified ciphertext object
+ */
+
+function encryptContent(content, options) {
+  console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method encryptContent().');
+  var userSession = new _userSession.UserSession();
+  return userSession.encryptContent(content, options);
+}
+/**
+ * Decrypts data encrypted with `encryptContent` with the
+ * transit private key.
+ * @param {String|Buffer} content - encrypted content.
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
+ * @return {String|Buffer} decrypted content.
+ */
 
 
-  function getFile(path, options) {
-    console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method getFile().');
-    var userSession = new _userSession.UserSession();
-    return userSession.getFile(path, options);
-  }
-  /**
-   * Stores the data provided in the app's data store to to the file specified.
-   * @param {String} path - the path to store the data in
-   * @param {String|Buffer} content - the data to store in the file
-   * @param {Object} [options=null] - options object
-   * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
-   *                                                  or the provided public key
-   * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
-   *                                         the app private key
-   * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
-   * @return {Promise} that resolves if the operation succeed and rejects
-   * if it failed
-   */
+function decryptContent(content, options) {
+  console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method decryptContent().');
+  var userSession = new _userSession.UserSession();
+  return userSession.decryptContent(content, options);
+}
+/**
+ * Retrieves the specified file from the app's data store.
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {Boolean} options.verify - Whether the content should be verified, only to be used
+ * when `putFile` was set to `sign = true`
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise} that resolves to the raw data in the file
+ * or rejects with an error
+ */
 
 
-  function putFile(path, content, options) {
-    console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method putFile().');
-    var userSession = new _userSession.UserSession();
-    return userSession.putFile(path, content, options);
-  }
-  /**
-   * List the set of files in this application's Gaia storage bucket.
-   * @param {function} callback - a callback to invoke on each named file that
-   * returns `true` to continue the listing operation or `false` to end it
-   * @return {Promise} that resolves to the number of files listed
-   */
+function getFile(path, options) {
+  console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method getFile().');
+  var userSession = new _userSession.UserSession();
+  return userSession.getFile(path, options);
+}
+/**
+ * Stores the data provided in the app's data store to to the file specified.
+ * @param {String} path - the path to store the data in
+ * @param {String|Buffer} content - the data to store in the file
+ * @param {Object} [options=null] - options object
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
+ *                                                  or the provided public key
+ * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+ *                                         the app private key
+ * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ */
 
 
-  function listFiles(callback) {
-    console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method listFiles().');
-    var userSession = new _userSession.UserSession();
-    return userSession.listFiles(callback);
-  }
-  /**
-   * Deletes the specified file from the app's data store. Currently not implemented.
-   * @param {String} path - the path to the file to delete
-   * @returns {Promise} that resolves when the file has been removed
-   * or rejects with an error
-   * @private
-   */
+function putFile(path, content, options) {
+  console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method putFile().');
+  var userSession = new _userSession.UserSession();
+  return userSession.putFile(path, content, options);
+}
+/**
+ * List the set of files in this application's Gaia storage bucket.
+ * @param {function} callback - a callback to invoke on each named file that
+ * returns `true` to continue the listing operation or `false` to end it
+ * @return {Promise} that resolves to the number of files listed
+ */
 
 
-  function deleteFile(path) {
-    Promise.reject(new Error("Delete of ".concat(path, " not supported by gaia hubs")));
-  }
-  /**
-   * Fetch the public read URL of a user file for the specified app.
-   * @param {String} path - the path to the file to read
-   * @param {String} username - The Blockstack ID of the user to look up
-   * @param {String} appOrigin - The app origin
-   * @param {String} [zoneFileLookupURL=null] - The URL
-   * to use for zonefile lookup. If falsey, this will use the
-   * blockstack.js's getNameInfo function instead.
-   * @return {Promise} that resolves to the public read URL of the file
-   * or rejects with an error
-   */
+function listFiles(callback) {
+  console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method listFiles().');
+  var userSession = new _userSession.UserSession();
+  return userSession.listFiles(callback);
+}
+/**
+ * Deletes the specified file from the app's data store. Currently not implemented.
+ * @param {String} path - the path to the file to delete
+ * @returns {Promise} that resolves when the file has been removed
+ * or rejects with an error
+ * @private
+ */
 
 
-  function getUserAppFileUrl(path, username, appOrigin) {
-    var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    return (0, _profiles.lookupProfile)(username, zoneFileLookupURL).then(function (profile) {
-      if (profile.hasOwnProperty('apps')) {
-        if (profile.apps.hasOwnProperty(appOrigin)) {
-          return profile.apps[appOrigin];
-        } else {
-          return null;
-        }
+function deleteFile(path) {
+  Promise.reject(new Error("Delete of ".concat(path, " not supported by gaia hubs")));
+}
+/**
+ * Fetch the public read URL of a user file for the specified app.
+ * @param {String} path - the path to the file to read
+ * @param {String} username - The Blockstack ID of the user to look up
+ * @param {String} appOrigin - The app origin
+ * @param {String} [zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @return {Promise} that resolves to the public read URL of the file
+ * or rejects with an error
+ */
+
+
+function getUserAppFileUrl(path, username, appOrigin) {
+  var zoneFileLookupURL = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+  return (0, _profiles.lookupProfile)(username, zoneFileLookupURL).then(function (profile) {
+    if (profile.hasOwnProperty('apps')) {
+      if (profile.apps.hasOwnProperty(appOrigin)) {
+        return profile.apps[appOrigin];
       } else {
         return null;
       }
-    }).then(function (bucketUrl) {
-      if (bucketUrl) {
-        var bucket = bucketUrl.replace(/\/?(\?|#|$)/, '/$1');
-        return "".concat(bucket).concat(path);
+    } else {
+      return null;
+    }
+  }).then(function (bucketUrl) {
+    if (bucketUrl) {
+      var bucket = bucketUrl.replace(/\/?(\?|#|$)/, '/$1');
+      return "".concat(bucket).concat(path);
+    } else {
+      return null;
+    }
+  });
+}
+/**
+ * Encrypts the data provided with the app public key.
+ * @param {UserSession} caller - the instance calling this method
+ * @param {String|Buffer} content - data to encrypt
+ * @param {Object} [options=null] - options object
+ * @param {String} options.publicKey - the hex string of the ECDSA public
+ * key to use for encryption. If not provided, will use user's appPublicKey.
+ * @return {String} Stringified ciphertext object
+ * @private
+ */
+
+
+function encryptContentImpl(caller, content, options) {
+  var defaults = {
+    publicKey: null
+  };
+  var opt = Object.assign({}, defaults, options);
+
+  if (!opt.publicKey) {
+    var userData = caller.loadUserData();
+    var privateKey = userData.appPrivateKey;
+    opt.publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
+  }
+
+  var cipherObject = (0, _encryption.encryptECIES)(opt.publicKey, content);
+  return JSON.stringify(cipherObject);
+}
+/**
+ * Decrypts data encrypted with `encryptContent` with the
+ * transit private key.
+ * @param {UserSession} caller - the instance calling this method
+ * @param {String|Buffer} content - encrypted content.
+ * @param {Object} [options=null] - options object
+ * @param {String} options.privateKey - the hex string of the ECDSA private
+ * key to use for decryption. If not provided, will use user's appPrivateKey.
+ * @return {String|Buffer} decrypted content.
+ * @private
+ */
+
+
+function decryptContentImpl(caller, content, options) {
+  var defaults = {
+    privateKey: null
+  };
+  var opt = Object.assign({}, defaults, options);
+  var privateKey = opt.privateKey;
+
+  if (!privateKey) {
+    privateKey = caller.loadUserData().appPrivateKey;
+  }
+
+  try {
+    var cipherObject = JSON.parse(content);
+    return (0, _encryption.decryptECIES)(privateKey, cipherObject);
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      throw new Error('Failed to parse encrypted content JSON. The content may not ' + 'be encrypted. If using getFile, try passing { decrypt: false }.');
+    } else {
+      throw err;
+    }
+  }
+}
+/* Get the gaia address used for servicing multiplayer reads for the given
+ * (username, app) pair.
+ * @private
+ */
+
+
+function getGaiaAddress(caller, app, username, zoneFileLookupURL) {
+  return Promise.resolve().then(function () {
+    if (username) {
+      return getUserAppFileUrl('/', username, app, zoneFileLookupURL);
+    } else {
+      return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
+        return (0, _hub.getFullReadUrl)('/', gaiaHubConfig);
+      });
+    }
+  }).then(function (fileUrl) {
+    var matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/);
+
+    if (!matches) {
+      throw new Error('Failed to parse gaia address');
+    }
+
+    return matches[matches.length - 1];
+  });
+}
+/* Handle fetching the contents from a given path. Handles both
+ *  multi-player reads and reads from own storage.
+ * @private
+ */
+
+
+function getFileContents(caller, path, app, username, zoneFileLookupURL, forceText) {
+  return Promise.resolve().then(function () {
+    if (username) {
+      return getUserAppFileUrl(path, username, app, zoneFileLookupURL);
+    } else {
+      return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
+        return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
+      });
+    }
+  }).then(function (readUrl) {
+    return new Promise(function (resolve, reject) {
+      if (!readUrl) {
+        reject(null);
       } else {
-        return null;
+        resolve(readUrl);
       }
     });
-  }
-  /**
-   * Encrypts the data provided with the app public key.
-   * @param {UserSession} caller - the instance calling this method
-   * @param {String|Buffer} content - data to encrypt
-   * @param {Object} [options=null] - options object
-   * @param {String} options.publicKey - the hex string of the ECDSA public
-   * key to use for encryption. If not provided, will use user's appPublicKey.
-   * @return {String} Stringified ciphertext object
-   * @private
-   */
+  }).then(function (readUrl) {
+    return fetch(readUrl);
+  }).then(function (response) {
+    if (response.status !== 200) {
+      if (response.status === 404) {
+        _logger.Logger.debug("getFile ".concat(path, " returned 404, returning null"));
 
-
-  function encryptContentImpl(caller, content, options) {
-    var defaults = {
-      publicKey: null
-    };
-    var opt = Object.assign({}, defaults, options);
-
-    if (!opt.publicKey) {
-      var userData = caller.loadUserData();
-      var privateKey = userData.appPrivateKey;
-      opt.publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
+        return null;
+      } else {
+        throw new Error("getFile ".concat(path, " failed with HTTP status ").concat(response.status));
+      }
     }
 
-    var cipherObject = (0, _encryption.encryptECIES)(opt.publicKey, content);
-    return JSON.stringify(cipherObject);
-  }
-  /**
-   * Decrypts data encrypted with `encryptContent` with the
-   * transit private key.
-   * @param {UserSession} caller - the instance calling this method
-   * @param {String|Buffer} content - encrypted content.
-   * @param {Object} [options=null] - options object
-   * @param {String} options.privateKey - the hex string of the ECDSA private
-   * key to use for decryption. If not provided, will use user's appPrivateKey.
-   * @return {String|Buffer} decrypted content.
-   * @private
-   */
+    var contentType = response.headers.get('Content-Type');
 
-
-  function decryptContentImpl(caller, content, options) {
-    var defaults = {
-      privateKey: null
-    };
-    var opt = Object.assign({}, defaults, options);
-    var privateKey = opt.privateKey;
-
-    if (!privateKey) {
-      privateKey = caller.loadUserData().appPrivateKey;
+    if (forceText || contentType === null || contentType.startsWith('text') || contentType === 'application/json') {
+      return response.text();
+    } else {
+      return response.arrayBuffer();
     }
+  });
+}
+/* Handle fetching an unencrypted file, its associated signature
+ *  and then validate it. Handles both multi-player reads and reads
+ *  from own storage.
+ * @private
+ */
+
+
+function getFileSignedUnencrypted(caller, path, opt) {
+  // future optimization note:
+  //    in the case of _multi-player_ reads, this does a lot of excess
+  //    profile lookups to figure out where to read files
+  //    do browsers cache all these requests if Content-Cache is set?
+  return Promise.all([getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false), getFileContents(caller, "".concat(path).concat(SIGNATURE_FILE_SUFFIX), opt.app, opt.username, opt.zoneFileLookupURL, true), getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)]).then(function (_ref) {
+    var _ref2 = (0, _slicedToArray2.default)(_ref, 3),
+        fileContents = _ref2[0],
+        signatureContents = _ref2[1],
+        gaiaAddress = _ref2[2];
+
+    if (!fileContents) {
+      return fileContents;
+    }
+
+    if (!gaiaAddress) {
+      throw new _errors.SignatureVerificationError('Failed to get gaia address for verification of: ' + "".concat(path));
+    }
+
+    if (!signatureContents || typeof signatureContents !== 'string') {
+      throw new _errors.SignatureVerificationError('Failed to obtain signature for file: ' + "".concat(path, " -- looked in ").concat(path).concat(SIGNATURE_FILE_SUFFIX));
+    }
+
+    var signature;
+    var publicKey;
 
     try {
-      var cipherObject = JSON.parse(content);
-      return (0, _encryption.decryptECIES)(privateKey, cipherObject);
+      var sigObject = JSON.parse(signatureContents);
+      signature = sigObject.signature;
+      publicKey = sigObject.publicKey;
     } catch (err) {
       if (err instanceof SyntaxError) {
-        throw new Error('Failed to parse encrypted content JSON. The content may not ' + 'be encrypted. If using getFile, try passing { decrypt: false }.');
+        throw new Error('Failed to parse signature content JSON ' + "(path: ".concat(path).concat(SIGNATURE_FILE_SUFFIX, ")") + ' The content may be corrupted.');
       } else {
         throw err;
       }
     }
-  }
-  /* Get the gaia address used for servicing multiplayer reads for the given
-   * (username, app) pair.
-   * @private
-   */
 
+    var signerAddress = (0, _keys.publicKeyToAddress)(publicKey);
 
-  function getGaiaAddress(caller, app, username, zoneFileLookupURL) {
-    return Promise.resolve().then(function () {
-      if (username) {
-        return getUserAppFileUrl('/', username, app, zoneFileLookupURL);
-      } else {
-        return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
-          return (0, _hub.getFullReadUrl)('/', gaiaHubConfig);
-        });
-      }
-    }).then(function (fileUrl) {
-      var matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/);
-
-      if (!matches) {
-        throw new Error('Failed to parse gaia address');
-      }
-
-      return matches[matches.length - 1];
-    });
-  }
-  /* Handle fetching the contents from a given path. Handles both
-   *  multi-player reads and reads from own storage.
-   * @private
-   */
-
-
-  function getFileContents(caller, path, app, username, zoneFileLookupURL, forceText) {
-    return Promise.resolve().then(function () {
-      if (username) {
-        return getUserAppFileUrl(path, username, app, zoneFileLookupURL);
-      } else {
-        return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
-          return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
-        });
-      }
-    }).then(function (readUrl) {
-      return new Promise(function (resolve, reject) {
-        if (!readUrl) {
-          reject(null);
-        } else {
-          resolve(readUrl);
-        }
-      });
-    }).then(function (readUrl) {
-      return fetch(readUrl);
-    }).then(function (response) {
-      if (response.status !== 200) {
-        if (response.status === 404) {
-          _logger.Logger.debug("getFile ".concat(path, " returned 404, returning null"));
-
-          return null;
-        } else {
-          throw new Error("getFile ".concat(path, " failed with HTTP status ").concat(response.status));
-        }
-      }
-
-      var contentType = response.headers.get('Content-Type');
-
-      if (forceText || contentType === null || contentType.startsWith('text') || contentType === 'application/json') {
-        return response.text();
-      } else {
-        return response.arrayBuffer();
-      }
-    });
-  }
-  /* Handle fetching an unencrypted file, its associated signature
-   *  and then validate it. Handles both multi-player reads and reads
-   *  from own storage.
-   * @private
-   */
-
-
-  function getFileSignedUnencrypted(caller, path, opt) {
-    // future optimization note:
-    //    in the case of _multi-player_ reads, this does a lot of excess
-    //    profile lookups to figure out where to read files
-    //    do browsers cache all these requests if Content-Cache is set?
-    return Promise.all([getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false), getFileContents(caller, "".concat(path).concat(SIGNATURE_FILE_SUFFIX), opt.app, opt.username, opt.zoneFileLookupURL, true), getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)]).then(function (_ref) {
-      var _ref2 = (0, _slicedToArray2.default)(_ref, 3),
-          fileContents = _ref2[0],
-          signatureContents = _ref2[1],
-          gaiaAddress = _ref2[2];
-
-      if (!fileContents) {
-        return fileContents;
-      }
-
-      if (!gaiaAddress) {
-        throw new _errors.SignatureVerificationError('Failed to get gaia address for verification of: ' + "".concat(path));
-      }
-
-      if (!signatureContents || typeof signatureContents !== 'string') {
-        throw new _errors.SignatureVerificationError('Failed to obtain signature for file: ' + "".concat(path, " -- looked in ").concat(path).concat(SIGNATURE_FILE_SUFFIX));
-      }
-
-      var signature;
-      var publicKey;
-
-      try {
-        var sigObject = JSON.parse(signatureContents);
-        signature = sigObject.signature;
-        publicKey = sigObject.publicKey;
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          throw new Error('Failed to parse signature content JSON ' + "(path: ".concat(path).concat(SIGNATURE_FILE_SUFFIX, ")") + ' The content may be corrupted.');
-        } else {
-          throw err;
-        }
-      }
-
-      var signerAddress = (0, _keys.publicKeyToAddress)(publicKey);
-
-      if (gaiaAddress !== signerAddress) {
-        throw new _errors.SignatureVerificationError("Signer pubkey address (".concat(signerAddress, ") doesn't") + " match gaia address (".concat(gaiaAddress, ")"));
-      } else if (!(0, _encryption.verifyECDSA)(Buffer.from(fileContents), publicKey, signature)) {
-        throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature: ' + "path: ".concat(path, ", signature: ").concat(path).concat(SIGNATURE_FILE_SUFFIX));
-      } else {
-        return fileContents;
-      }
-    });
-  }
-  /* Handle signature verification and decryption for contents which are
-   *  expected to be signed and encrypted. This works for single and
-   *  multiplayer reads. In the case of multiplayer reads, it uses the
-   *  gaia address for verification of the claimed public key.
-   * @private
-   */
-
-
-  function handleSignedEncryptedContents(caller, path, storedContents, app, username, zoneFileLookupURL) {
-    var appPrivateKey = caller.loadUserData().appPrivateKey;
-    var appPublicKey = (0, _keys.getPublicKeyFromPrivate)(appPrivateKey);
-    var addressPromise;
-
-    if (username) {
-      addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL);
+    if (gaiaAddress !== signerAddress) {
+      throw new _errors.SignatureVerificationError("Signer pubkey address (".concat(signerAddress, ") doesn't") + " match gaia address (".concat(gaiaAddress, ")"));
+    } else if (!(0, _encryption.verifyECDSA)(Buffer.from(fileContents), publicKey, signature)) {
+      throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature: ' + "path: ".concat(path, ", signature: ").concat(path).concat(SIGNATURE_FILE_SUFFIX));
     } else {
-      var address = (0, _keys.publicKeyToAddress)(appPublicKey);
-      addressPromise = Promise.resolve(address);
+      return fileContents;
     }
+  });
+}
+/* Handle signature verification and decryption for contents which are
+ *  expected to be signed and encrypted. This works for single and
+ *  multiplayer reads. In the case of multiplayer reads, it uses the
+ *  gaia address for verification of the claimed public key.
+ * @private
+ */
 
-    return addressPromise.then(function (address) {
-      if (!address) {
-        throw new _errors.SignatureVerificationError('Failed to get gaia address for verification of: ' + "".concat(path));
-      }
 
-      var sigObject;
+function handleSignedEncryptedContents(caller, path, storedContents, app, username, zoneFileLookupURL) {
+  var appPrivateKey = caller.loadUserData().appPrivateKey;
+  var appPublicKey = (0, _keys.getPublicKeyFromPrivate)(appPrivateKey);
+  var addressPromise;
 
-      try {
-        sigObject = JSON.parse(storedContents);
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          throw new Error('Failed to parse encrypted, signed content JSON. The content may not ' + 'be encrypted. If using getFile, try passing' + ' { verify: false, decrypt: false }.');
-        } else {
-          throw err;
-        }
-      }
-
-      var signature = sigObject.signature;
-      var signerPublicKey = sigObject.publicKey;
-      var cipherText = sigObject.cipherText;
-      var signerAddress = (0, _keys.publicKeyToAddress)(signerPublicKey);
-
-      if (!signerPublicKey || !cipherText || !signature) {
-        throw new _errors.SignatureVerificationError('Failed to get signature verification data from file:' + " ".concat(path));
-      } else if (signerAddress !== address) {
-        throw new _errors.SignatureVerificationError("Signer pubkey address (".concat(signerAddress, ") doesn't") + " match gaia address (".concat(address, ")"));
-      } else if (!(0, _encryption.verifyECDSA)(cipherText, signerPublicKey, signature)) {
-        throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature in file:' + " ".concat(path));
-      } else {
-        return caller.decryptContent(cipherText);
-      }
-    });
+  if (username) {
+    addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL);
+  } else {
+    var address = (0, _keys.publicKeyToAddress)(appPublicKey);
+    addressPromise = Promise.resolve(address);
   }
-  /**
-   * Retrieves the specified file from the app's data store.
-   * @param {UserSession} caller - instance calling this method
-   * @param {String} path - the path to the file to read
-   * @param {Object} [options=null] - options object
-   * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
-   * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
-   * @param {Boolean} options.verify - Whether the content should be verified, only to be used
-   * when `putFile` was set to `sign = true`
-   * @param {String} options.app - the app to lookup for multi-player storage -
-   * defaults to current origin
-   * @param {String} [options.zoneFileLookupURL=null] - The URL
-   * to use for zonefile lookup. If falsey, this will use the
-   * blockstack.js's getNameInfo function instead.
-   * @returns {Promise} that resolves to the raw data in the file
-   * or rejects with an error
-   * @private
-   */
 
-
-  function getFileImpl(caller, path, options) {
-    var appConfig = caller.appConfig;
-
-    if (!appConfig) {
-      throw new _errors.InvalidStateError('Missing AppConfig');
+  return addressPromise.then(function (address) {
+    if (!address) {
+      throw new _errors.SignatureVerificationError('Failed to get gaia address for verification of: ' + "".concat(path));
     }
 
-    var defaults = {
-      decrypt: true,
-      verify: false,
-      username: null,
-      app: appConfig.appDomain,
-      zoneFileLookupURL: null
-    };
-    var opt = Object.assign({}, defaults, options); // in the case of signature verification, but no
-    //  encryption expected, need to fetch _two_ files.
+    var sigObject;
 
-    if (opt.verify && !opt.decrypt) {
-      return getFileSignedUnencrypted(caller, path, opt);
-    }
-
-    return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt).then(function (storedContents) {
-      if (storedContents === null) {
-        return storedContents;
-      } else if (opt.decrypt && !opt.verify) {
-        if (typeof storedContents !== 'string') {
-          throw new Error('Expected to get back a string for the cipherText');
-        }
-
-        return decryptContentImpl(caller, storedContents);
-      } else if (opt.decrypt && opt.verify) {
-        if (typeof storedContents !== 'string') {
-          throw new Error('Expected to get back a string for the cipherText');
-        }
-
-        return handleSignedEncryptedContents(caller, path, storedContents, opt.app, opt.username, opt.zoneFileLookupURL);
-      } else if (!opt.verify && !opt.decrypt) {
-        return storedContents;
+    try {
+      sigObject = JSON.parse(storedContents);
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        throw new Error('Failed to parse encrypted, signed content JSON. The content may not ' + 'be encrypted. If using getFile, try passing' + ' { verify: false, decrypt: false }.');
       } else {
-        throw new Error('Should be unreachable.');
+        throw err;
       }
-    });
+    }
+
+    var signature = sigObject.signature;
+    var signerPublicKey = sigObject.publicKey;
+    var cipherText = sigObject.cipherText;
+    var signerAddress = (0, _keys.publicKeyToAddress)(signerPublicKey);
+
+    if (!signerPublicKey || !cipherText || !signature) {
+      throw new _errors.SignatureVerificationError('Failed to get signature verification data from file:' + " ".concat(path));
+    } else if (signerAddress !== address) {
+      throw new _errors.SignatureVerificationError("Signer pubkey address (".concat(signerAddress, ") doesn't") + " match gaia address (".concat(address, ")"));
+    } else if (!(0, _encryption.verifyECDSA)(cipherText, signerPublicKey, signature)) {
+      throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature in file:' + " ".concat(path));
+    } else {
+      return caller.decryptContent(cipherText);
+    }
+  });
+}
+/**
+ * Retrieves the specified file from the app's data store.
+ * @param {UserSession} caller - instance calling this method
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {Boolean} options.verify - Whether the content should be verified, only to be used
+ * when `putFile` was set to `sign = true`
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise} that resolves to the raw data in the file
+ * or rejects with an error
+ * @private
+ */
+
+
+function getFileImpl(caller, path, options) {
+  var appConfig = caller.appConfig;
+
+  if (!appConfig) {
+    throw new _errors.InvalidStateError('Missing AppConfig');
   }
-  /**
-   * Stores the data provided in the app's data store to to the file specified.
-   * @param {UserSession} caller - instance calling this method
-   * @param {String} path - the path to store the data in
-   * @param {String|Buffer} content - the data to store in the file
-   * @param {Object} [options=null] - options object
-   * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
-   *                                                  or the provided public key
-   * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
-   *                                         the app private key
-   * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
-   * @return {Promise} that resolves if the operation succeed and rejects
-   * if it failed
-   * @private
-   */
+
+  var defaults = {
+    decrypt: true,
+    verify: false,
+    username: null,
+    app: appConfig.appDomain,
+    zoneFileLookupURL: null
+  };
+  var opt = Object.assign({}, defaults, options); // in the case of signature verification, but no
+  //  encryption expected, need to fetch _two_ files.
+
+  if (opt.verify && !opt.decrypt) {
+    return getFileSignedUnencrypted(caller, path, opt);
+  }
+
+  return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt).then(function (storedContents) {
+    if (storedContents === null) {
+      return storedContents;
+    } else if (opt.decrypt && !opt.verify) {
+      if (typeof storedContents !== 'string') {
+        throw new Error('Expected to get back a string for the cipherText');
+      }
+
+      return decryptContentImpl(caller, storedContents);
+    } else if (opt.decrypt && opt.verify) {
+      if (typeof storedContents !== 'string') {
+        throw new Error('Expected to get back a string for the cipherText');
+      }
+
+      return handleSignedEncryptedContents(caller, path, storedContents, opt.app, opt.username, opt.zoneFileLookupURL);
+    } else if (!opt.verify && !opt.decrypt) {
+      return storedContents;
+    } else {
+      throw new Error('Should be unreachable.');
+    }
+  });
+}
+/**
+ * Stores the data provided in the app's data store to to the file specified.
+ * @param {UserSession} caller - instance calling this method
+ * @param {String} path - the path to store the data in
+ * @param {String|Buffer} content - the data to store in the file
+ * @param {Object} [options=null] - options object
+ * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
+ *                                                  or the provided public key
+ * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
+ *                                         the app private key
+ * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
+ * @return {Promise} that resolves if the operation succeed and rejects
+ * if it failed
+ * @private
+ */
 
 
-  function putFileImpl(caller, path, content, options) {
-    var defaults = {
-      encrypt: true,
-      sign: false,
-      contentType: ''
-    };
-    var opt = Object.assign({}, defaults, options);
-    var contentType = opt.contentType;
+function putFileImpl(caller, path, content, options) {
+  var defaults = {
+    encrypt: true,
+    sign: false,
+    contentType: ''
+  };
+  var opt = Object.assign({}, defaults, options);
+  var contentType = opt.contentType;
 
-    if (!contentType) {
-      contentType = typeof content === 'string' ? 'text/plain; charset=utf-8' : 'application/octet-stream';
-    } // First, let's figure out if we need to get public/private keys,
-    //  or if they were passed in
+  if (!contentType) {
+    contentType = typeof content === 'string' ? 'text/plain; charset=utf-8' : 'application/octet-stream';
+  } // First, let's figure out if we need to get public/private keys,
+  //  or if they were passed in
 
 
-    var privateKey = '';
-    var publicKey = '';
+  var privateKey = '';
+  var publicKey = '';
 
-    if (opt.sign) {
-      if (typeof opt.sign === 'string') {
-        privateKey = opt.sign;
-      } else {
+  if (opt.sign) {
+    if (typeof opt.sign === 'string') {
+      privateKey = opt.sign;
+    } else {
+      privateKey = caller.loadUserData().appPrivateKey;
+    }
+  }
+
+  if (opt.encrypt) {
+    if (typeof opt.encrypt === 'string') {
+      publicKey = opt.encrypt;
+    } else {
+      if (!privateKey) {
         privateKey = caller.loadUserData().appPrivateKey;
       }
+
+      publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
     }
-
-    if (opt.encrypt) {
-      if (typeof opt.encrypt === 'string') {
-        publicKey = opt.encrypt;
-      } else {
-        if (!privateKey) {
-          privateKey = caller.loadUserData().appPrivateKey;
-        }
-
-        publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
-      }
-    } // In the case of signing, but *not* encrypting,
-    //   we perform two uploads. So the control-flow
-    //   here will return there.
+  } // In the case of signing, but *not* encrypting,
+  //   we perform two uploads. So the control-flow
+  //   here will return there.
 
 
-    if (!opt.encrypt && opt.sign) {
-      var signatureObject = (0, _encryption.signECDSA)(privateKey, content);
-      var signatureContent = JSON.stringify(signatureObject);
-      return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
-        return new Promise(function (resolve, reject) {
-          return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType), (0, _hub.uploadToGaiaHub)("".concat(path).concat(SIGNATURE_FILE_SUFFIX), signatureContent, gaiaHubConfig, 'application/json')]).then(resolve).catch(function () {
-            (0, _hub.setLocalGaiaHubConnection)(caller).then(function (freshHubConfig) {
-              return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType), (0, _hub.uploadToGaiaHub)("".concat(path).concat(SIGNATURE_FILE_SUFFIX), signatureContent, freshHubConfig, 'application/json')]).then(resolve).catch(reject);
-            });
-          });
-        });
-      }).then(function (fileUrls) {
-        return fileUrls[0];
-      });
-    } // In all other cases, we only need one upload.
-
-
-    if (opt.encrypt && !opt.sign) {
-      content = encryptContentImpl(caller, content, {
-        publicKey: publicKey
-      });
-      contentType = 'application/json';
-    } else if (opt.encrypt && opt.sign) {
-      var cipherText = encryptContentImpl(caller, content, {
-        publicKey: publicKey
-      });
-
-      var _signatureObject = (0, _encryption.signECDSA)(privateKey, cipherText);
-
-      var signedCipherObject = {
-        signature: _signatureObject.signature,
-        publicKey: _signatureObject.publicKey,
-        cipherText: cipherText
-      };
-      content = JSON.stringify(signedCipherObject);
-      contentType = 'application/json';
-    }
-
+  if (!opt.encrypt && opt.sign) {
+    var signatureObject = (0, _encryption.signECDSA)(privateKey, content);
+    var signatureContent = JSON.stringify(signatureObject);
     return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
       return new Promise(function (resolve, reject) {
-        (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType).then(resolve).catch(function () {
+        return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType), (0, _hub.uploadToGaiaHub)("".concat(path).concat(SIGNATURE_FILE_SUFFIX), signatureContent, gaiaHubConfig, 'application/json')]).then(resolve).catch(function () {
           (0, _hub.setLocalGaiaHubConnection)(caller).then(function (freshHubConfig) {
-            return (0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType).then(resolve).catch(reject);
+            return Promise.all([(0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType), (0, _hub.uploadToGaiaHub)("".concat(path).concat(SIGNATURE_FILE_SUFFIX), signatureContent, freshHubConfig, 'application/json')]).then(resolve).catch(reject);
           });
         });
       });
+    }).then(function (fileUrls) {
+      return fileUrls[0];
     });
+  } // In all other cases, we only need one upload.
+
+
+  if (opt.encrypt && !opt.sign) {
+    content = encryptContentImpl(caller, content, {
+      publicKey: publicKey
+    });
+    contentType = 'application/json';
+  } else if (opt.encrypt && opt.sign) {
+    var cipherText = encryptContentImpl(caller, content, {
+      publicKey: publicKey
+    });
+
+    var _signatureObject = (0, _encryption.signECDSA)(privateKey, cipherText);
+
+    var signedCipherObject = {
+      signature: _signatureObject.signature,
+      publicKey: _signatureObject.publicKey,
+      cipherText: cipherText
+    };
+    content = JSON.stringify(signedCipherObject);
+    contentType = 'application/json';
   }
-  /**
-   * Get the app storage bucket URL
-   * @param {String} gaiaHubUrl - the gaia hub URL
-   * @param {String} appPrivateKey - the app private key used to generate the app address
-   * @returns {Promise} That resolves to the URL of the app index file
-   * or rejects if it fails
-   */
+
+  return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
+    return new Promise(function (resolve, reject) {
+      (0, _hub.uploadToGaiaHub)(path, content, gaiaHubConfig, contentType).then(resolve).catch(function () {
+        (0, _hub.setLocalGaiaHubConnection)(caller).then(function (freshHubConfig) {
+          return (0, _hub.uploadToGaiaHub)(path, content, freshHubConfig, contentType).then(resolve).catch(reject);
+        });
+      });
+    });
+  });
+}
+/**
+ * Get the app storage bucket URL
+ * @param {String} gaiaHubUrl - the gaia hub URL
+ * @param {String} appPrivateKey - the app private key used to generate the app address
+ * @returns {Promise} That resolves to the URL of the app index file
+ * or rejects if it fails
+ */
 
 
-  function getAppBucketUrl(gaiaHubUrl, appPrivateKey) {
-    return (0, _hub.getBucketUrl)(gaiaHubUrl, appPrivateKey);
+function getAppBucketUrl(gaiaHubUrl, appPrivateKey) {
+  return (0, _hub.getBucketUrl)(gaiaHubUrl, appPrivateKey);
+}
+/**
+ * Loop over the list of files in a Gaia hub, and run a callback on each entry.
+ * Not meant to be called by external clients.
+ * @param {GaiaHubConfig} hubConfig - the Gaia hub config
+ * @param {String | null} page - the page ID
+ * @param {number} callCount - the loop count
+ * @param {number} fileCount - the number of files listed so far
+ * @param {function} callback - the callback to invoke on each file.  If it returns a falsey
+ *  value, then the loop stops.  If it returns a truthy value, the loop continues.
+ * @returns {Promise} that resolves to the number of files listed.
+ * @private
+ */
+
+
+function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
+  if (callCount > 65536) {
+    // this is ridiculously huge, and probably indicates
+    // a faulty Gaia hub anyway (e.g. on that serves endless data)
+    throw new Error('Too many entries to list');
   }
-  /**
-   * Loop over the list of files in a Gaia hub, and run a callback on each entry.
-   * Not meant to be called by external clients.
-   * @param {GaiaHubConfig} hubConfig - the Gaia hub config
-   * @param {String | null} page - the page ID
-   * @param {number} callCount - the loop count
-   * @param {number} fileCount - the number of files listed so far
-   * @param {function} callback - the callback to invoke on each file.  If it returns a falsey
-   *  value, then the loop stops.  If it returns a truthy value, the loop continues.
-   * @returns {Promise} that resolves to the number of files listed.
-   * @private
-   */
 
+  var httpStatus;
+  var pageRequest = JSON.stringify({
+    page: page
+  });
+  var fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': "".concat(pageRequest.length),
+      Authorization: "bearer ".concat(hubConfig.token)
+    },
+    body: pageRequest
+  };
+  return fetch("".concat(hubConfig.server, "/list-files/").concat(hubConfig.address), fetchOptions).then(function (response) {
+    httpStatus = response.status;
 
-  function listFilesLoop(hubConfig, page, callCount, fileCount, callback) {
-    if (callCount > 65536) {
-      // this is ridiculously huge, and probably indicates
-      // a faulty Gaia hub anyway (e.g. on that serves endless data)
-      throw new Error('Too many entries to list');
+    if (httpStatus >= 400) {
+      throw new Error("listFiles failed with HTTP status ".concat(httpStatus));
     }
 
-    var httpStatus;
-    var pageRequest = JSON.stringify({
-      page: page
-    });
-    var fetchOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': "".concat(pageRequest.length),
-        Authorization: "bearer ".concat(hubConfig.token)
-      },
-      body: pageRequest
-    };
-    return fetch("".concat(hubConfig.server, "/list-files/").concat(hubConfig.address), fetchOptions).then(function (response) {
-      httpStatus = response.status;
+    return response.text();
+  }).then(function (responseText) {
+    return JSON.parse(responseText);
+  }).then(function (responseJSON) {
+    var entries = responseJSON.entries;
+    var nextPage = responseJSON.page;
 
-      if (httpStatus >= 400) {
-        throw new Error("listFiles failed with HTTP status ".concat(httpStatus));
+    if (entries === null || entries === undefined) {
+      // indicates a misbehaving Gaia hub or a misbehaving driver
+      // (i.e. the data is malformed)
+      throw new Error('Bad listFiles response: no entries');
+    }
+
+    for (var i = 0; i < entries.length; i++) {
+      var rc = callback(entries[i]);
+
+      if (!rc) {
+        // callback indicates that we're done
+        return Promise.resolve(fileCount + i);
       }
+    }
 
-      return response.text();
-    }).then(function (responseText) {
-      return JSON.parse(responseText);
-    }).then(function (responseJSON) {
-      var entries = responseJSON.entries;
-      var nextPage = responseJSON.page;
-
-      if (entries === null || entries === undefined) {
-        // indicates a misbehaving Gaia hub or a misbehaving driver
-        // (i.e. the data is malformed)
-        throw new Error('Bad listFiles response: no entries');
-      }
-
-      for (var i = 0; i < entries.length; i++) {
-        var rc = callback(entries[i]);
-
-        if (!rc) {
-          // callback indicates that we're done
-          return Promise.resolve(fileCount + i);
-        }
-      }
-
-      if (nextPage && entries.length > 0) {
-        // keep going -- have more entries
-        return listFilesLoop(hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback);
-      } else {
-        // no more entries -- end of data
-        return Promise.resolve(fileCount + entries.length);
-      }
-    });
-  }
-  /**
-   * List the set of files in this application's Gaia storage bucket.
-   * @param {UserSession} caller - instance calling this method
-   * @param {function} callback - a callback to invoke on each named file that
-   * returns `true` to continue the listing operation or `false` to end it
-   * @return {Promise} that resolves to the number of files listed
-   * @private
-   */
+    if (nextPage && entries.length > 0) {
+      // keep going -- have more entries
+      return listFilesLoop(hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback);
+    } else {
+      // no more entries -- end of data
+      return Promise.resolve(fileCount + entries.length);
+    }
+  });
+}
+/**
+ * List the set of files in this application's Gaia storage bucket.
+ * @param {UserSession} caller - instance calling this method
+ * @param {function} callback - a callback to invoke on each named file that
+ * returns `true` to continue the listing operation or `false` to end it
+ * @return {Promise} that resolves to the number of files listed
+ * @private
+ */
 
 
-  function listFilesImpl(caller, callback) {
-    return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
-      return listFilesLoop(gaiaHubConfig, null, 0, 0, callback);
-    });
-  }
-});
+function listFilesImpl(caller, callback) {
+  return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
+    return listFilesLoop(gaiaHubConfig, null, 0, 0, callback);
+  });
+}
 
 }).call(this,require("buffer").Buffer)
 },{"../auth/userSession":512,"../encryption":515,"../errors":516,"../keys":518,"../logger":519,"../profiles":527,"./hub":549,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18,"buffer":149}],551:[function(require,module,exports){
 (function (Buffer){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "url", "bitcoinjs-lib", "./config"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("url"), require("bitcoinjs-lib"), require("./config"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.url, global.bitcoinjsLib, global.config);
-    global.utils = mod.exports;
-  }
-})(this, function (_exports, _url, _bitcoinjsLib, _config) {
-  "use strict";
+"use strict";
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.nextYear = nextYear;
-  _exports.nextMonth = nextMonth;
-  _exports.nextHour = nextHour;
-  _exports.updateQueryStringParameter = updateQueryStringParameter;
-  _exports.isLaterVersion = isLaterVersion;
-  _exports.hexStringToECPair = hexStringToECPair;
-  _exports.ecPairToHexString = ecPairToHexString;
-  _exports.ecPairToAddress = ecPairToAddress;
-  _exports.makeUUID4 = makeUUID4;
-  _exports.isSameOriginAbsoluteUrl = isSameOriginAbsoluteUrl;
-  _exports.BLOCKSTACK_HANDLER = void 0;
-  _url = _interopRequireDefault(_url);
-  var BLOCKSTACK_HANDLER = 'blockstack';
-  /**
-   * Time
-   * @private
-   */
-
-  _exports.BLOCKSTACK_HANDLER = BLOCKSTACK_HANDLER;
-
-  function nextYear() {
-    return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
-  }
-
-  function nextMonth() {
-    return new Date(new Date().setMonth(new Date().getMonth() + 1));
-  }
-
-  function nextHour() {
-    return new Date(new Date().setHours(new Date().getHours() + 1));
-  }
-  /**
-   * Query Strings
-   * @private
-   */
-
-
-  function updateQueryStringParameter(uri, key, value) {
-    var re = new RegExp("([?&])".concat(key, "=.*?(&|$)"), 'i');
-    var separator = uri.indexOf('?') !== -1 ? '&' : '?';
-
-    if (uri.match(re)) {
-      return uri.replace(re, "$1".concat(key, "=").concat(value, "$2"));
-    } else {
-      return "".concat(uri).concat(separator).concat(key, "=").concat(value);
-    }
-  }
-  /**
-   * Versioning
-   * @param {string} v1 - the left half of the version inequality
-   * @param {string} v2 - right half of the version inequality
-   * @returns {bool} iff v1 >= v2
-   * @private
-   */
-
-
-  function isLaterVersion(v1, v2) {
-    if (v1 === undefined) {
-      v1 = '0.0.0';
-    }
-
-    if (v2 === undefined) {
-      v2 = '0.0.0';
-    }
-
-    var v1tuple = v1.split('.').map(function (x) {
-      return parseInt(x, 10);
-    });
-    var v2tuple = v2.split('.').map(function (x) {
-      return parseInt(x, 10);
-    });
-
-    for (var index = 0; index < v2.length; index++) {
-      if (index >= v1.length) {
-        v2tuple.push(0);
-      }
-
-      if (v1tuple[index] < v2tuple[index]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  function hexStringToECPair(skHex) {
-    var ecPairOptions = {
-      network: _config.config.network.layer1,
-      compressed: true
-    };
-
-    if (skHex.length === 66) {
-      if (skHex.slice(64) !== '01') {
-        throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' + 'indicates compressed key, but last byte must be == 1');
-      }
-
-      return _bitcoinjsLib.ECPair.fromPrivateKey(new Buffer(skHex.slice(0, 64), 'hex'), ecPairOptions);
-    } else if (skHex.length === 64) {
-      ecPairOptions.compressed = false;
-      return _bitcoinjsLib.ECPair.fromPrivateKey(new Buffer(skHex, 'hex'), ecPairOptions);
-    } else {
-      throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.');
-    }
-  }
-
-  function ecPairToHexString(secretKey) {
-    var ecPointHex = secretKey.privateKey.toString('hex');
-
-    if (secretKey.compressed) {
-      return "".concat(ecPointHex, "01");
-    } else {
-      return ecPointHex;
-    }
-  }
-
-  function ecPairToAddress(keyPair) {
-    return _bitcoinjsLib.address.toBase58Check(_bitcoinjsLib.crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash);
-  }
-  /**
-   * UUIDs
-   * @private
-   */
-
-
-  function makeUUID4() {
-    var d = new Date().getTime();
-
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
-      d += performance.now(); // use high-precision timer if available
-    }
-
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
-      d = Math.floor(d / 16);
-      return (c === 'x' ? r : r & 0x3 | 0x8).toString(16);
-    });
-  }
-  /**
-   * Checks if both urls pass the same origin check & are absolute
-   * @param  {[type]}  uri1 first uri to check
-   * @param  {[type]}  uri2 second uri to check
-   * @return {Boolean} true if they pass the same origin check
-   * @private
-   */
-
-
-  function isSameOriginAbsoluteUrl(uri1, uri2) {
-    var parsedUri1 = _url.default.parse(uri1);
-
-    var parsedUri2 = _url.default.parse(uri2);
-
-    var port1 = parseInt(parsedUri1.port, 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80);
-    var port2 = parseInt(parsedUri2.port, 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80);
-    var match = {
-      scheme: parsedUri1.protocol === parsedUri2.protocol,
-      hostname: parsedUri1.hostname === parsedUri2.hostname,
-      port: port1 === port2,
-      absolute: (uri1.includes('http://') || uri1.includes('https://')) && (uri2.includes('http://') || uri2.includes('https://'))
-    };
-    return match.scheme && match.hostname && match.port && match.absolute;
-  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.nextYear = nextYear;
+exports.nextMonth = nextMonth;
+exports.nextHour = nextHour;
+exports.updateQueryStringParameter = updateQueryStringParameter;
+exports.isLaterVersion = isLaterVersion;
+exports.hexStringToECPair = hexStringToECPair;
+exports.ecPairToHexString = ecPairToHexString;
+exports.ecPairToAddress = ecPairToAddress;
+exports.makeUUID4 = makeUUID4;
+exports.isSameOriginAbsoluteUrl = isSameOriginAbsoluteUrl;
+exports.BLOCKSTACK_HANDLER = void 0;
+
+var _url = _interopRequireDefault(require("url"));
+
+var _bitcoinjsLib = require("bitcoinjs-lib");
+
+var _config = require("./config");
+
+var BLOCKSTACK_HANDLER = 'blockstack';
+/**
+ * Time
+ * @private
+ */
+
+exports.BLOCKSTACK_HANDLER = BLOCKSTACK_HANDLER;
+
+function nextYear() {
+  return new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+}
+
+function nextMonth() {
+  return new Date(new Date().setMonth(new Date().getMonth() + 1));
+}
+
+function nextHour() {
+  return new Date(new Date().setHours(new Date().getHours() + 1));
+}
+/**
+ * Query Strings
+ * @private
+ */
+
+
+function updateQueryStringParameter(uri, key, value) {
+  var re = new RegExp("([?&])".concat(key, "=.*?(&|$)"), 'i');
+  var separator = uri.indexOf('?') !== -1 ? '&' : '?';
+
+  if (uri.match(re)) {
+    return uri.replace(re, "$1".concat(key, "=").concat(value, "$2"));
+  } else {
+    return "".concat(uri).concat(separator).concat(key, "=").concat(value);
+  }
+}
+/**
+ * Versioning
+ * @param {string} v1 - the left half of the version inequality
+ * @param {string} v2 - right half of the version inequality
+ * @returns {bool} iff v1 >= v2
+ * @private
+ */
+
+
+function isLaterVersion(v1, v2) {
+  if (v1 === undefined) {
+    v1 = '0.0.0';
+  }
+
+  if (v2 === undefined) {
+    v2 = '0.0.0';
+  }
+
+  var v1tuple = v1.split('.').map(function (x) {
+    return parseInt(x, 10);
+  });
+  var v2tuple = v2.split('.').map(function (x) {
+    return parseInt(x, 10);
+  });
+
+  for (var index = 0; index < v2.length; index++) {
+    if (index >= v1.length) {
+      v2tuple.push(0);
+    }
+
+    if (v1tuple[index] < v2tuple[index]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function hexStringToECPair(skHex) {
+  var ecPairOptions = {
+    network: _config.config.network.layer1,
+    compressed: true
+  };
+
+  if (skHex.length === 66) {
+    if (skHex.slice(64) !== '01') {
+      throw new Error('Improperly formatted private-key hex string. 66-length hex usually ' + 'indicates compressed key, but last byte must be == 1');
+    }
+
+    return _bitcoinjsLib.ECPair.fromPrivateKey(new Buffer(skHex.slice(0, 64), 'hex'), ecPairOptions);
+  } else if (skHex.length === 64) {
+    ecPairOptions.compressed = false;
+    return _bitcoinjsLib.ECPair.fromPrivateKey(new Buffer(skHex, 'hex'), ecPairOptions);
+  } else {
+    throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.');
+  }
+}
+
+function ecPairToHexString(secretKey) {
+  var ecPointHex = secretKey.privateKey.toString('hex');
+
+  if (secretKey.compressed) {
+    return "".concat(ecPointHex, "01");
+  } else {
+    return ecPointHex;
+  }
+}
+
+function ecPairToAddress(keyPair) {
+  return _bitcoinjsLib.address.toBase58Check(_bitcoinjsLib.crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash);
+}
+/**
+ * UUIDs
+ * @private
+ */
+
+
+function makeUUID4() {
+  var d = new Date().getTime();
+
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+    d += performance.now(); // use high-precision timer if available
+  }
+
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (d + Math.random() * 16) % 16 | 0;
+    d = Math.floor(d / 16);
+    return (c === 'x' ? r : r & 0x3 | 0x8).toString(16);
+  });
+}
+/**
+ * Checks if both urls pass the same origin check & are absolute
+ * @param  {[type]}  uri1 first uri to check
+ * @param  {[type]}  uri2 second uri to check
+ * @return {Boolean} true if they pass the same origin check
+ * @private
+ */
+
+
+function isSameOriginAbsoluteUrl(uri1, uri2) {
+  var parsedUri1 = _url.default.parse(uri1);
+
+  var parsedUri2 = _url.default.parse(uri2);
+
+  var port1 = parseInt(parsedUri1.port, 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80);
+  var port2 = parseInt(parsedUri2.port, 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80);
+  var match = {
+    scheme: parsedUri1.protocol === parsedUri2.protocol,
+    hostname: parsedUri1.hostname === parsedUri2.hostname,
+    port: port1 === port2,
+    absolute: (uri1.includes('http://') || uri1.includes('https://')) && (uri2.includes('http://') || uri2.includes('https://'))
+  };
+  return match.scheme && match.hostname && match.port && match.absolute;
+}
 
 }).call(this,require("buffer").Buffer)
 },{"./config":513,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73,"buffer":149,"url":489}],552:[function(require,module,exports){
-(function (global, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(["exports", "@babel/runtime/regenerator", "@babel/runtime/helpers/asyncToGenerator", "@babel/runtime/helpers/classCallCheck", "@babel/runtime/helpers/createClass", "@babel/runtime/helpers/defineProperty", "crypto", "bitcoinjs-lib", "bip39", "bip32", "./utils", "./encryption"], factory);
-  } else if (typeof exports !== "undefined") {
-    factory(exports, require("@babel/runtime/regenerator"), require("@babel/runtime/helpers/asyncToGenerator"), require("@babel/runtime/helpers/classCallCheck"), require("@babel/runtime/helpers/createClass"), require("@babel/runtime/helpers/defineProperty"), require("crypto"), require("bitcoinjs-lib"), require("bip39"), require("bip32"), require("./utils"), require("./encryption"));
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, global.regenerator, global.asyncToGenerator, global.classCallCheck, global.createClass, global.defineProperty, global.crypto, global.bitcoinjsLib, global.bip39, global.bip32, global.utils, global.encryption);
-    global.wallet = mod.exports;
-  }
-})(this, function (_exports, _regenerator, _asyncToGenerator2, _classCallCheck2, _createClass2, _defineProperty2, _crypto, _bitcoinjsLib, _bip, _bip2, _utils, _encryption) {
-  "use strict";
+"use strict";
 
-  var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard");
+var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard");
 
-  var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.BlockstackWallet = void 0;
-  _regenerator = _interopRequireDefault(_regenerator);
-  _asyncToGenerator2 = _interopRequireDefault(_asyncToGenerator2);
-  _classCallCheck2 = _interopRequireDefault(_classCallCheck2);
-  _createClass2 = _interopRequireDefault(_createClass2);
-  _defineProperty2 = _interopRequireDefault(_defineProperty2);
-  _crypto = _interopRequireWildcard(_crypto);
-  _bitcoinjsLib = _interopRequireWildcard(_bitcoinjsLib);
-  _bip = _interopRequireDefault(_bip);
-  _bip2 = _interopRequireDefault(_bip2);
-  var APPS_NODE_INDEX = 0;
-  var IDENTITY_KEYCHAIN = 888;
-  var BLOCKSTACK_ON_BITCOIN = 0;
-  var BITCOIN_BIP_44_PURPOSE = 44;
-  var BITCOIN_COIN_TYPE = 0;
-  var BITCOIN_ACCOUNT_INDEX = 0;
-  var EXTERNAL_ADDRESS = 'EXTERNAL_ADDRESS';
-  var CHANGE_ADDRESS = 'CHANGE_ADDRESS';
-
-  function hashCode(string) {
-    var hash = 0;
-    if (string.length === 0) return hash;
-
-    for (var i = 0; i < string.length; i++) {
-      var character = string.charCodeAt(i);
-      hash = (hash << 5) - hash + character;
-      hash &= hash;
-    }
-
-    return hash & 0x7fffffff;
-  }
-
-  function getNodePrivateKey(node) {
-    return (0, _utils.ecPairToHexString)(_bitcoinjsLib.ECPair.fromPrivateKey(node.privateKey));
-  }
-
-  function getNodePublicKey(node) {
-    return node.publicKey.toString('hex');
-  }
-  /**
-   * The BlockstackWallet class manages the hierarchical derivation
-   *  paths for a standard blockstack client wallet. This includes paths
-   *  for bitcoin payment address, blockstack identity addresses, blockstack
-   *  application specific addresses.
-   *  @private
-   */
-
-
-  var BlockstackWallet =
-  /*#__PURE__*/
-  function () {
-    function BlockstackWallet(rootNode) {
-      (0, _classCallCheck2.default)(this, BlockstackWallet);
-      (0, _defineProperty2.default)(this, "rootNode", void 0);
-      this.rootNode = rootNode;
-    }
-
-    (0, _createClass2.default)(BlockstackWallet, [{
-      key: "toBase58",
-      value: function toBase58() {
-        return this.rootNode.toBase58();
-      }
-      /**
-       * Initialize a blockstack wallet from a seed buffer
-       * @param {Buffer} seed - the input seed for initializing the root node
-       *  of the hierarchical wallet
-       * @return {BlockstackWallet} the constructed wallet
-       */
-
-    }, {
-      key: "getIdentityPrivateKeychain",
-      value: function getIdentityPrivateKeychain() {
-        return this.rootNode.deriveHardened(IDENTITY_KEYCHAIN).deriveHardened(BLOCKSTACK_ON_BITCOIN);
-      }
-    }, {
-      key: "getBitcoinPrivateKeychain",
-      value: function getBitcoinPrivateKeychain() {
-        return this.rootNode.deriveHardened(BITCOIN_BIP_44_PURPOSE).deriveHardened(BITCOIN_COIN_TYPE).deriveHardened(BITCOIN_ACCOUNT_INDEX);
-      }
-    }, {
-      key: "getBitcoinNode",
-      value: function getBitcoinNode(addressIndex) {
-        var chainType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : EXTERNAL_ADDRESS;
-        return BlockstackWallet.getNodeFromBitcoinKeychain(this.getBitcoinPrivateKeychain().toBase58(), addressIndex, chainType);
-      }
-    }, {
-      key: "getIdentityAddressNode",
-      value: function getIdentityAddressNode(identityIndex) {
-        var identityPrivateKeychain = this.getIdentityPrivateKeychain();
-        return identityPrivateKeychain.deriveHardened(identityIndex);
-      }
-    }, {
-      key: "getIdentitySalt",
-
-      /**
-       * Get a salt for use with creating application specific addresses
-       * @return {String} the salt
-       */
-      value: function getIdentitySalt() {
-        var identityPrivateKeychain = this.getIdentityPrivateKeychain();
-        var publicKeyHex = getNodePublicKey(identityPrivateKeychain);
-        return _crypto.default.createHash('sha256').update(publicKeyHex).digest('hex');
-      }
-      /**
-       * Get a bitcoin receive address at a given index
-       * @param {number} addressIndex - the index of the address
-       * @return {String} address
-       */
-
-    }, {
-      key: "getBitcoinAddress",
-      value: function getBitcoinAddress(addressIndex) {
-        return BlockstackWallet.getAddressFromBIP32Node(this.getBitcoinNode(addressIndex));
-      }
-      /**
-       * Get the private key hex-string for a given bitcoin receive address
-       * @param {number} addressIndex - the index of the address
-       * @return {String} the hex-string. this will be either 64
-       * characters long to denote an uncompressed bitcoin address, or 66
-       * characters long for a compressed bitcoin address.
-       */
-
-    }, {
-      key: "getBitcoinPrivateKey",
-      value: function getBitcoinPrivateKey(addressIndex) {
-        return getNodePrivateKey(this.getBitcoinNode(addressIndex));
-      }
-      /**
-       * Get the root node for the bitcoin public keychain
-       * @return {String} base58-encoding of the public node
-       */
-
-    }, {
-      key: "getBitcoinPublicKeychain",
-      value: function getBitcoinPublicKeychain() {
-        return this.getBitcoinPrivateKeychain().neutered();
-      }
-      /**
-       * Get the root node for the identity public keychain
-       * @return {String} base58-encoding of the public node
-       */
-
-    }, {
-      key: "getIdentityPublicKeychain",
-      value: function getIdentityPublicKeychain() {
-        return this.getIdentityPrivateKeychain().neutered();
-      }
-    }, {
-      key: "getIdentityKeyPair",
-
-      /**
-       * Get the keypair information for a given identity index. This
-       * information is used to obtain the private key for an identity address
-       * and derive application specific keys for that address.
-       * @param {number} addressIndex - the identity index
-       * @param {boolean} alwaysUncompressed - if true, always return a
-       *   private-key hex string corresponding to the uncompressed address
-       * @return {Object} an IdentityKeyPair type object with keys:
-       *   .key {String} - the private key hex-string
-       *   .keyID {String} - the public key hex-string
-       *   .address {String} - the identity address
-       *   .appsNodeKey {String} - the base-58 encoding of the applications node
-       *   .salt {String} - the salt used for creating app-specific addresses
-       */
-      value: function getIdentityKeyPair(addressIndex) {
-        var alwaysUncompressed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-        var identityNode = this.getIdentityAddressNode(addressIndex);
-        var address = BlockstackWallet.getAddressFromBIP32Node(identityNode);
-        var identityKey = getNodePrivateKey(identityNode);
-
-        if (alwaysUncompressed && identityKey.length === 66) {
-          identityKey = identityKey.slice(0, 64);
-        }
-
-        var identityKeyID = getNodePublicKey(identityNode);
-        var appsNodeKey = BlockstackWallet.getAppsNode(identityNode).toBase58();
-        var salt = this.getIdentitySalt();
-        var keyPair = {
-          key: identityKey,
-          keyID: identityKeyID,
-          address: address,
-          appsNodeKey: appsNodeKey,
-          salt: salt
-        };
-        return keyPair;
-      }
-    }], [{
-      key: "fromSeedBuffer",
-      value: function fromSeedBuffer(seed) {
-        return new BlockstackWallet(_bip2.default.fromSeed(seed));
-      }
-      /**
-       * Initialize a blockstack wallet from a base58 string
-       * @param {string} keychain - the Base58 string used to initialize
-       *  the root node of the hierarchical wallet
-       * @return {BlockstackWallet} the constructed wallet
-       */
-
-    }, {
-      key: "fromBase58",
-      value: function fromBase58(keychain) {
-        return new BlockstackWallet(_bip2.default.fromBase58(keychain));
-      }
-      /**
-       * Initialize a blockstack wallet from an encrypted phrase & password. Throws
-       * if the password is incorrect. Supports all formats of Blockstack phrases.
-       * @param {string} data - The encrypted phrase as a hex-encoded string
-       * @param {string} password - The plain password
-       * @return {Promise<BlockstackWallet>} the constructed wallet
-       */
-
-    }, {
-      key: "fromEncryptedMnemonic",
-      value: function fromEncryptedMnemonic(data, password) {
-        return (0, _encryption.decryptMnemonic)(data, password).then(function (mnemonic) {
-          var seed = _bip.default.mnemonicToSeed(mnemonic);
-
-          return new BlockstackWallet(_bip2.default.fromSeed(seed));
-        }).catch(function (err) {
-          if (err.message && err.message.startsWith('bad header;')) {
-            throw new Error('Incorrect password');
-          } else {
-            throw err;
-          }
-        });
-      }
-      /**
-       * Generate a BIP-39 12 word mnemonic
-       * @return {Promise<string>} space-separated 12 word phrase
-       */
-
-    }, {
-      key: "generateMnemonic",
-      value: function generateMnemonic() {
-        return _bip.default.generateMnemonic(128, _crypto.randomBytes);
-      }
-      /**
-       * Encrypt a mnemonic phrase with a password
-       * @param {string} mnemonic - Raw mnemonic phrase
-       * @param {string} password - Password to encrypt mnemonic with
-       * @return {Promise<string>} Hex-encoded encrypted mnemonic
-       */
-
-    }, {
-      key: "encryptMnemonic",
-      value: function () {
-        var _encryptMnemonic2 = (0, _asyncToGenerator2.default)(
-        /*#__PURE__*/
-        _regenerator.default.mark(function _callee(mnemonic, password) {
-          var encryptedBuffer;
-          return _regenerator.default.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  _context.next = 2;
-                  return (0, _encryption.encryptMnemonic)(mnemonic, password);
-
-                case 2:
-                  encryptedBuffer = _context.sent;
-                  return _context.abrupt("return", encryptedBuffer.toString('hex'));
-
-                case 4:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        function encryptMnemonic(_x, _x2) {
-          return _encryptMnemonic2.apply(this, arguments);
-        }
-
-        return encryptMnemonic;
-      }()
-    }, {
-      key: "getAppsNode",
-      value: function getAppsNode(identityNode) {
-        return identityNode.deriveHardened(APPS_NODE_INDEX);
-      }
-    }, {
-      key: "getNodeFromBitcoinKeychain",
-      value: function getNodeFromBitcoinKeychain(keychainBase58, addressIndex) {
-        var chainType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : EXTERNAL_ADDRESS;
-        var chain;
-
-        if (chainType === EXTERNAL_ADDRESS) {
-          chain = 0;
-        } else if (chainType === CHANGE_ADDRESS) {
-          chain = 1;
-        } else {
-          throw new Error('Invalid chain type');
-        }
-
-        var keychain = _bip2.default.fromBase58(keychainBase58);
-
-        return keychain.derive(chain).derive(addressIndex);
-      }
-      /**
-       * Get a bitcoin address given a base-58 encoded bitcoin node
-       * (usually called the account node)
-       * @param {String} keychainBase58 - base58-encoding of the node
-       * @param {number} addressIndex - index of the address to get
-       * @param {String} chainType - either 'EXTERNAL_ADDRESS' (for a
-       * "receive" address) or 'CHANGE_ADDRESS'
-       * @return {String} the address
-       */
-
-    }, {
-      key: "getAddressFromBitcoinKeychain",
-      value: function getAddressFromBitcoinKeychain(keychainBase58, addressIndex) {
-        var chainType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : EXTERNAL_ADDRESS;
-        return BlockstackWallet.getAddressFromBIP32Node(BlockstackWallet.getNodeFromBitcoinKeychain(keychainBase58, addressIndex, chainType));
-      }
-      /**
-       * Get a ECDSA private key hex-string for an application-specific
-       *  address.
-       * @param {String} appsNodeKey - the base58-encoded private key for
-       * applications node (the `appsNodeKey` return in getIdentityKeyPair())
-       * @param {String} salt - a string, used to salt the
-       * application-specific addresses
-       * @param {String} appDomain - the appDomain to generate a key for
-       * @return {String} the private key hex-string. this will be a 64
-       * character string
-       */
-
-    }, {
-      key: "getLegacyAppPrivateKey",
-      value: function getLegacyAppPrivateKey(appsNodeKey, salt, appDomain) {
-        var hash = _crypto.default.createHash('sha256').update("".concat(appDomain).concat(salt)).digest('hex');
-
-        var appIndex = hashCode(hash);
-
-        var appNode = _bip2.default.fromBase58(appsNodeKey).deriveHardened(appIndex);
-
-        return getNodePrivateKey(appNode).slice(0, 64);
-      }
-    }, {
-      key: "getAddressFromBIP32Node",
-      value: function getAddressFromBIP32Node(node) {
-        return _bitcoinjsLib.default.payments.p2pkh({
-          pubkey: node.publicKey
-        }).address;
-      }
-      /**
-       * Get a ECDSA private key hex-string for an application-specific
-       *  address.
-       * @param {String} appsNodeKey - the base58-encoded private key for
-       * applications node (the `appsNodeKey` return in getIdentityKeyPair())
-       * @param {String} salt - a string, used to salt the
-       * application-specific addresses
-       * @param {String} appDomain - the appDomain to generate a key for
-       * @return {String} the private key hex-string. this will be a 64
-       * character string
-       */
-
-    }, {
-      key: "getAppPrivateKey",
-      value: function getAppPrivateKey(appsNodeKey, salt, appDomain) {
-        var hash = _crypto.default.createHash('sha256').update("".concat(appDomain).concat(salt)).digest('hex');
-
-        var appIndexHexes = []; // note: there's hardcoded numbers here, precisely because I want this
-        //   code to be very specific to the derivation paths we expect.
-
-        if (hash.length !== 64) {
-          throw new Error("Unexpected app-domain hash length of ".concat(hash.length));
-        }
-
-        for (var i = 0; i < 11; i++) {
-          // split the hash into 3-byte chunks
-          // because child nodes can only be up to 2^31,
-          // and we shouldn't deal in partial bytes.
-          appIndexHexes.push(hash.slice(i * 6, i * 6 + 6));
-        }
-
-        var appNode = _bip2.default.fromBase58(appsNodeKey);
-
-        appIndexHexes.forEach(function (hex) {
-          if (hex.length > 6) {
-            throw new Error('Invalid hex string length');
-          }
-
-          appNode = appNode.deriveHardened(parseInt(hex, 16));
-        });
-        return getNodePrivateKey(appNode).slice(0, 64);
-      }
-    }]);
-    return BlockstackWallet;
-  }();
-
-  _exports.BlockstackWallet = BlockstackWallet;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
+exports.BlockstackWallet = void 0;
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _crypto = _interopRequireWildcard(require("crypto"));
+
+var _bitcoinjsLib = _interopRequireWildcard(require("bitcoinjs-lib"));
+
+var _bip = _interopRequireDefault(require("bip39"));
+
+var _bip2 = _interopRequireDefault(require("bip32"));
+
+var _utils = require("./utils");
+
+var _encryption = require("./encryption");
+
+var APPS_NODE_INDEX = 0;
+var IDENTITY_KEYCHAIN = 888;
+var BLOCKSTACK_ON_BITCOIN = 0;
+var BITCOIN_BIP_44_PURPOSE = 44;
+var BITCOIN_COIN_TYPE = 0;
+var BITCOIN_ACCOUNT_INDEX = 0;
+var EXTERNAL_ADDRESS = 'EXTERNAL_ADDRESS';
+var CHANGE_ADDRESS = 'CHANGE_ADDRESS';
+
+function hashCode(string) {
+  var hash = 0;
+  if (string.length === 0) return hash;
+
+  for (var i = 0; i < string.length; i++) {
+    var character = string.charCodeAt(i);
+    hash = (hash << 5) - hash + character;
+    hash &= hash;
+  }
+
+  return hash & 0x7fffffff;
+}
+
+function getNodePrivateKey(node) {
+  return (0, _utils.ecPairToHexString)(_bitcoinjsLib.ECPair.fromPrivateKey(node.privateKey));
+}
+
+function getNodePublicKey(node) {
+  return node.publicKey.toString('hex');
+}
+/**
+ * The BlockstackWallet class manages the hierarchical derivation
+ *  paths for a standard blockstack client wallet. This includes paths
+ *  for bitcoin payment address, blockstack identity addresses, blockstack
+ *  application specific addresses.
+ *  @private
+ */
+
+
+var BlockstackWallet =
+/*#__PURE__*/
+function () {
+  function BlockstackWallet(rootNode) {
+    (0, _classCallCheck2.default)(this, BlockstackWallet);
+    (0, _defineProperty2.default)(this, "rootNode", void 0);
+    this.rootNode = rootNode;
+  }
+
+  (0, _createClass2.default)(BlockstackWallet, [{
+    key: "toBase58",
+    value: function toBase58() {
+      return this.rootNode.toBase58();
+    }
+    /**
+     * Initialize a blockstack wallet from a seed buffer
+     * @param {Buffer} seed - the input seed for initializing the root node
+     *  of the hierarchical wallet
+     * @return {BlockstackWallet} the constructed wallet
+     */
+
+  }, {
+    key: "getIdentityPrivateKeychain",
+    value: function getIdentityPrivateKeychain() {
+      return this.rootNode.deriveHardened(IDENTITY_KEYCHAIN).deriveHardened(BLOCKSTACK_ON_BITCOIN);
+    }
+  }, {
+    key: "getBitcoinPrivateKeychain",
+    value: function getBitcoinPrivateKeychain() {
+      return this.rootNode.deriveHardened(BITCOIN_BIP_44_PURPOSE).deriveHardened(BITCOIN_COIN_TYPE).deriveHardened(BITCOIN_ACCOUNT_INDEX);
+    }
+  }, {
+    key: "getBitcoinNode",
+    value: function getBitcoinNode(addressIndex) {
+      var chainType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : EXTERNAL_ADDRESS;
+      return BlockstackWallet.getNodeFromBitcoinKeychain(this.getBitcoinPrivateKeychain().toBase58(), addressIndex, chainType);
+    }
+  }, {
+    key: "getIdentityAddressNode",
+    value: function getIdentityAddressNode(identityIndex) {
+      var identityPrivateKeychain = this.getIdentityPrivateKeychain();
+      return identityPrivateKeychain.deriveHardened(identityIndex);
+    }
+  }, {
+    key: "getIdentitySalt",
+
+    /**
+     * Get a salt for use with creating application specific addresses
+     * @return {String} the salt
+     */
+    value: function getIdentitySalt() {
+      var identityPrivateKeychain = this.getIdentityPrivateKeychain();
+      var publicKeyHex = getNodePublicKey(identityPrivateKeychain);
+      return _crypto.default.createHash('sha256').update(publicKeyHex).digest('hex');
+    }
+    /**
+     * Get a bitcoin receive address at a given index
+     * @param {number} addressIndex - the index of the address
+     * @return {String} address
+     */
+
+  }, {
+    key: "getBitcoinAddress",
+    value: function getBitcoinAddress(addressIndex) {
+      return BlockstackWallet.getAddressFromBIP32Node(this.getBitcoinNode(addressIndex));
+    }
+    /**
+     * Get the private key hex-string for a given bitcoin receive address
+     * @param {number} addressIndex - the index of the address
+     * @return {String} the hex-string. this will be either 64
+     * characters long to denote an uncompressed bitcoin address, or 66
+     * characters long for a compressed bitcoin address.
+     */
+
+  }, {
+    key: "getBitcoinPrivateKey",
+    value: function getBitcoinPrivateKey(addressIndex) {
+      return getNodePrivateKey(this.getBitcoinNode(addressIndex));
+    }
+    /**
+     * Get the root node for the bitcoin public keychain
+     * @return {String} base58-encoding of the public node
+     */
+
+  }, {
+    key: "getBitcoinPublicKeychain",
+    value: function getBitcoinPublicKeychain() {
+      return this.getBitcoinPrivateKeychain().neutered();
+    }
+    /**
+     * Get the root node for the identity public keychain
+     * @return {String} base58-encoding of the public node
+     */
+
+  }, {
+    key: "getIdentityPublicKeychain",
+    value: function getIdentityPublicKeychain() {
+      return this.getIdentityPrivateKeychain().neutered();
+    }
+  }, {
+    key: "getIdentityKeyPair",
+
+    /**
+     * Get the keypair information for a given identity index. This
+     * information is used to obtain the private key for an identity address
+     * and derive application specific keys for that address.
+     * @param {number} addressIndex - the identity index
+     * @param {boolean} alwaysUncompressed - if true, always return a
+     *   private-key hex string corresponding to the uncompressed address
+     * @return {Object} an IdentityKeyPair type object with keys:
+     *   .key {String} - the private key hex-string
+     *   .keyID {String} - the public key hex-string
+     *   .address {String} - the identity address
+     *   .appsNodeKey {String} - the base-58 encoding of the applications node
+     *   .salt {String} - the salt used for creating app-specific addresses
+     */
+    value: function getIdentityKeyPair(addressIndex) {
+      var alwaysUncompressed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var identityNode = this.getIdentityAddressNode(addressIndex);
+      var address = BlockstackWallet.getAddressFromBIP32Node(identityNode);
+      var identityKey = getNodePrivateKey(identityNode);
+
+      if (alwaysUncompressed && identityKey.length === 66) {
+        identityKey = identityKey.slice(0, 64);
+      }
+
+      var identityKeyID = getNodePublicKey(identityNode);
+      var appsNodeKey = BlockstackWallet.getAppsNode(identityNode).toBase58();
+      var salt = this.getIdentitySalt();
+      var keyPair = {
+        key: identityKey,
+        keyID: identityKeyID,
+        address: address,
+        appsNodeKey: appsNodeKey,
+        salt: salt
+      };
+      return keyPair;
+    }
+  }], [{
+    key: "fromSeedBuffer",
+    value: function fromSeedBuffer(seed) {
+      return new BlockstackWallet(_bip2.default.fromSeed(seed));
+    }
+    /**
+     * Initialize a blockstack wallet from a base58 string
+     * @param {string} keychain - the Base58 string used to initialize
+     *  the root node of the hierarchical wallet
+     * @return {BlockstackWallet} the constructed wallet
+     */
+
+  }, {
+    key: "fromBase58",
+    value: function fromBase58(keychain) {
+      return new BlockstackWallet(_bip2.default.fromBase58(keychain));
+    }
+    /**
+     * Initialize a blockstack wallet from an encrypted phrase & password. Throws
+     * if the password is incorrect. Supports all formats of Blockstack phrases.
+     * @param {string} data - The encrypted phrase as a hex-encoded string
+     * @param {string} password - The plain password
+     * @return {Promise<BlockstackWallet>} the constructed wallet
+     */
+
+  }, {
+    key: "fromEncryptedMnemonic",
+    value: function fromEncryptedMnemonic(data, password) {
+      return (0, _encryption.decryptMnemonic)(data, password).then(function (mnemonic) {
+        var seed = _bip.default.mnemonicToSeed(mnemonic);
+
+        return new BlockstackWallet(_bip2.default.fromSeed(seed));
+      }).catch(function (err) {
+        if (err.message && err.message.startsWith('bad header;')) {
+          throw new Error('Incorrect password');
+        } else {
+          throw err;
+        }
+      });
+    }
+    /**
+     * Generate a BIP-39 12 word mnemonic
+     * @return {Promise<string>} space-separated 12 word phrase
+     */
+
+  }, {
+    key: "generateMnemonic",
+    value: function generateMnemonic() {
+      return _bip.default.generateMnemonic(128, _crypto.randomBytes);
+    }
+    /**
+     * Encrypt a mnemonic phrase with a password
+     * @param {string} mnemonic - Raw mnemonic phrase
+     * @param {string} password - Password to encrypt mnemonic with
+     * @return {Promise<string>} Hex-encoded encrypted mnemonic
+     */
+
+  }, {
+    key: "encryptMnemonic",
+    value: function () {
+      var _encryptMnemonic2 = (0, _asyncToGenerator2.default)(
+      /*#__PURE__*/
+      _regenerator.default.mark(function _callee(mnemonic, password) {
+        var encryptedBuffer;
+        return _regenerator.default.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return (0, _encryption.encryptMnemonic)(mnemonic, password);
+
+              case 2:
+                encryptedBuffer = _context.sent;
+                return _context.abrupt("return", encryptedBuffer.toString('hex'));
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+
+      function encryptMnemonic(_x, _x2) {
+        return _encryptMnemonic2.apply(this, arguments);
+      }
+
+      return encryptMnemonic;
+    }()
+  }, {
+    key: "getAppsNode",
+    value: function getAppsNode(identityNode) {
+      return identityNode.deriveHardened(APPS_NODE_INDEX);
+    }
+  }, {
+    key: "getNodeFromBitcoinKeychain",
+    value: function getNodeFromBitcoinKeychain(keychainBase58, addressIndex) {
+      var chainType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : EXTERNAL_ADDRESS;
+      var chain;
+
+      if (chainType === EXTERNAL_ADDRESS) {
+        chain = 0;
+      } else if (chainType === CHANGE_ADDRESS) {
+        chain = 1;
+      } else {
+        throw new Error('Invalid chain type');
+      }
+
+      var keychain = _bip2.default.fromBase58(keychainBase58);
+
+      return keychain.derive(chain).derive(addressIndex);
+    }
+    /**
+     * Get a bitcoin address given a base-58 encoded bitcoin node
+     * (usually called the account node)
+     * @param {String} keychainBase58 - base58-encoding of the node
+     * @param {number} addressIndex - index of the address to get
+     * @param {String} chainType - either 'EXTERNAL_ADDRESS' (for a
+     * "receive" address) or 'CHANGE_ADDRESS'
+     * @return {String} the address
+     */
+
+  }, {
+    key: "getAddressFromBitcoinKeychain",
+    value: function getAddressFromBitcoinKeychain(keychainBase58, addressIndex) {
+      var chainType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : EXTERNAL_ADDRESS;
+      return BlockstackWallet.getAddressFromBIP32Node(BlockstackWallet.getNodeFromBitcoinKeychain(keychainBase58, addressIndex, chainType));
+    }
+    /**
+     * Get a ECDSA private key hex-string for an application-specific
+     *  address.
+     * @param {String} appsNodeKey - the base58-encoded private key for
+     * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+     * @param {String} salt - a string, used to salt the
+     * application-specific addresses
+     * @param {String} appDomain - the appDomain to generate a key for
+     * @return {String} the private key hex-string. this will be a 64
+     * character string
+     */
+
+  }, {
+    key: "getLegacyAppPrivateKey",
+    value: function getLegacyAppPrivateKey(appsNodeKey, salt, appDomain) {
+      var hash = _crypto.default.createHash('sha256').update("".concat(appDomain).concat(salt)).digest('hex');
+
+      var appIndex = hashCode(hash);
+
+      var appNode = _bip2.default.fromBase58(appsNodeKey).deriveHardened(appIndex);
+
+      return getNodePrivateKey(appNode).slice(0, 64);
+    }
+  }, {
+    key: "getAddressFromBIP32Node",
+    value: function getAddressFromBIP32Node(node) {
+      return _bitcoinjsLib.default.payments.p2pkh({
+        pubkey: node.publicKey
+      }).address;
+    }
+    /**
+     * Get a ECDSA private key hex-string for an application-specific
+     *  address.
+     * @param {String} appsNodeKey - the base58-encoded private key for
+     * applications node (the `appsNodeKey` return in getIdentityKeyPair())
+     * @param {String} salt - a string, used to salt the
+     * application-specific addresses
+     * @param {String} appDomain - the appDomain to generate a key for
+     * @return {String} the private key hex-string. this will be a 64
+     * character string
+     */
+
+  }, {
+    key: "getAppPrivateKey",
+    value: function getAppPrivateKey(appsNodeKey, salt, appDomain) {
+      var hash = _crypto.default.createHash('sha256').update("".concat(appDomain).concat(salt)).digest('hex');
+
+      var appIndexHexes = []; // note: there's hardcoded numbers here, precisely because I want this
+      //   code to be very specific to the derivation paths we expect.
+
+      if (hash.length !== 64) {
+        throw new Error("Unexpected app-domain hash length of ".concat(hash.length));
+      }
+
+      for (var i = 0; i < 11; i++) {
+        // split the hash into 3-byte chunks
+        // because child nodes can only be up to 2^31,
+        // and we shouldn't deal in partial bytes.
+        appIndexHexes.push(hash.slice(i * 6, i * 6 + 6));
+      }
+
+      var appNode = _bip2.default.fromBase58(appsNodeKey);
+
+      appIndexHexes.forEach(function (hex) {
+        if (hex.length > 6) {
+          throw new Error('Invalid hex string length');
+        }
+
+        appNode = appNode.deriveHardened(parseInt(hex, 16));
+      });
+      return getNodePrivateKey(appNode).slice(0, 64);
+    }
+  }]);
+  return BlockstackWallet;
+}();
+
+exports.BlockstackWallet = BlockstackWallet;
 
 },{"./encryption":515,"./utils":551,"@babel/runtime/helpers/asyncToGenerator":3,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/interopRequireWildcard":12,"@babel/runtime/regenerator":24,"bip32":54,"bip39":55,"bitcoinjs-lib":73,"crypto":169}]},{},[517])(517)
 });
