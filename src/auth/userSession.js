@@ -56,7 +56,7 @@ export class UserSession {
 
   store: SessionDataStore
 
-  constructor(options: {appConfig?: AppConfig,
+  constructor(options?: {appConfig?: AppConfig,
     sessionStore?: SessionDataStore,
     sessionOptions?: SessionOptions }) {
     let runningInBrowser = true

@@ -18,7 +18,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 
-import type { UserSession } from '../auth/userSession'
+import { UserSession } from '../auth/userSession'
 
 export type PutFileOptions = {
   encrypt?: boolean | string,
@@ -41,7 +41,7 @@ export function encryptContent(content: string | Buffer, options?: {publicKey?: 
   console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method encryptContent().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.encryptContent(content, options)
 }
 
@@ -58,7 +58,7 @@ export function decryptContent(content: string, options?: {privateKey?: ?string}
   console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method decryptContent().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.decryptContent(content, options)
 }
 
@@ -88,7 +88,7 @@ export function getFile(path: string, options?: {
   console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method getFile().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.getFile(path, options)
 }
 
@@ -113,7 +113,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
   console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method putFile().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.putFile(path, content, options)
 }
 
@@ -127,7 +127,7 @@ export function listFiles(callback: (name: string) => boolean) : Promise<number>
   console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method listFiles().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.listFiles(callback)
 }
 

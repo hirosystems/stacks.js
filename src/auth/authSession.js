@@ -67,43 +67,38 @@ export function sendCoreSessionRequest(coreHost: string,
                                        corePort: number,
                                        coreAuthRequest: string,
                                        apiPassword: string) {
-  return new Promise<string>((resolve, reject) => {
+  return Promise.resolve().then(() => {
     if (!apiPassword) {
-      reject('Missing API password')
-      return null
+      throw new Error('Missing API password')
     }
-
-    const options = {
-      headers: {
-        Authorization: `bearer ${apiPassword}`
-      }
-    }
-
-    const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
-
-    return fetch(url, options)
-      .then((response) => {
-        if (!response.ok) {
-          reject('HTTP status not OK')
-          throw new Error('HTTP status not OK')
-        }
-        return response.text()
-      })
-      .then(responseText => JSON.parse(responseText))
-      .then((responseJson) => {
-        const token = responseJson.token
-        if (!token) {
-          reject('Failed to get Core session token')
-          return null
-        }
-        resolve(token)
-        return token
-      })
-      .catch((error) => {
-        console.error(error)
-        reject('Invalid Core response: not JSON')
-      })
   })
+    .then(() => {
+      const options = {
+        headers: {
+          Authorization: `bearer ${apiPassword}`
+        }
+      }
+      const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
+      return fetch(url, options)
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('HTTP status not OK')
+      }
+      return response.text()
+    })
+    .then((responseText) => {
+      const responseJson = JSON.parse(responseText)
+      const token = responseJson.token
+      if (!token) {
+        throw new Error('Failed to get Core session token')
+      }
+      return token
+    })
+    .catch((error) => {
+      console.error(error)
+      throw new Error('Invalid Core response: not JSON')
+    })
 }
 
 
