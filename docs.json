@@ -5458,7 +5458,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
     },
     "augments": [],
     "examples": [],
@@ -5948,8 +5948,8 @@
             "column": 3
           }
         },
-        "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js",
-        "sortKey": "!/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js 00000069",
+        "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js",
+        "sortKey": "!/Users/matt/Projects/blockstack.js/src/auth/appConfig.js 00000069",
         "code": "{\n  /**\n   * Blockstack apps are uniquely identified by their app domain.\n   * @type {string}\n   */\n  appDomain: string\n\n  /**\n   * An array of string representing permissions requested by the app.\n   * @type {[Array<string>}\n   */\n  scopes: Array<string>\n\n\n  /**\n   * Path on app domain to redirect users to after authentication. The\n   * authentication response token will be postpended in a query.\n   * @type {string}\n   */\n  redirectPath: string\n\n  /**\n   * Path relative to app domain of app's manifest file.\n   *\n   * This file needs to have CORS headers set so that it can be fetched\n   * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.\n   * @type {string}\n   */\n  manifestPath: string\n\n  /**\n   * The URL of Blockstack core node to use for this app. If this is\n   * `null`, the core node specified by the user or default core node\n   * will be used.\n   * @type {string}\n   */\n  coreNode: string\n\n  /**\n   * The URL of a web-based Blockstack Authenticator to use in the event\n   * the user doesn't have Blockstack installed on their machine. If this\n   * is not specified, the current default in this library will be used.\n   * @type {string}\n   */\n  authenticatorURL: ?string\n\n  /**\n   * @param {Array<string>} scopes - permissions this app is requesting\n   * @param {string} appDomain - the app domain\n   * @param {string} redirectPath - path on app domain to redirect users to after authentication\n   * @param {string} manifestPath - path relative to app domain of app's manifest file\n   * @param {string} coreNode - override the default or user selected core node\n   * @param {string} authenticatorURL - the web-based fall back authenticator\n   */\n  constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),\n              appDomain: string = window.location.origin,\n              redirectPath: string = '',\n              manifestPath: string = '/manifest.json',\n              coreNode: ?string = null,\n              authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST) {\n    this.appDomain = appDomain\n    this.scopes = scopes\n    this.redirectPath = redirectPath\n    this.manifestPath = manifestPath\n\n    if (!coreNode) {\n      this.coreNode = DEFAULT_CORE_NODE\n    } else {\n      this.coreNode = coreNode\n    }\n\n    this.authenticatorURL = authenticatorURL\n  }\n\n  /**\n   * The location to which the authenticator should\n   * redirect the user.\n   * @returns {string} - URI\n   */\n  redirectURI() : string {\n    return `${this.appDomain}${this.redirectPath}`\n  }\n\n  /**\n   * The location of the app's manifest file.\n   * @returns {string} - URI\n   */\n  manifestURI() : string {\n    return `${this.appDomain}${this.manifestPath}`\n  }\n}"
       },
       "augments": [],
@@ -6441,7 +6441,7 @@
                 "column": 19
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -6564,7 +6564,7 @@
                 "column": 23
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -6700,7 +6700,7 @@
                 "column": 22
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -6896,7 +6896,7 @@
                 "column": 22
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -7060,7 +7060,7 @@
                 "column": 18
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -7189,7 +7189,7 @@
                 "column": 27
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -7316,7 +7316,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -7495,7 +7495,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/appConfig.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/appConfig.js"
           },
           "augments": [],
           "examples": [],
@@ -7760,7 +7760,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
     },
     "augments": [],
     "examples": [],
@@ -8140,7 +8140,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -8409,7 +8409,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -8637,7 +8637,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -8816,7 +8816,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -9012,7 +9012,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -9225,7 +9225,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -9503,7 +9503,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -9783,7 +9783,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -9962,7 +9962,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -10148,7 +10148,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -10617,7 +10617,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -11085,7 +11085,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -11687,7 +11687,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -12378,7 +12378,7 @@
                 "column": 3
               }
             },
-            "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/userSession.js"
+            "file": "/Users/matt/Projects/blockstack.js/src/auth/userSession.js"
           },
           "augments": [],
           "examples": [],
@@ -12697,7 +12697,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/sessionStore.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/sessionStore.js"
     },
     "augments": [],
     "examples": [],
@@ -12823,7 +12823,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/sessionStore.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/sessionStore.js"
     },
     "augments": [
       {
@@ -12954,7 +12954,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/sessionStore.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/sessionStore.js"
     },
     "augments": [
       {
@@ -13091,7 +13091,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -13544,7 +13544,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -14010,7 +14010,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -14510,7 +14510,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -15127,7 +15127,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -15401,7 +15401,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -15806,7 +15806,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -15992,7 +15992,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -18107,7 +18107,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -18493,7 +18493,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -18848,7 +18848,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -19482,7 +19482,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileTokens.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/profiles/profileTokens.js"
     },
     "augments": [],
     "examples": [],
@@ -19874,11 +19874,11 @@
           "column": 0
         },
         "end": {
-          "line": 56,
+          "line": 54,
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileProofs.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/profiles/profileProofs.js"
     },
     "augments": [],
     "examples": [],
@@ -20259,7 +20259,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/profiles/profileLookup.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/profiles/profileLookup.js"
     },
     "augments": [],
     "examples": [],
@@ -20696,7 +20696,7 @@
         {
           "type": "code",
           "lang": "JavaScript",
-          "value": " blockstack.putFile(\"/hello.txt\", \"hello world!\")\n .then(() => {\n    // /hello.txt exists now, and has the contents \"hello world!\".\n })",
+          "value": "let options = {\n  encrypt: false\n}\n blockstack.putFile(\"/hello.txt\", \"hello world!\", options)\n .then(() => {\n    // /hello.txt exists now, and has the contents \"hello world!\".\n })",
           "position": {
             "start": {
               "line": 12,
@@ -20704,11 +20704,14 @@
               "offset": 370
             },
             "end": {
-              "line": 17,
+              "line": 20,
               "column": 4,
-              "offset": 523
+              "offset": 567
             },
             "indent": [
+              1,
+              1,
+              1,
               1,
               1,
               1,
@@ -20726,14 +20729,14 @@
               "value": "Reading a file",
               "position": {
                 "start": {
-                  "line": 19,
+                  "line": 22,
                   "column": 4,
-                  "offset": 528
+                  "offset": 572
                 },
                 "end": {
-                  "line": 19,
+                  "line": 22,
                   "column": 18,
-                  "offset": 542
+                  "offset": 586
                 },
                 "indent": []
               }
@@ -20741,14 +20744,14 @@
           ],
           "position": {
             "start": {
-              "line": 19,
+              "line": 22,
               "column": 1,
-              "offset": 525
+              "offset": 569
             },
             "end": {
-              "line": 19,
+              "line": 22,
               "column": 18,
-              "offset": 542
+              "offset": 586
             },
             "indent": []
           }
@@ -20756,19 +20759,23 @@
         {
           "type": "code",
           "lang": "JavaScript",
-          "value": " blockstack.getFile(\"/hello.txt\")\n .then((fileContents) => {\n    // get the contents of the file /hello.txt\n    assert(fileContents === \"hello world!\")\n });",
+          "value": " let options = {\n   decrypt: false\n }\n \n blockstack.getFile(\"/hello.txt\", options)\n .then((fileContents) => {\n    // get the contents of the file /hello.txt\n    assert(fileContents === \"hello world!\")\n });",
           "position": {
             "start": {
-              "line": 21,
+              "line": 24,
               "column": 1,
-              "offset": 544
+              "offset": 588
             },
             "end": {
-              "line": 27,
+              "line": 34,
               "column": 4,
-              "offset": 718
+              "offset": 811
             },
             "indent": [
+              1,
+              1,
+              1,
+              1,
               1,
               1,
               1,
@@ -20787,14 +20794,14 @@
               "value": "Creating an encrypted file",
               "position": {
                 "start": {
-                  "line": 29,
+                  "line": 36,
                   "column": 4,
-                  "offset": 723
+                  "offset": 816
                 },
                 "end": {
-                  "line": 29,
+                  "line": 36,
                   "column": 30,
-                  "offset": 749
+                  "offset": 842
                 },
                 "indent": []
               }
@@ -20802,14 +20809,14 @@
           ],
           "position": {
             "start": {
-              "line": 29,
+              "line": 36,
               "column": 1,
-              "offset": 720
+              "offset": 813
             },
             "end": {
-              "line": 29,
+              "line": 36,
               "column": 30,
-              "offset": 749
+              "offset": 842
             },
             "indent": []
           }
@@ -20820,14 +20827,14 @@
           "value": " let options = {\n   encrypt: true\n }\n\n blockstack.putFile(\"/message.txt\", \"Secret hello!\", options)\n .then(() => {\n    // message.txt exists now, and has the contents \"hello world!\".\n })",
           "position": {
             "start": {
-              "line": 31,
+              "line": 38,
               "column": 1,
-              "offset": 751
+              "offset": 844
             },
             "end": {
-              "line": 40,
+              "line": 47,
               "column": 4,
-              "offset": 955
+              "offset": 1048
             },
             "indent": [
               1,
@@ -20851,14 +20858,14 @@
               "value": "Reading an encrypted file",
               "position": {
                 "start": {
-                  "line": 42,
+                  "line": 49,
                   "column": 4,
-                  "offset": 960
+                  "offset": 1053
                 },
                 "end": {
-                  "line": 42,
+                  "line": 49,
                   "column": 29,
-                  "offset": 985
+                  "offset": 1078
                 },
                 "indent": []
               }
@@ -20866,14 +20873,14 @@
           ],
           "position": {
             "start": {
-              "line": 42,
+              "line": 49,
               "column": 1,
-              "offset": 957
+              "offset": 1050
             },
             "end": {
-              "line": 42,
+              "line": 49,
               "column": 29,
-              "offset": 985
+              "offset": 1078
             },
             "indent": []
           }
@@ -20884,14 +20891,14 @@
           "value": " let options = {\n   decrypt: true\n }\n\n blockstack.getFile(\"/message.txt\", options)\n .then((fileContents) => {\n    // get & decrypt the contents of the file /message.txt\n    assert(fileContents === \"Secret hello!\")\n });",
           "position": {
             "start": {
-              "line": 44,
+              "line": 51,
               "column": 1,
-              "offset": 987
+              "offset": 1080
             },
             "end": {
-              "line": 54,
+              "line": 61,
               "column": 4,
-              "offset": 1223
+              "offset": 1316
             },
             "indent": [
               1,
@@ -20916,14 +20923,14 @@
               "value": "Reading another user's unencrypted file",
               "position": {
                 "start": {
-                  "line": 56,
+                  "line": 63,
                   "column": 4,
-                  "offset": 1228
+                  "offset": 1321
                 },
                 "end": {
-                  "line": 56,
+                  "line": 63,
                   "column": 43,
-                  "offset": 1267
+                  "offset": 1360
                 },
                 "indent": []
               }
@@ -20931,14 +20938,14 @@
           ],
           "position": {
             "start": {
-              "line": 56,
+              "line": 63,
               "column": 1,
-              "offset": 1225
+              "offset": 1318
             },
             "end": {
-              "line": 56,
+              "line": 63,
               "column": 43,
-              "offset": 1267
+              "offset": 1360
             },
             "indent": []
           }
@@ -20951,14 +20958,14 @@
               "value": "In order for files to be publicly readable, the app must request\nthe ",
               "position": {
                 "start": {
-                  "line": 57,
+                  "line": 64,
                   "column": 1,
-                  "offset": 1268
+                  "offset": 1361
                 },
                 "end": {
-                  "line": 58,
+                  "line": 65,
                   "column": 5,
-                  "offset": 1337
+                  "offset": 1430
                 },
                 "indent": [
                   1
@@ -20970,14 +20977,14 @@
               "value": "publish_data",
               "position": {
                 "start": {
-                  "line": 58,
+                  "line": 65,
                   "column": 5,
-                  "offset": 1337
+                  "offset": 1430
                 },
                 "end": {
-                  "line": 58,
+                  "line": 65,
                   "column": 19,
-                  "offset": 1351
+                  "offset": 1444
                 },
                 "indent": []
               }
@@ -20987,14 +20994,14 @@
               "value": " scope during authentication.",
               "position": {
                 "start": {
-                  "line": 58,
+                  "line": 65,
                   "column": 19,
-                  "offset": 1351
+                  "offset": 1444
                 },
                 "end": {
-                  "line": 58,
+                  "line": 65,
                   "column": 48,
-                  "offset": 1380
+                  "offset": 1473
                 },
                 "indent": []
               }
@@ -21002,14 +21009,14 @@
           ],
           "position": {
             "start": {
-              "line": 57,
+              "line": 64,
               "column": 1,
-              "offset": 1268
+              "offset": 1361
             },
             "end": {
-              "line": 58,
+              "line": 65,
               "column": 48,
-              "offset": 1380
+              "offset": 1473
             },
             "indent": [
               1
@@ -21022,14 +21029,14 @@
           "value": " let options = {\n   user: 'ryan.id', // the Blockstack ID of the user for which to lookup the file\n   app: 'http://BlockstackApp.com' // origin of the app this file is stored for\n }\n\n blockstack.getFile(\"/message.txt\", options)\n .then((fileContents) => {\n    // get the contents of the file /message.txt\n    assert(fileContents === \"hello world!\")\n });",
           "position": {
             "start": {
-              "line": 60,
+              "line": 67,
               "column": 1,
-              "offset": 1382
+              "offset": 1475
             },
             "end": {
-              "line": 71,
+              "line": 78,
               "column": 4,
-              "offset": 1752
+              "offset": 1845
             },
             "indent": [
               1,
@@ -21055,14 +21062,14 @@
               "value": "Deleting a file",
               "position": {
                 "start": {
-                  "line": 73,
+                  "line": 80,
                   "column": 4,
-                  "offset": 1757
+                  "offset": 1850
                 },
                 "end": {
-                  "line": 73,
+                  "line": 80,
                   "column": 19,
-                  "offset": 1772
+                  "offset": 1865
                 },
                 "indent": []
               }
@@ -21070,14 +21077,14 @@
           ],
           "position": {
             "start": {
-              "line": 73,
+              "line": 80,
               "column": 1,
-              "offset": 1754
+              "offset": 1847
             },
             "end": {
-              "line": 73,
+              "line": 80,
               "column": 19,
-              "offset": 1772
+              "offset": 1865
             },
             "indent": []
           }
@@ -21093,14 +21100,14 @@
                   "value": "Note: deleteFile is currently not implemented. For now, we recommend\nwriting an empty file to wipe data",
                   "position": {
                     "start": {
-                      "line": 75,
+                      "line": 82,
                       "column": 2,
-                      "offset": 1775
+                      "offset": 1868
                     },
                     "end": {
-                      "line": 76,
+                      "line": 83,
                       "column": 35,
-                      "offset": 1878
+                      "offset": 1971
                     },
                     "indent": [
                       1
@@ -21110,14 +21117,14 @@
               ],
               "position": {
                 "start": {
-                  "line": 75,
+                  "line": 82,
                   "column": 1,
-                  "offset": 1774
+                  "offset": 1867
                 },
                 "end": {
-                  "line": 76,
+                  "line": 83,
                   "column": 36,
-                  "offset": 1879
+                  "offset": 1972
                 },
                 "indent": [
                   1
@@ -21127,14 +21134,14 @@
           ],
           "position": {
             "start": {
-              "line": 75,
+              "line": 82,
               "column": 1,
-              "offset": 1774
+              "offset": 1867
             },
             "end": {
-              "line": 76,
+              "line": 83,
               "column": 36,
-              "offset": 1879
+              "offset": 1972
             },
             "indent": [
               1
@@ -21147,14 +21154,14 @@
           "value": " blockstack.deleteFile(\"/hello.txt\")\n .then(() => {\n    // /hello.txt is now removed.\n })",
           "position": {
             "start": {
-              "line": 78,
+              "line": 85,
               "column": 1,
-              "offset": 1881
+              "offset": 1974
             },
             "end": {
-              "line": 83,
+              "line": 90,
               "column": 4,
-              "offset": 1988
+              "offset": 2081
             },
             "indent": [
               1,
@@ -21173,9 +21180,9 @@
           "offset": 0
         },
         "end": {
-          "line": 84,
+          "line": 91,
           "column": 1,
-          "offset": 1989
+          "offset": 2082
         }
       }
     },
@@ -21300,7 +21307,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -21643,7 +21650,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -22153,7 +22160,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -22921,7 +22928,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -23539,7 +23546,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -24001,7 +24008,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -24392,7 +24399,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/storage/index.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/storage/index.js"
     },
     "augments": [],
     "examples": [],
@@ -24698,7 +24705,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -24921,7 +24928,7 @@
           "column": 1
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/auth/authApp.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/auth/authApp.js"
     },
     "augments": [],
     "examples": [],
@@ -25251,7 +25258,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -25508,7 +25515,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -25759,7 +25766,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -25944,7 +25951,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -26195,7 +26202,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -26446,7 +26453,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -26693,7 +26700,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -26944,7 +26951,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -27205,7 +27212,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -27527,7 +27534,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -27855,7 +27862,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -28167,7 +28174,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],
@@ -28432,7 +28439,7 @@
           "column": 3
         }
       },
-      "file": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/src/network.js"
+      "file": "/Users/matt/Projects/blockstack.js/src/network.js"
     },
     "augments": [],
     "examples": [],

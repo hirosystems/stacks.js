@@ -16,18 +16,14 @@ module.exports = function (api) {
       [
         "@babel/preset-env",
         {
-          "useBuiltIns": "usage"
+          "useBuiltIns": "entry",
+          "modules": "umd"
         }
       ]
     ],
     plugins: [
       "@babel/plugin-proposal-class-properties",
-      [
-        "@babel/plugin-transform-runtime",
-        {
-          "helpers": false
-        }
-      ]
+      "@babel/plugin-transform-runtime"
     ]
   };
 

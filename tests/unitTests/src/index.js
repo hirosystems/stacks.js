@@ -1,4 +1,3 @@
-// import '@babel/polyfill'
 import { runAuthTests }         from './unitTestsAuth'
 import { runProfilesUnitTests } from './unitTestsProfiles'
 import { runProofsUnitTests }   from './unitTestsProofs'

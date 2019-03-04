@@ -2,9 +2,10 @@
 // see https://github.com/blockstack/blockstack-core/tree/master/integration_tests
 
 import {
-  getCoreSession,
-  makeAuthRequest
-} from '../../../src'
+  getCoreSession
+} from '../../../src/auth'
+
+import { makeAuthRequest } from '../../../src/auth/authApp'
 
 const assert = require('assert')
 const jsontokens = require('jsontokens')

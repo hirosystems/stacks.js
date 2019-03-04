@@ -22,7 +22,7 @@ import {
   UserSession,
   AppConfig,
   config
-} from '../../../lib'
+} from '../../../src'
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
 
