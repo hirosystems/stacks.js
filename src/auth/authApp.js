@@ -15,7 +15,7 @@ import {
 
 import { extractProfile } from '../profiles'
 
-import type { UserSession } from './userSession'
+import { UserSession } from './userSession'
 import { config } from '../config'
 
 import { Logger } from '../logger'
@@ -34,7 +34,7 @@ export function isUserSignedIn() {
   console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method isUserSignedIn().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.isUserSignedIn()
 }
 
@@ -67,7 +67,7 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   userSession.redirectToSignIn()
 }
 /* eslint-enable no-unused-vars */
@@ -80,7 +80,7 @@ export function isSignInPending() {
   console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method isSignInPending().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.isSignInPending()
 }
 
@@ -105,7 +105,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
     + 'instance method handlePendingSignIn().')
   console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and '
     + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.handlePendingSignIn(authResponseToken)
 }
 /* eslint-enable no-unused-vars */
@@ -127,7 +127,7 @@ export function loadUserData() {
   console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method loadUserData().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.loadUserData()
 }
 
@@ -140,7 +140,7 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
   console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method signUserOut().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   userSession.signUserOut()
   window.location = redirectURL
 }
@@ -175,7 +175,7 @@ export function makeAuthRequest(transitPrivateKey: string,
                                 extraParams: Object = {}): string {
   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
     + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   const transitKey = (transitPrivateKey == null) 
     ? userSession.generateAndStoreTransitKey() : transitPrivateKey
 
@@ -571,7 +571,7 @@ export function redirectToSignInWithAuthRequest(authRequest: string,
   console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will '
     + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession '
     + 'and call the instance method redirectToSignInWithAuthRequest().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
 
   const sessionAuthRequest = (authRequest == null) 
     ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest
