@@ -9,7 +9,7 @@ import {
 
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
-} from '../encryption'
+} from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 import {
