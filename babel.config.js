@@ -13,12 +13,7 @@ module.exports = function (api) {
   let configBrowserify = {
     presets: [
       "@babel/preset-flow",
-      [
-        "@babel/preset-env",
-        {
-          "useBuiltIns": "entry"
-        }
-      ]
+      "@babel/preset-env"
     ],
     plugins: [
       "@babel/plugin-proposal-class-properties",
