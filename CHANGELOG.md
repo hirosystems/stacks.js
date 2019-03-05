@@ -4,7 +4,36 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [18.1.0] - 2018-10-024
+## [18.3.0] - 2018-01-29
+
+### Changed
+
+- New method for auth protocol handler detection. This should fix sign in flows for 
+most major web browsers and operating systems with both the native browser installed and
+not installed. 
+- NOTE: If you're using this version of blockstack.js with an old version of the native 
+browser, the app will (1) open an auth handler in the native browser and (2) also redirect 
+the original tab to browser.blockstack.org. 
+
+## [18.2.1] - 2018-01-08
+
+### Added
+
+- Added automatic retry logic to `putFile` in the case of a failed storage call. This might be
+the case if there have been any token revokations. This new logic will catch the first failed write,
+construct (and cache) a new Gaia token, and then attempt the write again. This allows tokens
+to be revoked without any hiccups from a user experience standpoint.
+
+## [18.2.0] - 2018-12-20
+
+### Added
+
+- Added an extra parameter to `makeAuthRequest`, called `extraParams`. This is a wildcard object, 
+and all keys and values included in this argument will be included in the `payload` of
+an `authRequest`.
+- `authRequest` version bumped to `1.3.1` from `1.3.0`.
+
+## [18.1.0] - 2018-10-24
 
 ### Added
 - The `BlockstackWallet` class in `blockstack.js` supports generating
@@ -28,6 +57,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug in version checking during the authentication process
   that manifested itself when signing in with apps using very old versions
   of blockstack.js.
+- Default redirect URI changed from origin plus trailing slash to the
+  origin. For example, app with origin `https://example.com` default
+  redirect URI which was previously `https://example.com/` is
+  now `https://example.com`.
 - Fixed a couple bugs in the transaction generation, networking
   code. First, coerce address now correctly coerces P2SH
   addresses. Second, bitcoinjs-lib recently switched to defaulting to

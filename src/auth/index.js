@@ -1,11 +1,9 @@
 export {
-  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
-  getAuthResponseToken, isSignInPending,
-  handlePendingSignIn, loadUserData, signUserOut,
-  generateAndStoreTransitKey, getTransitKey
-} from './authApp'
+  AppConfig
+} from './appConfig'
+
 export {
-  makeAuthRequest, makeAuthResponse
+  makeAuthResponse
 } from './authMessages'
 export {
   getAuthRequestFromURL, fetchAppManifest, redirectUserToApp
@@ -19,3 +17,7 @@ export {
   doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
   isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
 } from './authVerification'
+export {
+  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
+  isSignInPending, handlePendingSignIn, loadUserData, signUserOut
+} from './authApp'

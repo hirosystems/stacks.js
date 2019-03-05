@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "18.1.0",
+  "version": "19.0.0-alpha.5",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "scripts": {
@@ -86,7 +86,7 @@
     "babel-preset-flow": "^6.23.0",
     "blue-tape": "^1.0.0",
     "browserify": "^13.1.1",
-    "documentation": "^8.0.0",
+    "documentation": "^9.0.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-plugin-flowtype": "^2.46.3",
@@ -114,7 +114,6 @@
     "bitcoinjs-lib": "^4",
     "cheerio": "^0.22.0",
     "cross-fetch": "^2.2.2",
-    "custom-protocol-detection-blockstack": "1.1.4",
     "ecurve": "^1.0.6",
     "elliptic": "^6.4.0",
     "es6-promise": "^4.2.4",
