@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+      "target": "es2018",
+      "module": "umd",
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "declaration": true,
+      "noImplicitAny": false,
+      "strictNullChecks": false,
+      "outDir": "lib",
+      "sourceMap": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
