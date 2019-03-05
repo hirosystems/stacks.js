@@ -10,7 +10,10 @@ version. These features will be rolled out in future updates.
 ## Creating a file
 
 ```JavaScript
- blockstack.putFile("/hello.txt", "hello world!")
+let options = {
+  encrypt: false
+}
+ blockstack.putFile("/hello.txt", "hello world!", options)
  .then(() => {
     // /hello.txt exists now, and has the contents "hello world!".
  })
@@ -19,7 +22,11 @@ version. These features will be rolled out in future updates.
 ## Reading a file
 
 ```JavaScript
- blockstack.getFile("/hello.txt")
+ let options = {
+   decrypt: false
+ }
+ 
+ blockstack.getFile("/hello.txt", options)
  .then((fileContents) => {
     // get the contents of the file /hello.txt
     assert(fileContents === "hello world!")
