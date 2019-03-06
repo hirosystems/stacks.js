@@ -1,12 +1,8 @@
 {
   "compilerOptions": {
-      "target": "es2018",
-      "module": "commonjs",
-      "moduleResolution": "node",
+      "target": "es5",
       "esModuleInterop": true,
-      "declaration": true,
       "noImplicitAny": false,
-      "outDir": "lib",
       "sourceMap": true
   },
   "include": [

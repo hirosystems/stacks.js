@@ -5,26 +5,21 @@
   "main": "lib/index",
   "browser": "dist/blockstack.js",
   "scripts": {
-    "browserify": "rm -rf ./dist/blockstack.js && browserify src/index.js --standalone blockstack -o ./dist/blockstack.js",
-    "browserify-tests": "browserify src/index.js --debug --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib && babel src -d lib",
-    "compile-watch": "rm -rf lib && babel src -d lib --watch",
-    "compile-tests": "rm -rf tests/authTests/lib && rm -rf test/operationsTests/lib && babel tests/authTests/src -d tests/authTests/lib && babel tests/operationsTests/src -d tests/operationsTests/lib",
-    "prepare": "npm run compile",
+    "build": "npm run build:webpack && npm run build:node",
+    "build:webpack": "rm -rf dist/blockstack.js && NODE_ENV=production webpack --mode=production",
+    "build:node": "rm -rf lib && tsc",
+    "build:node-watch": "rm -rf lib && tsc --watch",
+    "test": "NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
     "prepublishOnly": "npm run build",
     "dev-auth": "npm run compile && npm run browserify && node ./tests/browserTests/auth-server.js",
     "dev-proofs": "npm run compile && npm run browserify && node ./tests/browserTests/proofs-server.js",
     "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && tape -r @babel/register ./tests/unitTests/src/index.js",
     "integration-test-auth": "npm run compile && npm run compile-tests && npm run browserify && node ./tests/authTests/lib/index.js",
     "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
-    "build": "npm run build-documentation && npm run compile && npm run browserify",
-    "flow": "flow",
     "lint": "eslint src && eslint tests",
-    "test": "NODE_ENV=test nyc npm run unit-test",
     "documentation": "documentation",
     "build-documentation": "documentation build src --config ./documentation.yml --format html --output docs && documentation build src --config ./documentation.yml --format json --output docs.json",
-    "codecovUpload": "codecov",
-    "tsc": "tsc"
+    "codecovUpload": "codecov"
   },
   "repository": {
     "type": "git",
@@ -84,8 +79,11 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.3.4",
     "@babel/plugin-transform-runtime": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
+    "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.0.0",
     "@types/bigi": "^1.4.2",
     "@types/bip32": "^1.0.1",
@@ -103,9 +101,8 @@
     "@types/tape": "^4.2.33",
     "@types/triplesec": "^3.0.0",
     "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
     "babel-plugin-istanbul": "^5.1.1",
-    "babelify": "^10.0.0",
-    "browserify": "^16.2.3",
     "codecov": "^3.2.0",
     "documentation": "^9.3.0",
     "eslint": "^5.15.0",
@@ -124,12 +121,14 @@
     "source-map-support": "^0.5.10",
     "tape": "^4.10.1",
     "tape-promise": "^4.0.0",
+    "ts-loader": "^5.3.3",
     "ts-node": "^8.0.2",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
   },
   "dependencies": {
     "ajv": "^4.11.5",
-    "@babel/runtime": "^7.3.4",
     "bigi": "^1.4.2",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
@@ -157,25 +156,23 @@
     "npm": ">=6"
   },
   "nyc": {
+    "extension": [
+      ".ts"
+    ],
     "include": [
-      "src/**"
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.d.ts"
     ],
     "require": [
-      "@babel/register"
+      "ts-node/register/transpile-only",
+      "source-map-support/register"
     ],
     "reporter": [
       "text",
       "html",
       "lcov"
-    ],
-    "sourceMap": false,
-    "instrument": false
-  },
-  "browserify": {
-    "transform": [
-      [
-        "babelify"
-      ]
     ]
   }
 }
