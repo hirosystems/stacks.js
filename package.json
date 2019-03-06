@@ -5,7 +5,7 @@
   "main": "lib/index",
   "browser": "dist/blockstack.js",
   "scripts": {
-    "build": "npm run build:webpack && npm run build:node",
+    "build": "npm run build:webpack && npm run build:node && npm run build-documentation",
     "build:webpack": "rm -rf dist/blockstack.js && NODE_ENV=production webpack --mode=production",
     "build:node": "rm -rf lib && tsc",
     "build:node-watch": "rm -rf lib && tsc --watch",
@@ -17,8 +17,7 @@
     "integration-test-auth": "npm run compile && npm run compile-tests && npm run browserify && node ./tests/authTests/lib/index.js",
     "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
     "lint": "eslint src && eslint tests",
-    "documentation": "documentation",
-    "build-documentation": "documentation build src --config ./documentation.yml --format html --output docs && documentation build src --config ./documentation.yml --format json --output docs.json",
+    "build-documentation": "rm -rf docs && typedoc --out docs src && typedoc --json docs/docs.json src",
     "codecovUpload": "codecov"
   },
   "repository": {
@@ -104,7 +103,6 @@
     "babel-loader": "^8.0.5",
     "babel-plugin-istanbul": "^5.1.1",
     "codecov": "^3.2.0",
-    "documentation": "^9.3.0",
     "eslint": "^5.15.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.16.0",
@@ -123,6 +121,7 @@
     "tape-promise": "^4.0.0",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.2",
+    "typedoc": "^0.14.2",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
