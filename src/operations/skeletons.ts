@@ -160,8 +160,8 @@ function opEncode(opcode: string): string {
 }
 
 export function makePreorderSkeleton(
-  fullyQualifiedName: string, consensusHash : string, preorderAddress: string,
-  burnAddress : string, burn: AmountType,
+  fullyQualifiedName: string, consensusHash: string, preorderAddress: string,
+  burnAddress: string, burn: AmountType,
   registerAddress: string = null
 ) {
   // Returns a preorder tx skeleton.
@@ -485,7 +485,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 }
 
 export function makeNamespacePreorderSkeleton(
-  namespaceID: string, consensusHash : string, preorderAddress: string,
+  namespaceID: string, consensusHash: string, preorderAddress: string,
   registerAddress: string, burn: AmountType
 ) {
   // Returns a namespace preorder tx skeleton.

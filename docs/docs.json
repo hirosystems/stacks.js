@@ -490,8 +490,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									}
 								]
 							}
@@ -500,7 +500,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 20,
+							"line": 22,
 							"character": 22
 						}
 					]
@@ -525,8 +525,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "reference",
-										"name": "Number"
+										"type": "intrinsic",
+										"name": "number"
 									}
 								]
 							}
@@ -535,7 +535,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 24,
+							"line": 26,
 							"character": 16
 						}
 					]
@@ -590,7 +590,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 32,
+							"line": 34,
 							"character": 19
 						}
 					]
@@ -645,13 +645,13 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 28,
-															"character": 58
+															"line": 30,
+															"character": 57
 														}
 													],
 													"type": {
-														"type": "reference",
-														"name": "Number"
+														"type": "intrinsic",
+														"name": "number"
 													}
 												}
 											],
@@ -667,8 +667,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 28,
-													"character": 45
+													"line": 30,
+													"character": 44
 												}
 											]
 										}
@@ -680,7 +680,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 28,
+							"line": 30,
 							"character": 20
 						}
 					]
@@ -701,7 +701,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 19,
+					"line": 21,
 					"character": 27
 				}
 			],
@@ -783,7 +783,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 917,
+															"line": 920,
 															"character": 83
 														}
 													],
@@ -801,7 +801,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 917,
+															"line": 920,
 															"character": 65
 														}
 													],
@@ -824,7 +824,7 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 917,
+													"line": 920,
 													"character": 55
 												}
 											]
@@ -842,7 +842,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 915,
+							"line": 918,
 							"character": 21
 						}
 					]
@@ -858,7 +858,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 913,
+							"line": 916,
 							"character": 21
 						}
 					],
@@ -880,7 +880,7 @@
 									"sources": [
 										{
 											"fileName": "network.ts",
-											"line": 913,
+											"line": 916,
 											"character": 50
 										}
 									],
@@ -898,7 +898,7 @@
 									"sources": [
 										{
 											"fileName": "network.ts",
-											"line": 913,
+											"line": 916,
 											"character": 32
 										}
 									],
@@ -921,7 +921,7 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 913,
+									"line": 916,
 									"character": 22
 								}
 							]
@@ -939,7 +939,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 911,
+							"line": 914,
 							"character": 13
 						}
 					],
@@ -959,7 +959,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 915,
+							"line": 918,
 							"character": 16
 						}
 					],
@@ -1016,7 +1016,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 924,
+							"line": 927,
 							"character": 22
 						}
 					],
@@ -1061,7 +1061,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 942,
+							"line": 945,
 							"character": 16
 						}
 					],
@@ -1126,7 +1126,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1000,
+							"line": 1003,
 							"character": 19
 						}
 					],
@@ -1186,13 +1186,13 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 959,
-															"character": 60
+															"line": 962,
+															"character": 59
 														}
 													],
 													"type": {
-														"type": "reference",
-														"name": "Number"
+														"type": "intrinsic",
+														"name": "number"
 													}
 												}
 											],
@@ -1208,8 +1208,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 959,
-													"character": 47
+													"line": 962,
+													"character": 46
 												}
 											]
 										}
@@ -1226,7 +1226,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 959,
+							"line": 962,
 							"character": 20
 						}
 					],
@@ -1268,7 +1268,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 910,
+					"line": 913,
 					"character": 24
 				}
 			],
@@ -1328,7 +1328,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1096,
+							"line": 1099,
 							"character": 25
 						}
 					]
@@ -1344,7 +1344,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1096,
+							"line": 1099,
 							"character": 17
 						}
 					],
@@ -1401,7 +1401,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1147,
+							"line": 1150,
 							"character": 22
 						}
 					],
@@ -1446,7 +1446,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1103,
+							"line": 1106,
 							"character": 16
 						}
 					],
@@ -1511,7 +1511,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1109,
+							"line": 1112,
 							"character": 19
 						}
 					],
@@ -1571,13 +1571,13 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 1135,
-															"character": 60
+															"line": 1138,
+															"character": 59
 														}
 													],
 													"type": {
-														"type": "reference",
-														"name": "Number"
+														"type": "intrinsic",
+														"name": "number"
 													}
 												}
 											],
@@ -1593,8 +1593,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 1135,
-													"character": 47
+													"line": 1138,
+													"character": 46
 												}
 											]
 										}
@@ -1611,7 +1611,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1135,
+							"line": 1138,
 							"character": 20
 						}
 					],
@@ -1651,7 +1651,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 1095,
+					"line": 1098,
 					"character": 30
 				}
 			],
@@ -2684,7 +2684,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 52,
+							"line": 54,
 							"character": 21
 						}
 					]
@@ -2700,7 +2700,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 44,
+							"line": 46,
 							"character": 14
 						}
 					],
@@ -2720,7 +2720,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 52,
+							"line": 54,
 							"character": 13
 						}
 					],
@@ -2740,7 +2740,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 38,
+							"line": 40,
 							"character": 18
 						}
 					],
@@ -2760,7 +2760,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 40,
+							"line": 42,
 							"character": 21
 						}
 					],
@@ -2780,7 +2780,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 50,
+							"line": 52,
 							"character": 5
 						}
 					],
@@ -2801,7 +2801,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 48,
+							"line": 50,
 							"character": 16
 						}
 					],
@@ -2828,7 +2828,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 46,
+							"line": 48,
 							"character": 16
 						}
 					],
@@ -2873,7 +2873,7 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 46,
+									"line": 48,
 									"character": 17
 								}
 							]
@@ -2891,7 +2891,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 42,
+							"line": 44,
 							"character": 8
 						}
 					],
@@ -2972,17 +2972,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "union",
-										"types": [
-											{
-												"type": "reference",
-												"name": "Object"
-											},
-											{
-												"type": "reference",
-												"name": "Error"
-											}
-										]
+										"type": "intrinsic",
+										"name": "any"
 									}
 								]
 							}
@@ -2991,7 +2982,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 745,
+							"line": 748,
 							"character": 27
 						}
 					]
@@ -3041,8 +3032,8 @@
 									"flags": {},
 									"comment": {},
 									"type": {
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									}
 								}
 							],
@@ -3054,8 +3045,8 @@
 										"type": "union",
 										"types": [
 											{
-												"type": "reference",
-												"name": "Object"
+												"type": "intrinsic",
+												"name": "any"
 											},
 											{
 												"type": "reference",
@@ -3070,7 +3061,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 567,
+							"line": 570,
 							"character": 29
 						}
 					]
@@ -3148,8 +3139,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									}
 								]
 							}
@@ -3158,7 +3149,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 609,
+							"line": 612,
 							"character": 22
 						}
 					]
@@ -3233,7 +3224,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 662,
+							"line": 665,
 							"character": 19
 						}
 					]
@@ -3275,7 +3266,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 68,
+							"line": 70,
 							"character": 15
 						}
 					]
@@ -3304,7 +3295,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 790,
+							"line": 793,
 							"character": 18
 						}
 					]
@@ -3376,7 +3367,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 470,
+							"line": 473,
 							"character": 14
 						}
 					]
@@ -3445,7 +3436,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 529,
+							"line": 532,
 							"character": 19
 						}
 					]
@@ -3517,7 +3508,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 434,
+							"line": 437,
 							"character": 23
 						}
 					]
@@ -3586,7 +3577,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 405,
+							"line": 408,
 							"character": 18
 						}
 					]
@@ -3644,7 +3635,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 502,
+							"line": 505,
 							"character": 18
 						}
 					]
@@ -3669,8 +3660,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "reference",
-										"name": "Number"
+										"type": "intrinsic",
+										"name": "number"
 									}
 								]
 							}
@@ -3679,7 +3670,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 890,
+							"line": 893,
 							"character": 16
 						}
 					]
@@ -3714,7 +3705,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 880,
+							"line": 883,
 							"character": 18
 						}
 					]
@@ -3743,7 +3734,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 85,
+							"line": 87,
 							"character": 23
 						}
 					]
@@ -3778,7 +3769,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 784,
+							"line": 787,
 							"character": 12
 						}
 					]
@@ -3811,6 +3802,9 @@
 									"flags": {
 										"isOptional": true
 									},
+									"comment": {
+										"text": "unused"
+									},
 									"type": {
 										"type": "intrinsic",
 										"name": "string"
@@ -3832,7 +3826,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 262,
+							"line": 265,
 							"character": 16
 						}
 					]
@@ -3887,7 +3881,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 315,
+							"line": 318,
 							"character": 13
 						}
 					]
@@ -3949,8 +3943,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 236,
-															"character": 75
+															"line": 238,
+															"character": 74
 														}
 													],
 													"type": {
@@ -3967,8 +3961,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 236,
-															"character": 59
+															"line": 238,
+															"character": 58
 														}
 													],
 													"type": {
@@ -3990,8 +3984,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 236,
-													"character": 53
+													"line": 238,
+													"character": 52
 												}
 											]
 										}
@@ -4003,7 +3997,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 236,
+							"line": 238,
 							"character": 14
 						}
 					]
@@ -4068,8 +4062,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 95,
-															"character": 77
+															"line": 97,
+															"character": 76
 														}
 													],
 													"type": {
@@ -4086,8 +4080,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 95,
-															"character": 61
+															"line": 97,
+															"character": 60
 														}
 													],
 													"type": {
@@ -4109,8 +4103,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 95,
-													"character": 55
+													"line": 97,
+													"character": 54
 												}
 											]
 										}
@@ -4122,7 +4116,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 95,
+							"line": 97,
 							"character": 16
 						}
 					]
@@ -4187,8 +4181,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 160,
-															"character": 77
+															"line": 162,
+															"character": 76
 														}
 													],
 													"type": {
@@ -4205,8 +4199,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 160,
-															"character": 61
+															"line": 162,
+															"character": 60
 														}
 													],
 													"type": {
@@ -4228,8 +4222,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 160,
-													"character": 55
+													"line": 162,
+													"character": 54
 												}
 											]
 										}
@@ -4241,7 +4235,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 160,
+							"line": 162,
 							"character": 16
 						}
 					]
@@ -4299,7 +4293,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 271,
+							"line": 274,
 							"character": 15
 						}
 					]
@@ -4354,7 +4348,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 284,
+							"line": 287,
 							"character": 25
 						}
 					]
@@ -4409,7 +4403,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 346,
+							"line": 349,
 							"character": 18
 						}
 					]
@@ -4471,7 +4465,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 251,
+															"line": 253,
 															"character": 72
 														}
 													],
@@ -4489,7 +4483,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 251,
+															"line": 253,
 															"character": 56
 														}
 													],
@@ -4512,7 +4506,7 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 251,
+													"line": 253,
 													"character": 50
 												}
 											]
@@ -4525,7 +4519,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 251,
+							"line": 253,
 							"character": 19
 						}
 					]
@@ -4590,8 +4584,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 129,
-															"character": 75
+															"line": 131,
+															"character": 74
 														}
 													],
 													"type": {
@@ -4608,8 +4602,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 129,
-															"character": 59
+															"line": 131,
+															"character": 58
 														}
 													],
 													"type": {
@@ -4631,8 +4625,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 129,
-													"character": 53
+													"line": 131,
+													"character": 52
 												}
 											]
 										}
@@ -4644,7 +4638,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 129,
+							"line": 131,
 							"character": 21
 						}
 					]
@@ -4709,7 +4703,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 198,
+															"line": 200,
 															"character": 74
 														}
 													],
@@ -4727,7 +4721,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 198,
+															"line": 200,
 															"character": 58
 														}
 													],
@@ -4750,7 +4744,7 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 198,
+													"line": 200,
 													"character": 52
 												}
 											]
@@ -4763,7 +4757,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 198,
+							"line": 200,
 							"character": 21
 						}
 					]
@@ -4818,7 +4812,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 894,
+							"line": 897,
 							"character": 19
 						}
 					]
@@ -4873,13 +4867,13 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 886,
-															"character": 60
+															"line": 889,
+															"character": 59
 														}
 													],
 													"type": {
-														"type": "reference",
-														"name": "Number"
+														"type": "intrinsic",
+														"name": "number"
 													}
 												}
 											],
@@ -4895,8 +4889,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 886,
-													"character": 47
+													"line": 889,
+													"character": 46
 												}
 											]
 										}
@@ -4908,7 +4902,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 886,
+							"line": 889,
 							"character": 20
 						}
 					]
@@ -4963,7 +4957,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 794,
+							"line": 797,
 							"character": 10
 						}
 					]
@@ -5018,7 +5012,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 378,
+							"line": 381,
 							"character": 13
 						}
 					]
@@ -5070,7 +5064,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 827,
+							"line": 830,
 							"character": 19
 						}
 					]
@@ -5112,7 +5106,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 875,
+							"line": 878,
 							"character": 12
 						}
 					]
@@ -5182,7 +5176,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 37,
+					"line": 39,
 					"character": 30
 				}
 			],
@@ -6511,7 +6505,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 18,
+							"line": 17,
 							"character": 10
 						}
 					],
@@ -6552,7 +6546,7 @@
 							"sources": [
 								{
 									"fileName": "profiles/profile.ts",
-									"line": 18,
+									"line": 17,
 									"character": 11
 								}
 							]
@@ -6625,7 +6619,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 26,
+							"line": 25,
 							"character": 8
 						}
 					],
@@ -6677,7 +6671,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 30,
+							"line": 29,
 							"character": 9
 						}
 					],
@@ -6816,7 +6810,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 44,
+							"line": 43,
 							"character": 21
 						}
 					],
@@ -6878,7 +6872,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 48,
+							"line": 47,
 							"character": 23
 						}
 					],
@@ -7173,8 +7167,8 @@
 									"kindString": "Parameter",
 									"flags": {},
 									"type": {
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									}
 								}
 							],
@@ -8398,7 +8392,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1044,
+							"line": 1047,
 							"character": 16
 						}
 					]
@@ -8414,7 +8408,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1044,
+							"line": 1047,
 							"character": 8
 						}
 					],
@@ -8471,7 +8465,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1051,
+							"line": 1054,
 							"character": 22
 						}
 					],
@@ -8516,7 +8510,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1062,
+							"line": 1065,
 							"character": 16
 						}
 					],
@@ -8581,7 +8575,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1081,
+							"line": 1084,
 							"character": 19
 						}
 					],
@@ -8641,13 +8635,13 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 1068,
-															"character": 60
+															"line": 1071,
+															"character": 59
 														}
 													],
 													"type": {
-														"type": "reference",
-														"name": "Number"
+														"type": "intrinsic",
+														"name": "number"
 													}
 												}
 											],
@@ -8663,8 +8657,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 1068,
-													"character": 47
+													"line": 1071,
+													"character": 46
 												}
 											]
 										}
@@ -8681,7 +8675,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1068,
+							"line": 1071,
 							"character": 20
 						}
 					],
@@ -8721,7 +8715,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 1043,
+					"line": 1046,
 					"character": 26
 				}
 			],
@@ -9248,7 +9242,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 43,
+							"line": 42,
 							"character": 27
 						}
 					],
@@ -9270,7 +9264,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 43,
+							"line": 42,
 							"character": 13
 						}
 					],
@@ -9309,7 +9303,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 65,
+							"line": 64,
 							"character": 19
 						}
 					],
@@ -9349,7 +9343,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 53,
+							"line": 52,
 							"character": 16
 						}
 					],
@@ -9402,7 +9396,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 60,
+							"line": 59,
 							"character": 16
 						}
 					],
@@ -9441,7 +9435,7 @@
 			"sources": [
 				{
 					"fileName": "auth/sessionStore.ts",
-					"line": 42,
+					"line": 41,
 					"character": 30
 				}
 			],
@@ -11153,7 +11147,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 899,
+							"line": 902,
 							"character": 53
 						}
 					],
@@ -11174,7 +11168,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 44,
+							"line": 46,
 							"character": 14
 						}
 					],
@@ -11199,7 +11193,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 52,
+							"line": 54,
 							"character": 13
 						}
 					],
@@ -11224,7 +11218,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 38,
+							"line": 40,
 							"character": 18
 						}
 					],
@@ -11249,7 +11243,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 40,
+							"line": 42,
 							"character": 21
 						}
 					],
@@ -11274,7 +11268,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 50,
+							"line": 52,
 							"character": 5
 						}
 					],
@@ -11300,7 +11294,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 48,
+							"line": 50,
 							"character": 16
 						}
 					],
@@ -11332,7 +11326,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 46,
+							"line": 48,
 							"character": 16
 						}
 					],
@@ -11377,7 +11371,7 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 46,
+									"line": 48,
 									"character": 17
 								}
 							]
@@ -11400,7 +11394,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 42,
+							"line": 44,
 							"character": 8
 						}
 					],
@@ -11486,17 +11480,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "union",
-										"types": [
-											{
-												"type": "reference",
-												"name": "Object"
-											},
-											{
-												"type": "reference",
-												"name": "Error"
-											}
-										]
+										"type": "intrinsic",
+										"name": "any"
 									}
 								]
 							},
@@ -11510,7 +11495,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 745,
+							"line": 748,
 							"character": 27
 						}
 					],
@@ -11565,8 +11550,8 @@
 									"flags": {},
 									"comment": {},
 									"type": {
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									}
 								}
 							],
@@ -11578,8 +11563,8 @@
 										"type": "union",
 										"types": [
 											{
-												"type": "reference",
-												"name": "Object"
+												"type": "intrinsic",
+												"name": "any"
 											},
 											{
 												"type": "reference",
@@ -11599,7 +11584,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 567,
+							"line": 570,
 							"character": 29
 						}
 					],
@@ -11682,8 +11667,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									}
 								]
 							},
@@ -11697,7 +11682,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 609,
+							"line": 612,
 							"character": 22
 						}
 					],
@@ -11782,7 +11767,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 662,
+							"line": 665,
 							"character": 19
 						}
 					],
@@ -11834,7 +11819,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 68,
+							"line": 70,
 							"character": 15
 						}
 					],
@@ -11873,7 +11858,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 790,
+							"line": 793,
 							"character": 18
 						}
 					],
@@ -11955,7 +11940,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 470,
+							"line": 473,
 							"character": 14
 						}
 					],
@@ -12034,7 +12019,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 529,
+							"line": 532,
 							"character": 19
 						}
 					],
@@ -12116,7 +12101,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 434,
+							"line": 437,
 							"character": 23
 						}
 					],
@@ -12195,7 +12180,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 405,
+							"line": 408,
 							"character": 18
 						}
 					],
@@ -12263,7 +12248,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 502,
+							"line": 505,
 							"character": 18
 						}
 					],
@@ -12293,8 +12278,8 @@
 								"name": "Promise",
 								"typeArguments": [
 									{
-										"type": "reference",
-										"name": "Number"
+										"type": "intrinsic",
+										"name": "number"
 									}
 								]
 							},
@@ -12308,7 +12293,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 890,
+							"line": 893,
 							"character": 16
 						}
 					],
@@ -12353,7 +12338,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 880,
+							"line": 883,
 							"character": 18
 						}
 					],
@@ -12392,7 +12377,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 85,
+							"line": 87,
 							"character": 23
 						}
 					],
@@ -12437,7 +12422,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 905,
+							"line": 908,
 							"character": 12
 						}
 					],
@@ -12475,6 +12460,9 @@
 									"flags": {
 										"isOptional": true
 									},
+									"comment": {
+										"text": "unused"
+									},
 									"type": {
 										"type": "intrinsic",
 										"name": "string"
@@ -12501,7 +12489,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 262,
+							"line": 265,
 							"character": 16
 						}
 					],
@@ -12566,7 +12554,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 315,
+							"line": 318,
 							"character": 13
 						}
 					],
@@ -12633,8 +12621,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 236,
-															"character": 75
+															"line": 238,
+															"character": 74
 														}
 													],
 													"type": {
@@ -12651,8 +12639,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 236,
-															"character": 59
+															"line": 238,
+															"character": 58
 														}
 													],
 													"type": {
@@ -12674,8 +12662,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 236,
-													"character": 53
+													"line": 238,
+													"character": 52
 												}
 											]
 										}
@@ -12692,7 +12680,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 236,
+							"line": 238,
 							"character": 14
 						}
 					],
@@ -12762,8 +12750,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 95,
-															"character": 77
+															"line": 97,
+															"character": 76
 														}
 													],
 													"type": {
@@ -12780,8 +12768,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 95,
-															"character": 61
+															"line": 97,
+															"character": 60
 														}
 													],
 													"type": {
@@ -12803,8 +12791,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 95,
-													"character": 55
+													"line": 97,
+													"character": 54
 												}
 											]
 										}
@@ -12821,7 +12809,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 95,
+							"line": 97,
 							"character": 16
 						}
 					],
@@ -12891,8 +12879,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 160,
-															"character": 77
+															"line": 162,
+															"character": 76
 														}
 													],
 													"type": {
@@ -12909,8 +12897,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 160,
-															"character": 61
+															"line": 162,
+															"character": 60
 														}
 													],
 													"type": {
@@ -12932,8 +12920,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 160,
-													"character": 55
+													"line": 162,
+													"character": 54
 												}
 											]
 										}
@@ -12950,7 +12938,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 160,
+							"line": 162,
 							"character": 16
 						}
 					],
@@ -13018,7 +13006,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 271,
+							"line": 274,
 							"character": 15
 						}
 					],
@@ -13083,7 +13071,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 284,
+							"line": 287,
 							"character": 25
 						}
 					],
@@ -13148,7 +13136,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 346,
+							"line": 349,
 							"character": 18
 						}
 					],
@@ -13215,7 +13203,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 251,
+															"line": 253,
 															"character": 72
 														}
 													],
@@ -13233,7 +13221,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 251,
+															"line": 253,
 															"character": 56
 														}
 													],
@@ -13256,7 +13244,7 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 251,
+													"line": 253,
 													"character": 50
 												}
 											]
@@ -13274,7 +13262,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 251,
+							"line": 253,
 							"character": 19
 						}
 					],
@@ -13344,8 +13332,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 129,
-															"character": 75
+															"line": 131,
+															"character": 74
 														}
 													],
 													"type": {
@@ -13362,8 +13350,8 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 129,
-															"character": 59
+															"line": 131,
+															"character": 58
 														}
 													],
 													"type": {
@@ -13385,8 +13373,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 129,
-													"character": 53
+													"line": 131,
+													"character": 52
 												}
 											]
 										}
@@ -13403,7 +13391,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 129,
+							"line": 131,
 							"character": 21
 						}
 					],
@@ -13473,7 +13461,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 198,
+															"line": 200,
 															"character": 74
 														}
 													],
@@ -13491,7 +13479,7 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 198,
+															"line": 200,
 															"character": 58
 														}
 													],
@@ -13514,7 +13502,7 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 198,
+													"line": 200,
 													"character": 52
 												}
 											]
@@ -13532,7 +13520,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 198,
+							"line": 200,
 							"character": 21
 						}
 					],
@@ -13597,7 +13585,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 894,
+							"line": 897,
 							"character": 19
 						}
 					],
@@ -13657,13 +13645,13 @@
 													"sources": [
 														{
 															"fileName": "network.ts",
-															"line": 886,
-															"character": 60
+															"line": 889,
+															"character": 59
 														}
 													],
 													"type": {
-														"type": "reference",
-														"name": "Number"
+														"type": "intrinsic",
+														"name": "number"
 													}
 												}
 											],
@@ -13679,8 +13667,8 @@
 											"sources": [
 												{
 													"fileName": "network.ts",
-													"line": 886,
-													"character": 47
+													"line": 889,
+													"character": 46
 												}
 											]
 										}
@@ -13697,7 +13685,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 886,
+							"line": 889,
 							"character": 20
 						}
 					],
@@ -13762,7 +13750,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 794,
+							"line": 797,
 							"character": 10
 						}
 					],
@@ -13827,7 +13815,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 378,
+							"line": 381,
 							"character": 13
 						}
 					],
@@ -13889,7 +13877,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 827,
+							"line": 830,
 							"character": 19
 						}
 					],
@@ -13941,7 +13929,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 875,
+							"line": 878,
 							"character": 12
 						}
 					],
@@ -14016,7 +14004,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 899,
+					"line": 902,
 					"character": 25
 				}
 			],
@@ -14092,7 +14080,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 76,
+							"line": 75,
 							"character": 13
 						}
 					],
@@ -14113,7 +14101,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 76,
+							"line": 75,
 							"character": 5
 						}
 					],
@@ -14151,7 +14139,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 110,
+							"line": 109,
 							"character": 19
 						}
 					],
@@ -14191,7 +14179,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 96,
+							"line": 95,
 							"character": 16
 						}
 					],
@@ -14244,7 +14232,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 105,
+							"line": 104,
 							"character": 16
 						}
 					],
@@ -14283,7 +14271,7 @@
 			"sources": [
 				{
 					"fileName": "auth/sessionStore.ts",
-					"line": 75,
+					"line": 74,
 					"character": 30
 				}
 			],
@@ -15817,7 +15805,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 18,
+							"line": 17,
 							"character": 10
 						}
 					],
@@ -15858,7 +15846,7 @@
 							"sources": [
 								{
 									"fileName": "profiles/profile.ts",
-									"line": 18,
+									"line": 17,
 									"character": 11
 								}
 							]
@@ -15931,7 +15919,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 26,
+							"line": 25,
 							"character": 8
 						}
 					],
@@ -15983,7 +15971,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 30,
+							"line": 29,
 							"character": 9
 						}
 					],
@@ -16122,7 +16110,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 44,
+							"line": 43,
 							"character": 21
 						}
 					],
@@ -16184,7 +16172,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 48,
+							"line": 47,
 							"character": 23
 						}
 					],
@@ -16509,7 +16497,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 18,
+							"line": 17,
 							"character": 10
 						}
 					],
@@ -16550,7 +16538,7 @@
 							"sources": [
 								{
 									"fileName": "profiles/profile.ts",
-									"line": 18,
+									"line": 17,
 									"character": 11
 								}
 							]
@@ -17242,7 +17230,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 30,
+							"line": 29,
 							"character": 9
 						}
 					],
@@ -17475,7 +17463,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 44,
+							"line": 43,
 							"character": 21
 						}
 					],
@@ -17537,7 +17525,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 48,
+							"line": 47,
 							"character": 23
 						}
 					],
@@ -17722,7 +17710,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 18,
+							"line": 17,
 							"character": 32
 						}
 					]
@@ -17738,7 +17726,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 18,
+							"line": 17,
 							"character": 10
 						}
 					],
@@ -17779,7 +17767,7 @@
 							"sources": [
 								{
 									"fileName": "profiles/profile.ts",
-									"line": 18,
+									"line": 17,
 									"character": 11
 								}
 							]
@@ -17842,7 +17830,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 26,
+							"line": 25,
 							"character": 8
 						}
 					]
@@ -17884,7 +17872,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 30,
+							"line": 29,
 							"character": 9
 						}
 					]
@@ -17949,7 +17937,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 39,
+							"line": 38,
 							"character": 18
 						}
 					]
@@ -18003,7 +17991,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 44,
+							"line": 43,
 							"character": 21
 						}
 					]
@@ -18055,7 +18043,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 48,
+							"line": 47,
 							"character": 23
 						}
 					]
@@ -18110,7 +18098,7 @@
 					"sources": [
 						{
 							"fileName": "profiles/profile.ts",
-							"line": 34,
+							"line": 33,
 							"character": 23
 						}
 					]
@@ -19656,7 +19644,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 15,
+							"line": 14,
 							"character": 31
 						}
 					]
@@ -19685,7 +19673,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 32,
+							"line": 31,
 							"character": 19
 						}
 					]
@@ -19715,7 +19703,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 23,
+							"line": 22,
 							"character": 16
 						}
 					]
@@ -19758,7 +19746,7 @@
 					"sources": [
 						{
 							"fileName": "auth/sessionStore.ts",
-							"line": 28,
+							"line": 27,
 							"character": 16
 						}
 					]
@@ -19785,7 +19773,7 @@
 			"sources": [
 				{
 					"fileName": "auth/sessionStore.ts",
-					"line": 15,
+					"line": 14,
 					"character": 29
 				}
 			],
@@ -20593,8 +20581,8 @@
 													"sources": [
 														{
 															"fileName": "auth/userSession.ts",
-															"line": 60,
-															"character": 34
+															"line": 58,
+															"character": 13
 														}
 													],
 													"type": {
@@ -20614,7 +20602,7 @@
 													"sources": [
 														{
 															"fileName": "auth/userSession.ts",
-															"line": 62,
+															"line": 60,
 															"character": 18
 														}
 													],
@@ -20635,7 +20623,7 @@
 													"sources": [
 														{
 															"fileName": "auth/userSession.ts",
-															"line": 61,
+															"line": 59,
 															"character": 16
 														}
 													],
@@ -20660,7 +20648,7 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 60,
+													"line": 57,
 													"character": 23
 												}
 											]
@@ -20678,7 +20666,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 58,
+							"line": 55,
 							"character": 25
 						}
 					]
@@ -20694,7 +20682,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 56,
+							"line": 53,
 							"character": 11
 						}
 					],
@@ -20715,7 +20703,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 58,
+							"line": 55,
 							"character": 7
 						}
 					],
@@ -20790,7 +20778,7 @@
 													"sources": [
 														{
 															"fileName": "auth/userSession.ts",
-															"line": 266,
+															"line": 264,
 															"character": 55
 														}
 													],
@@ -20812,7 +20800,7 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 266,
+													"line": 264,
 													"character": 43
 												}
 											]
@@ -20838,7 +20826,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 266,
+							"line": 264,
 							"character": 16
 						}
 					]
@@ -20890,7 +20878,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 323,
+							"line": 321,
 							"character": 12
 						}
 					]
@@ -20969,7 +20957,7 @@
 													"sources": [
 														{
 															"fileName": "auth/userSession.ts",
-															"line": 253,
+															"line": 251,
 															"character": 37
 														}
 													],
@@ -20991,7 +20979,7 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 253,
+													"line": 251,
 													"character": 26
 												}
 											]
@@ -21008,7 +20996,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 252,
+							"line": 250,
 							"character": 16
 						}
 					]
@@ -21041,7 +21029,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 169,
+							"line": 167,
 							"character": 28
 						}
 					]
@@ -21074,7 +21062,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 181,
+							"line": 179,
 							"character": 22
 						}
 					]
@@ -21152,7 +21140,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 302,
+							"line": 300,
 							"character": 9
 						}
 					]
@@ -21399,7 +21387,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 210,
+							"line": 208,
 							"character": 21
 						}
 					]
@@ -21432,7 +21420,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 190,
+							"line": 188,
 							"character": 17
 						}
 					]
@@ -21465,7 +21453,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 198,
+							"line": 196,
 							"character": 16
 						}
 					]
@@ -21536,7 +21524,7 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 312,
+													"line": 310,
 													"character": 21
 												}
 											]
@@ -21559,7 +21547,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 312,
+							"line": 310,
 							"character": 11
 						}
 					]
@@ -21592,7 +21580,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 218,
+							"line": 216,
 							"character": 14
 						}
 					]
@@ -21660,8 +21648,8 @@
 										"text": "Any extra parameters you'd like to pass to the authenticator.\nUse this to pass options that aren't part of the Blockstack auth spec, but might be supported\nby special authenticators."
 									},
 									"type": {
-										"type": "reference",
-										"name": "Object"
+										"type": "intrinsic",
+										"name": "any"
 									},
 									"defaultValue": " {}"
 								}
@@ -21675,7 +21663,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 146,
+							"line": 144,
 							"character": 17
 						}
 					]
@@ -21767,7 +21755,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 282,
+							"line": 280,
 							"character": 9
 						}
 					]
@@ -21801,7 +21789,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 110,
+							"line": 108,
 							"character": 18
 						}
 					]
@@ -21851,7 +21839,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 125,
+							"line": 123,
 							"character": 33
 						}
 					]
@@ -21884,7 +21872,7 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 227,
+							"line": 225,
 							"character": 13
 						}
 					]
@@ -21932,7 +21920,7 @@
 			"sources": [
 				{
 					"fileName": "auth/userSession.ts",
-					"line": 55,
+					"line": 52,
 					"character": 24
 				}
 			]
@@ -22163,7 +22151,7 @@
 						{
 							"fileName": "profiles/services/index.ts",
 							"line": 14,
-							"character": 19
+							"character": 18
 						}
 					]
 				},
@@ -22203,7 +22191,7 @@
 						{
 							"fileName": "profiles/services/index.ts",
 							"line": 12,
-							"character": 20
+							"character": 19
 						}
 					]
 				},
@@ -22243,7 +22231,7 @@
 						{
 							"fileName": "profiles/services/index.ts",
 							"line": 11,
-							"character": 14
+							"character": 13
 						}
 					]
 				},
@@ -22283,7 +22271,7 @@
 						{
 							"fileName": "profiles/services/index.ts",
 							"line": 13,
-							"character": 15
+							"character": 14
 						}
 					]
 				},
@@ -22353,7 +22341,7 @@
 						{
 							"fileName": "profiles/services/index.ts",
 							"line": 10,
-							"character": 16
+							"character": 15
 						}
 					]
 				}
@@ -22599,7 +22587,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 10,
+					"line": 9,
 					"character": 24
 				}
 			],
@@ -22621,7 +22609,7 @@
 							"sources": [
 								{
 									"fileName": "encryption/ec.ts",
-									"line": 13,
+									"line": 12,
 									"character": 12
 								}
 							],
@@ -22639,7 +22627,7 @@
 							"sources": [
 								{
 									"fileName": "encryption/ec.ts",
-									"line": 12,
+									"line": 11,
 									"character": 13
 								}
 							],
@@ -22657,7 +22645,7 @@
 							"sources": [
 								{
 									"fileName": "encryption/ec.ts",
-									"line": 11,
+									"line": 10,
 									"character": 4
 								}
 							],
@@ -22675,7 +22663,7 @@
 							"sources": [
 								{
 									"fileName": "encryption/ec.ts",
-									"line": 14,
+									"line": 13,
 									"character": 5
 								}
 							],
@@ -22693,7 +22681,7 @@
 							"sources": [
 								{
 									"fileName": "encryption/ec.ts",
-									"line": 15,
+									"line": 14,
 									"character": 11
 								}
 							],
@@ -22719,7 +22707,7 @@
 					"sources": [
 						{
 							"fileName": "encryption/ec.ts",
-							"line": 10,
+							"line": 9,
 							"character": 26
 						}
 					]
@@ -22956,7 +22944,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 427,
+					"line": 429,
 					"character": 26
 				}
 			],
@@ -22980,7 +22968,7 @@
 							"sources": [
 								{
 									"fileName": "storage/index.ts",
-									"line": 431,
+									"line": 433,
 									"character": 5
 								}
 							],
@@ -23009,7 +22997,7 @@
 							"sources": [
 								{
 									"fileName": "storage/index.ts",
-									"line": 428,
+									"line": 430,
 									"character": 9
 								}
 							],
@@ -23029,7 +23017,7 @@
 							"sources": [
 								{
 									"fileName": "storage/index.ts",
-									"line": 430,
+									"line": 432,
 									"character": 10
 								}
 							],
@@ -23058,7 +23046,7 @@
 							"sources": [
 								{
 									"fileName": "storage/index.ts",
-									"line": 429,
+									"line": 431,
 									"character": 8
 								}
 							],
@@ -23078,7 +23066,7 @@
 							"sources": [
 								{
 									"fileName": "storage/index.ts",
-									"line": 432,
+									"line": 434,
 									"character": 19
 								}
 							],
@@ -23113,7 +23101,7 @@
 					"sources": [
 						{
 							"fileName": "storage/index.ts",
-							"line": 427,
+							"line": 429,
 							"character": 28
 						}
 					]
@@ -23684,8 +23672,8 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 10,
-									"character": 27
+									"line": 11,
+									"character": 15
 								}
 							],
 							"type": {
@@ -23702,8 +23690,8 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 11,
-									"character": 21
+									"line": 12,
+									"character": 9
 								}
 							],
 							"type": {
@@ -23720,8 +23708,8 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 12,
-									"character": 25
+									"line": 13,
+									"character": 13
 								}
 							],
 							"type": {
@@ -23740,8 +23728,8 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 9,
-									"character": 26
+									"line": 10,
+									"character": 7
 								}
 							],
 							"type": {
@@ -24281,7 +24269,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 1174,
+					"line": 1177,
 					"character": 19
 				}
 			],
@@ -24303,7 +24291,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 1181,
+					"line": 1184,
 					"character": 21
 				}
 			],
@@ -24347,7 +24335,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 14,
+					"line": 16,
 					"character": 22
 				}
 			],
@@ -24410,7 +24398,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 16,
+					"line": 18,
 					"character": 48
 				}
 			],
@@ -24431,7 +24419,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 17,
+					"line": 19,
 					"character": 38
 				}
 			],
@@ -24452,7 +24440,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 15,
+					"line": 17,
 					"character": 45
 				}
 			],
@@ -24641,7 +24629,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 8,
+					"line": 7,
 					"character": 12
 				}
 			],
@@ -25144,7 +25132,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 23,
+					"line": 22,
 					"character": 25
 				}
 			]
@@ -25206,7 +25194,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 18,
+					"line": 17,
 					"character": 25
 				}
 			]
@@ -25321,7 +25309,7 @@
 			"sources": [
 				{
 					"fileName": "storage/hub.ts",
-					"line": 109,
+					"line": 110,
 					"character": 32
 				}
 			]
@@ -25685,7 +25673,7 @@
 											"sources": [
 												{
 													"fileName": "storage/index.ts",
-													"line": 218,
+													"line": 219,
 													"character": 56
 												}
 											],
@@ -25707,7 +25695,7 @@
 									"sources": [
 										{
 											"fileName": "storage/index.ts",
-											"line": 218,
+											"line": 219,
 											"character": 44
 										}
 									]
@@ -25733,7 +25721,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 216,
+					"line": 217,
 					"character": 34
 				}
 			]
@@ -26771,7 +26759,7 @@
 											"sources": [
 												{
 													"fileName": "storage/index.ts",
-													"line": 192,
+													"line": 193,
 													"character": 55
 												}
 											],
@@ -26793,7 +26781,7 @@
 									"sources": [
 										{
 											"fileName": "storage/index.ts",
-											"line": 192,
+											"line": 193,
 											"character": 44
 										}
 									]
@@ -26810,7 +26798,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 190,
+					"line": 191,
 					"character": 34
 				}
 			]
@@ -26883,7 +26871,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 77,
+					"line": 76,
 					"character": 28
 				}
 			]
@@ -27077,7 +27065,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 32,
+					"line": 31,
 					"character": 23
 				}
 			]
@@ -28989,7 +28977,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 611,
+					"line": 613,
 					"character": 31
 				}
 			]
@@ -29199,7 +29187,7 @@
 			"sources": [
 				{
 					"fileName": "storage/hub.ts",
-					"line": 170,
+					"line": 171,
 					"character": 28
 				}
 			]
@@ -29252,7 +29240,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 178,
+					"line": 179,
 					"character": 18
 				}
 			]
@@ -29687,7 +29675,7 @@
 												{
 													"fileName": "storage/index.ts",
 													"line": 85,
-													"character": 7
+													"character": 5
 												}
 											],
 											"type": {
@@ -29707,7 +29695,7 @@
 												{
 													"fileName": "storage/index.ts",
 													"line": 82,
-													"character": 11
+													"character": 9
 												}
 											],
 											"type": {
@@ -29730,7 +29718,7 @@
 												{
 													"fileName": "storage/index.ts",
 													"line": 84,
-													"character": 12
+													"character": 10
 												}
 											],
 											"type": {
@@ -29753,7 +29741,7 @@
 												{
 													"fileName": "storage/index.ts",
 													"line": 83,
-													"character": 10
+													"character": 8
 												}
 											],
 											"type": {
@@ -29773,7 +29761,7 @@
 												{
 													"fileName": "storage/index.ts",
 													"line": 86,
-													"character": 21
+													"character": 19
 												}
 											],
 											"type": {
@@ -29963,7 +29951,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 267,
+					"line": 268,
 					"character": 24
 				}
 			]
@@ -30059,7 +30047,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 453,
+					"line": 455,
 					"character": 27
 				}
 			]
@@ -30135,7 +30123,7 @@
 													"sources": [
 														{
 															"fileName": "storage/index.ts",
-															"line": 313,
+															"line": 315,
 															"character": 5
 														}
 													],
@@ -30164,7 +30152,7 @@
 													"sources": [
 														{
 															"fileName": "storage/index.ts",
-															"line": 312,
+															"line": 314,
 															"character": 10
 														}
 													],
@@ -30193,7 +30181,7 @@
 													"sources": [
 														{
 															"fileName": "storage/index.ts",
-															"line": 314,
+															"line": 316,
 															"character": 19
 														}
 													],
@@ -30226,7 +30214,7 @@
 											"sources": [
 												{
 													"fileName": "storage/index.ts",
-													"line": 311,
+													"line": 313,
 													"character": 90
 												}
 											]
@@ -30260,7 +30248,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 311,
+					"line": 313,
 					"character": 33
 				}
 			]
@@ -30398,7 +30386,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 243,
+					"line": 244,
 					"character": 23
 				}
 			]
@@ -30482,7 +30470,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 52,
+					"line": 51,
 					"character": 28
 				}
 			]
@@ -30654,7 +30642,7 @@
 			"sources": [
 				{
 					"fileName": "storage/hub.ts",
-					"line": 158,
+					"line": 159,
 					"character": 46
 				}
 			]
@@ -32098,7 +32086,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 375,
+					"line": 377,
 					"character": 38
 				}
 			]
@@ -32315,7 +32303,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 28,
+					"line": 27,
 					"character": 19
 				}
 			]
@@ -33259,7 +33247,7 @@
 									"sources": [
 										{
 											"fileName": "storage/index.ts",
-											"line": 696,
+											"line": 698,
 											"character": 39
 										}
 									]
@@ -33282,7 +33270,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 695,
+					"line": 697,
 					"character": 29
 				}
 			]
@@ -33421,7 +33409,7 @@
 									"sources": [
 										{
 											"fileName": "storage/index.ts",
-											"line": 631,
+											"line": 633,
 											"character": 32
 										}
 									]
@@ -33444,7 +33432,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 627,
+					"line": 629,
 					"character": 22
 				}
 			]
@@ -33856,8 +33844,8 @@
 								"text": "Any extra parameters you'd like to pass to the authenticator.\nUse this to pass options that aren't part of the Blockstack auth spec, but might be supported\nby special authenticators."
 							},
 							"type": {
-								"type": "reference",
-								"name": "Object"
+								"type": "intrinsic",
+								"name": "any"
 							},
 							"defaultValue": " {}"
 						}
@@ -34001,8 +33989,8 @@
 								"text": "Any extra parameters you'd like to pass to the authenticator.\nUse this to pass options that aren't part of the Blockstack auth spec, but might be supported\nby special authenticators."
 							},
 							"type": {
-								"type": "reference",
-								"name": "Object"
+								"type": "intrinsic",
+								"name": "any"
 							},
 							"defaultValue": " {}"
 						}
@@ -37032,7 +37020,7 @@
 			"sources": [
 				{
 					"fileName": "storage/hub.ts",
-					"line": 84,
+					"line": 85,
 					"character": 28
 				}
 			]
@@ -37702,7 +37690,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 512,
+					"line": 514,
 					"character": 27
 				}
 			]
@@ -38122,8 +38110,8 @@
 									"sources": [
 										{
 											"fileName": "profiles/profileSchemas/personZoneFiles.ts",
-											"line": 8,
-											"character": 92
+											"line": 11,
+											"character": 11
 										}
 									]
 								}
@@ -38473,7 +38461,7 @@
 			"sources": [
 				{
 					"fileName": "storage/hub.ts",
-					"line": 138,
+					"line": 139,
 					"character": 41
 				}
 			]
@@ -38522,7 +38510,7 @@
 									"sources": [
 										{
 											"fileName": "encryption/ec.ts",
-											"line": 47,
+											"line": 46,
 											"character": 17
 										}
 									],
@@ -38541,7 +38529,7 @@
 									"sources": [
 										{
 											"fileName": "encryption/ec.ts",
-											"line": 48,
+											"line": 47,
 											"character": 11
 										}
 									],
@@ -38569,7 +38557,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 43,
+					"line": 42,
 					"character": 27
 				}
 			]
@@ -38654,7 +38642,7 @@
 										{
 											"fileName": "encryption/ec.ts",
 											"line": 164,
-											"character": 15
+											"character": 11
 										}
 									],
 									"type": {
@@ -38672,7 +38660,7 @@
 										{
 											"fileName": "encryption/ec.ts",
 											"line": 164,
-											"character": 34
+											"character": 30
 										}
 									],
 									"type": {
@@ -38694,8 +38682,8 @@
 							"sources": [
 								{
 									"fileName": "encryption/ec.ts",
-									"line": 164,
-									"character": 3
+									"line": 163,
+									"character": 72
 								}
 							]
 						}
@@ -39707,7 +39695,7 @@
 			"sources": [
 				{
 					"fileName": "encryption/ec.ts",
-					"line": 192,
+					"line": 193,
 					"character": 27
 				}
 			]
@@ -40188,7 +40176,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1191,
+							"line": 1194,
 							"character": 13
 						}
 					],
@@ -40209,7 +40197,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1190,
+							"line": 1193,
 							"character": 19
 						}
 					],
@@ -40230,7 +40218,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1188,
+							"line": 1191,
 							"character": 19
 						}
 					],
@@ -40251,7 +40239,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1192,
+							"line": 1195,
 							"character": 15
 						}
 					],
@@ -40272,7 +40260,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1189,
+							"line": 1192,
 							"character": 14
 						}
 					],
@@ -40302,7 +40290,7 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 1193,
+									"line": 1196,
 									"character": 27
 								}
 							],
@@ -40323,7 +40311,7 @@
 							"sources": [
 								{
 									"fileName": "network.ts",
-									"line": 1193,
+									"line": 1196,
 									"character": 44
 								}
 							],
@@ -40347,7 +40335,7 @@
 					"sources": [
 						{
 							"fileName": "network.ts",
-							"line": 1193,
+							"line": 1196,
 							"character": 10
 						}
 					],
@@ -40380,7 +40368,7 @@
 			"sources": [
 				{
 					"fileName": "network.ts",
-					"line": 1187,
+					"line": 1190,
 					"character": 20
 				}
 			],

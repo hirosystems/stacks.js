@@ -65,9 +65,10 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
     const digest = bitcoin.crypto.sha256(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
-    const signatureWithHash = bitcoin.script.signature.encode(signatureBuffer, bitcoin.Transaction.SIGHASH_NONE)
+    const signatureWithHash = bitcoin.script.signature.encode(
+      signatureBuffer, bitcoin.Transaction.SIGHASH_NONE)
     
-     // We only want the DER encoding so remove the sighash version byte at the end.
+    // We only want the DER encoding so remove the sighash version byte at the end.
     // See: https://github.com/bitcoinjs/bitcoinjs-lib/issues/1241#issuecomment-428062912
     const signature = signatureWithHash.toString('hex').slice(0, -2)
     

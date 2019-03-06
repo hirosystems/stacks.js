@@ -25,11 +25,8 @@ import {
   getFileImpl,
   putFileImpl,
   listFilesImpl,
+  PutFileOptions,
   GetFileOptions
-} from '../storage'
-
-import {
-  PutFileOptions
 } from '../storage'
 
 import {
@@ -57,7 +54,8 @@ export class UserSession {
 
   store: SessionDataStore
 
-  constructor(options?: {appConfig?: AppConfig,
+  constructor(options?: {
+    appConfig?: AppConfig,
     sessionStore?: SessionDataStore,
     sessionOptions?: SessionOptions }) {
     let runningInBrowser = true
@@ -145,7 +143,7 @@ export class UserSession {
    */
   makeAuthRequest(transitKey: string,
                   expiresAt: number = nextHour().getTime(),
-                  extraParams: Object = {}): string {
+                  extraParams: any = {}): string {
     const appConfig = this.appConfig
 
     if (!appConfig) {
@@ -309,7 +307,7 @@ export class UserSession {
    * returns `true` to continue the listing operation or `false` to end it
    * @return {Promise} that resolves to the number of files listed
    */
-  listFiles(callback: (name: string) => boolean) : Promise<number> {
+  listFiles(callback: (name: string) => boolean): Promise<number> {
     return listFilesImpl(this, callback)
   }
 

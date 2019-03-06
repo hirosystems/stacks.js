@@ -91,7 +91,7 @@ export class AppConfig {
    * redirect the user.
    * @returns {string} - URI
    */
-  redirectURI() : string {
+  redirectURI(): string {
     return `${this.appDomain}${this.redirectPath}`
   }
 
@@ -99,7 +99,7 @@ export class AppConfig {
    * The location of the app's manifest file.
    * @returns {string} - URI
    */
-  manifestURI() : string {
+  manifestURI(): string {
     return `${this.appDomain}${this.manifestPath}`
   }
 }

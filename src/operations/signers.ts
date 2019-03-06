@@ -48,7 +48,7 @@ export class PubkeyHashSigner implements TransactionSigner {
       .then(() => ecPairToAddress(this.ecPair))
   }
 
-  signTransaction(transaction: bitcoinjs.TransactionBuilder, inputIndex: number) : Promise<void> {
+  signTransaction(transaction: bitcoinjs.TransactionBuilder, inputIndex: number): Promise<void> {
     return Promise.resolve()
       .then(() => {
         transaction.sign(inputIndex, this.ecPair)

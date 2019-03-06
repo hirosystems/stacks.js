@@ -11,7 +11,7 @@ const schemaDefinition: {[key: string]: any} = {
     '@context': { type: 'string', optional: true },
     '@type': { type: 'string' },
     '@id': { type: 'string', optional: true }
-  },
+  }
 }
 
 export class Organization extends Profile {

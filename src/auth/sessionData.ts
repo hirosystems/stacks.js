@@ -54,15 +54,15 @@ export class SessionData {
     this.gaiaHubConfig = null
   }
 
-  getGaiaHubConfig() : GaiaHubConfig {
+  getGaiaHubConfig(): GaiaHubConfig {
     return this.gaiaHubConfig
   }
 
-  setGaiaHubConfig(config: GaiaHubConfig) : void {
+  setGaiaHubConfig(config: GaiaHubConfig): void {
     this.gaiaHubConfig = config
   }
 
-  static fromJSON(json: any) : SessionData {
+  static fromJSON(json: any): SessionData {
     if (json.version !== SESSION_VERSION) {
       throw new InvalidStateError(`JSON data version ${json.version} not supported by SessionData`)
     }

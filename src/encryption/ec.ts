@@ -1,6 +1,5 @@
 
 import { ec as EllipticCurve } from 'elliptic'
-import ff from 'elliptic'
 import BN from 'bn.js'
 import crypto from 'crypto'
 import { getPublicKeyFromPrivate } from '../keys'
@@ -76,7 +75,8 @@ export function getHexFromBN(bnInput: BN) {
  */
 export function encryptECIES(publicKey: string, content: string | Buffer): CipherObject {
   const isString = (typeof (content) === 'string')
-  const plainText = content instanceof Buffer ? Buffer.from(content) : Buffer.from(content) // always copy to buffer
+  // always copy to buffer
+  const plainText = content instanceof Buffer ? Buffer.from(content) : Buffer.from(content)
 
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic() as BN
   const ephemeralSK = ecurve.genKeyPair()
@@ -160,8 +160,9 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
  * public key - Hex encoded private string taken from privateKey
  * @private
  */
-export function signECDSA(privateKey: string, content: string | Buffer)
-  : { publicKey: string, signature: string } {
+export function signECDSA(privateKey: string, content: string | Buffer): { 
+  publicKey: string, signature: string 
+} {
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
@@ -176,7 +177,7 @@ export function signECDSA(privateKey: string, content: string | Buffer)
 }
 
 function getBuffer(content: string | ArrayBuffer | Buffer) {
-  if (content instanceof Buffer) { return content }
+  if (content instanceof Buffer) return content
   else if (content instanceof ArrayBuffer) return Buffer.from(content)
   else return Buffer.from(content)
 }

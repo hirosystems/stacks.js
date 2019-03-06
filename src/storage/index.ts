@@ -79,12 +79,12 @@ export function decryptContent(content: string, options?: {privateKey?: string})
  * or rejects with an error
  */
 export function getFile(path: string, options?: {
-    decrypt?: boolean,
-    verify?: boolean,
-    username?: string,
-    app?: string,
-    zoneFileLookupURL?: string
-  }) {
+  decrypt?: boolean;
+  verify?: boolean;
+  username?: string;
+  app?: string;
+  zoneFileLookupURL?: string;
+}) {
   console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method getFile().')
@@ -109,7 +109,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
   encrypt?: boolean | string,
   sign?: boolean,
   contentType?: string
-  }) {
+}) {
   console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method putFile().')
@@ -123,7 +123,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
  */
-export function listFiles(callback: (name: string) => boolean) : Promise<number> {
+export function listFiles(callback: (name: string) => boolean): Promise<number> {
   console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method listFiles().')
@@ -154,7 +154,8 @@ export function deleteFile(path: string) {
  * or rejects with an error
  */
 export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
-                                  zoneFileLookupURL: string | undefined = null) : Promise<string|null> {
+                                  zoneFileLookupURL: string | undefined = null
+): Promise<string|null> {
   return lookupProfile(username, zoneFileLookupURL)
     .then((profile) => {
       if (profile.hasOwnProperty('apps')) {
@@ -265,8 +266,9 @@ function getGaiaAddress(caller: UserSession,
  * @private
  */
 function getFileContents(caller: UserSession,
-                         path: string, app: string, username: string | undefined, zoneFileLookupURL: string | undefined,
-                         forceText: boolean) : Promise<string | ArrayBuffer | null> {
+                         path: string, app: string, username: string | undefined, 
+                         zoneFileLookupURL: string | undefined,
+                         forceText: boolean): Promise<string | ArrayBuffer | null> {
   return Promise.resolve()
     .then(() => {
       if (username) {
@@ -309,9 +311,9 @@ function getFileContents(caller: UserSession,
  * @private
  */
 function getFileSignedUnencrypted(caller: UserSession, path: string, opt: GetFileOptions & {
-  username?: string | null,
-  app?: string | null,
-  zoneFileLookupURL?: string | null
+  username?: string | null;
+  app?: string | null;
+  zoneFileLookupURL?: string | null;
 }) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
@@ -628,7 +630,7 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
                        page: string | null,
                        callCount: number,
                        fileCount: number,
-                       callback: (name: string) => boolean) : Promise<number> {
+                       callback: (name: string) => boolean): Promise<number> {
   if (callCount > 65536) {
     // this is ridiculously huge, and probably indicates
     // a faulty Gaia hub anyway (e.g. on that serves endless data)
@@ -693,7 +695,7 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
  * @private
  */
 export function listFilesImpl(caller: UserSession,
-                              callback: (name: string) => boolean) : Promise<number> {
+                              callback: (name: string) => boolean): Promise<number> {
   return getOrSetLocalGaiaHubConnection(caller)
     .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
 }

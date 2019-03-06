@@ -137,7 +137,7 @@ export function loadUserData() {
  * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
  * @return {void}
  */
-export function signUserOut(redirectURL: string | null = null) { // eslint-disable-line no-unused-vars
+export function signUserOut(redirectURL: string | null = null) {
   console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method signUserOut().')
@@ -173,7 +173,7 @@ export function makeAuthRequest(transitPrivateKey: string,
                                 scopes: Array<string>,
                                 appDomain: string = window.location.origin,
                                 expiresAt: number,
-                                extraParams: Object = {}): string {
+                                extraParams: any = {}): string {
   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
     + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
   const userSession = new UserSession()

@@ -6,7 +6,7 @@ import bigi from 'bigi'
 
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
-import { UTXO } from '../network';
+import { UTXO } from '../network'
 
 export const DUST_MINIMUM = 5500
 
@@ -82,7 +82,7 @@ export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.Transact
   return transactionBytes(inputs, outputs)
 }
 
-export function sumOutputValues(txIn : bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
+export function sumOutputValues(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
   const innerTx = getTransaction(txIn)
   return innerTx.outs.reduce((agg, x) => agg + x.value, 0)
 }

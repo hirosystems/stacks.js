@@ -61,7 +61,7 @@ export function makeAuthRequestImpl(transitPrivateKey: string,
                                     scopes: Array<string>,
                                     appDomain: string = window.location.origin,
                                     expiresAt: number,
-                                    extraParams: Object = {}): string {
+                                    extraParams: any = {}): string {
   /* Create the payload */
   const payload = Object.assign({}, extraParams, {
     jti: makeUUID4(),

@@ -19,7 +19,7 @@ import {
 import { config } from '../config'
 import { InvalidAmountError, InvalidParameterError } from '../errors'
 import { TransactionSigner, PubkeyHashSigner } from './signers'
-import { UTXO } from '../network';
+import { UTXO } from '../network'
 
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
@@ -96,7 +96,7 @@ function estimatePreorder(fullyQualifiedName: string,
                           destinationAddress: string,
                           paymentAddress: string,
                           paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
   const preorderPromise = network.getNamePrice(fullyQualifiedName)
     .then(namePrice => makePreorderSkeleton(
@@ -131,7 +131,7 @@ function estimateRegister(fullyQualifiedName: string,
                           paymentAddress: string,
                           includingZonefile: boolean = false,
                           paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
 
   let valueHash
@@ -167,7 +167,7 @@ function estimateUpdate(fullyQualifiedName: string,
                         ownerAddress: string,
                         paymentAddress: string,
                         paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
 
   const updateTX = makeUpdateSkeleton(
@@ -201,7 +201,7 @@ function estimateTransfer(fullyQualifiedName: string,
                           ownerAddress: string,
                           paymentAddress: string,
                           paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
 
   const transferTX = makeTransferSkeleton(fullyQualifiedName, dummyConsensusHash,
@@ -237,7 +237,7 @@ function estimateRenewal(fullyQualifiedName: string,
                          paymentAddress: string,
                          includingZonefile: boolean = false,
                          paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
 
   let valueHash: string
@@ -276,7 +276,7 @@ function estimateRevoke(fullyQualifiedName: string,
                         ownerAddress: string,
                         paymentAddress: string,
                         paymentUtxos: number = 1
-) : Promise<number>  {
+): Promise<number>  {
   const network = config.network
   const revokeTX = makeRevokeSkeleton(fullyQualifiedName)
 
@@ -308,7 +308,7 @@ function estimateNamespacePreorder(namespaceID: string,
                                    revealAddress: string,
                                    paymentAddress: string,
                                    paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
 
   const preorderPromise = network.getNamespacePrice(namespaceID)
@@ -344,7 +344,7 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
                                  revealAddress: string,
                                  paymentAddress: string,
                                  paymentUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
   const revealTX = makeNamespaceRevealSkeleton(namespace, revealAddress)
 
@@ -368,7 +368,7 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
  */
 function estimateNamespaceReady(namespaceID: string,
                                 revealUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
   const readyTX = makeNamespaceReadySkeleton(namespaceID)
 
@@ -395,7 +395,7 @@ function estimateNameImport(name: string,
                             recipientAddr: string,
                             zonefileHash: string,
                             importUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
   const importTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
 
@@ -418,7 +418,7 @@ function estimateNameImport(name: string,
  */
 function estimateAnnounce(messageHash: string,
                           senderUtxos: number = 1
-) : Promise<number> {
+): Promise<number> {
   const network = config.network
   const announceTX = makeAnnounceSkeleton(messageHash)
 
@@ -1078,18 +1078,18 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
         network.getFeeRate(),
         txPromise
       ]).then(([senderUTXOs, btcUTXOs, feeRate, tokenTransferTX]) => {
-          const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+        const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
 
-          if (separateFunder) {
-            const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
-            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
-            return signInputs(signingTxB, btcKey,
-                              [{ index: payerInput.index, signer: senderKey }])
-          } else {
-            const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
-            return signInputs(signingTxB, senderKey)
-          }
-        })
+        if (separateFunder) {
+          const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
+          const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
+          return signInputs(signingTxB, btcKey,
+                            [{ index: payerInput.index, signer: senderKey }])
+        } else {
+          const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
+          return signInputs(signingTxB, senderKey)
+        }
+      })
     })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }

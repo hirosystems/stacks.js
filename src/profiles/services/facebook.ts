@@ -3,7 +3,7 @@ import cheerio from 'cheerio'
 import { Service } from './service'
 
 class Facebook extends Service {
-  static getProofUrl(proof: Object) {
+  static getProofUrl(proof: any) {
     return this.normalizeUrl(proof)
   }
 

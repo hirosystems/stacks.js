@@ -14,7 +14,6 @@ const schemaDefinition: {[key: string]: any} = {
 }
 
 export class Profile {
-
   _profile: {[key: string]: any}
 
   constructor(profile = {}) {

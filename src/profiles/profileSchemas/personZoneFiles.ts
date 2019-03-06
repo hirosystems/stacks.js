@@ -5,7 +5,10 @@ import { Person } from './person'
 import { getTokenFileUrl } from '../profileZoneFiles'
 import { extractProfile } from '../profileTokens'
 
-export function resolveZoneFileToPerson(zoneFile: any, publicKeyOrAddress: string, callback: (profile: any) => void) {
+export function resolveZoneFileToPerson(
+  zoneFile: any, 
+  publicKeyOrAddress: string, 
+  callback: (profile: any) => void) {
   let zoneFileJson = null
   try {
     zoneFileJson = parseZoneFile(zoneFile)
