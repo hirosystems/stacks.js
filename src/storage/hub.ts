@@ -1,7 +1,8 @@
-/* @flow */
+
 import bitcoin from 'bitcoinjs-lib'
 import crypto from 'crypto'
 
+// @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
 import { ecPairToAddress } from '../utils'
 import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
@@ -167,7 +168,7 @@ export function getOrSetLocalGaiaHubConnection(caller: UserSession): Promise<Gai
 }
 
 export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
-  let challengeSigner
+  let challengeSigner: bitcoin.ECPair
   try {
     challengeSigner = bitcoin.ECPair.fromPrivateKey(new Buffer(appPrivateKey, 'hex'))
   } catch (e) {

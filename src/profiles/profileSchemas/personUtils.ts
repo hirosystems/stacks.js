@@ -1,4 +1,4 @@
-export function getName(profile) {
+export function getName(profile: any) {
   if (!profile) {
     return null
   }
@@ -18,7 +18,7 @@ export function getName(profile) {
   return name
 }
 
-export function getGivenName(profile) {
+export function getGivenName(profile: any) {
   if (!profile) {
     return null
   }
@@ -33,7 +33,7 @@ export function getGivenName(profile) {
   return givenName
 }
 
-export function getFamilyName(profile) {
+export function getFamilyName(profile: any) {
   if (!profile) {
     return null
   }
@@ -48,7 +48,7 @@ export function getFamilyName(profile) {
   return familyName
 }
 
-export function getDescription(profile) {
+export function getDescription(profile: any) {
   if (!profile) {
     return null
   }
@@ -60,14 +60,14 @@ export function getDescription(profile) {
   return description
 }
 
-export function getAvatarUrl(profile) {
+export function getAvatarUrl(profile: any) {
   if (!profile) {
     return null
   }
 
-  let avatarContentUrl = null
+  let avatarContentUrl: string | null = null
   if (profile.image) {
-    profile.image.map((image) => {
+    profile.image.map((image: any) => {
       if (image.name === 'avatar') {
         avatarContentUrl = image.contentUrl
         return avatarContentUrl
@@ -79,14 +79,14 @@ export function getAvatarUrl(profile) {
   return avatarContentUrl
 }
 
-export function getVerifiedAccounts(profile, verifications?: any[]) {
+export function getVerifiedAccounts(profile: any, verifications?: any[]) {
   if (!profile) {
     return null
   }
 
-  const filteredAccounts = []
+  const filteredAccounts: any[] = []
   if (profile.hasOwnProperty('account') && verifications) {
-    profile.account.map((account) => {
+    profile.account.map((account: any) => {
       let accountIsValid = false
       let proofUrl = null
 
@@ -118,12 +118,12 @@ export function getVerifiedAccounts(profile, verifications?: any[]) {
   return filteredAccounts
 }
 
-export function getOrganizations(profile) {
+export function getOrganizations(profile: any) {
   if (!profile) {
     return null
   }
 
-  const organizations = []
+  const organizations: any[] = []
 
   if (profile.hasOwnProperty('worksFor')) {
     return profile.worksFor
@@ -132,7 +132,7 @@ export function getOrganizations(profile) {
   return organizations
 }
 
-export function getConnections(profile) {
+export function getConnections(profile: any) {
   if (!profile) {
     return null
   }
@@ -146,7 +146,7 @@ export function getConnections(profile) {
   return connections
 }
 
-export function getAddress(profile) {
+export function getAddress(profile: any) {
   if (!profile) {
     return null
   }
@@ -177,7 +177,7 @@ export function getAddress(profile) {
   return addressString
 }
 
-export function getBirthDate(profile) {
+export function getBirthDate(profile: any) {
   if (!profile) {
     return null
   }

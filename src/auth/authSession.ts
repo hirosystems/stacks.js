@@ -1,4 +1,4 @@
-/* @flow */
+// @ts-ignore: Could not find a declaration file for module
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
 import 'cross-fetch/polyfill'
 

@@ -1,4 +1,4 @@
-/* @flow */
+
 export const ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',

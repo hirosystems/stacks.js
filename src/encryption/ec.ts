@@ -1,4 +1,4 @@
-/* @flow */
+
 import { ec as EllipticCurve } from 'elliptic'
 import ff from 'elliptic'
 import BN from 'bn.js'

@@ -1,3 +1,4 @@
+// @ts-ignore: Could not find a declaration file for module
 import inspector from 'schema-inspector'
 
 import { Profile } from '../profile'
@@ -105,17 +106,17 @@ export class Person extends Profile {
     }, this._profile)
   }
 
-  static validateSchema(profile, strict = false) {
+  static validateSchema(profile: any, strict = false) {
     schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token, publicKeyOrAddress = null) {
+  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new Person(profile)
   }
 
-  static fromLegacyFormat(legacyProfile) {
+  static fromLegacyFormat(legacyProfile: any) {
     const profile = getPersonFromLegacyFormat(legacyProfile)
     return new Person(profile)
   }

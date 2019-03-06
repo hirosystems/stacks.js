@@ -18,7 +18,7 @@ export function encryptMnemonic(phrase: string, password: string) {
 
     // normalize plaintext to fixed length byte string
     const plaintextNormalized = Buffer.from(
-      bip39.mnemonicToEntropy(phrase).toString('hex'), 'hex'
+      bip39.mnemonicToEntropy(phrase), 'hex'
     )
 
     // AES-128-CBC with SHA256 HMAC
@@ -101,7 +101,7 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
  * @private
  */
 function decryptLegacy(dataBuffer: Buffer, password: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<Buffer>((resolve, reject) => {
     triplesec.decrypt(
       {
         key: Buffer.from(password),
@@ -122,16 +122,16 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
  * Encrypt a raw mnemonic phrase with a password
  * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
  * @param {string} password - Password for data
- * @return {Promise<Buffer>} the raw mnemonic phrase
+ * @return {Promise<string>} the raw mnemonic phrase
  * @private
  */
-export function decryptMnemonic(data: (string | Buffer), password: string) {
+export function decryptMnemonic(data: (string | Buffer), password: string): Promise<string> {
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
   return decryptMnemonicBuffer(dataBuffer, password).catch((err) => {
     // If it was a password error, don't even bother with legacy
     if (err instanceof PasswordError) {
       throw err
     }
-    return decryptLegacy(dataBuffer, password)
+    return decryptLegacy(dataBuffer, password).then(data => data.toString())
   })
 }

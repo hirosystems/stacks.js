@@ -1,4 +1,4 @@
-// @flow
+// @ts-ignore: Could not find a declaration file for module
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import {
   getAddressFromDID, publicKeyToAddress,

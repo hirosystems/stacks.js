@@ -1,4 +1,4 @@
-/* @flow */
+
 import queryString from 'query-string'
 import { AppConfig } from './appConfig'
 import { SessionOptions } from './sessionData'
@@ -24,7 +24,8 @@ import {
   encryptContentImpl,
   getFileImpl,
   putFileImpl,
-  listFilesImpl
+  listFilesImpl,
+  GetFileOptions
 } from '../storage'
 
 import {
@@ -179,7 +180,7 @@ export class UserSession {
    */
   getAuthResponseToken(): string {
     const queryDict = queryString.parse(location.search)
-    return queryDict.authResponse ? queryDict.authResponse : ''
+    return queryDict.authResponse ? <string>queryDict.authResponse : ''
   }
 
   /**
@@ -298,13 +299,7 @@ export class UserSession {
    * @returns {Promise} that resolves to the raw data in the file
    * or rejects with an error
    */
-  getFile(path: string, options?: {
-      decrypt?: boolean,
-      verify?: boolean,
-      username?: string,
-      app?: string,
-      zoneFileLookupURL?: string
-    }) {
+  getFile(path: string, options?: GetFileOptions) {
     return getFileImpl(this, path, options)
   }
 

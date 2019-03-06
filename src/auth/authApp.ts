@@ -1,5 +1,6 @@
-/* @flow */
+
 import queryString from 'query-string'
+// @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
@@ -116,7 +117,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
  */
 function getAuthResponseToken(): string {
   const queryDict = queryString.parse(location.search)
-  return queryDict.authResponse ? queryDict.authResponse : ''
+  return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
 
 /**
@@ -239,7 +240,7 @@ function detectProtocolLaunch(
     redirectToWebAuthTimer = window.setTimeout(() => {
       if (redirectToWebAuthTimer) {
         cancelWebAuthRedirectTimer()
-        let nextFunc
+        let nextFunc: () => void
         if (window.localStorage.getItem(echoReplyKey) === 'success') {
           Logger.info('Protocol echo reply detected.')
           nextFunc = successCallback

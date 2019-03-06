@@ -1,4 +1,4 @@
-/* @flow */
+
 import { GaiaHubConfig } from '../storage/hub'
 import { InvalidStateError } from '../errors'
 

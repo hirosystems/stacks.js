@@ -1,4 +1,4 @@
-/* @flow */
+
 export function containsValidProofStatement(searchText: string, name: string | null = null) {
   if (!name) {
     return false

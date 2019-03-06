@@ -1,4 +1,4 @@
-/* @flow */
+
 import crypto, { randomBytes } from 'crypto'
 import bitcoin, { ECPair } from 'bitcoinjs-lib'
 import bip39 from 'bip39'
@@ -25,7 +25,7 @@ export type IdentityKeyPair = {
   salt: string
 }
 
-function hashCode(string) {
+function hashCode(string: string) {
   let hash = 0
   if (string.length === 0) return hash
   for (let i = 0; i < string.length; i++) {

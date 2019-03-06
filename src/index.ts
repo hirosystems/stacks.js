@@ -1,4 +1,4 @@
-/* @flow */
+
 
 import queryString from 'query-string'
 
@@ -25,7 +25,7 @@ import queryString from 'query-string'
     // Redirect back to the localhost auth url, as opposed to another protocol launch.
     // This will re-use the same tab rather than creating another useless one.
     window.setTimeout(() => {
-      window.location.href = decodeURIComponent(queryDict.authContinuation)
+      window.location.href = decodeURIComponent(<string>queryDict.authContinuation)
     }, 10)
   }
 }())
@@ -57,6 +57,7 @@ export { BlockstackWallet, IdentityKeyPair } from './wallet'
 
 export { network } from './network'
 
+// @ts-ignore: Could not find a declaration file for module
 export { decodeToken } from 'jsontokens'
 
 export { config } from './config'

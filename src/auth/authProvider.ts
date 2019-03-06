@@ -1,4 +1,5 @@
 import queryString from 'query-string'
+// @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { updateQueryStringParameter } from '../index'
 import { BLOCKSTACK_HANDLER } from '../utils'
@@ -14,7 +15,7 @@ import { Logger } from '../logger'
 export function getAuthRequestFromURL() {
   const queryDict = queryString.parse(location.search)
   if (queryDict.authRequest !== null && queryDict.authRequest !== undefined) {
-    return queryDict.authRequest.split(`${BLOCKSTACK_HANDLER}:`).join('')
+    return (<string>queryDict.authRequest).split(`${BLOCKSTACK_HANDLER}:`).join('')
   } else {
     return null
   }
@@ -29,7 +30,7 @@ export function getAuthRequestFromURL() {
  * message.
  * @private
  */
-export function fetchAppManifest(authRequest) {
+export function fetchAppManifest(authRequest: string) {
   return new Promise((resolve, reject) => {
     if (!authRequest) {
       reject('Invalid auth request')
@@ -62,12 +63,12 @@ export function fetchAppManifest(authRequest) {
  * response token as a query parameter.
  *
  * @param {String} authRequest  encoded and signed authentication request token
- * @param  {String} authResponse encoded and signed authentication response token
+ * @param {String} authResponse encoded and signed authentication response token
  * @return {void}
  * @throws {Error} if there is no redirect uri
  * @private
  */
-export function redirectUserToApp(authRequest, authResponse) {
+export function redirectUserToApp(authRequest: string, authResponse: string) {
   const payload = decodeToken(authRequest).payload
   let redirectURI = payload.redirect_uri
   Logger.debug(redirectURI)

@@ -1,7 +1,7 @@
 import { ECPair } from 'bitcoinjs-lib'
-import {
-  decodeToken, SECP256K1Client, TokenSigner, TokenVerifier
-} from 'jsontokens'
+
+// @ts-ignore: Could not find a declaration file for module
+import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens'
 
 import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
 
@@ -16,10 +16,10 @@ import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
   * @param {Date} expiresAt - the time of expiration of the token
   * @returns {Object} - the signed profile token
   */
-export function signProfileToken(profile,
-                                 privateKey,
-                                 subject = null,
-                                 issuer = null,
+export function signProfileToken(profile: any,
+                                 privateKey: string,
+                                 subject: any | null = null,
+                                 issuer: any | null = null,
                                  signingAlgorithm = 'ES256K',
                                  issuedAt = new Date(),
                                  expiresAt = nextYear()) {
@@ -56,7 +56,7 @@ export function signProfileToken(profile,
   * @param {String} token - the token to be wrapped
   * @returns {Object} - including `token` and `decodedToken`
   */
-export function wrapProfileToken(token) {
+export function wrapProfileToken(token: string) {
   return {
     token,
     decodedToken: decodeToken(token)
@@ -71,7 +71,7 @@ export function wrapProfileToken(token) {
   * @returns {Object} - the verified, decoded profile token
   * @throws {Error} - throws an error if token verification fails
   */
-export function verifyProfileToken(token, publicKeyOrAddress) {
+export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
   const decodedToken = decodeToken(token)
   const payload = decodedToken.payload
 
@@ -138,7 +138,7 @@ export function verifyProfileToken(token, publicKeyOrAddress) {
   * @returns {Object} - the profile extracted from the encoded token
   * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
   */
-export function extractProfile(token, publicKeyOrAddress = null) {
+export function extractProfile(token: string, publicKeyOrAddress: string | null = null) {
   let decodedToken
   if (publicKeyOrAddress) {
     decodedToken = verifyProfileToken(token, publicKeyOrAddress)

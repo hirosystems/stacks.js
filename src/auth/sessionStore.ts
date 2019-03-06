@@ -1,4 +1,4 @@
-/* @flow */
+
 import { SessionData } from './sessionData'
 import { SessionOptions } from './sessionData'
 // import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage/hub'

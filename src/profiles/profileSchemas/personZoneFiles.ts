@@ -1,10 +1,11 @@
+// @ts-ignore: Could not find a declaration file for module
 import { parseZoneFile } from 'zone-file'
 
 import { Person } from './person'
 import { getTokenFileUrl } from '../profileZoneFiles'
 import { extractProfile } from '../profileTokens'
 
-export function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
+export function resolveZoneFileToPerson(zoneFile: any, publicKeyOrAddress: string, callback: (profile: any) => void) {
   let zoneFileJson = null
   try {
     zoneFileJson = parseZoneFile(zoneFile)

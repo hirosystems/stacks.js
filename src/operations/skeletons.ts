@@ -1,4 +1,4 @@
-/* @flow */
+
 
 import bitcoin from 'bitcoinjs-lib'
 import BigInteger from 'bigi'

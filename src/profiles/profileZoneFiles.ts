@@ -1,10 +1,11 @@
+// @ts-ignore: Could not find a declaration file for module
 import { makeZoneFile, parseZoneFile } from 'zone-file'
 import { extractProfile } from './profileTokens'
 import { Person } from './index'
 
 import { Logger } from '../logger'
 
-export function makeProfileZoneFile(origin, tokenFileUrl) {
+export function makeProfileZoneFile(origin: string, tokenFileUrl: string) {
   if (tokenFileUrl.indexOf('://') < 0) {
     throw new Error('Invalid token file url')
   }
@@ -33,7 +34,7 @@ export function makeProfileZoneFile(origin, tokenFileUrl) {
   return makeZoneFile(zoneFile, zoneFileTemplate)
 }
 
-export function getTokenFileUrl(zoneFileJson) {
+export function getTokenFileUrl(zoneFileJson: any): string | null {
   if (!zoneFileJson.hasOwnProperty('uri')) {
     return null
   }
@@ -61,7 +62,7 @@ export function getTokenFileUrl(zoneFileJson) {
   return tokenFileUrl
 }
 
-export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
+export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: string) {
   return new Promise((resolve, reject) => {
     let zoneFileJson = null
     try {
@@ -73,7 +74,7 @@ export function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
       reject(e)
     }
 
-    let tokenFileUrl = null
+    let tokenFileUrl: string | null = null
     if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
       tokenFileUrl = getTokenFileUrl(zoneFileJson)
     } else {

@@ -1,4 +1,4 @@
-/* @flow */
+
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
 import bigi from 'bigi'
@@ -268,7 +268,7 @@ export class BlockstackNetwork {
    * @param {String} address the blockchain address (the hash of the owner public key)
    * @return {Promise} a promise that resolves to a list of names (Strings)
    */
-  getNamesOwned(address: string) {
+  getNamesOwned(address: string): Promise<string[]> {
     const networkAddress = this.coerceAddress(address)
     return fetch(`${this.blockstackAPIUrl}/v1/addresses/bitcoin/${networkAddress}`)
       .then(resp => resp.json())
@@ -449,7 +449,7 @@ export class BlockstackNetwork {
           throw new Error(`Unable to get account history page: ${historyList.error}`)
         }
         // coerse all addresses and convert to bigint
-        return historyList.map((histEntry) => {
+        return historyList.map((histEntry: any) => {
           histEntry.address = this.coerceAddress(histEntry.address)
           histEntry.debit_value = <any>bigi.fromByteArrayUnsigned(String(histEntry.debit_value)) as bigi
           histEntry.credit_value = <any>bigi.fromByteArrayUnsigned(String(histEntry.credit_value)) as bigi
@@ -484,7 +484,7 @@ export class BlockstackNetwork {
           throw new Error(`Unable to get historic account state: ${historyList.error}`)
         }
         // coerce all addresses 
-        return historyList.map((histEntry) => {
+        return historyList.map((histEntry: any) => {
           histEntry.address = this.coerceAddress(histEntry.address)
           histEntry.debit_value = <any>bigi.fromByteArrayUnsigned(String(histEntry.debit_value)) as bigi
           histEntry.credit_value = <any>bigi.fromByteArrayUnsigned(String(histEntry.credit_value)) as bigi
@@ -842,7 +842,7 @@ export class BlockstackNetwork {
 
     const txHash = Buffer.from(tx.getHash().reverse()).toString('hex')
     tx.outs.forEach((utxoCreated, txOutputN) => {
-      const isNullData = function isNullData(script) {
+      const isNullData = function isNullData(script: Buffer) {
         try {
           bitcoinjs.payments.embed({ output: script }, { validate: true })
           return true
@@ -1030,7 +1030,7 @@ export class BitcoindAPI extends BitcoinNetwork {
       .then(resp => resp.json())
       .then(x => x.result)
       .then(utxos => utxos.map(
-        x => Object({
+        (x: any) => Object({
           value: Math.round(x.amount * SATOSHIS_PER_BTC),
           confirmations: x.confirmations,
           tx_hash: x.txid,
@@ -1082,7 +1082,7 @@ export class InsightClient extends BitcoinNetwork {
     return fetch(`${this.apiUrl}/addr/${address}/utxo`)
       .then(resp => resp.json())
       .then(utxos => utxos.map(
-        x => ({
+        (x: any) => ({
           value: x.satoshis,
           confirmations: x.confirmations,
           tx_hash: x.txid,
@@ -1120,7 +1120,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
       })
       .then(utxoJSON => utxoJSON.unspent_outputs)
       .then(utxoList => utxoList.map(
-        (utxo) => {
+        (utxo: any) => {
           const utxoOut = {
             value: utxo.value,
             tx_output_n: utxo.tx_output_n,
@@ -1150,7 +1150,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
     return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
                  {
                    method: 'POST',
-                   body: form
+                   body: <any>form
                  })
       .then((resp) => {
         const text = resp.text()

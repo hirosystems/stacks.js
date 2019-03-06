@@ -1,4 +1,4 @@
-/* @flow */
+
 
 import bitcoinjs from 'bitcoinjs-lib'
 import RIPEMD160 from 'ripemd160'
@@ -133,7 +133,7 @@ export function decodeB40(input: string) {
 export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
                                utxos: Array<UTXO>,
                                amountToFund: number, feeRate: number,
-                               fundNewFees: boolean = true) {
+                               fundNewFees: boolean = true): number {
   if (utxos.length === 0) {
     throw new NotEnoughFundsError(amountToFund)
   }

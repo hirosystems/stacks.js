@@ -1,4 +1,4 @@
-/* @flow */
+
 import { randomBytes } from 'crypto'
 import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
 

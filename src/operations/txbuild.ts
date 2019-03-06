@@ -1,4 +1,4 @@
-/* @flow */
+
 
 import bitcoinjs from 'bitcoinjs-lib'
 import BigInteger from 'bigi'
@@ -240,7 +240,7 @@ function estimateRenewal(fullyQualifiedName: string,
 ) : Promise<number> {
   const network = config.network
 
-  let valueHash
+  let valueHash: string
   if (includingZonefile) {
     valueHash = dummyZonefileHash
   }

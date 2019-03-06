@@ -1,4 +1,4 @@
-/* @flow */
+
 import bitcoinjs from 'bitcoinjs-lib'
 import { hexStringToECPair, ecPairToAddress } from '../utils'
 

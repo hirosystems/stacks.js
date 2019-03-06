@@ -8,8 +8,8 @@ export const levels = [
   'none'
 ]
 
-const levelToInt = {}
-const intToLevel = {}
+const levelToInt: {[level: string]: number} = {}
+const intToLevel: {[int: number]: string} = {}
 
 for (let index = 0; index < levels.length; index++) {
   const level = levels[index]

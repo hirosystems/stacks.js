@@ -1,4 +1,4 @@
-/* @flow */
+
 import { profileServices } from './services'
 
 /**
@@ -18,7 +18,7 @@ export function validateProofs(profile: any,
   }
 
   let accounts: Array<any> = []
-  const proofsToValidate = []
+  const proofsToValidate: Promise<any>[] = []
 
   if (profile.hasOwnProperty('account')) {
     accounts = profile.account

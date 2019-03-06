@@ -1,4 +1,4 @@
-/* @flow */
+
 import cheerio from 'cheerio'
 import { Service } from './service'
 

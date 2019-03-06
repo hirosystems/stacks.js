@@ -1,4 +1,4 @@
-/* @flow */
+
 
 import {
   getOrSetLocalGaiaHubConnection, getFullReadUrl, setLocalGaiaHubConnection,
@@ -190,7 +190,7 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 export function encryptContentImpl(caller: UserSession,
                                    content: string | Buffer,
                                    options?: {publicKey?: string}) {
-  const defaults = { publicKey: null }
+  const defaults: { publicKey: string | null } = { publicKey: null }
   const opt = Object.assign({}, defaults, options)
   if (!opt.publicKey) {
     const userData = caller.loadUserData()
@@ -216,7 +216,7 @@ export function encryptContentImpl(caller: UserSession,
 export function decryptContentImpl(caller: UserSession,
                                    content: string,
                                    options?: {privateKey?: string}) {
-  const defaults = { privateKey: null }
+  const defaults: {privateKey?: string | null } = { privateKey: null }
   const opt = Object.assign({}, defaults, options)
   let privateKey = opt.privateKey
   if (!privateKey) {
@@ -308,10 +308,10 @@ function getFileContents(caller: UserSession,
  *  from own storage.
  * @private
  */
-function getFileSignedUnencrypted(caller: UserSession, path: string, opt: {
-  username?: string,
-  app: string,
-  zoneFileLookupURL?: string
+function getFileSignedUnencrypted(caller: UserSession, path: string, opt: GetFileOptions & {
+  username?: string | null,
+  app?: string | null,
+  zoneFileLookupURL?: string | null
 }) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
@@ -377,7 +377,7 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   const appPrivateKey = caller.loadUserData().appPrivateKey
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
 
-  let addressPromise
+  let addressPromise: Promise<string>
   if (username) {
     addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL)
   } else {
@@ -424,6 +424,14 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   })
 }
 
+export type GetFileOptions = {
+  decrypt?: boolean,
+  verify?: boolean,
+  username?: string | null,
+  app?: string | null,
+  zoneFileLookupURL?: string | null
+}
+
 /**
  * Retrieves the specified file from the app's data store.
  * @param {UserSession} caller - instance calling this method
@@ -442,18 +450,12 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
  * or rejects with an error
  * @private
  */
-export function getFileImpl(caller: UserSession, path: string, options?: {
-    decrypt?: boolean,
-    verify?: boolean,
-    username?: string,
-    app?: string,
-    zoneFileLookupURL?: string
-  }) {
+export function getFileImpl(caller: UserSession, path: string, options?: GetFileOptions) {
   const appConfig = caller.appConfig
   if (!appConfig) {
     throw new InvalidStateError('Missing AppConfig')
   }
-  const defaults = {
+  const defaults: GetFileOptions = {
     decrypt: true,
     verify: false,
     username: null,
@@ -470,7 +472,7 @@ export function getFileImpl(caller: UserSession, path: string, options?: {
   }
 
   return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
-    .then((storedContents) => {
+    .then<string|ArrayBuffer|Buffer>((storedContents) => {
       if (storedContents === null) {
         return storedContents
       } else if (opt.decrypt && !opt.verify) {
@@ -554,12 +556,12 @@ export function putFileImpl(caller: UserSession,
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
     return getOrSetLocalGaiaHubConnection(caller)
-      .then(gaiaHubConfig => new Promise((resolve, reject) => Promise.all([
+      .then(gaiaHubConfig => new Promise<string[]>((resolve, reject) => Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, gaiaHubConfig, 'application/json')
       ])
-        .then(resolve)
+        .then(files => resolve(files))
         .catch(() => {
           setLocalGaiaHubConnection(caller)
             .then(freshHubConfig => Promise.all([
@@ -567,7 +569,7 @@ export function putFileImpl(caller: UserSession,
               uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                               signatureContent, freshHubConfig, 'application/json')
             ])
-              .then(resolve).catch(reject))
+              .then(files => resolve(files)).catch(reject))
         })))
       .then(fileUrls => fileUrls[0])
   }

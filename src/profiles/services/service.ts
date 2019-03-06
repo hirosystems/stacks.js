@@ -1,4 +1,4 @@
-/* @flow */
+
 import 'cross-fetch/polyfill'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 
@@ -6,7 +6,7 @@ export class Service {
   static validateProof(proof: any,
                        ownerAddress: string,
                        name: string = null) {
-    let proofUrl
+    let proofUrl: string
     return Promise.resolve()
       .then(() => {
         proofUrl = this.getProofUrl(proof)
@@ -37,7 +37,7 @@ export class Service {
       })
   }
 
-  static getBaseUrls() {
+  static getBaseUrls(): string[] {
     return []
   }
 
@@ -63,7 +63,7 @@ export class Service {
     }
   }
 
-  static getProofUrl(proof: any) {
+  static getProofUrl(proof: any): string {
     const baseUrls = this.getBaseUrls()
 
     let proofUrl = proof.proof_url.toLowerCase()

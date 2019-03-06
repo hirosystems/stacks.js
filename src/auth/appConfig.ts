@@ -1,4 +1,4 @@
-/* @flow */
+
 import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST } from './authConstants'
 
 

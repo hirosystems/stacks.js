@@ -1,3 +1,4 @@
+// @ts-ignore: Could not find a declaration file for module
 import inspector from 'schema-inspector'
 
 import { signProfileToken, extractProfile } from './profileTokens'
@@ -26,25 +27,25 @@ export class Profile {
     return Object.assign({}, this._profile)
   }
 
-  toToken(privateKey) {
+  toToken(privateKey: string) {
     return signProfileToken(this.toJSON(), privateKey)
   }
 
-  static validateSchema(profile, strict = false) {
+  static validateSchema(profile: any, strict = false) {
     schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token, publicKeyOrAddress = null) {
+  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new Profile(profile)
   }
 
-  static makeZoneFile(domainName, tokenFileURL) {
+  static makeZoneFile(domainName: string, tokenFileURL: string) {
     return makeProfileZoneFile(domainName, tokenFileURL)
   }
 
-  static validateProofs(domainName) {
+  static validateProofs(domainName: string) {
     return validateProofs(new Profile().toJSON(), domainName)
   }
 }

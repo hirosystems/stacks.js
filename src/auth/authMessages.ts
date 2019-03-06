@@ -1,10 +1,8 @@
-/* @flow */
+
 import 'cross-fetch/polyfill'
 
-import {
-  TokenSigner,
-  SECP256K1Client
-} from 'jsontokens'
+// @ts-ignore: Could not find a declaration file for module
+import { TokenSigner, SECP256K1Client } from 'jsontokens'
 
 import {
   makeDIDFromAddress, makeUUID4,

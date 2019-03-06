@@ -1,4 +1,4 @@
-/* @flow */
+
 import { Service } from './service'
 
 class Github extends Service {
