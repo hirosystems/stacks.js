@@ -7,6 +7,10 @@ class Github extends Service {
     return baseUrls
   }
 
+  static normalizeUrl(proof: any) {
+    return ''
+  }
+
   static getProofUrl(proof: any) {
     const baseUrls = this.getBaseUrls()
     let proofUrl = proof.proof_url.toLowerCase()

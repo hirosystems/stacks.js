@@ -738,10 +738,10 @@ export function runStorageTests() {
 
     FetchMock.post(fullWriteUrl, (url, { headers }) => {
       console.log(url, headers)
-      if (headers.Authorization === 'bearer ') {
+      if ((<any>headers).Authorization === 'bearer ') {
         t.ok(true, 'tries with invalid token')
         return 401
-      } else if (headers.Authorization === 'bearer valid') {
+      } else if ((<any>headers).Authorization === 'bearer valid') {
         t.ok(true, 'Tries with valid hub config')
         return {
           status: 200,
@@ -879,7 +879,7 @@ export function runStorageTests() {
     const associationTokenClaim = {
       childToAssociate: publicKey,
       iss: identityPublicKey,
-      exp: FOUR_MONTH_SECONDS + (new Date() / 1000),
+      exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
       salt
     }
     const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)

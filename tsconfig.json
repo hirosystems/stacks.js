@@ -5,11 +5,12 @@
       "esModuleInterop": true,
       "moduleResolution": "node",
       "declaration": true,
-      "noImplicitAny": true,
+      "noImplicitAny": false,
       "outDir": "lib",
       "sourceMap": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/unitTests/src/**/*"
   ]
 }

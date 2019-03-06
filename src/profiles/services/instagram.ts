@@ -10,7 +10,7 @@ class Instagram extends Service {
 
   static getProofUrl(proof: any) {
     const baseUrls = this.getBaseUrls()
-    const normalizedProofUrl = this.normalizeInstagramUrl(proof)
+    const normalizedProofUrl = this.normalizeUrl(proof)
 
     for (let i = 0; i < baseUrls.length; i++) {
       if (normalizedProofUrl.startsWith(`${baseUrls[i]}`)) {
@@ -20,7 +20,7 @@ class Instagram extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeInstagramUrl(proof: any) {
+  static normalizeUrl(proof: any) {
     let proofUrl = proof.proof_url
     proofUrl = super.prefixScheme(proofUrl)
 

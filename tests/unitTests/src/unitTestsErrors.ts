@@ -9,6 +9,6 @@ export function runErrorsTests() {
 
     t.equal(error.message, 'the message')
     t.equal(error.parameter, null)
-    t.equal(error.param, undefined)
+    t.equal((<any>error).param, undefined)
   })
 }

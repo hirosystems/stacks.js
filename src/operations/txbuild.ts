@@ -1055,7 +1055,7 @@ function makeAnnounce(messageHash: string,
 function makeTokenTransfer(recipientAddress: string, tokenType: string,
                            tokenAmount: BigInteger, scratchArea: string,
                            senderKeyIn: string | TransactionSigner,
-                           btcFunderKeyIn: string | TransactionSigner,
+                           btcFunderKeyIn?: string | TransactionSigner,
                            buildIncomplete: boolean = false
 ) {
   const network = config.network

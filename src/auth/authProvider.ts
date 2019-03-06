@@ -30,7 +30,7 @@ export function getAuthRequestFromURL() {
  * message.
  * @private
  */
-export function fetchAppManifest(authRequest: string) {
+export function fetchAppManifest(authRequest: string): Promise<any> {
   return new Promise((resolve, reject) => {
     if (!authRequest) {
       reject('Invalid auth request')

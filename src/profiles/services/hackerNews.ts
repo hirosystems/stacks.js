@@ -25,6 +25,10 @@ class HackerNews extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
+  static normalizeUrl(proof: any) {
+    return ''
+  }
+
   static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const tables = $('#hnmain').children().find('table')

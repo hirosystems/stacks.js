@@ -109,7 +109,7 @@ function testZoneFile() {
   })
 }
 function testSchemas() {
-  const keyPair = new ECPair.makeRandom({ rng: getEntropy })
+  const keyPair = ECPair.makeRandom({ rng: getEntropy })
   const privateKey = keyPair.privateKey.toString('hex')
   const publicKey = keyPair.publicKey.toString('hex')
 

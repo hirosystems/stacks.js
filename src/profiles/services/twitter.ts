@@ -12,6 +12,10 @@ class Twitter extends Service {
     return baseUrls
   }
 
+  static normalizeUrl(proof: any) {
+    return ''
+  }
+
   static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[property="og:description"]').attr('content')

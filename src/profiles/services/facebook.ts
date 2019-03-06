@@ -4,10 +4,10 @@ import { Service } from './service'
 
 class Facebook extends Service {
   static getProofUrl(proof: Object) {
-    return this.normalizeFacebookUrl(proof)
+    return this.normalizeUrl(proof)
   }
 
-  static normalizeFacebookUrl(proof: any) {
+  static normalizeUrl(proof: any) {
     let proofUrl = proof.proof_url.toLowerCase()
     const urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/
 

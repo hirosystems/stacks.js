@@ -249,8 +249,8 @@ function utilsTests() {
     const change = addUTXOsToFund(txB, utxos, 10000, 10)
 
     t.equal(change, 38520) // gots to pay the fee!
-    t.equal(txB.__tx.ins[0].hash.toString('hex'),
-            Buffer.from(utxos[0].tx_hash, 'hex').reverse().toString('hex'))
+    t.equal((<any>txB).__tx.ins[0].hash.toString('hex'),
+            Buffer.from(Buffer.from(utxos[0].tx_hash, 'hex').reverse()).toString('hex'))
   })
 
   test('addUTXOsToFundTwoUTXOs', (t) => {
@@ -273,11 +273,11 @@ function utilsTests() {
 
     const change = addUTXOsToFund(txB, utxos, 55000, 10)
 
-    t.ok(change <= 5000, `${txB.__tx.outs[1].value} should be less than 5k`)
-    t.equal(txB.__tx.ins[0].hash.toString('hex'),
-            Buffer.from(utxos[0].tx_hash, 'hex').reverse().toString('hex'))
-    t.equal(txB.__tx.ins[1].hash.toString('hex'),
-            Buffer.from(utxos[1].tx_hash, 'hex').reverse().toString('hex'))
+    t.ok(change <= 5000, `${(<any>txB).__tx.outs[1].value} should be less than 5k`)
+    t.equal((<any>txB).__tx.ins[0].hash.toString('hex'),
+            Buffer.from(Buffer.from(utxos[0].tx_hash, 'hex').reverse()).toString('hex'))
+    t.equal((<any>txB).__tx.ins[1].hash.toString('hex'),
+    Buffer.from(Buffer.from(utxos[1].tx_hash, 'hex').reverse()).toString('hex'))
   })
 
   test('modifiedTXSets', (t) => {
@@ -297,7 +297,7 @@ function utilsTests() {
 
     const txHash = '22a024f16944d2f568de4a613566fcfab53b86d37f1903668d399f9a366883de'
 
-    t.equal(txStarter.getHash().reverse().toString('hex'), txHash)
+    t.equal(Buffer.from(txStarter.getHash().reverse()).toString('hex'), txHash)
 
     const usedTXHash = '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'
     const utxoValues = [287825, 287825]
@@ -481,8 +481,8 @@ function transactionTests() {
     const utxosAll = utxoSets.concat()
     return inputTXArgument.ins.reduce((agg, x) => {
       const inputTX = utxosAll.find(
-        y => Buffer.from(y.tx_hash_big_endian, 'hex')
-          .reverse().compare(x.hash) === 0
+        y => Buffer.from(Buffer.from(y.tx_hash_big_endian, 'hex')
+          .reverse()).compare(x.hash) === 0
       )
       if (inputTX) {
         return agg + inputTX.value
@@ -523,7 +523,7 @@ function transactionTests() {
     const nullSigner = { getAddress, signTransaction }
     return transactions.makeNamespacePreorder('hello',
                                               testAddresses[3].address,
-                                              nullSigner)
+                                              <any>nullSigner)
       .then(() => {
         t.fail('Should have failed to build unsigned TX.')
       })
@@ -532,7 +532,7 @@ function transactionTests() {
       })
       .then(() => transactions.makeNamespacePreorder('hello',
                                                      testAddresses[3].address,
-                                                     nullSigner,
+                                                     <any>nullSigner,
                                                      true))
       .then((txhex) => {
         t.ok(txhex, 'Should have built incomplete TX when buildIncomplete = true')
@@ -711,11 +711,11 @@ function transactionTests() {
     Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
-                                         bigi.fromByteArrayUnsigned('123'),
+                                         <any>bigi.fromByteArrayUnsigned('123'),
                                          'hello world!', 2),
       transactions.makeTokenTransfer(testAddresses[1].address,
                                      'STACKS',
-                                     bigi.fromByteArrayUnsigned('123'),
+                                     <any>bigi.fromByteArrayUnsigned('123'),
                                      'hello world!',
                                      testAddresses[4].skHex)])
       .then(([estimatedCost, hexTX]) => {
@@ -749,11 +749,11 @@ function transactionTests() {
     Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
-                                         bigi.fromByteArrayUnsigned('123'),
+                                         <any>bigi.fromByteArrayUnsigned('123'),
                                          'hello world!', 2, 2),
       transactions.makeTokenTransfer(testAddresses[1].address,
                                      'STACKS',
-                                     bigi.fromByteArrayUnsigned('123'),
+                                     <any>bigi.fromByteArrayUnsigned('123'),
                                      'hello world!',
                                      testAddresses[4].skHex,
                                      testAddresses[5].skHex)])
@@ -1207,7 +1207,7 @@ function transactionTests() {
         ),
         transactions.makeTokenTransfer(testAddresses[1].address,
                                        'STACKS',
-                                       bigi.fromByteArrayUnsigned('123'),
+                                       <any>bigi.fromByteArrayUnsigned('123'),
                                        'hello world!',
                                        testAddresses[4].skHex)
       ])

@@ -37,10 +37,10 @@ export function runUtilsTests() {
 
   test('isLaterVersion', (t) => {
     t.plan(4)
-    t.false(isLaterVersion(undefined, '1.1.0', 'undefined version is not later than 1.1.0'))
-    t.true(isLaterVersion('1.2.0', '1.1.0', '1.2.0 version is later than 1.1.0'))
-    t.true(isLaterVersion('1.1.0', '1.1.0', '1.1.0 version is later than 1.1.0'))
-    t.false(isLaterVersion('1.1.0', '1.2.0', '1.1.0 version is later than 1.2.0'))
+    t.false(isLaterVersion(undefined, '1.1.0'), 'undefined version is not later than 1.1.0')
+    t.true(isLaterVersion('1.2.0', '1.1.0'), '1.2.0 version is later than 1.1.0')
+    t.true(isLaterVersion('1.1.0', '1.1.0'), '1.1.0 version is later than 1.1.0')
+    t.false(isLaterVersion('1.1.0', '1.2.0'), '1.1.0 version is later than 1.2.0')
   })
 
   test('isSameOriginAbsoluteUrl', (t) => {

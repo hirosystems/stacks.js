@@ -127,7 +127,7 @@ export function runEncryptionTests() {
             (err) => {
               t.fail(`Should encrypt mnemonic phrase, instead errored: ${err}`)
             })
-      .then((decoded) => {
+      .then((decoded: string) => {
         t.true(decoded.toString() === rawPhrase, 'Should encrypt & decrypt a phrase correctly')
       }, (err) => {
         t.fail(`Should decrypt encrypted phrase, instead errored: ${err}`)

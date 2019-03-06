@@ -189,7 +189,7 @@ export function runAuthTests() {
   test('makeAuthResponse && verifyAuthResponse', (t) => {
     t.plan(11)
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan)
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, null, null)
     t.ok(authResponse, 'auth response should have been created')
 
     const decodedToken = decodeToken(authResponse)
@@ -233,7 +233,7 @@ export function runAuthTests() {
 
     FetchMock.get(url, sampleNameRecords.ryan)
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id')
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null)
     // console.log(decodeToken(authResponse))
 
     doPublicKeysMatchUsername(authResponse, nameLookupURL)
@@ -354,8 +354,8 @@ export function runAuthTests() {
 
 
   test('app config defaults app domain to origin', (t) => {
-    t.plan(5)
-    global.window = {
+    t.plan(5);
+    (<any>global).window = {
       location: {
         origin: 'https://example.com'
       }
@@ -367,13 +367,13 @@ export function runAuthTests() {
     t.equal(appConfig.scopes.length, 1)
     t.equal(appConfig.scopes[0], 'store_write')
     t.equal(appConfig.manifestURI(), 'https://example.com/manifest.json')
-    t.equal(appConfig.redirectURI(), 'https://example.com')
-    global.window = undefined
+    t.equal(appConfig.redirectURI(), 'https://example.com');
+    (<any>global).window = undefined
   })
 
   test('app config works with custom app domain to origin', (t) => {
-    t.plan(5)
-    global.window = {
+    t.plan(5);
+    (<any>global).window = {
       location: {
         origin: 'https://example.com'
       }
@@ -385,8 +385,8 @@ export function runAuthTests() {
     t.equal(appConfig.scopes.length, 1)
     t.equal(appConfig.scopes[0], 'store_write')
     t.equal(appConfig.manifestURI(), 'https://custom.example.com/manifest.json')
-    t.equal(appConfig.redirectURI(), 'https://custom.example.com')
-    global.window = undefined
+    t.equal(appConfig.redirectURI(), 'https://custom.example.com');
+    (<any>global).window = undefined
   })
 
   test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', (t) => {
@@ -448,7 +448,7 @@ export function runAuthTests() {
     const associationTokenClaim = {
       childToAssociate: appPublicKey,
       iss: identityPublicKey,
-      exp: FOUR_MONTH_SECONDS + (new Date() / 1000),
+      exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
       salt
     }
     const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)

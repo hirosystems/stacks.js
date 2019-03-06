@@ -81,7 +81,7 @@ export function runProofStatementUnitTests() {
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
     const ken = sampleAddressBasedVerifications.ken
-
+    
     t.equal(profileServices.facebook.getProofStatement(larry.facebook.body),
             'Verifying that "larry.id" is my Blockstack ID.',
             'Should extract proof statement from Facebook page meta tags')
@@ -128,51 +128,51 @@ export function runOwnerAddressBasedProofsUnitTests() {
     const linkedInProofStatement = profileServices.linkedIn.getProofStatement(ken.linkedIn.body)
 
     t.equals(containsValidAddressProofStatement(facebookProofStatement,
-                                                '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH', true),
+                                                '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH'),
              true, 'Facebook post meta tags should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(facebookProofStatement,
-                                                'differentBitcoinAddress', true),
+                                                'differentBitcoinAddress'),
              false, 'Facebook post meta tags should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(twitterProofStatement,
-                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5'),
              true, 'Twitter status meta tags should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(twitterProofStatement,
-                                                'differentBitcoinAddress', true),
+                                                'differentBitcoinAddress'),
              false, 'Twitter status meta tags should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(githubProofStatement,
-                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5'),
              true, 'Github gist body should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(githubProofStatement,
-                                                'differentBitcoinAddress', true),
+                                                'differentBitcoinAddress'),
              false, 'Github gist body should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(instagramProofStatement,
-                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5'),
              true, 'Instagram body should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(instagramProofStatement,
-                                                'differentBitcoinAddress', true),
+                                                'differentBitcoinAddress'),
              false, 'Instagram body should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(hackerNewsProofStatement,
-                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5'),
              true, 'Hacker News body should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(hackerNewsProofStatement,
-                                                'differentBitcoinAddress', true),
+                                                'differentBitcoinAddress'),
              false, 'Hacker News body should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement,
-                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5', true),
+                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5'),
              true, 'LinkedIn body should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement,
-                                                'differentBitcoinAddress', true),
+                                                'differentBitcoinAddress'),
              false, 'LinkedIn body should not contain valid bitcoin address proof statement')
   })
 }
@@ -235,7 +235,7 @@ export function runProofUtilsUnitTests() {
 export function runProofServicesUnitTests() {
   test('normalize Facebook URLs', (t) => {
     t.plan(6)
-    t.equal(profileServices.facebook.normalizeFacebookUrl(
+    t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
         proof_url: 'https://www.facebook.com/navalr/posts/10152190734077261',
@@ -244,7 +244,7 @@ export function runProofServicesUnitTests() {
     ),
             'https://www.facebook.com/navalr/posts/10152190734077261',
             'Facebook URL should be normalized')
-    t.equal(profileServices.facebook.normalizeFacebookUrl(
+    t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
         proof_url: 'https://facebook.com/navalr/posts/10152190734077261',
@@ -253,7 +253,7 @@ export function runProofServicesUnitTests() {
     ),
             'https://www.facebook.com/navalr/posts/10152190734077261',
             'Facebook URL should be normalized')
-    t.equal(profileServices.facebook.normalizeFacebookUrl(
+    t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
         proof_url: 'https://www.facebook.com/larrysalibra/posts/10100341028448093',
@@ -262,7 +262,7 @@ export function runProofServicesUnitTests() {
     ),
             'https://www.facebook.com/larrysalibra/posts/10100341028448093',
             'Facebook URL should be normalized')
-    t.notEqual(profileServices.facebook.normalizeFacebookUrl(
+    t.notEqual(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
         proof_url: 'https://www.facebook.com/larry.salibra/posts/10100341028448093',
@@ -271,7 +271,7 @@ export function runProofServicesUnitTests() {
     ),
                'https://www.facebook.com/larrysalibra/posts/10100341028448093',
                'Facebook URL should be normalized')
-    t.notEqual(profileServices.facebook.normalizeFacebookUrl(
+    t.notEqual(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
         proof_url: 'https://facebook.com/larry.salibra/posts/10100341028448093',
@@ -280,7 +280,7 @@ export function runProofServicesUnitTests() {
     ),
                'https://www.facebook.com/larrysalibra/posts/10100341028448093',
                'Facebook URL should be normalized')
-    t.equal(profileServices.facebook.normalizeFacebookUrl(
+    t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
         proof_url: 'https://facebook.com/larrysalibra/posts/10100341028448093',
@@ -293,7 +293,7 @@ export function runProofServicesUnitTests() {
 
   test('normalize Instagarm URLs', (t) => {
     t.plan(4)
-    t.equal(profileServices.instagram.normalizeInstagramUrl(
+    t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
         proof_url: 'https://www.instagram.com/p/BZ7KMM0A-Qc/',
@@ -302,7 +302,7 @@ export function runProofServicesUnitTests() {
     ),
             'https://www.instagram.com/p/BZ7KMM0A-Qc/',
             'Instagram URL should be normalized')
-    t.equal(profileServices.instagram.normalizeInstagramUrl(
+    t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
         proof_url: 'https://instagram.com/p/BZ7KMM0A-Qc/',
@@ -311,7 +311,7 @@ export function runProofServicesUnitTests() {
     ),
             'https://www.instagram.com/p/BZ7KMM0A-Qc/',
             'Instagram URL should be normalized')
-    t.equal(profileServices.instagram.normalizeInstagramUrl(
+    t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
         proof_url: 'http://www.instagram.com/p/BZ7KMM0A-Qc/',
@@ -320,7 +320,7 @@ export function runProofServicesUnitTests() {
     ),
             'https://www.instagram.com/p/BZ7KMM0A-Qc/',
             'Instagram URL should be normalized')
-    t.equal(profileServices.instagram.normalizeInstagramUrl(
+    t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
         proof_url: 'http://instagram.com/p/BZ7KMM0A-Qc/',

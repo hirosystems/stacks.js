@@ -659,7 +659,7 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastZoneFile(zoneFile: string,
+  broadcastZoneFile(zoneFile?: string,
                     transactionToWatch: string = null) {
     if (!zoneFile) {
       return Promise.reject(new MissingParameterError('zoneFile'))
