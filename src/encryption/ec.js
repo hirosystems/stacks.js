@@ -1,33 +1,33 @@
 /* @flow */
 import { ec as EllipticCurve } from 'elliptic'
 import crypto from 'crypto'
-import bip39 from 'bip39'
-import triplesec from 'triplesec'
-import { getPublicKeyFromPrivate } from './keys'
+import { getPublicKeyFromPrivate } from '../keys'
 
 const ecurve = new EllipticCurve('secp256k1')
 
-export type CipherObject = { iv: string,
-                             ephemeralPK: string,
-                             cipherText: string,
-                             mac: string,
-                             wasString: boolean }
+export type CipherObject = {
+  iv: string,
+  ephemeralPK: string,
+  cipherText: string,
+  mac: string,
+  wasString: boolean
+}
 
-function aes256CbcEncrypt(iv : Buffer, key : Buffer, plaintext : Buffer) {
+function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer) {
   const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
   return Buffer.concat([cipher.update(plaintext), cipher.final()])
 }
 
-function aes256CbcDecrypt(iv : Buffer, key : Buffer, ciphertext : Buffer) {
+function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
   const cipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
   return Buffer.concat([cipher.update(ciphertext), cipher.final()])
 }
 
-function hmacSha256(key : Buffer, content : Buffer) {
+function hmacSha256(key: Buffer, content: Buffer) {
   return crypto.createHmac('sha256', key).update(content).digest()
 }
 
-function equalConstTime(b1 : Buffer, b2 : Buffer) {
+function equalConstTime(b1: Buffer, b2: Buffer) {
   if (b1.length !== b2.length) {
     return false
   }
@@ -38,7 +38,7 @@ function equalConstTime(b1 : Buffer, b2 : Buffer) {
   return res === 0
 }
 
-function sharedSecretToKeys(sharedSecret : Buffer) {
+function sharedSecretToKeys(sharedSecret: Buffer) {
   // generate mac and encryption key from shared secret
   const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
   return {
@@ -72,7 +72,7 @@ export function getHexFromBN(bnInput: Object) {
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
  *  @private
  */
-export function encryptECIES(publicKey: string, content: string | Buffer) : CipherObject {
+export function encryptECIES(publicKey: string, content: string | Buffer): CipherObject {
   const isString = (typeof (content) === 'string')
   const plainText = Buffer.from(content) // always copy to buffer
 
@@ -159,7 +159,7 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
  * @private
  */
 export function signECDSA(privateKey: string, content: string | Buffer)
-: {publicKey: string, signature: string } {
+  : { publicKey: string, signature: string } {
   const contentBuffer = Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
@@ -189,138 +189,4 @@ export function verifyECDSA(content: string | Buffer,
   const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()
 
   return ecPublic.verify(contentHash, signature)
-}
-
-/**
- * Encrypt a raw mnemonic phrase to be password protected
- * @param {string} phrase - Raw mnemonic phrase
- * @param {string} password - Password to encrypt mnemonic with
- * @return {Promise<Buffer>} The encrypted phrase
- * @private
- */
-export function encryptMnemonic(phrase: string, password: string) {
-  return Promise.resolve().then(() => {
-    // must be bip39 mnemonic
-    if (!bip39.validateMnemonic(phrase)) {
-      throw new Error('Not a valid bip39 nmemonic')
-    }
-
-    // normalize plaintext to fixed length byte string
-    const plaintextNormalized = Buffer.from(
-      bip39.mnemonicToEntropy(phrase).toString('hex'), 'hex'
-    )
-
-    // AES-128-CBC with SHA256 HMAC
-    const salt = crypto.randomBytes(16)
-    const keysAndIV = crypto.pbkdf2Sync(password, salt, 100000, 48, 'sha512')
-    const encKey = keysAndIV.slice(0, 16)
-    const macKey = keysAndIV.slice(16, 32)
-    const iv = keysAndIV.slice(32, 48)
-
-    const cipher = crypto.createCipheriv('aes-128-cbc', encKey, iv)
-    let cipherText = cipher.update(plaintextNormalized).toString('hex')
-    cipherText += cipher.final().toString('hex')
-
-    const hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')])
-
-    const hmac = crypto.createHmac('sha256', macKey)
-    hmac.write(hmacPayload)
-    const hmacDigest = hmac.digest()
-
-    const payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')])
-    return payload
-  })
-}
-
-// Used to distinguish bad password during decrypt vs invalid format
-class PasswordError extends Error {}
-
-function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
-  return Promise.resolve().then(() => {
-    const salt = dataBuffer.slice(0, 16)
-    const hmacSig = dataBuffer.slice(16, 48)   // 32 bytes
-    const cipherText = dataBuffer.slice(48)
-    const hmacPayload = Buffer.concat([salt, cipherText])
-
-    const keysAndIV = crypto.pbkdf2Sync(password, salt, 100000, 48, 'sha512')
-    const encKey = keysAndIV.slice(0, 16)
-    const macKey = keysAndIV.slice(16, 32)
-    const iv = keysAndIV.slice(32, 48)
-
-    const decipher = crypto.createDecipheriv('aes-128-cbc', encKey, iv)
-    let plaintext = decipher.update(cipherText).toString('hex')
-    plaintext += decipher.final().toString('hex')
-
-    const hmac = crypto.createHmac('sha256', macKey)
-    hmac.write(hmacPayload)
-    const hmacDigest = hmac.digest()
-
-    // hash both hmacSig and hmacDigest so string comparison time
-    // is uncorrelated to the ciphertext
-    const hmacSigHash = crypto.createHash('sha256')
-      .update(hmacSig)
-      .digest()
-      .toString('hex')
-
-    const hmacDigestHash = crypto.createHash('sha256')
-      .update(hmacDigest)
-      .digest()
-      .toString('hex')
-
-    if (hmacSigHash !== hmacDigestHash) {
-      // not authentic
-      throw new PasswordError('Wrong password (HMAC mismatch)')
-    }
-
-    const mnemonic = bip39.entropyToMnemonic(plaintext)
-    if (!bip39.validateMnemonic(mnemonic)) {
-      throw new PasswordError('Wrong password (invalid plaintext)')
-    }
-
-    return mnemonic
-  })
-}
-
-
-/**
- * Decrypt legacy triplesec keys
- * @param {Buffer} dataBuffer - The encrypted key
- * @param {String} password - Password for data
- * @return {Promise<Buffer>} Decrypted seed
- * @private
- */
-function decryptLegacy(dataBuffer: Buffer, password: string) {
-  return new Promise((resolve, reject) => {
-    triplesec.decrypt(
-      {
-        key: Buffer.from(password),
-        data: dataBuffer
-      },
-      (err, plaintextBuffer) => {
-        if (!err) {
-          resolve(plaintextBuffer)
-        } else {
-          reject(err)
-        }
-      }
-    )
-  })
-}
-
-/**
- * Encrypt a raw mnemonic phrase with a password
- * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
- * @param {string} password - Password for data
- * @return {Promise<Buffer>} the raw mnemonic phrase
- * @private
- */
-export function decryptMnemonic(data: (string | Buffer), password: string) {
-  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from((data: any), 'hex')
-  return decryptMnemonicBuffer((dataBuffer: any), password).catch((err) => {
-    // If it was a password error, don't even bother with legacy
-    if (err instanceof PasswordError) {
-      throw err
-    }
-    return decryptLegacy((dataBuffer: any), password)
-  })
 }

@@ -6,13 +6,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+ ### Added
 - New function `getFileUrl()` will return a URL for reading a particular file
   from an applications' Gaia bucket.
 
-### Changed
+ ### Changed
 - If `window` and `window.location` is not set (e.g., you are running outside
   a browser context), `getFile` is now usable for multi-player reads.
+
+
+## [19.0.0] - 2019-02-21
+
+### Added
+
+- Moved common user session related functions into `UserSession`. Session configuration is 
+done through AppConfig objects. This change removes the library's dependency on browser 
+environments.
+- List of functions moved: redirectToSignIn(), isUserSignedIn(), isSignInPending(), 
+handlePendingSignIn(), loadUserData(), signUserOut(), getFile(), putFile(), 
+encryptContent(), decryptContent(), listfile(), deleteFile()
+- The public API will remain backward compatible until a future release.
+
+### Changed
+
+- `loadUserData()` now throws an error instead of returning null if no signed in user session 
+is detected
+
+## [18.3.0] - 2019-01-29
+
+### Changed
+
+- New method for auth protocol handler detection. This should fix sign in flows for 
+most major web browsers and operating systems with both the native browser installed and
+not installed. 
+- NOTE: If you're using this version of blockstack.js with an old version of the native 
+browser, the app will (1) open an auth handler in the native browser and (2) also redirect 
+the original tab to browser.blockstack.org. 
+
+## [18.2.1] - 2019-01-08
+
+### Added
+
+- Added automatic retry logic to `putFile` in the case of a failed storage call. This might be
+the case if there have been any token revokations. This new logic will catch the first failed write,
+construct (and cache) a new Gaia token, and then attempt the write again. This allows tokens
+to be revoked without any hiccups from a user experience standpoint.
 
 ## [18.2.0] - 2018-12-20
 
@@ -47,6 +85,10 @@ an `authRequest`.
 - Fixed a bug in version checking during the authentication process
   that manifested itself when signing in with apps using very old versions
   of blockstack.js.
+- Default redirect URI changed from origin plus trailing slash to the
+  origin. For example, app with origin `https://example.com` default
+  redirect URI which was previously `https://example.com/` is
+  now `https://example.com`.
 - Fixed a couple bugs in the transaction generation, networking
   code. First, coerce address now correctly coerces P2SH
   addresses. Second, bitcoinjs-lib recently switched to defaulting to

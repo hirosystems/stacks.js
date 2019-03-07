@@ -441,6 +441,7 @@ function estimateAnnounce(messageHash: string,
  *  just the recipient output (default = 1, if the token owner is also the bitcoin funder)
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this token-transfer transaction
+ * @private
  */
 function estimateTokenTransfer(recipientAddress: string,
                                tokenType: string,

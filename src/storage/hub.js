@@ -3,11 +3,13 @@ import bitcoin from 'bitcoinjs-lib'
 import crypto from 'crypto'
 
 import { TokenSigner } from 'jsontokens'
-import { loadUserData } from '../auth/authApp'
 import { ecPairToAddress } from '../utils'
 import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, BLOCKSTACK_STORAGE_LABEL } from '../auth/authConstants'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from '../auth/authConstants'
+
+import { UserSession } from '../auth/userSession'
 import { Logger } from '../logger'
+import { InvalidStateError } from '../errors'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
@@ -31,7 +33,13 @@ export function uploadToGaiaHub(filename: string, contents: any,
                  },
                  body: contents
                })
-    .then(response => response.text())
+    .then((response) => {
+      if (response.ok) {
+        return response.text()
+      } else {
+        throw new Error('Error when uploading to Gaia hub')
+      }
+    })
     .then(responseText => JSON.parse(responseText))
     .then(responseJSON => responseJSON.publicURL)
 }
@@ -67,7 +75,7 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
 
 function makeV1GaiaAuthToken(hubInfo: Object,
                              signerKeyHex: string,
-                             hubUrl: string, 
+                             hubUrl: string,
                              associationToken?: string): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
@@ -93,18 +101,6 @@ function makeV1GaiaAuthToken(hubInfo: Object,
 export function connectToGaiaHub(gaiaHubUrl: string,
                                  challengeSignerHex: string,
                                  associationToken?: string): Promise<GaiaHubConfig> {
-  if (!associationToken) {
-    // maybe given in local storage?
-    try {
-      const userData = loadUserData()
-      if (userData && userData.gaiaAssociationToken) {
-        associationToken = userData.gaiaAssociationToken
-      }
-    } catch (e) {
-      associationToken = undefined
-    }
-  }
-
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   return fetch(`${gaiaHubUrl}/hub_info`)
@@ -127,38 +123,40 @@ export function connectToGaiaHub(gaiaHubUrl: string,
  * These two functions are app-specific connections to gaia hub,
  *   they read the user data object for information on setting up
  *   a hub connection, and store the hub config to localstorage
+ * @param {UserSession} caller - the instance calling this function
  * @private
  * @returns {Promise} that resolves to the new gaia hub connection
  */
-export function setLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
-  let userData = loadUserData()
+export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
+  const userData = caller.loadUserData()
+
+  if (!userData) {
+    throw new InvalidStateError('Missing userData')
+  }
 
   if (!userData.hubUrl) {
     userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
-
-    window.localStorage.setItem(
-      BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
-    )
-
-    userData = loadUserData()
   }
 
-  return connectToGaiaHub(userData.hubUrl, userData.appPrivateKey, userData.associationToken)
+  return connectToGaiaHub(userData.hubUrl,
+                          userData.appPrivateKey,
+                          userData.associationToken)
     .then((gaiaConfig) => {
-      localStorage.setItem(BLOCKSTACK_GAIA_HUB_LABEL, JSON.stringify(gaiaConfig))
+      userData.gaiaHubConfig = gaiaConfig
       return gaiaConfig
     })
 }
 
-export function getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
-  const hubConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL)
-  if (hubConfig) {
-    const hubJSON = JSON.parse(hubConfig)
-    if (hubJSON !== null) {
-      return Promise.resolve(hubJSON)
-    }
+export function getOrSetLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
+  const userData = caller.store.getSessionData().userData
+  if (!userData) {
+    throw new InvalidStateError('Missing userData')
   }
-  return setLocalGaiaHubConnection()
+  const hubConfig = userData.gaiaHubConfig
+  if (hubConfig) {
+    return Promise.resolve(hubConfig)
+  }
+  return setLocalGaiaHubConnection(caller)
 }
 
 export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
