@@ -24,7 +24,7 @@ function initializeBlockstackCore(): Promise<any> {
     // running with an external test suite
     return Promise.resolve()
   } else {
-    return pExec('docker pull quay.io/blockstack/integrationtests:develop')
+    return pExec('docker pull quay.io/blockstack/integrationtests:master')
       .then(() => {
         console.log('Pulled latest docker image')
         return pExec(`docker stop test-bsk-core ;
@@ -38,7 +38,7 @@ function initializeBlockstackCore(): Promise<any> {
                         + '-e BLOCKSTACK_TEST_CLIENT_BIND=0.0.0.0 '
                         + '-e BLOCKSTACK_TEST_BITCOIND_ALLOWIP=172.17.0.0/16 '
                         + '-e BLOCKSTACK_WEB_TEST_BIND=0.0.0.0 '
-                        + 'quay.io/blockstack/integrationtests:develop '
+                        + 'quay.io/blockstack/integrationtests:master '
                         + 'blockstack-test-scenario --interactive 2 '
                         + 'blockstack_integration_tests.scenarios.portal_test_env'))
       .then(() => {
@@ -306,6 +306,9 @@ export function runIntegrationTests() {
                 `aaron.hello should be owned by ${destAddress}`)
         t.equal(nameInfo.zonefile, zfTest, 'zonefile should be properly set')
       })
+      .then(() => nextBlock())
+      .then(() => nextBlock())
+      .then(() => nextBlock())
       .then(() => transactions.makeUpdate('aaron.hello', dest, payer, zfTest2))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
@@ -330,6 +333,8 @@ export function runIntegrationTests() {
         t.equal(myNet.coerceAddress(nameInfo.address), transferDestination,
                 `aaron.hello should be owned by ${transferDestination}`)
       })
+      .then(() => nextBlock())
+      .then(() => nextBlock())
       .then(() => transactions.makeRenewal('aaron.hello', renewalDestination,
                                            secondOwner, payer, renewalZF))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
@@ -345,6 +350,8 @@ export function runIntegrationTests() {
         t.equal(myNet.coerceAddress(nameInfo.address), renewalDestination,
                 `aaron.hello should be owned by ${renewalDestination}`)
       })
+      .then(() => nextBlock())
+      .then(() => nextBlock())
       .then(() => transactions.makeRevoke('aaron.hello', renewalKey, payer))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
@@ -356,12 +363,15 @@ export function runIntegrationTests() {
       .then((nameInfo) => {
         t.equal(nameInfo.status, 'revoked', 'Name should be revoked')
       })
+      .then(() => nextBlock())
+      .then(() => nextBlock())
       .then(() => transactions.makeBitcoinSpend(btcDestAddress, payer, 500000))
       .then(rawtx => myNet.broadcastTransaction(rawtx))
       .then(() => {
         console.log('broadcasted SPEND, waiting 10 seconds.')
         return nextBlock(6)
       })
+      .then(() => nextBlock())
       .then(() => myNet.getUTXOs(btcDestAddress))
       .then((utxos) => {
         t.equal(utxos.length, 1, `Destination address ${btcDestAddress} should have 1 UTXO`)
