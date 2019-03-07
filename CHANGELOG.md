@@ -10,11 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New function `getFileUrl()` will return a URL for reading a particular file
   from an applications' Gaia bucket.
 
- ### Changed
-- If `window` and `window.location` is not set (e.g., you are running outside
-  a browser context), `getFile` is now usable for multi-player reads.
-
-
 ## [19.0.0] - 2019-02-21
 
 ### Added
