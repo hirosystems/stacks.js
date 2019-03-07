@@ -8,7 +8,7 @@ import {
   connectToGaiaHub,
   getBucketUrl
 } from '../../../lib/storage/hub'
-import { getFileImpl, encryptContentImpl } from '../../../lib/storage'
+import { getFileImpl, encryptContentImpl, getFileUrlImpl } from '../../../lib/storage'
 import { getPublicKeyFromPrivate } from '../../../lib/keys'
 
 import { UserSession, AppConfig } from '../../../lib'
@@ -752,6 +752,39 @@ export function runStorageTests() {
     })
     putFileImpl(blockstack, path, 'hello world', { encrypt: false })
       .then(() => t.ok(true, 'Request should pass'))
+  })
+
+  test('getFileUrl', (t) => { 
+    t.plan(2)
+    const config = {
+      address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+      url_prefix: 'gaia.testblockstack.org/hub/',
+      token: '',
+      server: 'hub.testblockstack.org'
+    }
+
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = {
+      appPrivateKey: privateKey,
+      gaiaHubConfig: config
+    } // manually set for testing
+
+    FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
+                  { status: 404 })
+
+    getFileUrlImpl(blockstack, 'foo.json')
+      .then(x => t.equal(
+        x, 
+        'gaia.testblockstack.org/hub/19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk/foo.json', 
+        'getFileUrlImpl should return correct url'))
+
+    blockstack.getFileUrl('foo.json') 
+      .then(x => t.equal(
+        x, 
+        'gaia.testblockstack.org/hub/19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk/foo.json', 
+        'UserSession.getFileUrl should return correct url'))
   })
 
   test('fetch404null', (t) => {
