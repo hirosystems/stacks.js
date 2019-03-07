@@ -86,7 +86,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   const sharedSecretHex = getHexFromBN(sharedSecret)
 
   const sharedKeys = sharedSecretToKeys(
-    new Buffer(sharedSecretHex, 'hex')
+    Buffer.from(sharedSecretHex, 'hex')
   )
 
   const initializationVector = crypto.randomBytes(16)
@@ -96,7 +96,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   )
 
   const macData = Buffer.concat([initializationVector,
-                                 new Buffer(ephemeralPK.encodeCompressed()),
+                                 Buffer.from(ephemeralPK.encodeCompressed()),
                                  cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
@@ -124,18 +124,18 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
   const ephemeralPK = ecurve.keyFromPublic(cipherObject.ephemeralPK, 'hex').getPublic()
   const sharedSecret = ecSK.derive(ephemeralPK)
-  const sharedSecretBuffer = new Buffer(getHexFromBN(sharedSecret), 'hex')
+  const sharedSecretBuffer = Buffer.from(getHexFromBN(sharedSecret), 'hex')
 
   const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
-  const ivBuffer = new Buffer(cipherObject.iv, 'hex')
-  const cipherTextBuffer = new Buffer(cipherObject.cipherText, 'hex')
+  const ivBuffer = Buffer.from(cipherObject.iv, 'hex')
+  const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 new Buffer(ephemeralPK.encodeCompressed()),
+                                 Buffer.from(ephemeralPK.encodeCompressed()),
                                  cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
-  const expectedMac = new Buffer(cipherObject.mac, 'hex')
+  const expectedMac = Buffer.from(cipherObject.mac, 'hex')
   if (!equalConstTime(expectedMac, actualMac)) {
     throw new Error('Decryption failed: failure in MAC check')
   }

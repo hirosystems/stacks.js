@@ -171,7 +171,7 @@ export function getOrSetLocalGaiaHubConnection(caller: UserSession): Promise<Gai
 export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
   let challengeSigner: bitcoin.ECPair
   try {
-    challengeSigner = bitcoin.ECPair.fromPrivateKey(new Buffer(appPrivateKey, 'hex'))
+    challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
   } catch (e) {
     return Promise.reject(e)
   }

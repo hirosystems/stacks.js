@@ -105,7 +105,7 @@ export function encryptPrivateKey(publicKey: string,
                                   privateKey: string): string | null {
   const encryptedObj = encryptECIES(publicKey, privateKey)
   const encryptedJSON = JSON.stringify(encryptedObj)
-  return (new Buffer(encryptedJSON)).toString('hex')
+  return (Buffer.from(encryptedJSON)).toString('hex')
 }
 
 /**
@@ -120,7 +120,7 @@ export function encryptPrivateKey(publicKey: string,
  */
 export function decryptPrivateKey(privateKey: string,
                                   hexedEncrypted: string): string | null {
-  const unhexedString = new Buffer(hexedEncrypted, 'hex').toString()
+  const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
   const decrypted = decryptECIES(privateKey, encryptedObj)
   if (typeof decrypted !== 'string') {

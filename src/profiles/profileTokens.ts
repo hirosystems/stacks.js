@@ -99,7 +99,7 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
   }
 
   const issuerPublicKey = payload.issuer.publicKey
-  const publicKeyBuffer = new Buffer(issuerPublicKey, 'hex')
+  const publicKeyBuffer = Buffer.from(issuerPublicKey, 'hex')
 
   const compressedKeyPair =  ECPair.fromPublicKey(publicKeyBuffer, { compressed: true })
   const compressedAddress = ecPairToAddress(compressedKeyPair)

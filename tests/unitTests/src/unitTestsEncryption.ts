@@ -19,7 +19,7 @@ export function runEncryptionTests() {
     let deciphered = decryptECIES(privateKey, cipherObj)
     t.equal(deciphered, testString, 'Decrypted ciphertext does not match expected plaintext')
 
-    const testBuffer = new Buffer(testString)
+    const testBuffer = Buffer.from(testString)
     cipherObj = encryptECIES(publicKey, testBuffer)
     deciphered = decryptECIES(privateKey, cipherObj)
     t.equal(deciphered.toString('hex'), testBuffer.toString('hex'),
@@ -52,7 +52,7 @@ export function runEncryptionTests() {
     t.true(verifyECDSA(testString, sigObj.publicKey, sigObj.signature),
            'String content should be verified')
 
-    const testBuffer = new Buffer(testString)
+    const testBuffer = Buffer.from(testString)
     sigObj = signECDSA(privateKey, testBuffer)
     t.true(verifyECDSA(testBuffer, sigObj.publicKey, sigObj.signature),
            'String buffer should be verified')

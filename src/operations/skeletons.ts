@@ -127,7 +127,7 @@ export class BlockstackNamespace {
     const bucketHex = this.buckets.map(b => b.toString(16)).reduce((b1, b2) => b1 + b2, '')
     const discountHex = this.nonalphaDiscount.toString(16) + this.noVowelDiscount.toString(16)
     const versionHex = `0000${this.version.toString(16)}`.slice(-4)
-    const namespaceIDHex = new Buffer(this.namespaceID).toString('hex')
+    const namespaceIDHex = Buffer.from(this.namespaceID).toString('hex')
 
     return lifeHex + coeffHex + baseHex + bucketHex + discountHex + versionHex + namespaceIDHex
   }
@@ -638,7 +638,7 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
 
   const tx = makeTXbuilder()
   const zonefileHashB58 = bitcoin.address.toBase58Check(
-    new Buffer(zonefileHash, 'hex'), network.layer1.pubKeyHash
+    Buffer.from(zonefileHash, 'hex'), network.layer1.pubKeyHash
   )
 
   tx.addOutput(nullOutput, 0)
@@ -694,7 +694,7 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
 
   const opReturnBuffer = Buffer.alloc(46 + scratchArea.length)
 
-  const tokenTypeHex = new Buffer(tokenType).toString('hex')
+  const tokenTypeHex = Buffer.from(tokenType).toString('hex')
   const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
 
   const tokenValueHex = tokenAmount.toHex()

@@ -90,10 +90,10 @@ export function hexStringToECPair(skHex: string) {
       throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
                       + 'indicates compressed key, but last byte must be == 1')
     }
-    return ECPair.fromPrivateKey(new Buffer(skHex.slice(0, 64), 'hex'), ecPairOptions)
+    return ECPair.fromPrivateKey(Buffer.from(skHex.slice(0, 64), 'hex'), ecPairOptions)
   } else if (skHex.length === 64) {
     ecPairOptions.compressed = false
-    return ECPair.fromPrivateKey(new Buffer(skHex, 'hex'), ecPairOptions)
+    return ECPair.fromPrivateKey(Buffer.from(skHex, 'hex'), ecPairOptions)
   } else {
     throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.')
   }
