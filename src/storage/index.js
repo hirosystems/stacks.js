@@ -260,17 +260,27 @@ function getGaiaAddress(caller: UserSession,
     })
 }
 
-/* Handle fetching the contents from a given path. Handles both
- *  multi-player reads and reads from own storage.
- * @private
- */
-function getFileContents(caller: UserSession,
-                         path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
-                         forceText: boolean) : Promise<?string | ?ArrayBuffer> {
+export function getFileUrlImpl(caller: UserSession, path: string, options?: {
+    app?: string, 
+    username?: string, 
+    zoneFileLookupURL?: ?string 
+  }): Promise<string> {
   return Promise.resolve()
     .then(() => {
-      if (username) {
-        return getUserAppFileUrl(path, username, app, zoneFileLookupURL)
+      const appConfig = caller.appConfig
+      if (!appConfig) {
+        throw new InvalidStateError('Missing AppConfig')
+      }
+      const defaults = {
+        username: null,
+        app: appConfig.appDomain,
+        zoneFileLookupURL: null
+      }
+      return Object.assign({}, defaults, options)
+    })
+    .then((opts) => {
+      if (opts.username) {
+        return getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
       } else {
         return getOrSetLocalGaiaHubConnection(caller)
           .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
@@ -283,6 +293,44 @@ function getFileContents(caller: UserSession,
         resolve(readUrl)
       }
     }))
+}
+
+/**
+ * Get the URL for reading a file from an app's data store.
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise<string>} that resolves to the URL or rejects with an error
+ */
+export function getFileUrl(path: string, options?: {
+    username?: string,
+    app?: string,
+    zoneFileLookupURL?: ?string
+  }): Promise<string> {
+  console.warn('DEPRECATION WARNING: The static getFileUrl() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method getFileUrl().')
+  const userSession = new UserSession()
+  return getFileUrlImpl(userSession, path, options)
+}
+
+/* Handle fetching the contents from a given path. Handles both
+ *  multi-player reads and reads from own storage.
+ * @private
+ */
+function getFileContents(caller: UserSession,
+                         path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
+                         forceText: boolean) : Promise<?string | ?ArrayBuffer> {
+  return Promise.resolve()
+    .then(() => {
+      const opts: any = { app, username, zoneFileLookupURL }
+      return getFileUrlImpl(caller, path, opts)
+    })
     .then(readUrl => fetch(readUrl))
     .then((response) => {
       if (response.status !== 200) {

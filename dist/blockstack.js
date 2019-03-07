@@ -94387,6 +94387,24 @@ function () {
       return (0, _storage.getFileImpl)(this, path, options);
     }
     /**
+     * Get the URL for reading a file from an app's data store.
+     * @param {String} path - the path to the file to read
+     * @param {Object} [options=null] - options object
+     * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+     * @param {String} options.app - the app to lookup for multi-player storage -
+     * defaults to current origin
+     * @param {String} [options.zoneFileLookupURL=null] - The URL
+     * to use for zonefile lookup. If falsey, this will use the
+     * blockstack.js's getNameInfo function instead.
+     * @returns {Promise<string>} that resolves to the URL or rejects with an error
+     */
+
+  }, {
+    key: "getFileUrl",
+    value: function getFileUrl(path, options) {
+      return (0, _storage.getFileUrlImpl)(this, path, options);
+    }
+    /**
      * List the set of files in this application's Gaia storage bucket.
      * @param {function} callback - a callback to invoke on each named file that
      * returns `true` to continue the listing operation or `false` to end it
@@ -96926,7 +96944,7 @@ function (_BitcoinNetwork2) {
     key: "broadcastTransaction",
     value: function broadcastTransaction(transaction) {
       var jsonData = {
-        tx: transaction
+        rawtx: transaction
       };
       return fetch("".concat(this.apiUrl, "/tx/send"), {
         method: 'POST',
@@ -102016,6 +102034,8 @@ exports.deleteFile = deleteFile;
 exports.getUserAppFileUrl = getUserAppFileUrl;
 exports.encryptContentImpl = encryptContentImpl;
 exports.decryptContentImpl = decryptContentImpl;
+exports.getFileUrlImpl = getFileUrlImpl;
+exports.getFileUrl = getFileUrl;
 exports.getFileImpl = getFileImpl;
 exports.putFileImpl = putFileImpl;
 exports.getAppBucketUrl = getAppBucketUrl;
@@ -102276,16 +102296,24 @@ function getGaiaAddress(caller, app, username, zoneFileLookupURL) {
     return matches[matches.length - 1];
   });
 }
-/* Handle fetching the contents from a given path. Handles both
- *  multi-player reads and reads from own storage.
- * @private
- */
 
-
-function getFileContents(caller, path, app, username, zoneFileLookupURL, forceText) {
+function getFileUrlImpl(caller, path, options) {
   return Promise.resolve().then(function () {
-    if (username) {
-      return getUserAppFileUrl(path, username, app, zoneFileLookupURL);
+    var appConfig = caller.appConfig;
+
+    if (!appConfig) {
+      throw new _errors.InvalidStateError('Missing AppConfig');
+    }
+
+    var defaults = {
+      username: null,
+      app: appConfig.appDomain,
+      zoneFileLookupURL: null
+    };
+    return Object.assign({}, defaults, options);
+  }).then(function (opts) {
+    if (opts.username) {
+      return getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL);
     } else {
       return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
         return (0, _hub.getFullReadUrl)(path, gaiaHubConfig);
@@ -102299,6 +102327,41 @@ function getFileContents(caller, path, app, username, zoneFileLookupURL, forceTe
         resolve(readUrl);
       }
     });
+  });
+}
+/**
+ * Get the URL for reading a file from an app's data store.
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise<string>} that resolves to the URL or rejects with an error
+ */
+
+
+function getFileUrl(path, options) {
+  console.warn('DEPRECATION WARNING: The static getFileUrl() function will be deprecated in ' + 'the next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method getFileUrl().');
+  var userSession = new _userSession.UserSession();
+  return getFileUrlImpl(userSession, path, options);
+}
+/* Handle fetching the contents from a given path. Handles both
+ *  multi-player reads and reads from own storage.
+ * @private
+ */
+
+
+function getFileContents(caller, path, app, username, zoneFileLookupURL, forceText) {
+  return Promise.resolve().then(function () {
+    var opts = {
+      app: app,
+      username: username,
+      zoneFileLookupURL: zoneFileLookupURL
+    };
+    return getFileUrlImpl(caller, path, opts);
   }).then(function (readUrl) {
     return fetch(readUrl);
   }).then(function (response) {
