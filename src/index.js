@@ -1,3 +1,5 @@
+/* @flow */
+
 import queryString from 'query-string'
 
 // TODO: Putting in here so it executes ASAP. There is probably a better place to put this.
@@ -60,3 +62,5 @@ export { decodeToken } from 'jsontokens'
 export { config } from './config'
 
 export { encryptMnemonic, decryptMnemonic } from './encryption'
+
+export { UserSession }  from './auth/userSession'

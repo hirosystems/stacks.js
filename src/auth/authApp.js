@@ -1,26 +1,24 @@
 /* @flow */
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { makeAuthRequest, verifyAuthResponse } from './index'
+import { verifyAuthResponse } from './index'
 import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
-import { getAddressFromDID, makeECPrivateKey } from '../index'
-import { LoginFailedError } from '../errors'
-import { decryptPrivateKey } from './authMessages'
+import { getAddressFromDID } from '../index'
+import { InvalidStateError, LoginFailedError } from '../errors'
+import { decryptPrivateKey, makeAuthRequestImpl } from './authMessages'
 import {
-  BLOCKSTACK_APP_PRIVATE_KEY_LABEL,
-  BLOCKSTACK_STORAGE_LABEL,
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
+  NAME_LOOKUP_PATH,
   DEFAULT_SCOPE
 } from './authConstants'
 
-import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage'
-
 import { extractProfile } from '../profiles'
 
-import { Logger } from '../logger'
-
+import type { UserSession } from './userSession'
 import { config } from '../config'
+
+import { Logger } from '../logger'
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',
@@ -28,34 +26,161 @@ const DEFAULT_PROFILE = {
 }
 
 /**
- * Fetches the hex value of the transit private key from local storage.
- * @return {String} the hex encoded private key
- * @private
- */
-export function getTransitKey() : string {
-  const transitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
-  return ((transitKey: any): string)
-}
-
-/**
- * Generates a ECDSA keypair to
- * use as the ephemeral app transit private key
- * and stores the hex value of the private key in
- * local storage.
- * @return {String} the hex encoded private key
- */
-export function generateAndStoreTransitKey() {
-  const transitKey = makeECPrivateKey()
-  localStorage.setItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL, transitKey)
-  return transitKey
-}
-
-/**
  * Check if a user is currently signed in.
+ * @method isUserSignedIn
  * @return {Boolean} `true` if the user is signed in, `false` if not.
  */
 export function isUserSignedIn() {
-  return !!window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
+  console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method isUserSignedIn().')
+  const userSession = new this.UserSession()
+  return userSession.isUserSignedIn()
+}
+
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
+ * Most applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ *
+ * @param {String} [redirectURI=`${window.location.origin}/`]
+ * The location to which the identity provider will redirect the user after
+ * the user approves sign in.
+ * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * Location of the manifest file.
+ * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * this app's data store.
+ * An array of strings indicating which permissions this app is requesting.
+ * @return {void}
+ */
+/* eslint-disable no-unused-vars */
+export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
+                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
+                                 scopes: Array<string> = DEFAULT_SCOPE) { 
+  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method redirectToSignIn().')
+  const userSession = new this.UserSession()
+  userSession.redirectToSignIn()
+}
+/* eslint-enable no-unused-vars */
+
+/**
+ * Check if there is a authentication request that hasn't been handled.
+ * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
+ */
+export function isSignInPending() {
+  console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method isSignInPending().')
+  const userSession = new this.UserSession()
+  return userSession.isSignInPending()
+}
+
+/**
+ * Try to process any pending sign in request by returning a `Promise` that resolves
+ * to the user data object if the sign in succeeds.
+ *
+ * @param {String} nameLookupURL - the endpoint against which to verify public
+ * keys match claimed username
+ * @param {String} authResponseToken - the signed authentication response token
+ * @param {String} transitKey - the transit private key that corresponds to the transit public key
+ * that was provided in the authentication request
+ * @return {Promise} that resolves to the user data object if successful and rejects
+ * if handling the sign in request fails or there was no pending sign in request.
+ */
+/* eslint-disable no-unused-vars, no-use-before-define */
+export function handlePendingSignIn(nameLookupURL: string = '', 
+                                    authResponseToken: string = getAuthResponseToken(), 
+                                    transitKey: string = '') { 
+  console.warn('DEPRECATION WARNING: The static handlePendingSignIn() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method handlePendingSignIn().')
+  console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and '
+    + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.')
+  const userSession = new this.UserSession()
+  return userSession.handlePendingSignIn(authResponseToken)
+}
+/* eslint-enable no-unused-vars */
+
+/**
+ * Retrieve the authentication token from the URL query
+ * @return {String} the authentication token if it exists otherwise `null`
+ */
+function getAuthResponseToken(): string {
+  const queryDict = queryString.parse(location.search)
+  return queryDict.authResponse ? queryDict.authResponse : ''
+}
+
+/**
+ * Retrieves the user data object. The user's profile is stored in the key `profile`.
+ * @return {Object} User data object.
+ */
+export function loadUserData() {
+  console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method loadUserData().')
+  const userSession = new this.UserSession()
+  return userSession.loadUserData()
+}
+
+/**
+ * Sign the user out and optionally redirect to given location.
+ * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
+ * @return {void}
+ */
+export function signUserOut(redirectURL: ?string = null) { // eslint-disable-line no-unused-vars
+  console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method signUserOut().')
+  const userSession = new this.UserSession()
+  userSession.signUserOut()
+  window.location = redirectURL
+}
+
+/**
+ * Generates an authentication request that can be sent to the Blockstack
+ * browser for the user to approve sign in. This authentication request can
+ * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * method.
+ *
+ * *Note: This method should only be used if you want to roll your own authentication
+ * flow. Typically you'd use `redirectToSignIn` which takes care of this
+ * under the hood.*
+ *
+ * @param  {String} transitPrivateKey - hex encoded transit private key
+ * @param {String} redirectURI - location to redirect user to after sign in approval
+ * @param {String} manifestURI - location of this app's manifest file
+ * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {String} appDomain - the origin of this app
+ * @param {Number} expiresAt - the time at which this request is no longer valid
+ * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
+ * by special authenticators.
+ * @return {String} the authentication request
+ */
+export function makeAuthRequest(transitPrivateKey: string,
+                                redirectURI: string,
+                                manifestURI: string,
+                                scopes: Array<string>,
+                                appDomain: string = window.location.origin,
+                                expiresAt: number,
+                                extraParams: Object = {}): string {
+  console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
+    + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
+  const userSession = new this.UserSession()
+  const transitKey = (transitPrivateKey == null) 
+    ? userSession.generateAndStoreTransitKey() : transitPrivateKey
+
+  return makeAuthRequestImpl(transitKey, redirectURI, manifestURI,
+                             scopes, appDomain, expiresAt, extraParams)
 }
 
 /**
@@ -232,15 +357,21 @@ function detectProtocolLaunch(
  * The user is redirected to the `blockstackIDHost` if the `blockstack:`
  * protocol handler is not detected. Please note that the protocol handler detection
  * does not work on all browsers.
+ * @param  {UserSession} caller - the instance calling this method
  * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
  * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
  *                                     protocol handler is not detected
  * @return {void}
+ * @private
  */
-export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRequest(),
-                                                blockstackIDHost: string =
-                                                DEFAULT_BLOCKSTACK_HOST) {
-  const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
+export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
+                                                    authRequest: string) {
+  let httpsURI = `${DEFAULT_BLOCKSTACK_HOST}?authRequest=${authRequest}`
+
+  if (caller.appConfig
+      && caller.appConfig.authenticatorURL) {
+    httpsURI = `${caller.appConfig.authenticatorURL}?authRequest=${authRequest}`
+  }
 
   // If they're on a mobile OS, always redirect them to HTTPS site
   if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
@@ -269,45 +400,19 @@ export function redirectToSignInWithAuthRequest(authRequest: string = makeAuthRe
  * Please note that this requires that the web browser properly handles the
  * `blockstack:` URL protocol handler.
  *
- * Most applications should use this
+ * Most web applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
- *
- * @param {String} [redirectURI=`${window.location.origin}/`]
- * The location to which the identity provider will redirect the user after
- * the user approves sign in.
- * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
- * Location of the manifest file.
- * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
- * this app's data store.
- * An array of strings indicating which permissions this app is requesting.
+ * use `makeAuthRequest`,
+ * and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ * @param {UserSession} caller - the instance calling this function
  * @return {void}
+ * @private
  */
-export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`,
-                                 manifestURI: string = `${window.location.origin}/manifest.json`,
-                                 scopes: Array<string> = DEFAULT_SCOPE) {
-  const authRequest = makeAuthRequest(
-    generateAndStoreTransitKey(), redirectURI, manifestURI, scopes
-  )
-  redirectToSignInWithAuthRequest(authRequest)
-}
-
-/**
- * Retrieve the authentication token from the URL query
- * @return {String} the authentication token if it exists otherwise `null`
- */
-export function getAuthResponseToken(): string {
-  const queryDict = queryString.parse(location.search)
-  return queryDict.authResponse ? queryDict.authResponse : ''
-}
-
-/**
- * Check if there is a authentication request that hasn't been handled.
- * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
- */
-export function isSignInPending() {
-  return !!getAuthResponseToken()
+export function redirectToSignInImpl(caller: UserSession) {
+  const transitKey = caller.generateAndStoreTransitKey()
+  const authRequest = caller.makeAuthRequest(transitKey)
+  redirectToSignInWithAuthRequestImpl(caller, authRequest)
 }
 
 
@@ -315,18 +420,19 @@ export function isSignInPending() {
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
- * @param {String} nameLookupURL - the endpoint against which to verify public
- * keys match claimed username
+ * @param {UserSession} caller - the instance calling this function
  * @param {String} authResponseToken - the signed authentication response token
- * @param {String} transitKey - the transit private key that corresponds to the transit public key
- * that was provided in the authentication request
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
+ * @private
  */
-export function handlePendingSignIn(nameLookupURL: string = '',
-                                    authResponseToken: string = getAuthResponseToken(),
-                                    transitKey: string = getTransitKey()) {
-  if (!nameLookupURL) {
+export function handlePendingSignInImpl(caller: UserSession,
+                                        authResponseToken: string) {
+  const transitKey = caller.store.getSessionData().transitKey
+  const coreNodeSessionValue = caller.store.getSessionData().coreNode
+  let nameLookupURL = null
+
+  if (!coreNodeSessionValue) {
     const tokenPayload = decodeToken(authResponseToken).payload
     if (isLaterVersion(tokenPayload.version, '1.3.0')
        && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
@@ -334,10 +440,10 @@ export function handlePendingSignIn(nameLookupURL: string = '',
       Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
         + `with ${tokenPayload.blockstackAPIUrl}`)
       config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
-      nameLookupURL = `${tokenPayload.blockstackAPIUrl}/v1/names`
-    } 
-
-    nameLookupURL = `${config.network.blockstackAPIUrl}/v1/names/`
+    }
+    nameLookupURL = `${config.network.blockstackAPIUrl}${NAME_LOOKUP_PATH}`
+  } else {
+    nameLookupURL = `${coreNodeSessionValue}${NAME_LOOKUP_PATH}`
   }
   return verifyAuthResponse(authResponseToken, nameLookupURL)
     .then((isValid) => {
@@ -405,28 +511,28 @@ export function handlePendingSignIn(nameLookupURL: string = '',
           .then((response) => {
             if (!response.ok) { // return blank profile if we fail to fetch
               userData.profile = Object.assign({}, DEFAULT_PROFILE)
-              window.localStorage.setItem(
-                BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
-              )
+              const sessionData = caller.store.getSessionData()
+              sessionData.userData = userData
+              caller.store.setSessionData(sessionData)
               return userData
             } else {
               return response.text()
                 .then(responseText => JSON.parse(responseText))
                 .then(wrappedProfile => extractProfile(wrappedProfile[0].token))
                 .then((profile) => {
+                  const sessionData = caller.store.getSessionData()
                   userData.profile = profile
-                  window.localStorage.setItem(
-                    BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
-                  )
+                  sessionData.userData = userData
+                  caller.store.setSessionData(sessionData)
                   return userData
                 })
             }
           })
       } else {
+        const sessionData = caller.store.getSessionData()
         userData.profile = tokenPayload.profile
-        window.localStorage.setItem(
-          BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData)
-        )
+        sessionData.userData = userData
+        caller.store.setSessionData(sessionData)
         return userData
       }
     })
@@ -434,22 +540,43 @@ export function handlePendingSignIn(nameLookupURL: string = '',
 
 /**
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
- * @return {Object} User data object.
+ *
+ *  @param {UserSession} caller - the instance calling this function
+ *  @return {Object} User data object.
+ *  @private
  */
-export function loadUserData() {
-  return JSON.parse(window.localStorage.getItem(BLOCKSTACK_STORAGE_LABEL))
+export function loadUserDataImpl(caller: UserSession) {
+  const userData = caller.store.getSessionData().userData
+  if (!userData) {
+    throw new InvalidStateError('No user data found. Did the user sign in?')
+  }
+  return userData
 }
 
 /**
- * Sign the user out and optionally redirect to given location.
- * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
+ * Redirects the user to the Blockstack browser to approve the sign in request
+ * given.
+ *
+ * The user is redirected to the `blockstackIDHost` if the `blockstack:`
+ * protocol handler is not detected. Please note that the protocol handler detection
+ * does not work on all browsers.
+ * @param  {String} authRequest - the authentication request generated by `makeAuthRequest`
+ * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
+ *                                     protocol handler is not detected
  * @return {void}
  */
-export function signUserOut(redirectURL: ?string = null) {
-  window.localStorage.removeItem(BLOCKSTACK_STORAGE_LABEL)
-  window.localStorage.removeItem(BLOCKSTACK_GAIA_HUB_LABEL)
+export function redirectToSignInWithAuthRequest(authRequest: string,
+                                                blockstackIDHost: string =
+                                                DEFAULT_BLOCKSTACK_HOST) {
+  console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will '
+    + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession '
+    + 'and call the instance method redirectToSignInWithAuthRequest().')
+  const userSession = new this.UserSession()
 
-  if (redirectURL !== null) {
-    window.location = redirectURL
-  }
+  const sessionAuthRequest = (authRequest == null) 
+    ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest
+  
+  userSession.appConfig.authenticatorURL = blockstackIDHost
+
+  redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest)
 }
