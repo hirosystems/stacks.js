@@ -3,12 +3,12 @@
 <head>
   <meta charset='utf-8' />
   <title>blockstack 19.0.0 | Documentation</title>
-  <meta name='viewport' content='width=device-width,initial-scale=1'>
-  <link href='assets/bass.css' type='text/css' rel='stylesheet' />
-  <link href='assets/style.css' type='text/css' rel='stylesheet' />
-  <link href='assets/github.css' type='text/css' rel='stylesheet' />
-  <link href='assets/split.css' type='text/css' rel='stylesheet' />
   <meta name='description' content='The Blockstack Javascript library for authentication, identity, and storage.'>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link href='assets/bass.css' rel='stylesheet' />
+  <link href='assets/style.css' rel='stylesheet' />
+  <link href='assets/github.css' rel='stylesheet' />
+  <link href='assets/split.css' rel='stylesheet' />
 </head>
 <body class='documentation m0'>
     <div class='flex'>
@@ -850,240 +850,6 @@ redirectToSignInWithAuthRequest(authRequest)</pre>
   </section>
 </div>
           
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='authentication'>
-      Authentication
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Blockstack Authentication provides single sign on and authentication without third parties or remote servers. Blockstack Authentication is a bearer token-based authentication system. From an app user's perspective, it functions similar to legacy third-party authentication techniques that they're familiar with. For an app developer, the flow is a bit different from the typical client-server flow of centralized sign in services (e.g., OAuth). Rather, with Blockstack, the authentication flow happens entirely client-side.</p>
-<h2>Quickstart</h2>
-<p>1) Install <code>blockstack.js</code>:</p>
-<pre class='hljs'>npm install blockstack --save</pre>
-<p>2) Import Blockstack into your project</p>
-<pre class='hljs'><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> blockstack <span class="hljs-keyword">from</span> <span class="hljs-string">'blockstack'</span></pre>
-<p>3) Wire up a sign in button</p>
-<pre class='hljs'><span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'signin-button'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  blockstack.redirectToSignIn()
-})</pre>
-<p>4) Wire up a sign out button</p>
-<pre class='hljs'><span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'signout-button'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-  blockstack.signUserOut(<span class="hljs-built_in">window</span>.location.origin)
-})</pre>
-<p>5) Include the logic to (a) load user data (b) handle the auth response</p>
-<pre class='hljs'><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showProfile</span>(<span class="hljs-params">profile</span>) </span>{
-  <span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> blockstack.Person(profile)
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'heading-name'</span>).innerHTML = person.name()
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'avatar-image'</span>).setAttribute(<span class="hljs-string">'src'</span>, person.avatarUrl())
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'section-1'</span>).style.display = <span class="hljs-string">'none'</span>
-  <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'section-2'</span>).style.display = <span class="hljs-string">'block'</span>
-}
-
-<span class="hljs-keyword">if</span> (blockstack.isUserSignedIn()) {
-  <span class="hljs-keyword">const</span> userData = blockstack.loadUserData()
-  showProfile(userData.profile)
-} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (blockstack.isSignInPending()) {
-  blockstack.handlePendingSignIn()
-  .then(<span class="hljs-function"><span class="hljs-params">userData</span> =&gt;</span> {
-    showProfile(userData.profile)
-  })
-}</pre>
-<p>6) Create a <code>manifest.json</code> file</p>
-<pre class='hljs'>{
-  <span class="hljs-attr">"name"</span>: <span class="hljs-string">"Hello, Blockstack"</span>,
-  <span class="hljs-attr">"start_url"</span>: <span class="hljs-string">"localhost:5000"</span>,
-  <span class="hljs-attr">"description"</span>: <span class="hljs-string">"A simple demo of Blockstack Auth"</span>,
-  <span class="hljs-attr">"icons"</span>: [{
-    <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://helloblockstack.com/icon-192x192.png"</span>,
-    <span class="hljs-attr">"sizes"</span>: <span class="hljs-string">"192x192"</span>,
-    <span class="hljs-attr">"type"</span>: <span class="hljs-string">"image/png"</span>
-  }]
-}</pre>
-<p>Make sure your <code>manifest.json</code> file has appropriate CORS headers so that it can
-be fetched via an http <code>GET</code> from any origin.</p>
-<p>7) Serve your application</p>
-<h2>User flow</h2>
-<p>What follows is a walk through of the experience of a user, Alice, signing in to your app with Blockstack.</p>
-<p>First, Alice clicks the "Sign in with Blockstack" button on your app. She is redirected to her copy of the Blockstack Browser. The Blockstack Browser shows Alice an approval dialog with information about your app including:</p>
-<ul>
-<li>The origin your app was served from</li>
-<li>Your app's name</li>
-<li>Your app's logo</li>
-<li>The types of permissions and data your app is requesting</li>
-</ul>
-<p>Alice can choose to authenticate as one of her Blockstack IDs by selecting the ID and clicking the Approve button.</p>
-<p>When she clicks approve, she's redirected back to your app. Your app gets cryptographic proof that she is who she claims to be, access to a dedicated bucket in her Gaia storage hub for your app to read and write its own data along with public information she's stored in her profile.</p>
-<h2>Manifest file</h2>
-<p>Blockstack apps have a manifest file based on the <a href="https://w3c.github.io/manifest/">W3C web app manifest specification</a>. The Blockstack Browser retrieves the manifest file from the app during the authentication process and displays some of the information in it such as the app name and icon to the user. The location of the app manifest file is specific in the authentication request token and <em>MUST</em> be on the same origin as the app requesting authentication.</p>
-<p>Below is an example of a manifest file:</p>
-<pre><code>{
-  "name": "Todo App",
-  "start_url": "http://blockstack-todos.appartisan.com",
-  "description": "A simple todo app build on blockstack",
-  "icons": [{
-    "src": "http://blockstack-todos.appartisan.com/logo.png",
-    "sizes": "400x400",
-    "type": "image/png"
-  }]
-}
-</code></pre>
-<p>The manifest file <em>MUST</em> have <a href="https://en.wikipedia.org/wiki/Cross-origin_resource_sharing">Cross-origin resource sharing (CORS) headers</a> that allow the manifest file to be fetched from any arbitrary source. This usually means returning:</p>
-<pre><code>Access-Control-Allow-Origin: *
-</code></pre>
-<h2>Key pairs</h2>
-<p>Blockstack Authentication makes extensive use of public key cryptography. As mentioned above, we use ECDSA with the secp256k1 curve. What follows is a description of the various public-private key pairs used in the authentication process including how they're generated, where they're used and to whom the private key is disclosed.</p>
-<h3>Transit private key</h3>
-<p>The transit private is an ephemeral key that is used to encrypt secrets that need to be passed from the Blockstack Browser to the app during the authentication process. It is randomly generated by the app at the beginning of the authentication response. The public key that corresponds to the transit private key is stored in a single element array in the <code>public_keys</code> key of the authentication request token. The Blockstack Browser encrypts secret data such as the app private key using this public key and sends it back to the app when the user signs in to the app. The transit private key signs the app authentication request.</p>
-<h3>Blockstack ID Identity address private key</h3>
-<p>The identity address private key is derived from the user's keychain phrase and is the private key of the Blockstack ID that the user chooses to use to sign in to the app. It is a secret owned by the user and never leaves the user's instance of the Blockstack browser. This private key signs the authentication response token for an app to indicate that the user approves sign in to that app.</p>
-<h3>App private key</h3>
-<p>The app private key is an app-specific private key that is generated from the user's identity address private key using the <code>domain_name</code> as input. It is deterministic in that for a given Blockstack ID and <code>domain_name</code>, the same private key will be generated each time. The app private key is securely shared with the app on each authentication, encrypted by the Blockstack browser with the transit public key.</p>
-<p>The app private key serves three functions.</p>
-<ul>
-<li>It is used to create the credentials that give an app access to the gaia hub storage bucket for that specific app.</li>
-<li>It is used in the end-to-end encryption of files stored for the app on the user's gaia hub.</li>
-<li>It serves as a cryptographic secret that apps can use to perform other cryptographic functions.</li>
-</ul>
-<h2>Scopes</h2>
-<p>Scopes define the information and permissions an app requests from the
-user during authentication. Requested scopes may be any of the following:</p>
-<ul>
-<li>
-<p><code>store_write</code> - read and write data to the user's Gaia hub in an app-specific storage bucket</p>
-</li>
-<li>
-<p><code>publish_data</code> - publish data so that other users of the app can discover and interact with the user</p>
-</li>
-<li>
-<p><code>email</code> - requests the user's email if available</p>
-<p> If no <code>scopes</code> array is provided to the <code>redirectToSignIn</code> or
-<code>makeAuthRequest</code> functions, the default is to request <code>['store_write']</code>.</p>
-</li>
-</ul>
-<h2>Authentication tokens</h2>
-<p>The app and the Blockstack Browser communicate during the authentication flow by passing back and forth two tokens:</p>
-<p>The requesting application sends the Blockstack Browser an authRequest token.
-Once a user approves a sign in, the Blockstack Browser responds to the application with an authResponse token.</p>
-<p>These tokens are <a href="https://jwt.io/">JSON Web Tokens</a>, and they are passed via URL query strings.</p>
-<h3>JSON Web Token signatures</h3>
-<p>Blockstack's authentication tokens are based on the <a href="https://tools.ietf.org/html/rfc7519">RFC 7519 OAuth JSON Web Token (JWT)</a> with additional support for the secp256k1 curve used by bitcoin and many other cryptocurrencies.</p>
-<p>This signature algorithm is indicated by specifying <code>ES256K</code> in the token's <code>alg</code> key, specifying that the JWT signature uses ECDSA with the secp256k1 curve. We provide both <a href="https://github.com/blockstack/jsontokens-js">JavaScript</a> and <a href="https://github.com/blockstack/ruby-jwt-blockstack/tree/ruby-jwt-blockstack">Ruby</a> JWT libraries with support for this signing algorithm.</p>
-<h3>Authentication request payload schema</h3>
-<pre class='hljs'><span class="hljs-keyword">const</span> requestPayload = {
-    jti, <span class="hljs-comment">// UUID</span>
-    iat, <span class="hljs-comment">// JWT creation time in seconds</span>
-    exp, <span class="hljs-comment">// JWT expiration time in seconds</span>
-    iss, <span class="hljs-comment">// legacy decentralized identifier generated from transit key</span>
-    public_keys, <span class="hljs-comment">// single entry array with public key of transit key</span>
-    domain_name, <span class="hljs-comment">// app origin</span>
-    manifest_uri, <span class="hljs-comment">// url to manifest file - must be hosted on app origin</span>
-    redirect_uri, <span class="hljs-comment">// url to which browser redirects user on auth approval - must be hosted on app origin</span>
-    version, <span class="hljs-comment">// version tuple</span>
-    do_not_include_profile, <span class="hljs-comment">// a boolean flag asking browser to send profile url instead of profile object</span>
-    supports_hub_url, <span class="hljs-comment">// a boolean flag indicating gaia hub support</span>
-    scopes <span class="hljs-comment">// an array of string values indicating scopes requested by the app</span>
-  }</pre>
-<h3>Authentication response payload schema</h3>
-<pre class='hljs'>    <span class="hljs-keyword">const</span> responsePayload = {
-    jti, <span class="hljs-comment">// UUID</span>
-    iat, <span class="hljs-comment">// JWT creation time in seconds</span>
-    exp, <span class="hljs-comment">// JWT expiration time in seconds</span>
-    iss, <span class="hljs-comment">// legacy decentralized identifier (string prefix + identity address) - this uniquely identifies the user</span>
-    private_key, <span class="hljs-comment">// encrypted private key payload</span>
-    public_keys, <span class="hljs-comment">// single entry array with public key</span>
-    profile, <span class="hljs-comment">// profile object or null if passed by profile_url</span>
-    username, <span class="hljs-comment">// blockstack id username (if any)</span>
-    core_token, <span class="hljs-comment">// encrypted core token payload</span>
-    email, <span class="hljs-comment">// email if email scope is requested &amp; email available</span>
-    profile_url, <span class="hljs-comment">// url to signed profile token</span>
-    hubUrl, <span class="hljs-comment">// url pointing to user's gaia hub</span>
-    version <span class="hljs-comment">// version tuple</span>
-  }</pre>
-<h2><code>blockstack:</code> custom protocol handler</h2>
-<p>The <code>blockstack:</code> custom protocol handler is how Blockstack apps send their authentication requests to the Blockstack Browser. When the Blockstack Browser is installed on a user's computer, it registers itself as the handler for the <code>blockstack:</code> customer protocol.</p>
-<p>When an application calls <a href="http://blockstack.github.io/blockstack.js/index.html#redirecttosignin"><code>redirectToSignIn</code></a> or <a href="http://blockstack.github.io/blockstack.js/index.html#redirecttosigninwithauthrequest"><code>redirectToSignInWithAuthRequest</code></a>, blockstack.js checks if a blockstack: protocol handler is installed and, if so, redirects the user to <code>blockstack:&#x3C;authRequestToken></code>. This passes the authentication request token from the app to the Blockstack Browser, which will in turn validate the request and display an authentication dialog.</p>
-<h2>Adding Blockstack Authentication to your app</h2>
-<p>The way you can add Blockstack Authentication to you app depends on whether your app is a modern decentralized Blockstack App where code runs client-side without trusted servers or a legacy client-server app where a server is trusted.</p>
-<h3>Authentication in Client-side apps</h3>
-<p>This method is appropriate for decentralized client-side apps where the user's zone of trust - the parts of the app that the user is trusting - begins and ends with the code running on their own computer. In apps like these, any code the app interacts with that's not on their own computer such as external servers does not need to know who she is.</p>
-<p><a href="https://github.com/blockstack/blockstack.js">Blockstack.js</a> provides API methods that help you to implement Blockstack Authentication in your client-side app.</p>
-<h4>Standard flow</h4>
-<p>The preferred way to implement authentication in these apps is to use the standard flow. This flow hides much of the process behind a few easy function calls and makes it very fast to get up and running.</p>
-<p>In this process you'll use these four functions:</p>
-<ul>
-<li><code>redirectToSignIn</code></li>
-<li><code>isSignInPending</code></li>
-<li><code>handlePendingSignIn</code></li>
-<li><code>loadUserData</code></li>
-</ul>
-<h5>Starting the sign in process</h5>
-<p>When your app wants to start the sign in process, typically when the user clicks a "Sign in with Blockstack" button, your app will call the <a href="http://blockstack.github.io/blockstack.js/index.html#redirecttosignin"><code>redirectToSignIn</code></a> method of <a href="https://github.com/blockstack/blockstack.js">blockstack.js</a>.</p>
-<p>This creates an ephemeral transit key, stores it in the web browser's <code>localStorage</code>, uses it to create an authentication request token and finally redirects the user to the Blockstack browser to approve the sign in request.</p>
-<h5>Handling an authentication response</h5>
-<p>When a user approves a sign in request, the Blockstack Browser will return the signed authentication response token to the <code>redirectURI</code> specified in <code>redirectToSignIn</code>.</p>
-<p>To check for the presence of this token, your app should call <code>isSignInPending</code>. If this returns <code>true</code>, the app should then call <code>handlePendingSignIn</code>. This decodes the token, returns the signed-in-user's data, and simultaneously storing it to <code>localStorage</code> so that it can be retrieved later with <code>loadUserData</code>.</p>
-<pre class='hljs'><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> blockstack <span class="hljs-keyword">from</span> <span class="hljs-string">'blockstack'</span>
-
-<span class="hljs-keyword">if</span> (blockstack.isSignInPending()) {
-    blockstack.handlePendingSignIn()
-    .then(<span class="hljs-function"><span class="hljs-params">userData</span> =&gt;</span> {
-        <span class="hljs-keyword">const</span> profile = userData.profile
-    })
-}</pre>
-<h4>Manual flow</h4>
-<p>Alternatively, you can manually generate your own transit private key and/or authentication request token. This gives you more control over the experience.</p>
-<p>For example, you could use the following code to generate an authentication request on <code>https://alice.example.com</code> or <code>https://bob.example.com</code> for an app running on origin <code>https://example.com</code>.</p>
-<pre class='hljs'><span class="hljs-keyword">const</span> transitPrivateKey = generateAndStoreTransitKey()
-<span class="hljs-keyword">const</span> redirectURI = <span class="hljs-string">'https://example.com/authLandingPage'</span>
-<span class="hljs-keyword">const</span> manifestURI = <span class="hljs-string">'https://example.com/manifest.json'</span>
-<span class="hljs-keyword">const</span> scopes = [<span class="hljs-string">'scope_write'</span>, <span class="hljs-string">'publish_data'</span>]
-<span class="hljs-keyword">const</span> appDomain = <span class="hljs-string">'https://example.com'</span>
-
-<span class="hljs-keyword">const</span> authRequest = makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes, appDomain)
-
-redirectToSignInWithAuthRequest(authRequest)</pre>
-<h3>Authentication in client-server apps</h3>
-<p><em>Note: Client-server authentication requires using a library written in the language of your server app. There are private methods in blockstack.js that can be accomplish this on node.js server apps, but they are not currently part of our public, supported API.</em></p>
-<p>Using Blockstack Authentication in client-server apps is very similar to client-side apps. You generate the authentication request using the same code in the client as described above.</p>
-<p>The main difference is that you need to verify the authentication response token on the server after the user approves sign in to your app.</p>
-<p>For an example of how verification can be done server side, take a look at the <a href="https://github.com/blockstack/blockstack-ruby#to-verify-an-auth-response">blockstack-ruby</a> library.</p>
-
- 
-   
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -1106,10 +872,7 @@ class without any arguments will use
 On non-browser platforms, you need to
 specify an app domain as the first argument.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>new AppConfig(scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>, appDomain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirectPath: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, manifestPath: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, coreNode: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, authenticatorURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
-   
   
     <p>
       Type:
@@ -1220,10 +983,7 @@ specify an app domain as the first argument.</p>
 
   <p>Blockstack apps are uniquely identified by their app domain.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>appDomain</div>
-   
   
     <p>
       Type:
@@ -1237,6 +997,8 @@ specify an app domain as the first argument.</p>
   
   
   
+  
+
   
 
   
@@ -1273,10 +1035,7 @@ specify an app domain as the first argument.</p>
 
   <p>An array of string representing permissions requested by the app.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>scopes</div>
-   
   
     <p>
       Type:
@@ -1290,6 +1049,8 @@ specify an app domain as the first argument.</p>
   
   
   
+  
+
   
 
   
@@ -1327,10 +1088,7 @@ specify an app domain as the first argument.</p>
   <p>Path on app domain to redirect users to after authentication. The
 authentication response token will be postpended in a query.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>redirectPath</div>
-   
   
     <p>
       Type:
@@ -1344,6 +1102,8 @@ authentication response token will be postpended in a query.</p>
   
   
   
+  
+
   
 
   
@@ -1382,10 +1142,7 @@ authentication response token will be postpended in a query.</p>
 <p>This file needs to have CORS headers set so that it can be fetched
 from any origin. Typically this means return the header <code>Access-Control-Allow-Origin: *</code>.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>manifestPath</div>
-   
   
     <p>
       Type:
@@ -1399,6 +1156,8 @@ from any origin. Typically this means return the header <code>Access-Control-All
   
   
   
+  
+
   
 
   
@@ -1437,10 +1196,7 @@ from any origin. Typically this means return the header <code>Access-Control-All
 <code>null</code>, the core node specified by the user or default core node
 will be used.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>coreNode</div>
-   
   
     <p>
       Type:
@@ -1454,6 +1210,8 @@ will be used.</p>
   
   
   
+  
+
   
 
   
@@ -1492,10 +1250,7 @@ will be used.</p>
 the user doesn't have Blockstack installed on their machine. If this
 is not specified, the current default in this library will be used.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>authenticatorURL</div>
-   
   
     <p>
       Type:
@@ -1509,6 +1264,8 @@ is not specified, the current default in this library will be used.</p>
   
   
   
+  
+
   
 
   
@@ -1546,10 +1303,7 @@ is not specified, the current default in this library will be used.</p>
   <p>The location to which the authenticator should
 redirect the user.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>redirectURI(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
-   
   
   
 
@@ -1572,6 +1326,8 @@ redirect the user.</p>
 
       
     
+  
+
   
 
   
@@ -1602,10 +1358,7 @@ redirect the user.</p>
 
   <p>The location of the app's manifest file.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>manifestURI(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
-   
   
   
 
@@ -1639,6 +1392,8 @@ redirect the user.</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -1649,8 +1404,11 @@ redirect the user.</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -1673,10 +1431,7 @@ of the user's gaia storage bucket for the app.</p>
 <p>A user can be signed in either directly through the interactive
 sign in process or by directly providing the app private key.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>new UserSession(options: {appConfig: <a href="#appconfig">AppConfig</a>?, sessionStore: <a href="#sessiondatastore">SessionDataStore</a>?, sessionOptions: SessionOptions?})</div>
-   
   
     <p>
       Type:
@@ -1743,10 +1498,7 @@ authentication request is generated. If your app falls into this category,
 use <code>generateAndStoreTransitKey</code>, <code>makeAuthRequest</code>,
 and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>redirectToSignIn(): void</div>
-   
   
   
 
@@ -1769,6 +1521,8 @@ and <code>redirectToSignInWithAuthRequest</code> to build your own sign in proce
 
       
     
+  
+
   
 
   
@@ -1804,10 +1558,7 @@ if the <code>blockstack:</code> protocol handler is not detected.
 Please note that the protocol handler detection
 does not work on all browsers.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-   
   
   
 
@@ -1856,6 +1607,8 @@ does not work on all browsers.</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -1877,10 +1630,7 @@ does not work on all browsers.</p>
 use as the ephemeral app transit private key
 and store in the session</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>generateAndStoreTransitKey(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-   
   
   
 
@@ -1914,6 +1664,8 @@ and store in the session</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -1933,10 +1685,7 @@ and store in the session</p>
 
   <p>Retrieve the authentication token from the URL query</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAuthResponseToken(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-   
   
   
 
@@ -1971,6 +1720,8 @@ and store in the session</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -1990,10 +1741,7 @@ and store in the session</p>
 
   <p>Check if there is a authentication request that hasn't been handled.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>isSignInPending(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-   
   
   
 
@@ -2029,6 +1777,8 @@ and store in the session</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -2048,10 +1798,7 @@ and store in the session</p>
 
   <p>Check if a user is currently signed in.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-   
   
   
 
@@ -2088,6 +1835,8 @@ and store in the session</p>
   
 
   
+
+  
 </section>
 
       </div>
@@ -2108,10 +1857,7 @@ and store in the session</p>
   <p>Try to process any pending sign in request by returning a <code>Promise</code> that resolves
 to the user data object if the sign in succeeds.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>handlePendingSignIn(authResponseToken: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -2161,6 +1907,8 @@ if handling the sign in request fails or there was no pending sign in request.
   
 
   
+
+  
 </section>
 
       </div>
@@ -2180,10 +1928,7 @@ if handling the sign in request fails or there was no pending sign in request.
 
   <p>Retrieves the user data object. The user's profile is stored in the key <code>profile</code>.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>loadUserData(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-   
   
   
 
@@ -2217,6 +1962,8 @@ if handling the sign in request fails or there was no pending sign in request.
   
 
   
+
+  
 </section>
 
       </div>
@@ -2236,10 +1983,7 @@ if handling the sign in request fails or there was no pending sign in request.
 
   <p>Sign the user out</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>signUserOut(): void</div>
-   
   
   
 
@@ -2273,6 +2017,8 @@ if handling the sign in request fails or there was no pending sign in request.
   
 
   
+
+  
 </section>
 
       </div>
@@ -2292,10 +2038,7 @@ if handling the sign in request fails or there was no pending sign in request.
 
   <p>Encrypts the data provided with the app public key.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>encryptContent(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-   
   
   
 
@@ -2379,6 +2122,8 @@ key to use for encryption. If not provided, will use user's appPrivateKey.
   
 
   
+
+  
 </section>
 
       </div>
@@ -2399,10 +2144,7 @@ key to use for encryption. If not provided, will use user's appPrivateKey.
   <p>Decrypts data encrypted with <code>encryptContent</code> with the
 transit private key.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>decryptContent(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)</div>
-   
   
   
 
@@ -2486,6 +2228,8 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
   
 
   
+
+  
 </section>
 
       </div>
@@ -2505,10 +2249,7 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
 
   <p>Stores the data provided in the app's data store to to the file specified.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -2616,6 +2357,8 @@ if it failed
   
 
   
+
+  
 </section>
 
       </div>
@@ -2635,10 +2378,7 @@ if it failed
 
   <p>Retrieves the specified file from the app's data store.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -2769,6 +2509,8 @@ or rejects with an error
   
 
   
+
+  
 </section>
 
       </div>
@@ -2788,10 +2530,7 @@ or rejects with an error
 
   <p>Get the URL for reading a file from an app's data store.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getFileUrl(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
-   
   
   
 
@@ -2897,6 +2636,8 @@ blockstack.js's getNameInfo function instead.
   
 
   
+
+  
 </section>
 
       </div>
@@ -2916,10 +2657,7 @@ blockstack.js's getNameInfo function instead.
 
   <p>List the set of files in this application's Gaia storage bucket.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>listFiles(callback: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -2972,6 +2710,8 @@ returns
   
 
   
+
+  
 </section>
 
       </div>
@@ -2982,8 +2722,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3001,10 +2744,7 @@ returns
 
   <p>An abstract class representing the SessionDataStore interface.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>new SessionDataStore(sessionOptions: SessionOptions)</div>
-   
   
     <p>
       Type:
@@ -3048,8 +2788,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3067,10 +2810,7 @@ returns
 
   <p>Stores session data in the instance of this class.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>new InstanceDataStore(sessionOptions: SessionOptions)</div>
-   
   
     <p>
       Type:
@@ -3121,8 +2861,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3140,10 +2883,7 @@ returns
 
   <p>Stores session data in browser a localStorage entry.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>new LocalStorageStore(sessionOptions: SessionOptions)</div>
-   
   
     <p>
       Type:
@@ -3194,8 +2934,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3213,10 +2956,7 @@ returns
 
   <p>Check if a user is currently signed in.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>isUserSignedIn(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-   
   
   
 
@@ -3253,8 +2993,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3279,10 +3022,7 @@ method for sign in unless they require more fine grained control over how the
 authentication request is generated. If your app falls into this category,
 use <code>makeAuthRequest</code> and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>redirectToSignIn(redirectURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>): void</div>
-   
   
   
 
@@ -3354,8 +3094,11 @@ An array of strings indicating which permissions this app is requesting.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3377,10 +3120,7 @@ given.</p>
 protocol handler is not detected. Please note that the protocol handler detection
 does not work on all browsers.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>redirectToSignInWithAuthRequest(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, blockstackIDHost: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-   
   
   
 
@@ -3440,8 +3180,11 @@ protocol handler is not detected
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3465,10 +3208,7 @@ method.</p>
 flow. Typically you'd use <code>redirectToSignIn</code> which takes care of this
 under the hood.</em></p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>makeAuthRequest(transitPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, redirectURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, manifestURI: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, scopes: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>, appDomain: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, expiresAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>, extraParams: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-   
   
   
 
@@ -3574,8 +3314,11 @@ by special authenticators.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3593,10 +3336,7 @@ by special authenticators.
 
   <p>Check if there is a authentication request that hasn't been handled.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>isSignInPending(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a></div>
-   
   
   
 
@@ -3632,8 +3372,11 @@ by special authenticators.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3652,10 +3395,7 @@ by special authenticators.
   <p>Try to process any pending sign in request by returning a <code>Promise</code> that resolves
 to the user data object if the sign in succeeds.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>handlePendingSignIn(nameLookupURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, authResponseToken: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, transitKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -3727,8 +3467,11 @@ if handling the sign in request fails or there was no pending sign in request.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3746,10 +3489,7 @@ if handling the sign in request fails or there was no pending sign in request.
 
   <p>Retrieves the user data object. The user's profile is stored in the key <code>profile</code>.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>loadUserData(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-   
   
   
 
@@ -3783,8 +3523,11 @@ if handling the sign in request fails or there was no pending sign in request.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -3802,10 +3545,7 @@ if handling the sign in request fails or there was no pending sign in request.
 
   <p>Sign the user out and optionally redirect to given location.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>signUserOut(redirectURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-   
   
   
 
@@ -3854,8 +3594,11 @@ if handling the sign in request fails or there was no pending sign in request.
   
 
   
+
+  
 </section>
 
+          
         
           
             <div class='keyline-top-not py2'>
@@ -3968,146 +3711,6 @@ to return true.</p>
   </section>
 </div>
           
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='profiles'>
-      Profiles
-    </h3>
-    
-    
-  </div>
-  
-
-  <p>Follow these steps to create and register a profile for a Blockchain ID:</p>
-<ol>
-<li>Create a JSON profile object</li>
-<li>Split up the profile into tokens, sign the tokens, and put them in a token file</li>
-<li>Create a zone file that points to the web location of the profile token file</li>
-</ol>
-<h3>Create a profile</h3>
-<pre class='hljs'>const profileOfNaval = {
-  "@context": "http://schema.org/",
-  "@type": "Person",
-  "name": "Naval Ravikant",
-  "description": "Co-founder of AngelList"
-}</pre>
-<h3>Sign a profile as a single token</h3>
-<pre class='hljs'>import { makeECPrivateKey, wrapProfileToken, Person } from 'blockstack'
-
-const privateKey = makeECPrivateKey()
-
-const person = new Person(profileOfNaval)
-const token = person.toToken(privateKey)
-const tokenFile = [wrapProfileToken(token)]</pre>
-<h3>Verify an individual token</h3>
-<pre class='hljs'><span class="hljs-keyword">import</span> { verifyProfileToken } <span class="hljs-keyword">from</span> <span class="hljs-string">'blockstack'</span>
-
-<span class="hljs-keyword">try</span> {
-  <span class="hljs-keyword">const</span> decodedToken = verifyProfileToken(tokenFile[<span class="hljs-number">0</span>].token, publicKey)
-} <span class="hljs-keyword">catch</span>(e) {
-  <span class="hljs-built_in">console</span>.log(e)
-}</pre>
-<h3>Recover a profile from a token file</h3>
-<pre class='hljs'><span class="hljs-keyword">const</span> recoveredProfile = Person.fromToken(tokenFile, publicKey)</pre>
-<h3>Validate profile schema</h3>
-<pre class='hljs'><span class="hljs-keyword">const</span> validationResults = Person.validateSchema(recoveredProfile)</pre>
-<h3>Where profile data is stored</h3>
-<p>Profile data is stored using Gaia on the user's selected storage provider.</p>
-<p>An example of a profile.json file URL using Blockstack provided storage:
-<code>https://gaia.blockstack.org/hub/1EeZtGNdFrVB2AgLFsZbyBCF7UTZcEWhHk/profile.json</code></p>
-<h3>Validate a proof</h3>
-<pre class='hljs'>import { validateProofs } from 'blockstack'
-
-const domainName = "naval.id"
-validateProofs(profile, domainName).then((proofs) =&gt; {
-  console.log(proofs)
-})</pre>
-<h3>How proofs are validated</h3>
-<p>The <code>validateProofs</code> function checks each of the proofs listed in the
-profile by fetching the proof URL and verifying the proof message.</p>
-<p>The proof message must be of the form:</p>
-<pre><code>Verifying my Blockstack ID is secured with the address
-1EeZtGNdFrVB2AgLFsZbyBCF7UTZcEWhHk
-</code></pre>
-<p>The proof message also must appear in the required location on the
-proof page specific to each type of social media account.</p>
-<p>The account from which the proof message is posted must match exactly
-the account identifier/username claimed in the user profile. The
-<code>validateProofs</code> function will check this in the body of the proof or
-in the proof URL depending on the service.</p>
-<h3>Adding additional social account validation services</h3>
-<p>The <code>Service</code> class can be extended to provide proof validation service
-to additional social account types. You will need to override the
-<code>getProofStatement(searchText: string)</code> method which parses the proof
-body and returns the proof message text. Additionally, the identifier
-claimed should be verified in the proof URL or in the body by implementing
-<code>getProofIdentity(searchText: string)</code> and setting <code>shouldValidateIdentityInBody()</code>
-to return true.</p>
-<p>The following snippet uses the meta tags in the proof page to retrieve the proof message.</p>
-<pre class='hljs'><span class="hljs-keyword">static</span> getProofStatement(searchText: string) {
-	<span class="hljs-keyword">const</span> $ = cheerio.load(searchText)
-	<span class="hljs-keyword">const</span> statement = $(<span class="hljs-string">'meta[property="og:description"]'</span>)
-	                    .attr(<span class="hljs-string">'content'</span>)
-
-	<span class="hljs-keyword">if</span> (statement !== <span class="hljs-literal">undefined</span> &amp;&amp; statement.split(<span class="hljs-string">':'</span>).length &gt; <span class="hljs-number">1</span>) {
-	  <span class="hljs-keyword">return</span> statement.split(<span class="hljs-string">':'</span>)[<span class="hljs-number">1</span>].trim().replace(<span class="hljs-string">'“'</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-string">'”'</span>, <span class="hljs-string">''</span>)
-	} <span class="hljs-keyword">else</span> {
-	  <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>
-	}
-}</pre>
-<h3>Currently supported proof validation services</h3>
-<ul>
-<li>Facebook</li>
-<li>Twitter</li>
-<li>Instagram</li>
-<li>LinkedIn</li>
-<li>Hacker News</li>
-<li>GitHub</li>
-</ul>
-<h3>Profile proof schema</h3>
-<p>Proofs are stored under the <code>account</code> key in the user's profile data</p>
-<pre class='hljs'><span class="hljs-string">"account"</span>: [
-	{
-	  <span class="hljs-string">"@type"</span>: <span class="hljs-string">"Account"</span>,
-	  <span class="hljs-string">"service"</span>: <span class="hljs-string">"twitter"</span>,
-	  <span class="hljs-string">"identifier"</span>: <span class="hljs-string">"naval"</span>,
-	  <span class="hljs-string">"proofType"</span>: <span class="hljs-string">"http"</span>,
-	  <span class="hljs-string">"proofUrl"</span>: <span class="hljs-string">"https://twitter.com/naval/status/12345678901234567890"</span>
-	}
-]</pre>
-
- 
-   
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4126,10 +3729,7 @@ to return true.</p>
   <p>Extracts a profile from an encoded token and optionally verifies it,
 if <code>publicKeyOrAddress</code> is provided.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>extractProfile(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-   
   
   
 
@@ -4197,8 +3797,11 @@ keypair that is thought to have signed the token
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4216,10 +3819,7 @@ keypair that is thought to have signed the token
 
   <p>Wraps a token for a profile token file</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>wrapProfileToken(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-   
   
   
 
@@ -4270,8 +3870,11 @@ keypair that is thought to have signed the token
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4289,10 +3892,7 @@ keypair that is thought to have signed the token
 
   <p>Signs a profile token</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>signProfileToken(profile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, privateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, subject: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, issuer: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, signingAlgorithm: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, issuedAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>, expiresAt: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date">Date</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-   
   
   
 
@@ -4399,8 +3999,11 @@ keypair that is thought to have signed the token
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4418,10 +4021,7 @@ keypair that is thought to have signed the token
 
   <p>Verifies a profile token</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>verifyProfileToken(token: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, publicKeyOrAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
-   
   
   
 
@@ -4487,8 +4087,11 @@ keypair that is thought to have signed the token
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4507,10 +4110,7 @@ keypair that is thought to have signed the token
   <p>Validates the social proofs in a user's profile. Currently supports validation of
 Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>validateProofs(profile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, ownerAddress: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -4577,8 +4177,11 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4596,10 +4199,7 @@ Facebook, Twitter, GitHub, Instagram, LinkedIn and HackerNews accounts.</p>
 
   <p>Look up a user profile by blockstack ID</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>lookupProfile(username: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -4659,8 +4259,11 @@ blockstack.js getNameInfo function.
   
 
   
+
+  
 </section>
 
+          
         
           
             <div class='keyline-top-not py2'>
@@ -4741,114 +4344,6 @@ writing an empty file to wipe data</em></p>
   </section>
 </div>
           
-          <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-  <div class='clearfix'>
-    
-    <h3 class='fl m0' id='storage'>
-      Storage
-    </h3>
-    
-    
-  </div>
-  
-
-  <blockquote>
-<p><strong>Notes</strong>:</p>
-<p>1) Blockstack Gaia Storage APIs and on-disk format will change in
-upcoming pre-releases breaking backward compatibility. File encryption is currently
-opt-in on a file by file basis.</p>
-<p>2) Certain storage features such as and collections are not implemented in the current
-version. These features will be rolled out in future updates.</p>
-</blockquote>
-<h2>Creating a file</h2>
-<pre class='hljs'><span class="hljs-keyword">let</span> options = {
-  <span class="hljs-attr">encrypt</span>: <span class="hljs-literal">false</span>
-}
- blockstack.putFile(<span class="hljs-string">"/hello.txt"</span>, <span class="hljs-string">"hello world!"</span>, options)
- .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-comment">// /hello.txt exists now, and has the contents "hello world!".</span>
- })</pre>
-<h2>Reading a file</h2>
-<pre class='hljs'> <span class="hljs-keyword">let</span> options = {
-   <span class="hljs-attr">decrypt</span>: <span class="hljs-literal">false</span>
- }
- 
- blockstack.getFile(<span class="hljs-string">"/hello.txt"</span>, options)
- .then(<span class="hljs-function">(<span class="hljs-params">fileContents</span>) =&gt;</span> {
-    <span class="hljs-comment">// get the contents of the file /hello.txt</span>
-    assert(fileContents === <span class="hljs-string">"hello world!"</span>)
- });</pre>
-<h2>Creating an encrypted file</h2>
-<pre class='hljs'> <span class="hljs-keyword">let</span> options = {
-   <span class="hljs-attr">encrypt</span>: <span class="hljs-literal">true</span>
- }
-
- blockstack.putFile(<span class="hljs-string">"/message.txt"</span>, <span class="hljs-string">"Secret hello!"</span>, options)
- .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-comment">// message.txt exists now, and has the contents "hello world!".</span>
- })</pre>
-<h2>Reading an encrypted file</h2>
-<pre class='hljs'> <span class="hljs-keyword">let</span> options = {
-   <span class="hljs-attr">decrypt</span>: <span class="hljs-literal">true</span>
- }
-
- blockstack.getFile(<span class="hljs-string">"/message.txt"</span>, options)
- .then(<span class="hljs-function">(<span class="hljs-params">fileContents</span>) =&gt;</span> {
-    <span class="hljs-comment">// get &amp; decrypt the contents of the file /message.txt</span>
-    assert(fileContents === <span class="hljs-string">"Secret hello!"</span>)
- });</pre>
-<h2>Reading another user's unencrypted file</h2>
-<p>In order for files to be publicly readable, the app must request
-the <code>publish_data</code> scope during authentication.</p>
-<pre class='hljs'> <span class="hljs-keyword">let</span> options = {
-   <span class="hljs-attr">user</span>: <span class="hljs-string">'ryan.id'</span>, <span class="hljs-comment">// the Blockstack ID of the user for which to lookup the file</span>
-   app: <span class="hljs-string">'http://BlockstackApp.com'</span> <span class="hljs-comment">// origin of the app this file is stored for</span>
- }
-
- blockstack.getFile(<span class="hljs-string">"/message.txt"</span>, options)
- .then(<span class="hljs-function">(<span class="hljs-params">fileContents</span>) =&gt;</span> {
-    <span class="hljs-comment">// get the contents of the file /message.txt</span>
-    assert(fileContents === <span class="hljs-string">"hello world!"</span>)
- });</pre>
-<h2>Deleting a file</h2>
-<p><em>Note: deleteFile is currently not implemented. For now, we recommend
-writing an empty file to wipe data</em></p>
-<pre class='hljs'> blockstack.deleteFile(<span class="hljs-string">"/hello.txt"</span>)
- .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
-    <span class="hljs-comment">// /hello.txt is now removed.</span>
- })</pre>
-
- 
-   
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4866,10 +4361,7 @@ writing an empty file to wipe data</em></p>
 
   <p>Get the app storage bucket URL</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAppBucketUrl(gaiaHubUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appPrivateKey: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -4927,8 +4419,11 @@ or rejects if it fails
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -4946,10 +4441,7 @@ or rejects if it fails
 
   <p>Fetch the public read URL of a user file for the specified app.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getUserAppFileUrl(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, username: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, appOrigin: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, zoneFileLookupURL: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5028,8 +4520,11 @@ or rejects with an error
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5047,10 +4542,7 @@ or rejects with an error
 
   <p>Retrieves the specified file from the app's data store.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getFile(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5181,8 +4673,11 @@ or rejects with an error
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5200,10 +4695,7 @@ or rejects with an error
 
   <p>Stores the data provided in the app's data store to to the file specified.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>putFile(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5322,8 +4814,11 @@ if it failed
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5341,10 +4836,7 @@ if it failed
 
   <p>Encrypts the data provided with the app public key.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>encryptContent(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-   
   
   
 
@@ -5428,8 +4920,11 @@ key to use for encryption. If not provided, will use user's appPublicKey.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5448,10 +4943,7 @@ key to use for encryption. If not provided, will use user's appPublicKey.
   <p>Decrypts data encrypted with <code>encryptContent</code> with the
 transit private key.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>decryptContent(content: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>), options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a> | <a href="https://nodejs.org/api/buffer.html">Buffer</a>)</div>
-   
   
   
 
@@ -5535,8 +5027,11 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5554,10 +5049,7 @@ key to use for decryption. If not provided, will use user's appPrivateKey.
 
   <p>List the set of files in this application's Gaia storage bucket.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>listFiles(callback: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5610,8 +5102,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5629,10 +5124,7 @@ returns
 
   <p>Retrieve the authentication token from the URL query</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAuthResponseToken(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
-   
   
   
 
@@ -5667,8 +5159,11 @@ returns
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5687,10 +5182,7 @@ returns
   <p>Detects if the native auth-browser is installed and is successfully
 launched via a custom protocol URI.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>detectProtocolLaunch(authRequest: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, successCallback: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, failCallback: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): void</div>
-   
   
   
 
@@ -5756,8 +5248,11 @@ launched via a custom protocol URI.</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5775,10 +5270,7 @@ launched via a custom protocol URI.</p>
 
   <p>Get the price of a name.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getNamePrice(fullyQualifiedName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5830,8 +5322,11 @@ launched via a custom protocol URI.</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5849,10 +5344,7 @@ launched via a custom protocol URI.</p>
 
   <p>Get the price of a namespace</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getNamespacePrice(namespaceID: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5904,8 +5396,11 @@ launched via a custom protocol URI.</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5924,10 +5419,7 @@ launched via a custom protocol URI.</p>
   <p>How many blocks can pass between a name expiring and the name being able to be
 re-registered by a different owner?</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getGracePeriod(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -5961,8 +5453,11 @@ re-registered by a different owner?</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -5980,10 +5475,7 @@ re-registered by a different owner?</p>
 
   <p>Get the names -- both on-chain and off-chain -- owned by an address.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getNamesOwned(address: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6031,8 +5523,11 @@ re-registered by a different owner?</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6051,10 +5546,7 @@ re-registered by a different owner?</p>
   <p>Get the blockchain address to which a name's registration fee must be sent
 (the address will depend on the namespace in which it is registered.)</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getNamespaceBurnAddress(namespace: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6102,8 +5594,11 @@ re-registered by a different owner?</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6122,10 +5617,7 @@ re-registered by a different owner?</p>
   <p>Get WHOIS-like information for a name, including the address that owns it,
 the block at which it expires, and the zone file anchored to it (if available).</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getNameInfo(fullyQualifiedName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6173,8 +5665,11 @@ the block at which it expires, and the zone file anchored to it (if available).<
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6192,10 +5687,7 @@ the block at which it expires, and the zone file anchored to it (if available).<
 
   <p>Get the pricing parameters and creation history of a namespace.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getNamespaceInfo(namespaceID: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6243,8 +5735,11 @@ the block at which it expires, and the zone file anchored to it (if available).<
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6263,10 +5758,7 @@ the block at which it expires, and the zone file anchored to it (if available).<
   <p>Get a zone file, given its hash.  Throws an exception if the zone file
 obtained does not match the hash.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getZonefile(zonefileHash: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6314,8 +5806,11 @@ obtained does not match the hash.</p>
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6334,10 +5829,7 @@ obtained does not match the hash.</p>
   <p>Get the status of an account for a particular token holding.  This includes its total number of
 expenditures and credits, lockup times, last txid, and so on.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAccountStatus(address: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, tokenType: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6395,8 +5887,11 @@ for this token
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6414,10 +5909,7 @@ for this token
 
   <p>Get a page of an account's transaction history.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAccountHistoryPage(address: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, page: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6475,8 +5967,11 @@ states of the account at various block heights (e.g. prior balances, txids, etc)
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6496,10 +5991,7 @@ states of the account at various block heights (e.g. prior balances, txids, etc)
 account beginning with this block's transactions, as well as all of the states the account
 passed through when this block was processed (if any).</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAccountAt(address: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, blockHeight: Integer): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6557,8 +6049,11 @@ states of the account at this block.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6576,10 +6071,7 @@ states of the account at this block.
 
   <p>Get the set of token types that this account owns</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAccountTokens(address: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6628,8 +6120,11 @@ type of token this account holds (excluding the underlying blockchain's tokens)
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6648,10 +6143,7 @@ type of token this account holds (excluding the underlying blockchain's tokens)
   <p>Get the number of tokens owned by an account.  If the account does not exist or has no
 tokens of this type, then 0 will be returned.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getAccountBalance(address: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, tokenType: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-   
   
   
 
@@ -6709,8 +6201,11 @@ held by this account.
   
 
   
+
+  
 </section>
 
+          
         
           
           <section class='p2 mb2 clearfix bg-white minishadow'>
@@ -6728,10 +6223,7 @@ held by this account.
 
   <p>Get the URL for reading a file from an app's data store.</p>
 
- 
-  
     <div class='pre p1 fill-light mt0'>getFileUrl(path: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>></div>
-   
   
   
 
@@ -6837,8 +6329,11 @@ blockstack.js's getNameInfo function instead.
   
 
   
+
+  
 </section>
 
+          
         
       </div>
     </div>

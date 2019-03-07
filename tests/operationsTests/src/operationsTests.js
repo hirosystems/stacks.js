@@ -3,8 +3,8 @@ import test from 'tape'
 
 import {
   transactions, config, network, hexStringToECPair 
-} from '../../../lib'
-import { hash160 } from '../../../lib/operations/utils'
+} from '../../../src'
+import { hash160 } from '../../../src/operations/utils'
 
 const BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST
 

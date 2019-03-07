@@ -1,4 +1,6 @@
 [ignore]
+babel.config.js
+.*/node_modules/browserify/*
 .*/node_modules/documentation/*
 .*/node_modules/.staging/*
 .*/node_modules/chalk/*

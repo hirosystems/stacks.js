@@ -3,7 +3,7 @@ import { SECP256K1Client } from 'jsontokens'
 import {
   getEntropy, makeECPrivateKey, publicKeyToAddress, isSameOriginAbsoluteUrl,
   ecPairToHexString, hexStringToECPair, ecPairToAddress, isLaterVersion
-} from '../../../lib'
+} from '../../../src'
 
 export function runUtilsTests() {
   test('makeECPrivateKey', (t) => {
