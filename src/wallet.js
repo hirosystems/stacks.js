@@ -5,7 +5,7 @@ import bip39 from 'bip39'
 import bip32 from 'bip32'
 import type BIP32 from 'bip32'
 import { ecPairToHexString } from './utils'
-import { encryptMnemonic, decryptMnemonic } from './encryption'
+import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888

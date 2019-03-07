@@ -12,7 +12,7 @@ import {
   makeECPrivateKey
 } from '../index'
 
-import { encryptECIES, decryptECIES } from '../encryption'
+import { encryptECIES, decryptECIES } from '../encryption/ec'
 
 import { Logger } from '../logger'
 
