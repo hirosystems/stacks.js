@@ -10,12 +10,12 @@
     "build:node": "rm -rf lib && tsc",
     "test": "npm run lint && NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
     "integration-test-ops": "NODE_ENV=test nyc node ./tests/operationsTests/src/index.ts",
+    "dev-auth": "npm run build:webpack && ts-node ./tests/browserTests/auth-server.ts",
+    "dev-proofs": "npm run build:webpack && ts-node ./tests/browserTests/proofs-server.ts",
     "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint --ext .ts ./src",
     "build-documentation": "rm -rf docs && typedoc --out docs src && typedoc --json docs/docs.json src",
-    "codecovUpload": "codecov",
-    "_todo_dev-auth": "npm run compile && npm run browserify && node ./tests/browserTests/auth-server.js",
-    "_todo_dev-proofs": "npm run compile && npm run browserify && node ./tests/browserTests/proofs-server.js"
+    "codecovUpload": "codecov"
   },
   "repository": {
     "type": "git",
