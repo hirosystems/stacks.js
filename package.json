@@ -8,6 +8,7 @@
     "browserify": "rm -rf ./dist/blockstack.js && browserify src/index.js --standalone blockstack -o ./dist/blockstack.js",
     "browserify-tests": "browserify src/index.js --debug --standalone blockstack -o ./tests/browserTests/bundle.js",
     "compile": "rm -rf lib && babel src -d lib",
+    "compile-watch": "rm -rf lib; babel src -d lib --watch",
     "compile-tests": "rm -rf tests/authTests/lib && rm -rf test/operationsTests/lib && babel tests/authTests/src -d tests/authTests/lib && babel tests/operationsTests/src -d tests/operationsTests/lib",
     "prepare": "npm run compile",
     "prepublishOnly": "npm run build",

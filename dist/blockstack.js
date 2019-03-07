@@ -44744,21 +44744,27 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":111,"minimalistic-assert":394,"minimalistic-crypto-utils":395}],216:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.4.1",
+  "_args": [
+    [
+      "elliptic@6.4.1",
+      "/Users/matt/Projects/blockstack.js"
+    ]
+  ],
+  "_from": "elliptic@6.4.1",
   "_id": "elliptic@6.4.1",
   "_inBundle": false,
   "_integrity": "sha512-BsXLz5sqX8OHcsh7CqBMztyXARmGQ3LWPtGjJi6DiJHq5C/qvi9P3OqgswKSDftbu8+IoI/QDTAm2fFnQ9SZSQ==",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^6.4.1",
+    "raw": "elliptic@6.4.1",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^6.4.1",
+    "rawSpec": "6.4.1",
     "saveSpec": null,
-    "fetchSpec": "^6.4.1"
+    "fetchSpec": "6.4.1"
   },
   "_requiredBy": [
     "/",
@@ -44769,8 +44775,7 @@ module.exports={
     "/tiny-secp256k1"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.1.tgz",
-  "_shasum": "c2d0b7776911b86722c632c3c06c60f2f819939a",
-  "_spec": "elliptic@^6.4.1",
+  "_spec": "6.4.1",
   "_where": "/Users/matt/Projects/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
@@ -44779,7 +44784,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -44789,7 +44793,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -92777,7 +92780,7 @@ function redirectToSignInWithAuthRequest(authRequest) {
   redirectToSignInWithAuthRequestImpl(userSession, sessionAuthRequest);
 }
 
-},{"../config":513,"../errors":516,"../index":517,"../logger":519,"../profiles":527,"../utils":551,"./authConstants":504,"./authMessages":505,"./index":509,"./userSession":512,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],504:[function(require,module,exports){
+},{"../config":513,"../errors":518,"../index":519,"../logger":521,"../profiles":529,"../utils":553,"./authConstants":504,"./authMessages":505,"./index":509,"./userSession":512,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],504:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -92822,7 +92825,7 @@ var _jsontokens = require("jsontokens");
 
 var _index = require("../index");
 
-var _encryption = require("../encryption");
+var _ec = require("../encryption/ec");
 
 var _logger = require("../logger");
 
@@ -92912,7 +92915,7 @@ function makeAuthRequestImpl(transitPrivateKey, redirectURI, manifestURI, scopes
 
 
 function encryptPrivateKey(publicKey, privateKey) {
-  var encryptedObj = (0, _encryption.encryptECIES)(publicKey, privateKey);
+  var encryptedObj = (0, _ec.encryptECIES)(publicKey, privateKey);
   var encryptedJSON = JSON.stringify(encryptedObj);
   return new Buffer(encryptedJSON).toString('hex');
 }
@@ -92931,7 +92934,7 @@ function encryptPrivateKey(publicKey, privateKey) {
 function decryptPrivateKey(privateKey, hexedEncrypted) {
   var unhexedString = new Buffer(hexedEncrypted, 'hex').toString();
   var encryptedObj = JSON.parse(unhexedString);
-  var decrypted = (0, _encryption.decryptECIES)(privateKey, encryptedObj);
+  var decrypted = (0, _ec.decryptECIES)(privateKey, encryptedObj);
 
   if (typeof decrypted !== 'string') {
     throw new Error('Unable to correctly decrypt private key');
@@ -93033,7 +93036,7 @@ function makeAuthResponse(privateKey) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../encryption":515,"../index":517,"../logger":519,"buffer":149,"cross-fetch/polyfill":168,"jsontokens":266}],506:[function(require,module,exports){
+},{"../encryption/ec":515,"../index":519,"../logger":521,"buffer":149,"cross-fetch/polyfill":168,"jsontokens":266}],506:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -93139,7 +93142,7 @@ function redirectUserToApp(authRequest, authResponse) {
   window.location = redirectURI;
 }
 
-},{"../index":517,"../logger":519,"../utils":551,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],507:[function(require,module,exports){
+},{"../index":519,"../logger":521,"../utils":553,"@babel/runtime/helpers/interopRequireDefault":11,"jsontokens":266,"query-string":421}],507:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93598,7 +93601,7 @@ function verifyAuthResponse(token, nameLookupURL) {
   });
 }
 
-},{".":509,"../index":517,"jsontokens":266}],509:[function(require,module,exports){
+},{".":509,"../index":519,"jsontokens":266}],509:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -93858,7 +93861,7 @@ function () {
 
 exports.SessionData = SessionData;
 
-},{"../errors":516,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11}],511:[function(require,module,exports){
+},{"../errors":518,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11}],511:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -94061,7 +94064,7 @@ function (_SessionDataStore2) {
 
 exports.LocalStorageStore = LocalStorageStore;
 
-},{"../errors":516,"./authConstants":504,"./sessionData":510,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],512:[function(require,module,exports){
+},{"../errors":518,"./authConstants":504,"./sessionData":510,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],512:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -94414,7 +94417,7 @@ function () {
 
 exports.UserSession = UserSession;
 
-},{"../errors":516,"../logger":519,"../storage":550,"../utils":551,"./appConfig":502,"./authApp":503,"./authMessages":505,"./sessionStore":511,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"query-string":421}],513:[function(require,module,exports){
+},{"../errors":518,"../logger":521,"../storage":552,"../utils":553,"./appConfig":502,"./authApp":503,"./authMessages":505,"./sessionStore":511,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"query-string":421}],513:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94430,7 +94433,7 @@ var config = {
 };
 exports.config = config;
 
-},{"./network":520}],514:[function(require,module,exports){
+},{"./network":522}],514:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94496,7 +94499,7 @@ export function getPublicKeyOrAddressFromDID(decentralizedID) {
 }
 */
 
-},{"./errors":516}],515:[function(require,module,exports){
+},{"./errors":518}],515:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -94510,28 +94513,12 @@ exports.encryptECIES = encryptECIES;
 exports.decryptECIES = decryptECIES;
 exports.signECDSA = signECDSA;
 exports.verifyECDSA = verifyECDSA;
-exports.encryptMnemonic = encryptMnemonic;
-exports.decryptMnemonic = decryptMnemonic;
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
-
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
-
-var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
 
 var _elliptic = require("elliptic");
 
 var _crypto = _interopRequireDefault(require("crypto"));
 
-var _bip = _interopRequireDefault(require("bip39"));
-
-var _triplesec = _interopRequireDefault(require("triplesec"));
-
-var _keys = require("./keys");
+var _keys = require("../keys");
 
 var ecurve = new _elliptic.ec('secp256k1');
 
@@ -94706,6 +94693,95 @@ function verifyECDSA(content, publicKey, signature) {
 
   return ecPublic.verify(contentHash, signature);
 }
+
+}).call(this,require("buffer").Buffer)
+},{"../keys":520,"@babel/runtime/helpers/interopRequireDefault":11,"buffer":149,"crypto":169,"elliptic":201}],516:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "encryptECIES", {
+  enumerable: true,
+  get: function get() {
+    return _ec.encryptECIES;
+  }
+});
+Object.defineProperty(exports, "decryptECIES", {
+  enumerable: true,
+  get: function get() {
+    return _ec.decryptECIES;
+  }
+});
+Object.defineProperty(exports, "signECDSA", {
+  enumerable: true,
+  get: function get() {
+    return _ec.signECDSA;
+  }
+});
+Object.defineProperty(exports, "verifyECDSA", {
+  enumerable: true,
+  get: function get() {
+    return _ec.verifyECDSA;
+  }
+});
+Object.defineProperty(exports, "CipherObject", {
+  enumerable: true,
+  get: function get() {
+    return _ec.CipherObject;
+  }
+});
+Object.defineProperty(exports, "getHexFromBN", {
+  enumerable: true,
+  get: function get() {
+    return _ec.getHexFromBN;
+  }
+});
+Object.defineProperty(exports, "encryptMnemonic", {
+  enumerable: true,
+  get: function get() {
+    return _wallet.encryptMnemonic;
+  }
+});
+Object.defineProperty(exports, "decryptMnemonic", {
+  enumerable: true,
+  get: function get() {
+    return _wallet.decryptMnemonic;
+  }
+});
+
+var _ec = require("./ec");
+
+var _wallet = require("./wallet");
+
+},{"./ec":515,"./wallet":517}],517:[function(require,module,exports){
+(function (Buffer){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.encryptMnemonic = encryptMnemonic;
+exports.decryptMnemonic = decryptMnemonic;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
+
+var _crypto = _interopRequireDefault(require("crypto"));
+
+var _bip = _interopRequireDefault(require("bip39"));
+
+var _triplesec = _interopRequireDefault(require("triplesec"));
+
 /**
  * Encrypt a raw mnemonic phrase to be password protected
  * @param {string} phrase - Raw mnemonic phrase
@@ -94713,8 +94789,6 @@ function verifyECDSA(content, publicKey, signature) {
  * @return {Promise<Buffer>} The encrypted phrase
  * @private
  */
-
-
 function encryptMnemonic(phrase, password) {
   return Promise.resolve().then(function () {
     // must be bip39 mnemonic
@@ -94850,7 +94924,7 @@ function decryptMnemonic(data, password) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./keys":518,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/wrapNativeSuper":21,"bip39":55,"buffer":149,"crypto":169,"elliptic":201,"triplesec":468}],516:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/wrapNativeSuper":21,"bip39":55,"buffer":149,"crypto":169,"triplesec":468}],518:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -95161,7 +95235,7 @@ function (_BlockstackError10) {
 
 exports.NoSessionDataError = NoSessionDataError;
 
-},{"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/wrapNativeSuper":21}],517:[function(require,module,exports){
+},{"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/wrapNativeSuper":21}],519:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -95489,7 +95563,7 @@ var _userSession = require("./auth/userSession");
   }
 })();
 
-},{"./auth":509,"./auth/userSession":512,"./config":513,"./dids":514,"./encryption":515,"./keys":518,"./network":520,"./operations":521,"./profiles":527,"./storage":550,"./utils":551,"./wallet":552,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/typeof":20,"jsontokens":266,"query-string":421}],518:[function(require,module,exports){
+},{"./auth":509,"./auth/userSession":512,"./config":513,"./dids":514,"./encryption":516,"./keys":520,"./network":522,"./operations":523,"./profiles":529,"./storage":552,"./utils":553,"./wallet":554,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/typeof":20,"jsontokens":266,"query-string":421}],520:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -95537,7 +95611,7 @@ function getPublicKeyFromPrivate(privateKey) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bitcoinjs-lib":73,"buffer":149,"crypto":169}],519:[function(require,module,exports){
+},{"bitcoinjs-lib":73,"buffer":149,"crypto":169}],521:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -95612,7 +95686,7 @@ function () {
 
 exports.Logger = Logger;
 
-},{"./config":513,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11}],520:[function(require,module,exports){
+},{"./config":513,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11}],522:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -97029,7 +97103,7 @@ var network = {
 exports.network = network;
 
 }).call(this,require("buffer").Buffer)
-},{"./errors":516,"./logger":519,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/slicedToArray":18,"bigi":51,"bitcoinjs-lib":73,"buffer":149,"form-data":227,"ripemd160":442}],521:[function(require,module,exports){
+},{"./errors":518,"./logger":521,"@babel/runtime/helpers/assertThisInitialized":2,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"@babel/runtime/helpers/slicedToArray":18,"bigi":51,"bitcoinjs-lib":73,"buffer":149,"form-data":227,"ripemd160":442}],523:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -97091,7 +97165,7 @@ Object.keys(_signers).forEach(function (key) {
 
 var _safety = require("./safety");
 
-},{"./safety":522,"./signers":523,"./skeletons":524,"./txbuild":525,"./utils":526}],522:[function(require,module,exports){
+},{"./safety":524,"./signers":525,"./skeletons":526,"./txbuild":527,"./utils":528}],524:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -97258,7 +97332,7 @@ var safety = {
 };
 exports.safety = safety;
 
-},{"../config":513,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18}],523:[function(require,module,exports){
+},{"../config":513,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18}],525:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -97326,7 +97400,7 @@ function () {
 
 exports.PubkeyHashSigner = PubkeyHashSigner;
 
-},{"../utils":551,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73}],524:[function(require,module,exports){
+},{"../utils":553,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73}],526:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -98039,7 +98113,7 @@ function makeTokenTransferSkeleton(recipientAddress, consensusHash, tokenType, t
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../config":513,"./utils":526,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"bigi":51,"bitcoinjs-lib":73,"buffer":149}],525:[function(require,module,exports){
+},{"../config":513,"./utils":528,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"bigi":51,"bitcoinjs-lib":73,"buffer":149}],527:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -99217,7 +99291,7 @@ var transactions = {
 exports.transactions = transactions;
 
 }).call(this,require("buffer").Buffer)
-},{"../config":513,"../errors":516,"./signers":523,"./skeletons":524,"./utils":526,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18,"bigi":51,"bitcoinjs-lib":73,"buffer":149}],526:[function(require,module,exports){
+},{"../config":513,"../errors":518,"./signers":525,"./skeletons":526,"./utils":528,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18,"bigi":51,"bitcoinjs-lib":73,"buffer":149}],528:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -99445,7 +99519,7 @@ function signInputs(txB, defaultSigner, otherSigners) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../errors":516,"./signers":523,"@babel/runtime/helpers/interopRequireDefault":11,"bigi":51,"bitcoinjs-lib":73,"buffer":149,"ripemd160":442}],527:[function(require,module,exports){
+},{"../errors":518,"./signers":525,"@babel/runtime/helpers/interopRequireDefault":11,"bigi":51,"bitcoinjs-lib":73,"buffer":149,"ripemd160":442}],529:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -99568,7 +99642,7 @@ var _profileZoneFiles = require("./profileZoneFiles");
 
 var _profileLookup = require("./profileLookup");
 
-},{"./profile":528,"./profileLookup":529,"./profileProofs":530,"./profileSchemas":532,"./profileTokens":538,"./profileZoneFiles":539,"./services":543}],528:[function(require,module,exports){
+},{"./profile":530,"./profileLookup":531,"./profileProofs":532,"./profileSchemas":534,"./profileTokens":540,"./profileZoneFiles":541,"./services":545}],530:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -99654,7 +99728,7 @@ function () {
 
 exports.Profile = Profile;
 
-},{"./profileProofs":530,"./profileTokens":538,"./profileZoneFiles":539,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"schema-inspector":444}],529:[function(require,module,exports){
+},{"./profileProofs":532,"./profileTokens":540,"./profileZoneFiles":541,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"schema-inspector":444}],531:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -99702,7 +99776,7 @@ function lookupProfile(username) {
   });
 }
 
-},{"../config":513,"./profileZoneFiles":539}],530:[function(require,module,exports){
+},{"../config":513,"./profileZoneFiles":541}],532:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -99758,7 +99832,7 @@ function validateProofs(profile, ownerAddress) {
   return Promise.all(proofsToValidate);
 }
 
-},{"./services":543}],531:[function(require,module,exports){
+},{"./services":545}],533:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -99838,7 +99912,7 @@ function (_Profile) {
 
 exports.CreativeWork = CreativeWork;
 
-},{"../profile":528,"../profileTokens":538,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],532:[function(require,module,exports){
+},{"../profile":530,"../profileTokens":540,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],534:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -99885,7 +99959,7 @@ var _personLegacy = require("./personLegacy");
 
 var _personZoneFiles = require("./personZoneFiles");
 
-},{"./creativework":531,"./organization":533,"./person":534,"./personLegacy":535,"./personZoneFiles":537}],533:[function(require,module,exports){
+},{"./creativework":533,"./organization":535,"./person":536,"./personLegacy":537,"./personZoneFiles":539}],535:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -99965,7 +100039,7 @@ function (_Profile) {
 
 exports.Organization = Organization;
 
-},{"../profile":528,"../profileTokens":538,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],534:[function(require,module,exports){
+},{"../profile":530,"../profileTokens":540,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],536:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -100281,7 +100355,7 @@ function (_Profile) {
 
 exports.Person = Person;
 
-},{"../profile":528,"../profileTokens":538,"./personLegacy":535,"./personUtils":536,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],535:[function(require,module,exports){
+},{"../profile":530,"../profileTokens":540,"./personLegacy":537,"./personUtils":538,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"schema-inspector":444}],537:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -100407,7 +100481,7 @@ function getPersonFromLegacyFormat(profile) {
   return profileData;
 }
 
-},{}],536:[function(require,module,exports){
+},{}],538:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -100633,7 +100707,7 @@ function getBirthDate(profile) {
   return birthDateString;
 }
 
-},{}],537:[function(require,module,exports){
+},{}],539:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -100703,7 +100777,7 @@ function resolveZoneFileToPerson(zoneFile, publicKeyOrAddress, callback) {
   }
 }
 
-},{"../profileTokens":538,"../profileZoneFiles":539,"./person":534,"zone-file":497}],538:[function(require,module,exports){
+},{"../profileTokens":540,"../profileZoneFiles":541,"./person":536,"zone-file":497}],540:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -100888,7 +100962,7 @@ function extractProfile(token) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../utils":551,"bitcoinjs-lib":73,"buffer":149,"jsontokens":266}],539:[function(require,module,exports){
+},{"../utils":553,"bitcoinjs-lib":73,"buffer":149,"jsontokens":266}],541:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -101013,7 +101087,7 @@ function resolveZoneFileToProfile(zoneFile, publicKeyOrAddress) {
   });
 }
 
-},{"../logger":519,"./index":527,"./profileTokens":538,"zone-file":497}],540:[function(require,module,exports){
+},{"../logger":521,"./index":529,"./profileTokens":540,"zone-file":497}],542:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101092,7 +101166,7 @@ function (_Service) {
 
 exports.Facebook = Facebook;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],541:[function(require,module,exports){
+},{"./service":548,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],543:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101156,7 +101230,7 @@ function (_Service) {
 
 exports.Github = Github;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],542:[function(require,module,exports){
+},{"./service":548,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16}],544:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101244,7 +101318,7 @@ function (_Service) {
 
 exports.HackerNews = HackerNews;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],543:[function(require,module,exports){
+},{"./service":548,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],545:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -101288,7 +101362,7 @@ var profileServices = {
 };
 exports.profileServices = profileServices;
 
-},{"./facebook":540,"./github":541,"./hackerNews":542,"./instagram":544,"./linkedIn":545,"./serviceUtils":547,"./twitter":548}],544:[function(require,module,exports){
+},{"./facebook":542,"./github":543,"./hackerNews":544,"./instagram":546,"./linkedIn":547,"./serviceUtils":549,"./twitter":550}],546:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101394,7 +101468,7 @@ function (_Service) {
 
 exports.Instagram = Instagram;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],545:[function(require,module,exports){
+},{"./service":548,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],547:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101493,7 +101567,7 @@ function (_Service) {
 
 exports.LinkedIn = LinkedIn;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],546:[function(require,module,exports){
+},{"./service":548,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/get":8,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],548:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101604,7 +101678,7 @@ function () {
 
 exports.Service = Service;
 
-},{"./serviceUtils":547,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"cross-fetch/polyfill":168}],547:[function(require,module,exports){
+},{"./serviceUtils":549,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/interopRequireDefault":11,"cross-fetch/polyfill":168}],549:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -101667,7 +101741,7 @@ function containsValidAddressProofStatement(proofStatement, address) {
   return false;
 }
 
-},{}],548:[function(require,module,exports){
+},{}],550:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -101726,7 +101800,7 @@ function (_Service) {
 
 exports.Twitter = Twitter;
 
-},{"./service":546,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],549:[function(require,module,exports){
+},{"./service":548,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/getPrototypeOf":9,"@babel/runtime/helpers/inherits":10,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/possibleConstructorReturn":16,"cheerio":150}],551:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -101924,7 +101998,7 @@ function getBucketUrl(gaiaHubUrl, appPrivateKey) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../auth/authConstants":504,"../auth/userSession":512,"../errors":516,"../index":517,"../logger":519,"../utils":551,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73,"buffer":149,"crypto":169,"jsontokens":266}],550:[function(require,module,exports){
+},{"../auth/authConstants":504,"../auth/userSession":512,"../errors":518,"../index":519,"../logger":521,"../utils":553,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73,"buffer":149,"crypto":169,"jsontokens":266}],552:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -101969,7 +102043,7 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 
 var _hub = require("./hub");
 
-var _encryption = require("../encryption");
+var _ec = require("../encryption/ec");
 
 var _keys = require("../keys");
 
@@ -102139,7 +102213,7 @@ function encryptContentImpl(caller, content, options) {
     opt.publicKey = (0, _keys.getPublicKeyFromPrivate)(privateKey);
   }
 
-  var cipherObject = (0, _encryption.encryptECIES)(opt.publicKey, content);
+  var cipherObject = (0, _ec.encryptECIES)(opt.publicKey, content);
   return JSON.stringify(cipherObject);
 }
 /**
@@ -102168,7 +102242,7 @@ function decryptContentImpl(caller, content, options) {
 
   try {
     var cipherObject = JSON.parse(content);
-    return (0, _encryption.decryptECIES)(privateKey, cipherObject);
+    return (0, _ec.decryptECIES)(privateKey, cipherObject);
   } catch (err) {
     if (err instanceof SyntaxError) {
       throw new Error('Failed to parse encrypted content JSON. The content may not ' + 'be encrypted. If using getFile, try passing { decrypt: false }.');
@@ -102296,7 +102370,7 @@ function getFileSignedUnencrypted(caller, path, opt) {
 
     if (gaiaAddress !== signerAddress) {
       throw new _errors.SignatureVerificationError("Signer pubkey address (".concat(signerAddress, ") doesn't") + " match gaia address (".concat(gaiaAddress, ")"));
-    } else if (!(0, _encryption.verifyECDSA)(Buffer.from(fileContents), publicKey, signature)) {
+    } else if (!(0, _ec.verifyECDSA)(Buffer.from(fileContents), publicKey, signature)) {
       throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature: ' + "path: ".concat(path, ", signature: ").concat(path).concat(SIGNATURE_FILE_SUFFIX));
     } else {
       return fileContents;
@@ -102349,7 +102423,7 @@ function handleSignedEncryptedContents(caller, path, storedContents, app, userna
       throw new _errors.SignatureVerificationError('Failed to get signature verification data from file:' + " ".concat(path));
     } else if (signerAddress !== address) {
       throw new _errors.SignatureVerificationError("Signer pubkey address (".concat(signerAddress, ") doesn't") + " match gaia address (".concat(address, ")"));
-    } else if (!(0, _encryption.verifyECDSA)(cipherText, signerPublicKey, signature)) {
+    } else if (!(0, _ec.verifyECDSA)(cipherText, signerPublicKey, signature)) {
       throw new _errors.SignatureVerificationError('Contents do not match ECDSA signature in file:' + " ".concat(path));
     } else {
       return caller.decryptContent(cipherText);
@@ -102478,7 +102552,7 @@ function putFileImpl(caller, path, content, options) {
 
 
   if (!opt.encrypt && opt.sign) {
-    var signatureObject = (0, _encryption.signECDSA)(privateKey, content);
+    var signatureObject = (0, _ec.signECDSA)(privateKey, content);
     var signatureContent = JSON.stringify(signatureObject);
     return (0, _hub.getOrSetLocalGaiaHubConnection)(caller).then(function (gaiaHubConfig) {
       return new Promise(function (resolve, reject) {
@@ -102504,7 +102578,7 @@ function putFileImpl(caller, path, content, options) {
       publicKey: publicKey
     });
 
-    var _signatureObject = (0, _encryption.signECDSA)(privateKey, cipherText);
+    var _signatureObject = (0, _ec.signECDSA)(privateKey, cipherText);
 
     var signedCipherObject = {
       signature: _signatureObject.signature,
@@ -102626,7 +102700,7 @@ function listFilesImpl(caller, callback) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"../auth/userSession":512,"../encryption":515,"../errors":516,"../keys":518,"../logger":519,"../profiles":527,"./hub":549,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18,"buffer":149}],551:[function(require,module,exports){
+},{"../auth/userSession":512,"../encryption/ec":515,"../errors":518,"../keys":520,"../logger":521,"../profiles":529,"./hub":551,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/slicedToArray":18,"buffer":149}],553:[function(require,module,exports){
 (function (Buffer){
 "use strict";
 
@@ -102804,7 +102878,7 @@ function isSameOriginAbsoluteUrl(uri1, uri2) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./config":513,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73,"buffer":149,"url":489}],552:[function(require,module,exports){
+},{"./config":513,"@babel/runtime/helpers/interopRequireDefault":11,"bitcoinjs-lib":73,"buffer":149,"url":489}],554:[function(require,module,exports){
 "use strict";
 
 var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard");
@@ -102836,7 +102910,7 @@ var _bip2 = _interopRequireDefault(require("bip32"));
 
 var _utils = require("./utils");
 
-var _encryption = require("./encryption");
+var _wallet = require("./encryption/wallet");
 
 var APPS_NODE_INDEX = 0;
 var IDENTITY_KEYCHAIN = 888;
@@ -103042,7 +103116,7 @@ function () {
   }, {
     key: "fromEncryptedMnemonic",
     value: function fromEncryptedMnemonic(data, password) {
-      return (0, _encryption.decryptMnemonic)(data, password).then(function (mnemonic) {
+      return (0, _wallet.decryptMnemonic)(data, password).then(function (mnemonic) {
         var seed = _bip.default.mnemonicToSeed(mnemonic);
 
         return new BlockstackWallet(_bip2.default.fromSeed(seed));
@@ -103083,7 +103157,7 @@ function () {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return (0, _encryption.encryptMnemonic)(mnemonic, password);
+                return (0, _wallet.encryptMnemonic)(mnemonic, password);
 
               case 2:
                 encryptedBuffer = _context.sent;
@@ -103220,5 +103294,5 @@ function () {
 
 exports.BlockstackWallet = BlockstackWallet;
 
-},{"./encryption":515,"./utils":551,"@babel/runtime/helpers/asyncToGenerator":3,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/interopRequireWildcard":12,"@babel/runtime/regenerator":24,"bip32":54,"bip39":55,"bitcoinjs-lib":73,"crypto":169}]},{},[517])(517)
+},{"./encryption/wallet":517,"./utils":553,"@babel/runtime/helpers/asyncToGenerator":3,"@babel/runtime/helpers/classCallCheck":4,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/interopRequireDefault":11,"@babel/runtime/helpers/interopRequireWildcard":12,"@babel/runtime/regenerator":24,"bip32":54,"bip39":55,"bitcoinjs-lib":73,"crypto":169}]},{},[519])(519)
 });
