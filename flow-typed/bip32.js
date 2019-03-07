@@ -1,3 +1,6 @@
+declare type Network = string;
+declare type ECSignature = Buffer;
+
 declare module 'bip32' {
   declare class BIP32 {
     depth: number;
@@ -24,7 +27,6 @@ declare module 'bip32' {
     neutered(): BIP32;
     isNeutered(): boolean;
     static HIGHEST_BIT: number;
-    constructor(keyPair: ECPair, chainCode: Buffer): void;
   }
 
   declare export default typeof BIP32;

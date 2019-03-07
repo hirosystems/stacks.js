@@ -23,9 +23,7 @@ export function validateProofs(profile: Object,
   if (profile.hasOwnProperty('account')) {
     accounts = profile.account
   } else {
-    return new Promise((resolve) => {
-      resolve([])
-    })
+    return Promise.resolve([])
   }
 
   accounts.forEach((account) => {
