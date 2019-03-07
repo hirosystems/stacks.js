@@ -1,28 +1,25 @@
 import { exec } from 'child_process'
+import { promisify } from 'util'
 import test from 'tape'
 
 import {
-  transactions, config, network, hexStringToECPair 
+  transactions, config, network, hexStringToECPair, ecPairToAddress
 } from '../../../src'
 import { hash160 } from '../../../src/operations/utils'
 
 const BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST
 
-function pExec(cmd) {
-  return new Promise(
-    (resolve, reject) => {
-      exec(cmd, (err, stdout, stderr) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(stdout, stderr)
-        }
-      })
-    }
-  )
+async function pExec(cmd: string) {
+  try {
+    const { stdout } = await promisify(exec)(cmd)
+    return stdout
+  } catch (error) {
+    console.error(`Failed to run "${cmd}": ${error}`)
+    throw error
+  }
 }
 
-function initializeBlockstackCore() {
+function initializeBlockstackCore(): Promise<any> {
   if (BLOCKSTACK_TEST) {
     // running with an external test suite
     return Promise.resolve()
@@ -56,9 +53,9 @@ function initializeBlockstackCore() {
   }
 }
 
-function nextBlock(numBlocks) {
+function nextBlock(numBlocks?: number): Promise<any> {
   if (BLOCKSTACK_TEST) {
-    const options = {
+    const options: {method: string, body?: string} = {
       method: 'POST'
     }
 
@@ -80,7 +77,7 @@ function nextBlock(numBlocks) {
   }
 }
 
-function shutdownBlockstackCore() {
+function shutdownBlockstackCore(): Promise<any> {
   if (BLOCKSTACK_TEST) {
     return Promise.resolve()
   } else {
@@ -96,16 +93,16 @@ export function runIntegrationTests() {
     const myNet = config.network
 
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
-    const destAddress = hexStringToECPair(dest).getAddress()
+    const destAddress = ecPairToAddress(hexStringToECPair(dest))
 
 
     const btcDest = '897f1b92041b798580f96b8be379053f6276f04eb7590a9042a62059d46d6fc301'
-    const btcDestAddress = hexStringToECPair(btcDest).getAddress()
+    const btcDestAddress = ecPairToAddress(hexStringToECPair(btcDest))
 
     const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
 
     const secondOwner = '54164693e3803223f7fa9a004997bfbf1475f5c44f65593fa45c6783086dafec01'
-    const transferDestination = hexStringToECPair(secondOwner).getAddress()
+    const transferDestination = ecPairToAddress(hexStringToECPair(secondOwner))
 
     const renewalDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
@@ -204,21 +201,21 @@ export function runIntegrationTests() {
     const nsPay = '6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01'
     const nsReveal = 'c244642ce0b4eb68da8e098facfcad889e3063c36a68b7951fb4c085de49df1b01'
 
-    const nsRevealAddress = hexStringToECPair(nsReveal).getAddress()
+    const nsRevealAddress = ecPairToAddress(hexStringToECPair(nsReveal))
 
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
-    const destAddress = hexStringToECPair(dest).getAddress()
+    const destAddress = ecPairToAddress(hexStringToECPair(dest))
 
     const btcDest = '3ad9f690cc7694572fe7574526ad260ff2e711d608d3224895efd932b1d47c7201'
-    const btcDestAddress = hexStringToECPair(btcDest).getAddress()
+    const btcDestAddress = ecPairToAddress(hexStringToECPair(btcDest))
 
     const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
 
     const secondOwner = '54164693e3803223f7fa9a004997bfbf1475f5c44f65593fa45c6783086dafec01'
-    const transferDestination = hexStringToECPair(secondOwner).getAddress()
+    const transferDestination = ecPairToAddress(hexStringToECPair(secondOwner))
 
     const renewalKey = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d'
-    const renewalDestination = hexStringToECPair(renewalKey).getAddress()
+    const renewalDestination = ecPairToAddress(hexStringToECPair(renewalKey))
 
     const zfTest = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 '
           + `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
