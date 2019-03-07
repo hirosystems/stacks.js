@@ -4,7 +4,24 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [18.3.0] - 2018-01-29
+## [19.0.0] - 2019-02-21
+
+### Added
+
+- Moved common user session related functions into `UserSession`. Session configuration is 
+done through AppConfig objects. This change removes the library's dependency on browser 
+environments.
+- List of functions moved: redirectToSignIn(), isUserSignedIn(), isSignInPending(), 
+handlePendingSignIn(), loadUserData(), signUserOut(), getFile(), putFile(), 
+encryptContent(), decryptContent(), listfile(), deleteFile()
+- The public API will remain backward compatible until a future release.
+
+### Changed
+
+- `loadUserData()` now throws an error instead of returning null if no signed in user session 
+is detected
+
+## [18.3.0] - 2019-01-29
 
 ### Changed
 
@@ -15,7 +32,7 @@ not installed.
 browser, the app will (1) open an auth handler in the native browser and (2) also redirect 
 the original tab to browser.blockstack.org. 
 
-## [18.2.1] - 2018-01-08
+## [18.2.1] - 2019-01-08
 
 ### Added
 
