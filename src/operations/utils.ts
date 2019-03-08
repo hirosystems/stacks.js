@@ -2,7 +2,7 @@
 
 import bitcoinjs from 'bitcoinjs-lib'
 import RIPEMD160 from 'ripemd160'
-import bigi from 'bigi'
+import BN from 'bn.js'
 
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
@@ -100,17 +100,17 @@ export function decodeB40(input: string) {
   // hence, we reverse the characters first, and use the index
   //  to compute the value of each digit, then sum
   const characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+'
-  const base = bigi.valueOf(40)
+  const base = new BN(40)
   const inputDigits = input.split('').reverse()
   const digitValues = inputDigits.map(
-    ((character: string, exponent: number) => bigi.valueOf(characters.indexOf(character))
-      .multiply(base.pow(bigi.valueOf(exponent))))
+    ((character: string, exponent: number) => new BN(characters.indexOf(character))
+      .mul(base.pow(new BN(exponent))))
   )
   const sum = digitValues.reduce(
-    (agg: bigi, cur: bigi) => agg.add(cur),
-    bigi.ZERO
+    (agg: BN, cur: BN) => agg.add(cur),
+    new BN(0)
   )
-  return sum.toHex()
+  return sum.toString(16, 2)
 }
 
 /**

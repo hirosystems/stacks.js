@@ -1,6 +1,6 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
-import bigi from 'bigi'
+import BN from 'bn.js'
 
 import { network } from '../../../src'
 
@@ -53,11 +53,11 @@ export function runNetworkTests() {
 
     mynet.getNamePrice('test.id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: bigi.fromByteArrayUnsigned('5500') }))
+        response, { units: 'BTC', amount: new BN('5500') }))
 
     mynet.getNamespacePrice('id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: bigi.fromByteArrayUnsigned('650000') }))
+        response, { units: 'BTC', amount: new BN('650000') }))
   })
 
   test('prices-v2', (t) => {
@@ -75,15 +75,15 @@ export function runNetworkTests() {
 
     mynet.getNamePrice('test.id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: bigi.fromByteArrayUnsigned('5500') }))
+        response, { units: 'BTC', amount: new BN('5500') }))
 
     mynet.getNamePrice('test-tokens.id')
       .then(response => t.deepEqual(
-        response, { units: 'STACKS', amount: bigi.fromByteArrayUnsigned('1733000') }))
+        response, { units: 'STACKS', amount: new BN('1733000') }))
 
     mynet.getNamespacePrice('id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: bigi.fromByteArrayUnsigned('650000') }))
+        response, { units: 'BTC', amount: new BN('650000') }))
   })
 
   test('accounts', (t) => {
@@ -117,16 +117,16 @@ export function runNetworkTests() {
       .catch(e => t.equal(e.message, 'Account not found'))
 
     mynet.getAccountBalance(addr, 'STACKS')
-      .then(response => t.deepEqual(response, bigi.fromByteArrayUnsigned('69129')))
+      .then(response => t.deepEqual(response, new BN('69129')))
     mynet.getAccountBalance(addr2, 'NOPE')
-      .then(response => t.deepEqual(response, bigi.fromByteArrayUnsigned('0')))
+      .then(response => t.deepEqual(response, new BN('0')))
 
     mynet.getAccountStatus(addr, 'STACKS')
       .then(response => t.deepEqual(response, 
                                     {
                                       address: addr,
-                                      credit_value: bigi.fromByteArrayUnsigned('123450'),
-                                      debit_value: bigi.fromByteArrayUnsigned('54321')
+                                      credit_value: new BN('123450'),
+                                      debit_value: new BN('54321')
                                     }))
     mynet.getAccountStatus(addr2, 'STACKS')
       .then(() => t.fail('did not get exception when querying status of unknown address'))
@@ -136,8 +136,8 @@ export function runNetworkTests() {
       .then(response => t.deepEqual(response, 
                                     [{
                                       address: addr,
-                                      credit_value: bigi.fromByteArrayUnsigned('123450'),
-                                      debit_value: bigi.fromByteArrayUnsigned('54321')
+                                      credit_value: new BN('123450'),
+                                      debit_value: new BN('54321')
                                     }]))
     mynet.getAccountHistoryPage(addr2, 0)
       .then(() => t.fail('did not get exception when querying history of unknown address'))
@@ -147,8 +147,8 @@ export function runNetworkTests() {
       .then(response => t.deepEqual(response, 
                                     [{
                                       address: addr,
-                                      credit_value: bigi.fromByteArrayUnsigned('123450'),
-                                      debit_value: bigi.fromByteArrayUnsigned('54321')
+                                      credit_value: new BN('123450'),
+                                      debit_value: new BN('54321')
                                     }]))
     mynet.getAccountAt(addr2, 567890)
       .then(() => t.fail('did not get exception when querying block txs of unknown address'))

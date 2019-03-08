@@ -1,7 +1,7 @@
 
 
 import bitcoin from 'bitcoinjs-lib'
-import BigInteger from 'bigi'
+import BN from 'bn.js'
 import {
   decodeB40, hash160, hash128, DUST_MINIMUM
 } from './utils'
@@ -9,7 +9,7 @@ import { config } from '../config'
 
 // support v1 and v2 price API endpoint return values
 type AmountTypeV1 = number
-type AmountTypeV2 = { units: string, amount: BigInteger }
+type AmountTypeV2 = { units: string, amount: BN }
 type AmountType = AmountTypeV1 | AmountTypeV2
 
 // todo : add name length / character verification
@@ -138,7 +138,7 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
   // the "units" of a v1 amount type are always 'BTC'
   if (typeof amount === 'number') {
-    return { units: 'BTC', amount: <any>BigInteger.fromByteArrayUnsigned(String(amount)) as BigInteger }
+    return { units: 'BTC', amount: new BN(String(amount)) }
   } else {
     return { units: amount.units, amount: amount.amount }
   }
@@ -202,7 +202,7 @@ export function makePreorderSkeleton(
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
   if (burnAmount.units !== 'BTC') {
-    const burnHex = burnAmount.amount.toHex()
+    const burnHex = burnAmount.amount.toString(16, 2)
     if (burnHex.length > 16) {
       // exceeds 2**64; can't fit
       throw new Error(`Cannot preorder '${fullyQualifiedName}': cannot fit price into 8 bytes`)
@@ -220,7 +220,7 @@ export function makePreorderSkeleton(
   tx.addOutput(preorderAddress, DUST_MINIMUM)
 
   if (burnAmount.units === 'BTC') {
-    const btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
+    const btcBurnAmount = burnAmount.amount.toNumber()
     tx.addOutput(burnAddress, btcBurnAmount)
   } else {
     tx.addOutput(burnAddress, DUST_MINIMUM)
@@ -339,11 +339,11 @@ export function makeRenewalSkeleton(
   const network = config.network
   const burnTokenAmount = burnAmount.units === 'BTC' ? null : burnAmount.amount
   const burnBTCAmount = burnAmount.units === 'BTC' 
-    ? parseInt(burnAmount.amount.toHex(), 16) : DUST_MINIMUM
+    ? burnAmount.amount.toNumber() : DUST_MINIMUM
   
   let burnTokenHex = null
   if (!!burnTokenAmount) {
-    const burnHex = burnTokenAmount.toHex()
+    const burnHex = burnTokenAmount.toString(16, 2)
     if (burnHex.length > 16) {
       // exceeds 2**64; can't fit 
       throw new Error(`Cannot renew '${fullyQualifiedName}': cannot fit price into 8 bytes`)
@@ -532,7 +532,7 @@ export function makeNamespacePreorderSkeleton(
   if (burnAmount.units === 'STACKS') {
     opReturnBufferLen = 47
   } else {
-    btcBurnAmount = parseInt(burnAmount.amount.toHex(), 16)
+    btcBurnAmount = burnAmount.amount.toNumber()
   }
 
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
@@ -541,7 +541,7 @@ export function makeNamespacePreorderSkeleton(
   opReturnBuffer.write(consensusHash, 23, 16, 'hex')
 
   if (burnAmount.units === 'STACKS') {
-    const burnHex = burnAmount.amount.toHex()
+    const burnHex = burnAmount.amount.toString(16, 2)
     const paddedBurnHex = `0000000000000000${burnHex}`.slice(-16)
     opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
   }
@@ -674,7 +674,7 @@ export function makeAnnounceSkeleton(messageHash: string) {
 }
 
 export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string,
-                                          tokenType: string, tokenAmount: BigInteger,
+                                          tokenType: string, tokenAmount: BN,
                                           scratchArea: string
 ) {
   /*
@@ -697,7 +697,7 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
   const tokenTypeHex = Buffer.from(tokenType).toString('hex')
   const tokenTypeHexPadded = `00000000000000000000000000000000000000${tokenTypeHex}`.slice(-38)
 
-  const tokenValueHex = tokenAmount.toHex()
+  const tokenValueHex = tokenAmount.toString(16, 2)
 
   if (tokenValueHex.length > 16) {
     // exceeds 2**64; can't fit

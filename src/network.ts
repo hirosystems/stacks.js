@@ -1,7 +1,7 @@
 
 import bitcoinjs from 'bitcoinjs-lib'
 import FormData from 'form-data'
-import bigi from 'bigi'
+import BN from 'bn.js'
 import RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
@@ -94,7 +94,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: bigi}> {
+  getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     // legacy code path
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
@@ -116,7 +116,7 @@ export class BlockstackNetwork {
         }
         const result = {
           units: 'BTC',
-          amount: <any>bigi.fromByteArrayUnsigned(String(namePrice.satoshis)) as bigi
+          amount: new BN(String(namePrice.satoshis))
         }
         return result
       })
@@ -128,7 +128,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: bigi}> {
+  getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: BN}> {
     // legacy code path
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then((resp) => {
@@ -147,7 +147,7 @@ export class BlockstackNetwork {
         }
         const result = {
           units: 'BTC',
-          amount: <any>bigi.fromByteArrayUnsigned(String(namespacePrice.satoshis)) as bigi
+          amount: new BN(String(namespacePrice.satoshis))
         }
         return result
       })
@@ -159,7 +159,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: bigi}> {
+  getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
         if (resp.status !== 200) {
@@ -178,12 +178,12 @@ export class BlockstackNetwork {
         }
         const result = {
           units: namePrice.units,
-          amount: <any>bigi.fromByteArrayUnsigned(namePrice.amount) as bigi
+          amount: new BN(namePrice.amount)
         }
         if (namePrice.units === 'BTC') {
           // must be at least dust-minimum
-          const dustMin = <any>bigi.fromByteArrayUnsigned(String(this.DUST_MINIMUM)) as bigi
-          if (result.amount.compareTo(dustMin) < 0) {
+          const dustMin = new BN(String(this.DUST_MINIMUM))
+          if (result.amount.ucmp(dustMin) < 0) {
             result.amount = dustMin
           }
         }
@@ -197,7 +197,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamespacePriceV2(namespaceID: string): Promise<{units: string, amount: bigi}> {
+  getNamespacePriceV2(namespaceID: string): Promise<{units: string, amount: BN}> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/namespaces/${namespaceID}`)
       .then((resp) => {
         if (resp.status !== 200) {
@@ -213,12 +213,12 @@ export class BlockstackNetwork {
         }
         const result = {
           units: namespacePrice.units,
-          amount: <any>bigi.fromByteArrayUnsigned(namespacePrice.amount) as bigi
+          amount: new BN(namespacePrice.amount)
         }
         if (namespacePrice.units === 'BTC') {
           // must be at least dust-minimum
-          const dustMin = <any>bigi.fromByteArrayUnsigned(String(this.DUST_MINIMUM)) as bigi
-          if (result.amount.compareTo(dustMin) < 0) {
+          const dustMin = new BN(String(this.DUST_MINIMUM))
+          if (result.amount.ucmp(dustMin) < 0) {
             result.amount = dustMin
           }
         }
@@ -235,7 +235,7 @@ export class BlockstackNetwork {
    *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
    *   .amount will be microStacks)
    */
-  getNamePrice(fullyQualifiedName: string): Promise<{units: string, amount: bigi}> {
+  getNamePrice(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     // handle v1 or v2 
     return Promise.resolve().then(() => this.getNamePriceV2(fullyQualifiedName))
       .catch(() => this.getNamePriceV1(fullyQualifiedName))
@@ -250,7 +250,7 @@ export class BlockstackNetwork {
    *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
    *   .amount will be microStacks)
    */
-  getNamespacePrice(namespaceID: string): Promise<{units: string, amount: bigi}> {
+  getNamespacePrice(namespaceID: string): Promise<{units: string, amount: BN}> {
     // handle v1 or v2 
     return Promise.resolve().then(() => this.getNamespacePriceV2(namespaceID))
       .catch(() => this.getNamespacePriceV1(namespaceID))
@@ -419,8 +419,8 @@ export class BlockstackNetwork {
         // coerce all addresses, and convert credit/debit to biginteger
         const formattedStatus = Object.assign({}, accountStatus, {
           address: this.coerceAddress(accountStatus.address),
-          debit_value: <any>bigi.fromByteArrayUnsigned(String(accountStatus.debit_value)) as bigi,
-          credit_value: <any>bigi.fromByteArrayUnsigned(String(accountStatus.credit_value)) as bigi
+          debit_value: new BN(String(accountStatus.debit_value)),
+          credit_value: new BN(String(accountStatus.credit_value))
         })
         return formattedStatus
       })
@@ -454,8 +454,8 @@ export class BlockstackNetwork {
         // coerse all addresses and convert to bigint
         return historyList.map((histEntry: any) => {
           histEntry.address = this.coerceAddress(histEntry.address)
-          histEntry.debit_value = bigi.fromByteArrayUnsigned(String(histEntry.debit_value))
-          histEntry.credit_value = bigi.fromByteArrayUnsigned(String(histEntry.credit_value))
+          histEntry.debit_value = new BN(String(histEntry.debit_value))
+          histEntry.credit_value = new BN(String(histEntry.credit_value))
           return histEntry
         })
       })
@@ -489,8 +489,8 @@ export class BlockstackNetwork {
         // coerce all addresses 
         return historyList.map((histEntry: any) => {
           histEntry.address = this.coerceAddress(histEntry.address)
-          histEntry.debit_value = bigi.fromByteArrayUnsigned(String(histEntry.debit_value))
-          histEntry.credit_value = bigi.fromByteArrayUnsigned(String(histEntry.credit_value))
+          histEntry.debit_value = new BN(String(histEntry.debit_value))
+          histEntry.credit_value = new BN(String(histEntry.credit_value))
           return histEntry
         })
       })
@@ -529,12 +529,12 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to a BigInteger that encodes the number of tokens 
    *   held by this account.
    */
-  getAccountBalance(address: string, tokenType: string): Promise<bigi> {
+  getAccountBalance(address: string, tokenType: string): Promise<BN> {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
       .then((resp) => {
         if (resp.status === 404) {
           // talking to an older blockstack core node without the accounts API
-          return Promise.resolve().then(() => bigi.fromByteArrayUnsigned('0'))
+          return Promise.resolve().then(() => new BN('0'))
         } else if (resp.status !== 200) {
           throw new Error(`Bad response status: ${resp.status}`)
         } else {
@@ -549,7 +549,7 @@ export class BlockstackNetwork {
         if (tokenBalance && tokenBalance.balance) {
           balance = tokenBalance.balance
         }
-        return <any>bigi.fromByteArrayUnsigned(balance) as bigi
+        return new BN(balance)
       })
   }
 

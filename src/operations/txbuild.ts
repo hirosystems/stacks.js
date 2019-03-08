@@ -1,7 +1,7 @@
 
 
 import bitcoinjs from 'bitcoinjs-lib'
-import BigInteger from 'bigi'
+import BN from 'bn.js'
 
 import {
   addUTXOsToFund, DUST_MINIMUM,
@@ -447,7 +447,7 @@ function estimateAnnounce(messageHash: string,
  */
 function estimateTokenTransfer(recipientAddress: string,
                                tokenType: string,
-                               tokenAmount: BigInteger,
+                               tokenAmount: BN,
                                scratchArea: string,
                                senderUtxos: number = 1,
                                additionalOutputs: number = 1
@@ -1053,7 +1053,7 @@ function makeAnnounce(messageHash: string,
  * @private
  */
 function makeTokenTransfer(recipientAddress: string, tokenType: string,
-                           tokenAmount: BigInteger, scratchArea: string,
+                           tokenAmount: BN, scratchArea: string,
                            senderKeyIn: string | TransactionSigner,
                            btcFunderKeyIn?: string | TransactionSigner,
                            buildIncomplete: boolean = false

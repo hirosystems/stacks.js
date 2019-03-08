@@ -1,7 +1,7 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
-import bigi from 'bigi'
+import BN from 'bn.js'
 
 import { network, InsightClient, BitcoindAPI } from '../../../src/network'
 import {
@@ -711,11 +711,11 @@ function transactionTests() {
     Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
-                                         <any>bigi.fromByteArrayUnsigned('123'),
+                                         new BN('123'),
                                          'hello world!', 2),
       transactions.makeTokenTransfer(testAddresses[1].address,
                                      'STACKS',
-                                     <any>bigi.fromByteArrayUnsigned('123'),
+                                     new BN('123'),
                                      'hello world!',
                                      testAddresses[4].skHex)])
       .then(([estimatedCost, hexTX]) => {
@@ -749,11 +749,11 @@ function transactionTests() {
     Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
-                                         <any>bigi.fromByteArrayUnsigned('123'),
+                                         new BN('123'),
                                          'hello world!', 2, 2),
       transactions.makeTokenTransfer(testAddresses[1].address,
                                      'STACKS',
-                                     <any>bigi.fromByteArrayUnsigned('123'),
+                                     new BN('123'),
                                      'hello world!',
                                      testAddresses[4].skHex,
                                      testAddresses[5].skHex)])
@@ -1207,7 +1207,7 @@ function transactionTests() {
         ),
         transactions.makeTokenTransfer(testAddresses[1].address,
                                        'STACKS',
-                                       <any>bigi.fromByteArrayUnsigned('123'),
+                                       new BN('123'),
                                        'hello world!',
                                        testAddresses[4].skHex)
       ])
