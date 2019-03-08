@@ -1,4 +1,6 @@
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const analyze = !!process.env.ANALYZE
 
 module.exports = {
   entry: './src/index.ts',
@@ -33,5 +35,6 @@ module.exports = {
     library: 'blockstack',
     libraryTarget: 'umd',
     globalObject: 'this'
-  }
+  },
+  plugins: [].concat(analyze ? new BundleAnalyzerPlugin() : [])
 };
