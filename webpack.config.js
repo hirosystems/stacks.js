@@ -31,5 +31,7 @@ module.exports = {
     filename: 'blockstack.js',
     path: path.resolve(__dirname, 'dist'),
     library: 'blockstack',
+    libraryTarget: 'umd',
+    globalObject: 'this'
   }
 };
