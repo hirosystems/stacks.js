@@ -3,7 +3,7 @@
   "version": "19.0.0",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
-  "browser": "dist/blockstack.js",
+  "unpkg": "dist/blockstack.js",
   "scripts": {
     "build": "npm run build:node && npm run build:webpack && npm run build-documentation",
     "build:webpack": "shx rm -rf dist/* && cross-env NODE_ENV=production webpack --mode=production",
