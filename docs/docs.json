@@ -3427,7 +3427,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"name": "bigi"
+										"name": "BN"
 									}
 								]
 							}
@@ -3949,7 +3949,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -4068,7 +4068,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -4187,7 +4187,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -4471,7 +4471,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -4590,7 +4590,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -4709,7 +4709,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -12005,7 +12005,7 @@
 								"typeArguments": [
 									{
 										"type": "reference",
-										"name": "bigi"
+										"name": "BN"
 									}
 								]
 							},
@@ -12627,7 +12627,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -12756,7 +12756,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -12885,7 +12885,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -13209,7 +13209,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -13338,7 +13338,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -13467,7 +13467,7 @@
 													],
 													"type": {
 														"type": "reference",
-														"name": "bigi"
+														"name": "BN"
 													}
 												},
 												{
@@ -22612,7 +22612,7 @@
 							],
 							"type": {
 								"type": "reference",
-								"name": "BigInteger"
+								"name": "BN"
 							}
 						},
 						{
@@ -28254,7 +28254,7 @@
 							},
 							"type": {
 								"type": "reference",
-								"name": "BigInteger"
+								"name": "BN"
 							}
 						},
 						{
@@ -36768,7 +36768,7 @@
 							},
 							"type": {
 								"type": "reference",
-								"name": "BigInteger"
+								"name": "BN"
 							}
 						},
 						{
@@ -36928,7 +36928,7 @@
 							"flags": {},
 							"type": {
 								"type": "reference",
-								"name": "BigInteger"
+								"name": "BN"
 							}
 						},
 						{
