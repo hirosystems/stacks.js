@@ -1,6 +1,7 @@
 
 import { GaiaHubConfig } from '../storage/hub'
 import { InvalidStateError } from '../errors'
+import { UserData } from './authApp'
 
 const SESSION_VERSION = '1.0.0'
 
@@ -10,7 +11,7 @@ export type SessionOptions = {
   identityAddress?: string,
   coreNode?: string,
   hubUrl?: string,
-  userData?: any,
+  userData?: UserData,
   transitKey?: string,
   localStorageKey?: string,
   storeOptions?: {
@@ -35,7 +36,7 @@ export class SessionData {
 
   // using this in place of
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
-  userData?: any
+  userData?: UserData
 
   gaiaHubConfig?: GaiaHubConfig
 

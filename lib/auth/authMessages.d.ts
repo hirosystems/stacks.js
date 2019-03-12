@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import 'cross-fetch/polyfill';
 declare type AuthMetadata = {
     email?: string;
@@ -42,7 +43,7 @@ export declare function makeAuthRequestImpl(transitPrivateKey: string, redirectU
  * @return {String} hex encoded ciphertext
  * @private
  */
-export declare function encryptPrivateKey(publicKey: string, privateKey: string): string | null;
+export declare function encryptPrivateKey(publicKey: string, privateKey: string & Buffer): string | null;
 /**
  * Decrypts the hex encrypted private key
  * @param  {String} privateKey  the private key corresponding to the public
@@ -79,5 +80,5 @@ export declare function decryptPrivateKey(privateKey: string, hexedEncrypted: st
  * @return {String} signed and encoded authentication response token
  * @private
  */
-export declare function makeAuthResponse(privateKey: string, profile: {}, username: string, metadata: AuthMetadata, coreToken?: string, appPrivateKey?: string, expiresAt?: number, transitPublicKey?: string, hubUrl?: string, blockstackAPIUrl?: string, associationToken?: string): string;
+export declare function makeAuthResponse(privateKey: string, profile: {}, username: string, metadata: AuthMetadata, coreToken?: string & Buffer, appPrivateKey?: string & Buffer, expiresAt?: number, transitPublicKey?: string, hubUrl?: string, blockstackAPIUrl?: string, associationToken?: string): string;
 export {};

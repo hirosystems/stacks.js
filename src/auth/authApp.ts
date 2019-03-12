@@ -3,7 +3,7 @@ import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './index'
-import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
+import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, nextMonth } from '../utils'
 import { getAddressFromDID } from '../index'
 import { InvalidStateError, LoginFailedError } from '../errors'
 import { decryptPrivateKey, makeAuthRequestImpl } from './authMessages'
@@ -20,10 +20,25 @@ import { UserSession } from './userSession'
 import { config } from '../config'
 
 import { Logger } from '../logger'
+import { GaiaHubConfig } from '../storage/hub'
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
+}
+
+export interface UserData {
+  username: string;
+  decentralizedID: string;
+  identityAddress: string;
+  appPrivateKey: string;
+  hubUrl: string;
+  authResponseToken: string;
+  coreSessionToken?: string;
+  gaiaAssociationToken?: string;
+  associationToken?: string;
+  profile: any;
+  gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
@@ -68,8 +83,8 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
-  const userSession = new UserSession()
-  userSession.redirectToSignIn()
+  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
+  redirectToSignInWithAuthRequest(authRequest)
 }
 /* eslint-enable no-unused-vars */
 
@@ -168,11 +183,11 @@ export function signUserOut(redirectURL: string | null = null) {
  * @return {String} the authentication request
  */
 export function makeAuthRequest(transitPrivateKey: string,
-                                redirectURI: string,
-                                manifestURI: string,
-                                scopes: Array<string>,
+                                redirectURI: string = `${window.location.origin}/`, 
+                                manifestURI: string = `${window.location.origin}/manifest.json`, 
+                                scopes: Array<string> = DEFAULT_SCOPE,
                                 appDomain: string = window.location.origin,
-                                expiresAt: number,
+                                expiresAt: number = nextMonth().getTime(),
                                 extraParams: any = {}): string {
   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
     + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
@@ -495,7 +510,7 @@ export function handlePendingSignInImpl(caller: UserSession,
         gaiaAssociationToken = tokenPayload.associationToken
       }
 
-      const userData = {
+      const userData: UserData = {
         username: tokenPayload.username,
         profile: tokenPayload.profile,
         decentralizedID: tokenPayload.iss,

@@ -1,4 +1,19 @@
 import { UserSession } from './userSession';
+import { GaiaHubConfig } from '../storage/hub';
+export interface UserData {
+    username: string;
+    email?: string;
+    decentralizedID: string;
+    identityAddress: string;
+    appPrivateKey: string;
+    hubUrl: string;
+    authResponseToken: string;
+    coreSessionToken?: string;
+    gaiaAssociationToken?: string;
+    associationToken?: string;
+    profile: any;
+    gaiaHubConfig?: GaiaHubConfig;
+}
 /**
  * Check if a user is currently signed in.
  * @method isUserSignedIn
@@ -45,22 +60,12 @@ export declare function isSignInPending(): boolean;
  * @return {Promise} that resolves to the user data object if successful and rejects
  * if handling the sign in request fails or there was no pending sign in request.
  */
-export declare function handlePendingSignIn(nameLookupURL?: string, authResponseToken?: string, transitKey?: string): Promise<{
-    username: any;
-    profile: any;
-    decentralizedID: any;
-    identityAddress: string;
-    appPrivateKey: any;
-    coreSessionToken: any;
-    authResponseToken: string;
-    hubUrl: string;
-    gaiaAssociationToken: any;
-}>;
+export declare function handlePendingSignIn(nameLookupURL?: string, authResponseToken?: string, transitKey?: string): Promise<UserData>;
 /**
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  * @return {Object} User data object.
  */
-export declare function loadUserData(): any;
+export declare function loadUserData(): UserData;
 /**
  * Sign the user out and optionally redirect to given location.
  * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
@@ -88,7 +93,7 @@ export declare function signUserOut(redirectURL?: string | null): void;
  * by special authenticators.
  * @return {String} the authentication request
  */
-export declare function makeAuthRequest(transitPrivateKey: string, redirectURI: string, manifestURI: string, scopes: Array<string>, appDomain: string, expiresAt: number, extraParams?: any): string;
+export declare function makeAuthRequest(transitPrivateKey: string, redirectURI?: string, manifestURI?: string, scopes?: Array<string>, appDomain?: string, expiresAt?: number, extraParams?: any): string;
 /**
  * Redirects the user to the Blockstack browser to approve the sign in request
  * given.
@@ -131,17 +136,7 @@ export declare function redirectToSignInImpl(caller: UserSession): void;
  * if handling the sign in request fails or there was no pending sign in request.
  * @private
  */
-export declare function handlePendingSignInImpl(caller: UserSession, authResponseToken: string): Promise<{
-    username: any;
-    profile: any;
-    decentralizedID: any;
-    identityAddress: string;
-    appPrivateKey: any;
-    coreSessionToken: any;
-    authResponseToken: string;
-    hubUrl: string;
-    gaiaAssociationToken: any;
-}>;
+export declare function handlePendingSignInImpl(caller: UserSession, authResponseToken: string): Promise<UserData>;
 /**
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  *
@@ -149,7 +144,7 @@ export declare function handlePendingSignInImpl(caller: UserSession, authRespons
  *  @return {Object} User data object.
  *  @private
  */
-export declare function loadUserDataImpl(caller: UserSession): any;
+export declare function loadUserDataImpl(caller: UserSession): UserData;
 /**
  * Redirects the user to the Blockstack browser to approve the sign in request
  * given.

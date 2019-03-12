@@ -99,22 +99,12 @@ export declare class UserSession {
      * @return {Promise} that resolves to the user data object if successful and rejects
      * if handling the sign in request fails or there was no pending sign in request.
      */
-    handlePendingSignIn(authResponseToken?: string): Promise<{
-        username: any;
-        profile: any;
-        decentralizedID: any;
-        identityAddress: string;
-        appPrivateKey: any;
-        coreSessionToken: any;
-        authResponseToken: string;
-        hubUrl: string;
-        gaiaAssociationToken: any;
-    }>;
+    handlePendingSignIn(authResponseToken?: string): Promise<import("./authApp").UserData>;
     /**
      * Retrieves the user data object. The user's profile is stored in the key `profile`.
      * @return {Object} User data object.
      */
-    loadUserData(): any;
+    loadUserData(): import("./authApp").UserData;
     /**
      * Sign the user out
      * @return {void}

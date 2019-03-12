@@ -1,11 +1,12 @@
 import { GaiaHubConfig } from '../storage/hub';
+import { UserData } from './authApp';
 export declare type SessionOptions = {
     appPrivateKey?: string;
     username?: string;
     identityAddress?: string;
     coreNode?: string;
     hubUrl?: string;
-    userData?: any;
+    userData?: UserData;
     transitKey?: string;
     localStorageKey?: string;
     storeOptions?: {
@@ -20,7 +21,7 @@ export declare class SessionData {
     coreNode?: string;
     hubUrl?: string;
     transitKey?: string;
-    userData?: any;
+    userData?: UserData;
     gaiaHubConfig?: GaiaHubConfig;
     constructor(options: SessionOptions);
     getGaiaHubConfig(): GaiaHubConfig;
