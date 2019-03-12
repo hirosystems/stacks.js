@@ -495,6 +495,7 @@ export function handlePendingSignInImpl(caller: UserSession,
       const userData = {
         username: tokenPayload.username,
         profile: tokenPayload.profile,
+        email: tokenPayload.email,
         decentralizedID: tokenPayload.iss,
         identityAddress: getAddressFromDID(tokenPayload.iss),
         appPrivateKey,
