@@ -36441,33 +36441,28 @@ exports.isHtml = function(str) {
 
 },{"./parse":157,"dom-serializer":188}],160:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "cheerio@0.22.0",
-      "/Users/matt/Projects/blockstack.js"
-    ]
-  ],
-  "_from": "cheerio@0.22.0",
+  "_from": "cheerio@^0.22.0",
   "_id": "cheerio@0.22.0",
   "_inBundle": false,
   "_integrity": "sha1-qbqoYKP5tZWmuBsahocxIe06Jp4=",
   "_location": "/cheerio",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "cheerio@0.22.0",
+    "raw": "cheerio@^0.22.0",
     "name": "cheerio",
     "escapedName": "cheerio",
-    "rawSpec": "0.22.0",
+    "rawSpec": "^0.22.0",
     "saveSpec": null,
-    "fetchSpec": "0.22.0"
+    "fetchSpec": "^0.22.0"
   },
   "_requiredBy": [
     "/"
   ],
   "_resolved": "https://registry.npmjs.org/cheerio/-/cheerio-0.22.0.tgz",
-  "_spec": "0.22.0",
+  "_shasum": "a9baa860a3f9b595a6b81b1a86873121ed3a269e",
+  "_spec": "cheerio@^0.22.0",
   "_where": "/Users/matt/Projects/blockstack.js",
   "author": {
     "name": "Matt Mueller",
@@ -36477,6 +36472,7 @@ module.exports={
   "bugs": {
     "url": "https://github.com/cheeriojs/cheerio/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "css-select": "~1.2.0",
     "dom-serializer": "~0.1.0",
@@ -36495,6 +36491,7 @@ module.exports={
     "lodash.reject": "^4.4.0",
     "lodash.some": "^4.4.0"
   },
+  "deprecated": false,
   "description": "Tiny, fast, and elegant implementation of core jQuery designed specifically for the server",
   "devDependencies": {
     "benchmark": "^2.1.0",
@@ -44744,27 +44741,21 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":111,"minimalistic-assert":394,"minimalistic-crypto-utils":395}],216:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "elliptic@6.4.1",
-      "/Users/matt/Projects/blockstack.js"
-    ]
-  ],
-  "_from": "elliptic@6.4.1",
+  "_from": "elliptic@^6.4.1",
   "_id": "elliptic@6.4.1",
   "_inBundle": false,
   "_integrity": "sha512-BsXLz5sqX8OHcsh7CqBMztyXARmGQ3LWPtGjJi6DiJHq5C/qvi9P3OqgswKSDftbu8+IoI/QDTAm2fFnQ9SZSQ==",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "elliptic@6.4.1",
+    "raw": "elliptic@^6.4.1",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "6.4.1",
+    "rawSpec": "^6.4.1",
     "saveSpec": null,
-    "fetchSpec": "6.4.1"
+    "fetchSpec": "^6.4.1"
   },
   "_requiredBy": [
     "/",
@@ -44775,7 +44766,8 @@ module.exports={
     "/tiny-secp256k1"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.1.tgz",
-  "_spec": "6.4.1",
+  "_shasum": "c2d0b7776911b86722c632c3c06c60f2f819939a",
+  "_spec": "elliptic@^6.4.1",
   "_where": "/Users/matt/Projects/blockstack.js",
   "author": {
     "name": "Fedor Indutny",
@@ -44784,6 +44776,7 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -44793,6 +44786,7 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
+  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -92147,13 +92141,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.isUserSignedIn = isUserSignedIn;
-exports.redirectToSignIn = redirectToSignIn;
 exports.isSignInPending = isSignInPending;
 exports.handlePendingSignIn = handlePendingSignIn;
 exports.loadUserData = loadUserData;
 exports.signUserOut = signUserOut;
 exports.makeAuthRequest = makeAuthRequest;
 exports.redirectToSignInWithAuthRequestImpl = redirectToSignInWithAuthRequestImpl;
+exports.redirectToSignIn = redirectToSignIn;
 exports.redirectToSignInImpl = redirectToSignInImpl;
 exports.handlePendingSignInImpl = handlePendingSignInImpl;
 exports.loadUserDataImpl = loadUserDataImpl;
@@ -92199,42 +92193,6 @@ function isUserSignedIn() {
   var userSession = new _userSession.UserSession();
   return userSession.isUserSignedIn();
 }
-/**
- * Generates an authentication request and redirects the user to the Blockstack
- * browser to approve the sign in request.
- *
- * Please note that this requires that the web browser properly handles the
- * `blockstack:` URL protocol handler.
- *
- * Most applications should use this
- * method for sign in unless they require more fine grained control over how the
- * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
- *
- * @param {String} [redirectURI=`${window.location.origin}/`]
- * The location to which the identity provider will redirect the user after
- * the user approves sign in.
- * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
- * Location of the manifest file.
- * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
- * this app's data store.
- * An array of strings indicating which permissions this app is requesting.
- * @return {void}
- */
-
-/* eslint-disable no-unused-vars */
-
-
-function redirectToSignIn() {
-  var redirectURI = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "".concat(window.location.origin, "/");
-  var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "".concat(window.location.origin, "/manifest.json");
-  var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_SCOPE;
-  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method redirectToSignIn().');
-  var userSession = new _userSession.UserSession();
-  userSession.redirectToSignIn();
-}
-/* eslint-enable no-unused-vars */
-
 /**
  * Check if there is a authentication request that hasn't been handled.
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
@@ -92333,9 +92291,12 @@ function signUserOut() {
  */
 
 
-function makeAuthRequest(transitPrivateKey, redirectURI, manifestURI, scopes) {
+function makeAuthRequest(transitPrivateKey) {
+  var redirectURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "".concat(window.location.origin, "/");
+  var manifestURI = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "".concat(window.location.origin, "/manifest.json");
+  var scopes = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : _authConstants.DEFAULT_SCOPE;
   var appDomain = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : window.location.origin;
-  var expiresAt = arguments.length > 5 ? arguments[5] : undefined;
+  var expiresAt = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : (0, _utils.nextMonth)().getTime();
   var extraParams = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : {};
   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the ' + 'next major release of blockstack.js. Use UserSession to configure your auth request.');
   var userSession = new _userSession.UserSession();
@@ -92589,6 +92550,38 @@ function redirectToSignInWithAuthRequestImpl(caller, authRequest) {
   }
 
   detectProtocolLaunch(authRequest, successCallback, failCallback);
+}
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
+ * Most applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ *
+ * @param {String} [redirectURI=`${window.location.origin}/`]
+ * The location to which the identity provider will redirect the user after
+ * the user approves sign in.
+ * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * Location of the manifest file.
+ * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * this app's data store.
+ * An array of strings indicating which permissions this app is requesting.
+ * @return {void}
+ */
+
+
+function redirectToSignIn() {
+  var redirectURI = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "".concat(window.location.origin, "/");
+  var manifestURI = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "".concat(window.location.origin, "/manifest.json");
+  var scopes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _authConstants.DEFAULT_SCOPE;
+  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the ' + 'next major release of blockstack.js. Create an instance of UserSession and call the ' + 'instance method redirectToSignIn().');
+  var authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes);
+  redirectToSignInWithAuthRequest(authRequest);
 }
 /**
  * Generates an authentication request and redirects the user to the Blockstack
@@ -93755,6 +93748,12 @@ Object.defineProperty(exports, "signUserOut", {
   enumerable: true,
   get: function get() {
     return _authApp.signUserOut;
+  }
+});
+Object.defineProperty(exports, "makeAuthRequest", {
+  enumerable: true,
+  get: function get() {
+    return _authApp.makeAuthRequest;
   }
 });
 

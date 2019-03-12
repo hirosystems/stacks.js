@@ -3234,7 +3234,8 @@ under the hood.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>redirectURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>`${window.location.origin}/`</code>)</code>
 	    location to redirect user to after sign in approval
 
           </div>
@@ -3243,7 +3244,8 @@ under the hood.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>manifestURI</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>`${window.location.origin}/manifest.json`</code>)</code>
 	    location of this app's manifest file
 
           </div>
@@ -3252,7 +3254,8 @@ under the hood.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>)</code>
+            <span class='code bold'>scopes</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>
+            = <code>DEFAULT_SCOPE</code>)</code>
 	    the permissions this app is requesting
 
           </div>
@@ -3271,7 +3274,8 @@ under the hood.</em></p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>)</code>
+            <span class='code bold'>expiresAt</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">Number</a>
+            = <code>nextMonth().getTime()</code>)</code>
 	    the time at which this request is no longer valid
 
           </div>
