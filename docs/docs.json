@@ -22091,7 +22091,7 @@
 			},
 			"children": [
 				{
-					"id": 2324,
+					"id": 2323,
 					"name": "appPrivateKey",
 					"kind": 1024,
 					"kindString": "Property",
@@ -22101,7 +22101,7 @@
 					"sources": [
 						{
 							"fileName": "auth/authApp.ts",
-							"line": 35,
+							"line": 34,
 							"character": 15
 						}
 					],
@@ -22111,7 +22111,7 @@
 					}
 				},
 				{
-					"id": 2329,
+					"id": 2328,
 					"name": "associationToken",
 					"kind": 1024,
 					"kindString": "Property",
@@ -22122,7 +22122,7 @@
 					"sources": [
 						{
 							"fileName": "auth/authApp.ts",
-							"line": 40,
+							"line": 39,
 							"character": 18
 						}
 					],
@@ -22132,7 +22132,7 @@
 					}
 				},
 				{
-					"id": 2326,
+					"id": 2325,
 					"name": "authResponseToken",
 					"kind": 1024,
 					"kindString": "Property",
@@ -22142,7 +22142,7 @@
 					"sources": [
 						{
 							"fileName": "auth/authApp.ts",
-							"line": 37,
+							"line": 36,
 							"character": 19
 						}
 					],
@@ -22152,7 +22152,7 @@
 					}
 				},
 				{
-					"id": 2327,
+					"id": 2326,
 					"name": "coreSessionToken",
 					"kind": 1024,
 					"kindString": "Property",
@@ -22163,7 +22163,7 @@
 					"sources": [
 						{
 							"fileName": "auth/authApp.ts",
-							"line": 38,
+							"line": 37,
 							"character": 18
 						}
 					],
@@ -22173,8 +22173,91 @@
 					}
 				},
 				{
-					"id": 2322,
+					"id": 2321,
 					"name": "decentralizedID",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "auth/authApp.ts",
+							"line": 32,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 2327,
+					"name": "gaiaAssociationToken",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "auth/authApp.ts",
+							"line": 38,
+							"character": 22
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 2330,
+					"name": "gaiaHubConfig",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "auth/authApp.ts",
+							"line": 41,
+							"character": 15
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "GaiaHubConfig",
+						"id": 1358
+					}
+				},
+				{
+					"id": 2324,
+					"name": "hubUrl",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "auth/authApp.ts",
+							"line": 35,
+							"character": 8
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 2322,
+					"name": "identityAddress",
 					"kind": 1024,
 					"kindString": "Property",
 					"flags": {
@@ -22193,111 +22276,7 @@
 					}
 				},
 				{
-					"id": 2321,
-					"name": "email",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isExported": true,
-						"isOptional": true
-					},
-					"sources": [
-						{
-							"fileName": "auth/authApp.ts",
-							"line": 32,
-							"character": 7
-						}
-					],
-					"type": {
-						"type": "intrinsic",
-						"name": "string"
-					}
-				},
-				{
-					"id": 2328,
-					"name": "gaiaAssociationToken",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isExported": true,
-						"isOptional": true
-					},
-					"sources": [
-						{
-							"fileName": "auth/authApp.ts",
-							"line": 39,
-							"character": 22
-						}
-					],
-					"type": {
-						"type": "intrinsic",
-						"name": "string"
-					}
-				},
-				{
-					"id": 2331,
-					"name": "gaiaHubConfig",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isExported": true,
-						"isOptional": true
-					},
-					"sources": [
-						{
-							"fileName": "auth/authApp.ts",
-							"line": 42,
-							"character": 15
-						}
-					],
-					"type": {
-						"type": "reference",
-						"name": "GaiaHubConfig",
-						"id": 1358
-					}
-				},
-				{
-					"id": 2325,
-					"name": "hubUrl",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isExported": true
-					},
-					"sources": [
-						{
-							"fileName": "auth/authApp.ts",
-							"line": 36,
-							"character": 8
-						}
-					],
-					"type": {
-						"type": "intrinsic",
-						"name": "string"
-					}
-				},
-				{
-					"id": 2323,
-					"name": "identityAddress",
-					"kind": 1024,
-					"kindString": "Property",
-					"flags": {
-						"isExported": true
-					},
-					"sources": [
-						{
-							"fileName": "auth/authApp.ts",
-							"line": 34,
-							"character": 17
-						}
-					],
-					"type": {
-						"type": "intrinsic",
-						"name": "string"
-					}
-				},
-				{
-					"id": 2330,
+					"id": 2329,
 					"name": "profile",
 					"kind": 1024,
 					"kindString": "Property",
@@ -22307,7 +22286,7 @@
 					"sources": [
 						{
 							"fileName": "auth/authApp.ts",
-							"line": 41,
+							"line": 40,
 							"character": 9
 						}
 					],
@@ -22342,17 +22321,16 @@
 					"title": "Properties",
 					"kind": 1024,
 					"children": [
-						2324,
-						2329,
-						2326,
-						2327,
-						2322,
-						2321,
-						2328,
-						2331,
-						2325,
 						2323,
+						2328,
+						2325,
+						2326,
+						2321,
+						2327,
 						2330,
+						2324,
+						2322,
+						2329,
 						2320
 					]
 				}
@@ -26409,14 +26387,14 @@
 			]
 		},
 		{
-			"id": 2365,
+			"id": 2364,
 			"name": "detectProtocolLaunch",
 			"kind": 64,
 			"kindString": "Function",
 			"flags": {},
 			"signatures": [
 				{
-					"id": 2366,
+					"id": 2365,
 					"name": "detectProtocolLaunch",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -26427,7 +26405,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2367,
+							"id": 2366,
 							"name": "authRequest",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -26441,7 +26419,7 @@
 							}
 						},
 						{
-							"id": 2368,
+							"id": 2367,
 							"name": "successCallback",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -26452,14 +26430,54 @@
 							"type": {
 								"type": "reflection",
 								"declaration": {
-									"id": 2369,
+									"id": 2368,
 									"name": "__type",
 									"kind": 65536,
 									"kindString": "Type literal",
 									"flags": {},
 									"signatures": [
 										{
-											"id": 2370,
+											"id": 2369,
+											"name": "__call",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "void"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "auth/authApp.ts",
+											"line": 215,
+											"character": 18
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 2370,
+							"name": "failCallback",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"comment": {
+								"text": "\nThe callback that is invoked when the protocol handler was not detected."
+							},
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 2371,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {},
+									"signatures": [
+										{
+											"id": 2372,
 											"name": "__call",
 											"kind": 4096,
 											"kindString": "Call signature",
@@ -26474,46 +26492,6 @@
 										{
 											"fileName": "auth/authApp.ts",
 											"line": 216,
-											"character": 18
-										}
-									]
-								}
-							}
-						},
-						{
-							"id": 2371,
-							"name": "failCallback",
-							"kind": 32768,
-							"kindString": "Parameter",
-							"flags": {},
-							"comment": {
-								"text": "\nThe callback that is invoked when the protocol handler was not detected."
-							},
-							"type": {
-								"type": "reflection",
-								"declaration": {
-									"id": 2372,
-									"name": "__type",
-									"kind": 65536,
-									"kindString": "Type literal",
-									"flags": {},
-									"signatures": [
-										{
-											"id": 2373,
-											"name": "__call",
-											"kind": 4096,
-											"kindString": "Call signature",
-											"flags": {},
-											"type": {
-												"type": "intrinsic",
-												"name": "void"
-											}
-										}
-									],
-									"sources": [
-										{
-											"fileName": "auth/authApp.ts",
-											"line": 217,
 											"character": 15
 										}
 									]
@@ -26530,7 +26508,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 214,
+					"line": 213,
 					"character": 29
 				}
 			]
@@ -27249,17 +27227,8 @@
 							"flags": {},
 							"comment": {},
 							"type": {
-								"type": "intersection",
-								"types": [
-									{
-										"type": "intrinsic",
-										"name": "string"
-									},
-									{
-										"type": "reference",
-										"name": "Buffer"
-									}
-								]
+								"type": "intrinsic",
+								"name": "string"
 							}
 						}
 					],
@@ -29286,14 +29255,14 @@
 			]
 		},
 		{
-			"id": 2349,
+			"id": 2348,
 			"name": "getAuthResponseToken",
 			"kind": 64,
 			"kindString": "Function",
 			"flags": {},
 			"signatures": [
 				{
-					"id": 2350,
+					"id": 2349,
 					"name": "getAuthResponseToken",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -29311,7 +29280,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 134,
+					"line": 133,
 					"character": 29
 				}
 			]
@@ -32022,7 +31991,7 @@
 			]
 		},
 		{
-			"id": 2344,
+			"id": 2343,
 			"name": "handlePendingSignIn",
 			"kind": 64,
 			"kindString": "Function",
@@ -32031,7 +32000,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2345,
+					"id": 2344,
 					"name": "handlePendingSignIn",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -32042,7 +32011,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2346,
+							"id": 2345,
 							"name": "nameLookupURL",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -32057,7 +32026,7 @@
 							"defaultValue": "\"\""
 						},
 						{
-							"id": 2347,
+							"id": 2346,
 							"name": "authResponseToken",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -32072,7 +32041,7 @@
 							"defaultValue": " getAuthResponseToken()"
 						},
 						{
-							"id": 2348,
+							"id": 2347,
 							"name": "transitKey",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -32103,13 +32072,13 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 117,
+					"line": 116,
 					"character": 35
 				}
 			]
 		},
 		{
-			"id": 2381,
+			"id": 2380,
 			"name": "handlePendingSignInImpl",
 			"kind": 64,
 			"kindString": "Function",
@@ -32119,7 +32088,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2382,
+					"id": 2381,
 					"name": "handlePendingSignInImpl",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -32132,7 +32101,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2383,
+							"id": 2382,
 							"name": "caller",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -32147,7 +32116,7 @@
 							}
 						},
 						{
-							"id": 2384,
+							"id": 2383,
 							"name": "authResponseToken",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -32177,7 +32146,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 448,
+					"line": 447,
 					"character": 39
 				}
 			]
@@ -33204,7 +33173,7 @@
 			]
 		},
 		{
-			"id": 2342,
+			"id": 2341,
 			"name": "isSignInPending",
 			"kind": 64,
 			"kindString": "Function",
@@ -33213,7 +33182,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2343,
+					"id": 2342,
 					"name": "isSignInPending",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33231,13 +33200,13 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 96,
+					"line": 95,
 					"character": 31
 				}
 			]
 		},
 		{
-			"id": 2335,
+			"id": 2334,
 			"name": "isUserSignedIn",
 			"kind": 64,
 			"kindString": "Function",
@@ -33246,7 +33215,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2336,
+					"id": 2335,
 					"name": "isUserSignedIn",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33270,7 +33239,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 50,
+					"line": 49,
 					"character": 30
 				}
 			]
@@ -33644,7 +33613,7 @@
 			]
 		},
 		{
-			"id": 2351,
+			"id": 2350,
 			"name": "loadUserData",
 			"kind": 64,
 			"kindString": "Function",
@@ -33653,7 +33622,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2352,
+					"id": 2351,
 					"name": "loadUserData",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33672,13 +33641,13 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 143,
+					"line": 142,
 					"character": 28
 				}
 			]
 		},
 		{
-			"id": 2385,
+			"id": 2384,
 			"name": "loadUserDataImpl",
 			"kind": 64,
 			"kindString": "Function",
@@ -33687,7 +33656,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2386,
+					"id": 2385,
 					"name": "loadUserDataImpl",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33698,7 +33667,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2387,
+							"id": 2386,
 							"name": "caller",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33720,7 +33689,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 568,
+					"line": 566,
 					"character": 32
 				}
 			]
@@ -33931,7 +33900,7 @@
 			]
 		},
 		{
-			"id": 2356,
+			"id": 2355,
 			"name": "makeAuthRequest",
 			"kind": 64,
 			"kindString": "Function",
@@ -33940,7 +33909,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2357,
+					"id": 2356,
 					"name": "makeAuthRequest",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -33952,7 +33921,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2358,
+							"id": 2357,
 							"name": "transitPrivateKey",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33966,7 +33935,7 @@
 							}
 						},
 						{
-							"id": 2359,
+							"id": 2358,
 							"name": "redirectURI",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33981,7 +33950,7 @@
 							"defaultValue": " `${window.location.origin}/`"
 						},
 						{
-							"id": 2360,
+							"id": 2359,
 							"name": "manifestURI",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -33996,7 +33965,7 @@
 							"defaultValue": " `${window.location.origin}/manifest.json`"
 						},
 						{
-							"id": 2361,
+							"id": 2360,
 							"name": "scopes",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -34017,7 +33986,7 @@
 							"defaultValue": " DEFAULT_SCOPE"
 						},
 						{
-							"id": 2362,
+							"id": 2361,
 							"name": "appDomain",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -34032,7 +34001,7 @@
 							"defaultValue": " window.location.origin"
 						},
 						{
-							"id": 2363,
+							"id": 2362,
 							"name": "expiresAt",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -34047,7 +34016,7 @@
 							"defaultValue": " nextMonth().getTime()"
 						},
 						{
-							"id": 2364,
+							"id": 2363,
 							"name": "extraParams",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -34071,7 +34040,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 186,
+					"line": 185,
 					"character": 31
 				}
 			]
@@ -34313,17 +34282,8 @@
 								"text": "core session token when responding to a legacy auth request\nor `null` for current direct to gaia authentication requests"
 							},
 							"type": {
-								"type": "intersection",
-								"types": [
-									{
-										"type": "intrinsic",
-										"name": "string"
-									},
-									{
-										"type": "reference",
-										"name": "Buffer"
-									}
-								]
+								"type": "intrinsic",
+								"name": "string"
 							},
 							"defaultValue": " null"
 						},
@@ -34337,17 +34297,8 @@
 								"text": "the application private key. This private key is\nunique and specific for every Blockstack ID and application combination."
 							},
 							"type": {
-								"type": "intersection",
-								"types": [
-									{
-										"type": "intrinsic",
-										"name": "string"
-									},
-									{
-										"type": "reference",
-										"name": "Buffer"
-									}
-								]
+								"type": "intrinsic",
+								"name": "string"
 							},
 							"defaultValue": " null"
 						},
@@ -37926,7 +37877,7 @@
 			]
 		},
 		{
-			"id": 2337,
+			"id": 2336,
 			"name": "redirectToSignIn",
 			"kind": 64,
 			"kindString": "Function",
@@ -37935,7 +37886,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2338,
+					"id": 2337,
 					"name": "redirectToSignIn",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -37947,7 +37898,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2339,
+							"id": 2338,
 							"name": "redirectURI",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -37959,7 +37910,7 @@
 							"defaultValue": " `${window.location.origin}/`"
 						},
 						{
-							"id": 2340,
+							"id": 2339,
 							"name": "manifestURI",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -37971,7 +37922,7 @@
 							"defaultValue": " `${window.location.origin}/manifest.json`"
 						},
 						{
-							"id": 2341,
+							"id": 2340,
 							"name": "scopes",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -37998,13 +37949,13 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 81,
+					"line": 80,
 					"character": 32
 				}
 			]
 		},
 		{
-			"id": 2378,
+			"id": 2377,
 			"name": "redirectToSignInImpl",
 			"kind": 64,
 			"kindString": "Function",
@@ -38014,7 +37965,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2379,
+					"id": 2378,
 					"name": "redirectToSignInImpl",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -38027,7 +37978,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2380,
+							"id": 2379,
 							"name": "caller",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38051,13 +38002,13 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 431,
+					"line": 430,
 					"character": 36
 				}
 			]
 		},
 		{
-			"id": 2388,
+			"id": 2387,
 			"name": "redirectToSignInWithAuthRequest",
 			"kind": 64,
 			"kindString": "Function",
@@ -38066,7 +38017,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2389,
+					"id": 2388,
 					"name": "redirectToSignInWithAuthRequest",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -38078,7 +38029,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2390,
+							"id": 2389,
 							"name": "authRequest",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38092,7 +38043,7 @@
 							}
 						},
 						{
-							"id": 2391,
+							"id": 2390,
 							"name": "blockstackIDHost",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38116,13 +38067,13 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 588,
+					"line": 586,
 					"character": 47
 				}
 			]
 		},
 		{
-			"id": 2374,
+			"id": 2373,
 			"name": "redirectToSignInWithAuthRequestImpl",
 			"kind": 64,
 			"kindString": "Function",
@@ -38132,7 +38083,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2375,
+					"id": 2374,
 					"name": "redirectToSignInWithAuthRequestImpl",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -38145,7 +38096,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2376,
+							"id": 2375,
 							"name": "caller",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38160,7 +38111,7 @@
 							}
 						},
 						{
-							"id": 2377,
+							"id": 2376,
 							"name": "authRequest",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -38183,7 +38134,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 386,
+					"line": 385,
 					"character": 51
 				}
 			]
@@ -39226,7 +39177,7 @@
 			]
 		},
 		{
-			"id": 2353,
+			"id": 2352,
 			"name": "signUserOut",
 			"kind": 64,
 			"kindString": "Function",
@@ -39235,7 +39186,7 @@
 			},
 			"signatures": [
 				{
-					"id": 2354,
+					"id": 2353,
 					"name": "signUserOut",
 					"kind": 4096,
 					"kindString": "Call signature",
@@ -39246,7 +39197,7 @@
 					},
 					"parameters": [
 						{
-							"id": 2355,
+							"id": 2354,
 							"name": "redirectURL",
 							"kind": 32768,
 							"kindString": "Parameter",
@@ -39276,7 +39227,7 @@
 			"sources": [
 				{
 					"fileName": "auth/authApp.ts",
-					"line": 156,
+					"line": 155,
 					"character": 27
 				}
 			]
@@ -40104,7 +40055,7 @@
 			]
 		},
 		{
-			"id": 2332,
+			"id": 2331,
 			"name": "DEFAULT_PROFILE",
 			"kind": 2097152,
 			"kindString": "Object literal",
@@ -40113,7 +40064,7 @@
 			},
 			"children": [
 				{
-					"id": 2334,
+					"id": 2333,
 					"name": "@context",
 					"kind": 32,
 					"kindString": "Variable",
@@ -40132,7 +40083,7 @@
 					"defaultValue": "\"http://schema.org\""
 				},
 				{
-					"id": 2333,
+					"id": 2332,
 					"name": "@type",
 					"kind": 32,
 					"kindString": "Variable",
@@ -40156,8 +40107,8 @@
 					"title": "Variables",
 					"kind": 32,
 					"children": [
-						2334,
-						2333
+						2333,
+						2332
 					]
 				}
 			],
@@ -44878,7 +44829,7 @@
 				2107,
 				2239,
 				1511,
-				2365,
+				2364,
 				2290,
 				2293,
 				2287,
@@ -44912,7 +44863,7 @@
 				1630,
 				1600,
 				2256,
-				2349,
+				2348,
 				931,
 				947,
 				1395,
@@ -44946,8 +44897,8 @@
 				1856,
 				1514,
 				934,
-				2344,
-				2381,
+				2343,
+				2380,
 				1574,
 				1662,
 				1659,
@@ -44967,17 +44918,17 @@
 				2052,
 				2306,
 				603,
-				2342,
-				2335,
+				2341,
+				2334,
 				1505,
 				1614,
 				1604,
-				2351,
-				2385,
+				2350,
+				2384,
 				1208,
 				2002,
 				1823,
-				2356,
+				2355,
 				2226,
 				2243,
 				2016,
@@ -45023,10 +44974,10 @@
 				1404,
 				1496,
 				1594,
-				2337,
-				2378,
-				2388,
-				2374,
+				2336,
+				2377,
+				2387,
+				2373,
 				2261,
 				1200,
 				848,
@@ -45038,7 +44989,7 @@
 				1453,
 				1709,
 				607,
-				2353,
+				2352,
 				1696,
 				1681,
 				583,
@@ -45056,7 +45007,7 @@
 			"title": "Object literals",
 			"kind": 2097152,
 			"children": [
-				2332,
+				2331,
 				159,
 				574,
 				565,
