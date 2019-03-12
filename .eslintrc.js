@@ -51,7 +51,7 @@ module.exports = {
     "prefer-const": 2,
     "new-cap": 0,
     "semi": [2, "never"],
-    "valid-jsdoc": ["error"],
+    "valid-jsdoc": "off",
     "object-curly-newline": "off",    
     "arrow-parens": "off",
     "function-paren-newline": 0,
