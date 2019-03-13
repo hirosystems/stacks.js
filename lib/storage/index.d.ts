@@ -69,7 +69,7 @@ export declare function putFile(path: string, content: string | Buffer, options?
     encrypt?: boolean | string;
     sign?: boolean;
     contentType?: string;
-}): Promise<{}>;
+}): Promise<string>;
 /**
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
@@ -124,6 +124,9 @@ export declare function encryptContentImpl(caller: UserSession, content: string 
 export declare function decryptContentImpl(caller: UserSession, content: string, options?: {
     privateKey?: string;
 }): string | Buffer;
+/**
+ * @ignore
+ */
 export declare function getFileUrlImpl(caller: UserSession, path: string, options?: {
     app?: string;
     username?: string;
@@ -187,7 +190,7 @@ export declare function getFileImpl(caller: UserSession, path: string, options?:
  * if it failed
  * @private
  */
-export declare function putFileImpl(caller: UserSession, path: string, content: string | Buffer, options?: PutFileOptions): Promise<{}>;
+export declare function putFileImpl(caller: UserSession, path: string, content: string | Buffer, options?: PutFileOptions): Promise<string>;
 /**
  * Get the app storage bucket URL
  * @param {String} gaiaHubUrl - the gaia hub URL

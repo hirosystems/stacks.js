@@ -17516,7 +17516,7 @@
 								"typeArguments": [
 									{
 										"type": "intrinsic",
-										"name": "Object"
+										"name": "string"
 									}
 								]
 							}
@@ -18240,7 +18240,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 478,
+					"line": 481,
 					"character": 26
 				}
 			],
@@ -18255,7 +18255,7 @@
 					"sources": [
 						{
 							"fileName": "storage/index.ts",
-							"line": 478,
+							"line": 481,
 							"character": 28
 						}
 					]
@@ -20569,7 +20569,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 662,
+					"line": 667,
 					"character": 31
 				}
 			]
@@ -21298,7 +21298,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 504,
+					"line": 507,
 					"character": 27
 				}
 			]
@@ -21356,7 +21356,7 @@
 									"sources": [
 										{
 											"fileName": "storage/index.ts",
-											"line": 311,
+											"line": 314,
 											"character": 50
 										}
 									]
@@ -21379,94 +21379,8 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 311,
+					"line": 314,
 					"character": 26
-				}
-			]
-		},
-		{
-			"id": 1061,
-			"name": "getFileUrlImpl",
-			"kind": 64,
-			"kindString": "Function",
-			"flags": {
-				"isExported": true
-			},
-			"signatures": [
-				{
-					"id": 1062,
-					"name": "getFileUrlImpl",
-					"kind": 4096,
-					"kindString": "Call signature",
-					"flags": {},
-					"parameters": [
-						{
-							"id": 1063,
-							"name": "caller",
-							"kind": 32768,
-							"kindString": "Parameter",
-							"flags": {},
-							"type": {
-								"type": "reference",
-								"name": "UserSession",
-								"id": 884
-							}
-						},
-						{
-							"id": 1064,
-							"name": "path",
-							"kind": 32768,
-							"kindString": "Parameter",
-							"flags": {},
-							"type": {
-								"type": "intrinsic",
-								"name": "string"
-							}
-						},
-						{
-							"id": 1065,
-							"name": "options",
-							"kind": 32768,
-							"kindString": "Parameter",
-							"flags": {
-								"isOptional": true
-							},
-							"type": {
-								"type": "reflection",
-								"declaration": {
-									"id": 1066,
-									"name": "__type",
-									"kind": 65536,
-									"kindString": "Type literal",
-									"flags": {},
-									"sources": [
-										{
-											"fileName": "storage/index.ts",
-											"line": 264,
-											"character": 75
-										}
-									]
-								}
-							}
-						}
-					],
-					"type": {
-						"type": "reference",
-						"name": "Promise",
-						"typeArguments": [
-							{
-								"type": "intrinsic",
-								"name": "string"
-							}
-						]
-					}
-				}
-			],
-			"sources": [
-				{
-					"fileName": "storage/index.ts",
-					"line": 264,
-					"character": 30
 				}
 			]
 		},
@@ -22976,7 +22890,7 @@
 									"sources": [
 										{
 											"fileName": "storage/index.ts",
-											"line": 747,
+											"line": 752,
 											"character": 39
 										}
 									]
@@ -22999,7 +22913,7 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 746,
+					"line": 751,
 					"character": 29
 				}
 			]
@@ -23035,54 +22949,6 @@
 					"fileName": "auth/authApp.ts",
 					"line": 143,
 					"character": 28
-				}
-			]
-		},
-		{
-			"id": 1541,
-			"name": "loadUserDataImpl",
-			"kind": 64,
-			"kindString": "Function",
-			"flags": {
-				"isExported": true
-			},
-			"signatures": [
-				{
-					"id": 1542,
-					"name": "loadUserDataImpl",
-					"kind": 4096,
-					"kindString": "Call signature",
-					"flags": {},
-					"comment": {
-						"shortText": "Retrieves the user data object. The user's profile is stored in the key `profile`.",
-						"text": " @param {UserSession} caller - the instance calling this function\n @return {Object} User data object.\n @private\n"
-					},
-					"parameters": [
-						{
-							"id": 1543,
-							"name": "caller",
-							"kind": 32768,
-							"kindString": "Parameter",
-							"flags": {},
-							"type": {
-								"type": "reference",
-								"name": "UserSession",
-								"id": 884
-							}
-						}
-					],
-					"type": {
-						"type": "reference",
-						"name": "UserData",
-						"id": 1489
-					}
-				}
-			],
-			"sources": [
-				{
-					"fileName": "auth/authApp.ts",
-					"line": 568,
-					"character": 32
 				}
 			]
 		},
@@ -25022,7 +24888,7 @@
 						"typeArguments": [
 							{
 								"type": "intrinsic",
-								"name": "Object"
+								"name": "string"
 							}
 						]
 					}
@@ -25132,7 +24998,7 @@
 						"typeArguments": [
 							{
 								"type": "intrinsic",
-								"name": "Object"
+								"name": "string"
 							}
 						]
 					}
@@ -25141,8 +25007,8 @@
 			"sources": [
 				{
 					"fileName": "storage/index.ts",
-					"line": 563,
-					"character": 27
+					"line": 566,
+					"character": 33
 				}
 			]
 		},
@@ -28380,7 +28246,6 @@
 				1023,
 				1074,
 				1067,
-				1061,
 				958,
 				661,
 				990,
@@ -28409,7 +28274,6 @@
 				1034,
 				1089,
 				1516,
-				1541,
 				820,
 				1259,
 				1521,

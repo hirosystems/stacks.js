@@ -261,6 +261,9 @@ function getGaiaAddress(caller: UserSession,
     })
 }
 
+/**
+ * @ignore
+ */
 export function getFileUrlImpl(caller: UserSession, path: string, options?: {
   app?: string, 
   username?: string, 
@@ -560,10 +563,12 @@ export function getFileImpl(caller: UserSession, path: string, options?: GetFile
  * if it failed
  * @private
  */
-export function putFileImpl(caller: UserSession,
-                            path: string,
-                            content: string | Buffer,
-                            options?: PutFileOptions) {
+export async function putFileImpl(
+  caller: UserSession,
+  path: string,
+  content: string | Buffer,
+  options?: PutFileOptions
+): Promise<string> {
   const defaults = {
     encrypt: true,
     sign: false,
@@ -641,13 +646,13 @@ export function putFileImpl(caller: UserSession,
     contentType = 'application/json'
   }
   return getOrSetLocalGaiaHubConnection(caller)
-    .then(gaiaHubConfig => new Promise((resolve, reject) => {
+    .then(gaiaHubConfig => new Promise<string>((resolve, reject) => {
       uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
         .then(resolve)
         .catch(() => {
           setLocalGaiaHubConnection(caller)
             .then(freshHubConfig => uploadToGaiaHub(path, content, freshHubConfig, contentType)
-              .then(resolve).catch(reject))
+              .then(file => resolve(file)).catch(reject))
         })
     }))
 }

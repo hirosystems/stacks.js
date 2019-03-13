@@ -145,7 +145,7 @@ export declare class UserSession {
      * @return {Promise} that resolves if the operation succeed and rejects
      * if it failed
      */
-    putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<{}>;
+    putFile(path: string, content: string | Buffer, options?: PutFileOptions): Promise<string>;
     /**
      * Retrieves the specified file from the app's data store.
      * @param {String} path - the path to the file to read

@@ -140,9 +140,9 @@ export declare function handlePendingSignInImpl(caller: UserSession, authRespons
 /**
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  *
- *  @param {UserSession} caller - the instance calling this function
- *  @return {Object} User data object.
- *  @private
+ * @param {UserSession} caller - the instance calling this function
+ * @return {Object} User data object.
+ * @ignore
  */
 export declare function loadUserDataImpl(caller: UserSession): UserData;
 /**
