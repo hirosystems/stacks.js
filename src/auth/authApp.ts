@@ -29,6 +29,7 @@ const DEFAULT_PROFILE = {
 
 export interface UserData {
   username: string;
+  email?: string;
   decentralizedID: string;
   identityAddress: string;
   appPrivateKey: string;
@@ -513,6 +514,7 @@ export function handlePendingSignInImpl(caller: UserSession,
       const userData: UserData = {
         username: tokenPayload.username,
         profile: tokenPayload.profile,
+        email: tokenPayload.email,
         decentralizedID: tokenPayload.iss,
         identityAddress: getAddressFromDID(tokenPayload.iss),
         appPrivateKey,
