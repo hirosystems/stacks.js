@@ -13,7 +13,7 @@
     "src",
   ],
   "typedocOptions": {
-    "readme": "none",
+    "readme": "src/auth/README.md",
     "mode": "file",
     "excludePrivate": true,
     "excludeProtected": true,
