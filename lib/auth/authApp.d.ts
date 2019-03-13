@@ -2,6 +2,7 @@ import { UserSession } from './userSession';
 import { GaiaHubConfig } from '../storage/hub';
 export interface UserData {
     username: string;
+    email?: string;
     decentralizedID: string;
     identityAddress: string;
     appPrivateKey: string;
