@@ -19,7 +19,7 @@ import {
 
 import {
   decryptContentImpl,
-  encryptContentImpl,
+  encryptContent,
   getFileImpl,
   putFileImpl,
   listFilesImpl,
@@ -262,9 +262,15 @@ export class UserSession {
    * key to use for encryption. If not provided, will use user's appPrivateKey.
    * @return {String} Stringified ciphertext object
    */
-  encryptContent(content: string | Buffer,
-                 options?: {publicKey?: string}) {
-    return encryptContentImpl(this, content, options)
+  encryptContent(
+    content: string | Buffer,
+    options?: {publicKey?: string}
+  ) {
+    const opts: { publicKey?: string, privateKey?: string } = { ...options }
+    if (!opts.publicKey) {
+      opts.privateKey = this.loadUserData().appPrivateKey
+    }
+    return encryptContent(content, opts)
   }
 
   /**

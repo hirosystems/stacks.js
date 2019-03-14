@@ -30,22 +30,6 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
 
 
 /**
- * Encrypts the data provided with the app public key.
- * @param {String|Buffer} content - data to encrypt
- * @param {Object} [options=null] - options object
- * @param {String} options.publicKey - the hex string of the ECDSA public
- * key to use for encryption. If not provided, will use user's appPublicKey.
- * @return {String} Stringified ciphertext object
- */
-export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
-  console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method encryptContent().')
-  const userSession = new UserSession()
-  return userSession.encryptContent(content, options)
-}
-
-/**
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
@@ -180,7 +164,6 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
 
 /**
  * Encrypts the data provided with the app public key.
- * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
@@ -188,14 +171,19 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @return {String} Stringified ciphertext object
  * @private
  */
-export function encryptContentImpl(caller: UserSession,
-                                   content: string | Buffer,
-                                   options?: {publicKey?: string}) {
-  const defaults: { publicKey: string | null } = { publicKey: null }
-  const opt = Object.assign({}, defaults, options)
+export function encryptContent(
+  content: string | Buffer,
+  options?: {
+    publicKey?: string,
+    privateKey?: string
+  }
+) {
+  const opt = Object.assign({}, options)
+  if (opt.publicKey && opt.privateKey) {
+    throw new Error('Should not provide both `publicKey` and `privateKey`')
+  }
   if (!opt.publicKey) {
-    const userData = caller.loadUserData()
-    const privateKey = userData.appPrivateKey
+    const privateKey = opt.privateKey || new UserSession().loadUserData().appPrivateKey
     opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
 
@@ -632,10 +620,10 @@ export async function putFileImpl(
 
   // In all other cases, we only need one upload.
   if (opt.encrypt && !opt.sign) {
-    content = encryptContentImpl(caller, content, { publicKey })
+    content = encryptContent(content, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const cipherText = encryptContentImpl(caller, content, { publicKey })
+    const cipherText = encryptContent(content, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,

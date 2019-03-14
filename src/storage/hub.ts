@@ -152,6 +152,11 @@ export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubC
                           userData.associationToken)
     .then((gaiaConfig) => {
       userData.gaiaHubConfig = gaiaConfig
+
+      const sessionData = caller.store.getSessionData()
+      sessionData.userData.gaiaHubConfig = gaiaConfig
+      caller.store.setSessionData(sessionData)
+
       return gaiaConfig
     })
 }

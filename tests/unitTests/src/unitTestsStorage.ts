@@ -8,7 +8,7 @@ import {
   connectToGaiaHub,
   getBucketUrl
 } from '../../../src/storage/hub'
-import { getFileImpl, encryptContentImpl, getFileUrlImpl } from '../../../src/storage'
+import { getFileImpl, encryptContent, getFileUrlImpl } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -367,7 +367,7 @@ export function runStorageTests() {
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
-    FetchMock.get(fullReadUrl, encryptContentImpl(blockstack, fileContent))
+    FetchMock.get(fullReadUrl, blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: true }
     const decryptOptions = { decrypt: true }
     // put and encrypt the file
@@ -417,7 +417,7 @@ export function runStorageTests() {
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
-    FetchMock.get(fullReadUrl, encryptContentImpl(blockstack, fileContent))
+    FetchMock.get(fullReadUrl, blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: publicKey }
     const decryptOptions = { decrypt: true }
     // put and encrypt the file
