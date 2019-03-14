@@ -78,13 +78,7 @@ export function decryptContent(content: string, options?: {privateKey?: string})
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(path: string, options?: {
-  decrypt?: boolean;
-  verify?: boolean;
-  username?: string;
-  app?: string;
-  zoneFileLookupURL?: string;
-}) {
+export function getFile(path: string, options?: GetFileOptions ) {
   console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method getFile().')
