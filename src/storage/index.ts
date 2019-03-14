@@ -478,7 +478,7 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   })
 }
 
-export type GetFileOptions = {
+export interface GetFileOptions {
   decrypt?: boolean,
   verify?: boolean,
   username?: string | null,
