@@ -17,7 +17,7 @@
     "dev-proofs": "npm run build:webpack && ts-node ./tests/browserTests/proofs-server.ts",
     "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint --ext .ts ./src",
-    "build-documentation": "shx rm -rf docs && typedoc --tsconfig tsconfig-typedoc.json --out docs src && typedoc --tsconfig tsconfig-typedoc.json --json docs/docs.json src",
+    "build-documentation": "shx rm -rf docs && typedoc --tsconfig tsconfig-typedoc.json --out docs src && typedoc --tsconfig tsconfig-typedoc.json --includes mdincludes  --json docs/docs.json src",
     "codecovUpload": "codecov"
   },
   "repository": {

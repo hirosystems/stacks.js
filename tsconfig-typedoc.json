@@ -13,7 +13,9 @@
     "src",
   ],
   "typedocOptions": {
-    "readme": "src/auth/README.md",
+    "name": "blockstack.js Library Reference",
+    "readme": "none",
+    "includes": "docincludes",
     "mode": "file",
     "excludePrivate": true,
     "excludeProtected": true,

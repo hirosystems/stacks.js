@@ -1,6 +1,6 @@
 {
 	"id": 0,
-	"name": "blockstack",
+	"name": "blockstack.js Library Reference",
 	"kind": 0,
 	"flags": {},
 	"children": [
@@ -1586,7 +1586,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -1632,7 +1632,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -1661,7 +1661,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 974,
 							"character": 19
 						}
@@ -7270,7 +7270,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -7341,7 +7341,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -7570,7 +7570,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -7621,7 +7621,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -7859,7 +7859,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -7910,7 +7910,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -8136,7 +8136,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -8187,7 +8187,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -11608,7 +11608,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -11659,7 +11659,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -11897,7 +11897,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -11948,7 +11948,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -12174,7 +12174,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -12225,7 +12225,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -12471,7 +12471,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -12522,7 +12522,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -15114,7 +15114,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -15185,7 +15185,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -16389,7 +16389,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 963,
 							"character": 8
 						}
@@ -16440,7 +16440,7 @@
 					},
 					"sources": [
 						{
-							"fileName": "/Users/matt/Projects/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
+							"fileName": "/Users/manthony/repos/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
 							"line": 965,
 							"character": 9
 						}
@@ -16550,7 +16550,7 @@
 			},
 			"comment": {
 				"shortText": "Represents an instance of a signed in user for a particular app.",
-				"text": "A signed in user has access to two major pieces of information\nabout the user, the user's private key for that app and the location\nof the user's gaia storage bucket for the app.\n\nA user can be signed in either directly through the interactive\nsign in process or by directly providing the app private key.",
+				"text": "A signed in user has access to two major pieces of information\nabout the user, the user's private key for that app and the location\nof the user's gaia storage bucket for the app.\n\nA user can be signed in either directly through the interactive\nsign in process or by directly providing the app private key.\n",
 				"tags": [
 					{
 						"tag": "type",
@@ -16565,6 +16565,7 @@
 					"kind": 512,
 					"kindString": "Constructor",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -16594,8 +16595,8 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 58,
-													"character": 23
+													"line": 65,
+													"character": 30
 												}
 											]
 										}
@@ -16612,8 +16613,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 56,
-							"character": 25
+							"line": 63,
+							"character": 32
 						}
 					]
 				},
@@ -16623,13 +16624,14 @@
 					"kind": 1024,
 					"kindString": "Property",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 54,
-							"character": 11
+							"line": 61,
+							"character": 18
 						}
 					],
 					"type": {
@@ -16644,13 +16646,14 @@
 					"kind": 1024,
 					"kindString": "Property",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 56,
-							"character": 7
+							"line": 63,
+							"character": 14
 						}
 					],
 					"type": {
@@ -16665,6 +16668,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -16712,8 +16716,8 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 265,
-													"character": 43
+													"line": 272,
+													"character": 50
 												}
 											]
 										}
@@ -16738,8 +16742,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 265,
-							"character": 16
+							"line": 272,
+							"character": 23
 						}
 					]
 				},
@@ -16790,8 +16794,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 342,
-							"character": 12
+							"line": 349,
+							"character": 19
 						}
 					]
 				},
@@ -16801,6 +16805,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -16857,7 +16862,7 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 252,
+													"line": 259,
 													"character": 26
 												}
 											]
@@ -16874,8 +16879,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 251,
-							"character": 16
+							"line": 258,
+							"character": 23
 						}
 					]
 				},
@@ -16885,6 +16890,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -16907,8 +16913,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 168,
-							"character": 28
+							"line": 175,
+							"character": 35
 						}
 					]
 				},
@@ -16918,6 +16924,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -16940,8 +16947,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 180,
-							"character": 22
+							"line": 187,
+							"character": 29
 						}
 					]
 				},
@@ -16951,6 +16958,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17018,8 +17026,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 301,
-							"character": 9
+							"line": 308,
+							"character": 16
 						}
 					]
 				},
@@ -17029,6 +17037,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17076,8 +17085,8 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 317,
-													"character": 36
+													"line": 324,
+													"character": 43
 												}
 											]
 										}
@@ -17099,8 +17108,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 317,
-							"character": 12
+							"line": 324,
+							"character": 19
 						}
 					]
 				},
@@ -17110,6 +17119,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17156,8 +17166,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 209,
-							"character": 21
+							"line": 216,
+							"character": 28
 						}
 					]
 				},
@@ -17167,6 +17177,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17189,8 +17200,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 189,
-							"character": 17
+							"line": 196,
+							"character": 24
 						}
 					]
 				},
@@ -17200,6 +17211,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17222,8 +17234,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 197,
-							"character": 16
+							"line": 204,
+							"character": 23
 						}
 					]
 				},
@@ -17233,6 +17245,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17293,8 +17306,8 @@
 											"sources": [
 												{
 													"fileName": "auth/userSession.ts",
-													"line": 331,
-													"character": 21
+													"line": 338,
+													"character": 28
 												}
 											]
 										}
@@ -17316,8 +17329,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 331,
-							"character": 11
+							"line": 338,
+							"character": 18
 						}
 					]
 				},
@@ -17327,6 +17340,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17350,8 +17364,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 217,
-							"character": 14
+							"line": 224,
+							"character": 21
 						}
 					]
 				},
@@ -17433,8 +17447,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 145,
-							"character": 17
+							"line": 152,
+							"character": 24
 						}
 					]
 				},
@@ -17444,6 +17458,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17525,8 +17540,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 281,
-							"character": 9
+							"line": 288,
+							"character": 16
 						}
 					]
 				},
@@ -17536,6 +17551,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17559,8 +17575,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 109,
-							"character": 18
+							"line": 116,
+							"character": 25
 						}
 					]
 				},
@@ -17570,6 +17586,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17609,8 +17626,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 124,
-							"character": 33
+							"line": 131,
+							"character": 40
 						}
 					]
 				},
@@ -17620,6 +17637,7 @@
 					"kind": 2048,
 					"kindString": "Method",
 					"flags": {
+						"isPublic": true,
 						"isExported": true
 					},
 					"signatures": [
@@ -17642,8 +17660,8 @@
 					"sources": [
 						{
 							"fileName": "auth/userSession.ts",
-							"line": 226,
-							"character": 13
+							"line": 233,
+							"character": 20
 						}
 					]
 				}
@@ -17691,7 +17709,7 @@
 			"sources": [
 				{
 					"fileName": "auth/userSession.ts",
-					"line": 53,
+					"line": 60,
 					"character": 24
 				}
 			]
