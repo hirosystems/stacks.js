@@ -2,17 +2,16 @@
 
 Note: If you're looking for the Blockstack CLI repo it was merged with [Blockstack Core](https://github.com/blockstack/blockstack-core).
 
--   [Installation](#installation)
--   [About](#about)
--   [Auth](https://blockstack.github.io/blockstack.js/index.html#authentication)
--   [Profiles](https://blockstack.github.io/blockstack.js/index.html#profiles)
--   [Storage](https://blockstack.github.io/blockstack.js/index.html#storage)
--   [Documentation](#documentation)
--   [Compatibility](#compatibility)
--   [Contributing](#contributing)
--   [Maintainer](#maintainer)
--   [Testing](#testing)
--   [Releasing](#releasing)
+- [blockstack.js ![CircleCI](https://circleci.com/gh/blockstack/blockstack.js/tree/master) ![npm](https://www.npmjs.com/package/blockstack) ![npm](https://www.npmjs.com/package/blockstack) ![npm](https://www.npmjs.com/package/blockstack) ![Slack](http://slack.blockstack.org/)](#blockstackjs-circlecihttpscirclecicomghblockstackblockstackjstreemaster-npmhttpswwwnpmjscompackageblockstack-npmhttpswwwnpmjscompackageblockstack-npmhttpswwwnpmjscompackageblockstack-slackhttpslackblockstackorg)
+  - [Installation](#installation)
+  - [About](#about)
+  - [Documentation](#documentation)
+  - [Compatibility](#compatibility)
+  - [Contributing](#contributing)
+  - [Maintainer](#maintainer)
+  - [Testing](#testing)
+    - [Testing in a browser](#testing-in-a-browser)
+  - [Releasing](#releasing)
 
 ## Installation
 

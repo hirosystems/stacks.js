@@ -1,3 +1,5 @@
+## Work with Profiles
+
 Follow these steps to create and register a profile for a Blockchain ID:
 
 1. Create a JSON profile object

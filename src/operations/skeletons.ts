@@ -14,6 +14,9 @@ type AmountType = AmountTypeV1 | AmountTypeV2
 
 // todo : add name length / character verification
 
+/**
+* @ignore
+*/
 export class BlockstackNamespace {
   namespaceID: string
 
@@ -134,6 +137,9 @@ export class BlockstackNamespace {
 }
 
 
+/**
+* @ignore
+*/
 function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
   // the "units" of a v1 amount type are always 'BTC'
@@ -144,12 +150,18 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
   }
 }
 
+/**
+* @ignore
+*/
 function makeTXbuilder() {
   const txb = new bitcoin.TransactionBuilder(config.network.layer1)
   txb.setVersion(1)
   return txb
 }
 
+/**
+* @ignore
+*/
 function opEncode(opcode: string): string {
   // NOTE: must *always* a 3-character string
   const res = `${config.network.MAGIC_BYTES}${opcode}`
@@ -159,6 +171,9 @@ function opEncode(opcode: string): string {
   return res
 }
 
+/**
+* @ignore
+*/
 export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash: string, preorderAddress: string,
   burnAddress: string, burn: AmountType,
@@ -229,6 +244,9 @@ export function makePreorderSkeleton(
   return tx.buildIncomplete()
 }
 
+/**
+* @ignore
+*/
 export function makeRegisterSkeleton(
   fullyQualifiedName: string, ownerAddress: string,
   valueHash: string = null, burnTokenAmountHex: string = null
@@ -301,6 +319,9 @@ export function makeRegisterSkeleton(
   return tx.buildIncomplete()
 }
 
+/**
+* @ignore
+*/
 export function makeRenewalSkeleton(
   fullyQualifiedName: string, nextOwnerAddress: string, lastOwnerAddress: string,
   burnAddress: string, burn: AmountType, valueHash: string = null
@@ -362,6 +383,9 @@ export function makeRenewalSkeleton(
   return txB.buildIncomplete()
 }
 
+/**
+* @ignore
+*/
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
   keepZonefile: boolean = false
@@ -407,7 +431,9 @@ export function makeTransferSkeleton(
   return tx.buildIncomplete()
 }
 
-
+/**
+* @ignore
+*/
 export function makeUpdateSkeleton(
   fullyQualifiedName: string, consensusHash: string, valueHash: string
 ) {
@@ -451,7 +477,9 @@ export function makeUpdateSkeleton(
   return tx.buildIncomplete()
 }
 
-
+/**
+* @ignore
+*/
 export function makeRevokeSkeleton(fullyQualifiedName: string) {
   // Returns a revoke tx skeleton
   //    with 1 output: 1. the Blockstack revoke OP_RETURN
@@ -484,6 +512,9 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
   return tx.buildIncomplete()
 }
 
+/**
+* @ignore
+*/
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash: string, preorderAddress: string,
   registerAddress: string, burn: AmountType
@@ -556,7 +587,9 @@ export function makeNamespacePreorderSkeleton(
   return tx.buildIncomplete()
 }
 
-
+/**
+* @ignore
+*/
 export function makeNamespaceRevealSkeleton(
   namespace: BlockstackNamespace, revealAddress: string
 ) {
@@ -587,7 +620,9 @@ export function makeNamespaceRevealSkeleton(
   return tx.buildIncomplete()
 }
 
-
+/**
+* @ignore
+*/
 export function makeNamespaceReadySkeleton(namespaceID: string) {
   /*
    Format:
@@ -613,6 +648,9 @@ export function makeNamespaceReadySkeleton(namespaceID: string) {
 
 // type bitcoin.payments.p2data bitcoin.payments.embed
 
+/**
+* @ignore
+*/
 export function makeNameImportSkeleton(name: string, recipientAddr: string, zonefileHash: string) {
   /*
    Format:
@@ -648,6 +686,9 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
   return tx.buildIncomplete()
 }
 
+/**
+* @ignore
+*/
 export function makeAnnounceSkeleton(messageHash: string) {
   /*
     Format:
@@ -673,6 +714,9 @@ export function makeAnnounceSkeleton(messageHash: string) {
   return tx.buildIncomplete()
 }
 
+/**
+* @ignore
+*/
 export function makeTokenTransferSkeleton(recipientAddress: string, consensusHash: string,
                                           tokenType: string, tokenAmount: BN,
                                           scratchArea: string
