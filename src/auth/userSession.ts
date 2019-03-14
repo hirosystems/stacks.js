@@ -22,8 +22,8 @@ import {
   encryptContent,
   getFileImpl,
   putFileImpl,
-  listFilesImpl,
-  getFileUrlImpl,
+  listFiles,
+  getFileUrl,
   PutFileOptions,
   GetFileOptions
 } from '../storage'
@@ -343,7 +343,7 @@ export class UserSession {
     app?: string,
     zoneFileLookupURL?: string
   }): Promise<string> {
-    return getFileUrlImpl(this, path, options)
+    return getFileUrl(path, options, this)
   }
 
   /**
@@ -353,7 +353,7 @@ export class UserSession {
    * @return {Promise} that resolves to the number of files listed
    */
   listFiles(callback: (name: string) => boolean): Promise<number> {
-    return listFilesImpl(this, callback)
+    return listFiles(callback, this)
   }
 
   /**

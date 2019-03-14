@@ -85,20 +85,6 @@ export function putFile(path: string, content: string | Buffer, options?: {
 }
 
 /**
- * List the set of files in this application's Gaia storage bucket.
- * @param {function} callback - a callback to invoke on each named file that
- * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
- */
-export function listFiles(callback: (name: string) => boolean): Promise<number> {
-  console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method listFiles().')
-  const userSession = new UserSession()
-  return userSession.listFiles(callback)
-}
-
-/**
  * Deletes the specified file from the app's data store. Currently not implemented.
  * @param {String} path - the path to the file to delete
  * @returns {Promise} that resolves when the file has been removed
@@ -166,7 +152,7 @@ export function encryptContent(
     throw new Error('Should not provide both `publicKey` and `privateKey`')
   }
   if (!opt.publicKey) {
-    const privateKey = opt.privateKey || new UserSession().loadUserData().appPrivateKey
+    const privateKey = opt.privateKey || (new UserSession().loadUserData().appPrivateKey)
     opt.publicKey = getPublicKeyFromPrivate(privateKey)
   }
 
@@ -234,44 +220,6 @@ function getGaiaAddress(caller: UserSession,
 }
 
 /**
- * @ignore
- */
-export function getFileUrlImpl(caller: UserSession, path: string, options?: {
-  app?: string, 
-  username?: string, 
-  zoneFileLookupURL?: string 
-}): Promise<string> {
-  return Promise.resolve()
-    .then(() => {
-      const appConfig = caller.appConfig
-      if (!appConfig) {
-        throw new InvalidStateError('Missing AppConfig')
-      }
-      const defaults = {
-        username: null,
-        app: appConfig.appDomain,
-        zoneFileLookupURL: null
-      }
-      return Object.assign({}, defaults, options)
-    })
-    .then((opts) => {
-      if (opts.username) {
-        return getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
-      } else {
-        return getOrSetLocalGaiaHubConnection(caller)
-          .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
-      }
-    })
-    .then(readUrl => {
-      if (!readUrl) {
-        throw new Error('Missing readURL')
-      } else {
-        return readUrl
-      }
-    })
-}
-
-/**
  * Get the URL for reading a file from an app's data store.
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
@@ -283,16 +231,37 @@ export function getFileUrlImpl(caller: UserSession, path: string, options?: {
  * blockstack.js's getNameInfo function instead.
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
-export function getFileUrl(path: string, options?: {
-  username?: string,
-  app?: string,
-  zoneFileLookupURL?: string
-}): Promise<string> {
-  console.warn('DEPRECATION WARNING: The static getFileUrl() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method getFileUrl().')
-  const userSession = new UserSession()
-  return getFileUrlImpl(userSession, path, options)
+export async function getFileUrl(
+  path: string, 
+  options?: {
+    app?: string, 
+    username?: string, 
+    zoneFileLookupURL?: string
+  },
+  caller?: UserSession
+): Promise<string> {
+  const opts = Object.assign({}, options)
+
+  let readUrl: string
+  if (opts.username) {
+    if (!opts.app) {
+      const appConfig = (caller || new UserSession()).appConfig
+      if (!appConfig) {
+        throw new InvalidStateError('Missing AppConfig')
+      }
+      opts.app = appConfig.appDomain
+    }
+    readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
+  } else {
+    const gaiaHubConfig = await getOrSetLocalGaiaHubConnection(caller || new UserSession())
+    readUrl = await getFullReadUrl(path, gaiaHubConfig)
+  }
+
+  if (!readUrl) {
+    throw new Error('Missing readURL')
+  } else {
+    return readUrl
+  }
 }
 
 /* Handle fetching the contents from a given path. Handles both
@@ -306,7 +275,7 @@ function getFileContents(caller: UserSession,
   return Promise.resolve()
     .then(() => {
       const opts: any = { app, username, zoneFileLookupURL }
-      return getFileUrlImpl(caller, path, opts)
+      return getFileUrl(path, opts, caller)
     })
     .then(readUrl => fetch(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
@@ -720,9 +689,11 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
  * @return {Promise} that resolves to the number of files listed
  * @private
  */
-export function listFilesImpl(caller: UserSession,
-                              callback: (name: string) => boolean): Promise<number> {
-  return getOrSetLocalGaiaHubConnection(caller)
+export function listFiles(
+  callback: (name: string) => boolean,
+  caller?: UserSession
+): Promise<number> {
+  return getOrSetLocalGaiaHubConnection(caller || new UserSession())
     .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
 }
 

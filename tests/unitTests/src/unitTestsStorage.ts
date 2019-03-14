@@ -8,7 +8,7 @@ import {
   connectToGaiaHub,
   getBucketUrl
 } from '../../../src/storage/hub'
-import { getFileImpl, getFileUrlImpl } from '../../../src/storage'
+import { getFileImpl, getFileUrl } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -231,7 +231,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set private key for testing
 
@@ -341,7 +341,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set private key for testing
 
@@ -391,7 +391,7 @@ export function runStorageTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set private key for testing
 
@@ -436,7 +436,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set private key for testing
 
@@ -539,7 +539,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set private key for testing
 
@@ -766,7 +766,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey,
       gaiaHubConfig: config
     } // manually set for testing
@@ -774,7 +774,7 @@ export function runStorageTests() {
     FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
                   { status: 404 })
 
-    getFileUrlImpl(blockstack, 'foo.json')
+    getFileUrl('foo.json', {}, blockstack)
       .then(x => t.equal(
         x, 
         'gaia.testblockstack.org/hub/19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk/foo.json', 
@@ -799,7 +799,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey,
       gaiaHubConfig: config
     } // manually set for testing
@@ -870,7 +870,7 @@ export function runStorageTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set for testing
 
@@ -923,7 +923,7 @@ export function runStorageTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey
     } // manually set for testing
 
@@ -1007,7 +1007,7 @@ export function runStorageTests() {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().userData = {
+    blockstack.store.getSessionData().userData = <any>{
       appPrivateKey: privateKey,
       gaiaHubConfig
     } // manually set for testing
@@ -1025,15 +1025,15 @@ export function runStorageTests() {
     })
 
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
-    const { listFilesImpl } = proxyquire('../../../src/storage', {
+    const { listFiles } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection }
     })
 
     const files = []
-    listFilesImpl(blockstack, (name) => {
+    listFiles((name) => {
       files.push(name)
       return true
-    })
+    }, blockstack)
       .then((count) => {
         t.equal(files.length, 1, 'Got one file back')
         t.equal(files[0], 'file.json', 'Got the right file back')
