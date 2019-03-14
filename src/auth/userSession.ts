@@ -18,7 +18,7 @@ import {
 } from './authMessages'
 
 import {
-  decryptContentImpl,
+  decryptContent,
   encryptContent,
   getFileImpl,
   putFileImpl,
@@ -283,7 +283,11 @@ export class UserSession {
    * @return {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}) {
-    return decryptContentImpl(this, content, options)
+    const opts = { ...options }
+    if (!opts.privateKey) {
+      opts.privateKey = this.loadUserData().appPrivateKey
+    }
+    return decryptContent(content, opts)
   }
 
   /**

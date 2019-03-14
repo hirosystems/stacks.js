@@ -8,7 +8,7 @@ import {
   connectToGaiaHub,
   getBucketUrl
 } from '../../../src/storage/hub'
-import { getFileImpl, encryptContent, getFileUrlImpl } from '../../../src/storage'
+import { getFileImpl, getFileUrlImpl } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
