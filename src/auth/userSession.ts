@@ -8,15 +8,13 @@ import {
   InstanceDataStore
 } from './sessionStore'
 import {
-  redirectToSignInImpl,
-  redirectToSignInWithAuthRequestImpl,
-  handlePendingSignInImpl,
-  loadUserDataImpl
+  redirectToSignInWithAuthRequest,
+  handlePendingSignIn,
+  UserData
 } from './authApp'
 
 import {
-  makeAuthRequestImpl,
-  generateTransitKey
+  generateTransitKey, makeAuthRequest
 } from './authMessages'
 
 import {
@@ -107,7 +105,10 @@ export class UserSession {
    * @return {void}
    */
   redirectToSignIn() {
-    return redirectToSignInImpl(this)
+    const transitKey = this.generateAndStoreTransitKey()
+    const authRequest = this.makeAuthRequest(transitKey)
+    const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
+    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -122,7 +123,8 @@ export class UserSession {
    * @return {void}
    */
   redirectToSignInWithAuthRequest(authRequest: string) {
-    return redirectToSignInWithAuthRequestImpl(this, authRequest)
+    const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
+    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -154,8 +156,9 @@ export class UserSession {
     const manifestURI = appConfig.manifestURI()
     const scopes = appConfig.scopes
     const appDomain = appConfig.appDomain
-    return makeAuthRequestImpl(transitKey, redirectURI, manifestURI,
-                               scopes, appDomain, expiresAt, extraParams)
+    return makeAuthRequest(
+      transitKey, redirectURI, manifestURI,
+      scopes, appDomain, expiresAt, extraParams)
   }
 
   /**
@@ -207,7 +210,14 @@ export class UserSession {
    * if handling the sign in request fails or there was no pending sign in request.
    */
   handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
-    return handlePendingSignInImpl(this, authResponseToken)
+    const transitKey = this.store.getSessionData().transitKey
+    const nameLookupURL = this.store.getSessionData().coreNode
+    const storeUserData = (userData: UserData) => {
+      const sessionData = this.store.getSessionData()
+      sessionData.userData = userData
+      this.store.setSessionData(sessionData)
+    }
+    return handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, storeUserData)
   }
 
   /**
@@ -215,7 +225,11 @@ export class UserSession {
    * @return {Object} User data object.
    */
   loadUserData() {
-    return loadUserDataImpl(this)
+    const userData = this.store.getSessionData().userData
+    if (!userData) {
+      throw new InvalidStateError('No user data found. Did the user sign in?')
+    }
+    return userData
   }
 
 

@@ -13,6 +13,7 @@ import {
 import { encryptECIES, decryptECIES } from '../encryption/ec'
 
 import { Logger } from '../logger'
+import { DEFAULT_SCOPE } from './authConstants'
 
 const VERSION = '1.3.1'
 
@@ -32,6 +33,7 @@ export function generateTransitKey() {
   const transitKey = makeECPrivateKey()
   return transitKey
 }
+
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -55,13 +57,15 @@ export function generateTransitKey() {
  * @return {String} the authentication request
  * @private
  */
-export function makeAuthRequestImpl(transitPrivateKey: string,
-                                    redirectURI: string,
-                                    manifestURI: string,
-                                    scopes: Array<string>,
-                                    appDomain: string = window.location.origin,
-                                    expiresAt: number,
-                                    extraParams: any = {}): string {
+export function makeAuthRequest(
+  transitPrivateKey: string,
+  redirectURI: string = `${window.location.origin}/`, 
+  manifestURI: string = `${window.location.origin}/manifest.json`, 
+  scopes: Array<string> = DEFAULT_SCOPE,
+  appDomain: string = window.location.origin,
+  expiresAt: number = nextMonth().getTime(),
+  extraParams: any = {}
+): string {
   /* Create the payload */
   const payload = Object.assign({}, extraParams, {
     jti: makeUUID4(),
