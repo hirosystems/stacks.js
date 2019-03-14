@@ -12,6 +12,9 @@ const schemaDefinition: {[key: string]: any} = {
   }
 }
 
+/**
+ * @ignore
+ */
 export class CreativeWork extends Profile {
   constructor(profile = {}) {
     super(profile)
@@ -20,11 +23,18 @@ export class CreativeWork extends Profile {
     }, this._profile)
   }
 
+  /**
+   * 
+   * @ignore
+   */
   static validateSchema(profile: any, strict = false) {
     schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
+  /**
+   * @ignore
+   */
   static fromToken(token: string, publicKeyOrAddress: string | null = null) {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new CreativeWork(profile)

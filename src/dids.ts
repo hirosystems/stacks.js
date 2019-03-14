@@ -1,13 +1,22 @@
 import { InvalidDIDError } from './errors'
 
+/**
+* @ignore
+*/
 export function makeDIDFromAddress(address: string) {
   return `did:btc-addr:${address}`
 }
 
+/**
+* @ignore
+*/
 export function makeDIDFromPublicKey(publicKey: string) {
   return `did:ecdsa-pub:${publicKey}`
 }
 
+/**
+* @ignore
+*/
 export function getDIDType(decentralizedID: string) {
   const didParts = decentralizedID.split(':')
   
@@ -22,6 +31,9 @@ export function getDIDType(decentralizedID: string) {
   return didParts[1].toLowerCase()
 }
 
+/**
+* @ignore
+*/
 export function getAddressFromDID(decentralizedID: string) {
   const didType = getDIDType(decentralizedID)
   

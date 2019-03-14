@@ -12,7 +12,16 @@ const schemaDefinition: {[key: string]: any} = {
     '@type': { type: 'string' }
   }
 }
-
+ 
+/**
+ * Represents a user profile
+ * 
+ * @type {Profile}
+ * 
+ * ## How to work with Profiles
+ * 
+ * [[include:profiles.md]]
+ */
 export class Profile {
   _profile: {[key: string]: any}
 

@@ -18,6 +18,10 @@ const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
+/**
+ * @private
+ * @ignore
+ */
 export class BitcoinNetwork {
   broadcastTransaction(transaction: string): Promise<any> {
     return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
@@ -36,6 +40,10 @@ export class BitcoinNetwork {
   }
 }
 
+/**
+ * @private
+ * @ignore
+ */
 export class BlockstackNetwork {
   blockstackAPIUrl: string
 
@@ -84,6 +92,9 @@ export class BlockstackNetwork {
     return bitcoinjs.address.toBase58Check(hash, coercedVersion)
   }
 
+  /**
+  * @ignore
+  */
   getDefaultBurnAddress() {
     return this.coerceAddress('1111111111111111111114oLvT2')
   }
@@ -94,7 +105,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
+  private getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     // legacy code path
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
@@ -128,7 +139,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: BN}> {
+  private getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: BN}> {
     // legacy code path
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then((resp) => {
@@ -159,7 +170,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
+  private getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
         if (resp.status !== 200) {
@@ -197,7 +208,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  getNamespacePriceV2(namespaceID: string): Promise<{units: string, amount: BN}> {
+  public getNamespacePriceV2(namespaceID: string): Promise<{units: string, amount: BN}> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/namespaces/${namespaceID}`)
       .then((resp) => {
         if (resp.status !== 200) {
@@ -235,7 +246,7 @@ export class BlockstackNetwork {
    *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
    *   .amount will be microStacks)
    */
-  getNamePrice(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
+  public getNamePrice(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     // handle v1 or v2 
     return Promise.resolve().then(() => this.getNamePriceV2(fullyQualifiedName))
       .catch(() => this.getNamePriceV1(fullyQualifiedName))
@@ -250,7 +261,7 @@ export class BlockstackNetwork {
    *   (e.g. if .units is BTC, .amount will be satoshis; if .units is STACKS, 
    *   .amount will be microStacks)
    */
-  getNamespacePrice(namespaceID: string): Promise<{units: string, amount: BN}> {
+  public getNamespacePrice(namespaceID: string): Promise<{units: string, amount: BN}> {
     // handle v1 or v2 
     return Promise.resolve().then(() => this.getNamespacePriceV2(namespaceID))
       .catch(() => this.getNamespacePriceV1(namespaceID))
@@ -262,7 +273,7 @@ export class BlockstackNetwork {
    * @param {string} fullyQualifiedName unused
    * @return {Promise} a promise to the number of blocks
    */
-  getGracePeriod(fullyQualifiedName?: string) {
+  public getGracePeriod(fullyQualifiedName?: string) {
     return Promise.resolve(5000)
   }
 
@@ -271,7 +282,7 @@ export class BlockstackNetwork {
    * @param {String} address the blockchain address (the hash of the owner public key)
    * @return {Promise} a promise that resolves to a list of names (Strings)
    */
-  getNamesOwned(address: string): Promise<string[]> {
+  public getNamesOwned(address: string): Promise<string[]> {
     const networkAddress = this.coerceAddress(address)
     return fetch(`${this.blockstackAPIUrl}/v1/addresses/bitcoin/${networkAddress}`)
       .then(resp => resp.json())
@@ -284,7 +295,7 @@ export class BlockstackNetwork {
    * @param {String} namespace the namespace ID
    * @return {Promise} a promise that resolves to an address (String)
    */
-  getNamespaceBurnAddress(namespace: string) {
+  public getNamespaceBurnAddress(namespace: string) {
     return Promise.all([
       fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
       this.getBlockHeight()
@@ -315,7 +326,7 @@ export class BlockstackNetwork {
    * @param {String} fullyQualifiedName the name to query.  Can be on-chain of off-chain.
    * @return {Promise} a promise that resolves to the WHOIS-like information 
    */
-  getNameInfo(fullyQualifiedName: string) {
+  public getNameInfo(fullyQualifiedName: string) {
     Logger.debug(this.blockstackAPIUrl)
     const nameLookupURL = `${this.blockstackAPIUrl}/v1/names/${fullyQualifiedName}`
     return fetch(nameLookupURL)
@@ -346,7 +357,7 @@ export class BlockstackNetwork {
    * @param {String} namespaceID the namespace to query
    * @return {Promise} a promise that resolves to the namespace information.
    */
-  getNamespaceInfo(namespaceID: string) {
+  public getNamespaceInfo(namespaceID: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
       .then((resp) => {
         if (resp.status === 404) {
@@ -378,7 +389,7 @@ export class BlockstackNetwork {
    * @param {String} zonefileHash the ripemd160(sha256) hash of the zone file
    * @return {Promise} a promise that resolves to the zone file's text
    */
-  getZonefile(zonefileHash: string) {
+  public getZonefile(zonefileHash: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
       .then((resp) => {
         if (resp.status === 200) {
@@ -405,7 +416,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an object representing the state of the account
    *   for this token
    */
-  getAccountStatus(address: string, tokenType: string) {
+  public getAccountStatus(address: string, tokenType: string) {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/status`)
       .then((resp) => {
         if (resp.status === 404) {
@@ -434,8 +445,8 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an Array of Objects, where each Object encodes
    *   states of the account at various block heights (e.g. prior balances, txids, etc)
    */
-  getAccountHistoryPage(address: string,
-                        page: number): Promise<any[]> {
+  public getAccountHistoryPage(address: string,
+                               page: number): Promise<any[]> {
     const url = `${this.blockstackAPIUrl}/v1/accounts/${address}/history?page=${page}`
     return fetch(url)
       .then((resp) => {
@@ -470,7 +481,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an Array of Objects, where each Object encodes
    *   states of the account at this block.
    */
-  getAccountAt(address: string, blockHeight: number): Promise<any[]> {
+  public getAccountAt(address: string, blockHeight: number): Promise<any[]> {
     const url = `${this.blockstackAPIUrl}/v1/accounts/${address}/history/${blockHeight}`
     return fetch(url)
       .then((resp) => {
@@ -502,7 +513,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an Array of Strings, where each item encodes the 
    *   type of token this account holds (excluding the underlying blockchain's tokens)
    */
-  getAccountTokens(address: string): Promise<string[]> {
+  public getAccountTokens(address: string): Promise<string[]> {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
       .then((resp) => {
         if (resp.status === 404) {
@@ -529,7 +540,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to a BigInteger that encodes the number of tokens 
    *   held by this account.
    */
-  getAccountBalance(address: string, tokenType: string): Promise<BN> {
+  public getAccountBalance(address: string, tokenType: string): Promise<BN> {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
       .then((resp) => {
         if (resp.status === 404) {
@@ -567,7 +578,7 @@ export class BlockstackNetwork {
    *
    * @private
    */
-  broadcastServiceFetchHelper(endpoint: string, body: any): Promise<any|Error> {
+  private broadcastServiceFetchHelper(endpoint: string, body: any): Promise<any|Error> {
     const requestHeaders = {
       Accept: 'application/json',
       'Content-Type': 'application/json'
@@ -609,9 +620,9 @@ export class BlockstackNetwork {
   *   parameter
   * @private
   */
-  broadcastTransaction(transaction: string,
-                       transactionToWatch: string = null,
-                       confirmations: number = 6) {
+  private broadcastTransaction(transaction: string,
+                               transactionToWatch: string = null,
+                               confirmations: number = 6) {
     if (!transaction) {
       const error = new MissingParameterError('transaction')
       return Promise.reject(error)
@@ -662,8 +673,8 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastZoneFile(zoneFile?: string,
-                    transactionToWatch: string = null) {
+  private broadcastZoneFile(zoneFile?: string,
+                            transactionToWatch: string = null) {
     if (!zoneFile) {
       return Promise.reject(new MissingParameterError('zoneFile'))
     }
@@ -745,9 +756,9 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastNameRegistration(preorderTransaction: string,
-                            registerTransaction: string,
-                            zoneFile: string) {
+  private broadcastNameRegistration(preorderTransaction: string,
+                                    registerTransaction: string,
+                                    zoneFile: string) {
     /*
        * POST /v1/broadcast/registration
        * Request body:
@@ -784,16 +795,25 @@ export class BlockstackNetwork {
     return this.broadcastServiceFetchHelper(endpoint, requestBody)
   }
 
+  /**
+   * @ignore
+   */
   getFeeRate(): Promise<number> {
     return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
       .then(resp => resp.json())
       .then(rates => Math.floor(rates.fastestFee))
   }
 
+  /**
+   * @ignore
+   */
   countDustOutputs() {
     throw new Error('Not implemented.')
   }
 
+  /**
+   * @ignore
+   */
   getUTXOs(address: string): Promise<Array<UTXO>> {
     return this.getNetworkedUTXOs(address)
       .then((networkedUTXOs) => {
@@ -826,8 +846,9 @@ export class BlockstackNetwork {
    * @param {String} txHex - the hex-encoded transaction to use
    * @return {void} no return value, this modifies the UTXO config state
    * @private
+   * @ignore
    */
-  modifyUTXOSetFrom(txHex: string) {
+  private modifyUTXOSetFrom(txHex: string) {
     const tx = bitcoinjs.Transaction.fromHex(txHex)
 
     const excludeSet: Array<UTXO> = this.excludeUtxoSet.concat()
@@ -875,30 +896,39 @@ export class BlockstackNetwork {
     })
   }
 
-  resetUTXOs(address: string) {
+  private resetUTXOs(address: string) {
     delete this.includeUtxoMap[address]
     this.excludeUtxoSet = []
   }
 
+  /**
+  * @ignore
+  */
   getConsensusHash() {
     return fetch(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
       .then(resp => resp.json())
       .then(x => x.consensus_hash)
   }
 
-  getTransactionInfo(txHash: string): Promise<{block_height: number}> {
+  private getTransactionInfo(txHash: string): Promise<{block_height: number}> {
     return this.btc.getTransactionInfo(txHash)
   }
 
+  /**
+   * @ignore
+   */
   getBlockHeight() {
     return this.btc.getBlockHeight()
   }
 
-  getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
+  private getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
     return this.btc.getNetworkedUTXOs(address)
   }
 }
 
+/**
+ * @ignore
+ */
 export class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork) {
@@ -910,6 +940,9 @@ export class LocalRegtest extends BlockstackNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class BitcoindAPI extends BitcoinNetwork {
   bitcoindUrl: string
 
@@ -1043,6 +1076,9 @@ export class BitcoindAPI extends BitcoinNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class InsightClient extends BitcoinNetwork {
   apiUrl: string
 
@@ -1095,6 +1131,10 @@ export class InsightClient extends BitcoinNetwork {
   }
 }
 
+
+/**
+ * @ignore
+ */
 export class BlockchainInfoApi extends BitcoinNetwork {
   utxoProviderUrl: string
 
@@ -1174,6 +1214,10 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 }
 
+
+/**
+* @ignore
+*/
 const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
   'http://localhost:16269',
@@ -1181,12 +1225,18 @@ const LOCAL_REGTEST = new LocalRegtest(
                   { username: 'blockstack', password: 'blockstacksystem' })
 )
 
+/**
+* @ignore
+*/
 const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org',
   'https://broadcast.blockstack.org',
   new BlockchainInfoApi()
 )
 
+/**
+* @ignore
+*/
 export const network = {
   BlockstackNetwork,
   LocalRegtest,

@@ -18,6 +18,10 @@ export function getName(profile: any) {
   return name
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getGivenName(profile: any) {
   if (!profile) {
     return null
@@ -33,6 +37,10 @@ export function getGivenName(profile: any) {
   return givenName
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getFamilyName(profile: any) {
   if (!profile) {
     return null
@@ -48,6 +56,10 @@ export function getFamilyName(profile: any) {
   return familyName
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getDescription(profile: any) {
   if (!profile) {
     return null
@@ -60,6 +72,10 @@ export function getDescription(profile: any) {
   return description
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getAvatarUrl(profile: any) {
   if (!profile) {
     return null
@@ -79,6 +95,10 @@ export function getAvatarUrl(profile: any) {
   return avatarContentUrl
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getVerifiedAccounts(profile: any, verifications?: any[]) {
   if (!profile) {
     return null
@@ -118,6 +138,10 @@ export function getVerifiedAccounts(profile: any, verifications?: any[]) {
   return filteredAccounts
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getOrganizations(profile: any) {
   if (!profile) {
     return null
@@ -132,6 +156,10 @@ export function getOrganizations(profile: any) {
   return organizations
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getConnections(profile: any) {
   if (!profile) {
     return null
@@ -146,6 +174,10 @@ export function getConnections(profile: any) {
   return connections
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getAddress(profile: any) {
   if (!profile) {
     return null
@@ -177,6 +209,10 @@ export function getAddress(profile: any) {
   return addressString
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getBirthDate(profile: any) {
   if (!profile) {
     return null

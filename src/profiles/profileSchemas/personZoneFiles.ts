@@ -5,6 +5,14 @@ import { Person } from './person'
 import { getTokenFileUrl } from '../profileZoneFiles'
 import { extractProfile } from '../profileTokens'
 
+/**
+ * 
+ * @param zoneFile 
+ * @param publicKeyOrAddress 
+ * @param callback 
+ * 
+ * @ignore
+ */
 export function resolveZoneFileToPerson(
   zoneFile: any, 
   publicKeyOrAddress: string, 
