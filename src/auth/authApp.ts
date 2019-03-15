@@ -79,7 +79,6 @@ export function isUserSignedIn() {
  * An array of strings indicating which permissions this app is requesting.
  * @return {void}
  */
-/* eslint-disable no-unused-vars */
 export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
                                  manifestURI: string = `${window.location.origin}/manifest.json`, 
                                  scopes: Array<string> = DEFAULT_SCOPE) { 
@@ -89,7 +88,6 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
   const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
   redirectToSignInWithAuthRequest(authRequest)
 }
-/* eslint-enable no-unused-vars */
 
 /**
  * Check if there is a authentication request that hasn't been handled.

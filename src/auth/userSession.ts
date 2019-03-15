@@ -1,5 +1,4 @@
 
-import queryString from 'query-string'
 import { AppConfig } from './appConfig'
 import { SessionOptions } from './sessionData'
 import {
@@ -7,29 +6,10 @@ import {
   SessionDataStore,
   InstanceDataStore
 } from './sessionStore'
-import {
-  redirectToSignInWithAuthRequest,
-  handlePendingSignIn,
-  UserData,
-  getAuthResponseToken,
-  isSignInPending,
-  signUserOut
-} from './authApp'
 
-import {
-  generateTransitKey, makeAuthRequest
-} from './authMessages'
-
-import {
-  decryptContent,
-  encryptContent,
-  getFile,
-  putFile,
-  listFiles,
-  getFileUrl,
-  PutFileOptions,
-  GetFileOptions
-} from '../storage'
+import * as authApp from './authApp'
+import * as authMessages from './authMessages'
+import * as storage from '../storage'
 
 import {
   nextHour
@@ -113,7 +93,7 @@ export class UserSession {
     const transitKey = this.generateAndStoreTransitKey()
     const authRequest = this.makeAuthRequest(transitKey)
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
-    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
+    return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -129,7 +109,7 @@ export class UserSession {
    */
   redirectToSignInWithAuthRequest(authRequest: string) {
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
-    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
+    return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -160,7 +140,7 @@ export class UserSession {
     const manifestURI = appConfig.manifestURI()
     const scopes = appConfig.scopes
     const appDomain = appConfig.appDomain
-    return makeAuthRequest(
+    return authApp.makeAuthRequest(
       transitKey, redirectURI, manifestURI,
       scopes, appDomain, expiresAt, extraParams)
   }
@@ -174,7 +154,7 @@ export class UserSession {
    */
   generateAndStoreTransitKey(): string {
     const sessionData = this.store.getSessionData()
-    const transitKey = generateTransitKey()
+    const transitKey = authMessages.generateTransitKey()
     sessionData.transitKey = transitKey
     this.store.setSessionData(sessionData)
     return transitKey
@@ -185,7 +165,7 @@ export class UserSession {
    * @return {String} the authentication token if it exists otherwise `null`
    */
   getAuthResponseToken(): string {
-    return getAuthResponseToken()
+    return authApp.getAuthResponseToken()
   }
 
   /**
@@ -193,7 +173,7 @@ export class UserSession {
    * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
    */
   isSignInPending() {
-    return isSignInPending()
+    return authApp.isSignInPending()
   }
 
   /**
@@ -215,7 +195,7 @@ export class UserSession {
   handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
     const transitKey = this.store.getSessionData().transitKey
     const nameLookupURL = this.store.getSessionData().coreNode
-    return handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, this)
+    return authApp.handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, this)
   }
 
   /**
@@ -238,7 +218,7 @@ export class UserSession {
    * Only used in environments with `window` available
    */
   signUserOut(redirectURL?: string) {
-    signUserOut(redirectURL, this)
+    authApp.signUserOut(redirectURL, this)
   }
 
   //
@@ -266,7 +246,7 @@ export class UserSession {
     content: string | Buffer,
     options?: {publicKey?: string}
   ) {
-    return encryptContent(content, options, this)
+    return storage.encryptContent(content, options, this)
   }
 
   /**
@@ -279,7 +259,7 @@ export class UserSession {
    * @return {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}) {
-    return decryptContent(content, options, this)
+    return storage.decryptContent(content, options, this)
   }
 
   /**
@@ -294,8 +274,8 @@ export class UserSession {
    * @return {Promise} that resolves if the operation succeed and rejects
    * if it failed
    */
-  putFile(path: string, content: string | Buffer, options?: PutFileOptions) {
-    return putFile(path, content, options, this)
+  putFile(path: string, content: string | Buffer, options?: storage.PutFileOptions) {
+    return storage.putFile(path, content, options, this)
   }
 
   /**
@@ -314,8 +294,8 @@ export class UserSession {
    * @returns {Promise} that resolves to the raw data in the file
    * or rejects with an error
    */
-  getFile(path: string, options?: GetFileOptions) {
-    return getFile(path, options, this)
+  getFile(path: string, options?: storage.GetFileOptions) {
+    return storage.getFile(path, options, this)
   }
 
   /**
@@ -335,7 +315,7 @@ export class UserSession {
     app?: string,
     zoneFileLookupURL?: string
   }): Promise<string> {
-    return getFileUrl(path, options, this)
+    return storage.getFileUrl(path, options, this)
   }
 
   /**
@@ -345,7 +325,7 @@ export class UserSession {
    * @return {Promise} that resolves to the number of files listed
    */
   listFiles(callback: (name: string) => boolean): Promise<number> {
-    return listFiles(callback, this)
+    return storage.listFiles(callback, this)
   }
 
   /**
