@@ -10,7 +10,10 @@ import {
 import {
   redirectToSignInWithAuthRequest,
   handlePendingSignIn,
-  UserData
+  UserData,
+  getAuthResponseToken,
+  isSignInPending,
+  signUserOut
 } from './authApp'
 
 import {
@@ -144,7 +147,6 @@ export class UserSession {
    * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
    * by special authenticators.
    * @return {String} the authentication request
-   * @private
    */
   makeAuthRequest(transitKey: string,
                   expiresAt: number = nextHour().getTime(),
@@ -183,8 +185,7 @@ export class UserSession {
    * @return {String} the authentication token if it exists otherwise `null`
    */
   getAuthResponseToken(): string {
-    const queryDict = queryString.parse(location.search)
-    return queryDict.authResponse ? <string>queryDict.authResponse : ''
+    return getAuthResponseToken()
   }
 
   /**
@@ -192,7 +193,7 @@ export class UserSession {
    * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
    */
   isSignInPending() {
-    return !!this.getAuthResponseToken()
+    return isSignInPending()
   }
 
   /**
@@ -231,11 +232,13 @@ export class UserSession {
 
 
   /**
-   * Sign the user out
-   * @return {void}
+   * Sign the user out and optionally redirect to given location.
+   * @param  redirectURL
+   * Location to redirect user to after sign out. 
+   * Only used in environments with `window` available
    */
-  signUserOut() {
-    this.store.deleteSessionData()
+  signUserOut(redirectURL?: string) {
+    signUserOut(redirectURL, this)
   }
 
   //
@@ -263,11 +266,7 @@ export class UserSession {
     content: string | Buffer,
     options?: {publicKey?: string}
   ) {
-    const opts: { publicKey?: string, privateKey?: string } = { ...options }
-    if (!opts.publicKey) {
-      opts.privateKey = this.loadUserData().appPrivateKey
-    }
-    return encryptContent(content, opts)
+    return encryptContent(content, options, this)
   }
 
   /**
@@ -280,11 +279,7 @@ export class UserSession {
    * @return {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}) {
-    const opts = { ...options }
-    if (!opts.privateKey) {
-      opts.privateKey = this.loadUserData().appPrivateKey
-    }
-    return decryptContent(content, opts)
+    return decryptContent(content, options, this)
   }
 
   /**
@@ -358,7 +353,6 @@ export class UserSession {
    * @param {String} path - the path to the file to delete
    * @returns {Promise} that resolves when the file has been removed
    * or rejects with an error
-   * @private
    */
   deleteFile(path: string) {
     Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
@@ -382,7 +376,6 @@ export class UserSession {
    * These two functions are app-specific connections to gaia hub,
    *   they read the user data object for information on setting up
    *   a hub connection, and store the hub config to localstorage
-   * @param {UserSession} caller - the instance calling this function
    * @private
    * @returns {Promise} that resolves to the new gaia hub connection
    */

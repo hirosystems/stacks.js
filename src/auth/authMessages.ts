@@ -55,7 +55,6 @@ export function generateTransitKey() {
  * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
  * by special authenticators.
  * @return {String} the authentication request
- * @private
  */
 export function makeAuthRequest(
   transitPrivateKey: string,

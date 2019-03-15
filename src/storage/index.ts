@@ -33,7 +33,6 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
  * @param {String} path - the path to the file to delete
  * @returns {Promise} that resolves when the file has been removed
  * or rejects with an error
- * @private
  */
 export function deleteFile(path: string) {
   Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
@@ -82,25 +81,20 @@ export function getUserAppFileUrl(path: string, username: string, appOrigin: str
  * @param {String} options.publicKey - the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPublicKey.
  * @return {String} Stringified ciphertext object
- * @private
  */
 export function encryptContent(
   content: string | Buffer,
   options?: {
-    publicKey?: string,
-    privateKey?: string
-  }
+    publicKey?: string
+  },
+  caller?: UserSession
 ) {
-  const opt = Object.assign({}, options)
-  if (opt.publicKey && opt.privateKey) {
-    throw new Error('Should not provide both `publicKey` and `privateKey`')
+  const opts = Object.assign({}, options)
+  if (!opts.publicKey) {
+    const privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
-  if (!opt.publicKey) {
-    const privateKey = opt.privateKey || (new UserSession().loadUserData().appPrivateKey)
-    opt.publicKey = getPublicKeyFromPrivate(privateKey)
-  }
-
-  const cipherObject = encryptECIES(opt.publicKey, content)
+  const cipherObject = encryptECIES(opts.publicKey, content)
   return JSON.stringify(cipherObject)
 }
 
@@ -112,23 +106,22 @@ export function encryptContent(
  * @param {String} options.privateKey - the hex string of the ECDSA private
  * key to use for decryption. If not provided, will use user's appPrivateKey.
  * @return {String|Buffer} decrypted content.
- * @private
  */
 export function decryptContent(
   content: string,
   options?: {
     privateKey?: string
-  }
+  },
+  caller?: UserSession
 ) {
-  const opt = Object.assign({}, options)
-  let privateKey = opt.privateKey
-  if (!privateKey) {
-    privateKey = new UserSession().loadUserData().appPrivateKey
+  const opts = Object.assign({}, options)
+  if (!opts.privateKey) {
+    opts.privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
   }
 
   try {
     const cipherObject = JSON.parse(content)
-    return decryptECIES(privateKey, cipherObject)
+    return decryptECIES(opts.privateKey, cipherObject)
   } catch (err) {
     if (err instanceof SyntaxError) {
       throw new Error('Failed to parse encrypted content JSON. The content may not '
@@ -460,7 +453,6 @@ export function getFile(
  * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
- * @private
  */
 export async function putFile(
   path: string,
@@ -514,23 +506,24 @@ export async function putFile(
   if (!opt.encrypt && opt.sign) {
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
-    return caller.getOrSetLocalGaiaHubConnection()
-      .then(gaiaHubConfig => new Promise<string[]>((resolve, reject) => Promise.all([
+    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+
+    try {
+      const fileUrls = await Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, gaiaHubConfig, 'application/json')
       ])
-        .then(files => resolve(files))
-        .catch(() => {
-          caller.setLocalGaiaHubConnection()
-            .then(freshHubConfig => Promise.all([
+      return fileUrls[0]
+    } catch (error) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      const fileUrls = await Promise.all([
               uploadToGaiaHub(path, content, freshHubConfig, contentType),
               uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                               signatureContent, freshHubConfig, 'application/json')
             ])
-              .then(files => resolve(files)).catch(reject))
-        })))
-      .then(fileUrls => fileUrls[0])
+      return fileUrls[0]
+    }
   }
 
   // In all other cases, we only need one upload.
@@ -647,7 +640,6 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
- * @private
  */
 export async function listFiles(
   callback: (name: string) => boolean,

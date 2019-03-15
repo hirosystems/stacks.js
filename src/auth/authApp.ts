@@ -96,18 +96,14 @@ export function redirectToSignIn(redirectURI: string = `${window.location.origin
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
 export function isSignInPending() {
-  console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the '
-    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method isSignInPending().')
-  const userSession = new UserSession()
-  return userSession.isSignInPending()
+  return !!getAuthResponseToken()
 }
 
 /**
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
-function getAuthResponseToken(): string {
+export function getAuthResponseToken(): string {
   const queryDict = queryString.parse(location.search)
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
@@ -126,16 +122,16 @@ export function loadUserData() {
 
 /**
  * Sign the user out and optionally redirect to given location.
- * @param  {String} [redirectURL=null] Location to redirect user to after sign out.
- * @return {void}
+ * @param  redirectURL
+ * Location to redirect user to after sign out. 
+ * Only used in environments with `window` available
  */
-export function signUserOut(redirectURL: string | null = null) {
-  console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the '
-    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method signUserOut().')
-  const userSession = new UserSession()
-  userSession.signUserOut()
-  window.location.href = redirectURL
+export function signUserOut(redirectURL?: string, caller?: UserSession) {
+  const userSession = caller || new UserSession()
+  userSession.store.deleteSessionData()
+  if (redirectURL && typeof window !== 'undefined') {
+    window.location.href = redirectURL
+  }
 }
 
 /**
@@ -318,7 +314,6 @@ function detectProtocolLaunch(
  * @param  {String} blockstackIDHost - the URL to redirect the user to if the blockstack
  *                                     protocol handler is not detected
  * @return {void}
- * @private
  */
 export function redirectToSignInWithAuthRequest(
   authRequest: string,
