@@ -8,7 +8,7 @@ import {
   connectToGaiaHub,
   getBucketUrl
 } from '../../../src/storage/hub'
-import { getFile, getFileUrl, putFile } from '../../../src/storage'
+import { getFile, getFileUrl, putFile, listFiles } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -301,13 +301,9 @@ export function runStorageTests() {
     const fileContent = '<!DOCTYPE html><html><head><title>Title</title></head><body>Blockstack</body></html>'
 
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
-    const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
     const { putFile } = proxyquire('../../../src/storage', {
       './hub': { uploadToGaiaHub }
-    })
-    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
-      './hub': { getFullReadUrl }
     })
 
     const config = {
@@ -688,10 +684,6 @@ export function runStorageTests() {
       gaiaHubConfig
     }
 
-    const { putFile } = proxyquire('../../../src/storage', {
-
-    })
-
     FetchMock.post(`${fullReadUrl}`, { status: 404, body: 'Not found.' })
     putFile(path, 'hello world', { encrypt: false }, blockstack)
       .then(() => t.ok(false, 'Should not have returned'))
@@ -705,10 +697,9 @@ export function runStorageTests() {
       .catch(() => t.ok(true, 'Should have rejected promise'))
   })
 
-  test.skip('putFile gets a new gaia config and tries again', (t) => {
+  test('putFile gets a new gaia config and tries again', (t) => {
     t.plan(3)
-    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
-    const blockstack = new UserSession({ appConfig })
+
     const path = 'file.json'
     const fullWriteUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
     const invalidHubConfig = {
@@ -720,12 +711,21 @@ export function runStorageTests() {
     const validHubConfig = Object.assign({}, invalidHubConfig, {
       token: 'valid'
     })
+    const connectToGaiaHub = sinon.stub().resolves(validHubConfig)
+
+    const UserSessionClass = proxyquire('../../../src/auth/userSession', {
+      '../storage/hub': {
+        connectToGaiaHub
+      }
+    }).UserSession as typeof UserSession
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSessionClass({ appConfig })
     blockstack.store.getSessionData().userData = <any>{
       gaiaHubConfig: invalidHubConfig,
       hubUrl: 'https://hub.testblockstack.org'
     }
 
-    const connectToGaiaHub = sinon.stub().resolves(validHubConfig)
     const { putFile } = proxyquire('../../../src/storage', {
       './hub': {
         connectToGaiaHub
@@ -1018,11 +1018,6 @@ export function runStorageTests() {
       } else {
         throw new Error('Called too many times')
       }
-    })
-
-    const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
-    const { listFiles } = proxyquire('../../../src/storage', {
-      './hub': { getOrSetLocalGaiaHubConnection }
     })
 
     const files = []
