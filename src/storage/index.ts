@@ -49,29 +49,20 @@ export function deleteFile(path: string) {
  * @return {Promise<string>} that resolves to the public read URL of the file
  * or rejects with an error
  */
-export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
-                                  zoneFileLookupURL: string | undefined = null
+export async function getUserAppFileUrl(
+  path: string, username: string, appOrigin: string,
+  zoneFileLookupURL?: string
 ): Promise<string|null> {
-  return lookupProfile(username, zoneFileLookupURL)
-    .then((profile) => {
+  const profile = await lookupProfile(username, zoneFileLookupURL)
+  let bucketUrl: string = null
       if (profile.hasOwnProperty('apps')) {
         if (profile.apps.hasOwnProperty(appOrigin)) {
-          return profile.apps[appOrigin]
-        } else {
-          return null
-        }
-      } else {
-        return null
+      const url = profile.apps[appOrigin]
+      const bucket = url.replace(/\/?(\?|#|$)/, '/$1')
+      bucketUrl = `${bucket}${path}`
       }
-    })
-    .then((bucketUrl) => {
-      if (bucketUrl) {
-        const bucket = bucketUrl.replace(/\/?(\?|#|$)/, '/$1')
-        return `${bucket}${path}`
-      } else {
-        return null
       }
-    })
+  return bucketUrl
 }
 
 /**

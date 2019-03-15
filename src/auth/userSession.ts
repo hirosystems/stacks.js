@@ -31,7 +31,6 @@ import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
  *
  * A user can be signed in either directly through the interactive
  * sign in process or by directly providing the app private key.
- * @type {UserSession}
  */
 export class UserSession {
   appConfig: AppConfig
