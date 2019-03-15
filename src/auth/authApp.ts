@@ -362,10 +362,10 @@ export async function handlePendingSignIn(
   nameLookupURL: string = '', 
   authResponseToken: string = getAuthResponseToken(), 
   transitKey?: string,
-  saveUserData?: (userData: UserData) => void | Promise<void>
+  caller?: UserSession
 ) {
   if (!transitKey) {
-    transitKey = new UserSession().store.getSessionData().transitKey
+    transitKey = (caller || new UserSession()).store.getSessionData().transitKey
   }
   if (!nameLookupURL) {
     const tokenPayload = decodeToken(authResponseToken).payload
@@ -452,14 +452,10 @@ export async function handlePendingSignIn(
     userData.profile = tokenPayload.profile
   }
   
-  if (saveUserData) {
-    await Promise.resolve(saveUserData(userData))
-  } else {
-    const userSession = new UserSession()
-    const sessionData = userSession.store.getSessionData()
-    sessionData.userData = userData
-    userSession.store.setSessionData(sessionData)
-  }
-
+  const userSession = caller || new UserSession()
+  const sessionData = userSession.store.getSessionData()
+  sessionData.userData = userData
+  userSession.store.setSessionData(sessionData)
+  
   return userData
 }

@@ -1,7 +1,7 @@
 
 
 import {
-  getOrSetLocalGaiaHubConnection, getFullReadUrl, setLocalGaiaHubConnection,
+  getFullReadUrl,
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
   GaiaHubConfig
 } from './hub'
@@ -27,32 +27,6 @@ export type PutFileOptions = {
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
-
-
-/**
- * Stores the data provided in the app's data store to to the file specified.
- * @param {String} path - the path to store the data in
- * @param {String|Buffer} content - the data to store in the file
- * @param {Object} [options=null] - options object
- * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
- *                                                  or the provided public key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
- *                                         the app private key
- * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
- * @return {Promise} that resolves if the operation succeed and rejects
- * if it failed
- */
-export function putFile(path: string, content: string | Buffer, options?: {
-  encrypt?: boolean | string,
-  sign?: boolean,
-  contentType?: string
-}) {
-  console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method putFile().')
-  const userSession = new UserSession()
-  return userSession.putFile(path, content, options)
-}
 
 /**
  * Deletes the specified file from the app's data store. Currently not implemented.
@@ -169,14 +143,15 @@ export function decryptContent(
  * (username, app) pair.
  * @private
  */
-function getGaiaAddress(caller: UserSession,
-                        app: string, username?: string, zoneFileLookupURL?: string) {
+function getGaiaAddress(app: string, username?: string, zoneFileLookupURL?: string,
+                        caller?: UserSession) {
+  const opts = normalizeOptions({ app, username }, caller)
   return Promise.resolve()
     .then(() => {
       if (username) {
-        return getUserAppFileUrl('/', username, app, zoneFileLookupURL)
+        return getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
       } else {
-        return getOrSetLocalGaiaHubConnection(caller)
+        return (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
           .then(gaiaHubConfig => getFullReadUrl('/', gaiaHubConfig))
       }
     })
@@ -187,6 +162,31 @@ function getGaiaAddress(caller: UserSession,
       }
       return matches[matches.length - 1]
     })
+}
+/**
+ * @param {Object} [options=null] - options object
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ */
+function normalizeOptions<T>(
+  options?: {
+    app?: string, 
+    username?: string
+  } & T,
+  caller?: UserSession
+) {
+  const opts = Object.assign({}, options)
+  if (opts.username) {
+    if (!opts.app) {
+      const appConfig = (caller || new UserSession()).appConfig
+      if (!appConfig) {
+        throw new InvalidStateError('Missing AppConfig')
+      }
+      opts.app = appConfig.appDomain
+    }
+  }
+  return opts
 }
 
 /**
@@ -210,20 +210,13 @@ export async function getFileUrl(
   },
   caller?: UserSession
 ): Promise<string> {
-  const opts = Object.assign({}, options)
+  const opts = normalizeOptions(options, caller)
 
   let readUrl: string
   if (opts.username) {
-    if (!opts.app) {
-      const appConfig = (caller || new UserSession()).appConfig
-      if (!appConfig) {
-        throw new InvalidStateError('Missing AppConfig')
-      }
-      opts.app = appConfig.appDomain
-    }
     readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    const gaiaHubConfig = await getOrSetLocalGaiaHubConnection(caller || new UserSession())
+    const gaiaHubConfig = await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
     readUrl = await getFullReadUrl(path, gaiaHubConfig)
   }
 
@@ -238,10 +231,10 @@ export async function getFileUrl(
  *  multi-player reads and reads from own storage.
  * @private
  */
-function getFileContents(caller: UserSession,
-                         path: string, app: string, username: string | undefined, 
+function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
-                         forceText: boolean): Promise<string | ArrayBuffer | null> {
+                         forceText: boolean,
+                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
   return Promise.resolve()
     .then(() => {
       const opts = { app, username, zoneFileLookupURL }
@@ -273,20 +266,20 @@ function getFileContents(caller: UserSession,
  *  from own storage.
  * @private
  */
-function getFileSignedUnencrypted(caller: UserSession, path: string, opt: GetFileOptions & {
+function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
   username?: string | null;
   app?: string | null;
   zoneFileLookupURL?: string | null;
-}) {
+}, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
   return Promise.all(
-    [getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false),
-     getFileContents(caller, `${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
-                     opt.zoneFileLookupURL, true),
-     getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)]
+    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
+     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+                     opt.zoneFileLookupURL, true, caller),
+     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
     .then(([fileContents, signatureContents, gaiaAddress]) => {
       if (!fileContents) {
@@ -344,7 +337,7 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
 
   let addressPromise: Promise<string>
   if (username) {
-    addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL)
+    addressPromise = getGaiaAddress(app, username, zoneFileLookupURL, caller)
   } else {
     const address = publicKeyToAddress(appPublicKey)
     addressPromise = Promise.resolve(address)
@@ -429,10 +422,10 @@ export function getFile(
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.
   if (opt.verify && !opt.decrypt) {
-    return getFileSignedUnencrypted(caller, path, opt)
+    return getFileSignedUnencrypted(path, opt, caller)
   }
 
-  return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
+  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt, caller)
     .then<string|ArrayBuffer|Buffer>((storedContents) => {
       if (storedContents === null) {
         return storedContents
@@ -457,7 +450,6 @@ export function getFile(
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
- * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
@@ -470,11 +462,11 @@ export function getFile(
  * if it failed
  * @private
  */
-export async function putFileImpl(
-  caller: UserSession,
+export async function putFile(
   path: string,
   content: string | Buffer,
-  options?: PutFileOptions
+  options?: PutFileOptions,
+  caller?: UserSession,
 ): Promise<string> {
   const defaults = {
     encrypt: true,
@@ -487,6 +479,10 @@ export async function putFileImpl(
   let { contentType } = opt
   if (!contentType) {
     contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
+  }
+
+  if (!caller) {
+    caller = new UserSession()
   }
 
   // First, let's figure out if we need to get public/private keys,
@@ -518,7 +514,7 @@ export async function putFileImpl(
   if (!opt.encrypt && opt.sign) {
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
-    return getOrSetLocalGaiaHubConnection(caller)
+    return caller.getOrSetLocalGaiaHubConnection()
       .then(gaiaHubConfig => new Promise<string[]>((resolve, reject) => Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
@@ -526,7 +522,7 @@ export async function putFileImpl(
       ])
         .then(files => resolve(files))
         .catch(() => {
-          setLocalGaiaHubConnection(caller)
+          caller.setLocalGaiaHubConnection()
             .then(freshHubConfig => Promise.all([
               uploadToGaiaHub(path, content, freshHubConfig, contentType),
               uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
@@ -552,16 +548,14 @@ export async function putFileImpl(
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
   }
-  return getOrSetLocalGaiaHubConnection(caller)
-    .then(gaiaHubConfig => new Promise<string>((resolve, reject) => {
-      uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
-        .then(resolve)
-        .catch(() => {
-          setLocalGaiaHubConnection(caller)
-            .then(freshHubConfig => uploadToGaiaHub(path, content, freshHubConfig, contentType)
-              .then(file => resolve(file)).catch(reject))
-        })
-    }))
+  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  try {
+    return await uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
+  } catch (error) {
+    const freshHubConfig = await caller.setLocalGaiaHubConnection()
+    const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
+    return file
+  }
 }
 
 /**
@@ -655,12 +649,13 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
  * @return {Promise} that resolves to the number of files listed
  * @private
  */
-export function listFiles(
+export async function listFiles(
   callback: (name: string) => boolean,
   caller?: UserSession
 ): Promise<number> {
-  return getOrSetLocalGaiaHubConnection(caller || new UserSession())
-    .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
+  const userSession = caller || new UserSession()
+  const gaiaHubConfig = await userSession.getOrSetLocalGaiaHubConnection()
+  return listFilesLoop(gaiaHubConfig, null, 0, 0, callback)
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }

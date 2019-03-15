@@ -38,8 +38,6 @@ export class SessionData {
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
   userData?: UserData
 
-  gaiaHubConfig?: GaiaHubConfig
-
   constructor(options: SessionOptions) {
     this.version = SESSION_VERSION
     this.appPrivateKey = options.appPrivateKey
@@ -49,18 +47,14 @@ export class SessionData {
     this.hubUrl = options.hubUrl
     this.userData = options.userData
     this.transitKey = options.transitKey
-
-    // initializing Gaia connection requires a network request
-    // so we'll defer it until the first time it's needed
-    this.gaiaHubConfig = null
   }
 
   getGaiaHubConfig(): GaiaHubConfig {
-    return this.gaiaHubConfig
+    return this.userData && this.userData.gaiaHubConfig
   }
 
   setGaiaHubConfig(config: GaiaHubConfig): void {
-    this.gaiaHubConfig = config
+    this.userData.gaiaHubConfig = config
   }
 
   static fromJSON(json: any): SessionData {

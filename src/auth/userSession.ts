@@ -21,7 +21,7 @@ import {
   decryptContent,
   encryptContent,
   getFile,
-  putFileImpl,
+  putFile,
   listFiles,
   getFileUrl,
   PutFileOptions,
@@ -36,6 +36,8 @@ import {
   InvalidStateError
 } from '../errors'
 import { Logger } from '../logger'
+import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
 
 /**
  * Represents an instance of a signed in user for a particular app.
@@ -212,12 +214,7 @@ export class UserSession {
   handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
     const transitKey = this.store.getSessionData().transitKey
     const nameLookupURL = this.store.getSessionData().coreNode
-    const storeUserData = (userData: UserData) => {
-      const sessionData = this.store.getSessionData()
-      sessionData.userData = userData
-      this.store.setSessionData(sessionData)
-    }
-    return handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, storeUserData)
+    return handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, this)
   }
 
   /**
@@ -303,7 +300,7 @@ export class UserSession {
    * if it failed
    */
   putFile(path: string, content: string | Buffer, options?: PutFileOptions) {
-    return putFileImpl(this, path, content, options)
+    return putFile(path, content, options, this)
   }
 
   /**
@@ -365,5 +362,52 @@ export class UserSession {
    */
   deleteFile(path: string) {
     Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
+  }
+
+
+  getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
+    const sessionData = this.store.getSessionData()
+    const userData = sessionData.userData
+    if (!userData) {
+      throw new InvalidStateError('Missing userData')
+    }
+    const hubConfig = userData.gaiaHubConfig
+    if (hubConfig) {
+      return Promise.resolve(hubConfig)
+    }
+    return this.setLocalGaiaHubConnection()
+  }
+
+  /**
+   * These two functions are app-specific connections to gaia hub,
+   *   they read the user data object for information on setting up
+   *   a hub connection, and store the hub config to localstorage
+   * @param {UserSession} caller - the instance calling this function
+   * @private
+   * @returns {Promise} that resolves to the new gaia hub connection
+   */
+  async setLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
+    const userData = this.loadUserData()
+  
+    if (!userData) {
+      throw new InvalidStateError('Missing userData')
+    }
+  
+    if (!userData.hubUrl) {
+      userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
+    }
+  
+    const gaiaConfig = await connectToGaiaHub(
+      userData.hubUrl,
+      userData.appPrivateKey,
+      userData.associationToken)
+
+    userData.gaiaHubConfig = gaiaConfig
+
+    const sessionData = this.store.getSessionData()
+    sessionData.userData.gaiaHubConfig = gaiaConfig
+    this.store.setSessionData(sessionData)
+
+    return gaiaConfig
   }
 }

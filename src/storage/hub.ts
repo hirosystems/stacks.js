@@ -21,28 +21,28 @@ export type GaiaHubConfig = {
   server: string
 }
 
-export function uploadToGaiaHub(filename: string, contents: any,
-                                hubConfig: GaiaHubConfig,
-                                contentType: string = 'application/octet-stream'): Promise<string> {
+export async function uploadToGaiaHub(
+  filename: string, contents: any,
+  hubConfig: GaiaHubConfig,
+  contentType: string = 'application/octet-stream'
+): Promise<string> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
-  return fetch(`${hubConfig.server}/store/${hubConfig.address}/${filename}`,
-               {
-                 method: 'POST',
-                 headers: {
-                   'Content-Type': contentType,
-                   Authorization: `bearer ${hubConfig.token}`
-                 },
-                 body: contents
-               })
-    .then((response) => {
-      if (response.ok) {
-        return response.text()
-      } else {
-        throw new Error('Error when uploading to Gaia hub')
-      }
-    })
-    .then(responseText => JSON.parse(responseText))
-    .then(responseJSON => responseJSON.publicURL)
+  const response = await fetch(
+    `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': contentType,
+        Authorization: `bearer ${hubConfig.token}`
+      },
+      body: contents
+    }
+  )
+  if (!response.ok) {
+    throw new Error('Error when uploading to Gaia hub')
+  } 
+  const responseText = await response.text()
+  const responseJSON = JSON.parse(responseText)
+  return responseJSON.publicURL
 }
 
 export function getFullReadUrl(filename: string,
@@ -107,87 +107,34 @@ function makeV1GaiaAuthToken(hubInfo: any,
   return `v1:${token}`
 }
 
-export function connectToGaiaHub(gaiaHubUrl: string,
-                                 challengeSignerHex: string,
-                                 associationToken?: string): Promise<GaiaHubConfig> {
+export async function connectToGaiaHub(
+  gaiaHubUrl: string,
+  challengeSignerHex: string,
+  associationToken?: string
+): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
-  return fetch(`${gaiaHubUrl}/hub_info`)
-    .then(response => response.json())
-    .then((hubInfo) => {
-      const readURL = hubInfo.read_url_prefix
-      const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
-      const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
-                                        + (challengeSignerHex.length === 64 ? '01' : '')))
-      return {
-        url_prefix: readURL,
-        address,
-        token,
-        server: gaiaHubUrl
-      }
-    })
+  const response = await fetch(`${gaiaHubUrl}/hub_info`)
+  const hubInfo = await response.json()
+  const readURL = hubInfo.read_url_prefix
+  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
+  const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
+                                    + (challengeSignerHex.length === 64 ? '01' : '')))
+  return {
+    url_prefix: readURL,
+    address,
+    token,
+    server: gaiaHubUrl
+  }
 }
 
-/**
- * These two functions are app-specific connections to gaia hub,
- *   they read the user data object for information on setting up
- *   a hub connection, and store the hub config to localstorage
- * @param {UserSession} caller - the instance calling this function
- * @private
- * @returns {Promise} that resolves to the new gaia hub connection
- */
-export function setLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
-  const userData = caller.loadUserData()
-
-  if (!userData) {
-    throw new InvalidStateError('Missing userData')
-  }
-
-  if (!userData.hubUrl) {
-    userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
-  }
-
-  return connectToGaiaHub(userData.hubUrl,
-                          userData.appPrivateKey,
-                          userData.associationToken)
-    .then((gaiaConfig) => {
-      userData.gaiaHubConfig = gaiaConfig
-
-      const sessionData = caller.store.getSessionData()
-      sessionData.userData.gaiaHubConfig = gaiaConfig
-      caller.store.setSessionData(sessionData)
-
-      return gaiaConfig
-    })
-}
-
-export function getOrSetLocalGaiaHubConnection(caller: UserSession): Promise<GaiaHubConfig> {
-  const userData = caller.store.getSessionData().userData
-  if (!userData) {
-    throw new InvalidStateError('Missing userData')
-  }
-  const hubConfig = userData.gaiaHubConfig
-  if (hubConfig) {
-    return Promise.resolve(hubConfig)
-  }
-  return setLocalGaiaHubConnection(caller)
-}
-
-export function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
-  let challengeSigner: bitcoin.ECPair
-  try {
-    challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
-  } catch (e) {
-    return Promise.reject(e)
-  }
-
-  return fetch(`${gaiaHubUrl}/hub_info`)
-    .then(response => response.text())
-    .then(responseText => JSON.parse(responseText))
-    .then((responseJSON) => {
-      const readURL = responseJSON.read_url_prefix
-      const address = ecPairToAddress(challengeSigner)
-      const bucketUrl = `${readURL}${address}/`
-      return bucketUrl
-    })
+export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
+  const challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
+  const response = await fetch(`${gaiaHubUrl}/hub_info`)
+  const responseText = await response.text()
+  const responseJSON = JSON.parse(responseText)
+  const readURL = responseJSON.read_url_prefix
+  const address = ecPairToAddress(challengeSigner)
+  const bucketUrl = `${readURL}${address}/`
+  return bucketUrl
 }
