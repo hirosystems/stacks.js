@@ -30,36 +30,6 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
 
 
 /**
- * Retrieves the specified file from the app's data store.
- * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {Boolean} options.verify - Whether the content should be verified, only to be used
- * when `putFile` was set to `sign = true`
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
- * @returns {Promise} that resolves to the raw data in the file
- * or rejects with an error
- */
-export function getFile(path: string, options?: {
-  decrypt?: boolean;
-  verify?: boolean;
-  username?: string;
-  app?: string;
-  zoneFileLookupURL?: string;
-}) {
-  console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method getFile().')
-  const userSession = new UserSession()
-  return userSession.getFile(path, options)
-}
-
-/**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
@@ -274,7 +244,7 @@ function getFileContents(caller: UserSession,
                          forceText: boolean): Promise<string | ArrayBuffer | null> {
   return Promise.resolve()
     .then(() => {
-      const opts: any = { app, username, zoneFileLookupURL }
+      const opts = { app, username, zoneFileLookupURL }
       return getFileUrl(path, opts, caller)
     })
     .then(readUrl => fetch(readUrl))
@@ -429,7 +399,6 @@ export type GetFileOptions = {
 
 /**
  * Retrieves the specified file from the app's data store.
- * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
@@ -443,22 +412,19 @@ export type GetFileOptions = {
  * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
- * @private
  */
-export function getFileImpl(caller: UserSession, path: string, options?: GetFileOptions) {
-  const appConfig = caller.appConfig
-  if (!appConfig) {
-    throw new InvalidStateError('Missing AppConfig')
-  }
-  const defaults: GetFileOptions = {
-    decrypt: true,
-    verify: false,
-    username: null,
-    app: appConfig.appDomain,
-    zoneFileLookupURL: null
-  }
-
-  const opt = Object.assign({}, defaults, options)
+export function getFile(
+  path: string, 
+  options?: {
+    decrypt?: boolean;
+    verify?: boolean;
+    username?: string;
+    app?: string;
+    zoneFileLookupURL?: string;
+  },
+  caller?: UserSession
+) {
+  const opt = Object.assign({}, options)
 
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.

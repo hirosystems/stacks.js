@@ -20,7 +20,7 @@ import {
 import {
   decryptContent,
   encryptContent,
-  getFileImpl,
+  getFile,
   putFileImpl,
   listFiles,
   getFileUrl,
@@ -323,7 +323,7 @@ export class UserSession {
    * or rejects with an error
    */
   getFile(path: string, options?: GetFileOptions) {
-    return getFileImpl(this, path, options)
+    return getFile(path, options, this)
   }
 
   /**

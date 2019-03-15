@@ -8,7 +8,7 @@ import {
   connectToGaiaHub,
   getBucketUrl
 } from '../../../src/storage/hub'
-import { getFileImpl, getFileUrl } from '../../../src/storage'
+import { getFile, getFileUrl } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -58,13 +58,13 @@ export function runStorageTests() {
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
     FetchMock.get(fullReadUrl, fileContent)
     const options = { decrypt: false }
-    getFileImpl(blockstack, path, options)
+    getFile(path, options, blockstack)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), fileContent)
@@ -91,7 +91,7 @@ export function runStorageTests() {
     const getOrSetLocalGaiaHubConnection = sinon.stub().resolves(gaiaHubConfig)
     const getFullReadUrl2 = sinon.stub().resolves(fullReadUrl)
 
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl2 }
     })
 
@@ -194,7 +194,7 @@ export function runStorageTests() {
       decrypt: false
     }
 
-    getFileImpl(blockstack, path, options)
+    getFile(path, options, blockstack)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
@@ -208,7 +208,7 @@ export function runStorageTests() {
     }
 
     FetchMock.get('https://potato/v1/names/yukan.id', nameRecordContent)
-    getFileImpl(blockstack, path, optionsNameLookupUrl)
+    getFile(path, optionsNameLookupUrl, blockstack)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
@@ -219,7 +219,7 @@ export function runStorageTests() {
       decrypt: false
     }
 
-    getFileImpl(blockstack, path, optionsNoApp)
+    getFile(path, optionsNoApp, blockstack)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(file), JSON.parse(fileContents))
@@ -310,7 +310,7 @@ export function runStorageTests() {
     const { putFileImpl } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -328,7 +328,7 @@ export function runStorageTests() {
       })
       .then(() => {
         const decryptOptions = { decrypt: false }
-        getFileImpl(blockstack, path, decryptOptions).then((readContent) => {
+        getFile(path, decryptOptions, blockstack).then((readContent) => {
           t.equal(readContent, fileContent)
           t.ok(typeof (readContent) === 'string')
         })
@@ -363,7 +363,7 @@ export function runStorageTests() {
     const { putFileImpl } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -376,7 +376,7 @@ export function runStorageTests() {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        getFileImpl(blockstack, path, decryptOptions).then((readContent) => {
+        getFile(path, decryptOptions, blockstack).then((readContent) => {
           t.equal(readContent, fileContent)
           // put back whatever was inside before
         })
@@ -413,7 +413,7 @@ export function runStorageTests() {
     const { putFileImpl } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl }
     })
 
@@ -426,7 +426,7 @@ export function runStorageTests() {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        getFileImpl(blockstack, path, decryptOptions).then((readContent) => {
+        getFile(path, decryptOptions, blockstack).then((readContent) => {
           t.equal(readContent, fileContent)
         })
       })
@@ -477,7 +477,7 @@ export function runStorageTests() {
     const { putFileImpl } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl },
       '../profiles': { lookupProfile }
     })
@@ -500,32 +500,32 @@ export function runStorageTests() {
           publicKey: contentsObj.publicKey,
           cipherText: 'potato potato potato'
         }))
-      }).then(() => getFileImpl(blockstack, 'file.json', decryptOptions).then((readContent) => {
+      }).then(() => getFile('file.json', decryptOptions, blockstack).then((readContent) => {
         t.equal(readContent, fileContent)
       }))
-      .then(() => getFileImpl(blockstack, 'file.json', {
+      .then(() => getFile('file.json', {
         decrypt: true,
         verify: true,
         username: 'applejacks.id',
         app: 'origin'
-      })
+      }, blockstack)
         .then((readContent) => {
           t.equal(readContent, fileContent)
         }))
-      .then(() => getFileImpl(blockstack, 'badPK.json', decryptOptions)
+      .then(() => getFile('badPK.json', decryptOptions, blockstack)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
         .catch(err => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
                            `Should fail with complaint about mismatch PK: ${err.message}`)))
-      .then(() => getFileImpl(blockstack, 'badPK.json', {
+      .then(() => getFile('badPK.json', {
         decrypt: true,
         verify: true,
         username: 'applejacks.id',
         app: 'origin'
-      })
+      }, blockstack)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
         .catch(err => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
                            `Should fail with complaint about mismatch PK: ${err.message}`)))
-      .then(() => getFileImpl(blockstack, 'badSig.json', decryptOptions)
+      .then(() => getFile('badSig.json', decryptOptions, blockstack)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
         .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                            'Should fail with complaint about bad signature')))
@@ -588,7 +588,7 @@ export function runStorageTests() {
     const { putFileImpl } = proxyquire('../../../src/storage', {
       './hub': { getOrSetLocalGaiaHubConnection, uploadToGaiaHub }
     })
-    const { getFileImpl } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+    const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getOrSetLocalGaiaHubConnection, getFullReadUrl },
       '../profiles': { lookupProfile }
     })
@@ -635,34 +635,34 @@ export function runStorageTests() {
                         publicKey: badPK
                       }))
       })
-      .then(() => getFileImpl(blockstack, goodPath, decryptOptions).then((readContent) => {
+      .then(() => getFile(goodPath, decryptOptions, blockstack).then((readContent) => {
         t.equal(readContent, fileContent, 'should read the file')
       }))
-      .then(() => getFileImpl(blockstack, badSigPath, decryptOptions)
+      .then(() => getFile(badSigPath, decryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
         .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                            'Should fail with complaint about bad signature')))
-      .then(() => getFileImpl(blockstack, noSigPath, decryptOptions)
+      .then(() => getFile(noSigPath, decryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
         .catch(err => t.ok(err.message.indexOf('obtain signature for file') >= 0,
                            'Should fail with complaint about missing signature')))
-      .then(() => getFileImpl(blockstack, badPKPath, decryptOptions)
+      .then(() => getFile(badPKPath, decryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
         .catch(err => t.ok(err.message.indexOf('match gaia address') >= 0,
                            'Should fail with complaint about matching addresses')))
-      .then(() => getFileImpl(blockstack, goodPath, multiplayerDecryptOptions)
+      .then(() => getFile(goodPath, multiplayerDecryptOptions, blockstack)
         .then((readContent) => {
           t.equal(readContent, fileContent, 'should read the file')
         }))
-      .then(() => getFileImpl(blockstack, badSigPath, multiplayerDecryptOptions)
+      .then(() => getFile(badSigPath, multiplayerDecryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
         .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                            'Should fail with complaint about bad signature')))
-      .then(() => getFileImpl(blockstack, noSigPath, multiplayerDecryptOptions)
+      .then(() => getFile(noSigPath, multiplayerDecryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
         .catch(err => t.ok(err.message.indexOf('obtain signature for file') >= 0,
                            'Should fail with complaint about missing signature')))
-      .then(() => getFileImpl(blockstack, badPKPath, multiplayerDecryptOptions)
+      .then(() => getFile(badPKPath, multiplayerDecryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
         .catch(err => t.ok(err.message.indexOf('match gaia address') >= 0,
                            'Should fail with complaint about matching addresses')))
@@ -808,11 +808,11 @@ export function runStorageTests() {
                   { status: 404 })
 
     const optionsNoDecrypt = { decrypt: false }
-    getFileImpl(blockstack, 'foo.json', optionsNoDecrypt)
+    getFile('foo.json', optionsNoDecrypt, blockstack)
       .then(x => t.equal(x, null, '404 should return null'))
 
     const optionsDecrypt = { decrypt: true }
-    getFileImpl(blockstack, 'foo.json', optionsDecrypt)
+    getFile('foo.json', optionsDecrypt, blockstack)
       .then(x => t.equal(x, null, '404 should return null, even if we try to decrypt'))
   })
 
