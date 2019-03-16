@@ -43,6 +43,7 @@ export interface UserData {
 }
 
 /**
+ *  
  * Check if a user is currently signed in.
  * @method isUserSignedIn
  * @return {Boolean} `true` if the user is signed in, `false` if not.
@@ -65,7 +66,7 @@ export function isUserSignedIn() {
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ * use [[makeAuthRequest]] and `redirectToSignInWithAuthRequest` to build your own sign in process.
  *
  * @param {String} [redirectURI=`${window.location.origin}/`]
  * The location to which the identity provider will redirect the user after

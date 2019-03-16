@@ -256,7 +256,7 @@ export class UserSession {
    * @return {String} Stringified ciphertext object
    */
   public encryptContent(content: string | Buffer,
-                 options?: {publicKey?: string}) {
+                        options?: {publicKey?: string}) {
     return encryptContentImpl(this, content, options)
   }
 
