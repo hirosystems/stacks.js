@@ -55,13 +55,13 @@ export async function getUserAppFileUrl(
 ): Promise<string|null> {
   const profile = await lookupProfile(username, zoneFileLookupURL)
   let bucketUrl: string = null
-      if (profile.hasOwnProperty('apps')) {
-        if (profile.apps.hasOwnProperty(appOrigin)) {
+  if (profile.hasOwnProperty('apps')) {
+    if (profile.apps.hasOwnProperty(appOrigin)) {
       const url = profile.apps[appOrigin]
       const bucket = url.replace(/\/?(\?|#|$)/, '/$1')
       bucketUrl = `${bucket}${path}`
-      }
-      }
+    }
+  }
   return bucketUrl
 }
 
@@ -133,20 +133,20 @@ async function getGaiaAddress(
 ): Promise<string> {
   const opts = normalizeOptions({ app, username }, caller)
   let fileUrl: string
-      if (username) {
+  if (username) {
     fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
-      } else {
+  } else {
     if (!caller) {
       caller = new UserSession()
     }
     const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
     fileUrl = await getFullReadUrl('/', gaiaHubConfig)
-      }
-      const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
-      if (!matches) {
-        throw new Error('Failed to parse gaia address')
-      }
-      return matches[matches.length - 1]
+  }
+  const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
+  if (!matches) {
+    throw new Error('Failed to parse gaia address')
+  }
+  return matches[matches.length - 1]
 }
 /**
  * @param {Object} [options=null] - options object
@@ -521,10 +521,10 @@ export async function putFile(
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       const fileUrls = await Promise.all([
-              uploadToGaiaHub(path, content, freshHubConfig, contentType),
-              uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                              signatureContent, freshHubConfig, 'application/json')
-            ])
+        uploadToGaiaHub(path, content, freshHubConfig, contentType),
+        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                        signatureContent, freshHubConfig, 'application/json')
+      ])
       return fileUrls[0]
     }
   }
