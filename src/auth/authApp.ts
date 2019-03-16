@@ -312,9 +312,10 @@ function detectProtocolLaunch(
  * @return {void}
  */
 export function redirectToSignInWithAuthRequest(
-  authRequest: string = makeAuthRequest(),
-  blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST
+  authRequest?: string,
+  blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST,
 ) {
+  authRequest = authRequest || makeAuthRequest()
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
   // If they're on a mobile OS, always redirect them to HTTPS site

@@ -18,7 +18,6 @@
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,
-    "excludeNotExported": true,
     "includeDeclarations": false,
     "target": "ES6",
     "gitRevision": "master",
