@@ -127,25 +127,26 @@ export function decryptContent(
  * (username, app) pair.
  * @private
  */
-function getGaiaAddress(app: string, username?: string, zoneFileLookupURL?: string,
-                        caller?: UserSession) {
+async function getGaiaAddress(
+  app: string, username?: string, zoneFileLookupURL?: string,
+  caller?: UserSession
+): Promise<string> {
   const opts = normalizeOptions({ app, username }, caller)
-  return Promise.resolve()
-    .then(() => {
+  let fileUrl: string
       if (username) {
-        return getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
+    fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
       } else {
-        return (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
-          .then(gaiaHubConfig => getFullReadUrl('/', gaiaHubConfig))
+    if (!caller) {
+      caller = new UserSession()
+    }
+    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+    fileUrl = await getFullReadUrl('/', gaiaHubConfig)
       }
-    })
-    .then((fileUrl) => {
       const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
       if (!matches) {
         throw new Error('Failed to parse gaia address')
       }
       return matches[matches.length - 1]
-    })
 }
 /**
  * @param {Object} [options=null] - options object

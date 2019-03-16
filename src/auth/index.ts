@@ -1,7 +1,6 @@
 export {
   AppConfig
 } from './appConfig'
-
 export {
   makeAuthResponse
 } from './authMessages'
@@ -19,6 +18,8 @@ export {
 } from './authVerification'
 export {
   isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
-  isSignInPending, handlePendingSignIn, loadUserData, signUserOut,
-  makeAuthRequest
+  isSignInPending, handlePendingSignIn, loadUserData, signUserOut
 } from './authApp'
+export { 
+  makeAuthRequest
+} from './authMessages'

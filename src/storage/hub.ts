@@ -46,8 +46,8 @@ export async function uploadToGaiaHub(
 }
 
 export function getFullReadUrl(filename: string,
-                               hubConfig: GaiaHubConfig): string {
-  return `${hubConfig.url_prefix}${hubConfig.address}/${filename}`
+                               hubConfig: GaiaHubConfig): Promise<string> {
+  return Promise.resolve(`${hubConfig.url_prefix}${hubConfig.address}/${filename}`)
 }
 
 function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): string {

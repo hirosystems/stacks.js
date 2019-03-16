@@ -22,8 +22,6 @@ import { config } from '../config'
 import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
 
-export { makeAuthRequest }
-
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
@@ -314,7 +312,7 @@ function detectProtocolLaunch(
  * @return {void}
  */
 export function redirectToSignInWithAuthRequest(
-  authRequest: string,
+  authRequest: string = makeAuthRequest(),
   blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST
 ) {
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
@@ -357,8 +355,11 @@ export async function handlePendingSignIn(
   transitKey?: string,
   caller?: UserSession
 ) {
+  if (!caller) {
+    caller = new UserSession()
+  }
   if (!transitKey) {
-    transitKey = (caller || new UserSession()).store.getSessionData().transitKey
+    transitKey = caller.store.getSessionData().transitKey
   }
   if (!nameLookupURL) {
     const tokenPayload = decodeToken(authResponseToken).payload
@@ -445,10 +446,9 @@ export async function handlePendingSignIn(
     userData.profile = tokenPayload.profile
   }
   
-  const userSession = caller || new UserSession()
-  const sessionData = userSession.store.getSessionData()
+  const sessionData = caller.store.getSessionData()
   sessionData.userData = userData
-  userSession.store.setSessionData(sessionData)
+  caller.store.setSessionData(sessionData)
   
   return userData
 }

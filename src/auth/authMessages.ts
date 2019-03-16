@@ -14,6 +14,7 @@ import { encryptECIES, decryptECIES } from '../encryption/ec'
 
 import { Logger } from '../logger'
 import { DEFAULT_SCOPE } from './authConstants'
+import { UserSession } from './userSession'
 
 const VERSION = '1.3.1'
 
@@ -57,7 +58,7 @@ export function generateTransitKey() {
  * @return {String} the authentication request
  */
 export function makeAuthRequest(
-  transitPrivateKey: string,
+  transitPrivateKey?: string,
   redirectURI: string = `${window.location.origin}/`, 
   manifestURI: string = `${window.location.origin}/manifest.json`, 
   scopes: Array<string> = DEFAULT_SCOPE,
@@ -65,6 +66,9 @@ export function makeAuthRequest(
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
 ): string {
+  if (!transitPrivateKey) {
+    transitPrivateKey = new UserSession().generateAndStoreTransitKey()
+  }
   /* Create the payload */
   const payload = Object.assign({}, extraParams, {
     jti: makeUUID4(),

@@ -842,8 +842,9 @@ export function runStorageTests() {
       server: 'hub.testblockstack.org'
     }
 
-    const outUrl = getFullReadUrl('foo.json', config)
-    t.equal(`${config.url_prefix}${config.address}/foo.json`, outUrl)
+    getFullReadUrl('foo.json', config).then((outUrl) => {
+      t.equal(`${config.url_prefix}${config.address}/foo.json`, outUrl)
+    })
   })
 
   test('connectToGaiaHub', (t) => {
