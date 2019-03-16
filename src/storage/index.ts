@@ -402,7 +402,18 @@ export function getFile(
   },
   caller?: UserSession
 ) {
-  const opt = Object.assign({}, options)
+  const defaults = {
+    decrypt: true,
+    verify: false,
+    username: null,
+    app: typeof window !== 'undefined' ? window.location.origin : undefined,
+    zoneFileLookupURL: null
+  }
+  const opt = Object.assign({}, defaults, options)
+
+  if (!caller) {
+    caller = new UserSession()
+  }
 
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.

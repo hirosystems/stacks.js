@@ -432,7 +432,7 @@ export async function handlePendingSignIn(
     gaiaAssociationToken
   }
   const profileURL = tokenPayload.profile_url
-  if (!userData && profileURL) {
+  if (!userData.profile && profileURL) {
     const response = await fetch(profileURL)
     if (!response.ok) { // return blank profile if we fail to fetch
       userData.profile = Object.assign({}, DEFAULT_PROFILE)
