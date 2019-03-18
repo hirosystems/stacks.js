@@ -3,7 +3,7 @@ import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './index'
-import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, nextMonth } from '../utils'
+import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, nextMonth, checkWindowAPI } from '../utils'
 import { getAddressFromDID } from '../index'
 import { InvalidStateError, LoginFailedError } from '../errors'
 import { decryptPrivateKey, makeAuthRequest } from './authMessages'
@@ -77,9 +77,9 @@ export function isUserSignedIn() {
  * An array of strings indicating which permissions this app is requesting.
  * @return {void}
  */
-export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
-                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
-                                 scopes: Array<string> = DEFAULT_SCOPE) { 
+export function redirectToSignIn(redirectURI?: string, 
+                                 manifestURI?: string, 
+                                 scopes?: string[]) { 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
@@ -100,7 +100,8 @@ export function isSignInPending() {
  * @return {String} the authentication token if it exists otherwise `null`
  */
 export function getAuthResponseToken(): string {
-  const queryDict = queryString.parse(location.search)
+  checkWindowAPI('getAuthResponseToken', 'location')
+  const queryDict = queryString.parse(window.location.search)
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
 
@@ -125,9 +126,17 @@ export function loadUserData() {
 export function signUserOut(redirectURL?: string, caller?: UserSession) {
   const userSession = caller || new UserSession()
   userSession.store.deleteSessionData()
-  if (redirectURL && typeof window !== 'undefined') {
-    window.location.href = redirectURL
-  }
+  if (redirectURL) {
+    if (typeof window !== 'undefined') {
+      window.location.href = redirectURL
+    } else {
+      const errMsg = '`signUserOut` called with `redirectURL` specified'
+        + ` ("${redirectURL}")`
+        + ' but `window.location.href` is not available in this environment'
+      Logger.error(errMsg)
+      throw new Error(errMsg)
+    }
+  } 
 }
 
 /**
@@ -149,6 +158,9 @@ function detectProtocolLaunch(
   const echoReplyID = Math.random().toString(36).substr(2, 9)
   const echoReplyKeyPrefix = 'echo-reply-'
   const echoReplyKey = `${echoReplyKeyPrefix}${echoReplyID}`
+
+  const apis = ['localStorage', 'document', 'setTimeout', 'clearTimeout', 'addEventListener', 'removeEventListener']
+  apis.forEach((windowAPI) => checkWindowAPI('detectProtocolLaunch', windowAPI))
 
   // Use localStorage as a reliable cross-window communication method.
   // Create the storage entry to signal a protocol detection attempt for the
@@ -205,18 +217,18 @@ function detectProtocolLaunch(
   }
 
   startWebAuthRedirectTimer()
-
-  const inputPromptTracker = document.createElement('input')
+  
+  const inputPromptTracker = window.document.createElement('input')
   inputPromptTracker.type = 'text'
-  const elStyle: any = inputPromptTracker.style
+  const inputStyle: CSSStyleDeclarationFix = inputPromptTracker.style as any
   // Prevent this element from inherited any css.
-  elStyle.all = 'initial'
+  inputStyle.all = 'initial'
   // Setting display=none on an element prevents them from being focused/blurred.
   // So hide the element using other properties..
-  inputPromptTracker.style.opacity = '0'
-  inputPromptTracker.style.filter = 'alpha(opacity=0)'
-  inputPromptTracker.style.height = '0'
-  inputPromptTracker.style.width = '0'
+  inputStyle.opacity = '0'
+  inputStyle.filter = 'alpha(opacity=0)'
+  inputStyle.height = '0'
+  inputStyle.width = '0'
 
   // If the the focus of a page element is immediately changed then this likely indicates 
   // the protocol handler is installed, and the browser is prompting the user if they want 
@@ -242,8 +254,7 @@ function detectProtocolLaunch(
   }
   inputPromptTracker.addEventListener('blur', inputBlurredFunc, { once: true, capture: true })
   setTimeout(() => inputPromptTracker.removeEventListener('blur', inputBlurredFunc), 200)
-  // Flow complains without this check.
-  if (document.body) document.body.appendChild(inputPromptTracker)
+  window.document.body.appendChild(inputPromptTracker)
   inputPromptTracker.focus()
   
   // Detect if document.visibility is immediately changed which is a strong 
@@ -252,13 +263,13 @@ function detectProtocolLaunch(
   // This reduces the probability of a false-negative (where local auth works, but 
   // the original page was redirect to web auth because something took too long),
   const pageVisibilityChanged = () => {
-    if (document.hidden && redirectToWebAuthTimer) {
+    if (window.document.hidden && redirectToWebAuthTimer) {
       Logger.info('Detected immediate page visibility change (protocol handler probably working).')
       startWebAuthRedirectTimer(3000)
     }
   }
-  document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
-  setTimeout(() => document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
+  window.document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
+  setTimeout(() => window.document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
 
 
   // Listen for the custom protocol echo reply via localStorage update event.
@@ -286,17 +297,24 @@ function detectProtocolLaunch(
   // browser tab when the app is installed. 
   Logger.info('Attempting protocol launch via iframe injection.')
   const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
-  const iframe = document.createElement('iframe')
-  const iframeStyle: any = iframe.style
+  const iframe = window.document.createElement('iframe')
+  const iframeStyle: CSSStyleDeclarationFix = iframe.style as any
   iframeStyle.all = 'initial'
-  iframe.style.display = 'none'
+  iframeStyle.display = 'none'
   iframe.src = locationSrc
-  // Flow complains without this check.
-  if (document.body) {
-    document.body.appendChild(iframe)
-  } else {
-    Logger.error('document.body is null when attempting iframe injection for protoocol URI launch')
-  }
+  window.document.body.appendChild(iframe)
+}
+
+/**
+ * TODO: Submit PR to fix this:
+ * https://github.com/Microsoft/TypeScript/blob/master/src/lib/dom.generated.d.ts
+ * https://github.com/Microsoft/TypeScript/blob/master/CONTRIBUTING.md#modifying-generated-library-files
+ * https://github.com/Microsoft/TSJS-lib-generator#contribution-guidelines
+ * 
+ */
+interface CSSStyleDeclarationFix extends CSSStyleDeclaration {
+  /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/all */
+  all: string | null
 }
 
 /**
@@ -318,8 +336,11 @@ export function redirectToSignInWithAuthRequest(
   authRequest = authRequest || makeAuthRequest()
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
+  checkWindowAPI('redirectToSignInWithAuthRequest', 'navigator')
+  checkWindowAPI('redirectToSignInWithAuthRequest', 'location')
+
   // If they're on a mobile OS, always redirect them to HTTPS site
-  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)) {
+  if (/Android|webOS|iPhone|iPad|iPod|Opera Mini/i.test(window.navigator.userAgent)) {
     Logger.info('detected mobile OS, sending to https')
     window.location.href = httpsURI
     return
