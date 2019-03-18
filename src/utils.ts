@@ -2,6 +2,7 @@
 import url from 'url'
 import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
+import { Logger } from './logger'
 
 export const BLOCKSTACK_HANDLER = 'blockstack'
 /**
@@ -152,4 +153,22 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
   }
 
   return match.scheme && match.hostname && match.port && match.absolute
+}
+
+/**
+ * Runtime check for the existence of the global `window` object and the 
+ * given API key (name) on `window`. Throws an error if either are not
+ * available in the current environment. 
+ * @param fnDesc The function name to include in the thrown error and log.
+ * @param name The name of the key on the `window` object to check for.
+ * @hidden
+ */
+export function checkWindowAPI(fnDesc: string, name: string) {
+  const api = typeof window !== 'undefined' && window[name]
+  if (!api) {
+    const errMsg = `\`${fnDesc}\` uses the \`window.${name}\` API which is `
+      + ' not available in the current environment.'
+    Logger.error(errMsg)
+    throw new Error(errMsg)
+  }
 }

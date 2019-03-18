@@ -103,7 +103,7 @@ export function runAuthTests() {
     const blockstack = new UserSession({ appConfig })
 
     const authRequest = blockstack.makeAuthRequest(
-      privateKey, undefined, { myCustomParam: 'asdf' }
+      privateKey, undefined, undefined, undefined, undefined, undefined, { myCustomParam: 'asdf' }
     )
     t.ok(authRequest, 'auth request should have been created')
 

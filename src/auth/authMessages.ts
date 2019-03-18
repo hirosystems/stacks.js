@@ -59,16 +59,38 @@ export function generateTransitKey() {
  */
 export function makeAuthRequest(
   transitPrivateKey?: string,
-  redirectURI: string = `${window.location.origin}/`, 
-  manifestURI: string = `${window.location.origin}/manifest.json`, 
-  scopes: Array<string> = DEFAULT_SCOPE,
-  appDomain: string = window.location.origin,
+  redirectURI?: string, 
+  manifestURI?: string, 
+  scopes: string[] = DEFAULT_SCOPE,
+  appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
 ): string {
   if (!transitPrivateKey) {
     transitPrivateKey = new UserSession().generateAndStoreTransitKey()
   }
+
+  const getWindowOrigin = (paramName: string) => {
+    const origin = typeof window !== 'undefined' && window.location && window.location.origin
+    if (!origin) {
+      const errMsg = `\`makeAuthRequest\` called without the \`${paramName}\` param specified but`
+        + ' the default value uses `window.location.origin` which is not available in this environment'
+      Logger.error(errMsg)
+      throw new Error(errMsg)
+    }
+    return origin
+  }
+  
+  if (!redirectURI) {
+    redirectURI = `${getWindowOrigin('redirectURI')}/`
+  }
+  if (!manifestURI) {
+    manifestURI = `${getWindowOrigin('manifestURI')}/manifest.json`
+  }
+  if (!appDomain) {
+    appDomain = getWindowOrigin('appDomain')
+  }
+
   /* Create the payload */
   const payload = Object.assign({}, extraParams, {
     jti: makeUUID4(),
