@@ -21,6 +21,7 @@ import { config } from '../config'
 
 import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
+import { protocolEchoReplyDetection } from './protocolEchoDetection'
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',
@@ -88,11 +89,14 @@ export function redirectToSignIn(redirectURI?: string,
 }
 
 /**
- * Check if there is a authentication request that hasn't been handled.
+ * Check if there is a authentication request that hasn't been handled. 
+ * Also checks for a protocol echo reply (which if detected then the page
+ * will be automatically redirected after this call). 
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
 export function isSignInPending() {
-  return !!getAuthResponseToken()
+  const isProtocolEcho = protocolEchoReplyDetection()
+  return isProtocolEcho || !!getAuthResponseToken()
 }
 
 /**
