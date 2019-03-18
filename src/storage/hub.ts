@@ -10,7 +10,7 @@ import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from '../auth/authConstants'
 
 import { UserSession } from '../auth/userSession'
 import { Logger } from '../logger'
-import { InvalidStateError } from '../errors'
+import { InvalidStateError, FileNotFound } from '../errors'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
@@ -69,15 +69,11 @@ export async function deleteFromGaiaHub(
       + `${response.status} ${response.statusText}: ${responseMsg}`
     Logger.error(errorMsg)
     if (response.status === 404) {
-      // TODO make new error type
-      throw new Error('TODO')
+      throw new FileNotFound(errorMsg)
     } else {
-      throw new Error('Error when deleting file to Gaia hub')
+      throw new Error(errorMsg)
     }
   }
-  const responseText = await response.text()
-  const responseJSON = JSON.parse(responseText)
-  return responseJSON.publicURL
 }
 
 export function getFullReadUrl(filename: string,

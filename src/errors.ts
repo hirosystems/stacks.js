@@ -35,6 +35,13 @@ export class BlockstackError extends Error {
   }
 }
 
+export class FileNotFound extends BlockstackError {
+  constructor(message: string) {
+    super({ message, code: 'file_not_found' })
+    this.name = 'FileNotFound'
+  }
+}
+
 export class InvalidParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
     super({ code: 'missing_parameter', message, parameter: '' })

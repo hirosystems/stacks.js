@@ -6,9 +6,10 @@ import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import {
   uploadToGaiaHub, getFullReadUrl,
   connectToGaiaHub,
-  getBucketUrl
+  getBucketUrl,
+  deleteFromGaiaHub
 } from '../../../src/storage/hub'
-import { getFile, getFileUrl, putFile, listFiles } from '../../../src/storage'
+import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -38,6 +39,145 @@ import { UserSession, AppConfig } from '../../../src'
 // global.window.location.origin = 'https://myApp.blockstack.org'
 
 export function runStorageTests() {
+  test('deleteFile', (t) => {
+    t.plan(1)
+
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const deleteFromGaiaHub = sinon.stub().resolves()
+    const { deleteFile } = proxyquire('../../../src/storage', {
+      './hub': { deleteFromGaiaHub }
+    })
+
+    const options = { wasSigned: false }
+    deleteFile(path, options, blockstack)
+      .then(() => {
+        t.pass('Delete file')
+      })
+  })
+
+  test('deleteFile gets a new gaia config and tries again', (t) => {
+    t.plan(3)
+
+    const path = 'file.txt'
+    const fullDeleteUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.txt'
+    const invalidHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
+      server: 'https://hub.testblockstack.org',
+      token: '',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+    const validHubConfig = Object.assign({}, invalidHubConfig, {
+      token: 'valid'
+    })
+    const connectToGaiaHub = sinon.stub().resolves(validHubConfig)
+
+    const UserSessionClass = proxyquire('../../../src/auth/userSession', {
+      '../storage/hub': {
+        connectToGaiaHub
+      }
+    }).UserSession as typeof UserSession
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSessionClass({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig: invalidHubConfig,
+      hubUrl: 'https://hub.testblockstack.org'
+    }
+
+    const { deleteFile } = proxyquire('../../../src/storage', {
+      './hub': {
+        connectToGaiaHub
+      }
+    })
+
+    FetchMock.delete(fullDeleteUrl, (url, { headers }) => {
+      console.log(url, headers)
+      if ((<any>headers).Authorization === 'bearer ') {
+        t.ok(true, 'tries with invalid token')
+        return 401
+      } else if ((<any>headers).Authorization === 'bearer valid') {
+        t.ok(true, 'Tries with valid hub config')
+        return 202
+      }
+      return 401
+    })
+    deleteFile(path, { }, blockstack)
+      .then(() => t.ok(true, 'Request should pass'))
+  })
+
+  test('deleteFile wasSigned deletes signature file', (t) => {
+    t.plan(3)
+
+    const path = 'file.json'
+    const fullDeleteUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
+    const fullDeleteSigUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json.sig'
+    const hubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
+      server: 'https://hub.testblockstack.org',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig: hubConfig
+    }
+
+    FetchMock.delete(fullDeleteUrl, (url, { headers }) => {
+      console.log(url, headers)
+      t.pass('delete main file request')
+      return 202
+    })
+
+    FetchMock.delete(fullDeleteSigUrl, (url, { headers }) => {
+      console.log(url, headers)
+      t.pass('delete sig file request')
+      return 202
+    })
+
+    deleteFile(path, { wasSigned: true }, blockstack)
+      .then(() => t.ok(true, 'Request should pass'))
+  })
+
+  test('deleteFile throw on 404', (t) => {
+    t.plan(2)
+
+    const path = 'missingfile.txt'
+    const fullDeleteUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/missingfile.txt'
+    const hubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
+      server: 'https://hub.testblockstack.org',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig: hubConfig
+    }
+
+    FetchMock.delete(fullDeleteUrl, (url, { headers }) => {
+      console.log(url, headers)
+      t.pass('delete file requested')
+      return 404
+    })
+
+    deleteFile(path, { wasSigned: false }, blockstack)
+      .then(() => t.fail('deleteFile with 404 should fail'))
+      .catch(() => t.pass('deleteFile with 404 should fail'))
+  })
+
   test('getFile unencrypted, unsigned', (t) => {
     t.plan(2)
 
@@ -829,6 +969,24 @@ export function runStorageTests() {
       .then((url) => {
         t.ok(url, 'URL returned')
         t.equal(url, `${config.url_prefix}/${config.address}/foo.json`)
+      })
+  })
+
+  test('deleteFromGaiaHub', (t) => {
+    t.plan(1)
+
+    const config = {
+      address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
+      url_prefix: 'gaia.testblockstack.org',
+      token: '',
+      server: 'hub.testblockstack.org'
+    }
+
+    FetchMock.delete(`${config.server}/delete/${config.address}/foo.json`, 202)
+
+    deleteFromGaiaHub('foo.json', config)
+      .then(() => {
+        t.pass('Delete http request made')
       })
   })
 
