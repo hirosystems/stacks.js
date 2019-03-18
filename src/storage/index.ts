@@ -577,80 +577,86 @@ export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
  * @returns {Promise} that resolves to the number of files listed.
  * @private
  */
-function listFilesLoop(hubConfig: GaiaHubConfig,
-                       page: string | null,
-                       callCount: number,
-                       fileCount: number,
-                       callback: (name: string) => boolean): Promise<number> {
+async function listFilesLoop(
+  caller: UserSession,
+  hubConfig: GaiaHubConfig | null,
+  page: string | null,
+  callCount: number,
+  fileCount: number,
+  callback: (name: string) => boolean
+): Promise<number> {
   if (callCount > 65536) {
     // this is ridiculously huge, and probably indicates
     // a faulty Gaia hub anyway (e.g. on that serves endless data)
     throw new Error('Too many entries to list')
   }
 
-  let httpStatus
-  const pageRequest = JSON.stringify({ page })
-
-  const fetchOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': `${pageRequest.length}`,
-      Authorization: `bearer ${hubConfig.token}`
-    },
-    body: pageRequest
+  hubConfig = hubConfig || await caller.getOrSetLocalGaiaHubConnection()
+  let response: Response
+  try {
+    const pageRequest = JSON.stringify({ page })
+    const fetchOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': `${pageRequest.length}`,
+        Authorization: `bearer ${hubConfig.token}`
+      },
+      body: pageRequest
+    }
+    response = await fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
+    if (!response.ok) {
+      throw new Error(`listFiles failed with HTTP status ${response.status}`)
+    }
+  } catch (error) {
+    // If error occurs on the first call, perform a gaia re-connection and retry.
+    // Same logic as other gaia requests (putFile, getFile, etc).
+    if (callCount === 0) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      return listFilesLoop(caller, freshHubConfig, page, callCount + 1, 0, callback)
+    }
+    throw error
   }
 
-  return fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
-    .then((response) => {
-      httpStatus = response.status
-      if (httpStatus >= 400) {
-        throw new Error(`listFiles failed with HTTP status ${httpStatus}`)
-      }
-      return response.text()
-    })
-    .then(responseText => JSON.parse(responseText))
-    .then((responseJSON) => {
-      const entries = responseJSON.entries
-      const nextPage = responseJSON.page
-      if (entries === null || entries === undefined) {
-        // indicates a misbehaving Gaia hub or a misbehaving driver
-        // (i.e. the data is malformed)
-        throw new Error('Bad listFiles response: no entries')
-      }
-      for (let i = 0; i < entries.length; i++) {
-        const rc = callback(entries[i])
-        if (!rc) {
-          // callback indicates that we're done
-          return Promise.resolve(fileCount + i)
-        }
-      }
-      if (nextPage && entries.length > 0) {
-        // keep going -- have more entries
-        return listFilesLoop(
-          hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
-        )
-      } else {
-        // no more entries -- end of data
-        return Promise.resolve(fileCount + entries.length)
-      }
-    })
+  const responseText = await response.text()
+  const responseJSON = JSON.parse(responseText)
+  const entries = responseJSON.entries
+  const nextPage = responseJSON.page
+  if (entries === null || entries === undefined) {
+    // indicates a misbehaving Gaia hub or a misbehaving driver
+    // (i.e. the data is malformed)
+    throw new Error('Bad listFiles response: no entries')
+  }
+  for (let i = 0; i < entries.length; i++) {
+    const rc = callback(entries[i])
+    if (!rc) {
+      // callback indicates that we're done
+      return fileCount + i
+    }
+  }
+  if (nextPage && entries.length > 0) {
+    // keep going -- have more entries
+    return listFilesLoop(
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+    )
+  } else {
+    // no more entries -- end of data
+    return fileCount + entries.length
+  }
 }
 
 /**
  * List the set of files in this application's Gaia storage bucket.
- * @param {UserSession} caller - instance calling this method
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
  */
-export async function listFiles(
+export function listFiles(
   callback: (name: string) => boolean,
   caller?: UserSession
 ): Promise<number> {
-  const userSession = caller || new UserSession()
-  const gaiaHubConfig = await userSession.getOrSetLocalGaiaHubConnection()
-  return listFilesLoop(gaiaHubConfig, null, 0, 0, callback)
+  caller = caller || new UserSession()
+  return listFilesLoop(caller, null, null, 0, 0, callback)
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
