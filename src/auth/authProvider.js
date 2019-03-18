@@ -42,7 +42,7 @@ export function fetchAppManifest(authRequest) {
           .then(response => response.text())
           .then(responseText => JSON.parse(responseText))
           .then((responseJSON) => {
-            resolve(responseJSON)
+            resolve({ ...responseJSON, manifestURI })
           })
           .catch((e) => {
             Logger.debug(e.stack)
