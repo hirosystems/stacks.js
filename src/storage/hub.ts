@@ -4,13 +4,9 @@ import crypto from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
-import { ecPairToAddress } from '../utils'
-import { getPublicKeyFromPrivate, hexStringToECPair } from '../index'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from '../auth/authConstants'
-
-import { UserSession } from '../auth/userSession'
+import { ecPairToAddress, hexStringToECPair } from '../utils'
+import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
-import { InvalidStateError } from '../errors'
 
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 

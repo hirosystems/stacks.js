@@ -1,13 +1,9 @@
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken, TokenVerifier } from 'jsontokens'
-import {
-  getAddressFromDID, publicKeyToAddress,
-  isSameOriginAbsoluteUrl
-} from '../index'
-
-import {
-  fetchAppManifest
-} from '.'
+import { getAddressFromDID } from '../dids'
+import { publicKeyToAddress } from '../keys'
+import { isSameOriginAbsoluteUrl } from '../utils'
+import { fetchAppManifest } from './authProvider'
 
 /**
  * Checks if the ES256k signature on passed `token` match the claimed public key
