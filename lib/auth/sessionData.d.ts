@@ -22,7 +22,6 @@ export declare class SessionData {
     hubUrl?: string;
     transitKey?: string;
     userData?: UserData;
-    gaiaHubConfig?: GaiaHubConfig;
     constructor(options: SessionOptions);
     getGaiaHubConfig(): GaiaHubConfig;
     setGaiaHubConfig(config: GaiaHubConfig): void;
