@@ -64,4 +64,4 @@ export { config } from './config'
 
 export { encryptMnemonic, decryptMnemonic } from './encryption'
 
-export { UserSession }  from './auth/userSession'
+export { UserSession } from './auth/userSession'
