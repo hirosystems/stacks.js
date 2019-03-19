@@ -31,9 +31,8 @@ export declare function generateTransitKey(): string;
  * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
  * by special authenticators.
  * @return {String} the authentication request
- * @private
  */
-export declare function makeAuthRequestImpl(transitPrivateKey: string, redirectURI: string, manifestURI: string, scopes: Array<string>, appDomain: string, expiresAt: number, extraParams?: any): string;
+export declare function makeAuthRequest(transitPrivateKey?: string, redirectURI?: string, manifestURI?: string, scopes?: string[], appDomain?: string, expiresAt?: number, extraParams?: any): string;
 /**
  * Encrypts the private key for decryption by the given
  * public key.
