@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-      "target": "es5",
-      "esModuleInterop": true,
-      "noImplicitAny": false,
-      "sourceMap": true
+    "target": "es6",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "sourceMap": true
   },
   "include": [
     "src"

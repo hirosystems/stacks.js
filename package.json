@@ -153,6 +153,8 @@
     "npm": ">=6"
   },
   "nyc": {
+    "all": true,
+    "cache": false,
     "extension": [
       ".ts"
     ],
