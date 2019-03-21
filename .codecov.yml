@@ -3,6 +3,4 @@ coverage:
     project:
       default:
         base: pr
-    patch:
-      default:
-        base: pr
+    patch: off
