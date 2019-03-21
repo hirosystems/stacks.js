@@ -56,40 +56,6 @@ export function isUserSignedIn() {
 }
 
 /**
- * Generates an authentication request and redirects the user to the Blockstack
- * browser to approve the sign in request.
- *
- * Please note that this requires that the web browser properly handles the
- * `blockstack:` URL protocol handler.
- *
- * Most applications should use this
- * method for sign in unless they require more fine grained control over how the
- * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
- *
- * @param {String} [redirectURI=`${window.location.origin}/`]
- * The location to which the identity provider will redirect the user after
- * the user approves sign in.
- * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
- * Location of the manifest file.
- * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
- * this app's data store.
- * An array of strings indicating which permissions this app is requesting.
- * @return {void}
- */
-/* eslint-disable no-unused-vars */
-export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
-                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
-                                 scopes: Array<string> = DEFAULT_SCOPE) { 
-  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
-    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method redirectToSignIn().')
-  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
-  redirectToSignInWithAuthRequest(authRequest)
-}
-/* eslint-enable no-unused-vars */
-
-/**
  * Check if there is a authentication request that hasn't been handled.
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
@@ -410,6 +376,38 @@ export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
   }
 
   detectProtocolLaunch(authRequest, successCallback, failCallback)
+}
+
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
+ * Most applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ *
+ * @param {String} [redirectURI=`${window.location.origin}/`]
+ * The location to which the identity provider will redirect the user after
+ * the user approves sign in.
+ * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * Location of the manifest file.
+ * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * this app's data store.
+ * An array of strings indicating which permissions this app is requesting.
+ * @return {void}
+ */
+export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
+                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
+                                 scopes: Array<string> = DEFAULT_SCOPE) { 
+  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method redirectToSignIn().')
+  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
+  redirectToSignInWithAuthRequest(authRequest)
 }
 
 /**

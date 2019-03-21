@@ -18,8 +18,8 @@ import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
   */
 export function signProfileToken(profile: any,
                                  privateKey: string,
-                                 subject: any | null = null,
-                                 issuer: any | null = null,
+                                 subject?: any,
+                                 issuer?: any,
                                  signingAlgorithm = 'ES256K',
                                  issuedAt = new Date(),
                                  expiresAt = nextYear()) {
@@ -29,11 +29,11 @@ export function signProfileToken(profile: any,
 
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
 
-  if (subject === null) {
+  if (!subject) {
     subject = { publicKey }
   }
 
-  if (issuer === null) {
+  if (!issuer) {
     issuer = { publicKey }
   }
 

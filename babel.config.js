@@ -18,15 +18,6 @@ module.exports = function (api) {
     ]
   };
 
-  if (isTestEnv) {
-    // Configure options required for nyc/tape coverage reporting.
-    // Use the same babel config for web browser.
-    // See https://github.com/blockstack/blockstack.js/issues/534
-    opts = configBrowserify;
-    opts.sourceMaps = "inline";
-    opts.plugins.push("istanbul");
-  }
-
   // Use full source maps in development env.
   if (!opts.sourceMaps && isDevEnv) {
     opts.sourceMaps = "both";
