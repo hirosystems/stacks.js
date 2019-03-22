@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "declaration": true,
+    "noImplicitAny": false,
+    "outDir": "lib",
+    "sourceMap": true
+  },
+  "include": [
+    "src",
+  ],
+  "typedocOptions": {
+    "readme": "src/auth/README.md",
+    "mode": "file",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "includeDeclarations": false,
+    "target": "ES6",
+    "gitRevision": "master",
+    "listInvalidSymbolLinks": true
+  }
+}
