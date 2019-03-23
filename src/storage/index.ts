@@ -1,7 +1,7 @@
 
 
 import {
-  getOrSetLocalGaiaHubConnection, getFullReadUrl, setLocalGaiaHubConnection,
+  getFullReadUrl,
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
   GaiaHubConfig
 } from './hub'
@@ -11,7 +11,7 @@ import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
 } from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
-import { lookupProfile } from '../profiles'
+import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
   SignatureVerificationError
@@ -28,115 +28,11 @@ export type PutFileOptions = {
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
-
-/**
- * Encrypts the data provided with the app public key.
- * @param {String|Buffer} content - data to encrypt
- * @param {Object} [options=null] - options object
- * @param {String} options.publicKey - the hex string of the ECDSA public
- * key to use for encryption. If not provided, will use user's appPublicKey.
- * @return {String} Stringified ciphertext object
- */
-export function encryptContent(content: string | Buffer, options?: {publicKey?: string}) {
-  console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method encryptContent().')
-  const userSession = new UserSession()
-  return userSession.encryptContent(content, options)
-}
-
-/**
- * Decrypts data encrypted with `encryptContent` with the
- * transit private key.
- * @param {String|Buffer} content - encrypted content.
- * @param {Object} [options=null] - options object
- * @param {String} options.privateKey - the hex string of the ECDSA private
- * key to use for decryption. If not provided, will use user's appPrivateKey.
- * @return {String|Buffer} decrypted content.
- */
-export function decryptContent(content: string, options?: {privateKey?: string}) {
-  console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method decryptContent().')
-  const userSession = new UserSession()
-  return userSession.decryptContent(content, options)
-}
-
-/**
- * Retrieves the specified file from the app's data store.
- * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {Boolean} options.verify - Whether the content should be verified, only to be used
- * when `putFile` was set to `sign = true`
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
- * @returns {Promise} that resolves to the raw data in the file
- * or rejects with an error
- */
-export function getFile(path: string, options?: {
-  decrypt?: boolean;
-  verify?: boolean;
-  username?: string;
-  app?: string;
-  zoneFileLookupURL?: string;
-}) {
-  console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method getFile().')
-  const userSession = new UserSession()
-  return userSession.getFile(path, options)
-}
-
-/**
- * Stores the data provided in the app's data store to to the file specified.
- * @param {String} path - the path to store the data in
- * @param {String|Buffer} content - the data to store in the file
- * @param {Object} [options=null] - options object
- * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
- *                                                  or the provided public key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
- *                                         the app private key
- * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
- * @return {Promise} that resolves if the operation succeed and rejects
- * if it failed
- */
-export function putFile(path: string, content: string | Buffer, options?: {
-  encrypt?: boolean | string,
-  sign?: boolean,
-  contentType?: string
-}) {
-  console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method putFile().')
-  const userSession = new UserSession()
-  return userSession.putFile(path, content, options)
-}
-
-/**
- * List the set of files in this application's Gaia storage bucket.
- * @param {function} callback - a callback to invoke on each named file that
- * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
- */
-export function listFiles(callback: (name: string) => boolean): Promise<number> {
-  console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method listFiles().')
-  const userSession = new UserSession()
-  return userSession.listFiles(callback)
-}
-
 /**
  * Deletes the specified file from the app's data store. Currently not implemented.
  * @param {String} path - the path to the file to delete
  * @returns {Promise} that resolves when the file has been removed
  * or rejects with an error
- * @private
  */
 export function deleteFile(path: string) {
   Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
@@ -153,80 +49,70 @@ export function deleteFile(path: string) {
  * @return {Promise<string>} that resolves to the public read URL of the file
  * or rejects with an error
  */
-export function getUserAppFileUrl(path: string, username: string, appOrigin: string,
-                                  zoneFileLookupURL: string | undefined = null
+export async function getUserAppFileUrl(
+  path: string, username: string, appOrigin: string,
+  zoneFileLookupURL?: string
 ): Promise<string|null> {
-  return lookupProfile(username, zoneFileLookupURL)
-    .then((profile) => {
-      if (profile.hasOwnProperty('apps')) {
-        if (profile.apps.hasOwnProperty(appOrigin)) {
-          return profile.apps[appOrigin]
-        } else {
-          return null
-        }
-      } else {
-        return null
-      }
-    })
-    .then((bucketUrl) => {
-      if (bucketUrl) {
-        const bucket = bucketUrl.replace(/\/?(\?|#|$)/, '/$1')
-        return `${bucket}${path}`
-      } else {
-        return null
-      }
-    })
+  const profile = await lookupProfile(username, zoneFileLookupURL)
+  let bucketUrl: string = null
+  if (profile.hasOwnProperty('apps')) {
+    if (profile.apps.hasOwnProperty(appOrigin)) {
+      const url = profile.apps[appOrigin]
+      const bucket = url.replace(/\/?(\?|#|$)/, '/$1')
+      bucketUrl = `${bucket}${path}`
+    }
+  }
+  return bucketUrl
 }
 
 /**
  * Encrypts the data provided with the app public key.
- * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPublicKey.
  * @return {String} Stringified ciphertext object
- * @private
  */
-export function encryptContentImpl(caller: UserSession,
-                                   content: string | Buffer,
-                                   options?: {publicKey?: string}) {
-  const defaults: { publicKey: string | null } = { publicKey: null }
-  const opt = Object.assign({}, defaults, options)
-  if (!opt.publicKey) {
-    const userData = caller.loadUserData()
-    const privateKey = userData.appPrivateKey
-    opt.publicKey = getPublicKeyFromPrivate(privateKey)
+export function encryptContent(
+  content: string | Buffer,
+  options?: {
+    publicKey?: string
+  },
+  caller?: UserSession
+) {
+  const opts = Object.assign({}, options)
+  if (!opts.publicKey) {
+    const privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
-
-  const cipherObject = encryptECIES(opt.publicKey, content)
+  const cipherObject = encryptECIES(opts.publicKey, content)
   return JSON.stringify(cipherObject)
 }
 
 /**
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
- * @param {UserSession} caller - the instance calling this method
  * @param {String|Buffer} content - encrypted content.
  * @param {Object} [options=null] - options object
  * @param {String} options.privateKey - the hex string of the ECDSA private
  * key to use for decryption. If not provided, will use user's appPrivateKey.
  * @return {String|Buffer} decrypted content.
- * @private
  */
-export function decryptContentImpl(caller: UserSession,
-                                   content: string,
-                                   options?: {privateKey?: string}) {
-  const defaults: {privateKey?: string | null } = { privateKey: null }
-  const opt = Object.assign({}, defaults, options)
-  let privateKey = opt.privateKey
-  if (!privateKey) {
-    privateKey = caller.loadUserData().appPrivateKey
+export function decryptContent(
+  content: string,
+  options?: {
+    privateKey?: string
+  },
+  caller?: UserSession
+) {
+  const opts = Object.assign({}, options)
+  if (!opts.privateKey) {
+    opts.privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
   }
 
   try {
     const cipherObject = JSON.parse(content)
-    return decryptECIES(privateKey, cipherObject)
+    return decryptECIES(opts.privateKey, cipherObject)
   } catch (err) {
     if (err instanceof SyntaxError) {
       throw new Error('Failed to parse encrypted content JSON. The content may not '
@@ -241,62 +127,51 @@ export function decryptContentImpl(caller: UserSession,
  * (username, app) pair.
  * @private
  */
-function getGaiaAddress(caller: UserSession,
-                        app: string, username?: string, zoneFileLookupURL?: string) {
-  return Promise.resolve()
-    .then(() => {
-      if (username) {
-        return getUserAppFileUrl('/', username, app, zoneFileLookupURL)
-      } else {
-        return getOrSetLocalGaiaHubConnection(caller)
-          .then(gaiaHubConfig => getFullReadUrl('/', gaiaHubConfig))
-      }
-    })
-    .then((fileUrl) => {
-      const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
-      if (!matches) {
-        throw new Error('Failed to parse gaia address')
-      }
-      return matches[matches.length - 1]
-    })
+async function getGaiaAddress(
+  app: string, username?: string, zoneFileLookupURL?: string,
+  caller?: UserSession
+): Promise<string> {
+  const opts = normalizeOptions({ app, username }, caller)
+  let fileUrl: string
+  if (username) {
+    fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
+  } else {
+    if (!caller) {
+      caller = new UserSession()
+    }
+    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+    fileUrl = await getFullReadUrl('/', gaiaHubConfig)
+  }
+  const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
+  if (!matches) {
+    throw new Error('Failed to parse gaia address')
+  }
+  return matches[matches.length - 1]
 }
-
 /**
- * @ignore
+ * @param {Object} [options=null] - options object
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
  */
-export function getFileUrlImpl(caller: UserSession, path: string, options?: {
-  app?: string, 
-  username?: string, 
-  zoneFileLookupURL?: string 
-}): Promise<string> {
-  return Promise.resolve()
-    .then(() => {
-      const appConfig = caller.appConfig
+function normalizeOptions<T>(
+  options?: {
+    app?: string, 
+    username?: string
+  } & T,
+  caller?: UserSession
+) {
+  const opts = Object.assign({}, options)
+  if (opts.username) {
+    if (!opts.app) {
+      const appConfig = (caller || new UserSession()).appConfig
       if (!appConfig) {
         throw new InvalidStateError('Missing AppConfig')
       }
-      const defaults = {
-        username: null,
-        app: appConfig.appDomain,
-        zoneFileLookupURL: null
-      }
-      return Object.assign({}, defaults, options)
-    })
-    .then((opts) => {
-      if (opts.username) {
-        return getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
-      } else {
-        return getOrSetLocalGaiaHubConnection(caller)
-          .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
-      }
-    })
-    .then(readUrl => {
-      if (!readUrl) {
-        throw new Error('Missing readURL')
-      } else {
-        return readUrl
-      }
-    })
+      opts.app = appConfig.appDomain
+    }
+  }
+  return opts
 }
 
 /**
@@ -311,30 +186,44 @@ export function getFileUrlImpl(caller: UserSession, path: string, options?: {
  * blockstack.js's getNameInfo function instead.
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
-export function getFileUrl(path: string, options?: {
-  username?: string,
-  app?: string,
-  zoneFileLookupURL?: string
-}): Promise<string> {
-  console.warn('DEPRECATION WARNING: The static getFileUrl() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method getFileUrl().')
-  const userSession = new UserSession()
-  return getFileUrlImpl(userSession, path, options)
+export async function getFileUrl(
+  path: string, 
+  options?: {
+    app?: string, 
+    username?: string, 
+    zoneFileLookupURL?: string
+  },
+  caller?: UserSession
+): Promise<string> {
+  const opts = normalizeOptions(options, caller)
+
+  let readUrl: string
+  if (opts.username) {
+    readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
+  } else {
+    const gaiaHubConfig = await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
+    readUrl = await getFullReadUrl(path, gaiaHubConfig)
+  }
+
+  if (!readUrl) {
+    throw new Error('Missing readURL')
+  } else {
+    return readUrl
+  }
 }
 
 /* Handle fetching the contents from a given path. Handles both
  *  multi-player reads and reads from own storage.
  * @private
  */
-function getFileContents(caller: UserSession,
-                         path: string, app: string, username: string | undefined, 
+function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
-                         forceText: boolean): Promise<string | ArrayBuffer | null> {
+                         forceText: boolean,
+                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
   return Promise.resolve()
     .then(() => {
-      const opts: any = { app, username, zoneFileLookupURL }
-      return getFileUrlImpl(caller, path, opts)
+      const opts = { app, username, zoneFileLookupURL }
+      return getFileUrl(path, opts, caller)
     })
     .then(readUrl => fetch(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
@@ -362,20 +251,20 @@ function getFileContents(caller: UserSession,
  *  from own storage.
  * @private
  */
-function getFileSignedUnencrypted(caller: UserSession, path: string, opt: GetFileOptions & {
+function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
   username?: string | null;
   app?: string | null;
   zoneFileLookupURL?: string | null;
-}) {
+}, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
   return Promise.all(
-    [getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false),
-     getFileContents(caller, `${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
-                     opt.zoneFileLookupURL, true),
-     getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)]
+    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
+     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+                     opt.zoneFileLookupURL, true, caller),
+     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
     .then(([fileContents, signatureContents, gaiaAddress]) => {
       if (!fileContents) {
@@ -433,7 +322,7 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
 
   let addressPromise: Promise<string>
   if (username) {
-    addressPromise = getGaiaAddress(caller, app, username, zoneFileLookupURL)
+    addressPromise = getGaiaAddress(app, username, zoneFileLookupURL, caller)
   } else {
     const address = publicKeyToAddress(appPublicKey)
     addressPromise = Promise.resolve(address)
@@ -488,7 +377,6 @@ export type GetFileOptions = {
 
 /**
  * Retrieves the specified file from the app's data store.
- * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
@@ -502,30 +390,38 @@ export type GetFileOptions = {
  * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
- * @private
  */
-export function getFileImpl(caller: UserSession, path: string, options?: GetFileOptions) {
-  const appConfig = caller.appConfig
-  if (!appConfig) {
-    throw new InvalidStateError('Missing AppConfig')
-  }
-  const defaults: GetFileOptions = {
+export function getFile(
+  path: string, 
+  options?: {
+    decrypt?: boolean;
+    verify?: boolean;
+    username?: string;
+    app?: string;
+    zoneFileLookupURL?: string;
+  },
+  caller?: UserSession
+) {
+  const defaults = {
     decrypt: true,
     verify: false,
     username: null,
-    app: appConfig.appDomain,
+    app: typeof window !== 'undefined' ? window.location.origin : undefined,
     zoneFileLookupURL: null
   }
-
   const opt = Object.assign({}, defaults, options)
+
+  if (!caller) {
+    caller = new UserSession()
+  }
 
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.
   if (opt.verify && !opt.decrypt) {
-    return getFileSignedUnencrypted(caller, path, opt)
+    return getFileSignedUnencrypted(path, opt, caller)
   }
 
-  return getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt)
+  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt, caller)
     .then<string|ArrayBuffer|Buffer>((storedContents) => {
       if (storedContents === null) {
         return storedContents
@@ -533,7 +429,7 @@ export function getFileImpl(caller: UserSession, path: string, options?: GetFile
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
-        return decryptContentImpl(caller, storedContents)
+        return caller.decryptContent(storedContents)
       } else if (opt.decrypt && opt.verify) {
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
@@ -550,7 +446,6 @@ export function getFileImpl(caller: UserSession, path: string, options?: GetFile
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
- * @param {UserSession} caller - instance calling this method
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
  * @param {Object} [options=null] - options object
@@ -561,13 +456,12 @@ export function getFileImpl(caller: UserSession, path: string, options?: GetFile
  * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
- * @private
  */
-export async function putFileImpl(
-  caller: UserSession,
+export async function putFile(
   path: string,
   content: string | Buffer,
-  options?: PutFileOptions
+  options?: PutFileOptions,
+  caller?: UserSession,
 ): Promise<string> {
   const defaults = {
     encrypt: true,
@@ -580,6 +474,10 @@ export async function putFileImpl(
   let { contentType } = opt
   if (!contentType) {
     contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
+  }
+
+  if (!caller) {
+    caller = new UserSession()
   }
 
   // First, let's figure out if we need to get public/private keys,
@@ -611,31 +509,32 @@ export async function putFileImpl(
   if (!opt.encrypt && opt.sign) {
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
-    return getOrSetLocalGaiaHubConnection(caller)
-      .then(gaiaHubConfig => new Promise<string[]>((resolve, reject) => Promise.all([
+    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+
+    try {
+      const fileUrls = await Promise.all([
         uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, gaiaHubConfig, 'application/json')
       ])
-        .then(files => resolve(files))
-        .catch(() => {
-          setLocalGaiaHubConnection(caller)
-            .then(freshHubConfig => Promise.all([
-              uploadToGaiaHub(path, content, freshHubConfig, contentType),
-              uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                              signatureContent, freshHubConfig, 'application/json')
-            ])
-              .then(files => resolve(files)).catch(reject))
-        })))
-      .then(fileUrls => fileUrls[0])
+      return fileUrls[0]
+    } catch (error) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      const fileUrls = await Promise.all([
+        uploadToGaiaHub(path, content, freshHubConfig, contentType),
+        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                        signatureContent, freshHubConfig, 'application/json')
+      ])
+      return fileUrls[0]
+    }
   }
 
   // In all other cases, we only need one upload.
   if (opt.encrypt && !opt.sign) {
-    content = encryptContentImpl(caller, content, { publicKey })
+    content = encryptContent(content, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const cipherText = encryptContentImpl(caller, content, { publicKey })
+    const cipherText = encryptContent(content, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,
@@ -645,16 +544,14 @@ export async function putFileImpl(
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
   }
-  return getOrSetLocalGaiaHubConnection(caller)
-    .then(gaiaHubConfig => new Promise<string>((resolve, reject) => {
-      uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
-        .then(resolve)
-        .catch(() => {
-          setLocalGaiaHubConnection(caller)
-            .then(freshHubConfig => uploadToGaiaHub(path, content, freshHubConfig, contentType)
-              .then(file => resolve(file)).catch(reject))
-        })
-    }))
+  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  try {
+    return await uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
+  } catch (error) {
+    const freshHubConfig = await caller.setLocalGaiaHubConnection()
+    const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
+    return file
+  }
 }
 
 /**
@@ -746,12 +643,14 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
- * @private
  */
-export function listFilesImpl(caller: UserSession,
-                              callback: (name: string) => boolean): Promise<number> {
-  return getOrSetLocalGaiaHubConnection(caller)
-    .then(gaiaHubConfig => listFilesLoop(gaiaHubConfig, null, 0, 0, callback))
+export async function listFiles(
+  callback: (name: string) => boolean,
+  caller?: UserSession
+): Promise<number> {
+  const userSession = caller || new UserSession()
+  const gaiaHubConfig = await userSession.getOrSetLocalGaiaHubConnection()
+  return listFilesLoop(gaiaHubConfig, null, 0, 0, callback)
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }

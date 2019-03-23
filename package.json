@@ -18,6 +18,8 @@
     "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint --ext .ts ./src",
     "build-documentation": "shx rm -rf docs && typedoc --tsconfig tsconfig-typedoc.json --out docs src && typedoc --tsconfig tsconfig-typedoc.json --json docs/docs.json src",
+    "docs": "typedoc --tsconfig tsconfig-typedoc.json --out docs src",
+    "tsc": "tsc",
     "codecovUpload": "codecov"
   },
   "repository": {

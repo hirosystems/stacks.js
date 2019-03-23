@@ -3,16 +3,14 @@ import 'cross-fetch/polyfill'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner, SECP256K1Client } from 'jsontokens'
-
-import {
-  makeDIDFromAddress, makeUUID4,
-  nextMonth, publicKeyToAddress,
-  makeECPrivateKey
-} from '../index'
-
+import { makeECPrivateKey, publicKeyToAddress } from '../keys'
+import { makeUUID4, nextMonth } from '../utils'
+import { makeDIDFromAddress } from '../dids'
 import { encryptECIES, decryptECIES } from '../encryption/ec'
-
 import { Logger } from '../logger'
+import { DEFAULT_SCOPE } from './authConstants'
+import { UserSession } from './userSession'
+
 
 const VERSION = '1.3.1'
 
@@ -32,6 +30,7 @@ export function generateTransitKey() {
   const transitKey = makeECPrivateKey()
   return transitKey
 }
+
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -53,15 +52,41 @@ export function generateTransitKey() {
  * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
  * by special authenticators.
  * @return {String} the authentication request
- * @private
  */
-export function makeAuthRequestImpl(transitPrivateKey: string,
-                                    redirectURI: string,
-                                    manifestURI: string,
-                                    scopes: Array<string>,
-                                    appDomain: string = window.location.origin,
-                                    expiresAt: number,
-                                    extraParams: any = {}): string {
+export function makeAuthRequest(
+  transitPrivateKey?: string,
+  redirectURI?: string, 
+  manifestURI?: string, 
+  scopes: string[] = DEFAULT_SCOPE,
+  appDomain?: string,
+  expiresAt: number = nextMonth().getTime(),
+  extraParams: any = {}
+): string {
+  if (!transitPrivateKey) {
+    transitPrivateKey = new UserSession().generateAndStoreTransitKey()
+  }
+
+  const getWindowOrigin = (paramName: string) => {
+    const origin = typeof window !== 'undefined' && window.location && window.location.origin
+    if (!origin) {
+      const errMsg = `\`makeAuthRequest\` called without the \`${paramName}\` param specified but`
+        + ' the default value uses `window.location.origin` which is not available in this environment'
+      Logger.error(errMsg)
+      throw new Error(errMsg)
+    }
+    return origin
+  }
+  
+  if (!redirectURI) {
+    redirectURI = `${getWindowOrigin('redirectURI')}/`
+  }
+  if (!manifestURI) {
+    manifestURI = `${getWindowOrigin('manifestURI')}/manifest.json`
+  }
+  if (!appDomain) {
+    appDomain = getWindowOrigin('appDomain')
+  }
+
   /* Create the payload */
   const payload = Object.assign({}, extraParams, {
     jti: makeUUID4(),
