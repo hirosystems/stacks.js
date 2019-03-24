@@ -3,18 +3,14 @@ import 'cross-fetch/polyfill'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner, SECP256K1Client } from 'jsontokens'
-
-import {
-  makeDIDFromAddress, makeUUID4,
-  nextMonth, publicKeyToAddress,
-  makeECPrivateKey
-} from '../index'
-
+import { makeECPrivateKey, publicKeyToAddress } from '../keys'
+import { makeUUID4, nextMonth } from '../utils'
+import { makeDIDFromAddress } from '../dids'
 import { encryptECIES, decryptECIES } from '../encryption/ec'
-
 import { Logger } from '../logger'
 import { DEFAULT_SCOPE } from './authConstants'
 import { UserSession } from './userSession'
+
 
 const VERSION = '1.3.1'
 
