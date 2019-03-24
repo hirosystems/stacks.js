@@ -1,8 +1,7 @@
 import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
-import { updateQueryStringParameter } from '../index'
-import { BLOCKSTACK_HANDLER, checkWindowAPI } from '../utils'
+import { BLOCKSTACK_HANDLER, checkWindowAPI, updateQueryStringParameter } from '../utils'
 
 import { Logger } from '../logger'
 

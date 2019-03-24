@@ -2,26 +2,23 @@
 import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
-import { verifyAuthResponse } from './index'
-import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, nextMonth, checkWindowAPI } from '../utils'
-import { getAddressFromDID } from '../index'
-import { InvalidStateError, LoginFailedError } from '../errors'
+import { verifyAuthResponse } from './authVerification'
+import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, checkWindowAPI } from '../utils'
+import { getAddressFromDID } from '../dids'
+import { LoginFailedError } from '../errors'
 import { decryptPrivateKey, makeAuthRequest } from './authMessages'
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
-  NAME_LOOKUP_PATH,
-  DEFAULT_SCOPE
+  NAME_LOOKUP_PATH
 } from './authConstants'
-
-import { extractProfile } from '../profiles'
-
+import { extractProfile } from '../profiles/profileTokens'
 import { UserSession } from './userSession'
 import { config } from '../config'
-
 import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
 import { protocolEchoReplyDetection } from './protocolEchoDetection'
+
 
 const DEFAULT_PROFILE = {
   '@type': 'Person',

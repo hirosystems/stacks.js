@@ -471,7 +471,7 @@ export function runStorageTests() {
     })
     const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getFullReadUrl },
-      '../profiles': { lookupProfile }
+      '../profiles/profileLookup': { lookupProfile }
     })
 
     const encryptOptions = { encrypt: true, sign: true }
@@ -583,7 +583,7 @@ export function runStorageTests() {
     })
     const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getFullReadUrl },
-      '../profiles': { lookupProfile }
+      '../profiles/profileLookup': { lookupProfile }
     })
 
     const encryptOptions = { encrypt: false, sign: true }
@@ -980,7 +980,7 @@ export function runStorageTests() {
     const lookupProfile = sinon.stub().resolves(profile)
 
     const { getUserAppFileUrl } = proxyquire('../../../src/storage', {
-      '../profiles': { lookupProfile }
+      '../profiles/profileLookup': { lookupProfile }
     })
 
     getUserAppFileUrl(path, name, appOrigin)

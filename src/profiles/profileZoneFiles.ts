@@ -1,8 +1,7 @@
 // @ts-ignore: Could not find a declaration file for module
 import { makeZoneFile, parseZoneFile } from 'zone-file'
 import { extractProfile } from './profileTokens'
-import { Person } from './index'
-
+import { Person } from './profileSchemas/person'
 import { Logger } from '../logger'
 
 export function makeProfileZoneFile(origin: string, tokenFileUrl: string) {
