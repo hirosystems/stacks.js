@@ -1,8 +1,7 @@
 /* eslint-disable */
 document.addEventListener('DOMContentLoaded', function (event) {
   document.getElementById('signin-button').addEventListener('click', function () {
-    var authRequest = blockstack.makeAuthRequest(null, window.location.hostname)
-    blockstack.redirectUserToSignIn(authRequest)
+    blockstack.redirectToSignIn()
   })
   document.getElementById('signout-button').addEventListener('click', function () {
     blockstack.signUserOut(window.location.origin)
@@ -17,12 +16,11 @@ document.addEventListener('DOMContentLoaded', function (event) {
   }
 
   if (blockstack.isUserSignedIn()) {
-    blockstack.loadUserData(function (userData) {
-      showProfile(userData.profile)
-    })
+    const userData = blockstack.loadUserData()
+    showProfile(userData.profile)
   } else if (blockstack.isSignInPending()) {
-    blockstack.signUserIn(function (userData) {
-      window.location = window.location.origin
+    blockstack.handlePendingSignIn().then(userData => {
+      showProfile(userData.profile)
     })
   }
 })

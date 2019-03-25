@@ -1,0 +1,6 @@
+coverage:
+  status:
+    project:
+      default:
+        base: pr
+    patch: off

@@ -6,3 +6,6 @@ tests/unitTests/lib
 dist
 lib
 babel.config.js
+webpack.config.js
+typedoc.js
+**/*.d.ts

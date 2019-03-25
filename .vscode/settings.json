@@ -1,4 +1,8 @@
 {
-    // Prevents vscode from showing js/ts errors for Flow syntax.
-    "javascript.validate.enable": false
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ]
 }

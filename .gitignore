@@ -31,7 +31,6 @@ unused
 .DS_Store
 
 # Folder to ignore for development with es6
-lib
 bundle.js
 
 src/testing/browser/blockstack-proofs.js
