@@ -125,6 +125,7 @@ export function runOwnerAddressBasedProofsUnitTests() {
       .getProofStatement(ken.hackerNews.body)
     const linkedInProofStatement = profileServices.linkedIn.getProofStatement(oscar.linkedIn.body)
 
+
     t.equals(containsValidAddressProofStatement(facebookProofStatement,
                                                 '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH'),
              true, 'Facebook post meta tags should contain valid bitcoin address proof statement')
