@@ -36,7 +36,7 @@ class LinkedIn extends Service {
 
   static getProofIdentity(searchText: string) {
     const $ = cheerio.load(searchText)
-    const profileLink = $('.share-update-card__header > a')
+    const profileLink = $('body > main header a')
 
     if (profileLink !== undefined) {
       if (profileLink.attr('href') === undefined) {
@@ -55,11 +55,11 @@ class LinkedIn extends Service {
 
   static getProofStatement(searchText: string) {
     const $ = cheerio.load(searchText)
-    const postContent = $('.share-update-card__update-text')
+    const postContent = $('head > meta[property="og:title"]')
     let statement = ''
 
     if (postContent !== undefined) {
-      statement = postContent.text()
+      statement = postContent.attr('content')
     }
 
     return statement

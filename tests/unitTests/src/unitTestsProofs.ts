@@ -104,8 +104,8 @@ export function runProofStatementUnitTests() {
             'Should extract address-based proof statement from Hacker News profile')
 
     t.equal(profileServices.linkedIn.getProofStatement(oscar.linkedIn.body),
-            'Verifying my Blockstack ID is secured with the address 1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7 https://lnkd.in/gM-KvXa',
-            'Should extract address-based proof statement from LinkedIn profile')
+            'Oscar Lafarga on LinkedIn: "Verifying my Blockstack ID is secured with the address 1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7 https://lnkd.in/gM-KvXa"',
+            'Should extract address-based proof statement from LinkedIn meta tags')
   })
 }
 
