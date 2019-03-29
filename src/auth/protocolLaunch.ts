@@ -12,7 +12,7 @@ import { Logger } from '../logger'
  * The callback that is invoked when the protocol handler was not detected. 
  * @return {void}
  */
-export function detectProtocolLaunch(
+export function launchCustomProtocol(
   authRequest: string, 
   successCallback: () => void, 
   failCallback: () => void) {
@@ -82,7 +82,7 @@ export function detectProtocolLaunch(
   
   const inputPromptTracker = window.document.createElement('input')
   inputPromptTracker.type = 'text'
-  const inputStyle: CSSStyleDeclarationFix = inputPromptTracker.style as any
+  const inputStyle: CssStyle = inputPromptTracker.style as any
   // Prevent this element from inherited any css.
   inputStyle.all = 'initial'
   // Setting display=none on an element prevents them from being focused/blurred.
@@ -160,7 +160,7 @@ export function detectProtocolLaunch(
   Logger.info('Attempting protocol launch via iframe injection.')
   const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
   const iframe = window.document.createElement('iframe')
-  const iframeStyle: CSSStyleDeclarationFix = iframe.style as any
+  const iframeStyle: CssStyle = iframe.style as any
   iframeStyle.all = 'initial'
   iframeStyle.display = 'none'
   iframe.src = locationSrc
@@ -174,7 +174,7 @@ export function detectProtocolLaunch(
  * https://github.com/Microsoft/TSJS-lib-generator#contribution-guidelines
  * 
  */
-interface CSSStyleDeclarationFix extends CSSStyleDeclaration {
+interface CssStyle extends CSSStyleDeclaration {
   /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/all */
   all: string | null
 }

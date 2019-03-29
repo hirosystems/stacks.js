@@ -18,7 +18,7 @@ import { config } from '../config'
 import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
 import { protocolEchoReplyDetection } from './protocolEchoDetection'
-import { detectProtocolLaunch } from './protocolLaunch'
+import { launchCustomProtocol } from './protocolLaunch'
 
 
 const DEFAULT_PROFILE = {
@@ -189,7 +189,7 @@ export function redirectToSignInWithAuthRequest(
     window.location.href = httpsURI
   }
 
-  detectProtocolLaunch(authRequest, successCallback, failCallback)
+  launchCustomProtocol(authRequest, successCallback, failCallback)
 }
 
 /**
