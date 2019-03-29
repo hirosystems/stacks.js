@@ -18,7 +18,7 @@ import { config } from '../config'
 import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
 import { protocolEchoReplyDetection } from './protocolEchoDetection'
-import { detectProtocolLaunch } from './detectProtocolLaunch'
+import { detectProtocolLaunch } from './protocolLaunch'
 
 
 const DEFAULT_PROFILE = {
