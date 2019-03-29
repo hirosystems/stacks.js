@@ -12,7 +12,11 @@ export type SessionOptions = {
   hubUrl?: string,
   storeOptions?: {},
   userData?: any,
-  transitKey?: string
+  transitKey?: string,
+  localStorageKey?: string,
+  storeOptions?: {
+    localStorageKey?: string
+  }
 }
 
 export class SessionData {

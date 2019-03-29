@@ -24,7 +24,8 @@ import {
   encryptContentImpl,
   getFileImpl,
   putFileImpl,
-  listFilesImpl
+  listFilesImpl,
+  getFileUrlImpl
 } from '../storage'
 
 import type {
@@ -56,7 +57,7 @@ export class UserSession {
 
   store: SessionDataStore
 
-  constructor(options: {appConfig?: AppConfig,
+  constructor(options?: {appConfig?: AppConfig,
     sessionStore?: SessionDataStore,
     sessionOptions?: SessionOptions }) {
     let runningInBrowser = true
@@ -306,6 +307,26 @@ export class UserSession {
       zoneFileLookupURL?: ?string
     }) {
     return getFileImpl(this, path, options)
+  }
+
+  /**
+   * Get the URL for reading a file from an app's data store.
+   * @param {String} path - the path to the file to read
+   * @param {Object} [options=null] - options object
+   * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+   * @param {String} options.app - the app to lookup for multi-player storage -
+   * defaults to current origin
+   * @param {String} [options.zoneFileLookupURL=null] - The URL
+   * to use for zonefile lookup. If falsey, this will use the
+   * blockstack.js's getNameInfo function instead.
+   * @returns {Promise<string>} that resolves to the URL or rejects with an error
+   */
+  getFileUrl(path: string, options?: {
+    username?: string,
+    app?: string,
+    zoneFileLookupURL?: ?string
+  }): Promise<string> {
+    return getFileUrlImpl(this, path, options)
   }
 
   /**

@@ -2,7 +2,9 @@
 import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './index'
-import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair } from '../utils'
+import { 
+  BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, nextMonth 
+} from '../utils'
 import { getAddressFromDID } from '../index'
 import { InvalidStateError, LoginFailedError } from '../errors'
 import { decryptPrivateKey, makeAuthRequestImpl } from './authMessages'
@@ -15,7 +17,7 @@ import {
 
 import { extractProfile } from '../profiles'
 
-import type { UserSession } from './userSession'
+import { UserSession } from './userSession'
 import { config } from '../config'
 
 import { Logger } from '../logger'
@@ -34,43 +36,9 @@ export function isUserSignedIn() {
   console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method isUserSignedIn().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.isUserSignedIn()
 }
-
-/**
- * Generates an authentication request and redirects the user to the Blockstack
- * browser to approve the sign in request.
- *
- * Please note that this requires that the web browser properly handles the
- * `blockstack:` URL protocol handler.
- *
- * Most applications should use this
- * method for sign in unless they require more fine grained control over how the
- * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
- *
- * @param {String} [redirectURI=`${window.location.origin}/`]
- * The location to which the identity provider will redirect the user after
- * the user approves sign in.
- * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
- * Location of the manifest file.
- * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
- * this app's data store.
- * An array of strings indicating which permissions this app is requesting.
- * @return {void}
- */
-/* eslint-disable no-unused-vars */
-export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
-                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
-                                 scopes: Array<string> = DEFAULT_SCOPE) { 
-  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
-    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method redirectToSignIn().')
-  const userSession = new this.UserSession()
-  userSession.redirectToSignIn()
-}
-/* eslint-enable no-unused-vars */
 
 /**
  * Check if there is a authentication request that hasn't been handled.
@@ -80,7 +48,7 @@ export function isSignInPending() {
   console.warn('DEPRECATION WARNING: The static isSignInPending() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method isSignInPending().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.isSignInPending()
 }
 
@@ -105,7 +73,7 @@ export function handlePendingSignIn(nameLookupURL: string = '',
     + 'instance method handlePendingSignIn().')
   console.warn('DEPRECATION WARNING: handlePendingSignIn() no long supports setting of nameLookupURL and '
     + 'transitKey. The nameLookupURL and transitKey now defaults to values in the default user session.')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.handlePendingSignIn(authResponseToken)
 }
 /* eslint-enable no-unused-vars */
@@ -127,7 +95,7 @@ export function loadUserData() {
   console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method loadUserData().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.loadUserData()
 }
 
@@ -140,7 +108,7 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
   console.warn('DEPRECATION WARNING: The static signUserOut() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method signUserOut().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   userSession.signUserOut()
   window.location = redirectURL
 }
@@ -166,16 +134,16 @@ export function signUserOut(redirectURL: ?string = null) { // eslint-disable-lin
  * by special authenticators.
  * @return {String} the authentication request
  */
-export function makeAuthRequest(transitPrivateKey: string,
-                                redirectURI: string,
-                                manifestURI: string,
-                                scopes: Array<string>,
+export function makeAuthRequest(transitPrivateKey: ?string,
+                                redirectURI: string = `${window.location.origin}/`, 
+                                manifestURI: string = `${window.location.origin}/manifest.json`, 
+                                scopes: Array<string> = DEFAULT_SCOPE,
                                 appDomain: string = window.location.origin,
-                                expiresAt: number,
+                                expiresAt: number = nextMonth().getTime(),
                                 extraParams: Object = {}): string {
   console.warn('DEPRECATION WARNING: The makeAuthRequest() function will be deprecated in the '
     + 'next major release of blockstack.js. Use UserSession to configure your auth request.')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   const transitKey = (transitPrivateKey == null) 
     ? userSession.generateAndStoreTransitKey() : transitPrivateKey
 
@@ -400,6 +368,38 @@ export function redirectToSignInWithAuthRequestImpl(caller: UserSession,
  * Please note that this requires that the web browser properly handles the
  * `blockstack:` URL protocol handler.
  *
+ * Most applications should use this
+ * method for sign in unless they require more fine grained control over how the
+ * authentication request is generated. If your app falls into this category,
+ * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
+ *
+ * @param {String} [redirectURI=`${window.location.origin}/`]
+ * The location to which the identity provider will redirect the user after
+ * the user approves sign in.
+ * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * Location of the manifest file.
+ * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * this app's data store.
+ * An array of strings indicating which permissions this app is requesting.
+ * @return {void}
+ */
+export function redirectToSignIn(redirectURI: string = `${window.location.origin}/`, 
+                                 manifestURI: string = `${window.location.origin}/manifest.json`, 
+                                 scopes: Array<string> = DEFAULT_SCOPE) { 
+  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
+    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method redirectToSignIn().')
+  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
+  redirectToSignInWithAuthRequest(authRequest)
+}
+
+/**
+ * Generates an authentication request and redirects the user to the Blockstack
+ * browser to approve the sign in request.
+ *
+ * Please note that this requires that the web browser properly handles the
+ * `blockstack:` URL protocol handler.
+ *
  * Most web applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
@@ -495,6 +495,7 @@ export function handlePendingSignInImpl(caller: UserSession,
       const userData = {
         username: tokenPayload.username,
         profile: tokenPayload.profile,
+        email: tokenPayload.email,
         decentralizedID: tokenPayload.iss,
         identityAddress: getAddressFromDID(tokenPayload.iss),
         appPrivateKey,
@@ -571,7 +572,7 @@ export function redirectToSignInWithAuthRequest(authRequest: string,
   console.warn('DEPRECATION WARNING: The static redirectToSignInWithAuthRequest() function will '
     + 'be deprecated in the next major release of blockstack.js. Create an instance of UserSession '
     + 'and call the instance method redirectToSignInWithAuthRequest().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
 
   const sessionAuthRequest = (authRequest == null) 
     ? userSession.makeAuthRequest(userSession.generateAndStoreTransitKey()) : authRequest

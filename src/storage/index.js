@@ -9,7 +9,7 @@ import {
 
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
-} from '../encryption'
+} from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles'
 import {
@@ -18,7 +18,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 
-import type { UserSession } from '../auth/userSession'
+import { UserSession } from '../auth/userSession'
 
 export type PutFileOptions = {
   encrypt?: boolean | string,
@@ -41,7 +41,7 @@ export function encryptContent(content: string | Buffer, options?: {publicKey?: 
   console.warn('DEPRECATION WARNING: The static encryptContent() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method encryptContent().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.encryptContent(content, options)
 }
 
@@ -58,7 +58,7 @@ export function decryptContent(content: string, options?: {privateKey?: ?string}
   console.warn('DEPRECATION WARNING: The static decryptContent() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method decryptContent().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.decryptContent(content, options)
 }
 
@@ -88,7 +88,7 @@ export function getFile(path: string, options?: {
   console.warn('DEPRECATION WARNING: The static getFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method getFile().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.getFile(path, options)
 }
 
@@ -113,7 +113,7 @@ export function putFile(path: string, content: string | Buffer, options?: {
   console.warn('DEPRECATION WARNING: The static putFile() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method putFile().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.putFile(path, content, options)
 }
 
@@ -127,7 +127,7 @@ export function listFiles(callback: (name: string) => boolean) : Promise<number>
   console.warn('DEPRECATION WARNING: The static listFiles() function will be deprecated in '
     + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method listFiles().')
-  const userSession = new this.UserSession()
+  const userSession = new UserSession()
   return userSession.listFiles(callback)
 }
 
@@ -260,17 +260,27 @@ function getGaiaAddress(caller: UserSession,
     })
 }
 
-/* Handle fetching the contents from a given path. Handles both
- *  multi-player reads and reads from own storage.
- * @private
- */
-function getFileContents(caller: UserSession,
-                         path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
-                         forceText: boolean) : Promise<?string | ?ArrayBuffer> {
+export function getFileUrlImpl(caller: UserSession, path: string, options?: {
+    app?: string, 
+    username?: string, 
+    zoneFileLookupURL?: ?string 
+  }): Promise<string> {
   return Promise.resolve()
     .then(() => {
-      if (username) {
-        return getUserAppFileUrl(path, username, app, zoneFileLookupURL)
+      const appConfig = caller.appConfig
+      if (!appConfig) {
+        throw new InvalidStateError('Missing AppConfig')
+      }
+      const defaults = {
+        username: null,
+        app: appConfig.appDomain,
+        zoneFileLookupURL: null
+      }
+      return Object.assign({}, defaults, options)
+    })
+    .then((opts) => {
+      if (opts.username) {
+        return getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
       } else {
         return getOrSetLocalGaiaHubConnection(caller)
           .then(gaiaHubConfig => getFullReadUrl(path, gaiaHubConfig))
@@ -283,6 +293,44 @@ function getFileContents(caller: UserSession,
         resolve(readUrl)
       }
     }))
+}
+
+/**
+ * Get the URL for reading a file from an app's data store.
+ * @param {String} path - the path to the file to read
+ * @param {Object} [options=null] - options object
+ * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
+ * @param {String} options.app - the app to lookup for multi-player storage -
+ * defaults to current origin
+ * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * to use for zonefile lookup. If falsey, this will use the
+ * blockstack.js's getNameInfo function instead.
+ * @returns {Promise<string>} that resolves to the URL or rejects with an error
+ */
+export function getFileUrl(path: string, options?: {
+    username?: string,
+    app?: string,
+    zoneFileLookupURL?: ?string
+  }): Promise<string> {
+  console.warn('DEPRECATION WARNING: The static getFileUrl() function will be deprecated in '
+    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
+    + 'instance method getFileUrl().')
+  const userSession = new UserSession()
+  return getFileUrlImpl(userSession, path, options)
+}
+
+/* Handle fetching the contents from a given path. Handles both
+ *  multi-player reads and reads from own storage.
+ * @private
+ */
+function getFileContents(caller: UserSession,
+                         path: string, app: string, username: ?string, zoneFileLookupURL: ?string,
+                         forceText: boolean) : Promise<?string | ?ArrayBuffer> {
+  return Promise.resolve()
+    .then(() => {
+      const opts: any = { app, username, zoneFileLookupURL }
+      return getFileUrlImpl(caller, path, opts)
+    })
     .then(readUrl => fetch(readUrl))
     .then((response) => {
       if (response.status !== 200) {

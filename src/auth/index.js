@@ -19,5 +19,6 @@ export {
 } from './authVerification'
 export {
   isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
-  isSignInPending, handlePendingSignIn, loadUserData, signUserOut
+  isSignInPending, handlePendingSignIn, loadUserData, signUserOut, 
+  makeAuthRequest
 } from './authApp'

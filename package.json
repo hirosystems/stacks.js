@@ -1,26 +1,29 @@
 {
   "name": "blockstack",
-  "version": "19.0.0",
+  "version": "19.0.1",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
+  "unpkg": "dist/blockstack.js",
   "scripts": {
-    "browserify": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./dist/blockstack.js",
-    "browserify-tests": "./node_modules/.bin/browserify lib/index.js --standalone blockstack -o ./tests/browserTests/bundle.js",
-    "compile": "rm -rf lib; babel src -d lib",
-    "compile-tests": "rm -rf tests/unitTests/lib; rm -rf tests/authTests/lib; rm -rf test/operationsTests/lib; babel tests/unitTests/src -d tests/unitTests/lib; babel tests/authTests/src -d tests/authTests/lib; babel tests/operationsTests/src -d tests/operationsTests/lib;",
+    "browserify": "rm -rf ./dist/blockstack.js && browserify src/index.js --standalone blockstack -o ./dist/blockstack.js",
+    "browserify-tests": "browserify src/index.js --debug --standalone blockstack -o ./tests/browserTests/bundle.js",
+    "compile": "rm -rf lib && babel src -d lib",
+    "compile-watch": "rm -rf lib; babel src -d lib --watch",
+    "compile-tests": "rm -rf tests/authTests/lib && rm -rf test/operationsTests/lib && babel tests/authTests/src -d tests/authTests/lib && babel tests/operationsTests/src -d tests/operationsTests/lib",
     "prepare": "npm run compile",
     "prepublishOnly": "npm run build",
-    "dev-auth": "npm run compile; npm run browserify; node ./tests/browserTests/auth-server.js",
-    "dev-proofs": "npm run compile; npm run browserify; node ./tests/browserTests/proofs-server.js",
-    "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/unitTests/lib/index.js",
-    "integration-test-auth": "npm run compile; npm run compile-tests; npm run browserify; node ./tests/authTests/lib/index.js",
+    "dev-auth": "npm run compile && npm run browserify && node ./tests/browserTests/auth-server.js",
+    "dev-proofs": "npm run compile && npm run browserify && node ./tests/browserTests/proofs-server.js",
+    "unit-test": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && tape -r @babel/register ./tests/unitTests/src/index.js",
+    "integration-test-auth": "npm run compile && npm run compile-tests && npm run browserify && node ./tests/authTests/lib/index.js",
     "integration-test-ops": "npm run lint && npm run flow && npm run compile && npm run compile-tests && npm run browserify && node ./tests/operationsTests/lib/index.js",
     "build": "npm run build-documentation && npm run compile && npm run browserify",
     "flow": "flow",
     "lint": "eslint src && eslint tests",
-    "test": "nyc --reporter=text npm run unit-test",
+    "test": "NODE_ENV=test nyc npm run unit-test",
     "documentation": "documentation",
-    "build-documentation": "./node_modules/.bin/documentation build src --config ./documentation.yml --format html --output docs; ./node_modules/.bin/documentation build src --config ./documentation.yml --format json --output docs.json"
+    "build-documentation": "documentation build src --config ./documentation.yml --format html --output docs && documentation build src --config ./documentation.yml --format json --output docs.json",
+    "codecovUpload": "codecov"
   },
   "repository": {
     "type": "git",
@@ -78,65 +81,86 @@
     }
   ],
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.2.5",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-flow": "^6.23.0",
-    "blue-tape": "^1.0.0",
-    "browserify": "^13.1.1",
-    "documentation": "^9.0.0",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^17.0.0",
-    "eslint-plugin-flowtype": "^2.46.3",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.10.0",
-    "express": "^4.15.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/plugin-transform-runtime": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-istanbul": "^5.1.1",
+    "babelify": "^10.0.0",
+    "browserify": "^16.2.3",
+    "codecov": "^3.2.0",
+    "documentation": "^9.3.0",
+    "eslint": "^5.15.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-flowtype": "^3.4.2",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "express": "^4.16.4",
     "fetch-mock": "^5.5.0",
-    "flow-bin": "^0.49.1",
-    "mock-local-storage": "^1.0.5",
+    "flow-bin": "^0.94.0",
+    "mock-local-storage": "^1.1.8",
     "node-fetch": "^1.6.3",
-    "nyc": "^12.0.2",
+    "nyc": "^13.3.0",
     "opn": "^4.0.2",
     "proxyquire": "^1.8.0",
     "sinon": "^4.2.1",
-    "tape": "^4.6.3",
-    "tape-promise": "^2.0.1"
+    "tape": "^4.10.1",
+    "tape-promise": "^4.0.0"
   },
   "dependencies": {
     "ajv": "^4.11.5",
-    "babel-runtime": "^6.26.0",
+    "@babel/runtime": "^7.3.4",
     "bigi": "^1.4.2",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
-    "bitcoinjs-lib": "^4",
+    "bitcoinjs-lib": "^4.0.3",
     "cheerio": "^0.22.0",
     "cross-fetch": "^2.2.2",
     "ecurve": "^1.0.6",
-    "elliptic": "^6.4.0",
-    "es6-promise": "^4.2.4",
-    "form-data": "^2.3.2",
-    "jsontokens": "^0.7.8",
+    "elliptic": "^6.4.1",
+    "es6-promise": "^4.2.6",
+    "form-data": "^2.3.3",
+    "jsontokens": "^1.0.0",
     "promise": "^7.1.1",
     "query-string": "^4.3.2",
-    "request": "^2.87.0",
-    "ripemd160": "^2.0.1",
-    "schema-inspector": "^1.6.4",
-    "sprintf-js": "^1.0.3",
+    "request": "^2.88.0",
+    "ripemd160": "^2.0.2",
+    "schema-inspector": "^1.6.8",
+    "sprintf-js": "^1.1.2",
     "triplesec": "^3.0.26",
-    "uuid": "^3.2.1",
+    "uuid": "^3.3.2",
     "validator": "^7.0.0",
-    "zone-file": "^0.2.2"
+    "zone-file": "^1.0.0"
   },
   "engines": {
-    "node": ">=8",
+    "node": ">=10.13",
     "npm": ">=6"
   },
   "nyc": {
     "include": [
-      "lib/**"
+      "src/**"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify"
+      ]
     ]
   }
 }

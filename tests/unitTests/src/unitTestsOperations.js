@@ -3,13 +3,13 @@ import FetchMock from 'fetch-mock'
 import btc from 'bitcoinjs-lib'
 import bigi from 'bigi'
 
-import { network, InsightClient, BitcoindAPI } from '../../../lib/network'
+import { network, InsightClient, BitcoindAPI } from '../../../src/network'
 import {
   estimateTXBytes, addUTXOsToFund, sumOutputValues,
   hash160, hash128, decodeB40
-} from '../../../lib/operations/utils'
+} from '../../../src/operations/utils'
 
-import { transactions, safety, config } from '../../../lib'
+import { transactions, safety, config } from '../../../src'
 
 const testAddresses = [
   {

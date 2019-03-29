@@ -260,7 +260,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to the number of blocks
    */
   getGracePeriod() {
-    return new Promise(resolve => resolve(5000))
+    return Promise.resolve(5000)
   }
 
   /**
@@ -1049,7 +1049,7 @@ export class InsightClient extends BitcoinNetwork {
   }
 
   broadcastTransaction(transaction: string) {
-    const jsonData = { tx: transaction }
+    const jsonData = { rawtx: transaction }
     return fetch(`${this.apiUrl}/tx/send`,
                  {
                    method: 'POST',

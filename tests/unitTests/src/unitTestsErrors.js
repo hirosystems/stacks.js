@@ -1,6 +1,6 @@
 import test from 'tape-promise/tape'
 
-import { InvalidDIDError } from '../../../lib/errors'
+import { InvalidDIDError } from '../../../src/errors'
 
 export function runErrorsTests() {
   test('InvalidDIDError', (t) => {

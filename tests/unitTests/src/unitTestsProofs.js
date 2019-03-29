@@ -1,10 +1,9 @@
-import blueTest from 'blue-tape'
-import test from 'tape'
+import test from 'tape-promise/tape'
 import FetchMock from 'fetch-mock'
 
 import {
   validateProofs, containsValidProofStatement, containsValidAddressProofStatement, profileServices
-} from '../../../lib'
+} from '../../../src'
 
 import {
   sampleProfiles, sampleProofs,
@@ -22,18 +21,18 @@ function mockRequests() {
 }
 
 function testProofs(profile, username, totalProofs) {
-  blueTest(`Profiles ${username}`,
-           (t) =>  { // FetchMock.get('https://www.facebook.com/larry.salibra/posts/10100341028448093', 'hi')
-             mockRequests()
-             return validateProofs(profile, undefined, username).then((proofs) => {
-               t.ok(proofs, 'Proofs must have been created')
-               t.equal(proofs instanceof Array, true, 'Proofs should be an Array')
-               t.equal(proofs.length, totalProofs,
-                       `Should have a proof for each of the ${totalProofs} claimed accounts`)
-               t.equal(proofs.filter(x => x.valid).length, totalProofs, 'Should all be valid claims')
-               FetchMock.restore()
-             })
-           })
+  test(`Profiles ${username}`,
+       (t) =>  { // FetchMock.get('https://www.facebook.com/larry.salibra/posts/10100341028448093', 'hi')
+         mockRequests()
+         return validateProofs(profile, undefined, username).then((proofs) => {
+           t.ok(proofs, 'Proofs must have been created')
+           t.equal(proofs instanceof Array, true, 'Proofs should be an Array')
+           t.equal(proofs.length, totalProofs,
+                   `Should have a proof for each of the ${totalProofs} claimed accounts`)
+           t.equal(proofs.filter(x => x.valid).length, totalProofs, 'Should all be valid claims')
+           FetchMock.restore()
+         })
+       })
 }
 
 function brokenProofs() {

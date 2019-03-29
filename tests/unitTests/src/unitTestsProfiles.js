@@ -13,7 +13,7 @@ import {
   resolveZoneFileToPerson,
   makeProfileZoneFile,
   lookupProfile
-} from '../../../lib'
+} from '../../../src'
 
 import { sampleProfiles, sampleTokenFiles } from './sampleData'
 
