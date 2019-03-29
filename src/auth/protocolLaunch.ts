@@ -82,15 +82,12 @@ export function launchCustomProtocol(
   
   const inputPromptTracker = window.document.createElement('input')
   inputPromptTracker.type = 'text'
-  const inputStyle: CssStyle = inputPromptTracker.style as any
-  // Prevent this element from inherited any css.
-  inputStyle.all = 'initial'
-  // Setting display=none on an element prevents them from being focused/blurred.
-  // So hide the element using other properties..
-  inputStyle.opacity = '0'
-  inputStyle.filter = 'alpha(opacity=0)'
-  inputStyle.height = '0'
-  inputStyle.width = '0'
+
+  // Setting display:none on an element prevents them from being focused/blurred.
+  // So we hide using 0 width/height/opacity, and set position:fixed so that the
+  // page does not scroll when the element is focused. 
+  const hiddenCssStyle = 'all: initial; position: fixed; top: 0; height: 0; width: 0; opacity: 0;'
+  inputPromptTracker.style.cssText = hiddenCssStyle
 
   // If the the focus of a page element is immediately changed then this likely indicates 
   // the protocol handler is installed, and the browser is prompting the user if they want 
@@ -160,21 +157,9 @@ export function launchCustomProtocol(
   Logger.info('Attempting protocol launch via iframe injection.')
   const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
   const iframe = window.document.createElement('iframe')
-  const iframeStyle: CssStyle = iframe.style as any
-  iframeStyle.all = 'initial'
-  iframeStyle.display = 'none'
+
+  const iframeStyle = 'all: initial; display: none; position: fixed; top: 0; height: 0; width: 0; opacity: 0;'
+  iframe.style.cssText = iframeStyle
   iframe.src = locationSrc
   window.document.body.appendChild(iframe)
-}
-
-/**
- * TODO: Submit PR to fix this:
- * https://github.com/Microsoft/TypeScript/blob/master/src/lib/dom.generated.d.ts
- * https://github.com/Microsoft/TypeScript/blob/master/CONTRIBUTING.md#modifying-generated-library-files
- * https://github.com/Microsoft/TSJS-lib-generator#contribution-guidelines
- * 
- */
-interface CssStyle extends CSSStyleDeclaration {
-  /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/all */
-  all: string | null
 }
