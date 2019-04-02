@@ -18,7 +18,6 @@
     "readme": "overview.md",
     "includes": "includes",
     "mode": "file",
-    "exclude": "**/src/wallet.ts **/src/encryption/wallet.ts **/src/auth/authMessages.d.ts",
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,

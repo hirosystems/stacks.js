@@ -39,3 +39,6 @@ jobs:
       - run: npm build
 
       - run: npm run codecovUpload
+
+      - store_artifacts:
+          path: docs
