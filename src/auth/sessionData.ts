@@ -19,6 +19,9 @@ export type SessionOptions = {
   }
 }
 
+/**
+ * @ignore
+ */
 export class SessionData {
   version: string
 
