@@ -7,7 +7,7 @@ import { Logger } from '../logger'
 
 /**
  * Retrieves the authentication request from the query string
- * @return {String|null} the authentication request or `null` if
+ * @returns the authentication request or `null` if
  * the query string parameter `authRequest` is not found
  * @private
  * @ignore 
@@ -25,8 +25,8 @@ export function getAuthRequestFromURL() {
 /**
  * Fetches the contents of the manifest file specified in the authentication request
  *
- * @param  {String} authRequest encoded and signed authentication request
- * @return {Promise<Object|String>} Returns a `Promise` that resolves to the JSON
+ * @param authRequest encoded and signed authentication request
+ * @returns Returns a `Promise` that resolves to the JSON
  * object manifest file unless there's an error in which case rejects with an error
  * message.
  * @private
@@ -64,8 +64,8 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
  * specified in the authentication request, passing the authentication
  * response token as a query parameter.
  *
- * @param {String} authRequest  encoded and signed authentication request token
- * @param {String} authResponse encoded and signed authentication response token
+ * @param authRequest  encoded and signed authentication request token
+ * @param authResponse encoded and signed authentication response token
  * @return {void}
  * @throws {Error} if there is no redirect uri
  * @private

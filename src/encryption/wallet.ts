@@ -4,9 +4,9 @@ import triplesec from 'triplesec'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
- * @param {string} phrase - Raw mnemonic phrase
- * @param {string} password - Password to encrypt mnemonic with
- * @return {Promise<Buffer>} The encrypted phrase
+ * @param phrase - Raw mnemonic phrase
+ * @param password - Password to encrypt mnemonic with
+ * @returns The encrypted phrase
  * @private
  * @ignore 
  * */
@@ -100,9 +100,9 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
 
 /**
  * Decrypt legacy triplesec keys
- * @param {Buffer} dataBuffer - The encrypted key
- * @param {String} password - Password for data
- * @return {Promise<Buffer>} Decrypted seed
+ * @param dataBuffer - The encrypted key
+ * @param password - Password for data
+ * @returns Decrypted seed
  * @private
  * @ignore 
  */
@@ -126,9 +126,9 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
 
 /**
  * Encrypt a raw mnemonic phrase with a password
- * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
- * @param {string} password - Password for data
- * @return {Promise<string>} the raw mnemonic phrase
+ * @param data - Buffer or hex-encoded string of the encrypted mnemonic
+ * @param password - Password for data
+ * @returns the raw mnemonic phrase
  * @private
  * @ignore 
  */

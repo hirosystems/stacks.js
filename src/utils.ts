@@ -62,9 +62,9 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
 
 /**
  * Versioning
- * @param {string} v1 - the left half of the version inequality
- * @param {string} v2 - right half of the version inequality
- * @returns {bool} iff v1 >= v2
+ * @param v1 - the left half of the version inequality
+ * @param v2 - right half of the version inequality
+ * @returns iff v1 >= v2
  * @private
  * @ignore
  */
@@ -154,9 +154,9 @@ export function makeUUID4() {
 
 /**
  * Checks if both urls pass the same origin check & are absolute
- * @param  {[type]}  uri1 first uri to check
- * @param  {[type]}  uri2 second uri to check
- * @return {Boolean} true if they pass the same origin check
+ * @param  uri1 first uri to check
+ * @param  uri2 second uri to check
+ * @returns true if they pass the same origin check
  * @private
  * @ignore
  */

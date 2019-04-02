@@ -7,14 +7,14 @@ import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
 
 /**
   * Signs a profile token
-  * @param {Object} profile - the JSON of the profile to be signed
-  * @param {String} privateKey - the signing private key
-  * @param {Object} subject - the entity that the information is about
-  * @param {Object} issuer - the entity that is issuing the token
-  * @param {String} signingAlgorithm - the signing algorithm to use
-  * @param {Date} issuedAt - the time of issuance of the token
-  * @param {Date} expiresAt - the time of expiration of the token
-  * @returns {Object} - the signed profile token
+  * @param profile - the JSON of the profile to be signed
+  * @param privateKey - the signing private key
+  * @param subject - the entity that the information is about
+  * @param issuer - the entity that is issuing the token
+  * @param signingAlgorithm - the signing algorithm to use
+  * @param issuedAt - the time of issuance of the token
+  * @param expiresAt - the time of expiration of the token
+  * @returns - the signed profile token
   */
 export function signProfileToken(profile: any,
                                  privateKey: string,
@@ -53,8 +53,8 @@ export function signProfileToken(profile: any,
 
 /**
   * Wraps a token for a profile token file
-  * @param {String} token - the token to be wrapped
-  * @returns {Object} - including `token` and `decodedToken`
+  * @param token - the token to be wrapped
+  * @returns - including `token` and `decodedToken`
   */
 export function wrapProfileToken(token: string) {
   return {
@@ -65,10 +65,10 @@ export function wrapProfileToken(token: string) {
 
 /**
   * Verifies a profile token
-  * @param {String} token - the token to be verified
-  * @param {String} publicKeyOrAddress - the public key or address of the
+  * @param token - the token to be verified
+  * @param publicKeyOrAddress - the public key or address of the
   *   keypair that is thought to have signed the token
-  * @returns {Object} - the verified, decoded profile token
+  * @returns - the verified, decoded profile token
   * @throws {Error} - throws an error if token verification fails
   */
 export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
@@ -132,10 +132,10 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
 /**
   * Extracts a profile from an encoded token and optionally verifies it,
   * if `publicKeyOrAddress` is provided.
-  * @param {String} token - the token to be extracted
-  * @param {String} publicKeyOrAddress - the public key or address of the
+  * @param token - the token to be extracted
+  * @param publicKeyOrAddress - the public key or address of the
   *   keypair that is thought to have signed the token
-  * @returns {Object} - the profile extracted from the encoded token
+  * @returns - the profile extracted from the encoded token
   * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
   */
 export function extractProfile(token: string, publicKeyOrAddress: string | null = null) {

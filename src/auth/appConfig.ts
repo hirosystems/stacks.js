@@ -58,13 +58,12 @@ export class AppConfig {
   authenticatorURL?: string
 
   /**
-   * @param {Array<string>} scopes - permissions this app is requesting
-   * @param {string} appDomain - the app domain
-   * @param {string} redirectPath - path on app domain to redirect users to after authentication
-   * @param {string} manifestPath - path relative to app domain of app's manifest file
-   * @param {string} coreNode - override the default or user selected core node
-   * @param {string} authenticatorURL - the web-based fall back authenticator 
-   * ([[DEFAULT_BLOCKSTACK_HOST]])
+   * @param scopes - permissions this app is requesting
+   * @param appDomain - the app domain
+   * @param redirectPath - path on app domain to redirect users to after authentication
+   * @param manifestPath - path relative to app domain of app's manifest file
+   * @param coreNode - override the default or user selected core node
+   * @param authenticatorURL - the web-based fall back authenticator 
    */
   constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
               appDomain: string = window.location.origin,
@@ -89,7 +88,7 @@ export class AppConfig {
   /**
    * The location to which the authenticator should
    * redirect the user.
-   * @returns {string} - URI
+   * @returns - URI
    */
   redirectURI(): string {
     return `${this.appDomain}${this.redirectPath}`
@@ -97,7 +96,7 @@ export class AppConfig {
 
   /**
    * The location of the app's manifest file.
-   * @returns {string} - URI
+   * @returns - URI
    */
   manifestURI(): string {
     return `${this.appDomain}${this.manifestPath}`

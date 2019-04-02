@@ -73,9 +73,9 @@ export function getHexFromBN(bnInput: BN) {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @param {String} publicKey - secp256k1 public key hex string
- * @param {String | Buffer} content - content to encrypt
- * @return {Object} Object containing (hex encoded):
+ * @param publicKey - secp256k1 public key hex string
+ * @param content - content to encrypt
+ * @return Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
@@ -121,12 +121,12 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
 
 /**
  * Decrypt content encrypted using ECIES
- * @param {String} privateKey - secp256k1 private key hex string
- * @param {Object} cipherObject - object to decrypt, should contain:
+ * @param privateKey - secp256k1 private key hex string
+ * @param cipherObject - object to decrypt, should contain:
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeralPublicKey
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * @return {Buffer} plaintext
+ * @returns plaintext
  * @throws {Error} if unable to decrypt
  * @private
  * @ignore
@@ -164,9 +164,9 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
 /**
  * Sign content using ECDSA
  *
- * @param {String} privateKey - secp256k1 private key hex string
- * @param {Object} content - content to sign
- * @return {Object} contains:
+ * @param privateKey - secp256k1 private key hex string
+ * @param content - content to sign
+ * @returns contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
  * @private
@@ -199,10 +199,10 @@ function getBuffer(content: string | ArrayBuffer | Buffer) {
 
 /**
  * Verify content using ECDSA
- * @param {String | Buffer} content - Content to verify was signed
- * @param {String} publicKey - secp256k1 private key hex string
- * @param {String} signature - Hex encoded DER signature
- * @return {Boolean} returns true when signature matches publickey + content, false if not
+ * @param content - Content to verify was signed
+ * @param publicKey - secp256k1 private key hex string
+ * @param signature - Hex encoded DER signature
+ * @returns returns true when signature matches publickey + content, false if not
  * @private
  * @ignore
  */

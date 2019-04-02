@@ -4,11 +4,11 @@ import { Logger } from '../logger'
 /**
  * Detects if the native auth-browser is installed and is successfully 
  * launched via a custom protocol URI. 
- * @param {String} authRequest
+ * @param authRequest
  * The encoded authRequest to be used as a query param in the custom URI. 
- * @param {String} successCallback
+ * @param successCallback
  * The callback that is invoked when the protocol handler was detected. 
- * @param {String} failCallback
+ * @param failCallback
  * The callback that is invoked when the protocol handler was not detected. 
  * @return {void}
  * @ignore

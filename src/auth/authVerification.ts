@@ -9,8 +9,8 @@ import { fetchAppManifest } from './authProvider'
  * Checks if the ES256k signature on passed `token` match the claimed public key
  * in the payload key `public_keys`.
  *
- * @param  {String} token encoded and signed authentication token
- * @return {Boolean} Returns `true` if the signature matches the claimed public key
+ * @param token encoded and signed authentication token
+ * @returns Returns `true` if the signature matches the claimed public key
  * @throws {Error} if `token` contains multiple public keys
  * @private
  * @ignore 
@@ -41,8 +41,8 @@ export function doSignaturesMatchPublicKeys(token: string) {
  * the decentralized identifier passed in the issuer `iss`
  * key of the token matches the public key
  *
- * @param  {String} token encoded and signed authentication token
- * @return {Boolean} if the identity address and public keys match
+ * @param token encoded and signed authentication token
+ * @returns if the identity address and public keys match
  * @throws {Error} if ` token` has multiple public keys
  * @private
  * @ignore 
@@ -70,9 +70,9 @@ export function doPublicKeysMatchIssuer(token: string) {
  * to determine if the username is owned by the identity address
  * that matches the claimed public key
  *
- * @param  {String} token  encoded and signed authentication token
- * @param  {String} nameLookupURL a URL to the name lookup endpoint of the Blockstack Core API
- * @return {Promise<Boolean>} returns a `Promise` that resolves to
+ * @param token  encoded and signed authentication token
+ * @param nameLookupURL a URL to the name lookup endpoint of the Blockstack Core API
+ * @returns returns a `Promise` that resolves to
  * `true` if the username is owned by the public key, otherwise the
  * `Promise` resolves to `false`
  * @private
@@ -120,8 +120,8 @@ export function doPublicKeysMatchUsername(token: string,
  * Checks if the if the token issuance time and date is after the
  * current time and date.
  *
- * @param  {String}  token encoded and signed authentication token
- * @return {Boolean} `true` if the token was issued after the current time,
+ * @param  token encoded and signed authentication token
+ * @returns `true` if the token was issued after the current time,
  * otherwise returns `false`
  * @private
  * @ignore 
@@ -145,8 +145,8 @@ export function isIssuanceDateValid(token: string) {
 
 /**
  * Checks if the expiration date of the `token` is before the current time
- * @param  {String}  token encoded and signed authentication token
- * @return {Boolean} `true` if the `token` has not yet expired, `false`
+ * @param  token encoded and signed authentication token
+ * @returns `true` if the `token` has not yet expired, `false`
  * if the `token` has expired
  *
  * @private
@@ -171,8 +171,8 @@ export function isExpirationDateValid(token: string) {
 
 /**
  * Makes sure the `manifest_uri` is a same origin absolute URL.
- * @param  {String}  token encoded and signed authentication token
- * @return {Boolean} `true` if valid, otherwise `false`
+ * @param  token encoded and signed authentication token
+ * @returns `true` if valid, otherwise `false`
  * @private
  * @ignore 
  */
@@ -183,8 +183,8 @@ export function isManifestUriValid(token: string) {
 
 /**
  * Makes sure the `redirect_uri` is a same origin absolute URL.
- * @param  {String}  token encoded and signed authentication token
- * @return {Boolean} `true` if valid, otherwise `false`
+ * @param  token encoded and signed authentication token
+ * @returns `true` if valid, otherwise `false`
  * @private
  * @ignore 
  */
@@ -201,8 +201,8 @@ export function isRedirectUriValid(token: string) {
  * * Checks that both the manifest and redirect URLs are absolute and conform to
  * the same origin policy
  *
- * @param  {String} token encoded and signed authentication request token
- * @return {Promise} that resolves to true if the auth request
+ * @param token encoded and signed authentication request token
+ * @returns that resolves to true if the auth request
  *  is valid and false if it does not. It rejects with a String if the
  *  token is not signed
  * @private
@@ -232,8 +232,8 @@ export function verifyAuthRequest(token: string) {
 /**
  * Verify the authentication request is valid and
  * fetch the app manifest file if valid. Otherwise, reject the promise.
- * @param  {String} token encoded and signed authentication request token
- * @return {Promise} that resolves to the app manifest file in JSON format
+ * @param token encoded and signed authentication request token
+ * @returns that resolves to the app manifest file in JSON format
  * or rejects if the auth request or app manifest file is invalid
  * @private
  * @ignore 
@@ -251,9 +251,9 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
 
 /**
  * Verify the authentication response is valid
- * @param {String} token the authentication response token
- * @param {String} nameLookupURL the url use to verify owner of a username
- * @return {Promise} that resolves to true if auth response
+ * @param token the authentication response token
+ * @param nameLookupURL the url use to verify owner of a username
+ * @returns that resolves to true if auth response
  * is valid and false if it does not
  * @private
  * @ignore 

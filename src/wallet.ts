@@ -79,9 +79,9 @@ export class BlockstackWallet {
 
   /**
    * Initialize a Blockstack wallet from a seed buffer
-   * @param {Buffer} seed - the input seed for initializing the root node
+   * @param seed - the input seed for initializing the root node
    *  of the hierarchical wallet
-   * @return {BlockstackWallet} the constructed wallet
+   * @returns the constructed wallet
    */
   static fromSeedBuffer(seed: Buffer): BlockstackWallet {
     return new BlockstackWallet(bip32.fromSeed(seed))
@@ -89,9 +89,9 @@ export class BlockstackWallet {
 
   /**
    * Initialize a Blockstack wallet from a base58 string
-   * @param {string} keychain - the Base58 string used to initialize
+   * @param keychain - the Base58 string used to initialize
    *  the root node of the hierarchical wallet
-   * @return {BlockstackWallet} the constructed wallet
+   * @returns the constructed wallet
    */
   static fromBase58(keychain: string): BlockstackWallet {
     return new BlockstackWallet(bip32.fromBase58(keychain))
@@ -100,9 +100,9 @@ export class BlockstackWallet {
   /**
    * Initialize a blockstack wallet from an encrypted phrase & password. Throws
    * if the password is incorrect. Supports all formats of Blockstack phrases.
-   * @param {string} data - The encrypted phrase as a hex-encoded string
-   * @param {string} password - The plain password
-   * @return {Promise<BlockstackWallet>} the constructed wallet
+   * @param data - The encrypted phrase as a hex-encoded string
+   * @param password - The plain password
+   * @returns the constructed wallet
    * 
    * @ignore
    */
@@ -123,7 +123,7 @@ export class BlockstackWallet {
 
   /**
    * Generate a BIP-39 12 word mnemonic
-   * @return {Promise<string>} space-separated 12 word phrase
+   * @returns space-separated 12 word phrase
    */
   static generateMnemonic() {
     return bip39.generateMnemonic(128, randomBytes)
@@ -131,9 +131,9 @@ export class BlockstackWallet {
 
   /**
    * Encrypt a mnemonic phrase with a password
-   * @param {string} mnemonic - Raw mnemonic phrase
-   * @param {string} password - Password to encrypt mnemonic with
-   * @return {Promise<string>} Hex-encoded encrypted mnemonic
+   * @param mnemonic - Raw mnemonic phrase
+   * @param password - Password to encrypt mnemonic with
+   * @returns Hex-encoded encrypted mnemonic
    */
   static async encryptMnemonic(mnemonic: string, password: string) {
     const encryptedBuffer = await encryptMnemonic(mnemonic, password)
@@ -172,7 +172,7 @@ export class BlockstackWallet {
 
   /**
    * Get a salt for use with creating application specific addresses
-   * @return {String} the salt
+   * @returns the salt
    */
   getIdentitySalt(): string {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
@@ -182,8 +182,8 @@ export class BlockstackWallet {
 
   /**
    * Get a bitcoin receive address at a given index
-   * @param {number} addressIndex - the index of the address
-   * @return {String} address
+   * @param addressIndex - the index of the address
+   * @returns address
    */
   getBitcoinAddress(addressIndex: number): string {
     return BlockstackWallet.getAddressFromBIP32Node(this.getBitcoinNode(addressIndex))
@@ -191,8 +191,8 @@ export class BlockstackWallet {
 
   /**
    * Get the private key hex-string for a given bitcoin receive address
-   * @param {number} addressIndex - the index of the address
-   * @return {String} the hex-string. this will be either 64
+   * @param addressIndex - the index of the address
+   * @returns the hex-string. this will be either 64
    * characters long to denote an uncompressed bitcoin address, or 66
    * characters long for a compressed bitcoin address.
    */
@@ -202,7 +202,7 @@ export class BlockstackWallet {
 
   /**
    * Get the root node for the bitcoin public keychain
-   * @return {String} base58-encoding of the public node
+   * @returns base58-encoding of the public node
    */
   getBitcoinPublicKeychain(): BIP32 {
     return this.getBitcoinPrivateKeychain().neutered()
@@ -210,7 +210,7 @@ export class BlockstackWallet {
 
   /**
    * Get the root node for the identity public keychain
-   * @return {String} base58-encoding of the public node
+   * @returns base58-encoding of the public node
    */
   getIdentityPublicKeychain(): BIP32 {
     return this.getIdentityPrivateKeychain().neutered()
@@ -237,11 +237,11 @@ export class BlockstackWallet {
   /**
    * Get a bitcoin address given a base-58 encoded bitcoin node
    * (usually called the account node)
-   * @param {String} keychainBase58 - base58-encoding of the node
-   * @param {number} addressIndex - index of the address to get
-   * @param {String} chainType - either 'EXTERNAL_ADDRESS' (for a
+   * @param keychainBase58 - base58-encoding of the node
+   * @param addressIndex - index of the address to get
+   * @param chainType - either 'EXTERNAL_ADDRESS' (for a
    * "receive" address) or 'CHANGE_ADDRESS'
-   * @return {String} the address
+   * @returns the address
    */
   static getAddressFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
                                        chainType: string = EXTERNAL_ADDRESS): string {
@@ -252,12 +252,12 @@ export class BlockstackWallet {
   /**
    * Get a ECDSA private key hex-string for an application-specific
    *  address.
-   * @param {String} appsNodeKey - the base58-encoded private key for
+   * @param appsNodeKey - the base58-encoded private key for
    * applications node (the `appsNodeKey` return in getIdentityKeyPair())
-   * @param {String} salt - a string, used to salt the
+   * @param salt - a string, used to salt the
    * application-specific addresses
-   * @param {String} appDomain - the appDomain to generate a key for
-   * @return {String} the private key hex-string. this will be a 64
+   * @param appDomain - the appDomain to generate a key for
+   * @returns the private key hex-string. this will be a 64
    * character string
    */
   static getLegacyAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
@@ -277,12 +277,12 @@ export class BlockstackWallet {
   /**
    * Get a ECDSA private key hex-string for an application-specific
    *  address.
-   * @param {String} appsNodeKey - the base58-encoded private key for
+   * @param appsNodeKey - the base58-encoded private key for
    * applications node (the `appsNodeKey` return in getIdentityKeyPair())
-   * @param {String} salt - a string, used to salt the
+   * @param salt - a string, used to salt the
    * application-specific addresses
-   * @param {String} appDomain - the appDomain to generate a key for
-   * @return {String} the private key hex-string. this will be a 64
+   * @param appDomain - the appDomain to generate a key for
+   * @returns the private key hex-string. this will be a 64
    * character string
    */
   static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
@@ -315,10 +315,10 @@ export class BlockstackWallet {
    * Get the keypair information for a given identity index. This
    * information is used to obtain the private key for an identity address
    * and derive application specific keys for that address.
-   * @param {number} addressIndex - the identity index
-   * @param {boolean} alwaysUncompressed - if true, always return a
+   * @param addressIndex - the identity index
+   * @param alwaysUncompressed - if true, always return a
    *   private-key hex string corresponding to the uncompressed address
-   * @return {Object} an IdentityKeyPair type object with keys:
+   * @returns an IdentityKeyPair type object with keys:
    *   .key {String} - the private key hex-string
    *   .keyID {String} - the public key hex-string
    *   .address {String} - the identity address

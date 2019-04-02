@@ -66,8 +66,8 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
 
 /**
  * Deletes the specified file from the app's data store. Currently not implemented.
- * @param {String} path - the path to the file to delete
- * @returns {Promise} that resolves when the file has been removed
+ * @param path - the path to the file to delete
+ * @returns that resolves when the file has been removed
  * or rejects with an error
  */
 export function deleteFile(path: string) {
@@ -76,13 +76,13 @@ export function deleteFile(path: string) {
 
 /**
  * Fetch the public read URL of a user file for the specified app.
- * @param {String} path - the path to the file to read
- * @param {String} username - The Blockstack ID of the user to look up
- * @param {String} appOrigin - The app origin
- * @param {String} [zoneFileLookupURL=null] - The URL
+ * @param path - the path to the file to read
+ * @param username - The Blockstack ID of the user to look up
+ * @param appOrigin - The app origin
+ * @param [zoneFileLookupURL=null] - The URL
  * to use for zonefile lookup. If falsey, this will use the
  * blockstack.js's getNameInfo function instead.
- * @return {Promise<string>} that resolves to the public read URL of the file
+ * @returns that resolves to the public read URL of the file
  * or rejects with an error
  */
 export async function getUserAppFileUrl(
@@ -186,9 +186,9 @@ async function getGaiaAddress(
   return matches[matches.length - 1]
 }
 /**
- * @param {Object} [options=null] - options object
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {String} options.app - the app to lookup for multi-player storage -
+ * @param [options=null] - options object
+ * @param options.username - the Blockstack ID to lookup for multi-player storage
+ * @param options.app - the app to lookup for multi-player storage -
  * defaults to current origin
  * 
  * @ignore
@@ -413,8 +413,8 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
 
 /**
  * Retrieves the specified file from the app's data store.
- * @param {String} path - the path to the file to read
- * @returns {Promise} that resolves to the raw data in the file
+ * @param path - the path to the file to read
+ * @returns that resolves to the raw data in the file
  * or rejects with an error
  */
 export function getFile(
@@ -466,9 +466,9 @@ export function getFile(
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
- * @param {String} path - the path to store the data in
- * @param {String|Buffer} content - the data to store in the file
- * @return {Promise} that resolves if the operation succeed and rejects
+ * @param path - the path to store the data in
+ * @param content - the data to store in the file
+ * @returns that resolves if the operation succeed and rejects
  * if it failed
  */
 export async function putFile(
@@ -570,9 +570,9 @@ export async function putFile(
 
 /**
  * Get the app storage bucket URL
- * @param {String} gaiaHubUrl - the gaia hub URL
- * @param {String} appPrivateKey - the app private key used to generate the app address
- * @returns {Promise} That resolves to the URL of the app index file
+ * @param gaiaHubUrl - the gaia hub URL
+ * @param appPrivateKey - the app private key used to generate the app address
+ * @returns That resolves to the URL of the app index file
  * or rejects if it fails
  */
 export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
@@ -582,13 +582,13 @@ export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
 /**
  * Loop over the list of files in a Gaia hub, and run a callback on each entry.
  * Not meant to be called by external clients.
- * @param {GaiaHubConfig} hubConfig - the Gaia hub config
- * @param {String | null} page - the page ID
- * @param {number} callCount - the loop count
- * @param {number} fileCount - the number of files listed so far
- * @param {function} callback - the callback to invoke on each file.  If it returns a falsey
+ * @param hubConfig - the Gaia hub config
+ * @param page - the page ID
+ * @param callCount - the loop count
+ * @param fileCount - the number of files listed so far
+ * @param callback - the callback to invoke on each file.  If it returns a falsey
  *  value, then the loop stops.  If it returns a truthy value, the loop continues.
- * @returns {Promise} that resolves to the number of files listed.
+ * @returns that resolves to the number of files listed.
  * @private
  * @ignore
  */
@@ -654,10 +654,10 @@ function listFilesLoop(hubConfig: GaiaHubConfig,
 
 /**
  * List the set of files in this application's Gaia storage bucket.
- * @param {UserSession} caller - instance calling this method
- * @param {function} callback - a callback to invoke on each named file that
+ * @param caller - instance calling this method
+ * @param callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
+ * @returns that resolves to the number of files listed
  */
 export async function listFiles(
   callback: (name: string) => boolean,

@@ -19,8 +19,8 @@ export interface TransactionSigner {
   getAddress(): Promise<string>;
   /**
    * Signs a transaction input
-   * @param {TransactionBuilder} transaction - the transaction to sign
-   * @param {number} inputIndex - the input on the transaction to sign
+   * @param transaction - the transaction to sign
+   * @param inputIndex - the input on the transaction to sign
    * @private
    * @ignore
    */
