@@ -20,7 +20,7 @@ import { GaiaHubConfig } from '../storage/hub'
 import { protocolEchoReplyDetection } from './protocolEchoDetection'
 import { launchCustomProtocol } from './protocolLaunch'
 
-
+/** @ignore */
 const DEFAULT_PROFILE = {
   '@type': 'Person',
   '@context': 'http://schema.org'
@@ -43,8 +43,12 @@ export interface UserData {
 
 /**
  * Check if a user is currently signed in.
- * @method isUserSignedIn
- * @return {Boolean} `true` if the user is signed in, `false` if not.
+ * @return `true` if the user is signed in, `false` if not.
+ * 
+ * @deprecated v19
+ * 
+ * Use [[UserSession.isUserSignedIn]] instead.
+ * 
  */
 export function isUserSignedIn() {
   console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in '
@@ -60,21 +64,27 @@ export function isUserSignedIn() {
  *
  * Please note that this requires that the web browser properly handles the
  * `blockstack:` URL protocol handler.
- *
+ * 
  * Most applications should use this
  * method for sign in unless they require more fine grained control over how the
  * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
- *
- * @param {String} [redirectURI=`${window.location.origin}/`]
+ * use [[makeAuthRequest]] and [[redirectToSignInWithAuthRequest]] to build your 
+ * own sign in process.
+ * 
+ * @param redirectURI Defaults to `${window.location.origin}/`
  * The location to which the identity provider will redirect the user after
  * the user approves sign in.
- * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
+ * @param manifestURI Defaults to `${window.location.origin}/manifest.json`
  * Location of the manifest file.
- * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
+ * @param scopes Defaults to requesting write access to
  * this app's data store.
  * An array of strings indicating which permissions this app is requesting.
- * @return {void}
+ * 
+ * 
+ * @deprecated v19
+ * 
+ * Use [[UserSession.redirectToSignIn]] instead.
+ * 
  */
 export function redirectToSignIn(redirectURI?: string, 
                                  manifestURI?: string, 
@@ -116,9 +126,14 @@ export function getAuthResponseToken(): string {
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
 
-/**
+/** 
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
- * @return {Object} User data object.
+ * @return User data object.
+ * 
+ * @deprecated v19
+ * 
+ * See the [[UserSession.loadUserData]] instead.
+ * 
  */
 export function loadUserData() {
   console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
@@ -133,6 +148,7 @@ export function loadUserData() {
  * @param  redirectURL
  * Location to redirect user to after sign out. 
  * Only used in environments with `window` available
+ * @ignore
  */
 export function signUserOut(redirectURL?: string, caller?: UserSession) {
   const userSession = caller || new UserSession()

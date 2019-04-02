@@ -5,6 +5,9 @@ import { Person } from './person'
 import { getTokenFileUrl } from '../profileZoneFiles'
 import { extractProfile } from '../profileTokens'
 
+/**
+ * @ignore
+ */
 export function resolveZoneFileToPerson(
   zoneFile: any, 
   publicKeyOrAddress: string, 

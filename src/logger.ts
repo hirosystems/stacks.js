@@ -1,5 +1,6 @@
 import { config } from './config'
 
+/** @ignore */
 export const levels = [
   'debug',
   'info',
@@ -8,7 +9,9 @@ export const levels = [
   'none'
 ]
 
+/** @ignore */
 const levelToInt: {[level: string]: number} = {}
+/** @ignore */
 const intToLevel: {[int: number]: string} = {}
 
 for (let index = 0; index < levels.length; index++) {
@@ -17,6 +20,9 @@ for (let index = 0; index < levels.length; index++) {
   intToLevel[index] = level
 }
 
+/**
+* @ignore
+*/
 export class Logger {
   static error(message: string) {
     if (!this.shouldLog('error')) return

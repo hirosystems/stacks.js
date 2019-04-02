@@ -2,6 +2,7 @@
 import cheerio from 'cheerio'
 import { Service } from './service'
 
+/** @ignore */
 class Instagram extends Service {
   static getBaseUrls() {
     const baseUrls = ['https://www.instagram.com/', 'https://instagram.com/']

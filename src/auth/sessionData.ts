@@ -3,22 +3,26 @@ import { GaiaHubConfig } from '../storage/hub'
 import { InvalidStateError } from '../errors'
 import { UserData } from './authApp'
 
+/** @ignore */
 const SESSION_VERSION = '1.0.0'
 
-export type SessionOptions = {
-  appPrivateKey?: string,
-  username?: string,
-  identityAddress?: string,
-  coreNode?: string,
-  hubUrl?: string,
-  userData?: UserData,
-  transitKey?: string,
-  localStorageKey?: string,
+export interface SessionOptions {
+  appPrivateKey?: string;
+  username?: string;
+  identityAddress?: string;
+  coreNode?: string;
+  hubUrl?: string;
+  userData?: UserData;
+  transitKey?: string;
+  localStorageKey?: string;
   storeOptions?: {
-    localStorageKey?: string
+    localStorageKey?: string;
   }
 }
 
+/**
+ * @ignore
+ */
 export class SessionData {
   version: string
 

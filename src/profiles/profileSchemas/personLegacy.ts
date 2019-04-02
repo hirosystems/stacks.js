@@ -1,3 +1,6 @@
+/**
+ * @ignore
+ */
 function formatAccount(serviceName: string, data: any) {
   let proofUrl
   if (data.proof && data.proof.url) {
@@ -12,6 +15,9 @@ function formatAccount(serviceName: string, data: any) {
   }
 }
 
+/**
+ * @ignore
+ */
 export function getPersonFromLegacyFormat(profile: any) {
   const profileData: {
     ['@type']: string, 

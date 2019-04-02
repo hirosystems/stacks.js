@@ -6,17 +6,26 @@ import bip32, { BIP32 } from 'bip32'
 import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 
+/** @ignore */
 const APPS_NODE_INDEX = 0
+/** @ignore */
 const IDENTITY_KEYCHAIN = 888
+/** @ignore */
 const BLOCKSTACK_ON_BITCOIN = 0
 
+/** @ignore */
 const BITCOIN_BIP_44_PURPOSE = 44
+/** @ignore */
 const BITCOIN_COIN_TYPE = 0
+/** @ignore */
 const BITCOIN_ACCOUNT_INDEX = 0
 
+/** @ignore */
 const EXTERNAL_ADDRESS = 'EXTERNAL_ADDRESS'
+/** @ignore */
 const CHANGE_ADDRESS = 'CHANGE_ADDRESS'
 
+/** @ignore */
 export type IdentityKeyPair = {
   key: string,
   keyID: string,
@@ -25,6 +34,7 @@ export type IdentityKeyPair = {
   salt: string
 }
 
+/** @ignore */
 function hashCode(string: string) {
   let hash = 0
   if (string.length === 0) return hash
@@ -36,20 +46,25 @@ function hashCode(string: string) {
   return hash & 0x7fffffff
 }
 
+/** @ignore */
 function getNodePrivateKey(node: BIP32): string {
   return ecPairToHexString(ECPair.fromPrivateKey(node.privateKey))
 }
 
+/** @ignore */
 function getNodePublicKey(node: BIP32): string {
   return node.publicKey.toString('hex')
 }
 
 /**
- * The BlockstackWallet class manages the hierarchical derivation
- *  paths for a standard blockstack client wallet. This includes paths
- *  for bitcoin payment address, blockstack identity addresses, blockstack
- *  application specific addresses.
- *  @private
+ * The `BlockstackWallet` class manages the hierarchical derivation
+ * paths for a standard Blockstack client wallet. This includes paths
+ * for Bitcoin payment address, Blockstack identity addresses, Blockstack
+ * application specific addresses.
+ * 
+ * @private
+ * 
+ * @ignore
  */
 export class BlockstackWallet {
   rootNode: BIP32
@@ -63,7 +78,7 @@ export class BlockstackWallet {
   }
 
   /**
-   * Initialize a blockstack wallet from a seed buffer
+   * Initialize a Blockstack wallet from a seed buffer
    * @param {Buffer} seed - the input seed for initializing the root node
    *  of the hierarchical wallet
    * @return {BlockstackWallet} the constructed wallet
@@ -73,7 +88,7 @@ export class BlockstackWallet {
   }
 
   /**
-   * Initialize a blockstack wallet from a base58 string
+   * Initialize a Blockstack wallet from a base58 string
    * @param {string} keychain - the Base58 string used to initialize
    *  the root node of the hierarchical wallet
    * @return {BlockstackWallet} the constructed wallet
@@ -88,6 +103,8 @@ export class BlockstackWallet {
    * @param {string} data - The encrypted phrase as a hex-encoded string
    * @param {string} password - The plain password
    * @return {Promise<BlockstackWallet>} the constructed wallet
+   * 
+   * @ignore
    */
   static fromEncryptedMnemonic(data: string, password: string) {
     return decryptMnemonic(data, password)

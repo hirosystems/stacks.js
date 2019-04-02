@@ -4,12 +4,16 @@ import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
 
+/**
+ *  @ignore
+ */
 export const BLOCKSTACK_HANDLER = 'blockstack'
+
 /**
  * Time
  * @private
+ * @ignore
  */
-
 export function nextYear() {
   return new Date(
     new Date().setFullYear(
@@ -18,6 +22,9 @@ export function nextYear() {
   )
 }
 
+/**
+ * @ignore
+ */
 export function nextMonth() {
   return new Date(
     new Date().setMonth(
@@ -26,6 +33,9 @@ export function nextMonth() {
   )
 }
 
+/**
+ * @ignore
+ */
 export function nextHour() {
   return new Date(
     new Date().setHours(
@@ -37,6 +47,7 @@ export function nextHour() {
 /**
  * Query Strings
  * @private
+ * @ignore
  */
 
 export function updateQueryStringParameter(uri: string, key: string, value: string) {
@@ -55,6 +66,7 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  * @param {string} v2 - right half of the version inequality
  * @returns {bool} iff v1 >= v2
  * @private
+ * @ignore
  */
 
 export function isLaterVersion(v1: string, v2: string) {
@@ -80,6 +92,9 @@ export function isLaterVersion(v1: string, v2: string) {
   return true
 }
 
+/**
+ * @ignore
+ */
 export function hexStringToECPair(skHex: string) {
   const ecPairOptions = {
     network: config.network.layer1,
@@ -100,6 +115,10 @@ export function hexStringToECPair(skHex: string) {
   }
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function ecPairToHexString(secretKey: ECPair) {
   const ecPointHex = secretKey.privateKey.toString('hex')
   if (secretKey.compressed) {
@@ -109,6 +128,9 @@ export function ecPairToHexString(secretKey: ECPair) {
   }
 }
 
+/**
+ * @ignore
+ */
 export function ecPairToAddress(keyPair: ECPair) {
   return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
 }
@@ -116,8 +138,8 @@ export function ecPairToAddress(keyPair: ECPair) {
 /**
  * UUIDs
  * @private
+ * @ignore
  */
-
 export function makeUUID4() {
   let d = new Date().getTime()
   if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -136,6 +158,7 @@ export function makeUUID4() {
  * @param  {[type]}  uri2 second uri to check
  * @return {Boolean} true if they pass the same origin check
  * @private
+ * @ignore
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
   const parsedUri1 = url.parse(uri1)
@@ -164,7 +187,7 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
  * @hidden
  */
 export function checkWindowAPI(fnDesc: string, name: string) {
-  const api = typeof window !== 'undefined' && window[name]
+  const api = typeof window !== 'undefined' && (window as any)[name]
   if (!api) {
     const errMsg = `\`${fnDesc}\` uses the \`window.${name}\` API which is `
       + ' not available in the current environment.'

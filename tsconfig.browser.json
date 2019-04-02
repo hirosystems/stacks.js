@@ -3,7 +3,8 @@
     "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "sourceMap": true
   },
   "include": [

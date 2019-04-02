@@ -20,12 +20,48 @@ import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
 
-export type PutFileOptions = {
-  encrypt?: boolean | string,
-  sign?: boolean,
-  contentType?: string
+export interface PutFileOptions {
+  /**
+   * Encrypt the data with the app private key
+   * or the provided public key.
+   */
+  encrypt?: boolean | string;
+  /**
+   * Sign the data using ECDSA on SHA256 hashes with
+   * the app private key.
+   */
+  sign?: boolean;
+  contentType?: string;
 }
 
+export interface GetFileOptions {
+  /**
+   * Try to decrypt the data with the app private key
+   */
+  decrypt?: boolean;
+  /**
+   * Whether the content should be verified, only to be used
+   * when `putFile` was set to `sign = true`
+   */
+  verify?: boolean;
+  /**
+   * The Blockstack ID to lookup for multi-player storage
+   */
+  username?: string;
+  /**
+   * The app to lookup for multi-player storage -
+   * defaults to current origin
+   */
+  app?: string;
+  /**
+   * The URL
+   * to use for zonefile lookup. If falsey, this will use the
+   * blockstack.js's getNameInfo function instead.
+   */
+  zoneFileLookupURL?: string;
+}
+
+/** @ignore */
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
 /**
@@ -67,11 +103,11 @@ export async function getUserAppFileUrl(
 
 /**
  * Encrypts the data provided with the app public key.
- * @param {String|Buffer} content - data to encrypt
- * @param {Object} [options=null] - options object
- * @param {String} options.publicKey - the hex string of the ECDSA public
+ * @param content data to encrypt
+ * @param options options object
+ * @param options.publicKey the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPublicKey.
- * @return {String} Stringified ciphertext object
+ * @return Stringified ciphertext object
  */
 export function encryptContent(
   content: string | Buffer,
@@ -90,13 +126,13 @@ export function encryptContent(
 }
 
 /**
- * Decrypts data encrypted with `encryptContent` with the
+ * Decrypts data encrypted with [[encryptContent]] with the
  * transit private key.
- * @param {String|Buffer} content - encrypted content.
- * @param {Object} [options=null] - options object
- * @param {String} options.privateKey - the hex string of the ECDSA private
+ * @param content encrypted content.
+ * @param options options object
+ * @param options.privateKey the hex string of the ECDSA private
  * key to use for decryption. If not provided, will use user's appPrivateKey.
- * @return {String|Buffer} decrypted content.
+ * @return decrypted content.
  */
 export function decryptContent(
   content: string,
@@ -126,6 +162,7 @@ export function decryptContent(
 /* Get the gaia address used for servicing multiplayer reads for the given
  * (username, app) pair.
  * @private
+ * @ignore
  */
 async function getGaiaAddress(
   app: string, username?: string, zoneFileLookupURL?: string,
@@ -153,6 +190,8 @@ async function getGaiaAddress(
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
+ * 
+ * @ignore
  */
 function normalizeOptions<T>(
   options?: {
@@ -176,15 +215,15 @@ function normalizeOptions<T>(
 
 /**
  * Get the URL for reading a file from an app's data store.
- * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {String} options.app - the app to lookup for multi-player storage -
+ * @param path the path to the file to read
+ * @param options options object
+ * @param options.username the Blockstack ID to lookup for multi-player storage
+ * @param options.app the app to lookup for multi-player storage -
  * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
+ * @param options.zoneFileLookupURL The URL
  * to use for zonefile lookup. If falsey, this will use the
  * blockstack.js's getNameInfo function instead.
- * @returns {Promise<string>} that resolves to the URL or rejects with an error
+ * @returns resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
   path: string, 
@@ -215,6 +254,7 @@ export async function getFileUrl(
 /* Handle fetching the contents from a given path. Handles both
  *  multi-player reads and reads from own storage.
  * @private
+ * @ignore
  */
 function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
@@ -246,10 +286,12 @@ function getFileContents(path: string, app: string, username: string | undefined
     })
 }
 
-/* Handle fetching an unencrypted file, its associated signature
- *  and then validate it. Handles both multi-player reads and reads
- *  from own storage.
+/**
+ * Handle fetching an unencrypted file, its associated signature
+ * and then validate it. Handles both multi-player reads and reads
+ * from own storage.
  * @private
+ * @ignore
  */
 function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
   username?: string | null;
@@ -309,11 +351,13 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
 }
 
 
-/* Handle signature verification and decryption for contents which are
- *  expected to be signed and encrypted. This works for single and
- *  multiplayer reads. In the case of multiplayer reads, it uses the
- *  gaia address for verification of the claimed public key.
+/** 
+ * Handle signature verification and decryption for contents which are
+ * expected to be signed and encrypted. This works for single and
+ * multiplayer reads. In the case of multiplayer reads, it uses the
+ * gaia address for verification of the claimed public key.
  * @private
+ * @ignore
  */
 function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
                                        app: string, username?: string, zoneFileLookupURL?: string) {
@@ -367,47 +411,23 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   })
 }
 
-export type GetFileOptions = {
-  decrypt?: boolean,
-  verify?: boolean,
-  username?: string | null,
-  app?: string | null,
-  zoneFileLookupURL?: string | null
-}
-
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {Boolean} options.verify - Whether the content should be verified, only to be used
- * when `putFile` was set to `sign = true`
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
 export function getFile(
   path: string, 
-  options?: {
-    decrypt?: boolean;
-    verify?: boolean;
-    username?: string;
-    app?: string;
-    zoneFileLookupURL?: string;
-  },
+  options?: GetFileOptions,
   caller?: UserSession
 ) {
   const defaults = {
     decrypt: true,
     verify: false,
-    username: null,
+    username: null as string,
     app: typeof window !== 'undefined' ? window.location.origin : undefined,
-    zoneFileLookupURL: null
+    zoneFileLookupURL: null as string
   }
   const opt = Object.assign({}, defaults, options)
 
@@ -448,12 +468,6 @@ export function getFile(
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
- * @param {Object} [options=null] - options object
- * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
- *                                                  or the provided public key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
- *                                         the app private key
- * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
@@ -576,6 +590,7 @@ export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
  *  value, then the loop stops.  If it returns a truthy value, the loop continues.
  * @returns {Promise} that resolves to the number of files listed.
  * @private
+ * @ignore
  */
 function listFilesLoop(hubConfig: GaiaHubConfig,
                        page: string | null,

@@ -2,6 +2,9 @@
 
 import { config } from '../config'
 
+/**
+* @ignore
+*/
 function isNameValid(fullyQualifiedName: string = '') {
   const NAME_PART_RULE = /^[a-z0-9\-_+]+$/
   const LENGTH_MAX_NAME = 37
@@ -27,6 +30,9 @@ function isNameValid(fullyQualifiedName: string = '') {
   )
 }
 
+/**
+* @ignore
+*/
 function isNamespaceValid(namespaceID: string) {
   const NAMESPACE_RULE = /^[a-z0-9\-_]{1,19}$/
   return Promise.resolve(
@@ -34,6 +40,9 @@ function isNamespaceValid(namespaceID: string) {
   )
 }
 
+/**
+* @ignore
+*/
 function isNameAvailable(fullyQualifiedName: string) {
   return config.network.getNameInfo(fullyQualifiedName)
     .then(() => false)
@@ -46,6 +55,9 @@ function isNameAvailable(fullyQualifiedName: string) {
     })
 }
 
+/**
+* @ignore
+*/
 function isNamespaceAvailable(namespaceID: string) {
   return config.network.getNamespaceInfo(namespaceID)
     .then(() => false)
@@ -58,6 +70,9 @@ function isNamespaceAvailable(namespaceID: string) {
     })
 }       
 
+/**
+* @ignore
+*/
 function ownsName(fullyQualifiedName: string, ownerAddress: string) {
   return config.network.getNameInfo(fullyQualifiedName)
     .then(nameInfo => nameInfo.address === ownerAddress)
@@ -70,6 +85,9 @@ function ownsName(fullyQualifiedName: string, ownerAddress: string) {
     })
 }
 
+/**
+* @ignore
+*/
 function revealedNamespace(namespaceID: string, revealAddress: string) {
   return config.network.getNamespaceInfo(namespaceID)
     .then(namespaceInfo => namespaceInfo.recipient_address === revealAddress)
@@ -82,6 +100,9 @@ function revealedNamespace(namespaceID: string, revealAddress: string) {
     })
 }
 
+/**
+* @ignore
+*/
 function namespaceIsReady(namespaceID: string) {
   return config.network.getNamespaceInfo(namespaceID)
     .then(namespaceInfo => namespaceInfo.ready)
@@ -94,6 +115,9 @@ function namespaceIsReady(namespaceID: string) {
     })
 }
 
+/**
+* @ignore
+*/
 function namespaceIsRevealed(namespaceID: string) {
   return config.network.getNamespaceInfo(namespaceID)
     .then(namespaceInfo => !namespaceInfo.ready)
@@ -106,6 +130,9 @@ function namespaceIsRevealed(namespaceID: string) {
     })
 }
 
+/**
+* @ignore
+*/
 function isInGracePeriod(fullyQualifiedName: string) {
   const network = config.network
   return Promise.all([network.getNameInfo(fullyQualifiedName),
@@ -124,17 +151,26 @@ function isInGracePeriod(fullyQualifiedName: string) {
     })
 }
 
+/**
+* @ignore
+*/
 function addressCanReceiveName(address: string) {
   return config.network.getNamesOwned(address)
     .then(names => (Promise.all(names.map(name => isNameValid(name)))
       .then(validNames => validNames.filter(nameValid => nameValid).length < 25)))
 }
 
+/**
+* @ignore
+*/
 function isAccountSpendable(address: string, tokenType: string, blockHeight: number) {
   return config.network.getAccountStatus(address, tokenType)
     .then(accountStatus => accountStatus.transfer_send_block_id >= blockHeight)
 }
 
+/**
+ * @ignore
+ */
 export const safety = {
   addressCanReceiveName,
   isInGracePeriod,

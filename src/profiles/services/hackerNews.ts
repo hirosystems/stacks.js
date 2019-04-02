@@ -2,6 +2,7 @@
 import cheerio from 'cheerio'
 import { Service } from './service'
 
+/** @ignore */
 class HackerNews extends Service {
   static getBaseUrls() {
     const baseUrls = [

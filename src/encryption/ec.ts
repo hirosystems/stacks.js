@@ -4,8 +4,10 @@ import BN from 'bn.js'
 import crypto from 'crypto'
 import { getPublicKeyFromPrivate } from '../keys'
 
+/** @ignore */
 const ecurve = new EllipticCurve('secp256k1')
 
+/** @ignore */
 export type CipherObject = {
   iv: string,
   ephemeralPK: string,
@@ -14,20 +16,24 @@ export type CipherObject = {
   wasString: boolean
 }
 
+/** @ignore */
 function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer) {
   const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
   return Buffer.concat([cipher.update(plaintext), cipher.final()])
 }
 
+/** @ignore */
 function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
   const cipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
   return Buffer.concat([cipher.update(ciphertext), cipher.final()])
 }
 
+/** @ignore */
 function hmacSha256(key: Buffer, content: Buffer) {
   return crypto.createHmac('sha256', key).update(content).digest()
 }
 
+/** @ignore */
 function equalConstTime(b1: Buffer, b2: Buffer) {
   if (b1.length !== b2.length) {
     return false
@@ -39,6 +45,7 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
   return res === 0
 }
 
+/** @ignore */
 function sharedSecretToKeys(sharedSecret: Buffer) {
   // generate mac and encryption key from shared secret
   const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
@@ -48,6 +55,7 @@ function sharedSecretToKeys(sharedSecret: Buffer) {
   }
 }
 
+/** @ignore */
 export function getHexFromBN(bnInput: BN) {
   const hexOut = bnInput.toString('hex')
 
@@ -71,7 +79,9 @@ export function getHexFromBN(bnInput: BN) {
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- *  @private
+ * 
+ * @private
+ * @ignore
  */
 export function encryptECIES(publicKey: string, content: string | Buffer): CipherObject {
   const isString = (typeof (content) === 'string')
@@ -119,6 +129,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
  * @return {Buffer} plaintext
  * @throws {Error} if unable to decrypt
  * @private
+ * @ignore
  */
 export function decryptECIES(privateKey: string, cipherObject: CipherObject): Buffer | string {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
@@ -152,13 +163,14 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
 
 /**
  * Sign content using ECDSA
- * @private
+ *
  * @param {String} privateKey - secp256k1 private key hex string
  * @param {Object} content - content to sign
  * @return {Object} contains:
  * signature - Hex encoded DER signature
  * public key - Hex encoded private string taken from privateKey
  * @private
+ * @ignore
  */
 export function signECDSA(privateKey: string, content: string | Buffer): { 
   publicKey: string, signature: string 
@@ -176,6 +188,9 @@ export function signECDSA(privateKey: string, content: string | Buffer): {
   }
 }
 
+/**
+* @ignore
+*/
 function getBuffer(content: string | ArrayBuffer | Buffer) {
   if (content instanceof Buffer) return content
   else if (content instanceof ArrayBuffer) return Buffer.from(content)
@@ -189,6 +204,7 @@ function getBuffer(content: string | ArrayBuffer | Buffer) {
  * @param {String} signature - Hex encoded DER signature
  * @return {Boolean} returns true when signature matches publickey + content, false if not
  * @private
+ * @ignore
  */
 export function verifyECDSA(content: string | ArrayBuffer | Buffer,
                             publicKey: string,

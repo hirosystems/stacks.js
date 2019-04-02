@@ -21,9 +21,14 @@ import { InvalidAmountError, InvalidParameterError } from '../errors'
 import { TransactionSigner, PubkeyHashSigner } from './signers'
 import { UTXO } from '../network'
 
+/** @ignore */
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+/** @ignore */
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
 
+/**
+* @ignore
+*/
 function addOwnerInput(utxos: UTXO[],
                        ownerAddress: string,
                        txB: bitcoinjs.TransactionBuilder,
@@ -43,6 +48,9 @@ function addOwnerInput(utxos: UTXO[],
   return { index: ownerInput, value: ownerUTXO.value }
 }
 
+/**
+* @ignore
+*/
 function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: string,
                          utxos: UTXO[],
                          feeRate: number, inAmounts: number, changeIndex: number | null = null
@@ -60,6 +68,9 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
   return txB
 }
 
+/**
+* @ignore
+*/
 function returnTransactionHex(txB: bitcoinjs.TransactionBuilder,
                               buildIncomplete: boolean = false
 ) {
@@ -70,6 +81,9 @@ function returnTransactionHex(txB: bitcoinjs.TransactionBuilder,
   }
 }
 
+/**
+* @ignore
+*/
 function getTransactionSigner(input: string | TransactionSigner): TransactionSigner {
   if (typeof input === 'string') {
     return PubkeyHashSigner.fromHexString(input)
@@ -91,6 +105,7 @@ function getTransactionSigner(input: string | TransactionSigner): TransactionSig
  *    Even though this is a change output, the payer must supply enough funds
  *    to generate this output, so we include it in the cost.
  * @private
+ * @ignore
  */
 function estimatePreorder(fullyQualifiedName: string,
                           destinationAddress: string,
@@ -125,6 +140,7 @@ function estimatePreorder(fullyQualifiedName: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost to fund
  *    the register.
  * @private
+ * @ignore
  */
 function estimateRegister(fullyQualifiedName: string,
                           registerAddress: string,
@@ -162,6 +178,7 @@ function estimateRegister(fullyQualifiedName: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost to fund
  *    the update.
  * @private
+ * @ignore
  */
 function estimateUpdate(fullyQualifiedName: string,
                         ownerAddress: string,
@@ -195,6 +212,7 @@ function estimateUpdate(fullyQualifiedName: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost to fund
  *    the transfer.
  * @private
+ * @ignore
  */
 function estimateTransfer(fullyQualifiedName: string,
                           destinationAddress: string,
@@ -230,6 +248,7 @@ function estimateTransfer(fullyQualifiedName: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost to fund
  *    the transfer.
  * @private
+ * @ignore
  */
 function estimateRenewal(fullyQualifiedName: string,
                          destinationAddress: string,
@@ -271,6 +290,7 @@ function estimateRenewal(fullyQualifiedName: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost to fund the
  *    revoke.
  * @private
+ * @ignore
  */
 function estimateRevoke(fullyQualifiedName: string,
                         ownerAddress: string,
@@ -303,6 +323,7 @@ function estimateRevoke(fullyQualifiedName: string,
  *    Even though this is a change output, the payer must supply enough funds
  *    to generate this output, so we include it in the cost.
  * @private
+ * @ignore
  */
 function estimateNamespacePreorder(namespaceID: string,
                                    revealAddress: string,
@@ -339,6 +360,7 @@ function estimateNamespacePreorder(namespaceID: string,
  *    preorder.  Even though this is a change output, the payer must have
  *    enough funds to generate this output, so we include it in the cost.
  * @private
+ * @ignore
  */
 function estimateNamespaceReveal(namespace: BlockstackNamespace,
                                  revealAddress: string,
@@ -365,6 +387,7 @@ function estimateNamespaceReveal(namespace: BlockstackNamespace,
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this namespacey-ready transaction.
  * @private
+ * @ignore
  */
 function estimateNamespaceReady(namespaceID: string,
                                 revealUtxos: number = 1
@@ -390,6 +413,7 @@ function estimateNamespaceReady(namespaceID: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this name-import transaction
  * @private
+ * @ignore
  */
 function estimateNameImport(name: string,
                             recipientAddr: string,
@@ -415,6 +439,7 @@ function estimateNameImport(name: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost
  *  to fund this announce transaction
  * @private
+ * @ignore
  */
 function estimateAnnounce(messageHash: string,
                           senderUtxos: number = 1
@@ -444,6 +469,7 @@ function estimateAnnounce(messageHash: string,
  * @returns {Promise} - a promise which resolves to the satoshi cost to
  *  fund this token-transfer transaction
  * @private
+ * @ignore
  */
 function estimateTokenTransfer(recipientAddress: string,
                                tokenType: string,
@@ -478,6 +504,7 @@ function estimateTokenTransfer(recipientAddress: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * @ignore
  */
 function makePreorder(fullyQualifiedName: string,
                       destinationAddress: string,
@@ -534,6 +561,7 @@ function makePreorder(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * @ignore
  */
 function makeUpdate(fullyQualifiedName: string,
                     ownerKeyIn: string | TransactionSigner,
@@ -609,6 +637,7 @@ function makeUpdate(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * @ignore
  */
 function makeRegister(fullyQualifiedName: string,
                       registerAddress: string,
@@ -665,6 +694,7 @@ function makeRegister(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * @ignore
  */
 function makeTransfer(fullyQualifiedName: string,
                       destinationAddress: string,
@@ -719,6 +749,7 @@ function makeTransfer(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * @ignore
  */
 function makeRevoke(fullyQualifiedName: string,
                     ownerKeyIn: string | TransactionSigner,
@@ -771,6 +802,7 @@ function makeRevoke(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * @ignore
  */
 function makeRenewal(fullyQualifiedName: string,
                      destinationAddress: string,
@@ -845,6 +877,8 @@ function makeRenewal(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * 
+ * @ignore
  */
 function makeNamespacePreorder(namespaceID: string,
                                revealAddress: string,
@@ -892,6 +926,7 @@ function makeNamespacePreorder(namespaceID: string,
  *   this function *does not* perform the requisite safety checks -- please see
  *   the safety module for those.
  * @private
+ * @ignore
  */
 function makeNamespaceReveal(namespace: BlockstackNamespace,
                              revealAddress: string,
@@ -935,6 +970,7 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
  *  this function *does not* perform the requisite safety checks -- please see
  *  the safety module for those.
  * @private
+ * @ignore
  */
 function makeNamespaceReady(namespaceID: string,
                             revealKeyIn: string | TransactionSigner,
@@ -972,6 +1008,7 @@ function makeNamespaceReady(namespaceID: string,
  * this function does not perform the requisite safety checks -- please see
  * the safety module for those.
  * @private
+ * @ignore
  */
 function makeNameImport(name: string,
                         recipientAddr: string,
@@ -1010,6 +1047,7 @@ function makeNameImport(name: string,
  * this function does not perform the requisite safety checks -- please see the
  * safety module for those.
  * @private
+ * @ignore
  */
 function makeAnnounce(messageHash: string,
                       senderKeyIn: string | TransactionSigner,
@@ -1051,6 +1089,7 @@ function makeAnnounce(messageHash: string,
  * This function does not perform the requisite safety checks -- please see the
  * safety module for those.
  * @private
+ * @ignore
  */
 function makeTokenTransfer(recipientAddress: string, tokenType: string,
                            tokenAmount: BN, scratchArea: string,
@@ -1117,6 +1156,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
  * transaction. Useful for passing around a TX for multi-sig input signing.
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
+ * @ignore
  */
 function makeBitcoinSpend(destinationAddress: string,
                           paymentKeyIn: string | TransactionSigner,
@@ -1178,6 +1218,7 @@ function makeBitcoinSpend(destinationAddress: string,
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
+/** @ignore */
 export const transactions = {
   makeRenewal,
   makeUpdate,

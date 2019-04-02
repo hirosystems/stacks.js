@@ -6,6 +6,7 @@ import RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 
+/** @ignore */
 export type UTXO = {
   value?: number,
   confirmations?: number,
@@ -13,11 +14,18 @@ export type UTXO = {
   tx_output_n: number
 }
 
+/** @ignore */
 const SATOSHIS_PER_BTC = 1e8
+/** @ignore */
 const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
+/** @ignore */
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
+/** @ignore */
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
+/**
+ * @ignore
+ */
 export class BitcoinNetwork {
   broadcastTransaction(transaction: string): Promise<any> {
     return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
@@ -36,6 +44,9 @@ export class BitcoinNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class BlockstackNetwork {
   blockstackAPIUrl: string
 
@@ -784,16 +795,25 @@ export class BlockstackNetwork {
     return this.broadcastServiceFetchHelper(endpoint, requestBody)
   }
 
+  /**
+   * @ignore
+   */
   getFeeRate(): Promise<number> {
     return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
       .then(resp => resp.json())
       .then(rates => Math.floor(rates.fastestFee))
   }
 
+  /**
+   * @ignore
+   */
   countDustOutputs() {
     throw new Error('Not implemented.')
   }
 
+  /**
+   * @ignore
+   */
   getUTXOs(address: string): Promise<Array<UTXO>> {
     return this.getNetworkedUTXOs(address)
       .then((networkedUTXOs) => {
@@ -826,6 +846,7 @@ export class BlockstackNetwork {
    * @param {String} txHex - the hex-encoded transaction to use
    * @return {void} no return value, this modifies the UTXO config state
    * @private
+   * @ignore
    */
   modifyUTXOSetFrom(txHex: string) {
     const tx = bitcoinjs.Transaction.fromHex(txHex)
@@ -880,6 +901,9 @@ export class BlockstackNetwork {
     this.excludeUtxoSet = []
   }
 
+  /**
+  * @ignore
+  */
   getConsensusHash() {
     return fetch(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
       .then(resp => resp.json())
@@ -890,6 +914,9 @@ export class BlockstackNetwork {
     return this.btc.getTransactionInfo(txHash)
   }
 
+  /**
+   * @ignore
+   */
   getBlockHeight() {
     return this.btc.getBlockHeight()
   }
@@ -899,6 +926,9 @@ export class BlockstackNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork) {
@@ -910,6 +940,9 @@ export class LocalRegtest extends BlockstackNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class BitcoindAPI extends BitcoinNetwork {
   bitcoindUrl: string
 
@@ -1043,6 +1076,9 @@ export class BitcoindAPI extends BitcoinNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class InsightClient extends BitcoinNetwork {
   apiUrl: string
 
@@ -1095,6 +1131,10 @@ export class InsightClient extends BitcoinNetwork {
   }
 }
 
+
+/**
+ * @ignore
+ */
 export class BlockchainInfoApi extends BitcoinNetwork {
   utxoProviderUrl: string
 
@@ -1174,6 +1214,8 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 }
 
+
+/** @ignore */
 const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
   'http://localhost:16269',
@@ -1181,12 +1223,14 @@ const LOCAL_REGTEST = new LocalRegtest(
                   { username: 'blockstack', password: 'blockstacksystem' })
 )
 
+/** @ignore */
 const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org',
   'https://broadcast.blockstack.org',
   new BlockchainInfoApi()
 )
 
+/** @ignore */
 export const network = {
   BlockstackNetwork,
   LocalRegtest,

@@ -9,7 +9,7 @@ import { NoSessionDataError } from '../errors'
 
 /**
  * An abstract class representing the SessionDataStore interface.
- * @type {SessionData}
+ * @ignore
  */
 export class SessionDataStore {
   constructor(sessionOptions?: SessionOptions) {
@@ -36,7 +36,7 @@ export class SessionDataStore {
 
 /**
  * Stores session data in the instance of this class.
- * @type {InstanceDataStore}
+ * @ignore
  */
 export class InstanceDataStore extends SessionDataStore {
   sessionData?: SessionData
@@ -69,7 +69,7 @@ export class InstanceDataStore extends SessionDataStore {
 
 /**
  * Stores session data in browser a localStorage entry.
- * @type {LocalStorageStore}
+ * @ignore
  */
 export class LocalStorageStore extends SessionDataStore {
   key: string

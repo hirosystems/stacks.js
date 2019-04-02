@@ -6,6 +6,7 @@ import { HackerNews } from './hackerNews'
 import { LinkedIn } from './linkedIn'
 import { Service } from './service'
 
+/** @ignore */
 interface ValidateProofService {
   validateProof(proof: any, ownerAddress: string, name?: string): Promise<any>;
   getProofUrl(proof: any): string;
@@ -14,6 +15,7 @@ interface ValidateProofService {
   getProofIdentity(searchText: string): string;
 }
 
+/** @ignore */
 export const profileServices: {
   [serviceName: string]: Service & ValidateProofService
 } = {

@@ -11,6 +11,7 @@ import { Logger } from '../logger'
  * @param {String} failCallback
  * The callback that is invoked when the protocol handler was not detected. 
  * @return {void}
+ * @ignore
  */
 export function launchCustomProtocol(
   authRequest: string, 
@@ -172,7 +173,7 @@ export function launchCustomProtocol(
  * https://github.com/Microsoft/TypeScript/blob/master/src/lib/dom.generated.d.ts
  * https://github.com/Microsoft/TypeScript/blob/master/CONTRIBUTING.md#modifying-generated-library-files
  * https://github.com/Microsoft/TSJS-lib-generator#contribution-guidelines
- * 
+ * @ignore
  */
 interface CssStyle extends CSSStyleDeclaration {
   /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/all */

@@ -5,6 +5,7 @@ import { signProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'
 import { makeProfileZoneFile } from './profileZoneFiles'
 
+/** @ignore */
 const schemaDefinition: {[key: string]: any} = {
   type: 'object',
   properties: {
@@ -12,7 +13,15 @@ const schemaDefinition: {[key: string]: any} = {
     '@type': { type: 'string' }
   }
 }
-
+ 
+/**
+ * Represents a user profile
+ * 
+ * 
+ * ## How to work with Profiles
+ * 
+ * [[include:profiles.md]]
+ */
 export class Profile {
   _profile: {[key: string]: any}
 

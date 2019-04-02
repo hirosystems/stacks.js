@@ -11,13 +11,9 @@ import { Logger } from '../logger'
 import { DEFAULT_SCOPE } from './authConstants'
 import { UserSession } from './userSession'
 
-
+/** @ignore */
 const VERSION = '1.3.1'
 
-type AuthMetadata = {
-  email?: string,
-  profileUrl?: string
-}
 
 /**
  * Generates a ECDSA keypair to
@@ -25,6 +21,7 @@ type AuthMetadata = {
  * @param {SessionData} session - session object in which key will be stored
  * @return {String} the hex encoded private key
  * @private
+ * @ignore
  */
 export function generateTransitKey() {
   const transitKey = makeECPrivateKey()
@@ -35,23 +32,23 @@ export function generateTransitKey() {
 /**
  * Generates an authentication request that can be sent to the Blockstack
  * browser for the user to approve sign in. This authentication request can
- * then be used for sign in by passing it to the `redirectToSignInWithAuthRequest`
+ * then be used for sign in by passing it to the [[redirectToSignInWithAuthRequest]]
  * method.
  *
- * *Note: This method should only be used if you want to roll your own authentication
- * flow. Typically you'd use `redirectToSignIn` which takes care of this
- * under the hood.*
+ * *Note*: This method should only be used if you want to use a customized authentication
+ * flow. Typically, you'd use [[redirectToSignIn]] which takes care of this
+ * under the hood.
  *
- * @param  {String} transitPrivateKey - hex encoded transit private key
- * @param {String} redirectURI - location to redirect user to after sign in approval
- * @param {String} manifestURI - location of this app's manifest file
- * @param {Array<String>} scopes - the permissions this app is requesting
- * @param {String} appDomain - the origin of this app
- * @param {Number} expiresAt - the time at which this request is no longer valid
- * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
+ * @param transitPrivateKey - hex-encoded transit key
+ * @param redirectURI - location to redirect user to after sign in approval
+ * @param manifestURI - location of this app's manifest file
+ * @param scopes - the permissions this app is requesting. Defaults to `[store_write]`
+ * @param appDomain - the origin of this app
+ * @param expiresAt - the time at which this request is no longer valid
+ * @param extraParams - Any extra parameters you'd like to pass to the authenticator.
  * Use this to pass options that aren't part of the Blockstack auth spec, but might be supported
  * by special authenticators.
- * @return {String} the authentication request
+ * @return the authentication request
  */
 export function makeAuthRequest(
   transitPrivateKey?: string,
@@ -125,6 +122,7 @@ export function makeAuthRequest(
  * @param  {String} privateKey [description]
  * @return {String} hex encoded ciphertext
  * @private
+ * @ignore
  */
 export function encryptPrivateKey(publicKey: string,
                                   privateKey: string): string | null {
@@ -142,6 +140,7 @@ export function encryptPrivateKey(publicKey: string,
  * @throws {Error} if unable to decrypt
  *
  * @private
+ * @ignore
  */
 export function decryptPrivateKey(privateKey: string,
                                   hexedEncrypted: string): string | null {
@@ -179,11 +178,15 @@ export function decryptPrivateKey(privateKey: string,
  * @param {String} associationToken JWT that binds the app key to the identity key
  * @return {String} signed and encoded authentication response token
  * @private
+ * @ignore
  */
 export function makeAuthResponse(privateKey: string,
                                  profile: {} = {},
                                  username: string = null,
-                                 metadata: AuthMetadata,
+                                 metadata: {
+                                   email?: string,
+                                   profileUrl?: string
+                                 },
                                  coreToken: string = null,
                                  appPrivateKey: string = null,
                                  expiresAt: number = nextMonth().getTime(),

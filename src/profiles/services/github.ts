@@ -1,6 +1,7 @@
 
 import { Service } from './service'
 
+/** @ignore */
 class Github extends Service {
   static getBaseUrls() {
     const baseUrls = ['https://gist.github.com/', 'http://gist.github.com', 'gist.github.com']

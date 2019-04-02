@@ -5,7 +5,8 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "declaration": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "outDir": "lib",
     "sourceMap": true
   },
@@ -13,13 +14,16 @@
     "src",
   ],
   "typedocOptions": {
-    "readme": "src/auth/README.md",
+    "name": "blockstack.js Library Reference",
+    "readme": "overview.md",
+    "includes": "includes",
     "mode": "file",
+    "exclude": "**/src/wallet.ts **/src/encryption/wallet.ts **/src/auth/authMessages.d.ts",
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,
+    "excludeNotExported": false,
     "includeDeclarations": false,
-    "target": "ES6",
     "gitRevision": "master",
     "listInvalidSymbolLinks": true
   }

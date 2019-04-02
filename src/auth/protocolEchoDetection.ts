@@ -5,8 +5,13 @@
  * apps bundle/consume the blockstack.js lib. 
  */ 
 
+/** @ignore */
 const GLOBAL_DETECTION_CACHE_KEY = '_blockstackDidCheckEchoReply'
+
+/** @ignore */
 const ECHO_REPLY_PARAM = 'echoReply'
+
+/** @ignore */
 const AUTH_CONTINUATION_PARAM = 'authContinuation'
 
 /**

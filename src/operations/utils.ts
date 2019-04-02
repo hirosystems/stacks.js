@@ -8,13 +8,25 @@ import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
 
+/**
+ * 
+ * @ignore
+ */
 export const DUST_MINIMUM = 5500
 
+/**
+ * 
+ * @ignore
+ */
 export function hash160(buff: Buffer) {
   const sha256 = bitcoinjs.crypto.sha256(buff)
   return (new RIPEMD160()).update(sha256).digest()
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function hash128(buff: Buffer) {
   return Buffer.from(bitcoinjs.crypto.sha256(buff).slice(0, 16))
 }
@@ -22,16 +34,23 @@ export function hash128(buff: Buffer) {
 
 // COPIED FROM coinselect, because 1 byte matters sometimes.
 // baseline estimates, used to improve performance
+/** @ignore */
 const TX_EMPTY_SIZE = 4 + 1 + 1 + 4
+/** @ignore */
 const TX_INPUT_BASE = 32 + 4 + 1 + 4
+/** @ignore */
 const TX_INPUT_PUBKEYHASH = 107
+/** @ignore */
 const TX_OUTPUT_BASE = 8 + 1
+/** @ignore */
 const TX_OUTPUT_PUBKEYHASH = 25
 
+/** @ignore */
 type txPoint = {
   script: { length: number }
 }
 
+/** @ignore */
 function inputBytes(input: txPoint | null) {
   if (input && input.script && input.script.length > 0) {
     return TX_INPUT_BASE + input.script.length
@@ -40,6 +59,7 @@ function inputBytes(input: txPoint | null) {
   }
 }
 
+/** @ignore */
 function outputBytes(output: txPoint | null) {
   if (output && output.script && output.script.length > 0) {
     return TX_OUTPUT_BASE + output.script.length
@@ -48,16 +68,23 @@ function outputBytes(output: txPoint | null) {
   }
 }
 
+/** @ignore */
 function transactionBytes(inputs: Array<txPoint | null>, outputs: Array<txPoint | null>) {
   return TX_EMPTY_SIZE
     + inputs.reduce((a: number, x: txPoint | null) => (a + inputBytes(x)), 0)
     + outputs.reduce((a: number, x: txPoint | null) => (a + outputBytes(x)), 0)
 }
 
+/**
+ * @ignore
+ */
 export function getTransactionInsideBuilder(txBuilder: bitcoinjs.TransactionBuilder) {
   return <bitcoinjs.Transaction>(<any>txBuilder).__tx
 }
 
+/**
+ * @ignore
+ */
 function getTransaction(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
   if (txIn instanceof bitcoinjs.Transaction) {
     return txIn
@@ -65,8 +92,9 @@ function getTransaction(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuild
   return getTransactionInsideBuilder(txIn)
 }
 
-//
-
+/**
+ * @ignore
+ */
 export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
                                 additionalInputs: number,
                                 additionalOutputs: number) {
@@ -82,11 +110,17 @@ export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.Transact
   return transactionBytes(inputs, outputs)
 }
 
+/**
+ * @ignore
+ */
 export function sumOutputValues(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
   const innerTx = getTransaction(txIn)
   return innerTx.outs.reduce((agg, x) => agg + x.value, 0)
 }
 
+/**
+ * @ignore
+ */
 export function decodeB40(input: string) {
   // treat input as a base40 integer, and output a hex encoding
   // of that integer.
@@ -129,6 +163,7 @@ export function decodeB40(input: string) {
  *    if false, this function will fund _at most_ `amountToFund`
  * @returns {number} - the amount of leftover change (in satoshis)
  * @private
+ * @ignore
  */
 export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
                                utxos: Array<UTXO>,
@@ -177,7 +212,7 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
   }
 }
 
-
+/** @ignore */
 export function signInputs(txB: bitcoinjs.TransactionBuilder,
                            defaultSigner: TransactionSigner,
                            otherSigners?: Array<{index: number, signer: TransactionSigner}>) {
