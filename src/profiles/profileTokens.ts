@@ -27,6 +27,7 @@ export function signProfileToken(profile: any,
     throw new Error('Signing algorithm not supported')
   }
 
+  // TODO: use fast crypto
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
 
   if (!subject) {
@@ -48,6 +49,7 @@ export function signProfileToken(profile: any,
     claim: profile
   }
 
+  // TODO: use fast crypto
   return tokenSigner.sign(payload)
 }
 
@@ -101,6 +103,7 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
   const issuerPublicKey = payload.issuer.publicKey
   const publicKeyBuffer = Buffer.from(issuerPublicKey, 'hex')
 
+  // TODO: use fast crypto
   const compressedKeyPair =  ECPair.fromPublicKey(publicKeyBuffer, { compressed: true })
   const compressedAddress = ecPairToAddress(compressedKeyPair)
   const uncompressedKeyPair = ECPair.fromPublicKey(publicKeyBuffer, { compressed: false })

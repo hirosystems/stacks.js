@@ -106,6 +106,7 @@ export function makeAuthRequest(
   Logger.info(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
+  // TODO: use fast crypto
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
   payload.public_keys = [publicKey]
   const address = publicKeyToAddress(publicKey)
@@ -113,6 +114,7 @@ export function makeAuthRequest(
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
+  // TODO: use fast crypto
   const token = tokenSigner.sign(payload)
 
   return token
@@ -198,6 +200,7 @@ export async function makeAuthResponse(
   associationToken: string = null
 ): Promise<string> {
   /* Convert the private key to a public key to an issuer */
+  // TODO: use fast crypto
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
 
@@ -240,5 +243,6 @@ export async function makeAuthResponse(
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', privateKey)
+  // TODO: use fast crypto
   return tokenSigner.sign(payload)
 }

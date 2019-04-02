@@ -25,6 +25,7 @@ export function makeCoreSessionRequest(appDomain: string,
     thisDevice = '.default'
   }
 
+  // TODO: use fast crypto
   const appPublicKey = SECP256K1Client.derivePublicKey(appPrivateKey)
   const appPublicKeys = [{
     public_key: appPublicKey,
@@ -43,6 +44,7 @@ export function makeCoreSessionRequest(appDomain: string,
 
   // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
+  // TODO: use fast crypto
   const token = tokenSigner.sign(authBody)
 
   return token
