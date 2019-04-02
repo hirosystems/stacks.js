@@ -9,9 +9,17 @@ export async function getWebCrypto(): Promise<Crypto> {
   } else {
     if (webCryptoCached === null) {
       webCryptoCached = (async () => {
-        const { default: WebCrypto } = await import('node-webcrypto-ossl')
-        const webCryptoInstance = new WebCrypto()
-        return webCryptoInstance
+        try {
+          const { default: WebCrypto } = await import('node-webcrypto-ossl')
+          const webCryptoInstance = new WebCrypto()
+          return webCryptoInstance
+        } catch (error) {
+          console.error('The WebCrypto API is not available in this environment, '
+            + 'and the `node-webcrypto-ossl` module could not be imported. If running '
+            + 'within Node environment then ensure the `node-webcrypto-ossl` peer '
+            + 'dependency is installed.')
+          throw error
+        }
       })()
     }
     return webCryptoCached

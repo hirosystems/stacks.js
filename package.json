@@ -156,6 +156,9 @@
     "bitcoin-ts": "github:zone117x/bitcoin-ts#ecdh-support-dist",
     "node-webcrypto-ossl": "^1.0.42"
   },
+  "browser": {
+    "node-webcrypto-ossl": false
+  },
   "engines": {
     "node": ">=8",
     "npm": ">=6"

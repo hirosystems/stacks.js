@@ -22,6 +22,9 @@ module.exports = (env, argv) => {
   return {
     entry: './src/index.ts',
     devtool: "source-map",
+    optimization: {
+      usedExports: true
+    },
     module: {
       rules: [
         {
