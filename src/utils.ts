@@ -164,7 +164,7 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
  * @hidden
  */
 export function checkWindowAPI(fnDesc: string, name: string) {
-  const api = typeof window !== 'undefined' && window[name]
+  const api = typeof window !== 'undefined' && (window as any)[name]
   if (!api) {
     const errMsg = `\`${fnDesc}\` uses the \`window.${name}\` API which is `
       + ' not available in the current environment.'

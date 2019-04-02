@@ -186,10 +186,10 @@ export function runAuthTests() {
       })
   })
 
-  test('makeAuthResponse && verifyAuthResponse', (t) => {
+  test('makeAuthResponse && verifyAuthResponse', async (t) => {
     t.plan(11)
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, null, null)
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, null, null)
     t.ok(authResponse, 'auth response should have been created')
 
     const decodedToken = decodeToken(authResponse)
@@ -225,7 +225,7 @@ export function runAuthTests() {
       })
   })
 
-  test('auth response with username', (t) => {
+  test('auth response with username', async (t) => {
     t.plan(2)
 
     const url = `${nameLookupURL}ryan.id`
@@ -233,7 +233,7 @@ export function runAuthTests() {
 
     FetchMock.get(url, sampleNameRecords.ryan)
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null)
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null)
     // console.log(decodeToken(authResponse))
 
     doPublicKeysMatchUsername(authResponse, nameLookupURL)
@@ -247,7 +247,7 @@ export function runAuthTests() {
       })
   })
 
-  test('auth response with invalid private key', (t) => {
+  test('auth response with invalid private key', async (t) => {
     t.plan(2)
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
@@ -265,7 +265,7 @@ export function runAuthTests() {
     blockstack.store.getSessionData().transitKey = badTransitPrivateKey
     const metadata = { }
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
@@ -292,7 +292,7 @@ export function runAuthTests() {
       })
   })
 
-  test('handlePendingSignIn with authResponseToken', (t) => {
+  test('handlePendingSignIn with authResponseToken', async (t) => {
     t.plan(1)
 
     const url = `${nameLookupURL}ryan.id`
@@ -308,7 +308,7 @@ export function runAuthTests() {
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
@@ -322,7 +322,7 @@ export function runAuthTests() {
       })
   })
 
-  test('handlePendingSignIn 2', (t) => {
+  test('handlePendingSignIn 2', async (t) => {
     t.plan(1)
 
     const url = `${nameLookupURL}ryan.id`
@@ -334,7 +334,7 @@ export function runAuthTests() {
     const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
     const metadata = {}
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
@@ -389,7 +389,7 @@ export function runAuthTests() {
     (<any>global).window = undefined
   })
 
-  test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', (t) => {
+  test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', async (t) => {
     t.plan(2)
 
     const customBlockstackAPIUrl = 'https://test.name.lookups'
@@ -407,7 +407,7 @@ export function runAuthTests() {
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey, undefined, customBlockstackAPIUrl)
 
@@ -426,7 +426,7 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn with authResponseToken, transit key, '
-    + 'Blockstack API URL, and Gaia association token', (t) => {
+    + 'Blockstack API URL, and Gaia association token', async (t) => {
     t.plan(3)
 
     const customBlockstackAPIUrl = 'https://test.name.lookups'
@@ -454,7 +454,7 @@ export function runAuthTests() {
     const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
       .sign(associationTokenClaim)
 
-    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+    const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey, undefined, customBlockstackAPIUrl,
                                           gaiaAssociationToken)

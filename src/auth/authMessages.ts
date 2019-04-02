@@ -6,7 +6,7 @@ import { TokenSigner, SECP256K1Client } from 'jsontokens'
 import { makeECPrivateKey, publicKeyToAddress } from '../keys'
 import { makeUUID4, nextMonth } from '../utils'
 import { makeDIDFromAddress } from '../dids'
-import { encryptECIES, decryptECIES } from '../encryption/ec'
+import { encryptECIES, decryptECIES } from '../encryption/ecFast'
 import { Logger } from '../logger'
 import { DEFAULT_SCOPE } from './authConstants'
 import { UserSession } from './userSession'
@@ -126,9 +126,11 @@ export function makeAuthRequest(
  * @return {String} hex encoded ciphertext
  * @private
  */
-export function encryptPrivateKey(publicKey: string,
-                                  privateKey: string): string | null {
-  const encryptedObj = encryptECIES(publicKey, privateKey)
+export async function encryptPrivateKey(
+  publicKey: string,
+  privateKey: string
+): Promise<string | null> {
+  const encryptedObj = await encryptECIES(publicKey, privateKey)
   const encryptedJSON = JSON.stringify(encryptedObj)
   return (Buffer.from(encryptedJSON)).toString('hex')
 }
@@ -143,11 +145,13 @@ export function encryptPrivateKey(publicKey: string,
  *
  * @private
  */
-export function decryptPrivateKey(privateKey: string,
-                                  hexedEncrypted: string): string | null {
+export async function decryptPrivateKey(
+  privateKey: string,
+  hexedEncrypted: string
+): Promise<string | null> {
   const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
-  const decrypted = decryptECIES(privateKey, encryptedObj)
+  const decrypted = await decryptECIES(privateKey, encryptedObj)
   if (typeof decrypted !== 'string') {
     throw new Error('Unable to correctly decrypt private key')
   } else {
@@ -180,17 +184,19 @@ export function decryptPrivateKey(privateKey: string,
  * @return {String} signed and encoded authentication response token
  * @private
  */
-export function makeAuthResponse(privateKey: string,
-                                 profile: {} = {},
-                                 username: string = null,
-                                 metadata: AuthMetadata,
-                                 coreToken: string = null,
-                                 appPrivateKey: string = null,
-                                 expiresAt: number = nextMonth().getTime(),
-                                 transitPublicKey: string = null,
-                                 hubUrl: string = null,
-                                 blockstackAPIUrl: string = null,
-                                 associationToken: string = null): string {
+export async function makeAuthResponse(
+  privateKey: string,
+  profile: {} = {},
+  username: string = null,
+  metadata: AuthMetadata,
+  coreToken: string = null,
+  appPrivateKey: string = null,
+  expiresAt: number = nextMonth().getTime(),
+  transitPublicKey: string = null,
+  hubUrl: string = null,
+  blockstackAPIUrl: string = null,
+  associationToken: string = null
+): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
@@ -202,9 +208,9 @@ export function makeAuthResponse(privateKey: string,
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
     Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
-      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+      privateKeyPayload = await encryptPrivateKey(transitPublicKey, appPrivateKey)
       if (coreToken !== undefined && coreToken !== null) {
-        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
+        coreTokenPayload = await encryptPrivateKey(transitPublicKey, coreToken)
       }
     }
     additionalProperties = {

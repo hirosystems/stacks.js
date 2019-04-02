@@ -11,71 +11,71 @@ export function runEncryptionTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
-  test('encrypt-to-decrypt works', (t) => {
+  test('encrypt-to-decrypt works', async (t) => {
     t.plan(2)
 
     const testString = 'all work and no play makes jack a dull boy'
-    let cipherObj = encryptECIES(publicKey, testString)
-    let deciphered = decryptECIES(privateKey, cipherObj)
+    let cipherObj = await encryptECIES(publicKey, testString)
+    let deciphered = await decryptECIES(privateKey, cipherObj)
     t.equal(deciphered, testString, 'Decrypted ciphertext does not match expected plaintext')
 
     const testBuffer = Buffer.from(testString)
-    cipherObj = encryptECIES(publicKey, testBuffer)
-    deciphered = decryptECIES(privateKey, cipherObj)
+    cipherObj = await encryptECIES(publicKey, testBuffer)
+    deciphered = await decryptECIES(privateKey, cipherObj)
     t.equal(deciphered.toString('hex'), testBuffer.toString('hex'),
             'Decrypted cipherbuffer does not match expected plainbuffer')
   })
 
-  test('encrypt-to-decrypt fails on bad mac', (t) => {
+  test('encrypt-to-decrypt fails on bad mac', async (t) => {
     t.plan(1)
 
     const testString = 'all work and no play makes jack a dull boy'
-    const cipherObj = encryptECIES(publicKey, testString)
+    const cipherObj = await encryptECIES(publicKey, testString)
     const evilString = 'some work and some play makes jack a dull boy'
-    const evilObj = encryptECIES(publicKey, evilString)
+    const evilObj = await encryptECIES(publicKey, evilString)
 
     cipherObj.cipherText = evilObj.cipherText
 
     try {
-      decryptECIES(privateKey, cipherObj)
+      await decryptECIES(privateKey, cipherObj)
       t.true(false, 'Decryption should have failed when ciphertext modified')
     } catch (e) {
       t.true(true, 'Decryption correctly fails when ciphertext modified')
     }
   })
 
-  test('sign-to-verify-works', (t) => {
+  test('sign-to-verify-works', async (t) => {
     t.plan(2)
 
     const testString = 'all work and no play makes jack a dull boy'
-    let sigObj = signECDSA(privateKey, testString)
-    t.true(verifyECDSA(testString, sigObj.publicKey, sigObj.signature),
+    let sigObj = await signECDSA(privateKey, testString)
+    t.true(await verifyECDSA(testString, sigObj.publicKey, sigObj.signature),
            'String content should be verified')
 
     const testBuffer = Buffer.from(testString)
-    sigObj = signECDSA(privateKey, testBuffer)
-    t.true(verifyECDSA(testBuffer, sigObj.publicKey, sigObj.signature),
+    sigObj = await signECDSA(privateKey, testBuffer)
+    t.true(await verifyECDSA(testBuffer, sigObj.publicKey, sigObj.signature),
            'String buffer should be verified')
   })
 
-  test('sign-to-verify-fails', (t) => {
+  test('sign-to-verify-fails', async (t) => {
     t.plan(3)
 
     const testString = 'all work and no play makes jack a dull boy'
     const failString = 'I should fail'
 
-    let sigObj = signECDSA(privateKey, testString)
-    t.false(verifyECDSA(failString, sigObj.publicKey, sigObj.signature),
+    let sigObj = await signECDSA(privateKey, testString)
+    t.false(await verifyECDSA(failString, sigObj.publicKey, sigObj.signature),
             'String content should not be verified')
 
     const testBuffer = Buffer.from(testString)
-    sigObj = signECDSA(privateKey, testBuffer)
-    t.false(verifyECDSA(Buffer.from(failString), sigObj.publicKey, sigObj.signature),
+    sigObj = await signECDSA(privateKey, testBuffer)
+    t.false(await verifyECDSA(Buffer.from(failString), sigObj.publicKey, sigObj.signature),
             'Buffer content should not be verified')
 
     const badPK = '0288580b020800f421d746f738b221d384f098e911b81939d8c94df89e74cba776'
-    sigObj = signECDSA(privateKey, testBuffer)
-    t.false(verifyECDSA(Buffer.from(failString), badPK, sigObj.signature),
+    sigObj = await signECDSA(privateKey, testBuffer)
+    t.false(await verifyECDSA(Buffer.from(failString), badPK, sigObj.signature),
             'Buffer content should not be verified')
   })
 

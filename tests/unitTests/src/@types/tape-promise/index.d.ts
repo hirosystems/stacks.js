@@ -20,14 +20,11 @@ declare module 'tape-promise/tape' {
   function tape(cb: tape.TestCase): void;
   function tape(opts: tape.TestOptions, cb: tape.TestCase): void;
 
-  interface TestCb { (t: tape.TestCase): Promise<any> }
-  function tape(name: string, cb: TestCb): void;
-
 
   namespace tape {
 
     interface TestCase {
-      (test: Test): void;
+      (test: Test): void | Promise<any>;
     }
 
     /**

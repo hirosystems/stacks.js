@@ -257,7 +257,7 @@ export class UserSession {
    * @return {String} Stringified ciphertext object
    */
   encryptContent(
-    content: string | Buffer,
+    content: string | Buffer | Uint8Array,
     options?: {publicKey?: string}
   ) {
     return storage.encryptContent(content, options, this)
@@ -288,7 +288,11 @@ export class UserSession {
    * @return {Promise} that resolves if the operation succeed and rejects
    * if it failed
    */
-  putFile(path: string, content: string | Buffer, options?: storage.PutFileOptions) {
+  putFile(
+    path: string, 
+    content: string | Buffer | Uint8Array | Blob | File, 
+    options?: storage.PutFileOptions
+  ) {
     return storage.putFile(path, content, options, this)
   }
 
