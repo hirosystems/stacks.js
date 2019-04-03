@@ -76,12 +76,13 @@ function brokenProofs() {
 
 export function runProofStatementUnitTests() {
   test('getProofStatement', (t) => {
-    t.plan(7)
+    t.plan(6)
 
     const larry = sampleVerifications.larry
     const naval = sampleVerifications.naval
     const ken = sampleAddressBasedVerifications.ken
-    
+    const oscar = sampleAddressBasedVerifications.oscar
+
     t.equal(profileServices.facebook.getProofStatement(larry.facebook.body),
             'Verifying that "larry.id" is my Blockstack ID.',
             'Should extract proof statement from Facebook page meta tags')
@@ -102,13 +103,9 @@ export function runProofStatementUnitTests() {
             'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
             'Should extract address-based proof statement from Hacker News profile')
 
-    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedIn.body),
-            'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
-            'Should extract address-based proof statement from Hacker News profile')
-
-    t.equal(profileServices.linkedIn.getProofStatement(ken.linkedInBroken.body),
-            '',
-            'Should not crash on broken LinkedIn proof link')
+    t.equal(profileServices.linkedIn.getProofStatement(oscar.linkedIn.body),
+            'Oscar Lafarga on LinkedIn: "Verifying my Blockstack ID is secured with the address 1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7 https://lnkd.in/gM-KvXa"',
+            'Should extract address-based proof statement from LinkedIn meta tags')
   })
 }
 
@@ -118,6 +115,7 @@ export function runOwnerAddressBasedProofsUnitTests() {
 
     const larry = sampleAddressBasedVerifications.larry
     const ken = sampleAddressBasedVerifications.ken
+    const oscar = sampleAddressBasedVerifications.oscar
 
     const facebookProofStatement = profileServices.facebook.getProofStatement(larry.facebook.body)
     const twitterProofStatement = profileServices.twitter.getProofStatement(ken.twitter.body)
@@ -125,7 +123,8 @@ export function runOwnerAddressBasedProofsUnitTests() {
     const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body)
     const hackerNewsProofStatement = profileServices.hackerNews
       .getProofStatement(ken.hackerNews.body)
-    const linkedInProofStatement = profileServices.linkedIn.getProofStatement(ken.linkedIn.body)
+    const linkedInProofStatement = profileServices.linkedIn.getProofStatement(oscar.linkedIn.body)
+
 
     t.equals(containsValidAddressProofStatement(facebookProofStatement,
                                                 '1EyuZ8qxdhHjcnTChwQLyQaN3cmdK55DkH'),
@@ -168,7 +167,7 @@ export function runOwnerAddressBasedProofsUnitTests() {
              false, 'Hacker News body should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement,
-                                                '1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5'),
+                                                '1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7', true),
              true, 'LinkedIn body should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement,
@@ -181,6 +180,7 @@ export function runInBodyIdentityVerificationTests() {
   test('getProofIdentity', (t) => {
     t.plan(3)
     const ken = sampleAddressBasedVerifications.ken
+    const oscar = sampleAddressBasedVerifications.oscar
 
     t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body),
             'blckstcktest',
@@ -190,8 +190,8 @@ export function runInBodyIdentityVerificationTests() {
             'blckstcktest',
             'Should extract social proof identity from Instagram proof page body')
 
-    t.equal(profileServices.linkedIn.getProofIdentity(ken.linkedIn.body),
-            'blck-stck',
+    t.equal(profileServices.linkedIn.getProofIdentity(oscar.linkedIn.body),
+            'oscarlafarga',
             'Should extract social proof identity from LinkedIn proof page body')
   })
 }
