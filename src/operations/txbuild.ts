@@ -24,6 +24,9 @@ import { UTXO } from '../network'
 const dummyConsensusHash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 const dummyZonefileHash  = 'ffffffffffffffffffffffffffffffffffffffff'
 
+/**
+* @ignore
+*/
 function addOwnerInput(utxos: UTXO[],
                        ownerAddress: string,
                        txB: bitcoinjs.TransactionBuilder,
@@ -43,6 +46,9 @@ function addOwnerInput(utxos: UTXO[],
   return { index: ownerInput, value: ownerUTXO.value }
 }
 
+/**
+* @ignore
+*/
 function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: string,
                          utxos: UTXO[],
                          feeRate: number, inAmounts: number, changeIndex: number | null = null
@@ -60,6 +66,9 @@ function fundTransaction(txB: bitcoinjs.TransactionBuilder, paymentAddress: stri
   return txB
 }
 
+/**
+* @ignore
+*/
 function returnTransactionHex(txB: bitcoinjs.TransactionBuilder,
                               buildIncomplete: boolean = false
 ) {
@@ -70,6 +79,9 @@ function returnTransactionHex(txB: bitcoinjs.TransactionBuilder,
   }
 }
 
+/**
+* @ignore
+*/
 function getTransactionSigner(input: string | TransactionSigner): TransactionSigner {
   if (typeof input === 'string') {
     return PubkeyHashSigner.fromHexString(input)
@@ -845,6 +857,8 @@ function makeRenewal(fullyQualifiedName: string,
  *    this function *does not* perform the requisite safety checks -- please see
  *    the safety module for those.
  * @private
+ * 
+ * @ignore
  */
 function makeNamespacePreorder(namespaceID: string,
                                revealAddress: string,

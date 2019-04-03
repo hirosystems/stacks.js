@@ -26,23 +26,53 @@ const DEFAULT_PROFILE = {
   '@context': 'http://schema.org'
 }
 
+/**
+ *  Returned from the [[UserSession.loadUserData]] function.
+ */
 export interface UserData {
+  // public: the blockstack ID (for example: stackerson.id or alice.blockstack.id)
   username: string;
+  // public: the email address for the user. only available if the `email` 
+  // scope is requested, and if the user has entered a valid email into 
+  // their profile. 
+  //
+  // **Note**: Blockstack does not require email validation 
+  // for users for privacy reasons and blah blah (something like this, idk)
   email?: string;
+  // probably public: (a quick description of what this is, and a link to the
+  // DID foundation and/or the blockstack docs related to DID, idk)
   decentralizedID: string;
+  // probably private: looks like it happens to be the btc address but idk
+  // the value of establishing this as a supported field
   identityAddress: string;
+  // probably public: this is an advanced feature, I think many app devs 
+  // using our more advanced encryption functions (as opposed to putFile/getFile), 
+  // are probably using this. seems useful to explain. 
   appPrivateKey: string;
+  // maybe public: possibly useful for advanced devs / webapps. I see an opportunity
+  // to make a small plug about "user owned data" here, idk. 
   hubUrl: string;
+  // maybe private: this would be an advanced field for app devs to use. 
   authResponseToken: string;
+  // private: does not get sent to webapp at all.
   coreSessionToken?: string;
+  // private: does not get sent to webapp at all.
   gaiaAssociationToken?: string;
+  // private: does not get sent to webapp at all - also this is a 
+  // dup/bug of the previous field I think.
+  associationToken?: string;
+  // public: this is the proper `Person` schema json for the user. 
+  // This is the data that gets used when the `new blockstack.Person(profile)` class is used.
   profile: any;
+  // private: does not get sent to webapp at all.
   gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
+ * @deprecated 
+ * #### v19 Use [[UserSession.isUserSignedIn]] instead.
+ * 
  * Check if a user is currently signed in.
- * @method isUserSignedIn
  * @return {Boolean} `true` if the user is signed in, `false` if not.
  */
 export function isUserSignedIn() {
@@ -54,9 +84,14 @@ export function isUserSignedIn() {
 }
 
 /**
+ *
+ * 
+ * @deprecated 
+ * #### v19 Use [[UserSession.isUserSignedIn]] instead.
+ * 
  * Generates an authentication request and redirects the user to the Blockstack
  * browser to approve the sign in request.
- *
+ * 
  * Please note that this requires that the web browser properly handles the
  * `blockstack:` URL protocol handler.
  *
@@ -86,9 +121,14 @@ export function redirectToSignIn(redirectURI?: string,
 }
 
 /**
+ * @deprecated 
+ * #### v19 Use [[UserSession.isSignInPending]] instead. 
+ *
  * Check if there is a authentication request that hasn't been handled. 
+ *
  * Also checks for a protocol echo reply (which if detected then the page
  * will be automatically redirected after this call). 
+ * 
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
 export function isSignInPending() {
@@ -106,6 +146,9 @@ export function isSignInPending() {
 }
 
 /**
+ * @deprecated 
+ * #### v19 Use [[UserSession.getAuthResponseToken]] instead. 
+ *
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
@@ -115,10 +158,13 @@ export function getAuthResponseToken(): string {
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.loadUserData]] instead.
+ *
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  * @return {Object} User data object.
- */
+*/
 export function loadUserData() {
   console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
@@ -127,7 +173,10 @@ export function loadUserData() {
   return userSession.loadUserData()
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.signUserOut]] instead.
+ *
  * Sign the user out and optionally redirect to given location.
  * @param  redirectURL
  * Location to redirect user to after sign out. 
@@ -149,7 +198,10 @@ export function signUserOut(redirectURL?: string, caller?: UserSession) {
   } 
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.redirectToSignInWithAuthRequest]] instead.
+ *
  * Redirects the user to the Blockstack browser to approve the sign in request
  * given.
  *
@@ -191,7 +243,10 @@ export function redirectToSignInWithAuthRequest(
   launchCustomProtocol(authRequest, successCallback, failCallback)
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.handlePendingSignIn]] instead.
+ *
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *

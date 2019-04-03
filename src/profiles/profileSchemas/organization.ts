@@ -14,6 +14,9 @@ const schemaDefinition: {[key: string]: any} = {
   }
 }
 
+/**
+ * @ignore
+ */
 export class Organization extends Profile {
   constructor(profile = {}) {
     super(profile)

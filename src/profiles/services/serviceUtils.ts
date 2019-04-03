@@ -1,4 +1,7 @@
-
+/**
+ * 
+ * @ignore
+ */
 export function containsValidProofStatement(searchText: string, name: string | null = null) {
   if (!name) {
     return false
@@ -52,6 +55,10 @@ export function containsValidProofStatement(searchText: string, name: string | n
   return false
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function containsValidAddressProofStatement(proofStatement: string, address: string) {
   proofStatement = proofStatement.split(address)[0].toLowerCase() + address
 
