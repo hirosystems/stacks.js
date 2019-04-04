@@ -1032,4 +1032,48 @@ export function runStorageTests() {
         t.equal(count, 1, 'Count matches number of files')
       })
   })
+
+  test('connect to gaia hub with a user session and association token', (t) => {
+    t.plan(1)
+    const hubServer = 'hub.testblockstack.org'
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+
+    const hubInfo = {
+      read_url_prefix: 'gaia.testblockstack.org',
+      challenge_text: 'please-sign',
+      latest_auth_version: 'v1'
+    }
+
+    const address = '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+    const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
+
+    const identityPrivateKey = '4dea04fe440d760664d96f1fd219e7a73324fc8faa28c7babd1a7813d05970aa01'
+    const identityPublicKey = '0234f3c7aec9fe13190aede94d1eaa0a7d2b48d18fd86b9651fc3996a5f467fc73'
+
+    const FOUR_MONTH_SECONDS = 60 * 60 * 24 * 31 * 4
+    const salt = '00000000000000000000000000000'
+    const associationTokenClaim = {
+      childToAssociate: publicKey,
+      iss: identityPublicKey,
+      exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
+      salt
+    }
+    const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
+      .sign(associationTokenClaim)
+
+    FetchMock.get(`${hubServer}/hub_info`, JSON.stringify(hubInfo))
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      appPrivateKey: privateKey,
+      hubUrl: hubServer,
+      gaiaAssociationToken
+    }
+    blockstack.setLocalGaiaHubConnection().then((gaiaConfig) => {
+      const { token } = gaiaConfig
+      const { payload } = decodeToken(token.slice(2))
+      t.equal(payload.associationToken, gaiaAssociationToken, 'gaia config includes association token')
+    })
+  })
 }
