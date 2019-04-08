@@ -1033,6 +1033,7 @@ export function runStorageTests() {
       })
   })
 
+
   test('connect to gaia hub with a user session and association token', (t) => {
     t.plan(1)
     const hubServer = 'hub.testblockstack.org'
@@ -1075,5 +1076,69 @@ export function runStorageTests() {
       const { payload } = decodeToken(token.slice(2))
       t.equal(payload.associationToken, gaiaAssociationToken, 'gaia config includes association token')
     })
+  })
+
+  test('listFiles gets a new gaia config and tries again', (t) => {
+    t.plan(4)
+
+    const path = 'file.json'
+    const listFilesUrl = 'https://hub.testblockstack.org/list-files/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc'
+    const invalidHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
+      server: 'https://hub.testblockstack.org',
+      token: '',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+    const validHubConfig = Object.assign({}, invalidHubConfig, {
+      token: 'valid'
+    })
+    const connectToGaiaHub = sinon.stub().resolves(validHubConfig)
+    
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const UserSessionClass = proxyquire('../../../src/auth/userSession', {
+      '../storage/hub': {
+        connectToGaiaHub
+      }
+    }).UserSession as typeof UserSession
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSessionClass({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      appPrivateKey: privateKey,
+      gaiaHubConfig: invalidHubConfig
+    }
+
+    const { listFiles } = proxyquire('../../../src/storage', {
+      './hub': {
+        connectToGaiaHub
+      }
+    })
+
+    let callCount = 0
+    FetchMock.post(listFilesUrl, (url, { headers }) => {
+      if ((<any>headers).Authorization === 'bearer ') {
+        t.ok(true, 'tries with invalid token')
+        return 401
+      }
+      callCount += 1
+      if (callCount === 1) {
+        return { entries: [path], page: callCount }
+      } else if (callCount === 2) {
+        return { entries: [], page: callCount }
+      } else {
+        throw new Error('Called too many times')
+      }
+    })
+
+    const files = []
+    listFiles((name) => {
+      files.push(name)
+      return true
+    }, blockstack)
+      .then((count) => {
+        t.equal(files.length, 1, 'Got one file back')
+        t.equal(files[0], 'file.json', 'Got the right file back')
+        t.equal(count, 1, 'Count matches number of files')
+      })
   })
 }
