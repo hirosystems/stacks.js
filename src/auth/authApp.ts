@@ -36,7 +36,6 @@ export interface UserData {
   authResponseToken: string;
   coreSessionToken?: string;
   gaiaAssociationToken?: string;
-  associationToken?: string;
   profile: any;
   gaiaHubConfig?: GaiaHubConfig;
 }
