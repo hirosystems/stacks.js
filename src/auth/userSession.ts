@@ -387,7 +387,7 @@ export class UserSession {
     const gaiaConfig = await connectToGaiaHub(
       userData.hubUrl,
       userData.appPrivateKey,
-      userData.associationToken)
+      userData.gaiaAssociationToken)
 
     userData.gaiaHubConfig = gaiaConfig
 
