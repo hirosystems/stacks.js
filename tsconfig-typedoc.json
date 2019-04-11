@@ -24,6 +24,7 @@
     "includeDeclarations": false,
     "target": "ES6",
     "gitRevision": "master",
-    "listInvalidSymbolLinks": true
+    "listInvalidSymbolLinks": true,
+    "theme": "docs-theme"
   }
 }
