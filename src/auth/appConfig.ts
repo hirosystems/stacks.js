@@ -69,13 +69,13 @@ export class AppConfig {
    */
   constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
               appDomain: string = window.location.origin,
-              edirectPath: string = '',
+              redirectPath: string = '',
               manifestPath: string = '/manifest.json',
               coreNode: string | null = null,
               authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST) {
     this.appDomain = appDomain
     this.scopes = scopes
-    this.redirectPath = this.redirectPath
+    this.redirectPath = redirectPath
     this.manifestPath = manifestPath
 
     if (!coreNode) {

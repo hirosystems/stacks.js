@@ -70,11 +70,11 @@ function getNodePublicKey(node: BIP32): string {
 export class BlockstackWallet {
   private rootNode: BIP32
 
-  private constructor(rootNode: BIP32) {
+  constructor(rootNode: BIP32) {
     this.rootNode = rootNode
   }
 
-  private toBase58(): string {
+  toBase58(): string {
     return this.rootNode.toBase58()
   }
 
@@ -94,7 +94,7 @@ export class BlockstackWallet {
    *  the root node of the hierarchical wallet
    * @return {BlockstackWallet} the constructed wallet
    */
-  private static fromBase58(keychain: string): BlockstackWallet {
+  static fromBase58(keychain: string): BlockstackWallet {
     return new BlockstackWallet(bip32.fromBase58(keychain))
   }
 
@@ -126,7 +126,7 @@ export class BlockstackWallet {
    * Generate a BIP-39 12 word mnemonic
    * @return {Promise<string>} space-separated 12 word phrase
    */
-  private static generateMnemonic() {
+  static generateMnemonic() {
     return bip39.generateMnemonic(128, randomBytes)
   }
 
@@ -137,25 +137,25 @@ export class BlockstackWallet {
    * @return {Promise<string>} Hex-encoded encrypted mnemonic
    * 
    */
-  private static async encryptMnemonic(mnemonic: string, password: string) {
+  static async encryptMnemonic(mnemonic: string, password: string) { 
     const encryptedBuffer = await encryptMnemonic(mnemonic, password)
     return encryptedBuffer.toString('hex')
   }
 
-  private getIdentityPrivateKeychain(): BIP32 {
+  getIdentityPrivateKeychain(): BIP32 { 
     return this.rootNode
       .deriveHardened(IDENTITY_KEYCHAIN)
       .deriveHardened(BLOCKSTACK_ON_BITCOIN)
   }
 
-  private getBitcoinPrivateKeychain(): BIP32 {
+  getBitcoinPrivateKeychain(): BIP32 { 
     return this.rootNode
       .deriveHardened(BITCOIN_BIP_44_PURPOSE)
       .deriveHardened(BITCOIN_COIN_TYPE)
       .deriveHardened(BITCOIN_ACCOUNT_INDEX)
   }
 
-  private getBitcoinNode(addressIndex: number, chainType: string = EXTERNAL_ADDRESS): BIP32 {
+  getBitcoinNode(addressIndex: number, chainType: string = EXTERNAL_ADDRESS): BIP32 {
     return BlockstackWallet.getNodeFromBitcoinKeychain(
       this.getBitcoinPrivateKeychain().toBase58(),
       addressIndex,
@@ -163,12 +163,12 @@ export class BlockstackWallet {
     )
   }
 
-  private getIdentityAddressNode(identityIndex: number): BIP32 {
+  getIdentityAddressNode(identityIndex: number): BIP32 {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
     return identityPrivateKeychain.deriveHardened(identityIndex)
   }
 
-  private static getAppsNode(identityNode: BIP32): BIP32 {
+  static getAppsNode(identityNode: BIP32): BIP32 {
     return identityNode.deriveHardened(APPS_NODE_INDEX)
   }
 
@@ -176,7 +176,7 @@ export class BlockstackWallet {
    * Get a salt for use with creating application specific addresses
    * @return {String} the salt
    */
-  private getIdentitySalt(): string {
+  getIdentitySalt(): string {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
     const publicKeyHex = getNodePublicKey(identityPrivateKeychain)
     return crypto.createHash('sha256').update(publicKeyHex).digest('hex')
@@ -187,7 +187,7 @@ export class BlockstackWallet {
    * @param {number} addressIndex - the index of the address
    * @return {String} address
    */
-  private getBitcoinAddress(addressIndex: number): string {
+  getBitcoinAddress(addressIndex: number): string { 
     return BlockstackWallet.getAddressFromBIP32Node(this.getBitcoinNode(addressIndex))
   }
 
@@ -198,7 +198,7 @@ export class BlockstackWallet {
    * characters long to denote an uncompressed bitcoin address, or 66
    * characters long for a compressed bitcoin address.
    */
-  private getBitcoinPrivateKey(addressIndex: number): string {
+  getBitcoinPrivateKey(addressIndex: number): string {
     return getNodePrivateKey(this.getBitcoinNode(addressIndex))
   }
 
@@ -206,7 +206,7 @@ export class BlockstackWallet {
    * Get the root node for the bitcoin public keychain
    * @return {String} base58-encoding of the public node
    */
-  private getBitcoinPublicKeychain(): BIP32 {
+  getBitcoinPublicKeychain(): BIP32 {
     return this.getBitcoinPrivateKeychain().neutered()
   }
 
@@ -214,11 +214,11 @@ export class BlockstackWallet {
    * Get the root node for the identity public keychain
    * @return {String} base58-encoding of the public node
    */
-  private getIdentityPublicKeychain(): BIP32 {
+  getIdentityPublicKeychain(): BIP32 {
     return this.getIdentityPrivateKeychain().neutered()
   }
 
-  private static getNodeFromBitcoinKeychain(
+  static getNodeFromBitcoinKeychain(
     keychainBase58: string,
     addressIndex: number,
     chainType: string = EXTERNAL_ADDRESS
@@ -245,8 +245,8 @@ export class BlockstackWallet {
    * "receive" address) or 'CHANGE_ADDRESS'
    * @return {String} the address
    */
-  private static getAddressFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
-                                               chainType: string = EXTERNAL_ADDRESS): string {
+  static getAddressFromBitcoinKeychain(keychainBase58: string, addressIndex: number,
+                                       chainType: string = EXTERNAL_ADDRESS): string {
     return BlockstackWallet.getAddressFromBIP32Node(BlockstackWallet
       .getNodeFromBitcoinKeychain(keychainBase58, addressIndex, chainType))
   }
@@ -262,8 +262,8 @@ export class BlockstackWallet {
    * @return {String} the private key hex-string. this will be a 64
    * character string
    */
-  private static getLegacyAppPrivateKey(appsNodeKey: string, 
-                                        salt: string, appDomain: string): string {
+  static getLegacyAppPrivateKey(appsNodeKey: string, 
+                                salt: string, appDomain: string): string {
     const hash = crypto
       .createHash('sha256')
       .update(`${appDomain}${salt}`)
@@ -273,7 +273,7 @@ export class BlockstackWallet {
     return getNodePrivateKey(appNode).slice(0, 64)
   }
 
-  private static getAddressFromBIP32Node(node: BIP32) {
+  static getAddressFromBIP32Node(node: BIP32) {
     return bitcoin.payments.p2pkh({ pubkey: node.publicKey }).address
   }
 
@@ -288,7 +288,7 @@ export class BlockstackWallet {
    * @return {String} the private key hex-string. this will be a 64
    * character string
    */
-  private static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
+  static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
     const hash = crypto
       .createHash('sha256')
       .update(`${appDomain}${salt}`)
@@ -328,8 +328,8 @@ export class BlockstackWallet {
    *   .appsNodeKey {String} - the base-58 encoding of the applications node
    *   .salt {String} - the salt used for creating app-specific addresses
    */
-  private getIdentityKeyPair(addressIndex: number, 
-                             alwaysUncompressed: boolean = false): IdentityKeyPair {
+  getIdentityKeyPair(addressIndex: number, 
+                     alwaysUncompressed: boolean = false): IdentityKeyPair {
     const identityNode = this.getIdentityAddressNode(addressIndex)
 
     const address = BlockstackWallet.getAddressFromBIP32Node(identityNode)
