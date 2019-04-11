@@ -58,9 +58,6 @@ export interface UserData {
   coreSessionToken?: string;
   // private: does not get sent to webapp at all.
   gaiaAssociationToken?: string;
-  // private: does not get sent to webapp at all - also this is a 
-  // dup/bug of the previous field I think.
-  associationToken?: string;
   // public: this is the proper `Person` schema json for the user. 
   // This is the data that gets used when the `new blockstack.Person(profile)` class is used.
   profile: any;
