@@ -142,7 +142,6 @@
     "elliptic": "^6.4.1",
     "form-data": "^2.3.3",
     "jsontokens": "^1.0.0",
-    "lodash": "^4.17.11",
     "query-string": "^6.3.0",
     "request": "^2.88.0",
     "ripemd160": "^2.0.2",

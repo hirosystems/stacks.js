@@ -1,4 +1,3 @@
-import { MemoVoidIterator } from 'lodash'
 import { AppConfig } from './appConfig'
 import { SessionOptions } from './sessionData'
 import {
@@ -124,7 +123,6 @@ export class UserSession {
    * @param authRequest A request string built by the [[makeAuthRequest]] function
    * @param blockstackIDHost The ID of the Blockstack Browser application.
    * 
-   * @returns {MemoVoidIterator}
    */
   redirectToSignInWithAuthRequest(
     authRequest?: string,
