@@ -289,12 +289,12 @@ export class UserSession {
    * Stores the data provided in the app's data store to to the file specified.
    * @param {String} path - the path to store the data in
    * @param {String|Buffer} content - the data to store in the file
-   * @param options specify the [[PutFileOptions]] to use
+   * @param options a [[PutFileOptions]] object
    * 
    * @returns {Promise} that resolves if the operation succeed and rejects
    * if it failed
    */
-  putFile(path: string, content: string | Buffer, options?: storage.PutFileOptions) {
+  putFile(path: string, content: string | Buffer, options?: import('../storage').PutFileOptions) {
     return storage.putFile(path, content, options, this)
   }
 

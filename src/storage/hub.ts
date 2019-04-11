@@ -16,7 +16,7 @@ export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 /**
  * The configuration for the user's Gaia storage provider.
  */
-export type GaiaHubConfig = {
+export interface GaiaHubConfig {
   address: string,
   url_prefix: string,
   token: string,

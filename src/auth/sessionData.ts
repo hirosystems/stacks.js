@@ -5,7 +5,7 @@ import { UserData } from './authApp'
 
 const SESSION_VERSION = '1.0.0'
 
-export type SessionOptions = {
+export interface SessionOptions {
   appPrivateKey?: string,
   username?: string,
   identityAddress?: string,

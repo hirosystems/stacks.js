@@ -23,7 +23,7 @@ import { UserSession } from '../auth/userSession'
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[putFile]].
  */
-export type PutFileOptions = {
+export interface PutFileOptions {
   encrypt?: boolean | string,
   sign?: boolean,
   contentType?: string
