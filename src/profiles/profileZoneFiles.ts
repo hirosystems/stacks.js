@@ -4,6 +4,13 @@ import { extractProfile } from './profileTokens'
 import { Person } from './profileSchemas/person'
 import { Logger } from '../logger'
 
+/**
+ * 
+ * @param origin 
+ * @param tokenFileUrl 
+ * 
+ * @ignore
+ */
 export function makeProfileZoneFile(origin: string, tokenFileUrl: string) {
   if (tokenFileUrl.indexOf('://') < 0) {
     throw new Error('Invalid token file url')
@@ -33,6 +40,12 @@ export function makeProfileZoneFile(origin: string, tokenFileUrl: string) {
   return makeZoneFile(zoneFile, zoneFileTemplate)
 }
 
+/**
+ * 
+ * @param zoneFileJson 
+ * 
+ * @ignore
+ */
 export function getTokenFileUrl(zoneFileJson: any): string | null {
   if (!zoneFileJson.hasOwnProperty('uri')) {
     return null
@@ -61,6 +74,13 @@ export function getTokenFileUrl(zoneFileJson: any): string | null {
   return tokenFileUrl
 }
 
+/**
+ * 
+ * @param zoneFile 
+ * @param publicKeyOrAddress 
+ * 
+ * @ignore
+ */
 export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: string) {
   return new Promise((resolve, reject) => {
     let zoneFileJson = null

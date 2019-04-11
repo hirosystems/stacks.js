@@ -2,6 +2,9 @@
 import 'cross-fetch/polyfill'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 
+/**
+ * @ignore
+ */
 export class Service {
   static validateProof(proof: any,
                        ownerAddress: string,
