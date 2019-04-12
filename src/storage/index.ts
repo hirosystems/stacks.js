@@ -62,7 +62,7 @@ export function deleteFile(path: string) {
  * @param {String} appOrigin - The app origin
  * @param {String} [zoneFileLookupURL=null] - The URL
  * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
+ * blockstack.js's [[getNameInfo]] function instead.
  * @return {Promise<string>} that resolves to the public read URL of the file
  * or rejects with an error
  */
@@ -400,7 +400,7 @@ export interface GetFileUrlOptions {
   app?: string;
   /**
    * The URL to use for zonefile lookup. If falsey, this will use 
-   * the blockstack.js's getNameInfo function instead. 
+   * the blockstack.js's [[getNameInfo]] function instead. 
    */
   zoneFileLookupURL?: string;
 }

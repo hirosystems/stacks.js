@@ -5,6 +5,7 @@ import BN from 'bn.js'
 import RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
+import { config } from './config'
 
 /**
  * @ignore
@@ -1242,6 +1243,16 @@ const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://broadcast.blockstack.org',
   new BlockchainInfoApi()
 )
+
+/**
+ * Get WHOIS-like information for a name, including the address that owns it,
+ * the block at which it expires, and the zone file anchored to it (if available).
+ * @param {String} fullyQualifiedName the name to query.  Can be on-chain of off-chain.
+ * @return {Promise} a promise that resolves to the WHOIS-like information 
+ */
+export function getNameInfo(fullyQualifiedName: string) {
+  return config.network.getNameInfo(fullyQualifiedName)
+}
 
 /**
 * @ignore
