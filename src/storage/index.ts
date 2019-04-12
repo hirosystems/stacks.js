@@ -389,11 +389,13 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
 export interface GetFileUrlOptions {
   /**
    * The Blockstack ID to lookup for multi-player storage. 
+   * If not specified, the currently signed in username is used.
    */
   username?: string;
   /**
    * The app to lookup for multi-player storage - defaults to current origin. 
-   * @default `window.location.origin`
+   * @default `window.location.origin` 
+   * Only if available in the executing environment, otherwise `undefined`.
    */
   app?: string;
   /**
