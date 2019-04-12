@@ -1,6 +1,6 @@
 import { config } from './config'
 
-export const levels = [
+const levels = [
   'debug',
   'info',
   'warn',

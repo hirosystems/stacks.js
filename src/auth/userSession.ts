@@ -19,7 +19,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, DEFAULT_BLOCKSTACK_HOST, DEFAULT_SCOPE } from './authConstants'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
 
 
 /**
@@ -315,15 +315,10 @@ export class UserSession {
    * Get the URL for reading a file from an app's data store.
    * 
    * @param {String} path - the path to the file to read
-   * @param {Object} [options=null] - options object
    * 
    * @returns {Promise<string>} that resolves to the URL or rejects with an error
    */
-  getFileUrl(path: string, options?: {
-    username?: string,
-    app?: string,
-    zoneFileLookupURL?: string
-  }): Promise<string> {
+  getFileUrl(path: string, options?: import('../storage').GetFileUrlOptions): Promise<string> {
     return storage.getFileUrl(path, options, this)
   }
 
