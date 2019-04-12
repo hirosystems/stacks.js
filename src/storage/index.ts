@@ -20,7 +20,10 @@ import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
 
-export type PutFileOptions = {
+/**
+ * Specify a valid MIME type, encryption, and whether to sign the [[putFile]].
+ */
+export interface PutFileOptions {
   encrypt?: boolean | string,
   sign?: boolean,
   contentType?: string
@@ -66,6 +69,11 @@ export async function getUserAppFileUrl(
 }
 
 /**
+ * 
+ * 
+ * @deprecated 
+ * #### v19 Use [[UserSession.encryptContent]].
+ *
  * Encrypts the data provided with the app public key.
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
@@ -90,6 +98,10 @@ export function encryptContent(
 }
 
 /**
+ * 
+ * @deprecated 
+ * #### v19 Use [[UserSession.decryptContent]].
+ * 
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
@@ -126,6 +138,7 @@ export function decryptContent(
 /* Get the gaia address used for servicing multiplayer reads for the given
  * (username, app) pair.
  * @private
+ * @ignore
  */
 async function getGaiaAddress(
   app: string, username?: string, zoneFileLookupURL?: string,
@@ -153,6 +166,8 @@ async function getGaiaAddress(
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
+ * 
+ * @ignore
  */
 function normalizeOptions<T>(
   options?: {
@@ -175,8 +190,10 @@ function normalizeOptions<T>(
 }
 
 /**
- * Get the URL for reading a file from an app's data store.
- * @param {String} path - the path to the file to read
+ * @deprecated
+ * #### v19 Use [[UserSession.getFileUrl]] instead.
+ * 
+* @param {String} path - the path to the file to read
  * @param {Object} [options=null] - options object
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
@@ -215,6 +232,7 @@ export async function getFileUrl(
 /* Handle fetching the contents from a given path. Handles both
  *  multi-player reads and reads from own storage.
  * @private
+ * @ignore
  */
 function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
@@ -250,6 +268,7 @@ function getFileContents(path: string, app: string, username: string | undefined
  *  and then validate it. Handles both multi-player reads and reads
  *  from own storage.
  * @private
+ * @ignore
  */
 function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
   username?: string | null;
@@ -314,6 +333,7 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
  *  multiplayer reads. In the case of multiplayer reads, it uses the
  *  gaia address for verification of the claimed public key.
  * @private
+ * @ignore
  */
 function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
                                        app: string, username?: string, zoneFileLookupURL?: string) {
@@ -367,7 +387,11 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   })
 }
 
-export type GetFileOptions = {
+
+/**
+ * Used to pass options to [[UserSession.getFile]]
+ */
+export interface GetFileOptions {
   decrypt?: boolean,
   verify?: boolean,
   username?: string | null,
@@ -576,6 +600,7 @@ export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
  *  value, then the loop stops.  If it returns a truthy value, the loop continues.
  * @returns {Promise} that resolves to the number of files listed.
  * @private
+ * @ignore
  */
 async function listFilesLoop(
   caller: UserSession,

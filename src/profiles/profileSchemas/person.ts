@@ -98,6 +98,9 @@ const schemaDefinition = {
   }
 }
 
+/**
+ * @ignore
+ */
 export class Person extends Profile {
   constructor(profile = {}) {
     super(profile)

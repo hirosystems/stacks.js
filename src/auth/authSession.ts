@@ -15,6 +15,7 @@ import 'cross-fetch/polyfill'
  * @return {String} a JWT signed by the app's private key
  * @deprecated
  * @private
+ * @ignore 
  */
 export function makeCoreSessionRequest(appDomain: string,
                                        appMethods: Array<string>,
@@ -62,6 +63,7 @@ export function makeCoreSessionRequest(appDomain: string,
  * with an error message otherwise
  * @deprecated
  * @private
+ * @ignore 
  */
 export function sendCoreSessionRequest(coreHost: string,
                                        corePort: number,
@@ -119,6 +121,7 @@ export function sendCoreSessionRequest(coreHost: string,
  * with an error message.
  * @deprecated
  * @private
+ * @ignore 
  */
 export function getCoreSession(coreHost: string,
                                corePort: number,

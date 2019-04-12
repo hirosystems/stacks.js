@@ -1,0 +1,10 @@
+.tsd-is-private {
+    display: none;
+} 
+.tsd-is-not-exported {
+    display: none;
+}
+#tsd-filter {
+    display: none;
+}
+
