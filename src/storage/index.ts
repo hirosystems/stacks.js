@@ -21,19 +21,19 @@ import { Logger } from '../logger'
 import { UserSession } from '../auth/userSession'
 
 /**
- * Specify a valid MIME type, encryption, and whether to sign the [[putFile]].
+ * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
  */
 export interface PutFileOptions {
   /**
-   * Encrypt the data with the app public key. 
-   * If a string is specified, it will use used as the public key. 
-   * If the boolean `true` is specified then the current user's app public key will be used. 
+  * Encrypt the data with the app public key. 
+  * If a string is specified, it is used as the public key. 
+  * If the boolean `true` is specified then the current user's app public key is used. 
    * @default true
    */
   encrypt?: boolean | string;
   /**
    * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
-   * If a string is specified, it will be used as the private key. 
+   * If a string is specified, it is used as the private key. 
    * @default false
    */
   sign?: boolean | string;
@@ -416,7 +416,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
   decrypt?: boolean;
   /**
    * Whether the content should be verified, only to be used 
-   * when [[putFile]] was set to `sign = true`.
+   * when [[UserSession.putFile]] was set to `sign = true`.
    * @default false
    */
   verify?: boolean;
