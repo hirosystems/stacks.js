@@ -24,9 +24,23 @@ import { UserSession } from '../auth/userSession'
  * Specify a valid MIME type, encryption, and whether to sign the [[putFile]].
  */
 export interface PutFileOptions {
-  encrypt?: boolean | string,
-  sign?: boolean,
-  contentType?: string
+  /**
+   * Encrypt the data with the app public key. 
+   * If a string is specified, it will use used as the public key. 
+   * If the boolean `true` is specified then the current user's app public key will be used. 
+   * @default true
+   */
+  encrypt?: boolean | string;
+  /**
+   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
+   * If a string is specified, it will be used as the private key. 
+   * @default false
+   */
+  sign?: boolean | string;
+  /**
+   * Set a Content-Type header for unencrypted data. 
+   */
+  contentType?: string;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -193,23 +207,12 @@ function normalizeOptions<T>(
  * @deprecated
  * #### v19 Use [[UserSession.getFileUrl]] instead.
  * 
-* @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
+ * @param {String} path - the path to the file to read
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
   path: string, 
-  options?: {
-    app?: string, 
-    username?: string, 
-    zoneFileLookupURL?: string
-  },
+  options?: GetFileUrlOptions,
   caller?: UserSession
 ): Promise<string> {
   const opts = normalizeOptions(options, caller)
@@ -270,11 +273,7 @@ function getFileContents(path: string, app: string, username: string | undefined
  * @private
  * @ignore
  */
-function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
-  username?: string | null;
-  app?: string | null;
-  zoneFileLookupURL?: string | null;
-}, caller?: UserSession) {
+function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
@@ -387,46 +386,52 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   })
 }
 
+export interface GetFileUrlOptions {
+  /**
+   * The Blockstack ID to lookup for multi-player storage. 
+   */
+  username?: string;
+  /**
+   * The app to lookup for multi-player storage - defaults to current origin. 
+   * @default `window.location.origin`
+   */
+  app?: string;
+  /**
+   * The URL to use for zonefile lookup. If falsey, this will use 
+   * the blockstack.js's getNameInfo function instead. 
+   */
+  zoneFileLookupURL?: string;
+}
 
 /**
  * Used to pass options to [[UserSession.getFile]]
  */
-export interface GetFileOptions {
-  decrypt?: boolean,
-  verify?: boolean,
-  username?: string | null,
-  app?: string | null,
-  zoneFileLookupURL?: string | null
+export interface GetFileOptions extends GetFileUrlOptions {
+  /**
+   * Try to decrypt the data with the app private key.
+   * @default true
+   */
+  decrypt?: boolean;
+  /**
+   * Whether the content should be verified, only to be used 
+   * when [[putFile]] was set to `sign = true`.
+   * @default false
+   */
+  verify?: boolean;
 }
 
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {Boolean} options.verify - Whether the content should be verified, only to be used
- * when `putFile` was set to `sign = true`
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
 export function getFile(
   path: string, 
-  options?: {
-    decrypt?: boolean;
-    verify?: boolean;
-    username?: string;
-    app?: string;
-    zoneFileLookupURL?: string;
-  },
+  options?: GetFileOptions,
   caller?: UserSession
 ) {
-  const defaults = {
+  const defaults: GetFileOptions = {
     decrypt: true,
     verify: false,
     username: null,
@@ -472,12 +477,6 @@ export function getFile(
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
- * @param {Object} [options=null] - options object
- * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
- *                                                  or the provided public key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
- *                                         the app private key
- * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
@@ -487,7 +486,7 @@ export async function putFile(
   options?: PutFileOptions,
   caller?: UserSession,
 ): Promise<string> {
-  const defaults = {
+  const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
     contentType: ''
