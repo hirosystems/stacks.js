@@ -5,6 +5,7 @@ import BN from 'bn.js'
 import RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
+import { config } from './config'
 
 /**
  * @ignore
@@ -108,7 +109,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  private getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
+  getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     // legacy code path
     return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
@@ -142,7 +143,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  private getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: BN}> {
+  getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: BN}> {
     // legacy code path
     return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then((resp) => {
@@ -173,7 +174,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise to an Object with { units: String, amount: BigInteger }
    * @private
    */
-  private getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
+  getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     return fetch(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
         if (resp.status !== 200) {
@@ -581,7 +582,7 @@ export class BlockstackNetwork {
    *
    * @private
    */
-  private broadcastServiceFetchHelper(endpoint: string, body: any): Promise<any|Error> {
+  broadcastServiceFetchHelper(endpoint: string, body: any): Promise<any|Error> {
     const requestHeaders = {
       Accept: 'application/json',
       'Content-Type': 'application/json'
@@ -623,9 +624,11 @@ export class BlockstackNetwork {
   *   parameter
   * @private
   */
-  private broadcastTransaction(transaction: string,
-                               transactionToWatch: string = null,
-                               confirmations: number = 6) {
+  broadcastTransaction(
+    transaction: string,
+    transactionToWatch: string = null,
+    confirmations: number = 6
+  ) {
     if (!transaction) {
       const error = new MissingParameterError('transaction')
       return Promise.reject(error)
@@ -676,8 +679,10 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  private broadcastZoneFile(zoneFile?: string,
-                            transactionToWatch: string = null) {
+  broadcastZoneFile(
+    zoneFile?: string,
+    transactionToWatch: string = null
+  ) {
     if (!zoneFile) {
       return Promise.reject(new MissingParameterError('zoneFile'))
     }
@@ -759,9 +764,11 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  private broadcastNameRegistration(preorderTransaction: string,
-                                    registerTransaction: string,
-                                    zoneFile: string) {
+  broadcastNameRegistration(
+    preorderTransaction: string,
+    registerTransaction: string,
+    zoneFile: string
+  ) {
     /*
        * POST /v1/broadcast/registration
        * Request body:
@@ -851,7 +858,7 @@ export class BlockstackNetwork {
    * @private
    * @ignore
    */
-  private modifyUTXOSetFrom(txHex: string) {
+  modifyUTXOSetFrom(txHex: string) {
     const tx = bitcoinjs.Transaction.fromHex(txHex)
 
     const excludeSet: Array<UTXO> = this.excludeUtxoSet.concat()
@@ -899,7 +906,7 @@ export class BlockstackNetwork {
     })
   }
 
-  private resetUTXOs(address: string) {
+  resetUTXOs(address: string) {
     delete this.includeUtxoMap[address]
     this.excludeUtxoSet = []
   }
@@ -913,7 +920,7 @@ export class BlockstackNetwork {
       .then(x => x.consensus_hash)
   }
 
-  private getTransactionInfo(txHash: string): Promise<{block_height: number}> {
+  getTransactionInfo(txHash: string): Promise<{block_height: number}> {
     return this.btc.getTransactionInfo(txHash)
   }
 
@@ -924,7 +931,7 @@ export class BlockstackNetwork {
     return this.btc.getBlockHeight()
   }
 
-  private getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
+  getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
     return this.btc.getNetworkedUTXOs(address)
   }
 }
@@ -1236,6 +1243,16 @@ const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://broadcast.blockstack.org',
   new BlockchainInfoApi()
 )
+
+/**
+ * Get WHOIS-like information for a name, including the address that owns it,
+ * the block at which it expires, and the zone file anchored to it (if available).
+ * @param {String} fullyQualifiedName the name to query.  Can be on-chain of off-chain.
+ * @return {Promise} a promise that resolves to the WHOIS-like information 
+ */
+export function getNameInfo(fullyQualifiedName: string) {
+  return config.network.getNameInfo(fullyQualifiedName)
+}
 
 /**
 * @ignore

@@ -68,7 +68,7 @@ function getNodePublicKey(node: BIP32): string {
  * @ignore
  */
 export class BlockstackWallet {
-  private rootNode: BIP32
+  rootNode: BIP32
 
   constructor(rootNode: BIP32) {
     this.rootNode = rootNode
@@ -84,7 +84,7 @@ export class BlockstackWallet {
    *  of the hierarchical wallet
    * @return {BlockstackWallet} the constructed wallet
    */
-  private static fromSeedBuffer(seed: Buffer): BlockstackWallet {
+  static fromSeedBuffer(seed: Buffer): BlockstackWallet {
     return new BlockstackWallet(bip32.fromSeed(seed))
   }
 

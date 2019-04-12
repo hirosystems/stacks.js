@@ -2,13 +2,15 @@ import test from 'tape-promise/tape'
 import FetchMock from 'fetch-mock'
 
 import {
-  validateProofs, containsValidProofStatement, containsValidAddressProofStatement, profileServices
+  validateProofs, containsValidProofStatement, containsValidAddressProofStatement
 } from '../../../src'
+import { profileServices } from '../../../src/profiles/services'
 
 import {
   sampleProfiles, sampleProofs,
   sampleVerifications, sampleAddressBasedVerifications
 } from './sampleData'
+
 
 function mockRequests() {
   const naval = sampleVerifications.naval
@@ -167,7 +169,7 @@ export function runOwnerAddressBasedProofsUnitTests() {
              false, 'Hacker News body should not contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement,
-                                                '1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7', true),
+                                                '1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7'),
              true, 'LinkedIn body should contain valid bitcoin address proof statement')
 
     t.equals(containsValidAddressProofStatement(linkedInProofStatement,

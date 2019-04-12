@@ -14,6 +14,7 @@ interface ValidateProofService {
   getProofIdentity(searchText: string): string;
 }
 
+/** @ignore */
 export const profileServices: {
   [serviceName: string]: Service & ValidateProofService
 } = {
@@ -24,5 +25,3 @@ export const profileServices: {
   hackerNews: HackerNews,
   linkedIn: LinkedIn
 }
-
-export { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
