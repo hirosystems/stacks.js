@@ -678,8 +678,10 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastZoneFile(zoneFile?: string,
-                            transactionToWatch: string = null) {
+  broadcastZoneFile(
+    zoneFile?: string,
+    transactionToWatch: string = null
+  ) {
     if (!zoneFile) {
       return Promise.reject(new MissingParameterError('zoneFile'))
     }
@@ -761,9 +763,11 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastNameRegistration(preorderTransaction: string,
-                                    registerTransaction: string,
-                                    zoneFile: string) {
+  broadcastNameRegistration(
+    preorderTransaction: string,
+    registerTransaction: string,
+    zoneFile: string
+  ) {
     /*
        * POST /v1/broadcast/registration
        * Request body:

@@ -19,7 +19,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, DEFAULT_BLOCKSTACK_HOST, DEFAULT_SCOPE } from './authConstants'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
 
 
 /**

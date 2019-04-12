@@ -1,5 +1,30 @@
+import { Facebook } from './services/facebook'
+import { Github } from './services/github'
+import { Twitter } from './services/twitter'
+import { Instagram } from './services/instagram'
+import { HackerNews } from './services/hackerNews'
+import { LinkedIn } from './services/linkedIn'
+import { Service } from './services/service'
 
-import { profileServices } from './services'
+interface ValidateProofService {
+  validateProof(proof: any, ownerAddress: string, name?: string): Promise<any>;
+  getProofUrl(proof: any): string;
+  getProofStatement(searchText: string): string;
+  normalizeUrl(proof: any): string;
+  getProofIdentity(searchText: string): string;
+}
+
+const profileServices: {
+  [serviceName: string]: Service & ValidateProofService
+} = {
+  facebook: Facebook,
+  github: Github,
+  twitter: Twitter,
+  instagram: Instagram,
+  hackerNews: HackerNews,
+  linkedIn: LinkedIn
+}
+
 
 /**
  * Validates the social proofs in a user's profile. Currently supports validation of 
