@@ -15,6 +15,7 @@ import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
   * @param {Date} issuedAt - the time of issuance of the token
   * @param {Date} expiresAt - the time of expiration of the token
   * @returns {Object} - the signed profile token
+  * 
   */
 export function signProfileToken(profile: any,
                                  privateKey: string,

@@ -11,6 +11,7 @@
     "build:webpack:watch": "shx rm -rf dist/* && cross-env NODE_ENV=development webpack --mode=development --watch --progress --info-verbosity verbose",
     "build:node": "shx rm -rf lib && tsc",
     "build:node:watch": "shx rm -rf lib && tsc --watch",
+    "prepare": "npm run build:node && npm run build:webpack",
     "test": "npm run lint && cross-env NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
     "integration-test-ops": "cross-env NODE_ENV=test nyc node ./tests/operationsTests/src/index.ts",
     "dev-auth": "npm run build:webpack && ts-node ./tests/browserTests/auth-server.ts",

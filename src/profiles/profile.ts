@@ -12,7 +12,11 @@ const schemaDefinition: {[key: string]: any} = {
     '@type': { type: 'string' }
   }
 }
-
+ 
+/**
+ * Represents a user profile
+ * 
+ */
 export class Profile {
   _profile: {[key: string]: any}
 
