@@ -1,7 +1,7 @@
 import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
-import { BLOCKSTACK_HANDLER, checkWindowAPI, updateQueryStringParameter } from '../utils'
+import { BLOCKSTACK_HANDLER, getGlobalObject, updateQueryStringParameter } from '../utils'
 
 import { Logger } from '../logger'
 
@@ -13,8 +13,8 @@ import { Logger } from '../logger'
  * @ignore 
  */
 export function getAuthRequestFromURL() {
-  checkWindowAPI('getAuthRequestFromURL', 'location')
-  const queryDict = queryString.parse(window.location.search)
+  const location = getGlobalObject('location', { throwIfUnavailable: true, usageDesc: 'getAuthRequestFromURL' })
+  const queryDict = queryString.parse(location.search)
   if (queryDict.authRequest) {
     return (<string>queryDict.authRequest).split(`${BLOCKSTACK_HANDLER}:`).join('')
   } else {
@@ -80,7 +80,6 @@ export function redirectUserToApp(authRequest: string, authResponse: string) {
   } else {
     throw new Error('Invalid redirect URI')
   }
-  
-  checkWindowAPI('redirectUserToApp', 'location')
-  window.location.href = redirectURI
+  const location = getGlobalObject('location', { throwIfUnavailable: true, usageDesc: 'redirectUserToApp' })
+  location.href = redirectURI
 }

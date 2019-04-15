@@ -19,6 +19,7 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
+import { getGlobalObject } from '../utils'
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -437,7 +438,7 @@ export function getFile(
     decrypt: true,
     verify: false,
     username: null,
-    app: typeof window !== 'undefined' ? window.location.origin : undefined,
+    app: getGlobalObject('location', { returnEmptyObject: true }).origin,
     zoneFileLookupURL: null
   }
   const opt = Object.assign({}, defaults, options)
