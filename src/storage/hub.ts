@@ -18,7 +18,8 @@ export type GaiaHubConfig = {
 }
 
 export async function uploadToGaiaHub(
-  filename: string, contents: any,
+  filename: string, 
+  contents: string | Buffer | Blob | BufferSource,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
