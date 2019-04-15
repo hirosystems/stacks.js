@@ -250,6 +250,7 @@ interface GetGlobalObjectOptions {
  * When executing within the Node.js runtime these APIs are unavailable and will be 
  * `undefined` unless the API is provided via polyfill. 
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
+ * @ignore
  */
 export function getGlobalObject<K extends keyof Window>(
   name: K, 
@@ -284,6 +285,7 @@ export function getGlobalObject<K extends keyof Window>(
  * When executing within the Node.js runtime these APIs are unavailable will be `undefined` 
  * unless the API is provided via polyfill. 
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
+ * @ignore
  */
 export function getGlobalObjects<K extends keyof Window>(
   names: K[], 
