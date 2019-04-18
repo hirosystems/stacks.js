@@ -19,7 +19,7 @@ import {
 } from '../errors'
 import { Logger } from '../logger'
 import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
 
 
 /**
@@ -104,7 +104,7 @@ export class UserSession {
   redirectToSignIn(
     redirectURI?: string,
     manifestURI?: string,
-    scopes?: string[]
+    scopes?: Array<AuthScope | string>
   ) {
     const transitKey = this.generateAndStoreTransitKey()
     const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
@@ -159,7 +159,7 @@ export class UserSession {
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
-    scopes?: string[],
+    scopes?: Array<AuthScope | string>,
     appDomain?: string,
     expiresAt: number = nextHour().getTime(),
     extraParams: any = {}
