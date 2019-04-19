@@ -1,6 +1,6 @@
 
 
-import bitcoin from 'bitcoinjs-lib'
+import { TransactionBuilder, payments, address as bjsAddress } from 'bitcoinjs-lib'
 import BN from 'bn.js'
 import {
   decodeB40, hash160, hash128, DUST_MINIMUM
@@ -154,7 +154,7 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
 * @ignore
 */
 function makeTXbuilder() {
-  const txb = new bitcoin.TransactionBuilder(config.network.layer1)
+  const txb = new TransactionBuilder(config.network.layer1)
   txb.setVersion(1)
   return txb
 }
@@ -197,7 +197,7 @@ export function makePreorderSkeleton(
   const burnAmount = asAmountV2(burn)
   const network = config.network
   const nameBuff = Buffer.from(decodeB40(fullyQualifiedName), 'hex') // base40
-  const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network.layer1)
+  const scriptPublicKey = bjsAddress.toOutputScript(preorderAddress, network.layer1)
 
   const dataBuffers = [nameBuff, scriptPublicKey]
 
@@ -228,7 +228,7 @@ export function makePreorderSkeleton(
     opReturnBuffer.write(burnAmount.units, 47, burnAmount.units.length, 'ascii')
   }
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -310,7 +310,7 @@ export function makeRegisterSkeleton(
   }
 
   const opReturnBuffer = Buffer.concat([Buffer.from(opEncode(':'), 'ascii'), payload])
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -375,7 +375,7 @@ export function makeRenewalSkeleton(
   const registerTX = makeRegisterSkeleton(
     fullyQualifiedName, nextOwnerAddress, valueHash, burnTokenHex
   )
-  const txB = bitcoin.TransactionBuilder.fromTransaction(
+  const txB = TransactionBuilder.fromTransaction(
     registerTX, network.layer1
   )
   txB.addOutput(lastOwnerAddress, DUST_MINIMUM)
@@ -421,7 +421,7 @@ export function makeTransferSkeleton(
   hashed.copy(opRet, 4)
   opRet.write(consensusHash, 20, 16, 'hex')
 
-  const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
+  const opRetPayload = payments.embed({ data: [opRet] }).output
 
   const tx = makeTXbuilder()
 
@@ -468,7 +468,7 @@ export function makeUpdateSkeleton(
   hashedName.copy(opRet, 3)
   opRet.write(valueHash, 19, 20, 'hex')
 
-  const opRetPayload = bitcoin.payments.embed({ data: [opRet] }).output
+  const opRetPayload = payments.embed({ data: [opRet] }).output
 
   const tx = makeTXbuilder()
 
@@ -504,7 +504,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
   opRet.write(opEncode('~'), 0, 3, 'ascii')
 
   const opReturnBuffer = Buffer.concat([opRet, nameBuff])
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -550,7 +550,7 @@ export function makeNamespacePreorderSkeleton(
   const network = config.network
   const burnAddress = network.getDefaultBurnAddress()
   const namespaceIDBuff = Buffer.from(decodeB40(namespaceID), 'hex') // base40
-  const scriptPublicKey = bitcoin.address.toOutputScript(preorderAddress, network.layer1)
+  const scriptPublicKey = bjsAddress.toOutputScript(preorderAddress, network.layer1)
   const registerBuff = Buffer.from(registerAddress, 'ascii')
 
   const dataBuffers = [namespaceIDBuff, scriptPublicKey, registerBuff]
@@ -577,7 +577,7 @@ export function makeNamespacePreorderSkeleton(
     opReturnBuffer.write(paddedBurnHex, 39, 8, 'hex')
   }
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -611,7 +611,7 @@ export function makeNamespaceRevealSkeleton(
   opReturnBuffer.write(opEncode('&'), 0, 3, 'ascii')
   opReturnBuffer.write(hexPayload, 3, hexPayload.length / 2, 'hex')
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -637,7 +637,7 @@ export function makeNamespaceReadySkeleton(namespaceID: string) {
   opReturnBuffer.write(opEncode('!'), 0, 3, 'ascii')
   opReturnBuffer.write(`.${namespaceID}`, 3, namespaceID.length + 1, 'ascii')
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -672,10 +672,10 @@ export function makeNameImportSkeleton(name: string, recipientAddr: string, zone
   opReturnBuffer.write(opEncode(';'), 0, 3, 'ascii')
   opReturnBuffer.write(name, 3, name.length, 'ascii')
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
 
   const tx = makeTXbuilder()
-  const zonefileHashB58 = bitcoin.address.toBase58Check(
+  const zonefileHashB58 = bjsAddress.toBase58Check(
     Buffer.from(zonefileHash, 'hex'), network.layer1.pubKeyHash
   )
 
@@ -707,7 +707,7 @@ export function makeAnnounceSkeleton(messageHash: string) {
   opReturnBuffer.write(opEncode('#'), 0, 3, 'ascii')
   opReturnBuffer.write(messageHash, 3, messageHash.length / 2, 'hex')
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
@@ -756,7 +756,7 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
   opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex')
   opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii')
 
-  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const nullOutput = payments.embed({ data: [opReturnBuffer] }).output
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)

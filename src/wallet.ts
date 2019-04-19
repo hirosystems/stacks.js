@@ -1,5 +1,5 @@
 import crypto, { randomBytes } from 'crypto'
-import bitcoin, { ECPair } from 'bitcoinjs-lib'
+import { ECPair, payments } from 'bitcoinjs-lib'
 import bip39 from 'bip39'
 import bip32, { BIP32 } from 'bip32'
 import { ecPairToHexString } from './utils'
@@ -274,7 +274,7 @@ export class BlockstackWallet {
   }
 
   static getAddressFromBIP32Node(node: BIP32) {
-    return bitcoin.payments.p2pkh({ pubkey: node.publicKey }).address
+    return payments.p2pkh({ pubkey: node.publicKey }).address
   }
 
   /**

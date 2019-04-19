@@ -1,5 +1,4 @@
-
-import bitcoinjs from 'bitcoinjs-lib'
+import { TxOutput, address as bjsAddress, networks, crypto as bjsCrypto, Transaction, payments, Network } from 'bitcoinjs-lib'
 import FormData from 'form-data'
 import BN from 'bn.js'
 import RIPEMD160 from 'ripemd160'
@@ -53,7 +52,7 @@ export class BlockstackNetwork {
 
   broadcastServiceUrl: string
 
-  layer1: any
+  layer1: Network
 
   DUST_MINIMUM: number
 
@@ -67,7 +66,7 @@ export class BlockstackNetwork {
 
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork,
-              network = bitcoinjs.networks.bitcoin) {
+              network = networks.bitcoin) {
     this.blockstackAPIUrl = apiUrl
     this.broadcastServiceUrl = broadcastServiceUrl
     this.layer1 = network
@@ -80,11 +79,11 @@ export class BlockstackNetwork {
   }
 
   coerceAddress(address: string) {
-    const { hash, version } = bitcoinjs.address.fromBase58Check(address)
-    const scriptHashes = [bitcoinjs.networks.bitcoin.scriptHash,
-                          bitcoinjs.networks.testnet.scriptHash]
-    const pubKeyHashes = [bitcoinjs.networks.bitcoin.pubKeyHash,
-                          bitcoinjs.networks.testnet.pubKeyHash]
+    const { hash, version } = bjsAddress.fromBase58Check(address)
+    const scriptHashes = [networks.bitcoin.scriptHash,
+                          networks.testnet.scriptHash]
+    const pubKeyHashes = [networks.bitcoin.pubKeyHash,
+                          networks.testnet.pubKeyHash]
     let coercedVersion
     if (scriptHashes.indexOf(version) >= 0) {
       coercedVersion = this.layer1.scriptHash
@@ -93,7 +92,7 @@ export class BlockstackNetwork {
     } else {
       throw new Error(`Unrecognized address version number ${version} in ${address}`)
     }
-    return bitcoinjs.address.toBase58Check(hash, coercedVersion)
+    return bjsAddress.toBase58Check(hash, coercedVersion)
   }
 
   /**
@@ -399,7 +398,7 @@ export class BlockstackNetwork {
         if (resp.status === 200) {
           return resp.text()
             .then((body) => {
-              const sha256 = bitcoinjs.crypto.sha256(Buffer.from(body))
+              const sha256 = bjsCrypto.sha256(Buffer.from(body))
               const h = (new RIPEMD160()).update(sha256).digest('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)
@@ -859,7 +858,7 @@ export class BlockstackNetwork {
    * @ignore
    */
   modifyUTXOSetFrom(txHex: string) {
-    const tx = bitcoinjs.Transaction.fromHex(txHex)
+    const tx = Transaction.fromHex(txHex)
 
     const excludeSet: Array<UTXO> = this.excludeUtxoSet.concat()
 
@@ -878,7 +877,7 @@ export class BlockstackNetwork {
     tx.outs.forEach((utxoCreated, txOutputN) => {
       const isNullData = function isNullData(script: Buffer) {
         try {
-          bitcoinjs.payments.embed({ output: script }, { validate: true })
+          payments.embed({ output: script }, { validate: true })
           return true
         } catch (_) {
           return false
@@ -887,7 +886,7 @@ export class BlockstackNetwork {
       if (isNullData(utxoCreated.script)) {
         return
       }
-      const address = bitcoinjs.address.fromOutputScript(
+      const address = bjsAddress.fromOutputScript(
         utxoCreated.script, this.layer1
       )
 
@@ -899,7 +898,7 @@ export class BlockstackNetwork {
       includeSet.push({
         tx_hash: txHash,
         confirmations: 0,
-        value: utxoCreated.value,
+        value: (utxoCreated as TxOutput).value,
         tx_output_n: txOutputN
       })
       this.includeUtxoMap[address] = includeSet
@@ -942,7 +941,7 @@ export class BlockstackNetwork {
 export class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork) {
-    super(apiUrl, broadcastServiceUrl, bitcoinAPI, bitcoinjs.networks.testnet)
+    super(apiUrl, broadcastServiceUrl, bitcoinAPI, networks.testnet)
   }
 
   getFeeRate(): Promise<number> {
@@ -1211,7 +1210,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
           .then((respText) => {
             if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
               const txHash = Buffer.from(
-                bitcoinjs.Transaction.fromHex(transaction)
+                Transaction.fromHex(transaction)
                   .getHash()
                   .reverse()).toString('hex') // big_endian
               return txHash
