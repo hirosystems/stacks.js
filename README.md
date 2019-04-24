@@ -2,7 +2,7 @@
 
 Note: If you're looking for the Blockstack CLI repo it was merged with [Blockstack Core](https://github.com/blockstack/blockstack-core).
 
-- [blockstack.js ![CircleCI](https://circleci.com/gh/blockstack/blockstack.js/tree/master) ![npm](https://www.npmjs.com/package/blockstack) ![npm](https://www.npmjs.com/package/blockstack) ![npm](https://www.npmjs.com/package/blockstack) ![Slack](http://slack.blockstack.org/)](#blockstackjs-circlecihttpscirclecicomghblockstackblockstackjstreemaster-npmhttpswwwnpmjscompackageblockstack-npmhttpswwwnpmjscompackageblockstack-npmhttpswwwnpmjscompackageblockstack-slackhttpslackblockstackorg)
+- [blockstack.js ![CircleCI](https://circleci.com/gh/blockstack/blockstack.js/tree/master) ![npm](https://www.npmjs.com/package/blockstack) ![npm](https://www.npmjs.com/package/blockstack) ![npm](https://www.npmjs.com/package/blockstack) ![Slack](http://slack.blockstack.org/)(#blockstackjs-circlecihttpscirclecicomghblockstackblockstackjstreemaster-npmhttpswwwnpmjscompackageblockstack-npmhttpswwwnpmjscompackageblockstack-npmhttpswwwnpmjscompackageblockstack-slackhttpslackblockstackorg)
   - [Installation](#installation)
   - [About](#about)
   - [Documentation](#documentation)
