@@ -18,7 +18,7 @@
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,
-    "includes" : "mdincludes"
+    "includes" : "mdincludes",
     "includeDeclarations": false,
     "gitRevision": "master",
     "listInvalidSymbolLinks": true,
