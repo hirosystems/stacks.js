@@ -237,34 +237,31 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-function getFileContents(path: string, app: string, username: string | undefined, 
-                         zoneFileLookupURL: string | undefined,
-                         forceText: boolean,
-                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  return Promise.resolve()
-    .then(() => {
-      const opts = { app, username, zoneFileLookupURL }
-      return getFileUrl(path, opts, caller)
-    })
-    .then(readUrl => fetch(readUrl))
-    .then<string | ArrayBuffer | null>((response) => {
-      if (response.status !== 200) {
-        if (response.status === 404) {
-          Logger.debug(`getFile ${path} returned 404, returning null`)
-          return null
-        } else {
-          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
-        }
-      }
-      const contentType = response.headers.get('Content-Type')
-      if (forceText || contentType === null
-          || contentType.startsWith('text')
-          || contentType === 'application/json') {
-        return response.text()
-      } else {
-        return response.arrayBuffer()
-      }
-    })
+async function getFileContents(
+  path: string, app: string, username: string | undefined, 
+  zoneFileLookupURL: string | undefined,
+  forceText: boolean,
+  caller?: UserSession
+): Promise<string | ArrayBuffer | null> {
+  const opts = { app, username, zoneFileLookupURL }
+  const readUrl = await getFileUrl(path, opts, caller)
+  const response = await fetch(readUrl)
+  if (response.status !== 200) {
+    if (response.status === 404) {
+      Logger.debug(`getFile ${path} returned 404, returning null`)
+      return null
+    } else {
+      throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+    }
+  }
+  const contentType = response.headers.get('Content-Type')
+  if (forceText || contentType === null
+      || contentType.startsWith('text')
+      || contentType === 'application/json') {
+    return response.text()
+  } else {
+    return response.arrayBuffer()
+  }
 }
 
 /* Handle fetching an unencrypted file, its associated signature
@@ -428,7 +425,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(
+export async function getFile(
   path: string, 
   options?: GetFileOptions,
   caller?: UserSession
@@ -452,27 +449,29 @@ export function getFile(
     return getFileSignedUnencrypted(path, opt, caller)
   }
 
-  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt, caller)
-    .then<string|ArrayBuffer|Buffer>((storedContents) => {
-      if (storedContents === null) {
-        return storedContents
-      } else if (opt.decrypt && !opt.verify) {
-        if (typeof storedContents !== 'string') {
-          throw new Error('Expected to get back a string for the cipherText')
-        }
-        return caller.decryptContent(storedContents)
-      } else if (opt.decrypt && opt.verify) {
-        if (typeof storedContents !== 'string') {
-          throw new Error('Expected to get back a string for the cipherText')
-        }
-        return handleSignedEncryptedContents(caller, path, storedContents,
-                                             opt.app, opt.username, opt.zoneFileLookupURL)
-      } else if (!opt.verify && !opt.decrypt) {
-        return storedContents
-      } else {
-        throw new Error('Should be unreachable.')
-      }
-    })
+  const storedContents = await getFileContents(
+    path, opt.app, 
+    opt.username, opt.zoneFileLookupURL, 
+    !!opt.decrypt, caller)
+    
+  if (storedContents === null) {
+    return storedContents
+  } else if (opt.decrypt && !opt.verify) {
+    if (typeof storedContents !== 'string') {
+      throw new Error('Expected to get back a string for the cipherText')
+    }
+    return caller.decryptContent(storedContents)
+  } else if (opt.decrypt && opt.verify) {
+    if (typeof storedContents !== 'string') {
+      throw new Error('Expected to get back a string for the cipherText')
+    }
+    return handleSignedEncryptedContents(caller, path, storedContents,
+                                         opt.app, opt.username, opt.zoneFileLookupURL)
+  } else if (!opt.verify && !opt.decrypt) {
+    return storedContents
+  } else {
+    throw new Error('Should be unreachable.')
+  }
 }
 
 /**

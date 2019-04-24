@@ -47,19 +47,34 @@ module.exports = (env, argv) => {
         {
           test: /\.ts?$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: 'ts-loader',
-              options: {
-                configFile: "tsconfig.browser.json"
-              }
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                ["@babel/preset-env", { }],
+                "@babel/preset-typescript"
+              ],
+              plugins: [
+                ["@babel/plugin-transform-runtime", {
+                  "useESModules": true,
+                  "corejs": { version: "3", proposals: true }
+                }],
+                "@babel/proposal-class-properties",
+                "@babel/proposal-object-rest-spread"
+              ]
             }
-          ]
+          }
         },
         {
           test: /\.js$/,
           use: {
-            loader: 'babel-loader'
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                ['@babel/preset-env', { }]
+              ],
+              plugins: ['@babel/plugin-proposal-object-rest-spread']
+            }
           }
         }
       ].concat((isEnvDev || isEnvTest) ? {

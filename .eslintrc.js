@@ -57,6 +57,7 @@ module.exports = {
     "function-paren-newline": 0,
     "no-shadow": "off",
     "no-use-before-define": "off",
+    "import/named": "error",
     "@typescript-eslint/indent": [2, 2, {
       "FunctionDeclaration": { "parameters": "first" },
       "FunctionExpression": { "parameters": "first" },
@@ -80,9 +81,6 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
 
     // TODO: enable this when reasonable
-    "@typescript-eslint/promise-function-async": "off",
-
-    // TODO: enable when this is fixed https://github.com/benmosher/eslint-plugin-import/issues/1282
-    "import/named": "off"
+    "@typescript-eslint/promise-function-async": "off"
   }
 }
