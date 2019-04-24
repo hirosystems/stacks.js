@@ -13,12 +13,12 @@
     "src",
   ],
   "typedocOptions": {
-    "name": "blockstack.js Library Reference",
     "readme": "overview.md",
     "mode": "file",
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,
+    "includes" : "mdincludes"
     "includeDeclarations": false,
     "gitRevision": "master",
     "listInvalidSymbolLinks": true,
