@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "declaration": true,
+    "noImplicitAny": false,
+    "outDir": "lib",
+    "sourceMap": true
+  },
+  "include": [
+    "src",
+  ],
+  "typedocOptions": {
+    "readme": "overview.md",
+    "mode": "file",
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "includes" : "mdincludes",
+    "includeDeclarations": false,
+    "gitRevision": "master",
+    "listInvalidSymbolLinks": true,
+    "theme": "docs-theme"
+  }
+}
