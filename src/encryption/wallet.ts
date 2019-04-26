@@ -8,7 +8,8 @@ import triplesec from 'triplesec'
  * @param {string} password - Password to encrypt mnemonic with
  * @return {Promise<Buffer>} The encrypted phrase
  * @private
- */
+ * @ignore 
+ * */
 export function encryptMnemonic(phrase: string, password: string) {
   return Promise.resolve().then(() => {
     // must be bip39 mnemonic
@@ -48,6 +49,9 @@ export function encryptMnemonic(phrase: string, password: string) {
 // Used to distinguish bad password during decrypt vs invalid format
 class PasswordError extends Error { }
 
+/**
+* @ignore
+*/
 function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
   return Promise.resolve().then(() => {
     const salt = dataBuffer.slice(0, 16)
@@ -101,6 +105,7 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
  * @param {String} password - Password for data
  * @return {Promise<Buffer>} Decrypted seed
  * @private
+ * @ignore 
  */
 function decryptLegacy(dataBuffer: Buffer, password: string) {
   return new Promise<Buffer>((resolve, reject) => {
@@ -126,6 +131,7 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
  * @param {string} password - Password for data
  * @return {Promise<string>} the raw mnemonic phrase
  * @private
+ * @ignore 
  */
 export function decryptMnemonic(data: (string | Buffer), password: string): Promise<string> {
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')

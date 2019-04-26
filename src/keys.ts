@@ -2,6 +2,12 @@
 import { randomBytes } from 'crypto'
 import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
 
+/**
+ * 
+ * @param numberOfBytes 
+ * 
+ * @ignore
+ */
 export function getEntropy(numberOfBytes: number) {
   if (!numberOfBytes) {
     numberOfBytes = 32
@@ -9,12 +15,18 @@ export function getEntropy(numberOfBytes: number) {
   return randomBytes(numberOfBytes)
 }
 
+/**
+* @ignore
+*/
 export function makeECPrivateKey() {
   // TODO: use fast crypto
   const keyPair = ECPair.makeRandom({ rng: getEntropy })
   return keyPair.privateKey.toString('hex')
 }
 
+/**
+* @ignore
+*/
 export function publicKeyToAddress(publicKey: string) {
   // TODO: use fast crypto
   const publicKeyBuffer = Buffer.from(publicKey, 'hex')
@@ -23,6 +35,9 @@ export function publicKeyToAddress(publicKey: string) {
   return address
 }
 
+/**
+* @ignore
+*/
 export function getPublicKeyFromPrivate(privateKey: string) {
   // TODO: use fast crypto
   const keyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'))

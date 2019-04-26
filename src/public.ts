@@ -1,34 +1,19 @@
 
+import { protocolEchoReplyDetection } from './auth/protocolEchoDetection'
 
-import queryString from 'query-string'
-
-// TODO: Putting in here so it executes ASAP. There is probably a better place to put this.
-// Note: This prototype is designed to work as a drop-in-replacement (non-breaking upgrade)
-// for apps using blockstack.js. That requires doing this hacky global & immediate detection. 
-// A more proper approach would require developers to call an additional blockstack.js method 
-// for invoking this detection method.
-(function protocolEchoReplyDetection() {
-  // Check that the `window` APIs exist
-  if (typeof window !== 'object' || !window.location || !window.localStorage) {
-    // Exit detection function - we are not running in a browser environment.
-    return
-  }
-  // Check if the location query string contains a protocol-echo reply.
-  // If so, this page was only re-opened to signal back the originating 
-  // tab that the protocol handler is installed. 
-  const queryDict = queryString.parse(window.location.search)
-  if (queryDict.echoReply) {
-    // Use localStorage to notify originated tab that protocol handler is available and working.
-    const echoReplyKey = `echo-reply-${queryDict.echoReply}`
-    // Set the echo-reply result in localStorage for the other window to see.
-    window.localStorage.setItem(echoReplyKey, 'success')
-    // Redirect back to the localhost auth url, as opposed to another protocol launch.
-    // This will re-use the same tab rather than creating another useless one.
-    window.setTimeout(() => {
-      window.location.href = decodeURIComponent(<string>queryDict.authContinuation)
-    }, 10)
-  }
-}())
+try {
+  /**
+   * Located here so it executes ASAP. The protocol handler detection is designed to work 
+   * as a drop-in-replacement (non-breaking upgrade) for apps using blockstack.js. That 
+   * requires doing this global and immediate detection. 
+   * This function is also called in `isSignInPending` so that web app bundling the 
+   * blockstack.js lib in a more modular way will still perform the protocol detection 
+   * handling without any changes if this index file is not bundled in. 
+   */
+  protocolEchoReplyDetection()
+} catch (error) {
+  console.error(`Error performing global protocol echo reply detection: ${error}`)
+}
 
 export * from './auth'
 export * from './profiles'

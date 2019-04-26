@@ -21,10 +21,9 @@ export {
 } from './profileProofs'
 
 export {
-  profileServices,
   containsValidProofStatement,
   containsValidAddressProofStatement
-} from './services'
+} from './services/serviceUtils'
 
 export {
   makeProfileZoneFile,

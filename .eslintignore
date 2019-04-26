@@ -10,3 +10,4 @@ webpack.config.js
 typedoc.js
 **/*.d.ts
 tests/unitTests
+docs-theme/

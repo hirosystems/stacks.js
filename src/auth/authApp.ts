@@ -3,7 +3,7 @@ import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
-import { BLOCKSTACK_HANDLER, isLaterVersion, hexStringToECPair, checkWindowAPI } from '../utils'
+import { isLaterVersion, hexStringToECPair, checkWindowAPI } from '../utils'
 import { getAddressFromDID } from '../dids'
 import { LoginFailedError } from '../errors'
 import { decryptPrivateKey, makeAuthRequest } from './authMessages'
@@ -17,6 +17,8 @@ import { UserSession } from './userSession'
 import { config } from '../config'
 import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
+import { protocolEchoReplyDetection } from './protocolEchoDetection'
+import { launchCustomProtocol } from './protocolLaunch'
 
 
 const DEFAULT_PROFILE = {
@@ -24,24 +26,50 @@ const DEFAULT_PROFILE = {
   '@context': 'http://schema.org'
 }
 
+/**
+ *  Returned from the [[UserSession.loadUserData]] function.
+ */
 export interface UserData {
+  // public: the blockstack ID (for example: stackerson.id or alice.blockstack.id)
   username: string;
+  // public: the email address for the user. only available if the `email` 
+  // scope is requested, and if the user has entered a valid email into 
+  // their profile. 
+  //
+  // **Note**: Blockstack does not require email validation 
+  // for users for privacy reasons and blah blah (something like this, idk)
   email?: string;
+  // probably public: (a quick description of what this is, and a link to the
+  // DID foundation and/or the blockstack docs related to DID, idk)
   decentralizedID: string;
+  // probably private: looks like it happens to be the btc address but idk
+  // the value of establishing this as a supported field
   identityAddress: string;
+  // probably public: this is an advanced feature, I think many app devs 
+  // using our more advanced encryption functions (as opposed to putFile/getFile), 
+  // are probably using this. seems useful to explain. 
   appPrivateKey: string;
+  // maybe public: possibly useful for advanced devs / webapps. I see an opportunity
+  // to make a small plug about "user owned data" here, idk. 
   hubUrl: string;
+  // maybe private: this would be an advanced field for app devs to use. 
   authResponseToken: string;
+  // private: does not get sent to webapp at all.
   coreSessionToken?: string;
+  // private: does not get sent to webapp at all.
   gaiaAssociationToken?: string;
-  associationToken?: string;
+  // public: this is the proper `Person` schema json for the user. 
+  // This is the data that gets used when the `new blockstack.Person(profile)` class is used.
   profile: any;
+  // private: does not get sent to webapp at all.
   gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
+ * @deprecated 
+ * #### v19 Use [[UserSession.isUserSignedIn]] instead.
+ * 
  * Check if a user is currently signed in.
- * @method isUserSignedIn
  * @return {Boolean} `true` if the user is signed in, `false` if not.
  */
 export function isUserSignedIn() {
@@ -53,9 +81,14 @@ export function isUserSignedIn() {
 }
 
 /**
+ *
+ * 
+ * @deprecated 
+ * #### v19 Use [[UserSession.isUserSignedIn]] instead.
+ * 
  * Generates an authentication request and redirects the user to the Blockstack
  * browser to approve the sign in request.
- *
+ * 
  * Please note that this requires that the web browser properly handles the
  * `blockstack:` URL protocol handler.
  *
@@ -85,14 +118,34 @@ export function redirectToSignIn(redirectURI?: string,
 }
 
 /**
- * Check if there is a authentication request that hasn't been handled.
+ * @deprecated 
+ * #### v19 Use [[UserSession.isSignInPending]] instead. 
+ *
+ * Check if there is a authentication request that hasn't been handled. 
+ *
+ * Also checks for a protocol echo reply (which if detected then the page
+ * will be automatically redirected after this call). 
+ * 
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
 export function isSignInPending() {
+  try {
+    const isProtocolEcho = protocolEchoReplyDetection()
+    if (isProtocolEcho) {
+      Logger.info('protocolEchoReply detected from isSignInPending call, the page is about to redirect.')
+      return true
+    }
+  } catch (error) {
+    Logger.error(`Error checking for protocol echo reply isSignInPending: ${error}`)
+  }
+  
   return !!getAuthResponseToken()
 }
 
 /**
+ * @deprecated 
+ * #### v19 Use [[UserSession.getAuthResponseToken]] instead. 
+ *
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
@@ -102,10 +155,13 @@ export function getAuthResponseToken(): string {
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.loadUserData]] instead.
+ *
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
  * @return {Object} User data object.
- */
+*/
 export function loadUserData() {
   console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
@@ -114,7 +170,10 @@ export function loadUserData() {
   return userSession.loadUserData()
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.signUserOut]] instead.
+ *
  * Sign the user out and optionally redirect to given location.
  * @param  redirectURL
  * Location to redirect user to after sign out. 
@@ -136,185 +195,10 @@ export function signUserOut(redirectURL?: string, caller?: UserSession) {
   } 
 }
 
-/**
- * Detects if the native auth-browser is installed and is successfully 
- * launched via a custom protocol URI. 
- * @param {String} authRequest
- * The encoded authRequest to be used as a query param in the custom URI. 
- * @param {String} successCallback
- * The callback that is invoked when the protocol handler was detected. 
- * @param {String} failCallback
- * The callback that is invoked when the protocol handler was not detected. 
- * @return {void}
- */
-function detectProtocolLaunch(
-  authRequest: string, 
-  successCallback: () => void, 
-  failCallback: () => void) {
-  // Create a unique ID used for this protocol detection attempt.
-  const echoReplyID = Math.random().toString(36).substr(2, 9)
-  const echoReplyKeyPrefix = 'echo-reply-'
-  const echoReplyKey = `${echoReplyKeyPrefix}${echoReplyID}`
-
-  const apis = ['localStorage', 'document', 'setTimeout', 'clearTimeout', 'addEventListener', 'removeEventListener']
-  apis.forEach((windowAPI) => checkWindowAPI('detectProtocolLaunch', windowAPI))
-
-  // Use localStorage as a reliable cross-window communication method.
-  // Create the storage entry to signal a protocol detection attempt for the
-  // next browser window to check.
-  window.localStorage.setItem(echoReplyKey, Date.now().toString())
-  const cleanUpLocalStorage = () => {
-    try {
-      window.localStorage.removeItem(echoReplyKey)
-      // Also clear out any stale echo-reply keys older than 1 hour.
-      for (let i = 0; i < window.localStorage.length; i++) {
-        const storageKey = window.localStorage.key(i)
-        if (storageKey && storageKey.startsWith(echoReplyKeyPrefix)) {
-          const storageValue = window.localStorage.getItem(storageKey)
-          if (storageValue === 'success' || (Date.now() - parseInt(storageValue, 10)) > 3600000) {
-            window.localStorage.removeItem(storageKey)
-          }
-        }
-      }
-    } catch (err) {
-      Logger.error('Exception cleaning up echo-reply entries in localStorage')
-      Logger.error(err)
-    }
-  }
-
-  const detectionTimeout = 1000
-  let redirectToWebAuthTimer = 0
-  const cancelWebAuthRedirectTimer = () => {
-    if (redirectToWebAuthTimer) {
-      window.clearTimeout(redirectToWebAuthTimer)
-      redirectToWebAuthTimer = 0
-    }
-  }
-  const startWebAuthRedirectTimer = (timeout = detectionTimeout) => {
-    cancelWebAuthRedirectTimer()
-    redirectToWebAuthTimer = window.setTimeout(() => {
-      if (redirectToWebAuthTimer) {
-        cancelWebAuthRedirectTimer()
-        let nextFunc: () => void
-        if (window.localStorage.getItem(echoReplyKey) === 'success') {
-          Logger.info('Protocol echo reply detected.')
-          nextFunc = successCallback
-        } else {
-          Logger.info('Protocol handler not detected.')
-          nextFunc = failCallback
-        }
-        failCallback = () => {}
-        successCallback = () => {}
-        cleanUpLocalStorage()
-        // Briefly wait since localStorage changes can 
-        // sometimes be ignored when immediately redirected.
-        setTimeout(() => nextFunc(), 100)
-      }
-    }, timeout)
-  }
-
-  startWebAuthRedirectTimer()
-  
-  const inputPromptTracker = window.document.createElement('input')
-  inputPromptTracker.type = 'text'
-  const inputStyle: CSSStyleDeclarationFix = inputPromptTracker.style as any
-  // Prevent this element from inherited any css.
-  inputStyle.all = 'initial'
-  // Setting display=none on an element prevents them from being focused/blurred.
-  // So hide the element using other properties..
-  inputStyle.opacity = '0'
-  inputStyle.filter = 'alpha(opacity=0)'
-  inputStyle.height = '0'
-  inputStyle.width = '0'
-
-  // If the the focus of a page element is immediately changed then this likely indicates 
-  // the protocol handler is installed, and the browser is prompting the user if they want 
-  // to open the application. 
-  const inputBlurredFunc = () => {
-    // Use a timeout of 100ms to ignore instant toggles between blur and focus.
-    // Browsers often perform an instant blur & focus when the protocol handler is working
-    // but not showing any browser prompts, so we want to ignore those instances.
-    let isRefocused = false
-    inputPromptTracker.addEventListener('focus', () => { isRefocused = true }, { once: true, capture: true })
-    setTimeout(() => {
-      if (redirectToWebAuthTimer && !isRefocused) {
-        Logger.info('Detected possible browser prompt for opening the protocol handler app.')
-        window.clearTimeout(redirectToWebAuthTimer)
-        inputPromptTracker.addEventListener('focus', () => {
-          if (redirectToWebAuthTimer) {
-            Logger.info('Possible browser prompt closed, restarting auth redirect timeout.')
-            startWebAuthRedirectTimer()
-          }
-        }, { once: true, capture: true })
-      }
-    }, 100)
-  }
-  inputPromptTracker.addEventListener('blur', inputBlurredFunc, { once: true, capture: true })
-  setTimeout(() => inputPromptTracker.removeEventListener('blur', inputBlurredFunc), 200)
-  window.document.body.appendChild(inputPromptTracker)
-  inputPromptTracker.focus()
-  
-  // Detect if document.visibility is immediately changed which is a strong 
-  // indication that the protocol handler is working. We don't know for sure and 
-  // can't predict future browser changes, so only increase the redirect timeout.
-  // This reduces the probability of a false-negative (where local auth works, but 
-  // the original page was redirect to web auth because something took too long),
-  const pageVisibilityChanged = () => {
-    if (window.document.hidden && redirectToWebAuthTimer) {
-      Logger.info('Detected immediate page visibility change (protocol handler probably working).')
-      startWebAuthRedirectTimer(3000)
-    }
-  }
-  window.document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
-  setTimeout(() => window.document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
-
-
-  // Listen for the custom protocol echo reply via localStorage update event.
-  window.addEventListener('storage', function replyEventListener(event) {
-    if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
-      // Custom protocol worked, cancel the web auth redirect timer.
-      cancelWebAuthRedirectTimer()
-      inputPromptTracker.removeEventListener('blur', inputBlurredFunc)
-      Logger.info('Protocol echo reply detected from localStorage event.')
-      // Clean up event listener and localStorage.
-      window.removeEventListener('storage', replyEventListener)
-      const nextFunc = successCallback
-      successCallback = () => {}
-      failCallback = () => {}
-      cleanUpLocalStorage()
-      // Briefly wait since localStorage changes can sometimes 
-      // be ignored when immediately redirected.
-      setTimeout(() => nextFunc(), 100)
-    }
-  }, false)
-
-  // Use iframe technique for launching the protocol URI rather than setting `window.location`.
-  // This method prevents browsers like Safari, Opera, Firefox from showing error prompts
-  // about unknown protocol handler when app is not installed, and avoids an empty
-  // browser tab when the app is installed. 
-  Logger.info('Attempting protocol launch via iframe injection.')
-  const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
-  const iframe = window.document.createElement('iframe')
-  const iframeStyle: CSSStyleDeclarationFix = iframe.style as any
-  iframeStyle.all = 'initial'
-  iframeStyle.display = 'none'
-  iframe.src = locationSrc
-  window.document.body.appendChild(iframe)
-}
-
-/**
- * TODO: Submit PR to fix this:
- * https://github.com/Microsoft/TypeScript/blob/master/src/lib/dom.generated.d.ts
- * https://github.com/Microsoft/TypeScript/blob/master/CONTRIBUTING.md#modifying-generated-library-files
- * https://github.com/Microsoft/TSJS-lib-generator#contribution-guidelines
- * 
- */
-interface CSSStyleDeclarationFix extends CSSStyleDeclaration {
-  /** @see https://developer.mozilla.org/en-US/docs/Web/CSS/all */
-  all: string | null
-}
-
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.redirectToSignInWithAuthRequest]] instead.
+ *
  * Redirects the user to the Blockstack browser to approve the sign in request
  * given.
  *
@@ -353,10 +237,13 @@ export function redirectToSignInWithAuthRequest(
     window.location.href = httpsURI
   }
 
-  detectProtocolLaunch(authRequest, successCallback, failCallback)
+  launchCustomProtocol(authRequest, successCallback, failCallback)
 }
 
-/**
+/** 
+ * @deprecated 
+ * #### v19 Use [[UserSession.handlePendingSignIn]] instead.
+ *
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *
@@ -373,7 +260,25 @@ export async function handlePendingSignIn(
   authResponseToken: string = getAuthResponseToken(), 
   transitKey?: string,
   caller?: UserSession
-) {
+): Promise<UserData> {
+  try {
+    const isProtocolEcho = protocolEchoReplyDetection()
+    if (isProtocolEcho) {
+      const msg = 'handlePendingSignIn called while protocolEchoReply was detected, and ' 
+        + 'the page is about to redirect. This function will resolve with an error after '
+        + 'several seconds, if the page was not redirected for some reason.'
+      Logger.info(msg)
+      return new Promise<UserData>((_resolve, reject) => {
+        setTimeout(() => {
+          Logger.error('Page should have redirected by now. handlePendingSignIn will now throw.')
+          reject(msg)
+        }, 3000)
+      })
+    }
+  } catch (error) {
+    Logger.error(`Error checking for protocol echo reply handlePendingSignIn: ${error}`)
+  }
+
   if (!caller) {
     caller = new UserSession()
   }

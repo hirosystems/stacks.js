@@ -8,13 +8,25 @@ import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
 
+/**
+ * 
+ * @ignore
+ */
 export const DUST_MINIMUM = 5500
 
+/**
+ * 
+ * @ignore
+ */
 export function hash160(buff: Buffer) {
   const sha256 = bitcoinjs.crypto.sha256(buff)
   return (new RIPEMD160()).update(sha256).digest()
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function hash128(buff: Buffer) {
   return Buffer.from(bitcoinjs.crypto.sha256(buff).slice(0, 16))
 }
@@ -54,6 +66,10 @@ function transactionBytes(inputs: Array<txPoint | null>, outputs: Array<txPoint 
     + outputs.reduce((a: number, x: txPoint | null) => (a + outputBytes(x)), 0)
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function getTransactionInsideBuilder(txBuilder: bitcoinjs.TransactionBuilder) {
   return <bitcoinjs.Transaction>(<any>txBuilder).__tx
 }
@@ -67,6 +83,10 @@ function getTransaction(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuild
 
 //
 
+/**
+ * 
+ * @ignore
+ */
 export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
                                 additionalInputs: number,
                                 additionalOutputs: number) {
@@ -82,11 +102,19 @@ export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.Transact
   return transactionBytes(inputs, outputs)
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function sumOutputValues(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
   const innerTx = getTransaction(txIn)
   return innerTx.outs.reduce((agg, x) => agg + x.value, 0)
 }
 
+/**
+ * 
+ * @ignore
+ */
 export function decodeB40(input: string) {
   // treat input as a base40 integer, and output a hex encoding
   // of that integer.
@@ -129,6 +157,7 @@ export function decodeB40(input: string) {
  *    if false, this function will fund _at most_ `amountToFund`
  * @returns {number} - the amount of leftover change (in satoshis)
  * @private
+ * @ignore
  */
 export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
                                utxos: Array<UTXO>,

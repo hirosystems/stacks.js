@@ -10,18 +10,18 @@ import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST } from './aut
  * `window.location.origin` as the app domain.
  * On non-browser platforms, you need to
  * specify an app domain as the first argument.
- * @type {AppConfig}
+ * 
  */
 export class AppConfig {
   /**
    * Blockstack apps are uniquely identified by their app domain.
-   * @type {string}
+   *
    */
   appDomain: string
 
   /**
    * An array of string representing permissions requested by the app.
-   * @type {[Array<string>}
+   *
    */
   scopes: Array<string>
 
@@ -29,7 +29,7 @@ export class AppConfig {
   /**
    * Path on app domain to redirect users to after authentication. The
    * authentication response token will be postpended in a query.
-   * @type {string}
+   *
    */
   redirectPath: string
 
@@ -38,7 +38,7 @@ export class AppConfig {
    *
    * This file needs to have CORS headers set so that it can be fetched
    * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.
-   * @type {string}
+   *
    */
   manifestPath: string
 
@@ -46,7 +46,7 @@ export class AppConfig {
    * The URL of Blockstack core node to use for this app. If this is
    * `null`, the core node specified by the user or default core node
    * will be used.
-   * @type {string}
+   *
    */
   coreNode: string
 
@@ -54,7 +54,7 @@ export class AppConfig {
    * The URL of a web-based Blockstack Authenticator to use in the event
    * the user doesn't have Blockstack installed on their machine. If this
    * is not specified, the current default in this library will be used.
-   * @type {string}
+   *
    */
   authenticatorURL?: string
 
@@ -64,7 +64,8 @@ export class AppConfig {
    * @param {string} redirectPath - path on app domain to redirect users to after authentication
    * @param {string} manifestPath - path relative to app domain of app's manifest file
    * @param {string} coreNode - override the default or user selected core node
-   * @param {string} authenticatorURL - the web-based fall back authenticator
+   * @param {string} authenticatorURL - the web-based fall back authenticator 
+   * ([[DEFAULT_BLOCKSTACK_HOST]])
    */
   constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
               appDomain: string = window.location.origin,

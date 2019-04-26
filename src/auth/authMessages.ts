@@ -25,6 +25,7 @@ type AuthMetadata = {
  * @param {SessionData} session - session object in which key will be stored
  * @return {String} the hex encoded private key
  * @private
+ * @ignore
  */
 export function generateTransitKey() {
   const transitKey = makeECPrivateKey()
@@ -127,6 +128,7 @@ export function makeAuthRequest(
  * @param  {String} privateKey [description]
  * @return {String} hex encoded ciphertext
  * @private
+ * @ignore
  */
 export async function encryptPrivateKey(
   publicKey: string,
@@ -146,6 +148,7 @@ export async function encryptPrivateKey(
  * @throws {Error} if unable to decrypt
  *
  * @private
+ * @ignore
  */
 export async function decryptPrivateKey(
   privateKey: string,
@@ -185,6 +188,7 @@ export async function decryptPrivateKey(
  * @param {String} associationToken JWT that binds the app key to the identity key
  * @return {String} signed and encoded authentication response token
  * @private
+ * @ignore
  */
 export async function makeAuthResponse(
   privateKey: string,
