@@ -23,14 +23,14 @@ async function aes256CbcEncrypt(
   key: Buffer | Uint8Array, 
   plaintext: Buffer | Uint8Array
 ): Promise<Buffer> {
-  const { subtle } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
 
-  const cryptoKey = await subtle.importKey(
+  const cryptoKey = await webCrypto.subtle.importKey(
     'raw', key,
     { name: 'AES-CBC', length: 256 },
     false, ['encrypt']
   )
-  const cipher = await subtle.encrypt(
+  const cipher = await webCrypto.subtle.encrypt(
     { name: 'AES-CBC', iv },
     cryptoKey, plaintext
   )
@@ -52,14 +52,14 @@ async function aes256CbcDecrypt(
   key: Buffer | Uint8Array, 
   ciphertext: Buffer | Uint8Array
 ): Promise<Buffer> {
-  const { subtle } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
 
-  const cryptoKey = await subtle.importKey(
+  const cryptoKey = await webCrypto.subtle.importKey(
     'raw', key,
     { name: 'AES-CBC', length: 256 },
     false, ['decrypt']
   )
-  const plaintext = await subtle.decrypt(
+  const plaintext = await webCrypto.subtle.decrypt(
     { name: 'AES-CBC', iv },
     cryptoKey, ciphertext
   )
@@ -79,14 +79,14 @@ async function hmacSha256(
   keyData: Buffer | Uint8Array, 
   content: Buffer | Uint8Array
 ): Promise<Buffer> {
-  const { subtle } = await getWebCrypto()
-  const key = await subtle.importKey(
+  const webCrypto = await getWebCrypto()
+  const key = await webCrypto.subtle.importKey(
     'raw', keyData,
     { name: 'HMAC', hash: 'SHA-256' },
     false, ['sign']
   )
   
-  const sig = await subtle.sign('HMAC', key, content)
+  const sig = await webCrypto.subtle.sign('HMAC', key, content)
   
   if (DEBUG_CHECK) {
     const nodeCrypto = await import('crypto')
@@ -110,9 +110,9 @@ function equalConstTime(b1: Buffer | Uint8Array, b2: Buffer | Uint8Array) {
 }
 
 async function sharedSecretToKeys(sharedSecret: Buffer | Uint8Array) {
-  const { subtle } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
   // generate mac and encryption key from shared secret
-  const hashedSecretArr = await subtle.digest('SHA-512', sharedSecret)
+  const hashedSecretArr = await webCrypto.subtle.digest('SHA-512', sharedSecret)
   const hashedSecret = new Uint8Array(hashedSecretArr)
 
   if (DEBUG_CHECK) {
@@ -162,7 +162,7 @@ export async function encryptECIES(
   // always copy to buffer
   const plainText = typeof content === 'string' ? Buffer.from(content) : Buffer.from(content)
   
-  const { getRandomValues, subtle } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
 
   const ephemeralSK = await generatePrivateKey()
   const ephemeralPK = await getPublicKeyFromPrivate(ephemeralSK)
@@ -191,7 +191,7 @@ export async function encryptECIES(
   }
 
   const initializationVector = Buffer.alloc(16)
-  getRandomValues(initializationVector)
+  webCrypto.getRandomValues(initializationVector)
 
   const cipherText = await aes256CbcEncrypt(
     initializationVector, sharedKeys.encryptionKey, plainText
@@ -283,9 +283,9 @@ export async function signECDSA(
   privateKey: string, 
   content: string | Buffer | Uint8Array
 ): Promise<{publicKey: string, signature: string}> {
-  const { subtle } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
   const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
-  const msgHash = await subtle.digest('SHA-256', contentBuffer)
+  const msgHash = await webCrypto.subtle.digest('SHA-256', contentBuffer)
   const msgBytes = new Uint8Array(msgHash)
   const publicKey = await getPublicKeyFromPrivate(privateKey)
   const signature = await signMessage(privateKey, msgBytes)
@@ -324,10 +324,10 @@ export async function verifyECDSA(
   publicKey: string,
   signature: string
 ): Promise<boolean> {
-  const { subtle } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
   const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
 
-  const contentHash = await subtle.digest('SHA-256', contentBuffer)
+  const contentHash = await webCrypto.subtle.digest('SHA-256', contentBuffer)
   const contentBytes = new Uint8Array(contentHash)
   const verified = await verifyMessage(signature, publicKey, contentBytes)
 
