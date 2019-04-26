@@ -1,4 +1,4 @@
-import { strict as assert } from 'assert'
+import assert from 'assert'
 import { getWebCrypto } from './webCrypto'
 import { 
   generatePrivateKey, getPublicKeyFromPrivate, 
