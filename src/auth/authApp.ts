@@ -309,7 +309,7 @@ export async function handlePendingSignIn(
     if (transitKey !== undefined && transitKey != null) {
       if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
         try {
-          appPrivateKey = decryptPrivateKey(transitKey, tokenPayload.private_key)
+          appPrivateKey = await decryptPrivateKey(transitKey, tokenPayload.private_key)
         } catch (e) {
           Logger.warn('Failed decryption of appPrivateKey, will try to use as given')
           try {
@@ -322,7 +322,7 @@ export async function handlePendingSignIn(
       }
       if (coreSessionToken !== undefined && coreSessionToken !== null) {
         try {
-          coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+          coreSessionToken = await decryptPrivateKey(transitKey, coreSessionToken)
         } catch (e) {
           Logger.info('Failed decryption of coreSessionToken, will try to use as given')
         }

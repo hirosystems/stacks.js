@@ -22,6 +22,8 @@ export function encryptMnemonic(phrase: string, password: string) {
       bip39.mnemonicToEntropy(phrase), 'hex'
     )
 
+    // TODO: use fast crypto
+
     // AES-128-CBC with SHA256 HMAC
     const salt = crypto.randomBytes(16)
     const keysAndIV = crypto.pbkdf2Sync(password, salt, 100000, 48, 'sha512')

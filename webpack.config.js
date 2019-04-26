@@ -59,6 +59,7 @@ module.exports = (env, argv) => {
                   "useESModules": true,
                   "corejs": { version: "3", proposals: true }
                 }],
+                "@babel/plugin-syntax-dynamic-import",
                 "@babel/proposal-class-properties",
                 "@babel/proposal-object-rest-spread"
               ]

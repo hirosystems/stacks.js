@@ -6,7 +6,7 @@ export {
   verifyECDSA,
   CipherObject,
   getHexFromBN
-} from './ec'
+} from './ecFast'
 
 export { 
   encryptMnemonic,

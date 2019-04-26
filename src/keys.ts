@@ -19,6 +19,7 @@ export function getEntropy(numberOfBytes: number) {
 * @ignore
 */
 export function makeECPrivateKey() {
+  // TODO: use fast crypto
   const keyPair = ECPair.makeRandom({ rng: getEntropy })
   return keyPair.privateKey.toString('hex')
 }
@@ -27,6 +28,7 @@ export function makeECPrivateKey() {
 * @ignore
 */
 export function publicKeyToAddress(publicKey: string) {
+  // TODO: use fast crypto
   const publicKeyBuffer = Buffer.from(publicKey, 'hex')
   const publicKeyHash160 = bcrypto.hash160(publicKeyBuffer)
   const address = baddress.toBase58Check(publicKeyHash160, 0x00)
@@ -37,6 +39,7 @@ export function publicKeyToAddress(publicKey: string) {
 * @ignore
 */
 export function getPublicKeyFromPrivate(privateKey: string) {
+  // TODO: use fast crypto
   const keyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'))
   return keyPair.publicKey.toString('hex')
 }

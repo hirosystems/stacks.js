@@ -267,7 +267,7 @@ export class UserSession {
    * @returns {String} Stringified ciphertext object 
    */
   encryptContent(
-    content: string | Buffer,
+    content: string | Buffer | Uint8Array,
     options?: {publicKey?: string}
   ) {
     return storage.encryptContent(content, options, this)

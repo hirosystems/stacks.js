@@ -6,7 +6,7 @@ import { TokenSigner, SECP256K1Client } from 'jsontokens'
 import { makeECPrivateKey, publicKeyToAddress } from '../keys'
 import { makeUUID4, nextMonth } from '../utils'
 import { makeDIDFromAddress } from '../dids'
-import { encryptECIES, decryptECIES } from '../encryption/ec'
+import { encryptECIES, decryptECIES } from '../encryption/ecFast'
 import { Logger } from '../logger'
 import { DEFAULT_SCOPE } from './authConstants'
 import { UserSession } from './userSession'
@@ -107,6 +107,7 @@ export function makeAuthRequest(
   Logger.info(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
+  // TODO: use fast crypto
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
   payload.public_keys = [publicKey]
   const address = publicKeyToAddress(publicKey)
@@ -114,6 +115,7 @@ export function makeAuthRequest(
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
+  // TODO: use fast crypto
   const token = tokenSigner.sign(payload)
 
   return token
@@ -128,9 +130,11 @@ export function makeAuthRequest(
  * @private
  * @ignore
  */
-export function encryptPrivateKey(publicKey: string,
-                                  privateKey: string): string | null {
-  const encryptedObj = encryptECIES(publicKey, privateKey)
+export async function encryptPrivateKey(
+  publicKey: string,
+  privateKey: string
+): Promise<string | null> {
+  const encryptedObj = await encryptECIES(publicKey, privateKey)
   const encryptedJSON = JSON.stringify(encryptedObj)
   return (Buffer.from(encryptedJSON)).toString('hex')
 }
@@ -146,11 +150,13 @@ export function encryptPrivateKey(publicKey: string,
  * @private
  * @ignore
  */
-export function decryptPrivateKey(privateKey: string,
-                                  hexedEncrypted: string): string | null {
+export async function decryptPrivateKey(
+  privateKey: string,
+  hexedEncrypted: string
+): Promise<string | null> {
   const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
-  const decrypted = decryptECIES(privateKey, encryptedObj)
+  const decrypted = await decryptECIES(privateKey, encryptedObj)
   if (typeof decrypted !== 'string') {
     throw new Error('Unable to correctly decrypt private key')
   } else {
@@ -184,18 +190,21 @@ export function decryptPrivateKey(privateKey: string,
  * @private
  * @ignore
  */
-export function makeAuthResponse(privateKey: string,
-                                 profile: {} = {},
-                                 username: string = null,
-                                 metadata: AuthMetadata,
-                                 coreToken: string = null,
-                                 appPrivateKey: string = null,
-                                 expiresAt: number = nextMonth().getTime(),
-                                 transitPublicKey: string = null,
-                                 hubUrl: string = null,
-                                 blockstackAPIUrl: string = null,
-                                 associationToken: string = null): string {
+export async function makeAuthResponse(
+  privateKey: string,
+  profile: {} = {},
+  username: string = null,
+  metadata: AuthMetadata,
+  coreToken: string = null,
+  appPrivateKey: string = null,
+  expiresAt: number = nextMonth().getTime(),
+  transitPublicKey: string = null,
+  hubUrl: string = null,
+  blockstackAPIUrl: string = null,
+  associationToken: string = null
+): Promise<string> {
   /* Convert the private key to a public key to an issuer */
+  // TODO: use fast crypto
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
 
@@ -206,9 +215,9 @@ export function makeAuthResponse(privateKey: string,
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
     Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
-      privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+      privateKeyPayload = await encryptPrivateKey(transitPublicKey, appPrivateKey)
       if (coreToken !== undefined && coreToken !== null) {
-        coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
+        coreTokenPayload = await encryptPrivateKey(transitPublicKey, coreToken)
       }
     }
     additionalProperties = {
@@ -238,5 +247,6 @@ export function makeAuthResponse(privateKey: string,
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', privateKey)
+  // TODO: use fast crypto
   return tokenSigner.sign(payload)
 }

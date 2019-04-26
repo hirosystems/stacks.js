@@ -137,6 +137,7 @@ function makeV1GaiaAuthToken(hubInfo: any,
     salt,
     associationToken
   }
+  // TODO: use fast crypto
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
 }
@@ -174,6 +175,7 @@ export async function connectToGaiaHub(
  * @ignore
  */
 export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
+  // TODO: use fast crypto
   const challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
   const response = await fetch(`${gaiaHubUrl}/hub_info`)
   const responseText = await response.text()
