@@ -11,7 +11,8 @@ async function getSecp256k1(): Promise<Secp256k1> {
 }
 
 async function createSecp256k1(): Promise<Secp256k1> {
-  const { getRandomValues } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
+  const getRandomValues = webCrypto.getRandomValues
   const seed = new Uint8Array(32)
   getRandomValues(seed)
   const instance = await instantiateSecp256k1(seed)
@@ -81,7 +82,8 @@ export async function verifyMessage(
 
 export async function generatePrivateKey(): Promise<Buffer | Uint8Array> {
   const secp256k1 = await getSecp256k1()
-  const { getRandomValues } = await getWebCrypto()
+  const webCrypto = await getWebCrypto()
+  const getRandomValues = webCrypto.getRandomValues
   const privateKey = new Uint8Array(32)
   /**
    * Note: This is typical usage of libsecp256k1. Nearly every 256 number is a valid secp256k1 
