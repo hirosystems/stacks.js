@@ -139,6 +139,7 @@
     "ajv": "^4.11.5",
     "bip32": "^1.0.2",
     "bip39": "^2.5.0",
+    "bitcoin-ts": "github:zone117x/bitcoin-ts#ecdh-support-dist",
     "bitcoinjs-lib": "^4.0.3",
     "bn.js": "^4.11.8",
     "cheerio": "^0.22.0",
@@ -155,7 +156,6 @@
     "zone-file": "^1.0.0"
   },
   "peerDependencies": {
-    "bitcoin-ts": "github:zone117x/bitcoin-ts#ecdh-support-dist",
     "node-webcrypto-ossl": "^1.0.42"
   },
   "browser": {
