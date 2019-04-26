@@ -7,7 +7,7 @@ import {
   decompressPublicKey, compressPublicKey 
 } from './secp256k1-wasm'
 
-const DEBUG_CHECK = true
+const DEBUG_CHECK = false
 
 export type CipherObject = {
   iv: string,
