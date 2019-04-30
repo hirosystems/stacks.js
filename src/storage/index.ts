@@ -475,6 +475,40 @@ export function getFile(
     })
 }
 
+
+export async function putFileForUser(
+  path: string,
+  content: string | Buffer,
+  username: string,
+  options?: {
+    app?: string;
+    zoneFileLookupURL?: string;
+  }
+) {
+  // * Resolve the username's zoneFile
+  // * Resolve the username's profile to get the appShareKey
+  // * Derive the username's app-specific public appShareKey
+  // * Deterministically encrypt the path's filename for the username, using the username's app-specific appShareKey
+  // * Upload to current user's app-specific public appShareKey gaia bucket
+}
+
+export async function getFileForUser(
+  path: string,
+  content: string | Buffer,
+  username: string,
+  options?: {
+    app?: string;
+    zoneFileLookupURL?: string;
+  }
+) {
+  // * Deterministically encrypt the path's filename for current, using user's app-specific appShareKey (`path`)
+  // * Resolve the username's zoneFile
+  // * Resolve the username's profile to get the gaiaHubUrlPrefix (`otherHub`) and the public appShareKey
+  // * Derive the username's app-specific public appShareKey (`otherUserShareBucket`)
+  // * Fetch `${otherHub}/${otherUserShareBucket}/${path}
+  // * Decrypt with current user's app-specific appSharekey privateKey
+}
+
 /**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in

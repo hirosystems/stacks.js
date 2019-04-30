@@ -49,6 +49,7 @@ export interface UserData {
   // using our more advanced encryption functions (as opposed to putFile/getFile), 
   // are probably using this. seems useful to explain. 
   appPrivateKey: string;
+  publicShareAppPrivateKey: string;
   // maybe public: possibly useful for advanced devs / webapps. I see an opportunity
   // to make a small plug about "user owned data" here, idk. 
   hubUrl: string;
@@ -303,6 +304,7 @@ export async function handlePendingSignIn(
   }
   const tokenPayload = decodeToken(authResponseToken).payload
   // TODO: real version handling
+  let publicShareAppPrivateKey = tokenPayload.public_share_key
   let appPrivateKey = tokenPayload.private_key
   let coreSessionToken = tokenPayload.core_token
   if (isLaterVersion(tokenPayload.version, '1.1.0')) {
@@ -316,6 +318,19 @@ export async function handlePendingSignIn(
             hexStringToECPair(tokenPayload.private_key)
           } catch (ecPairError) {
             throw new LoginFailedError('Failed decrypting appPrivateKey. Usually means'
+                                      + ' that the transit key has changed during login.')
+          }
+        }
+      }
+      if (tokenPayload.public_share_key !== undefined && tokenPayload.public_share_key !== null) {
+        try {
+          publicShareAppPrivateKey = decryptPrivateKey(transitKey, tokenPayload.public_share_key)
+        } catch (e) {
+          Logger.warn('Failed decryption of publicShareAppPrivateKey, will try to use as given')
+          try {
+            hexStringToECPair(tokenPayload.public_share_key)
+          } catch (ecPairError) {
+            throw new LoginFailedError('Failed decrypting publicShareAppPrivateKey. Usually means'
                                       + ' that the transit key has changed during login.')
           }
         }
@@ -350,6 +365,7 @@ export async function handlePendingSignIn(
     decentralizedID: tokenPayload.iss,
     identityAddress: getAddressFromDID(tokenPayload.iss),
     appPrivateKey,
+    publicShareAppPrivateKey,
     coreSessionToken,
     authResponseToken,
     hubUrl,

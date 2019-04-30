@@ -194,19 +194,22 @@ export function makeAuthResponse(privateKey: string,
                                  transitPublicKey: string = null,
                                  hubUrl: string = null,
                                  blockstackAPIUrl: string = null,
-                                 associationToken: string = null): string {
+                                 associationToken: string = null,
+                                 publicSharedAppPrivateKey: string = null): string {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
 
   /* See if we should encrypt with the transit key */
   let privateKeyPayload = appPrivateKey
+  let publicSharedAppPrivateKeyPayload = publicSharedAppPrivateKey
   let coreTokenPayload = coreToken
   let additionalProperties = {}
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
     Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
       privateKeyPayload = encryptPrivateKey(transitPublicKey, appPrivateKey)
+      publicSharedAppPrivateKeyPayload = encryptPrivateKey(transitPublicKey, publicSharedAppPrivateKey)
       if (coreToken !== undefined && coreToken !== null) {
         coreTokenPayload = encryptPrivateKey(transitPublicKey, coreToken)
       }
@@ -229,6 +232,7 @@ export function makeAuthResponse(privateKey: string,
     iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
     exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
     iss: makeDIDFromAddress(address),
+    public_share_key: publicSharedAppPrivateKeyPayload,
     private_key: privateKeyPayload,
     public_keys: [publicKey],
     profile,
