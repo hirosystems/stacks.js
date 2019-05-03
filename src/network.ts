@@ -517,7 +517,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an Array of Strings, where each item encodes the 
    *   type of token this account holds (excluding the underlying blockchain's tokens)
    */
-  getAccountTokens(address: string): Promise<string[]> {
+  getAccountTokens(address: string): Promise<{tokens: string[]}> {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
       .then((resp) => {
         if (resp.status === 404) {
