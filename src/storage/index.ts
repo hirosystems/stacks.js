@@ -19,6 +19,7 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
+import { fetchPrivate } from '../fetchUtil'
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -246,7 +247,7 @@ function getFileContents(path: string, app: string, username: string | undefined
       const opts = { app, username, zoneFileLookupURL }
       return getFileUrl(path, opts, caller)
     })
-    .then(readUrl => fetch(readUrl))
+    .then(readUrl => fetchPrivate(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
@@ -630,7 +631,7 @@ async function listFilesLoop(
       },
       body: pageRequest
     }
-    response = await fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
+    response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
       throw new Error(`listFiles failed with HTTP status ${response.status}`)
     }
