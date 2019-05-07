@@ -20,14 +20,16 @@ This reference describes the Blockstack Javascript Software Developer Kit (SDK) 
 2. Import Blockstack into your project.
 
     ```js
-    import * as blockstack from 'blockstack'
+    import { Person, UserSession } from 'blockstack'
     ```
 
 3. Wire up a sign in button.
 
     ```js
+    var userSession = new UserSession()
+
     document.getElementById('signin-button').addEventListener('click', function() {
-      blockstack.redirectToSignIn()
+      userSession.redirectToSignIn()
     })
     ```
 
@@ -44,18 +46,20 @@ This reference describes the Blockstack Javascript Software Developer Kit (SDK) 
 
     ```js
     function showProfile(profile) {
-      var person = new blockstack.Person(profile)
+      var person = new Person(profile)
       document.getElementById('heading-name').innerHTML = person.name()
       document.getElementById('avatar-image').setAttribute('src', person.avatarUrl())
       document.getElementById('section-1').style.display = 'none'
       document.getElementById('section-2').style.display = 'block'
     }
 
-    if (blockstack.isUserSignedIn()) {
-     const userData = blockstack.loadUserData()
+    var userSession = new UserSession()
+
+    if (userSession.isUserSignedIn()) {
+     const userData = userSession.loadUserData()
       showProfile(userData.profile)
-    } else if (blockstack.isSignInPending()) {
-      blockstack.handlePendingSignIn()
+    } else if (userSession.isSignInPending()) {
+      userSession.handlePendingSignIn()
       .then(userData => {
         showProfile(userData.profile)
       })
