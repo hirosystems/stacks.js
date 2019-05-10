@@ -38,3 +38,7 @@ src/testing/browser/blockstack-proofs.js
 *.swp
 *.swo
 .nyc_output
+
+lib
+dist
+docs

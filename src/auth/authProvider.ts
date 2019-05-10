@@ -10,6 +10,7 @@ import { Logger } from '../logger'
  * @return {String|null} the authentication request or `null` if
  * the query string parameter `authRequest` is not found
  * @private
+ * @ignore 
  */
 export function getAuthRequestFromURL() {
   checkWindowAPI('getAuthRequestFromURL', 'location')
@@ -29,6 +30,7 @@ export function getAuthRequestFromURL() {
  * object manifest file unless there's an error in which case rejects with an error
  * message.
  * @private
+ * @ignore 
  */
 export function fetchAppManifest(authRequest: string): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -43,7 +45,7 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
           .then(response => response.text())
           .then(responseText => JSON.parse(responseText))
           .then((responseJSON) => {
-            resolve(responseJSON)
+            resolve({ ...responseJSON, manifestURI })
           })
           .catch((e) => {
             Logger.debug(e.stack)
@@ -67,6 +69,7 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
  * @return {void}
  * @throws {Error} if there is no redirect uri
  * @private
+ * @ignore 
  */
 export function redirectUserToApp(authRequest: string, authResponse: string) {
   const payload = decodeToken(authRequest).payload

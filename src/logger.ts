@@ -1,6 +1,6 @@
 import { config } from './config'
 
-export const levels = [
+const levels = [
   'debug',
   'info',
   'warn',
@@ -17,6 +17,9 @@ for (let index = 0; index < levels.length; index++) {
   intToLevel[index] = level
 }
 
+/**
+* @ignore
+*/
 export class Logger {
   static error(message: string) {
     if (!this.shouldLog('error')) return

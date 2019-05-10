@@ -5,7 +5,11 @@ import BN from 'bn.js'
 import RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
+import { config } from './config'
 
+/**
+ * @ignore
+ */
 export type UTXO = {
   value?: number,
   confirmations?: number,
@@ -18,6 +22,10 @@ const TX_BROADCAST_SERVICE_ZONE_FILE_ENDPOINT = 'zone-file'
 const TX_BROADCAST_SERVICE_REGISTRATION_ENDPOINT = 'registration'
 const TX_BROADCAST_SERVICE_TX_ENDPOINT = 'transaction'
 
+/**
+ * @private
+ * @ignore
+ */
 export class BitcoinNetwork {
   broadcastTransaction(transaction: string): Promise<any> {
     return Promise.reject(new Error(`Not implemented, broadcastTransaction(${transaction})`))
@@ -36,6 +44,10 @@ export class BitcoinNetwork {
   }
 }
 
+/**
+ * @private
+ * @ignore
+ */
 export class BlockstackNetwork {
   blockstackAPIUrl: string
 
@@ -84,6 +96,9 @@ export class BlockstackNetwork {
     return bitcoinjs.address.toBase58Check(hash, coercedVersion)
   }
 
+  /**
+  * @ignore
+  */
   getDefaultBurnAddress() {
     return this.coerceAddress('1111111111111111111114oLvT2')
   }
@@ -502,7 +517,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an Array of Strings, where each item encodes the 
    *   type of token this account holds (excluding the underlying blockchain's tokens)
    */
-  getAccountTokens(address: string): Promise<string[]> {
+  getAccountTokens(address: string): Promise<{tokens: string[]}> {
     return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
       .then((resp) => {
         if (resp.status === 404) {
@@ -609,9 +624,11 @@ export class BlockstackNetwork {
   *   parameter
   * @private
   */
-  broadcastTransaction(transaction: string,
-                       transactionToWatch: string = null,
-                       confirmations: number = 6) {
+  broadcastTransaction(
+    transaction: string,
+    transactionToWatch: string = null,
+    confirmations: number = 6
+  ) {
     if (!transaction) {
       const error = new MissingParameterError('transaction')
       return Promise.reject(error)
@@ -662,8 +679,10 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastZoneFile(zoneFile?: string,
-                    transactionToWatch: string = null) {
+  broadcastZoneFile(
+    zoneFile?: string,
+    transactionToWatch: string = null
+  ) {
     if (!zoneFile) {
       return Promise.reject(new MissingParameterError('zoneFile'))
     }
@@ -745,9 +764,11 @@ export class BlockstackNetwork {
    *   parameter
    * @private
    */
-  broadcastNameRegistration(preorderTransaction: string,
-                            registerTransaction: string,
-                            zoneFile: string) {
+  broadcastNameRegistration(
+    preorderTransaction: string,
+    registerTransaction: string,
+    zoneFile: string
+  ) {
     /*
        * POST /v1/broadcast/registration
        * Request body:
@@ -784,16 +805,25 @@ export class BlockstackNetwork {
     return this.broadcastServiceFetchHelper(endpoint, requestBody)
   }
 
+  /**
+   * @ignore
+   */
   getFeeRate(): Promise<number> {
     return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
       .then(resp => resp.json())
       .then(rates => Math.floor(rates.fastestFee))
   }
 
+  /**
+   * @ignore
+   */
   countDustOutputs() {
     throw new Error('Not implemented.')
   }
 
+  /**
+   * @ignore
+   */
   getUTXOs(address: string): Promise<Array<UTXO>> {
     return this.getNetworkedUTXOs(address)
       .then((networkedUTXOs) => {
@@ -826,6 +856,7 @@ export class BlockstackNetwork {
    * @param {String} txHex - the hex-encoded transaction to use
    * @return {void} no return value, this modifies the UTXO config state
    * @private
+   * @ignore
    */
   modifyUTXOSetFrom(txHex: string) {
     const tx = bitcoinjs.Transaction.fromHex(txHex)
@@ -880,6 +911,9 @@ export class BlockstackNetwork {
     this.excludeUtxoSet = []
   }
 
+  /**
+  * @ignore
+  */
   getConsensusHash() {
     return fetch(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
       .then(resp => resp.json())
@@ -890,6 +924,9 @@ export class BlockstackNetwork {
     return this.btc.getTransactionInfo(txHash)
   }
 
+  /**
+   * @ignore
+   */
   getBlockHeight() {
     return this.btc.getBlockHeight()
   }
@@ -899,6 +936,9 @@ export class BlockstackNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork) {
@@ -910,6 +950,9 @@ export class LocalRegtest extends BlockstackNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class BitcoindAPI extends BitcoinNetwork {
   bitcoindUrl: string
 
@@ -1043,6 +1086,9 @@ export class BitcoindAPI extends BitcoinNetwork {
   }
 }
 
+/**
+ * @ignore
+ */
 export class InsightClient extends BitcoinNetwork {
   apiUrl: string
 
@@ -1095,6 +1141,10 @@ export class InsightClient extends BitcoinNetwork {
   }
 }
 
+
+/**
+ * @ignore
+ */
 export class BlockchainInfoApi extends BitcoinNetwork {
   utxoProviderUrl: string
 
@@ -1174,6 +1224,10 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 }
 
+
+/**
+* @ignore
+*/
 const LOCAL_REGTEST = new LocalRegtest(
   'http://localhost:16268',
   'http://localhost:16269',
@@ -1181,12 +1235,28 @@ const LOCAL_REGTEST = new LocalRegtest(
                   { username: 'blockstack', password: 'blockstacksystem' })
 )
 
+/**
+* @ignore
+*/
 const MAINNET_DEFAULT = new BlockstackNetwork(
   'https://core.blockstack.org',
   'https://broadcast.blockstack.org',
   new BlockchainInfoApi()
 )
 
+/**
+ * Get WHOIS-like information for a name, including the address that owns it,
+ * the block at which it expires, and the zone file anchored to it (if available).
+ * @param {String} fullyQualifiedName the name to query.  Can be on-chain of off-chain.
+ * @return {Promise} a promise that resolves to the WHOIS-like information 
+ */
+export function getNameInfo(fullyQualifiedName: string) {
+  return config.network.getNameInfo(fullyQualifiedName)
+}
+
+/**
+* @ignore
+*/
 export const network = {
   BlockstackNetwork,
   LocalRegtest,

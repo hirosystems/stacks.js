@@ -21,10 +21,27 @@ import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
 
-export type PutFileOptions = {
-  encrypt?: boolean | string,
-  sign?: boolean,
-  contentType?: string
+/**
+ * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
+ */
+export interface PutFileOptions {
+  /**
+  * Encrypt the data with the app public key. 
+  * If a string is specified, it is used as the public key. 
+  * If the boolean `true` is specified then the current user's app public key is used. 
+   * @default true
+   */
+  encrypt?: boolean | string;
+  /**
+   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
+   * If a string is specified, it is used as the private key. 
+   * @default false
+   */
+  sign?: boolean | string;
+  /**
+   * Set a Content-Type header for unencrypted data. 
+   */
+  contentType?: string;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -36,7 +53,7 @@ const SIGNATURE_FILE_SUFFIX = '.sig'
  * @param {String} appOrigin - The app origin
  * @param {String} [zoneFileLookupURL=null] - The URL
  * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
+ * blockstack.js's [[getNameInfo]] function instead.
  * @return {Promise<string>} that resolves to the public read URL of the file
  * or rejects with an error
  */
@@ -57,6 +74,11 @@ export async function getUserAppFileUrl(
 }
 
 /**
+ * 
+ * 
+ * @deprecated 
+ * #### v19 Use [[UserSession.encryptContent]].
+ *
  * Encrypts the data provided with the app public key.
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
@@ -81,6 +103,10 @@ export function encryptContent(
 }
 
 /**
+ * 
+ * @deprecated 
+ * #### v19 Use [[UserSession.decryptContent]].
+ * 
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
@@ -117,6 +143,7 @@ export function decryptContent(
 /* Get the gaia address used for servicing multiplayer reads for the given
  * (username, app) pair.
  * @private
+ * @ignore
  */
 async function getGaiaAddress(
   app: string, username?: string, zoneFileLookupURL?: string,
@@ -144,6 +171,8 @@ async function getGaiaAddress(
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
+ * 
+ * @ignore
  */
 function normalizeOptions<T>(
   options?: {
@@ -166,24 +195,15 @@ function normalizeOptions<T>(
 }
 
 /**
- * Get the URL for reading a file from an app's data store.
+ * @deprecated
+ * #### v19 Use [[UserSession.getFileUrl]] instead.
+ * 
  * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
   path: string, 
-  options?: {
-    app?: string, 
-    username?: string, 
-    zoneFileLookupURL?: string
-  },
+  options?: GetFileUrlOptions,
   caller?: UserSession
 ): Promise<string> {
   const opts = normalizeOptions(options, caller)
@@ -206,6 +226,7 @@ export async function getFileUrl(
 /* Handle fetching the contents from a given path. Handles both
  *  multi-player reads and reads from own storage.
  * @private
+ * @ignore
  */
 function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
@@ -241,12 +262,9 @@ function getFileContents(path: string, app: string, username: string | undefined
  *  and then validate it. Handles both multi-player reads and reads
  *  from own storage.
  * @private
+ * @ignore
  */
-function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
-  username?: string | null;
-  app?: string | null;
-  zoneFileLookupURL?: string | null;
-}, caller?: UserSession) {
+function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
@@ -305,6 +323,7 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions & {
  *  multiplayer reads. In the case of multiplayer reads, it uses the
  *  gaia address for verification of the claimed public key.
  * @private
+ * @ignore
  */
 function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
                                        app: string, username?: string, zoneFileLookupURL?: string) {
@@ -358,42 +377,54 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
   })
 }
 
-export type GetFileOptions = {
-  decrypt?: boolean,
-  verify?: boolean,
-  username?: string | null,
-  app?: string | null,
-  zoneFileLookupURL?: string | null
+export interface GetFileUrlOptions {
+  /**
+   * The Blockstack ID to lookup for multi-player storage. 
+   * If not specified, the currently signed in username is used.
+   */
+  username?: string;
+  /**
+   * The app to lookup for multi-player storage - defaults to current origin. 
+   * @default `window.location.origin` 
+   * Only if available in the executing environment, otherwise `undefined`.
+   */
+  app?: string;
+  /**
+   * The URL to use for zonefile lookup. If falsey, this will use 
+   * the blockstack.js's [[getNameInfo]] function instead. 
+   */
+  zoneFileLookupURL?: string;
+}
+
+/**
+ * Used to pass options to [[UserSession.getFile]]
+ */
+export interface GetFileOptions extends GetFileUrlOptions {
+  /**
+   * Try to decrypt the data with the app private key.
+   * @default true
+   */
+  decrypt?: boolean;
+  /**
+   * Whether the content should be verified, only to be used 
+   * when [[UserSession.putFile]] was set to `sign = true`.
+   * @default false
+   */
+  verify?: boolean;
 }
 
 /**
  * Retrieves the specified file from the app's data store.
  * @param {String} path - the path to the file to read
- * @param {Object} [options=null] - options object
- * @param {Boolean} [options.decrypt=true] - try to decrypt the data with the app private key
- * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
- * @param {Boolean} options.verify - Whether the content should be verified, only to be used
- * when `putFile` was set to `sign = true`
- * @param {String} options.app - the app to lookup for multi-player storage -
- * defaults to current origin
- * @param {String} [options.zoneFileLookupURL=null] - The URL
- * to use for zonefile lookup. If falsey, this will use the
- * blockstack.js's getNameInfo function instead.
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
 export function getFile(
   path: string, 
-  options?: {
-    decrypt?: boolean;
-    verify?: boolean;
-    username?: string;
-    app?: string;
-    zoneFileLookupURL?: string;
-  },
+  options?: GetFileOptions,
   caller?: UserSession
 ) {
-  const defaults = {
+  const defaults: GetFileOptions = {
     decrypt: true,
     verify: false,
     username: null,
@@ -439,12 +470,6 @@ export function getFile(
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
  * @param {String|Buffer} content - the data to store in the file
- * @param {Object} [options=null] - options object
- * @param {Boolean|String} [options.encrypt=true] - encrypt the data with the app public key
- *                                                  or the provided public key
- * @param {Boolean} [options.sign=false] - sign the data using ECDSA on SHA256 hashes with
- *                                         the app private key
- * @param {String} [options.contentType=''] - set a Content-Type header for unencrypted data
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
@@ -454,7 +479,7 @@ export async function putFile(
   options?: PutFileOptions,
   caller?: UserSession,
 ): Promise<string> {
-  const defaults = {
+  const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
     contentType: ''
@@ -607,81 +632,88 @@ export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
  *  value, then the loop stops.  If it returns a truthy value, the loop continues.
  * @returns {Promise} that resolves to the number of files listed.
  * @private
+ * @ignore
  */
-function listFilesLoop(hubConfig: GaiaHubConfig,
-                       page: string | null,
-                       callCount: number,
-                       fileCount: number,
-                       callback: (name: string) => boolean): Promise<number> {
+async function listFilesLoop(
+  caller: UserSession,
+  hubConfig: GaiaHubConfig | null,
+  page: string | null,
+  callCount: number,
+  fileCount: number,
+  callback: (name: string) => boolean
+): Promise<number> {
   if (callCount > 65536) {
     // this is ridiculously huge, and probably indicates
     // a faulty Gaia hub anyway (e.g. on that serves endless data)
     throw new Error('Too many entries to list')
   }
 
-  let httpStatus
-  const pageRequest = JSON.stringify({ page })
-
-  const fetchOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': `${pageRequest.length}`,
-      Authorization: `bearer ${hubConfig.token}`
-    },
-    body: pageRequest
+  hubConfig = hubConfig || await caller.getOrSetLocalGaiaHubConnection()
+  let response: Response
+  try {
+    const pageRequest = JSON.stringify({ page })
+    const fetchOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': `${pageRequest.length}`,
+        Authorization: `bearer ${hubConfig.token}`
+      },
+      body: pageRequest
+    }
+    response = await fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
+    if (!response.ok) {
+      throw new Error(`listFiles failed with HTTP status ${response.status}`)
+    }
+  } catch (error) {
+    // If error occurs on the first call, perform a gaia re-connection and retry.
+    // Same logic as other gaia requests (putFile, getFile, etc).
+    if (callCount === 0) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      return listFilesLoop(caller, freshHubConfig, page, callCount + 1, 0, callback)
+    }
+    throw error
   }
 
-  return fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
-    .then((response) => {
-      httpStatus = response.status
-      if (httpStatus >= 400) {
-        throw new Error(`listFiles failed with HTTP status ${httpStatus}`)
-      }
-      return response.text()
-    })
-    .then(responseText => JSON.parse(responseText))
-    .then((responseJSON) => {
-      const entries = responseJSON.entries
-      const nextPage = responseJSON.page
-      if (entries === null || entries === undefined) {
-        // indicates a misbehaving Gaia hub or a misbehaving driver
-        // (i.e. the data is malformed)
-        throw new Error('Bad listFiles response: no entries')
-      }
-      for (let i = 0; i < entries.length; i++) {
-        const rc = callback(entries[i])
-        if (!rc) {
-          // callback indicates that we're done
-          return Promise.resolve(fileCount + i)
-        }
-      }
-      if (nextPage && entries.length > 0) {
-        // keep going -- have more entries
-        return listFilesLoop(
-          hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
-        )
-      } else {
-        // no more entries -- end of data
-        return Promise.resolve(fileCount + entries.length)
-      }
-    })
+  const responseText = await response.text()
+  const responseJSON = JSON.parse(responseText)
+  const entries = responseJSON.entries
+  const nextPage = responseJSON.page
+  if (entries === null || entries === undefined) {
+    // indicates a misbehaving Gaia hub or a misbehaving driver
+    // (i.e. the data is malformed)
+    throw new Error('Bad listFiles response: no entries')
+  }
+  for (let i = 0; i < entries.length; i++) {
+    const rc = callback(entries[i])
+    if (!rc) {
+      // callback indicates that we're done
+      return fileCount + i
+    }
+  }
+  if (nextPage && entries.length > 0) {
+    // keep going -- have more entries
+    return listFilesLoop(
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+    )
+  } else {
+    // no more entries -- end of data
+    return fileCount + entries.length
+  }
 }
 
 /**
  * List the set of files in this application's Gaia storage bucket.
- * @param {UserSession} caller - instance calling this method
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the number of files listed
  */
-export async function listFiles(
+export function listFiles(
   callback: (name: string) => boolean,
   caller?: UserSession
 ): Promise<number> {
-  const userSession = caller || new UserSession()
-  const gaiaHubConfig = await userSession.getOrSetLocalGaiaHubConnection()
-  return listFilesLoop(gaiaHubConfig, null, 0, 0, callback)
+  caller = caller || new UserSession()
+  return listFilesLoop(caller, null, null, 0, 0, callback)
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }

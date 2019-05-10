@@ -13,14 +13,15 @@
     "src",
   ],
   "typedocOptions": {
-    "readme": "src/auth/README.md",
+    "readme": "overview.md",
     "mode": "file",
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,
+    "includes" : "mdincludes",
     "includeDeclarations": false,
-    "target": "ES6",
     "gitRevision": "master",
-    "listInvalidSymbolLinks": true
+    "listInvalidSymbolLinks": true,
+    "theme": "docs-theme"
   }
 }

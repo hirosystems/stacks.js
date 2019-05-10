@@ -9,15 +9,30 @@ import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
 import { FileNotFound } from '../errors'
 
+/**
+ * @ignore
+ */
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 
-export type GaiaHubConfig = {
+/**
+ * The configuration for the user's Gaia storage provider.
+ */
+export interface GaiaHubConfig {
   address: string,
   url_prefix: string,
   token: string,
   server: string
 }
 
+/**
+ * 
+ * @param filename 
+ * @param contents 
+ * @param hubConfig 
+ * @param contentType 
+ * 
+ * @ignore
+ */
 export async function uploadToGaiaHub(
   filename: string, contents: any,
   hubConfig: GaiaHubConfig,
@@ -73,11 +88,25 @@ export async function deleteFromGaiaHub(
   }
 }
 
+/**
+ * 
+ * @param filename 
+ * @param hubConfig 
+ * 
+ * @ignore
+ */
 export function getFullReadUrl(filename: string,
                                hubConfig: GaiaHubConfig): Promise<string> {
   return Promise.resolve(`${hubConfig.url_prefix}${hubConfig.address}/${filename}`)
 }
 
+/**
+ * 
+ * @param challengeText 
+ * @param signerKeyHex 
+ * 
+ * @ignore
+ */
 function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): string {
   // only sign specific legacy auth challenges.
   let parsedChallenge
@@ -110,6 +139,15 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
   }
 }
 
+/**
+ * 
+ * @param hubInfo 
+ * @param signerKeyHex 
+ * @param hubUrl 
+ * @param associationToken 
+ * 
+ * @ignore
+ */
 function makeV1GaiaAuthToken(hubInfo: any,
                              signerKeyHex: string,
                              hubUrl: string,
@@ -135,6 +173,10 @@ function makeV1GaiaAuthToken(hubInfo: any,
   return `v1:${token}`
 }
 
+/**
+ * 
+ * @ignore
+ */
 export async function connectToGaiaHub(
   gaiaHubUrl: string,
   challengeSignerHex: string,
@@ -156,6 +198,13 @@ export async function connectToGaiaHub(
   }
 }
 
+/**
+ * 
+ * @param gaiaHubUrl 
+ * @param appPrivateKey 
+ * 
+ * @ignore
+ */
 export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
   const challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
   const response = await fetch(`${gaiaHubUrl}/hub_info`)

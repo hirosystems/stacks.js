@@ -116,5 +116,11 @@ export const sampleAddressBasedVerifications = {
       body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/ken.verification.linkedinbroken.html`,
                             'utf8')
     }
+  },
+  oscar: {
+    linkedIn: {
+      url: 'https://www.linkedin.com/feed/update/urn:li:activity:6504006525630189568/',
+      body: fs.readFileSync(`${TEST_DATA_DIR}/profiles/oscar.verification.linkedin.html`, 'utf8')
+    }
   }
 }

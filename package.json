@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "19.0.0",
+  "version": "19.1.0",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "unpkg": "dist/blockstack.js",
@@ -11,14 +11,14 @@
     "build:webpack:watch": "shx rm -rf dist/* && cross-env NODE_ENV=development webpack --mode=development --watch --progress --info-verbosity verbose",
     "build:node": "shx rm -rf lib && tsc",
     "build:node:watch": "shx rm -rf lib && tsc --watch",
+    "prepare": "npm run build:node && npm run build:webpack",
     "test": "npm run lint && cross-env NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
     "integration-test-ops": "cross-env NODE_ENV=test nyc node ./tests/operationsTests/src/index.ts",
     "dev-auth": "npm run build:webpack && ts-node ./tests/browserTests/auth-server.ts",
     "dev-proofs": "npm run build:webpack && ts-node ./tests/browserTests/proofs-server.ts",
     "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint --ext .ts ./src",
-    "build-documentation": "shx rm -rf docs && typedoc --tsconfig tsconfig-typedoc.json --out docs src && typedoc --tsconfig tsconfig-typedoc.json --json docs/docs.json src",
-    "docs": "typedoc --tsconfig tsconfig-typedoc.json --out docs src",
+    "build-documentation": "shx rm -rf docs && cross-env typedoc --name \"blockstack.js $npm_package_version Library Reference\" --tsconfig tsconfig.typedoc.json --out docs src && cross-env typedoc --name \"blockstack.js $npm_package_version Library Reference\" --tsconfig tsconfig.typedoc.json --json docs/docs.json src",
     "tsc": "tsc",
     "codecovUpload": "codecov"
   },
@@ -127,6 +127,7 @@
     "typedoc": "^0.14.2",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6",
+    "webpack-assets-manifest": "^3.1.1",
     "webpack-bundle-analyzer": "^3.1.0",
     "webpack-cli": "^3.2.3"
   },
