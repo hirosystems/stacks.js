@@ -23,8 +23,8 @@ export const enum AuthScope {
   store_write = 'store_write',
   /**
    * Publish data so that other users of the app can discover and interact with the user.
-   * The user's files stored on Gaia are made visible to others via the apps property in the 
-   * user’s profile.json file. 
+   * The user's files stored on Gaia hub are made visible to others via the `apps` property in the 
+   * user’s `profile.json` file. 
    */
   publish_data = 'publish_data',
   /**
