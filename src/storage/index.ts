@@ -3,7 +3,8 @@
 import {
   getFullReadUrl,
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
-  GaiaHubConfig
+  GaiaHubConfig,
+  deleteFromGaiaHub
 } from './hub'
 // export { type GaiaHubConfig } from './hub'
 
@@ -44,16 +45,6 @@ export interface PutFileOptions {
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
-
-/**
- * Deletes the specified file from the app's data store. Currently not implemented.
- * @param {String} path - the path to the file to delete
- * @returns {Promise} that resolves when the file has been removed
- * or rejects with an error
- */
-export function deleteFile(path: string) {
-  Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
-}
 
 /**
  * Fetch the public read URL of a user file for the specified app.
@@ -576,6 +567,46 @@ export async function putFile(
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
     const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
     return file
+  }
+}
+
+/**
+ * Deletes the specified file from the app's data store. 
+ * @param path - The path to the file to delete.
+ * @param options - Optional options object.
+ * @param options.wasSigned - Set to true if the file was originally signed
+ * in order for the corresponding signature file to also be deleted.
+ * @returns Resolves when the file has been removed or rejects with an error.
+ */
+export async function deleteFile(
+  path: string, 
+  options?: {
+    wasSigned?: boolean;
+  },
+  caller?: UserSession
+) {
+  if (!caller) {
+    caller = new UserSession()
+  }
+  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const opts = Object.assign({}, options)
+  if (opts.wasSigned) {
+    // If signed, delete both the content file and the .sig file
+    try {
+      await deleteFromGaiaHub(path, gaiaHubConfig)
+      await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
+    } catch (error) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      await deleteFromGaiaHub(path, freshHubConfig)
+      await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
+    }
+  } else {
+    try {
+      await deleteFromGaiaHub(path, gaiaHubConfig)
+    } catch (error) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      await deleteFromGaiaHub(path, freshHubConfig)
+    }
   }
 }
 
