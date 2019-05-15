@@ -11,7 +11,8 @@ import { decryptPrivateKey, makeAuthRequest } from './authMessages'
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
-  NAME_LOOKUP_PATH
+  NAME_LOOKUP_PATH,
+  AuthScope
 } from './authConstants'
 import { extractProfile } from '../profiles/profileTokens'
 import { UserSession } from './userSession'
@@ -110,7 +111,7 @@ export function isUserSignedIn() {
  */
 export function redirectToSignIn(redirectURI?: string, 
                                  manifestURI?: string, 
-                                 scopes?: string[]) { 
+                                 scopes?: Array<AuthScope | string>) { 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')

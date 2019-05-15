@@ -1,5 +1,5 @@
 
-import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST } from './authConstants'
+import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './authConstants'
 
 
 /**
@@ -23,7 +23,7 @@ export class AppConfig {
    * An array of string representing permissions requested by the app.
    *
    */
-  scopes: Array<string>
+  scopes: Array<AuthScope | string>
 
 
   /**
@@ -67,7 +67,7 @@ export class AppConfig {
    * @param {string} authenticatorURL - the web-based fall back authenticator 
    * ([[DEFAULT_BLOCKSTACK_HOST]])
    */
-  constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
+  constructor(scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
               appDomain: string = window.location.origin,
               redirectPath: string = '',
               manifestPath: string = '/manifest.json',
