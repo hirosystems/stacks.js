@@ -54,6 +54,7 @@ export interface UserData {
   // maybe public: possibly useful for advanced devs / webapps. I see an opportunity
   // to make a small plug about "user owned data" here, idk. 
   hubUrl: string;
+  coreNode: string;
   // maybe private: this would be an advanced field for app devs to use. 
   authResponseToken: string;
   // private: does not get sent to webapp at all.
@@ -288,15 +289,24 @@ export async function handlePendingSignIn(
     transitKey = caller.store.getSessionData().transitKey
   }
   if (!nameLookupURL) {
+    let coreNode = caller.appConfig && caller.appConfig.coreNode
+    if (!coreNode) {
+      coreNode = config.network.blockstackAPIUrl
+    }
+
     const tokenPayload = decodeToken(authResponseToken).payload
     if (isLaterVersion(tokenPayload.version, '1.3.0')
        && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
       // override globally
       Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
         + `with ${tokenPayload.blockstackAPIUrl}`)
+      // TODO: this config is never saved so the user node preference 
+      // is not respected in later sessions..
       config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
+      coreNode = tokenPayload.blockstackAPIUrl
     }
-    nameLookupURL = `${config.network.blockstackAPIUrl}${NAME_LOOKUP_PATH}`
+    
+    nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`
   }
   
   const isValid = await verifyAuthResponse(authResponseToken, nameLookupURL)
@@ -355,6 +365,7 @@ export async function handlePendingSignIn(
     coreSessionToken,
     authResponseToken,
     hubUrl,
+    coreNode: tokenPayload.blockstackAPIUrl,
     gaiaAssociationToken
   }
   const profileURL = tokenPayload.profile_url
