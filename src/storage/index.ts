@@ -5,7 +5,6 @@ import {
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
   GaiaHubConfig
 } from './hub'
-// export { type GaiaHubConfig } from './hub'
 
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
@@ -685,4 +684,4 @@ export function listFiles(
   return listFilesLoop(caller, null, null, 0, 0, callback)
 }
 
-export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
+export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GaiaHubConfig }
