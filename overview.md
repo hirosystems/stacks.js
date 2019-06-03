@@ -1,4 +1,4 @@
-# blockstack.js Reference Library
+# Using the library
 
 This reference describes the Blockstack Javascript Software Developer Kit (SDK) reference. For complete Blockstack documentation, see [docs.blockstack.org](https://docs.blockstack.org/). There is also reference material available for both the [iOS SDK](https://blockstack.github.io/blockstack-ios/) and [Android SDK](https://blockstack.github.io/blockstack-android/).
 
@@ -9,7 +9,7 @@ This reference describes the Blockstack Javascript Software Developer Kit (SDK) 
     $ npm install blockstack
 
 
-## Application Quickstart
+## Quickstart: Build an application
 
 1.  Install `blockstack.js` with `npm`.
 
@@ -81,3 +81,9 @@ This reference describes the Blockstack Javascript Software Developer Kit (SDK) 
     can be fetched via an http `GET` from any origin.
 
 7. Serve your application
+
+## Add the library without a package manager
+
+You can import `blockstack.js` as a script without using a package manager. To securely use the latest distribution of `blockstack.js` from a CDN, add the following `script` declaration in your application. 
+
+[[include:script-dist-file.md]]

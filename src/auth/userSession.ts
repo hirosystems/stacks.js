@@ -336,14 +336,14 @@ export class UserSession {
 
   /**
    * Deletes the specified file from the app's data store. 
-   * 
-   * @param {String} path - the path to the file to delete
-   * 
-   * @returns {Promise} that resolves when the file has been removed
-   * or rejects with an error
+   * @param path - The path to the file to delete.
+   * @param options - Optional options object.
+   * @param options.wasSigned - Set to true if the file was originally signed
+   * in order for the corresponding signature file to also be deleted.
+   * @returns Resolves when the file has been removed or rejects with an error.
    */
-  deleteFile(path: string) {
-    Promise.reject(new Error(`Delete of ${path} not supported by Gaia storage hubs`))
+  public deleteFile(path: string, options?: { wasSigned?: boolean }) {
+    return storage.deleteFile(path, options, this)
   }
 
 
