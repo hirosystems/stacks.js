@@ -1,6 +1,6 @@
 
 
-import bitcoinjs from 'bitcoinjs-lib'
+import { TransactionBuilder, Transaction, TxOutput, crypto as bjsCrypto } from 'bitcoinjs-lib'
 import RIPEMD160 from 'ripemd160'
 import BN from 'bn.js'
 
@@ -19,7 +19,7 @@ export const DUST_MINIMUM = 5500
  * @ignore
  */
 export function hash160(buff: Buffer) {
-  const sha256 = bitcoinjs.crypto.sha256(buff)
+  const sha256 = bjsCrypto.sha256(buff)
   return (new RIPEMD160()).update(sha256).digest()
 }
 
@@ -28,7 +28,7 @@ export function hash160(buff: Buffer) {
  * @ignore
  */
 export function hash128(buff: Buffer) {
-  return Buffer.from(bitcoinjs.crypto.sha256(buff).slice(0, 16))
+  return Buffer.from(bjsCrypto.sha256(buff).slice(0, 16))
 }
 
 
@@ -70,12 +70,12 @@ function transactionBytes(inputs: Array<txPoint | null>, outputs: Array<txPoint 
  * 
  * @ignore
  */
-export function getTransactionInsideBuilder(txBuilder: bitcoinjs.TransactionBuilder) {
-  return <bitcoinjs.Transaction>(<any>txBuilder).__tx
+export function getTransactionInsideBuilder(txBuilder: TransactionBuilder) {
+  return ((txBuilder as any).__TX as Transaction)
 }
 
-function getTransaction(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
-  if (txIn instanceof bitcoinjs.Transaction) {
+function getTransaction(txIn: Transaction | TransactionBuilder) {
+  if (txIn instanceof Transaction) {
     return txIn
   }
   return getTransactionInsideBuilder(txIn)
@@ -87,7 +87,7 @@ function getTransaction(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuild
  * 
  * @ignore
  */
-export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder,
+export function estimateTXBytes(txIn: Transaction | TransactionBuilder,
                                 additionalInputs: number,
                                 additionalOutputs: number) {
   const innerTx = getTransaction(txIn)
@@ -106,9 +106,9 @@ export function estimateTXBytes(txIn: bitcoinjs.Transaction | bitcoinjs.Transact
  * 
  * @ignore
  */
-export function sumOutputValues(txIn: bitcoinjs.Transaction | bitcoinjs.TransactionBuilder) {
+export function sumOutputValues(txIn: Transaction | TransactionBuilder) {
   const innerTx = getTransaction(txIn)
-  return innerTx.outs.reduce((agg, x) => agg + x.value, 0)
+  return innerTx.outs.reduce((agg, x) => agg + (x as TxOutput).value, 0)
 }
 
 /**
@@ -159,7 +159,7 @@ export function decodeB40(input: string) {
  * @private
  * @ignore
  */
-export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
+export function addUTXOsToFund(txBuilderIn: TransactionBuilder,
                                utxos: Array<UTXO>,
                                amountToFund: number, feeRate: number,
                                fundNewFees: boolean = true): number {
@@ -207,7 +207,7 @@ export function addUTXOsToFund(txBuilderIn: bitcoinjs.TransactionBuilder,
 }
 
 
-export function signInputs(txB: bitcoinjs.TransactionBuilder,
+export function signInputs(txB: TransactionBuilder,
                            defaultSigner: TransactionSigner,
                            otherSigners?: Array<{index: number, signer: TransactionSigner}>) {
   const txInner = getTransactionInsideBuilder(txB)

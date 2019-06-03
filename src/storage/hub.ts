@@ -1,5 +1,5 @@
 
-import bitcoin from 'bitcoinjs-lib'
+import { Transaction, script, crypto as bjsCrypto, ECPair } from 'bitcoinjs-lib'
 import crypto from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
@@ -120,11 +120,11 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = bitcoin.crypto.sha256(Buffer.from(challengeText))
+    const digest = bjsCrypto.sha256(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
-    const signatureWithHash = bitcoin.script.signature.encode(
-      signatureBuffer, bitcoin.Transaction.SIGHASH_NONE)
+    const signatureWithHash = script.signature.encode(
+      signatureBuffer, Transaction.SIGHASH_NONE)
     
     // We only want the DER encoding so remove the sighash version byte at the end.
     // See: https://github.com/bitcoinjs/bitcoinjs-lib/issues/1241#issuecomment-428062912
@@ -207,7 +207,7 @@ export async function connectToGaiaHub(
  * @ignore
  */
 export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
-  const challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
+  const challengeSigner = ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
   const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
