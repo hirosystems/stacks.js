@@ -3,6 +3,7 @@ import { decodeToken, TokenVerifier } from 'jsontokens'
 import { getAddressFromDID } from '../dids'
 import { publicKeyToAddress } from '../keys'
 import { isSameOriginAbsoluteUrl } from '../utils'
+import { fetchPrivate } from '../fetchUtil'
 import { fetchAppManifest } from './authProvider'
 
 /**
@@ -97,7 +98,7 @@ export function doPublicKeysMatchUsername(token: string,
 
     const username = payload.username
     const url = `${nameLookupURL.replace(/\/$/, '')}/${username}`
-    return fetch(url)
+    return fetchPrivate(url)
       .then(response => response.text())
       .then((responseText) => {
         const responseJSON = JSON.parse(responseText)

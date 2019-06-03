@@ -4,13 +4,15 @@ import queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
 import { isLaterVersion, hexStringToECPair, checkWindowAPI } from '../utils'
+import { fetchPrivate } from '../fetchUtil'
 import { getAddressFromDID } from '../dids'
 import { LoginFailedError } from '../errors'
 import { decryptPrivateKey, makeAuthRequest } from './authMessages'
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
-  NAME_LOOKUP_PATH
+  NAME_LOOKUP_PATH,
+  AuthScope
 } from './authConstants'
 import { extractProfile } from '../profiles/profileTokens'
 import { UserSession } from './userSession'
@@ -109,7 +111,7 @@ export function isUserSignedIn() {
  */
 export function redirectToSignIn(redirectURI?: string, 
                                  manifestURI?: string, 
-                                 scopes?: string[]) { 
+                                 scopes?: Array<AuthScope | string>) { 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
@@ -357,7 +359,7 @@ export async function handlePendingSignIn(
   }
   const profileURL = tokenPayload.profile_url
   if (!userData.profile && profileURL) {
-    const response = await fetch(profileURL)
+    const response = await fetchPrivate(profileURL)
     if (!response.ok) { // return blank profile if we fail to fetch
       userData.profile = Object.assign({}, DEFAULT_PROFILE)
     } else {

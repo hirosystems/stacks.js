@@ -4,6 +4,16 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [19.2.0] - 2019-05-12
+
+### Added
+- Method `deleteFile()` is now implemented
+
+### Changed
+- Fixed return type for BlockstackNetwork.getAccountTokens
+- Property `manifestURI` is now included in loaded manifest object
+- The `src` directory is now included in the npm package
+
 ## [19.1.0] - 2019-03-29
 
 ### Added

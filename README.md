@@ -2,21 +2,24 @@
 
 Note: If you're looking for the Blockstack CLI repo it was merged with [Blockstack Core](https://github.com/blockstack/blockstack-core).
 
--   [Installation](#installation)
--   [About](#about)
--   [Auth](https://blockstack.github.io/blockstack.js/index.html#authentication)
--   [Profiles](https://blockstack.github.io/blockstack.js/index.html#profiles)
--   [Storage](https://blockstack.github.io/blockstack.js/index.html#storage)
--   [Documentation](#documentation)
--   [Compatibility](#compatibility)
--   [Contributing](#contributing)
--   [Maintainer](#maintainer)
--   [Testing](#testing)
--   [Releasing](#releasing)
+  - [Installation](#installation)
+  - [About](#about)
+  - [Documentation](#documentation)
+  - [Compatibility](#compatibility)
+  - [Contributing](#contributing)
+  - [Maintainer](#maintainer)
+  - [Testing](#testing)
+    - [Testing in a browser](#testing-in-a-browser)
+  - [Releasing](#releasing)
 
 ## Installation
 
-    $ npm install blockstack
+```
+$ npm install blockstack
+```
+
+You can import `blockstack.js` as a script without using a package manager. To securely use the latest distribution of blockstack.js from a CDN, add [the mdincludes/script-dist-file.md](mdincludes/script-dist-file.md) script in your application. 
+
 
 ## About
 
