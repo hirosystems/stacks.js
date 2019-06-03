@@ -1,6 +1,7 @@
 
 import 'cross-fetch/polyfill'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
+import { fetchPrivate } from '../../fetchUtil'
 
 /**
  * @ignore
@@ -13,7 +14,7 @@ export class Service {
     return Promise.resolve()
       .then(() => {
         proofUrl = this.getProofUrl(proof)
-        return fetch(proofUrl)
+        return fetchPrivate(proofUrl)
       })
       .then((res) => {
         if (res.status !== 200) {
