@@ -18,9 +18,13 @@ import {
   InvalidStateError
 } from '../errors'
 import { Logger } from '../logger'
-import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
+import { 
+  GaiaHubConfig, 
+  connectToGaiaHub, 
+  GAIA_HUB_COLLECTION_KEY_FILE_NAME 
+} from '../storage/hub'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
-
+import { Collection } from 'blockstack-collection-schemas'
 
 /**
  * 
@@ -346,6 +350,31 @@ export class UserSession {
     return storage.deleteFile(path, options, this)
   }
 
+    /**
+   * Stores the data provided in the app's data store to to the file specified.
+   * @param {String} path - the path to store the data in
+   * @param {String|Buffer} content - the data to store in the file
+   * @param options a [[PutFileOptions]] object
+   * 
+   * @returns {Promise} that resolves if the operation succeed and rejects
+   * if it failed
+   */
+  putCollectionItem(item: Collection) {
+    return storage.putCollectionItem(item, this)
+  }
+
+  /**
+   * Retrieves the specified file from the app's data store.
+   * 
+   * @param {String} path - the path to the file to read
+   * @param {Object} options a [[GetFileOptions]] object
+   * 
+   * @returns {Promise} that resolves to the raw data in the file
+   * or rejects with an error
+   */
+  getCollectionItem(identifier: string, collectionTypeName: string) {
+    return storage.getCollectionItem(identifier, collectionTypeName, this)
+  }
 
   /**
    *  @ignore
@@ -393,5 +422,58 @@ export class UserSession {
     this.store.setSessionData(sessionData)
 
     return gaiaConfig
+  }
+
+  /**
+   * Retreive a collection Gaia hub config from local user data
+   * @param collection - the name of the collection to get hub config for
+   */
+  getCollectionGaiaHubConnection(collectionName: string): Promise<GaiaHubConfig> {
+    const sessionData = this.store.getSessionData()
+    const userData = sessionData.userData
+    if (!userData) {
+      throw new InvalidStateError('Missing userData')
+    }
+
+    const collectionHubConfigs = userData.collectionGaiaHubConfigs    
+    const hubConfig = collectionHubConfigs ? collectionHubConfigs[collectionName] : false
+
+    if (!hubConfig) {
+      const options = {}
+      const path = GAIA_HUB_COLLECTION_KEY_FILE_NAME
+
+      return storage.getFile(path, options, this)
+        .then((collectionKeyFile) => {
+          const collectionKeys = JSON.parse(collectionKeyFile as string)
+          const collectionHubConfig = collectionKeys[collectionName]
+
+          const hubConfig = {
+            address: collectionHubConfig.address,
+            url_prefix: collectionHubConfig.url_prefix,
+            token: collectionHubConfig.token,
+            server: collectionHubConfig.server
+          }
+
+          var newHubConfigs = sessionData.userData.collectionGaiaHubConfigs
+
+          if (!newHubConfigs) {
+            newHubConfigs = {
+              [collectionName]: hubConfig
+            }
+          } else {
+            newHubConfigs[collectionName] = hubConfig
+          }
+
+          sessionData.userData.collectionGaiaHubConfigs = newHubConfigs
+          this.store.setSessionData(sessionData)
+
+          return hubConfig
+        })
+        .catch((error) => {
+          throw new InvalidStateError('Unable to fetch collections Gaia hub auth token')
+        })
+    } else {
+      return Promise.resolve(hubConfig)
+    }
   }
 }

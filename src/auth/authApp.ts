@@ -58,11 +58,20 @@ export interface UserData {
   coreSessionToken?: string;
   // private: does not get sent to webapp at all.
   gaiaAssociationToken?: string;
+  // Gaia hub config to the user's collections storage buckets
+  collectionGaiaHubConfigs?: CollectionHubConfigArray;
   // public: this is the proper `Person` schema json for the user. 
   // This is the data that gets used when the `new blockstack.Person(profile)` class is used.
   profile: any;
   // private: does not get sent to webapp at all.
   gaiaHubConfig?: GaiaHubConfig;
+}
+
+/**
+ * Collection Gaia hub config array
+ */
+export interface CollectionHubConfigArray {
+  [collection: string]: GaiaHubConfig;
 }
 
 /**

@@ -6,7 +6,6 @@ import {
   GaiaHubConfig,
   deleteFromGaiaHub
 } from './hub'
-// export { type GaiaHubConfig } from './hub'
 
 import {
   encryptECIES, decryptECIES, signECDSA, verifyECDSA
@@ -20,6 +19,7 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
+import { Collection } from 'blockstack-collection-schemas'
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -42,6 +42,10 @@ export interface PutFileOptions {
    * Set a Content-Type header for unencrypted data. 
    */
   contentType?: string;
+  /**
+   * Optionally use a specified Gaia hub configuration
+   */
+  gaiaHubConfig?: GaiaHubConfig;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -482,7 +486,8 @@ export async function putFile(
   const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
-    contentType: ''
+    contentType: '',
+    gaiaHubConfig: null
   }
 
   const opt = Object.assign({}, defaults, options)
@@ -525,7 +530,7 @@ export async function putFile(
   if (!opt.encrypt && opt.sign) {
     const signatureObject = signECDSA(privateKey, content)
     const signatureContent = JSON.stringify(signatureObject)
-    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = opt.gaiaHubConfig || await caller.getOrSetLocalGaiaHubConnection()
 
     try {
       const fileUrls = await Promise.all([
@@ -560,13 +565,15 @@ export async function putFile(
     content = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
   }
-  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const gaiaHubConfig = opt.gaiaHubConfig || await caller.getOrSetLocalGaiaHubConnection()
   try {
     return await uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
   } catch (error) {
-    const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
-    return file
+    if(!opt.gaiaHubConfig) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
+      return file
+    }
   }
 }
 
@@ -714,6 +721,32 @@ export function listFiles(
 ): Promise<number> {
   caller = caller || new UserSession()
   return listFilesLoop(caller, null, null, 0, 0, callback)
+}
+
+export async function putCollectionItem(item: Collection, caller: UserSession) {
+  let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionTypeName)
+  let file = item.serialize()
+
+  let opt = {
+    gaiaHubConfig: hubConfig
+  }
+  return this.putFile(item.attrs.identifier, file, opt, caller)
+}
+
+export async function getCollectionItem(identifier: string, collectionTypeName: string, caller: UserSession) {
+  let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
+  let opt = {
+    gaiaHubConfig: hubConfig
+  }
+  return this.getFile(identifier, opt, caller)
+}
+
+export async function listCollectionFiles() {
+
+}
+
+export async function deleteCollectionFile() {
+
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
