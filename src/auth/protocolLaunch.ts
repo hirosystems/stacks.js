@@ -1,4 +1,4 @@
-import { checkWindowAPI, BLOCKSTACK_HANDLER } from '../utils'
+import { getGlobalObjects, BLOCKSTACK_HANDLER } from '../utils'
 import { Logger } from '../logger'
 
 /**
@@ -21,23 +21,29 @@ export function launchCustomProtocol(
   const echoReplyKeyPrefix = 'echo-reply-'
   const echoReplyKey = `${echoReplyKeyPrefix}${echoReplyID}`
 
-  const apis = ['localStorage', 'document', 'setTimeout', 'clearTimeout', 'addEventListener', 'removeEventListener']
-  apis.forEach((windowAPI) => checkWindowAPI('detectProtocolLaunch', windowAPI))
+  const { 
+    localStorage, document, 
+    setTimeout, clearTimeout, 
+    addEventListener, removeEventListener 
+  } = getGlobalObjects(
+    ['localStorage', 'document', 'setTimeout', 'clearTimeout', 'addEventListener', 'removeEventListener'],
+    { throwIfUnavailable: true, usageDesc: 'detectProtocolLaunch' }
+  )
 
   // Use localStorage as a reliable cross-window communication method.
   // Create the storage entry to signal a protocol detection attempt for the
   // next browser window to check.
-  window.localStorage.setItem(echoReplyKey, Date.now().toString())
+  localStorage.setItem(echoReplyKey, Date.now().toString())
   const cleanUpLocalStorage = () => {
     try {
-      window.localStorage.removeItem(echoReplyKey)
+      localStorage.removeItem(echoReplyKey)
       // Also clear out any stale echo-reply keys older than 1 hour.
-      for (let i = 0; i < window.localStorage.length; i++) {
-        const storageKey = window.localStorage.key(i)
+      for (let i = 0; i < localStorage.length; i++) {
+        const storageKey = localStorage.key(i)
         if (storageKey && storageKey.startsWith(echoReplyKeyPrefix)) {
-          const storageValue = window.localStorage.getItem(storageKey)
+          const storageValue = localStorage.getItem(storageKey)
           if (storageValue === 'success' || (Date.now() - parseInt(storageValue, 10)) > 3600000) {
-            window.localStorage.removeItem(storageKey)
+            localStorage.removeItem(storageKey)
           }
         }
       }
@@ -51,17 +57,17 @@ export function launchCustomProtocol(
   let redirectToWebAuthTimer = 0
   const cancelWebAuthRedirectTimer = () => {
     if (redirectToWebAuthTimer) {
-      window.clearTimeout(redirectToWebAuthTimer)
+      clearTimeout(redirectToWebAuthTimer)
       redirectToWebAuthTimer = 0
     }
   }
   const startWebAuthRedirectTimer = (timeout = detectionTimeout) => {
     cancelWebAuthRedirectTimer()
-    redirectToWebAuthTimer = window.setTimeout(() => {
+    redirectToWebAuthTimer = setTimeout(() => {
       if (redirectToWebAuthTimer) {
         cancelWebAuthRedirectTimer()
         let nextFunc: () => void
-        if (window.localStorage.getItem(echoReplyKey) === 'success') {
+        if (localStorage.getItem(echoReplyKey) === 'success') {
           Logger.info('Protocol echo reply detected.')
           nextFunc = successCallback
         } else {
@@ -80,7 +86,7 @@ export function launchCustomProtocol(
 
   startWebAuthRedirectTimer()
   
-  const inputPromptTracker = window.document.createElement('input')
+  const inputPromptTracker = document.createElement('input')
   inputPromptTracker.type = 'text'
 
   // Setting display:none on an element prevents them from being focused/blurred.
@@ -101,7 +107,7 @@ export function launchCustomProtocol(
     setTimeout(() => {
       if (redirectToWebAuthTimer && !isRefocused) {
         Logger.info('Detected possible browser prompt for opening the protocol handler app.')
-        window.clearTimeout(redirectToWebAuthTimer)
+        clearTimeout(redirectToWebAuthTimer)
         inputPromptTracker.addEventListener('focus', () => {
           if (redirectToWebAuthTimer) {
             Logger.info('Possible browser prompt closed, restarting auth redirect timeout.')
@@ -113,7 +119,7 @@ export function launchCustomProtocol(
   }
   inputPromptTracker.addEventListener('blur', inputBlurredFunc, { once: true, capture: true })
   setTimeout(() => inputPromptTracker.removeEventListener('blur', inputBlurredFunc), 200)
-  window.document.body.appendChild(inputPromptTracker)
+  document.body.appendChild(inputPromptTracker)
   inputPromptTracker.focus()
   
   // Detect if document.visibility is immediately changed which is a strong 
@@ -122,24 +128,24 @@ export function launchCustomProtocol(
   // This reduces the probability of a false-negative (where local auth works, but 
   // the original page was redirect to web auth because something took too long),
   const pageVisibilityChanged = () => {
-    if (window.document.hidden && redirectToWebAuthTimer) {
+    if (document.hidden && redirectToWebAuthTimer) {
       Logger.info('Detected immediate page visibility change (protocol handler probably working).')
       startWebAuthRedirectTimer(3000)
     }
   }
-  window.document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
-  setTimeout(() => window.document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
+  document.addEventListener('visibilitychange', pageVisibilityChanged, { once: true, capture: true })
+  setTimeout(() => document.removeEventListener('visibilitychange', pageVisibilityChanged), 500)
 
 
   // Listen for the custom protocol echo reply via localStorage update event.
-  window.addEventListener('storage', function replyEventListener(event) {
-    if (event.key === echoReplyKey && window.localStorage.getItem(echoReplyKey) === 'success') {
+  addEventListener('storage', function replyEventListener(event) {
+    if (event.key === echoReplyKey && localStorage.getItem(echoReplyKey) === 'success') {
       // Custom protocol worked, cancel the web auth redirect timer.
       cancelWebAuthRedirectTimer()
       inputPromptTracker.removeEventListener('blur', inputBlurredFunc)
       Logger.info('Protocol echo reply detected from localStorage event.')
       // Clean up event listener and localStorage.
-      window.removeEventListener('storage', replyEventListener)
+      removeEventListener('storage', replyEventListener)
       const nextFunc = successCallback
       successCallback = () => {}
       failCallback = () => {}
@@ -156,10 +162,10 @@ export function launchCustomProtocol(
   // browser tab when the app is installed. 
   Logger.info('Attempting protocol launch via iframe injection.')
   const locationSrc = `${BLOCKSTACK_HANDLER}:${authRequest}&echo=${echoReplyID}`
-  const iframe = window.document.createElement('iframe')
+  const iframe = document.createElement('iframe')
 
   const iframeStyle = 'all: initial; display: none; position: fixed; top: 0; height: 0; width: 0; opacity: 0;'
   iframe.style.cssText = iframeStyle
   iframe.src = locationSrc
-  window.document.body.appendChild(iframe)
+  document.body.appendChild(iframe)
 }

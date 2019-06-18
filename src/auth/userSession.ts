@@ -52,7 +52,7 @@ export class UserSession {
     sessionOptions?: SessionOptions }) {
     let runningInBrowser = true
 
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' && typeof self === 'undefined') {
       Logger.debug('UserSession: not running in browser')
       runningInBrowser = false
     }

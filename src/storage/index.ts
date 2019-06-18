@@ -20,6 +20,7 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
+import { getGlobalObject } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -429,7 +430,7 @@ export function getFile(
     decrypt: true,
     verify: false,
     username: null,
-    app: typeof window !== 'undefined' ? window.location.origin : undefined,
+    app: getGlobalObject('location', { returnEmptyObject: true }).origin,
     zoneFileLookupURL: null
   }
   const opt = Object.assign({}, defaults, options)
