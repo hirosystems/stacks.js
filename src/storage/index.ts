@@ -20,11 +20,8 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
-<<<<<<< HEAD
 import { getGlobalObject } from '../utils'
-=======
 import { fetchPrivate } from '../fetchUtil'
->>>>>>> develop
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].

@@ -1,5 +1,5 @@
 
-import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope} from './authConstants'
+import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './authConstants'
 import { getGlobalObject } from '../utils'
 
 /**
