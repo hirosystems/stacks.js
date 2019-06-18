@@ -1,11 +1,11 @@
-
-import bitcoinjs from 'bitcoinjs-lib'
+import { TxOutput, address as bjsAddress, networks, crypto as bjsCrypto, Transaction, payments, Network } from 'bitcoinjs-lib'
 import FormData from 'form-data'
 import BN from 'bn.js'
 import RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 import { config } from './config'
+import { fetchPrivate } from './fetchUtil'
 
 /**
  * @ignore
@@ -53,7 +53,7 @@ export class BlockstackNetwork {
 
   broadcastServiceUrl: string
 
-  layer1: any
+  layer1: Network
 
   DUST_MINIMUM: number
 
@@ -67,7 +67,7 @@ export class BlockstackNetwork {
 
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork,
-              network = bitcoinjs.networks.bitcoin) {
+              network = networks.bitcoin) {
     this.blockstackAPIUrl = apiUrl
     this.broadcastServiceUrl = broadcastServiceUrl
     this.layer1 = network
@@ -80,11 +80,11 @@ export class BlockstackNetwork {
   }
 
   coerceAddress(address: string) {
-    const { hash, version } = bitcoinjs.address.fromBase58Check(address)
-    const scriptHashes = [bitcoinjs.networks.bitcoin.scriptHash,
-                          bitcoinjs.networks.testnet.scriptHash]
-    const pubKeyHashes = [bitcoinjs.networks.bitcoin.pubKeyHash,
-                          bitcoinjs.networks.testnet.pubKeyHash]
+    const { hash, version } = bjsAddress.fromBase58Check(address)
+    const scriptHashes = [networks.bitcoin.scriptHash,
+                          networks.testnet.scriptHash]
+    const pubKeyHashes = [networks.bitcoin.pubKeyHash,
+                          networks.testnet.pubKeyHash]
     let coercedVersion
     if (scriptHashes.indexOf(version) >= 0) {
       coercedVersion = this.layer1.scriptHash
@@ -93,7 +93,7 @@ export class BlockstackNetwork {
     } else {
       throw new Error(`Unrecognized address version number ${version} in ${address}`)
     }
-    return bitcoinjs.address.toBase58Check(hash, coercedVersion)
+    return bjsAddress.toBase58Check(hash, coercedVersion)
   }
 
   /**
@@ -111,7 +111,7 @@ export class BlockstackNetwork {
    */
   getNamePriceV1(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
     // legacy code path
-    return fetch(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
         if (!resp.ok) {
           throw new Error(`Failed to query name price for ${fullyQualifiedName}`)
@@ -145,7 +145,7 @@ export class BlockstackNetwork {
    */
   getNamespacePriceV1(namespaceID: string): Promise<{units: string, amount: BN}> {
     // legacy code path
-    return fetch(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/prices/namespaces/${namespaceID}`)
       .then((resp) => {
         if (!resp.ok) {
           throw new Error(`Failed to query name price for ${namespaceID}`)
@@ -175,7 +175,7 @@ export class BlockstackNetwork {
    * @private
    */
   getNamePriceV2(fullyQualifiedName: string): Promise<{units: string, amount: BN}> {
-    return fetch(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v2/prices/names/${fullyQualifiedName}`)
       .then((resp) => {
         if (resp.status !== 200) {
           // old core node 
@@ -213,7 +213,7 @@ export class BlockstackNetwork {
    * @private
    */
   getNamespacePriceV2(namespaceID: string): Promise<{units: string, amount: BN}> {
-    return fetch(`${this.blockstackAPIUrl}/v2/prices/namespaces/${namespaceID}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v2/prices/namespaces/${namespaceID}`)
       .then((resp) => {
         if (resp.status !== 200) {
           // old core node 
@@ -288,7 +288,7 @@ export class BlockstackNetwork {
    */
   getNamesOwned(address: string): Promise<string[]> {
     const networkAddress = this.coerceAddress(address)
-    return fetch(`${this.blockstackAPIUrl}/v1/addresses/bitcoin/${networkAddress}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/addresses/bitcoin/${networkAddress}`)
       .then(resp => resp.json())
       .then(obj => obj.names)
   }
@@ -301,7 +301,7 @@ export class BlockstackNetwork {
    */
   getNamespaceBurnAddress(namespace: string) {
     return Promise.all([
-      fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
+      fetchPrivate(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
       this.getBlockHeight()
     ])
       .then(([resp, blockHeight]) => {
@@ -333,7 +333,7 @@ export class BlockstackNetwork {
   getNameInfo(fullyQualifiedName: string) {
     Logger.debug(this.blockstackAPIUrl)
     const nameLookupURL = `${this.blockstackAPIUrl}/v1/names/${fullyQualifiedName}`
-    return fetch(nameLookupURL)
+    return fetchPrivate(nameLookupURL)
       .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Name not found')
@@ -362,7 +362,7 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to the namespace information.
    */
   getNamespaceInfo(namespaceID: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/namespaces/${namespaceID}`)
       .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Namespace not found')
@@ -394,12 +394,12 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to the zone file's text
    */
   getZonefile(zonefileHash: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/zonefiles/${zonefileHash}`)
       .then((resp) => {
         if (resp.status === 200) {
           return resp.text()
             .then((body) => {
-              const sha256 = bitcoinjs.crypto.sha256(Buffer.from(body))
+              const sha256 = bjsCrypto.sha256(Buffer.from(body))
               const h = (new RIPEMD160()).update(sha256).digest('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)
@@ -421,7 +421,7 @@ export class BlockstackNetwork {
    *   for this token
    */
   getAccountStatus(address: string, tokenType: string) {
-    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/status`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/status`)
       .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Account not found')
@@ -452,7 +452,7 @@ export class BlockstackNetwork {
   getAccountHistoryPage(address: string,
                         page: number): Promise<any[]> {
     const url = `${this.blockstackAPIUrl}/v1/accounts/${address}/history?page=${page}`
-    return fetch(url)
+    return fetchPrivate(url)
       .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Account not found')
@@ -487,7 +487,7 @@ export class BlockstackNetwork {
    */
   getAccountAt(address: string, blockHeight: number): Promise<any[]> {
     const url = `${this.blockstackAPIUrl}/v1/accounts/${address}/history/${blockHeight}`
-    return fetch(url)
+    return fetchPrivate(url)
       .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Account not found')
@@ -517,8 +517,8 @@ export class BlockstackNetwork {
    * @return {Promise} a promise that resolves to an Array of Strings, where each item encodes the 
    *   type of token this account holds (excluding the underlying blockchain's tokens)
    */
-  getAccountTokens(address: string): Promise<string[]> {
-    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
+  getAccountTokens(address: string): Promise<{tokens: string[]}> {
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/accounts/${address}/tokens`)
       .then((resp) => {
         if (resp.status === 404) {
           throw new Error('Account not found')
@@ -545,7 +545,7 @@ export class BlockstackNetwork {
    *   held by this account.
    */
   getAccountBalance(address: string, tokenType: string): Promise<BN> {
-    return fetch(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/accounts/${address}/${tokenType}/balance`)
       .then((resp) => {
         if (resp.status === 404) {
           // talking to an older blockstack core node without the accounts API
@@ -595,7 +595,7 @@ export class BlockstackNetwork {
     }
 
     const url = `${this.broadcastServiceUrl}/v1/broadcast/${endpoint}`
-    return fetch(url, options)
+    return fetchPrivate(url, options)
       .then((response) => {
         if (response.ok) {
           return response.json()
@@ -715,14 +715,14 @@ export class BlockstackNetwork {
       // zone file is two words but core's api treats it as one word 'zonefile'
       const requestBody = { zonefile: zoneFile }
 
-      return fetch(`${this.blockstackAPIUrl}/v1/zonefile/`,
-                   {
-                     method: 'POST',
-                     body: JSON.stringify(requestBody),
-                     headers: {
-                       'Content-Type': 'application/json'
-                     }
-                   })
+      return fetchPrivate(`${this.blockstackAPIUrl}/v1/zonefile/`,
+                          {
+                            method: 'POST',
+                            body: JSON.stringify(requestBody),
+                            headers: {
+                              'Content-Type': 'application/json'
+                            }
+                          })
         .then((resp) => {
           const json = resp.json()
           return json
@@ -809,7 +809,7 @@ export class BlockstackNetwork {
    * @ignore
    */
   getFeeRate(): Promise<number> {
-    return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
+    return fetchPrivate('https://bitcoinfees.earn.com/api/v1/fees/recommended')
       .then(resp => resp.json())
       .then(rates => Math.floor(rates.fastestFee))
   }
@@ -859,7 +859,7 @@ export class BlockstackNetwork {
    * @ignore
    */
   modifyUTXOSetFrom(txHex: string) {
-    const tx = bitcoinjs.Transaction.fromHex(txHex)
+    const tx = Transaction.fromHex(txHex)
 
     const excludeSet: Array<UTXO> = this.excludeUtxoSet.concat()
 
@@ -878,7 +878,7 @@ export class BlockstackNetwork {
     tx.outs.forEach((utxoCreated, txOutputN) => {
       const isNullData = function isNullData(script: Buffer) {
         try {
-          bitcoinjs.payments.embed({ output: script }, { validate: true })
+          payments.embed({ output: script }, { validate: true })
           return true
         } catch (_) {
           return false
@@ -887,7 +887,7 @@ export class BlockstackNetwork {
       if (isNullData(utxoCreated.script)) {
         return
       }
-      const address = bitcoinjs.address.fromOutputScript(
+      const address = bjsAddress.fromOutputScript(
         utxoCreated.script, this.layer1
       )
 
@@ -899,7 +899,7 @@ export class BlockstackNetwork {
       includeSet.push({
         tx_hash: txHash,
         confirmations: 0,
-        value: utxoCreated.value,
+        value: (utxoCreated as TxOutput).value,
         tx_output_n: txOutputN
       })
       this.includeUtxoMap[address] = includeSet
@@ -915,7 +915,7 @@ export class BlockstackNetwork {
   * @ignore
   */
   getConsensusHash() {
-    return fetch(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
+    return fetchPrivate(`${this.blockstackAPIUrl}/v1/blockchains/bitcoin/consensus`)
       .then(resp => resp.json())
       .then(x => x.consensus_hash)
   }
@@ -942,7 +942,7 @@ export class BlockstackNetwork {
 export class LocalRegtest extends BlockstackNetwork {
   constructor(apiUrl: string, broadcastServiceUrl: string,
               bitcoinAPI: BitcoinNetwork) {
-    super(apiUrl, broadcastServiceUrl, bitcoinAPI, bitcoinjs.networks.testnet)
+    super(apiUrl, broadcastServiceUrl, bitcoinAPI, networks.testnet)
   }
 
   getFeeRate(): Promise<number> {
@@ -976,7 +976,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
     const headers = { Authorization: `Basic ${authString}` }
-    return fetch(this.bitcoindUrl, {
+    return fetchPrivate(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPC),
       headers
@@ -993,7 +993,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
     const headers = { Authorization: `Basic ${authString}` }
-    return fetch(this.bitcoindUrl, {
+    return fetchPrivate(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPC),
       headers
@@ -1011,7 +1011,7 @@ export class BitcoindAPI extends BitcoinNetwork {
     const authString =      Buffer.from(`${this.bitcoindCredentials.username}:${this.bitcoindCredentials.password}`)
       .toString('base64')
     const headers = { Authorization: `Basic ${authString}` }
-    return fetch(this.bitcoindUrl, {
+    return fetchPrivate(this.bitcoindUrl, {
       method: 'POST',
       body: JSON.stringify(jsonRPC),
       headers
@@ -1026,7 +1026,7 @@ export class BitcoindAPI extends BitcoinNetwork {
           params: [blockhash]
         }
         headers.Authorization = `Basic ${authString}`
-        return fetch(this.bitcoindUrl, {
+        return fetchPrivate(this.bitcoindUrl, {
           method: 'POST',
           body: JSON.stringify(jsonRPCBlock),
           headers
@@ -1060,7 +1060,7 @@ export class BitcoindAPI extends BitcoinNetwork {
 
     const importPromise = (this.importedBefore[address])
       ? Promise.resolve()
-      : fetch(this.bitcoindUrl, {
+      : fetchPrivate(this.bitcoindUrl, {
         method: 'POST',
         body: JSON.stringify(jsonRPCImport),
         headers
@@ -1068,7 +1068,7 @@ export class BitcoindAPI extends BitcoinNetwork {
         .then(() => { this.importedBefore[address] = true })
 
     return importPromise
-      .then(() => fetch(this.bitcoindUrl, {
+      .then(() => fetchPrivate(this.bitcoindUrl, {
         method: 'POST',
         body: JSON.stringify(jsonRPCUnspent),
         headers
@@ -1099,36 +1099,36 @@ export class InsightClient extends BitcoinNetwork {
 
   broadcastTransaction(transaction: string) {
     const jsonData = { rawtx: transaction }
-    return fetch(`${this.apiUrl}/tx/send`,
-                 {
-                   method: 'POST',
-                   headers: { 'Content-Type': 'application/json' },
-                   body: JSON.stringify(jsonData)
-                 })
+    return fetchPrivate(`${this.apiUrl}/tx/send`,
+                        {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(jsonData)
+                        })
       .then(resp => resp.json())
   }
 
   getBlockHeight() {
-    return fetch(`${this.apiUrl}/status`)
+    return fetchPrivate(`${this.apiUrl}/status`)
       .then(resp => resp.json())
       .then(status => status.blocks)
   }
 
   getTransactionInfo(txHash: string): Promise<{block_height: number}> {
-    return fetch(`${this.apiUrl}/tx/${txHash}`)
+    return fetchPrivate(`${this.apiUrl}/tx/${txHash}`)
       .then(resp => resp.json())
       .then((transactionInfo) => {
         if (transactionInfo.error) {
           throw new Error(`Error finding transaction: ${transactionInfo.error}`)
         }
-        return fetch(`${this.apiUrl}/block/${transactionInfo.blockHash}`)
+        return fetchPrivate(`${this.apiUrl}/block/${transactionInfo.blockHash}`)
       })
       .then(resp => resp.json())
       .then(blockInfo => ({ block_height: blockInfo.height }))
   }
 
   getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
-    return fetch(`${this.apiUrl}/addr/${address}/utxo`)
+    return fetchPrivate(`${this.apiUrl}/addr/${address}/utxo`)
       .then(resp => resp.json())
       .then(utxos => utxos.map(
         (x: any) => ({
@@ -1154,13 +1154,13 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 
   getBlockHeight() {
-    return fetch(`${this.utxoProviderUrl}/latestblock?cors=true`)
+    return fetchPrivate(`${this.utxoProviderUrl}/latestblock?cors=true`)
       .then(resp => resp.json())
       .then(blockObj => blockObj.height)
   }
 
   getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
-    return fetch(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
+    return fetchPrivate(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
       .then((resp) => {
         if (resp.status === 500) {
           Logger.debug('UTXO provider 500 usually means no UTXOs: returning []')
@@ -1186,7 +1186,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 
   getTransactionInfo(txHash: string): Promise<{block_height: number}> {
-    return fetch(`${this.utxoProviderUrl}/rawtx/${txHash}?cors=true`)
+    return fetchPrivate(`${this.utxoProviderUrl}/rawtx/${txHash}?cors=true`)
       .then((resp) => {
         if (resp.status === 200) {
           return resp.json()
@@ -1200,18 +1200,18 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   broadcastTransaction(transaction: string) {
     const form = new FormData()
     form.append('tx', transaction)
-    return fetch(`${this.utxoProviderUrl}/pushtx?cors=true`,
-                 {
-                   method: 'POST',
-                   body: <any>form
-                 })
+    return fetchPrivate(`${this.utxoProviderUrl}/pushtx?cors=true`,
+                        {
+                          method: 'POST',
+                          body: <any>form
+                        })
       .then((resp) => {
         const text = resp.text()
         return text
           .then((respText) => {
             if (respText.toLowerCase().indexOf('transaction submitted') >= 0) {
               const txHash = Buffer.from(
-                bitcoinjs.Transaction.fromHex(transaction)
+                Transaction.fromHex(transaction)
                   .getHash()
                   .reverse()).toString('hex') // big_endian
               return txHash

@@ -8,7 +8,7 @@ import { makeUUID4, nextMonth, getGlobalObject } from '../utils'
 import { makeDIDFromAddress } from '../dids'
 import { encryptECIES, decryptECIES } from '../encryption/ec'
 import { Logger } from '../logger'
-import { DEFAULT_SCOPE } from './authConstants'
+import { DEFAULT_SCOPE, AuthScope } from './authConstants'
 import { UserSession } from './userSession'
 
 
@@ -58,7 +58,7 @@ export function makeAuthRequest(
   transitPrivateKey?: string,
   redirectURI?: string, 
   manifestURI?: string, 
-  scopes: string[] = DEFAULT_SCOPE,
+  scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
   appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}

@@ -3,7 +3,8 @@
 import {
   getFullReadUrl,
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
-  GaiaHubConfig
+  GaiaHubConfig,
+  deleteFromGaiaHub
 } from './hub'
 // export { type GaiaHubConfig } from './hub'
 
@@ -19,7 +20,11 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
+<<<<<<< HEAD
 import { getGlobalObject } from '../utils'
+=======
+import { fetchPrivate } from '../fetchUtil'
+>>>>>>> develop
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -45,16 +50,6 @@ export interface PutFileOptions {
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
-
-/**
- * Deletes the specified file from the app's data store. Currently not implemented.
- * @param {String} path - the path to the file to delete
- * @returns {Promise} that resolves when the file has been removed
- * or rejects with an error
- */
-export function deleteFile(path: string) {
-  Promise.reject(new Error(`Delete of ${path} not supported by gaia hubs`))
-}
 
 /**
  * Fetch the public read URL of a user file for the specified app.
@@ -247,7 +242,7 @@ function getFileContents(path: string, app: string, username: string | undefined
       const opts = { app, username, zoneFileLookupURL }
       return getFileUrl(path, opts, caller)
     })
-    .then(readUrl => fetch(readUrl))
+    .then(readUrl => fetchPrivate(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
@@ -581,6 +576,46 @@ export async function putFile(
 }
 
 /**
+ * Deletes the specified file from the app's data store. 
+ * @param path - The path to the file to delete.
+ * @param options - Optional options object.
+ * @param options.wasSigned - Set to true if the file was originally signed
+ * in order for the corresponding signature file to also be deleted.
+ * @returns Resolves when the file has been removed or rejects with an error.
+ */
+export async function deleteFile(
+  path: string, 
+  options?: {
+    wasSigned?: boolean;
+  },
+  caller?: UserSession
+) {
+  if (!caller) {
+    caller = new UserSession()
+  }
+  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const opts = Object.assign({}, options)
+  if (opts.wasSigned) {
+    // If signed, delete both the content file and the .sig file
+    try {
+      await deleteFromGaiaHub(path, gaiaHubConfig)
+      await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
+    } catch (error) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      await deleteFromGaiaHub(path, freshHubConfig)
+      await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
+    }
+  } else {
+    try {
+      await deleteFromGaiaHub(path, gaiaHubConfig)
+    } catch (error) {
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      await deleteFromGaiaHub(path, freshHubConfig)
+    }
+  }
+}
+
+/**
  * Get the app storage bucket URL
  * @param {String} gaiaHubUrl - the gaia hub URL
  * @param {String} appPrivateKey - the app private key used to generate the app address
@@ -631,7 +666,7 @@ async function listFilesLoop(
       },
       body: pageRequest
     }
-    response = await fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
+    response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
       throw new Error(`listFiles failed with HTTP status ${response.status}`)
     }

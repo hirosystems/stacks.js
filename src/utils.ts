@@ -101,7 +101,7 @@ export function isLaterVersion(v1: string, v2: string) {
  * @private
  * @ignore
  */
-export function hexStringToECPair(skHex: string) {
+export function hexStringToECPair(skHex: string): ECPair.ECPairInterface {
   const ecPairOptions = {
     network: config.network.layer1,
     compressed: true
@@ -125,7 +125,7 @@ export function hexStringToECPair(skHex: string) {
  * 
  * @ignore
  */
-export function ecPairToHexString(secretKey: ECPair) {
+export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
   const ecPointHex = secretKey.privateKey.toString('hex')
   if (secretKey.compressed) {
     return `${ecPointHex}01`
@@ -139,7 +139,7 @@ export function ecPairToHexString(secretKey: ECPair) {
  * @private
  * @ignore
  */
-export function ecPairToAddress(keyPair: ECPair) {
+export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
   return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
 }
 

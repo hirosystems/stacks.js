@@ -1,7 +1,6 @@
 
-import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST } from './authConstants'
+import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope} from './authConstants'
 import { getGlobalObject } from '../utils'
-
 
 /**
  * Configuration data for the current app.
@@ -24,7 +23,7 @@ export class AppConfig {
    * An array of string representing permissions requested by the app.
    *
    */
-  scopes: Array<string>
+  scopes: Array<AuthScope | string>
 
 
   /**

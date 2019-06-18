@@ -2,6 +2,8 @@ import queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { BLOCKSTACK_HANDLER, getGlobalObject, updateQueryStringParameter } from '../utils'
+import { fetchPrivate } from '../fetchUtil'
+
 
 import { Logger } from '../logger'
 
@@ -41,11 +43,11 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
       const manifestURI = payload.manifest_uri
       try {
         Logger.debug(`Fetching manifest from ${manifestURI}`)
-        fetch(manifestURI)
+        fetchPrivate(manifestURI)
           .then(response => response.text())
           .then(responseText => JSON.parse(responseText))
           .then((responseJSON) => {
-            resolve(responseJSON)
+            resolve({ ...responseJSON, manifestURI })
           })
           .catch((e) => {
             Logger.debug(e.stack)
