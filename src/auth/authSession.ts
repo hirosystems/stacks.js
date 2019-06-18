@@ -1,6 +1,7 @@
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
 import 'cross-fetch/polyfill'
+import { fetchPrivate } from '../fetchUtil'
 
 /**
  * Create an authentication token to be sent to the Core API server
@@ -81,7 +82,7 @@ export function sendCoreSessionRequest(coreHost: string,
         }
       }
       const url = `http://${coreHost}:${corePort}/v1/auth?authRequest=${coreAuthRequest}`
-      return fetch(url, options)
+      return fetchPrivate(url, options)
     })
     .then((response) => {
       if (!response.ok) {

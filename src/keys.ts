@@ -1,5 +1,5 @@
 
-import { randomBytes } from 'crypto'
+import { randomBytes, randomFillSync } from 'crypto'
 import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
 
 /**
@@ -8,11 +8,15 @@ import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
  * 
  * @ignore
  */
-export function getEntropy(numberOfBytes: number) {
-  if (!numberOfBytes) {
-    numberOfBytes = 32
+export function getEntropy(arg: Buffer | number): Buffer {
+  if (!arg) {
+    arg = 32
   }
-  return randomBytes(numberOfBytes)
+  if (typeof arg === 'number') {
+    return randomBytes(arg)
+  } else {
+    return randomFillSync(arg)
+  }  
 }
 
 /**
