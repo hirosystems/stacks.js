@@ -9,7 +9,7 @@ import { getGlobalObject } from '../utils'
  * class without any arguments will use
  * `window.location.origin` as the app domain.
  * On non-browser platforms, you need to
- * specify an app domain as the first argument.
+ * specify an app domain as the second argument.
  * 
  */
 export class AppConfig {
