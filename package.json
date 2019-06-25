@@ -87,7 +87,6 @@
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.0.0",
     "@types/cheerio": "^0.22.10",
-    "@types/elliptic": "^6.4.5",
     "@types/fetch-mock": "^5.8.0",
     "@types/form-data": "^2.2.1",
     "@types/node": "^10",
@@ -129,6 +128,8 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
+    "@types/bn.js": "^4.11.5",
+    "@types/elliptic": "^6.4.9",
     "ajv": "^4.11.5",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.0.5",
@@ -137,7 +138,7 @@
     "cross-fetch": "^2.2.2",
     "elliptic": "^6.4.1",
     "form-data": "^2.3.3",
-    "jsontokens": "^1.0.0",
+    "jsontokens": "^2.0.2",
     "query-string": "^6.3.0",
     "request": "^2.88.0",
     "ripemd160": "^2.0.2",

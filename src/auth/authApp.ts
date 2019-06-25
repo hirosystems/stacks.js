@@ -289,6 +289,9 @@ export async function handlePendingSignIn(
   }
   if (!nameLookupURL) {
     const tokenPayload = decodeToken(authResponseToken).payload
+    if (typeof tokenPayload === 'string') {
+      throw new Error('Unexpected token payload type of string')
+    }
     if (isLaterVersion(tokenPayload.version, '1.3.0')
        && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
       // override globally
@@ -304,6 +307,10 @@ export async function handlePendingSignIn(
     throw new LoginFailedError('Invalid authentication response.')
   }
   const tokenPayload = decodeToken(authResponseToken).payload
+  if (typeof tokenPayload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
+
   // TODO: real version handling
   let appPrivateKey = tokenPayload.private_key
   let coreSessionToken = tokenPayload.core_token
