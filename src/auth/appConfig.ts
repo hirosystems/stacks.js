@@ -9,7 +9,7 @@ import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST } from './aut
  * class without any arguments will use
  * `window.location.origin` as the app domain.
  * On non-browser platforms, you need to
- * specify an app domain as the second argument.
+ * specify an app domain as the first argument.
  * 
  */
 export class AppConfig {
