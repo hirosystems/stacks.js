@@ -6,6 +6,7 @@ import {
   InstanceDataStore
 } from './sessionStore'
 
+import { UserData } from './authApp'
 import * as authApp from './authApp'
 import * as authMessages from './authMessages'
 import * as storage from '../storage'
@@ -23,7 +24,7 @@ import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
 
 
 /**
- * 
+ *
  * Represents an instance of a signed in user for a particular app.
  *
  * A signed in user has access to two major pieces of information
@@ -32,9 +33,9 @@ import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
  *
  * A user can be signed in either directly through the interactive
  * sign in process or by directly providing the app private key.
- * 
+ *
 
- * 
+ *
  */
 export class UserSession {
   appConfig: AppConfig
@@ -43,8 +44,8 @@ export class UserSession {
 
   /**
    * Creates a UserSession object
-   * 
-   * @param options 
+   *
+   * @param options
    */
   constructor(options?: {
     appConfig?: AppConfig,
@@ -80,7 +81,7 @@ export class UserSession {
     }
   }
 
-  
+
   /**
    * Generates an authentication request and redirects the user to the Blockstack
    * browser to approve the sign in request.
@@ -93,43 +94,44 @@ export class UserSession {
    * authentication request is generated. If your app falls into this category,
    * use [[generateAndStoreTransitKey]], [[makeAuthRequest]],
    * and [[redirectToSignInWithAuthRequest]] to build your own sign in process.
-   * 
+   *
    * @param redirectURI Location of your application.
    * @param manifestURI Location of the manifest.json file
    * @param scopes Permissions requested by the application. Possible values are
    *  `store_write` (default) or `publish_data`.
-   * 
-   * @returns {void}
+   *
+   * @returns {Promise}
    */
-  redirectToSignIn(
+  async redirectToSignIn(
     redirectURI?: string,
     manifestURI?: string,
     scopes?: Array<AuthScope | string>
   ) {
-    const transitKey = this.generateAndStoreTransitKey()
-    const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
+    const transitKey = await this.generateAndStoreTransitKey()
+    const authRequest = await this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
     return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
-   * Redirects the user to the Blockstack browser to approve the sign in request. 
+   * Redirects the user to the Blockstack browser to approve the sign in request.
    * To construct a request see the [[makeAuthRequest]] function.
    *
    * The user is redirected to the authenticator URL specified in the `AppConfig`
    * if the `blockstack:` protocol handler is not detected.
    * Please note that the protocol handler detection does not work on all browsers.
-   * 
+   *
    * @param authRequest A request string built by the [[makeAuthRequest]] function
    * @param blockstackIDHost The ID of the Blockstack Browser application.
-   * 
+   *
+   * @returns {Promise}
    */
-  redirectToSignInWithAuthRequest(
+  async redirectToSignInWithAuthRequest(
     authRequest?: string,
     blockstackIDHost?: string
   ) {
-    authRequest = authRequest || this.makeAuthRequest()
-    const authenticatorURL = blockstackIDHost 
+    authRequest = authRequest || await this.makeAuthRequest()
+    const authenticatorURL = blockstackIDHost
       || (this.appConfig && this.appConfig.authenticatorURL)
     return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
@@ -142,20 +144,20 @@ export class UserSession {
    *
    * *Note*: This method should only be used if you want to use a customized authentication
    * flow. Typically, you'd use [[redirectToSignIn]] which is the default sign in method.
-   * 
+   *
    * @param transitKey A HEX encoded transit private key.
    * @param redirectURI Location to redirect the user to after sign in approval.
    * @param manifestURI Location of this app's manifest file.
    * @param scopes The permissions this app is requesting. The default is `store_write`.
    * @param appDomain The origin of the app.
    * @param expiresAt The time at which this request is no longer valid.
-   * @param extraParams Any extra parameters to pass to the authenticator. Use this to 
-   * pass options that aren't part of the Blockstack authentication specification, 
+   * @param extraParams Any extra parameters to pass to the authenticator. Use this to
+   * pass options that aren't part of the Blockstack authentication specification,
    * but might be supported by special authenticators.
-   * 
+   *
    * @returns {String} the authentication request
    */
-  makeAuthRequest(
+  async makeAuthRequest(
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
@@ -163,12 +165,12 @@ export class UserSession {
     appDomain?: string,
     expiresAt: number = nextHour().getTime(),
     extraParams: any = {}
-  ): string {
+  ): Promise<string> {
     const appConfig = this.appConfig
     if (!appConfig) {
       throw new InvalidStateError('Missing AppConfig')
     }
-    transitKey = transitKey || this.generateAndStoreTransitKey()
+    transitKey = transitKey || await this.generateAndStoreTransitKey()
     redirectURI = redirectURI || appConfig.redirectURI()
     manifestURI = manifestURI || appConfig.manifestURI()
     scopes = scopes || appConfig.scopes
@@ -182,21 +184,21 @@ export class UserSession {
    * Generates a ECDSA keypair to
    * use as the ephemeral app transit private key
    * and store in the session.
-   * 
+   *
    * @returns {String} the hex encoded private key
    *
    */
-  generateAndStoreTransitKey(): string {
-    const sessionData = this.store.getSessionData()
+  async generateAndStoreTransitKey(): Promise<string> {
+    const sessionData = await this.store.getSessionData()
     const transitKey = authMessages.generateTransitKey()
     sessionData.transitKey = transitKey
-    this.store.setSessionData(sessionData)
+    await this.store.setSessionData(sessionData)
     return transitKey
   }
 
   /**
    * Retrieve the authentication token from the URL query.
-   * 
+   *
    * @returns {String} the authentication token if it exists otherwise `null`
    */
   getAuthResponseToken(): string {
@@ -205,20 +207,20 @@ export class UserSession {
 
   /**
    * Check if there is a authentication request that hasn't been handled.
-   * 
+   *
    * @returns{Boolean} `true` if there is a pending sign in, otherwise `false`
    */
-  isSignInPending() {
+  isSignInPending(): boolean {
     return authApp.isSignInPending()
   }
 
   /**
    * Check if a user is currently signed in.
-   * 
+   *
    * @returns {Boolean} `true` if the user is signed in, `false` if not.
    */
-  isUserSignedIn() {
-    return !!this.store.getSessionData().userData
+  isUserSignedIn(): Promise<boolean> {
+    return this.store.getSessionData().then(data => !!data.userData)
   }
 
   /**
@@ -229,19 +231,22 @@ export class UserSession {
    * @returns {Promise} that resolves to the user data object if successful and rejects
    * if handling the sign in request fails or there was no pending sign in request.
    */
-  handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
-    const transitKey = this.store.getSessionData().transitKey
-    const nameLookupURL = this.store.getSessionData().coreNode
+  async handlePendingSignIn(
+    authResponseToken: string = this.getAuthResponseToken()
+  ): Promise<UserData> {
+    const sessionData = await this.store.getSessionData()
+    const transitKey = sessionData.transitKey
+    const nameLookupURL = sessionData.coreNode
     return authApp.handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, this)
   }
 
   /**
    * Retrieves the user data object. The user's profile is stored in the key [[Profile]].
-   * 
-   * @returns {Object} User data object.
+   *
+   * @returns {Promise} User data object.
    */
-  loadUserData() {
-    const userData = this.store.getSessionData().userData
+  async loadUserData(): Promise<UserData> {
+    const userData = await this.store.getSessionData().then(data => data.userData)
     if (!userData) {
       throw new InvalidStateError('No user data found. Did the user sign in?')
     }
@@ -251,7 +256,7 @@ export class UserSession {
 
   /**
    * Sign the user out and optionally redirect to given location.
-   * @param  redirectURL Location to redirect user to after sign out. 
+   * @param  redirectURL Location to redirect user to after sign out.
    * Only used in environments with `window` available
    */
   signUserOut(redirectURL?: string) {
@@ -263,8 +268,8 @@ export class UserSession {
    * @param {String|Buffer} content  the data to encrypt
    * @param {String} options.publicKey the hex string of the ECDSA public
    * key to use for encryption. If not provided, will use user's appPrivateKey.
-   * 
-   * @returns {String} Stringified ciphertext object 
+   *
+   * @returns {String} Stringified ciphertext object
    */
   encryptContent(
     content: string | Buffer,
@@ -290,7 +295,7 @@ export class UserSession {
    * @param {String} path - the path to store the data in
    * @param {String|Buffer} content - the data to store in the file
    * @param options a [[PutFileOptions]] object
-   * 
+   *
    * @returns {Promise} that resolves if the operation succeed and rejects
    * if it failed
    */
@@ -300,10 +305,10 @@ export class UserSession {
 
   /**
    * Retrieves the specified file from the app's data store.
-   * 
+   *
    * @param {String} path - the path to the file to read
    * @param {Object} options a [[GetFileOptions]] object
-   * 
+   *
    * @returns {Promise} that resolves to the raw data in the file
    * or rejects with an error
    */
@@ -313,9 +318,9 @@ export class UserSession {
 
   /**
    * Get the URL for reading a file from an app's data store.
-   * 
+   *
    * @param {String} path - the path to the file to read
-   * 
+   *
    * @returns {Promise<string>} that resolves to the URL or rejects with an error
    */
   getFileUrl(path: string, options?: import('../storage').GetFileUrlOptions): Promise<string> {
@@ -324,10 +329,10 @@ export class UserSession {
 
   /**
    * List the set of files in this application's Gaia storage bucket.
-   * 
+   *
    * @param {function} callback - a callback to invoke on each named file that
    * returns `true` to continue the listing operation or `false` to end it
-   * 
+   *
    * @returns {Promise} that resolves to the number of files listed
    */
   listFiles(callback: (name: string) => boolean): Promise<number> {
@@ -335,7 +340,7 @@ export class UserSession {
   }
 
   /**
-   * Deletes the specified file from the app's data store. 
+   * Deletes the specified file from the app's data store.
    * @param path - The path to the file to delete.
    * @param options - Optional options object.
    * @param options.wasSigned - Set to true if the file was originally signed
@@ -350,8 +355,8 @@ export class UserSession {
   /**
    *  @ignore
    */
-  getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
-    const sessionData = this.store.getSessionData()
+  async getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
+    const sessionData = await this.store.getSessionData()
     const userData = sessionData.userData
     if (!userData) {
       throw new InvalidStateError('Missing userData')
@@ -371,16 +376,16 @@ export class UserSession {
    * @returns {Promise} that resolves to the new gaia hub connection
    */
   async setLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
-    const userData = this.loadUserData()
-  
+    const userData = await this.loadUserData()
+
     if (!userData) {
       throw new InvalidStateError('Missing userData')
     }
-  
+
     if (!userData.hubUrl) {
       userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
     }
-  
+
     const gaiaConfig = await connectToGaiaHub(
       userData.hubUrl,
       userData.appPrivateKey,
@@ -388,10 +393,9 @@ export class UserSession {
 
     userData.gaiaHubConfig = gaiaConfig
 
-    const sessionData = this.store.getSessionData()
+    const sessionData = await this.store.getSessionData()
     sessionData.userData.gaiaHubConfig = gaiaConfig
-    this.store.setSessionData(sessionData)
 
-    return gaiaConfig
+    return this.store.setSessionData(sessionData).then(_ => gaiaConfig)
   }
 }

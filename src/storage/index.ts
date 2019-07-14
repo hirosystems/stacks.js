@@ -2,7 +2,7 @@
 
 import {
   getFullReadUrl,
-  connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
+  connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL,
   GaiaHubConfig,
   deleteFromGaiaHub
 } from './hub'
@@ -28,20 +28,20 @@ import { fetchPrivate } from '../fetchUtil'
  */
 export interface PutFileOptions {
   /**
-  * Encrypt the data with the app public key. 
-  * If a string is specified, it is used as the public key. 
-  * If the boolean `true` is specified then the current user's app public key is used. 
+  * Encrypt the data with the app public key.
+  * If a string is specified, it is used as the public key.
+  * If the boolean `true` is specified then the current user's app public key is used.
    * @default true
    */
   encrypt?: boolean | string;
   /**
-   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
-   * If a string is specified, it is used as the private key. 
+   * Sign the data using ECDSA on SHA256 hashes with the user's app private key.
+   * If a string is specified, it is used as the private key.
    * @default false
    */
   sign?: boolean | string;
   /**
-   * Set a Content-Type header for unencrypted data. 
+   * Set a Content-Type header for unencrypted data.
    */
   contentType?: string;
 }
@@ -76,9 +76,9 @@ export async function getUserAppFileUrl(
 }
 
 /**
- * 
- * 
- * @deprecated 
+ *
+ *
+ * @deprecated
  * #### v19 Use [[UserSession.encryptContent]].
  *
  * Encrypts the data provided with the app public key.
@@ -86,9 +86,9 @@ export async function getUserAppFileUrl(
  * @param {Object} [options=null] - options object
  * @param {String} options.publicKey - the hex string of the ECDSA public
  * key to use for encryption. If not provided, will use user's appPublicKey.
- * @return {String} Stringified ciphertext object
+ * @return {Promise<String>} Stringified ciphertext object
  */
-export function encryptContent(
+export async function encryptContent(
   content: string | Buffer,
   options?: {
     publicKey?: string
@@ -97,7 +97,10 @@ export function encryptContent(
 ) {
   const opts = Object.assign({}, options)
   if (!opts.publicKey) {
-    const privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    const session = caller || new UserSession()
+    const userData = await session.loadUserData()
+    const privateKey = userData.appPrivateKey
+
     opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
   const cipherObject = encryptECIES(opts.publicKey, content)
@@ -105,19 +108,19 @@ export function encryptContent(
 }
 
 /**
- * 
- * @deprecated 
+ *
+ * @deprecated
  * #### v19 Use [[UserSession.decryptContent]].
- * 
+ *
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
  * @param {Object} [options=null] - options object
  * @param {String} options.privateKey - the hex string of the ECDSA private
  * key to use for decryption. If not provided, will use user's appPrivateKey.
- * @return {String|Buffer} decrypted content.
+ * @return {Promise<String|Buffer>} decrypted content.
  */
-export function decryptContent(
+export async function decryptContent(
   content: string,
   options?: {
     privateKey?: string
@@ -126,7 +129,10 @@ export function decryptContent(
 ) {
   const opts = Object.assign({}, options)
   if (!opts.privateKey) {
-    opts.privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    const session = caller || new UserSession()
+    const userData = await session.loadUserData()
+
+    opts.privateKey = userData.appPrivateKey
   }
 
   try {
@@ -173,12 +179,12 @@ async function getGaiaAddress(
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
- * 
+ *
  * @ignore
  */
 function normalizeOptions<T>(
   options?: {
-    app?: string, 
+    app?: string,
     username?: string
   } & T,
   caller?: UserSession
@@ -199,12 +205,12 @@ function normalizeOptions<T>(
 /**
  * @deprecated
  * #### v19 Use [[UserSession.getFileUrl]] instead.
- * 
+ *
  * @param {String} path - the path to the file to read
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
-  path: string, 
+  path: string,
   options?: GetFileUrlOptions,
   caller?: UserSession
 ): Promise<string> {
@@ -230,7 +236,7 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-function getFileContents(path: string, app: string, username: string | undefined, 
+function getFileContents(path: string, app: string, username: string | undefined,
                          zoneFileLookupURL: string | undefined,
                          forceText: boolean,
                          caller?: UserSession): Promise<string | ArrayBuffer | null> {
@@ -327,9 +333,15 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
  * @private
  * @ignore
  */
-function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
-                                       app: string, username?: string, zoneFileLookupURL?: string) {
-  const appPrivateKey = caller.loadUserData().appPrivateKey
+async function handleSignedEncryptedContents(
+  caller: UserSession,
+  path: string,
+  storedContents: string,
+  app: string,
+  username?: string,
+  zoneFileLookupURL?: string
+) {
+  const appPrivateKey = (await caller.loadUserData()).appPrivateKey
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
 
   let addressPromise: Promise<string>
@@ -381,19 +393,19 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
 
 export interface GetFileUrlOptions {
   /**
-   * The Blockstack ID to lookup for multi-player storage. 
+   * The Blockstack ID to lookup for multi-player storage.
    * If not specified, the currently signed in username is used.
    */
   username?: string;
   /**
-   * The app to lookup for multi-player storage - defaults to current origin. 
-   * @default `window.location.origin` 
+   * The app to lookup for multi-player storage - defaults to current origin.
+   * @default `window.location.origin`
    * Only if available in the executing environment, otherwise `undefined`.
    */
   app?: string;
   /**
-   * The URL to use for zonefile lookup. If falsey, this will use 
-   * the blockstack.js's [[getNameInfo]] function instead. 
+   * The URL to use for zonefile lookup. If falsey, this will use
+   * the blockstack.js's [[getNameInfo]] function instead.
    */
   zoneFileLookupURL?: string;
 }
@@ -408,7 +420,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
    */
   decrypt?: boolean;
   /**
-   * Whether the content should be verified, only to be used 
+   * Whether the content should be verified, only to be used
    * when [[UserSession.putFile]] was set to `sign = true`.
    * @default false
    */
@@ -422,7 +434,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * or rejects with an error
  */
 export function getFile(
-  path: string, 
+  path: string,
   options?: GetFileOptions,
   caller?: UserSession
 ) {
@@ -507,7 +519,7 @@ export async function putFile(
     if (typeof (opt.sign) === 'string') {
       privateKey = opt.sign
     } else {
-      privateKey = caller.loadUserData().appPrivateKey
+      privateKey = (await caller.loadUserData()).appPrivateKey
     }
   }
   if (opt.encrypt) {
@@ -515,7 +527,7 @@ export async function putFile(
       publicKey = opt.encrypt
     } else {
       if (!privateKey) {
-        privateKey = caller.loadUserData().appPrivateKey
+        privateKey = (await caller.loadUserData()).appPrivateKey
       }
       publicKey = getPublicKeyFromPrivate(privateKey)
     }
@@ -549,10 +561,10 @@ export async function putFile(
 
   // In all other cases, we only need one upload.
   if (opt.encrypt && !opt.sign) {
-    content = encryptContent(content, { publicKey })
+    content = await encryptContent(content, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const cipherText = encryptContent(content, { publicKey })
+    const cipherText = await encryptContent(content, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,
@@ -573,7 +585,7 @@ export async function putFile(
 }
 
 /**
- * Deletes the specified file from the app's data store. 
+ * Deletes the specified file from the app's data store.
  * @param path - The path to the file to delete.
  * @param options - Optional options object.
  * @param options.wasSigned - Set to true if the file was originally signed
@@ -581,7 +593,7 @@ export async function putFile(
  * @returns Resolves when the file has been removed or rejects with an error.
  */
 export async function deleteFile(
-  path: string, 
+  path: string,
   options?: {
     wasSigned?: boolean;
   },

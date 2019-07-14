@@ -247,7 +247,7 @@ export function runAuthTests() {
       })
   })
 
-  test('auth response with invalid private key', (t) => {
+  test('auth response with invalid private key', async (t) => {
     t.plan(2)
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
@@ -262,15 +262,16 @@ export function runAuthTests() {
     const transitPrivateKey = makeECPrivateKey()
     const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
     const badTransitPrivateKey = makeECPrivateKey()
-    blockstack.store.getSessionData().transitKey = badTransitPrivateKey
+
+    const sessionData = await blockstack.store.getSessionData()
+    sessionData.transitKey = badTransitPrivateKey
     const metadata = { }
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
-
-    blockstack.handlePendingSignIn(authResponse)
+    return blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.fail('Should have failed to decrypt auth response')
       })
@@ -278,8 +279,10 @@ export function runAuthTests() {
         console.log(err)
         t.pass('Should fail to decrypt auth response')
       })
-      .then(() => {
-        blockstack.store.getSessionData().transitKey = transitPrivateKey
+      .then(async () => {
+
+        const sessionData = await blockstack.store.getSessionData()
+        sessionData.transitKey = transitPrivateKey
 
         return blockstack.handlePendingSignIn(authResponse)
       })
@@ -292,7 +295,7 @@ export function runAuthTests() {
       })
   })
 
-  test('handlePendingSignIn with authResponseToken', (t) => {
+  test('handlePendingSignIn with authResponseToken', async (t) => {
     t.plan(1)
 
     const url = `${nameLookupURL}ryan.id`
@@ -306,7 +309,9 @@ export function runAuthTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().transitKey = transitPrivateKey
+
+    const sessionData = await blockstack.store.getSessionData()
+    sessionData.transitKey = transitPrivateKey
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
@@ -322,7 +327,7 @@ export function runAuthTests() {
       })
   })
 
-  test('handlePendingSignIn 2', (t) => {
+  test('handlePendingSignIn 2', async (t) => {
     t.plan(1)
 
     const url = `${nameLookupURL}ryan.id`
@@ -340,9 +345,11 @@ export function runAuthTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().transitKey = transitPrivateKey
 
-    blockstack.handlePendingSignIn(authResponse)
+    const sessionData = await blockstack.store.getSessionData()
+    sessionData.transitKey = transitPrivateKey
+
+    return blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
       })
@@ -389,7 +396,7 @@ export function runAuthTests() {
     (<any>global).window = undefined
   })
 
-  test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', (t) => {
+  test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', async (t) => {
     t.plan(2)
 
     const customBlockstackAPIUrl = 'https://test.name.lookups'
@@ -405,13 +412,15 @@ export function runAuthTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().transitKey = transitPrivateKey
+
+    const sessionData = await blockstack.store.getSessionData()
+    sessionData.transitKey = transitPrivateKey
 
     const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey, undefined, customBlockstackAPIUrl)
 
-    blockstack.handlePendingSignIn(authResponse)
+    return blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
         t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl,
@@ -426,7 +435,7 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn with authResponseToken, transit key, '
-    + 'Blockstack API URL, and Gaia association token', (t) => {
+    + 'Blockstack API URL, and Gaia association token', async (t) => {
     t.plan(3)
 
     const customBlockstackAPIUrl = 'https://test.name.lookups'
@@ -461,9 +470,11 @@ export function runAuthTests() {
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
-    blockstack.store.getSessionData().transitKey = transitPrivateKey
 
-    blockstack.handlePendingSignIn(authResponse)
+    const sessionData = await blockstack.store.getSessionData()
+    sessionData.transitKey = transitPrivateKey
+
+    return blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
         t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl,

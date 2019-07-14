@@ -34,11 +34,11 @@ const DEFAULT_PROFILE = {
 export interface UserData {
   // public: the blockstack ID (for example: stackerson.id or alice.blockstack.id)
   username: string;
-  // public: the email address for the user. only available if the `email` 
-  // scope is requested, and if the user has entered a valid email into 
-  // their profile. 
+  // public: the email address for the user. only available if the `email`
+  // scope is requested, and if the user has entered a valid email into
+  // their profile.
   //
-  // **Note**: Blockstack does not require email validation 
+  // **Note**: Blockstack does not require email validation
   // for users for privacy reasons and blah blah (something like this, idk)
   email?: string;
   // probably public: (a quick description of what this is, and a link to the
@@ -47,20 +47,20 @@ export interface UserData {
   // probably private: looks like it happens to be the btc address but idk
   // the value of establishing this as a supported field
   identityAddress: string;
-  // probably public: this is an advanced feature, I think many app devs 
-  // using our more advanced encryption functions (as opposed to putFile/getFile), 
-  // are probably using this. seems useful to explain. 
+  // probably public: this is an advanced feature, I think many app devs
+  // using our more advanced encryption functions (as opposed to putFile/getFile),
+  // are probably using this. seems useful to explain.
   appPrivateKey: string;
   // maybe public: possibly useful for advanced devs / webapps. I see an opportunity
-  // to make a small plug about "user owned data" here, idk. 
+  // to make a small plug about "user owned data" here, idk.
   hubUrl: string;
-  // maybe private: this would be an advanced field for app devs to use. 
+  // maybe private: this would be an advanced field for app devs to use.
   authResponseToken: string;
   // private: does not get sent to webapp at all.
   coreSessionToken?: string;
   // private: does not get sent to webapp at all.
   gaiaAssociationToken?: string;
-  // public: this is the proper `Person` schema json for the user. 
+  // public: this is the proper `Person` schema json for the user.
   // This is the data that gets used when the `new blockstack.Person(profile)` class is used.
   profile: any;
   // private: does not get sent to webapp at all.
@@ -68,9 +68,9 @@ export interface UserData {
 }
 
 /**
- * @deprecated 
+ * @deprecated
  * #### v19 Use [[UserSession.isUserSignedIn]] instead.
- * 
+ *
  * Check if a user is currently signed in.
  * @return {Boolean} `true` if the user is signed in, `false` if not.
  */
@@ -84,13 +84,13 @@ export function isUserSignedIn() {
 
 /**
  *
- * 
- * @deprecated 
+ *
+ * @deprecated
  * #### v19 Use [[UserSession.isUserSignedIn]] instead.
- * 
+ *
  * Generates an authentication request and redirects the user to the Blockstack
  * browser to approve the sign in request.
- * 
+ *
  * Please note that this requires that the web browser properly handles the
  * `blockstack:` URL protocol handler.
  *
@@ -107,27 +107,27 @@ export function isUserSignedIn() {
  * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
  * this app's data store.
  * An array of strings indicating which permissions this app is requesting.
- * @return {void}
+ * @return {Promise}
  */
-export function redirectToSignIn(redirectURI?: string, 
-                                 manifestURI?: string, 
-                                 scopes?: Array<AuthScope | string>) { 
+export async function redirectToSignIn(redirectURI?: string,
+                                 manifestURI?: string,
+                                 scopes?: Array<AuthScope | string>) {
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
-  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
-  redirectToSignInWithAuthRequest(authRequest)
+  const authRequest = await makeAuthRequest(null, redirectURI, manifestURI, scopes)
+  return redirectToSignInWithAuthRequest(authRequest)
 }
 
 /**
- * @deprecated 
- * #### v19 Use [[UserSession.isSignInPending]] instead. 
+ * @deprecated
+ * #### v19 Use [[UserSession.isSignInPending]] instead.
  *
- * Check if there is a authentication request that hasn't been handled. 
+ * Check if there is a authentication request that hasn't been handled.
  *
  * Also checks for a protocol echo reply (which if detected then the page
- * will be automatically redirected after this call). 
- * 
+ * will be automatically redirected after this call).
+ *
  * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
  */
 export function isSignInPending() {
@@ -140,28 +140,28 @@ export function isSignInPending() {
   } catch (error) {
     Logger.error(`Error checking for protocol echo reply isSignInPending: ${error}`)
   }
-  
+
   return !!getAuthResponseToken()
 }
 
 /**
- * @deprecated 
- * #### v19 Use [[UserSession.getAuthResponseToken]] instead. 
+ * @deprecated
+ * #### v19 Use [[UserSession.getAuthResponseToken]] instead.
  *
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
 export function getAuthResponseToken(): string {
   const search = getGlobalObject(
-    'location', 
+    'location',
     { throwIfUnavailable: true, usageDesc: 'getAuthResponseToken' }
   ).search
   const queryDict = queryString.parse(search)
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
 }
 
-/** 
- * @deprecated 
+/**
+ * @deprecated
  * #### v19 Use [[UserSession.loadUserData]] instead.
  *
  * Retrieves the user data object. The user's profile is stored in the key `profile`.
@@ -175,28 +175,29 @@ export function loadUserData() {
   return userSession.loadUserData()
 }
 
-/** 
- * @deprecated 
+/**
+ * @deprecated
  * #### v19 Use [[UserSession.signUserOut]] instead.
  *
  * Sign the user out and optionally redirect to given location.
- * @param  redirectURL
- * Location to redirect user to after sign out. 
+ * @param redirectURL
+ * Location to redirect user to after sign out.
  * Only used in environments with `window` available
  */
-export function signUserOut(redirectURL?: string, caller?: UserSession) {
+export async function signUserOut(redirectURL?: string, caller?: UserSession) {
   const userSession = caller || new UserSession()
-  userSession.store.deleteSessionData()
+  await userSession.store.deleteSessionData()
+
   if (redirectURL) {
     getGlobalObject(
-      'location', 
+      'location',
       { throwIfUnavailable: true, usageDesc: 'signUserOut' }
     ).href = redirectURL
-  } 
+  }
 }
 
-/** 
- * @deprecated 
+/**
+ * @deprecated
  * #### v19 Use [[UserSession.redirectToSignInWithAuthRequest]] instead.
  *
  * Redirects the user to the Blockstack browser to approve the sign in request
@@ -210,11 +211,11 @@ export function signUserOut(redirectURL?: string, caller?: UserSession) {
  *                                     protocol handler is not detected
  * @return {void}
  */
-export function redirectToSignInWithAuthRequest(
+export async function redirectToSignInWithAuthRequest(
   authRequest?: string,
   blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST,
 ) {
-  authRequest = authRequest || makeAuthRequest()
+  authRequest = authRequest || await makeAuthRequest()
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
   const { navigator, location } = getGlobalObjects(
@@ -242,8 +243,8 @@ export function redirectToSignInWithAuthRequest(
   launchCustomProtocol(authRequest, successCallback, failCallback)
 }
 
-/** 
- * @deprecated 
+/**
+ * @deprecated
  * #### v19 Use [[UserSession.handlePendingSignIn]] instead.
  *
  * Try to process any pending sign in request by returning a `Promise` that resolves
@@ -258,15 +259,15 @@ export function redirectToSignInWithAuthRequest(
  * if handling the sign in request fails or there was no pending sign in request.
  */
 export async function handlePendingSignIn(
-  nameLookupURL: string = '', 
-  authResponseToken: string = getAuthResponseToken(), 
+  nameLookupURL: string = '',
+  authResponseToken: string = getAuthResponseToken(),
   transitKey?: string,
   caller?: UserSession
 ): Promise<UserData> {
   try {
     const isProtocolEcho = protocolEchoReplyDetection()
     if (isProtocolEcho) {
-      const msg = 'handlePendingSignIn called while protocolEchoReply was detected, and ' 
+      const msg = 'handlePendingSignIn called while protocolEchoReply was detected, and '
         + 'the page is about to redirect. This function will resolve with an error after '
         + 'several seconds, if the page was not redirected for some reason.'
       Logger.info(msg)
@@ -284,9 +285,9 @@ export async function handlePendingSignIn(
   if (!caller) {
     caller = new UserSession()
   }
-  if (!transitKey) {
-    transitKey = caller.store.getSessionData().transitKey
-  }
+
+  transitKey = transitKey || await caller.store.getSessionData().then(data => data.transitKey)
+
   if (!nameLookupURL) {
     const tokenPayload = decodeToken(authResponseToken).payload
     if (isLaterVersion(tokenPayload.version, '1.3.0')
@@ -298,15 +299,19 @@ export async function handlePendingSignIn(
     }
     nameLookupURL = `${config.network.blockstackAPIUrl}${NAME_LOOKUP_PATH}`
   }
-  
+
   const isValid = await verifyAuthResponse(authResponseToken, nameLookupURL)
+
   if (!isValid) {
     throw new LoginFailedError('Invalid authentication response.')
   }
+
   const tokenPayload = decodeToken(authResponseToken).payload
+
   // TODO: real version handling
   let appPrivateKey = tokenPayload.private_key
   let coreSessionToken = tokenPayload.core_token
+
   if (isLaterVersion(tokenPayload.version, '1.1.0')) {
     if (transitKey !== undefined && transitKey != null) {
       if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
@@ -334,12 +339,15 @@ export async function handlePendingSignIn(
                                 + ' key, and none found.')
     }
   }
+
   let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
   let gaiaAssociationToken
+
   if (isLaterVersion(tokenPayload.version, '1.2.0')
     && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
     hubUrl = tokenPayload.hubUrl
   }
+
   if (isLaterVersion(tokenPayload.version, '1.3.0')
     && tokenPayload.associationToken !== null && tokenPayload.associationToken !== undefined) {
     gaiaAssociationToken = tokenPayload.associationToken
@@ -357,7 +365,9 @@ export async function handlePendingSignIn(
     hubUrl,
     gaiaAssociationToken
   }
+
   const profileURL = tokenPayload.profile_url
+
   if (!userData.profile && profileURL) {
     const response = await fetchPrivate(profileURL)
     if (!response.ok) { // return blank profile if we fail to fetch
@@ -371,10 +381,9 @@ export async function handlePendingSignIn(
   } else {
     userData.profile = tokenPayload.profile
   }
-  
-  const sessionData = caller.store.getSessionData()
-  sessionData.userData = userData
-  caller.store.setSessionData(sessionData)
-  
-  return userData
+
+  return caller.store.getSessionData().then(sessionData => {
+    sessionData.userData = userData
+    return caller.store.setSessionData(sessionData)
+  }).then(_ => userData)
 }

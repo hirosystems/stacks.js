@@ -9,7 +9,6 @@ import { NoSessionDataError } from '../errors'
 
 /**
  * An abstract class representing the SessionDataStore interface.
-
  */
 export class SessionDataStore {
   constructor(sessionOptions?: SessionOptions) {
@@ -19,19 +18,17 @@ export class SessionDataStore {
     }
   }
 
-  getSessionData(): SessionData {
+  getSessionData(): Promise<SessionData> {
     throw new Error('Abstract class')
   }
 
-  /* eslint-disable */
-  setSessionData(session: SessionData): boolean {
+  setSessionData(session: SessionData): Promise<boolean> {
     throw new Error('Abstract class')
   }
 
-  deleteSessionData(): boolean {
+  deleteSessionData(): Promise<boolean> {
     throw new Error('Abstract class')
   }
-  /* eslint-enable */
 }
 
 /**
@@ -48,22 +45,22 @@ export class InstanceDataStore extends SessionDataStore {
     }
   }
 
-
-  getSessionData(): SessionData {
+  getSessionData(): Promise<SessionData> {
     if (!this.sessionData) {
       throw new NoSessionDataError('No session data was found.')
     }
-    return this.sessionData
+
+    return Promise.resolve(this.sessionData)
   }
 
-  setSessionData(session: SessionData): boolean {
+  setSessionData(session: SessionData): Promise<boolean> {
     this.sessionData = session
-    return true
+    return Promise.resolve(true)
   }
 
-  deleteSessionData(): boolean {
-    this.setSessionData(new SessionData({}))
-    return true
+  deleteSessionData(): Promise<boolean> {
+    this.sessionData = null
+    return Promise.resolve(true)
   }
 }
 
@@ -76,6 +73,7 @@ export class LocalStorageStore extends SessionDataStore {
 
   constructor(sessionOptions?: SessionOptions) {
     super(sessionOptions)
+
     if (sessionOptions
       && sessionOptions.storeOptions
       && sessionOptions.storeOptions.localStorageKey
@@ -92,24 +90,26 @@ export class LocalStorageStore extends SessionDataStore {
     }
   }
 
-  getSessionData(): SessionData {
+  getSessionData(): Promise<SessionData> {
     const data = localStorage.getItem(this.key)
+
     if (!data) {
       throw new NoSessionDataError('No session data was found in localStorage')
     }
+
     const dataJSON = JSON.parse(data)
-    return SessionData.fromJSON(dataJSON)
+    const sessData = SessionData.fromJSON(dataJSON)
+    return Promise.resolve(sessData)
   }
 
-  setSessionData(session: SessionData): boolean {
+  setSessionData(session: SessionData): Promise<boolean> {
     localStorage.setItem(this.key, session.toString())
-    return true
+    return Promise.resolve(true)
   }
 
-  deleteSessionData(): boolean {
+  deleteSessionData(): Promise<boolean> {
     localStorage.removeItem(this.key)
-    this.setSessionData(new SessionData({}))
-    return true
+    return Promise.resolve(true)
   }
 
   // checkForLegacyDataAndMigrate(): Promise<SessionData> {

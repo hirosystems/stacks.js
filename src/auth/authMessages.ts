@@ -54,27 +54,27 @@ export function generateTransitKey() {
  * by special authenticators.
  * @return {String} the authentication request
  */
-export function makeAuthRequest(
+export async function makeAuthRequest(
   transitPrivateKey?: string,
-  redirectURI?: string, 
-  manifestURI?: string, 
+  redirectURI?: string,
+  manifestURI?: string,
   scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
   appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
-): string {
+): Promise<string> {
   if (!transitPrivateKey) {
-    transitPrivateKey = new UserSession().generateAndStoreTransitKey()
+    transitPrivateKey = await new UserSession().generateAndStoreTransitKey()
   }
 
   const getWindowOrigin = (paramName: string) => {
-    const location = getGlobalObject('location', { 
-      throwIfUnavailable: true, 
-      usageDesc: `makeAuthRequest([${paramName}=undefined])` 
+    const location = getGlobalObject('location', {
+      throwIfUnavailable: true,
+      usageDesc: `makeAuthRequest([${paramName}=undefined])`
     })
     return location.origin
   }
-  
+
   if (!redirectURI) {
     redirectURI = `${getWindowOrigin('redirectURI')}/`
   }
