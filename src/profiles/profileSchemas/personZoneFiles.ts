@@ -4,6 +4,7 @@ import { parseZoneFile } from 'zone-file'
 import { Person } from './person'
 import { getTokenFileUrl } from '../profileZoneFiles'
 import { extractProfile } from '../profileTokens'
+import { fetchPrivate } from '../../fetchUtil'
 
 /**
  * 
@@ -45,7 +46,7 @@ export function resolveZoneFileToPerson(
   }
 
   if (tokenFileUrl) {
-    fetch(tokenFileUrl)
+    fetchPrivate(tokenFileUrl)
       .then(response => response.text())
       .then(responseText => JSON.parse(responseText))
       .then((responseJson) => {

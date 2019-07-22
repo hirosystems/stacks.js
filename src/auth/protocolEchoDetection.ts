@@ -22,33 +22,43 @@ const AUTH_CONTINUATION_PARAM = 'authContinuation'
  */
 export function protocolEchoReplyDetection(): boolean {
   // Check that the `window` APIs exist
-  if (typeof window !== 'object' || !window.location || !window.localStorage) {
+  let globalScope: Window
+  if (typeof self !== 'undefined') {
+    globalScope = self
+  } else if (typeof window !== 'undefined') {
+    globalScope = window
+  } else {
+    // Exit detection function - we are not running in a browser environment.
+    return false
+  }
+
+  if (!globalScope.location || !globalScope.localStorage || !globalScope.URLSearchParams) {
     // Exit detection function - we are not running in a browser environment.
     return false
   }
 
   // Avoid performing the check twice and triggered multiple redirect timers.
-  const existingDetection = (window as any)[GLOBAL_DETECTION_CACHE_KEY]
+  const existingDetection = (globalScope as any)[GLOBAL_DETECTION_CACHE_KEY]
   if (typeof existingDetection === 'boolean') {
     return existingDetection
   }
 
-  const searchParams = new window.URLSearchParams(window.location.search)
+  const searchParams = new globalScope.URLSearchParams(globalScope.location.search)
   const echoReplyParam = searchParams.get(ECHO_REPLY_PARAM)
   if (echoReplyParam) {
-    (window as any)[GLOBAL_DETECTION_CACHE_KEY] = true
+    (globalScope as any)[GLOBAL_DETECTION_CACHE_KEY] = true
 
     // Use localStorage to notify originated tab that protocol handler is available and working.
     const echoReplyKey = `echo-reply-${echoReplyParam}`
 
     // Set the echo-reply result in localStorage for the other window to see.
-    window.localStorage.setItem(echoReplyKey, 'success')
+    globalScope.localStorage.setItem(echoReplyKey, 'success')
 
     // Redirect back to the localhost auth url, as opposed to another protocol launch.
     // This will re-use the same tab rather than creating another useless one.
-    window.setTimeout(() => {
+    globalScope.setTimeout(() => {
       const authContinuationParam = searchParams.get(AUTH_CONTINUATION_PARAM)
-      window.location.href = authContinuationParam
+      globalScope.location.href = authContinuationParam
     }, 10)
 
     return true

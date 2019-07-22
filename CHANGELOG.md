@@ -4,6 +4,12 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [19.2.2] - 2019-05-12
+
+### Changed
+- Updated bitcoinjs-lib dependency to v5 and eliminates node-gyp errors on install
+- Fixed bugs when running in a web worker
+
 ## [19.2.0] - 2019-05-12
 
 ### Added

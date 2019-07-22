@@ -3,6 +3,7 @@ import { makeZoneFile, parseZoneFile } from 'zone-file'
 import { extractProfile } from './profileTokens'
 import { Person } from './profileSchemas/person'
 import { Logger } from '../logger'
+import { fetchPrivate } from '../fetchUtil'
 
 /**
  * 
@@ -109,7 +110,7 @@ export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: stri
     }
 
     if (tokenFileUrl) {
-      fetch(tokenFileUrl)
+      fetchPrivate(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
         .then((responseJson) => {
