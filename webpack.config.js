@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 
@@ -78,7 +79,17 @@ module.exports = (env, argv) => {
       libraryTarget: 'umd',
       globalObject: 'this'
     },
-    plugins: []
+    plugins: [
+      // Can't get this regex exclusion to work...
+      // new webpack.IgnorePlugin(/\.\/wordlists\/(?!.*english.*)\.json/)
+      new webpack.IgnorePlugin(/\.\/wordlists\/chinese_simplified.json/),
+      new webpack.IgnorePlugin(/\.\/wordlists\/chinese_traditional.json/),
+      new webpack.IgnorePlugin(/\.\/wordlists\/korean.json/),
+      new webpack.IgnorePlugin(/\.\/wordlists\/french.json/),
+      new webpack.IgnorePlugin(/\.\/wordlists\/italian.json/),
+      new webpack.IgnorePlugin(/\.\/wordlists\/spanish.json/),
+      new webpack.IgnorePlugin(/\.\/wordlists\/japanese.json/)
+    ]
   }
 
   if (isEnvAnalyze) {
