@@ -4,7 +4,8 @@ import {
   getFullReadUrl,
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
   GaiaHubConfig,
-  deleteFromGaiaHub
+  deleteFromGaiaHub,
+  GAIA_HUB_COLLECTION_KEY_FILE_NAME
 } from './hub'
 
 import {
@@ -216,7 +217,7 @@ export async function getFileUrl(
   if (opts.username) {
     readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    const gaiaHubConfig = await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = options.gaiaHubConfig || await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
     readUrl = await getFullReadUrl(path, gaiaHubConfig)
   }
 
@@ -235,10 +236,11 @@ export async function getFileUrl(
 function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
                          forceText: boolean,
+                         hubConfig?: GaiaHubConfig,
                          caller?: UserSession): Promise<string | ArrayBuffer | null> {
   return Promise.resolve()
     .then(() => {
-      const opts = { app, username, zoneFileLookupURL }
+      const opts = { app, username, zoneFileLookupURL, hubConfig }
       return getFileUrl(path, opts, caller)
     })
     .then(readUrl => fetch(readUrl))
@@ -274,9 +276,9 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
   return Promise.all(
-    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
+    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, null, caller),
      getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
-                     opt.zoneFileLookupURL, true, caller),
+                     opt.zoneFileLookupURL, true, null, caller),
      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
     .then(([fileContents, signatureContents, gaiaAddress]) => {
@@ -398,6 +400,10 @@ export interface GetFileUrlOptions {
    * the blockstack.js's [[getNameInfo]] function instead. 
    */
   zoneFileLookupURL?: string;
+  /**
+   * Optionally use a specified Gaia hub configuration
+   */
+  gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
@@ -415,6 +421,10 @@ export interface GetFileOptions extends GetFileUrlOptions {
    * @default false
    */
   verify?: boolean;
+  /**
+   * Optionally use a specified Gaia hub configuration
+   */
+  gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
@@ -447,7 +457,8 @@ export function getFile(
     return getFileSignedUnencrypted(path, opt, caller)
   }
 
-  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt, caller)
+  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, 
+                        !!opt.decrypt, opt.gaiaHubConfig, caller)
     .then<string|ArrayBuffer|Buffer>((storedContents) => {
       if (storedContents === null) {
         return storedContents
@@ -733,7 +744,11 @@ export async function putCollectionItem(item: Collection, caller: UserSession) {
   return this.putFile(item.attrs.identifier, file, opt, caller)
 }
 
-export async function getCollectionItem(identifier: string, collectionTypeName: string, caller: UserSession) {
+export async function getCollectionItem(
+  identifier: string, 
+  collectionTypeName: string, 
+  caller: UserSession
+) {
   let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
   let opt = {
     gaiaHubConfig: hubConfig
@@ -741,12 +756,26 @@ export async function getCollectionItem(identifier: string, collectionTypeName: 
   return this.getFile(identifier, opt, caller)
 }
 
-export async function listCollectionFiles() {
-
+export async function listCollectionFiles(
+  collectionTypeName: string, 
+  callback: (name: string) => boolean,
+  caller?: UserSession,
+) {
+  caller = caller || new UserSession()
+  let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
+  return listFilesLoop(caller, hubConfig, null, 0, 0, callback)
 }
 
-export async function deleteCollectionFile() {
-
+export async function deleteCollectionFile(
+  identifier: string, 
+  collectionTypeName: string, 
+  caller: UserSession
+) {
+  let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
+  let opt = {
+    gaiaHubConfig: hubConfig
+  }
+  return this.deleteFile(identifier, opt, caller)
 }
 
-export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL }
+export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GAIA_HUB_COLLECTION_KEY_FILE_NAME }

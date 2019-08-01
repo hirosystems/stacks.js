@@ -101,7 +101,7 @@ export class UserSession {
    * @param redirectURI Location of your application.
    * @param manifestURI Location of the manifest.json file
    * @param scopes Permissions requested by the application. Possible values are
-   *  `store_write` (default) or `publish_data`.
+   *  `store_write` (default), `publish_data` or any collections data scopes.
    * 
    * @returns {void}
    */
