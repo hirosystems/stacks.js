@@ -122,7 +122,7 @@ export function hexStringToECPair(skHex: string): ECPair.ECPairInterface {
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
@@ -187,13 +187,13 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
 }
 
 /**
- * Returns the global scope `Window`, `WorkerGlobalScope`, or `NodeJS.Global` if available in the 
- * currently executing environment. 
+ * Returns the global scope `Window`, `WorkerGlobalScope`, or `NodeJS.Global` if available in the
+ * currently executing environment.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope/self
  * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope
- * 
- * This could be switched to `globalThis` once it is standardized and widely available. 
+ *
+ * This could be switched to `globalThis` once it is standardized and widely available.
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
  */
 function getGlobalScope(): Window {
@@ -204,9 +204,9 @@ function getGlobalScope(): Window {
     return window
   }
   // This function is meant to be called when accessing APIs that are typically only available in
-  // web-browser/DOM environments, but we also want to support situations where running in Node.js 
-  // environment, and a polyfill was added to the Node.js `global` object scope without adding the 
-  // `window` global object as well. 
+  // web-browser/DOM environments, but we also want to support situations where running in Node.js
+  // environment, and a polyfill was added to the Node.js `global` object scope without adding the
+  // `window` global object as well.
   if (typeof global !== 'undefined') {
     return (global as unknown) as Window
   }
@@ -215,8 +215,8 @@ function getGlobalScope(): Window {
 
 
 function getAPIUsageErrorMessage(
-  scopeObject: unknown, 
-  apiName: string, 
+  scopeObject: unknown,
+  apiName: string,
   usageDesc?: string
 ): string {
   if (usageDesc) {
@@ -228,32 +228,32 @@ function getAPIUsageErrorMessage(
 
 interface GetGlobalObjectOptions {
   /**
-   * Throw an error if the object is not found. 
+   * Throw an error if the object is not found.
    * @default false
    */
-  throwIfUnavailable?: boolean; 
+  throwIfUnavailable?: boolean;
   /**
-   * Additional information to include in an error if thrown. 
+   * Additional information to include in an error if thrown.
    */
-  usageDesc?: string; 
+  usageDesc?: string;
   /**
    * If the object is not found, return an new empty object instead of undefined.
-   * Requires [[throwIfUnavailable]] to be falsey. 
+   * Requires [[throwIfUnavailable]] to be falsey.
    * @default false
    */
-  returnEmptyObject?: boolean; 
+  returnEmptyObject?: boolean;
 }
 
 /**
- * Returns an object from the global scope (`Window` or `WorkerGlobalScope`) if it 
- * is available within the currently executing environment. 
- * When executing within the Node.js runtime these APIs are unavailable and will be 
- * `undefined` unless the API is provided via polyfill. 
+ * Returns an object from the global scope (`Window` or `WorkerGlobalScope`) if it
+ * is available within the currently executing environment.
+ * When executing within the Node.js runtime these APIs are unavailable and will be
+ * `undefined` unless the API is provided via polyfill.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
 export function getGlobalObject<K extends keyof Window>(
-  name: K, 
+  name: string,
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
 ): Window[K] {
   let globalScope: Window
@@ -273,22 +273,22 @@ export function getGlobalObject<K extends keyof Window>(
     Logger.error(errMsg)
     throw new Error(errMsg)
   }
-  if (returnEmptyObject) { 
+  if (returnEmptyObject) {
     return {}
   }
   return undefined
 }
 
 /**
- * Returns a specified subset of objects from the global scope (`Window` or `WorkerGlobalScope`) 
- * if they are available within the currently executing environment. 
- * When executing within the Node.js runtime these APIs are unavailable will be `undefined` 
- * unless the API is provided via polyfill. 
+ * Returns a specified subset of objects from the global scope (`Window` or `WorkerGlobalScope`)
+ * if they are available within the currently executing environment.
+ * When executing within the Node.js runtime these APIs are unavailable will be `undefined`
+ * unless the API is provided via polyfill.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
 export function getGlobalObjects<K extends keyof Window>(
-  names: K[], 
+  names: string[],
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
 ): Pick<Window, K> {
   let globalScope: Window

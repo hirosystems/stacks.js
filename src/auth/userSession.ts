@@ -6,7 +6,6 @@ import {
   InstanceDataStore
 } from './sessionStore'
 
-import { UserData } from './authApp'
 import * as authApp from './authApp'
 import * as authMessages from './authMessages'
 import * as storage from '../storage'
@@ -185,8 +184,7 @@ export class UserSession {
    * use as the ephemeral app transit private key
    * and store in the session.
    *
-   * @returns {String} the hex encoded private key
-   *
+   * @returns {Promise<String>} the hex encoded private key
    */
   async generateAndStoreTransitKey(): Promise<string> {
     const sessionData = await this.store.getSessionData()
@@ -233,7 +231,7 @@ export class UserSession {
    */
   async handlePendingSignIn(
     authResponseToken: string = this.getAuthResponseToken()
-  ): Promise<UserData> {
+  ): Promise<authApp.UserData> {
     const sessionData = await this.store.getSessionData()
     const transitKey = sessionData.transitKey
     const nameLookupURL = sessionData.coreNode
@@ -245,7 +243,7 @@ export class UserSession {
    *
    * @returns {Promise} User data object.
    */
-  async loadUserData(): Promise<UserData> {
+  async loadUserData(): Promise<authApp.UserData> {
     const userData = await this.store.getSessionData().then(data => data.userData)
     if (!userData) {
       throw new InvalidStateError('No user data found. Did the user sign in?')

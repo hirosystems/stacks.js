@@ -92,7 +92,7 @@ export function getHexFromBN(bnInput: BN) {
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * 
+ *
  * @private
  * @ignore
  */
@@ -101,7 +101,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   // always copy to buffer
   const plainText = content instanceof Buffer ? Buffer.from(content) : Buffer.from(content)
 
-  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic() as BN
+  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
   const ephemeralPK = ephemeralSK.getPublic()
   const sharedSecret = ephemeralSK.derive(ecPK) as BN
@@ -119,13 +119,13 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   )
 
   const macData = Buffer.concat([initializationVector,
-                                 Buffer.from(ephemeralPK.encodeCompressed()),
+                                 Buffer.from(ephemeralPK.encodeCompressed('array') as any),
                                  cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
   return {
     iv: initializationVector.toString('hex'),
-    ephemeralPK: ephemeralPK.encodeCompressed('hex'),
+    ephemeralPK: ephemeralPK.encodeCompressed('hex') as unknown as string,
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
     wasString: isString
@@ -156,7 +156,7 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 Buffer.from(ephemeralPK.encodeCompressed()),
+                                 Buffer.from(ephemeralPK.encodeCompressed('array') as any),
                                  cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = Buffer.from(cipherObject.mac, 'hex')
@@ -185,8 +185,8 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
  * @private
  * @ignore
  */
-export function signECDSA(privateKey: string, content: string | Buffer): { 
-  publicKey: string, signature: string 
+export function signECDSA(privateKey: string, content: string | Buffer): {
+  publicKey: string, signature: string
 } {
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')

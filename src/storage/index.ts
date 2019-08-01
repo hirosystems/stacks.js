@@ -247,23 +247,23 @@ function getFileContents(path: string, app: string, username: string | undefined
     })
     .then(readUrl => fetchPrivate(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
-    if (response.status !== 200) {
-      if (response.status === 404) {
-        Logger.debug(`getFile ${path} returned 404, returning null`)
-        return null
-      } else {
-        throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+      if (response.status !== 200) {
+        if (response.status === 404) {
+          Logger.debug(`getFile ${path} returned 404, returning null`)
+          return null
+        } else {
+          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+        }
       }
-    }
-    const contentType = response.headers.get('Content-Type')
-    if (forceText || contentType === null
-          || contentType.startsWith('text')
-          || contentType === 'application/json') {
-      return response.text()
-    } else {
-      return response.arrayBuffer()
-    }
-  })
+      const contentType = response.headers.get('Content-Type')
+      if (forceText || contentType === null
+            || contentType.startsWith('text')
+            || contentType === 'application/json') {
+        return response.text()
+      } else {
+        return response.arrayBuffer()
+      }
+    })
 }
 
 /* Handle fetching an unencrypted file, its associated signature
@@ -459,25 +459,25 @@ export function getFile(
 
   return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt, caller)
     .then<string|ArrayBuffer|Buffer>((storedContents) => {
-    if (storedContents === null) {
-      return storedContents
-    } else if (opt.decrypt && !opt.verify) {
-      if (typeof storedContents !== 'string') {
-        throw new Error('Expected to get back a string for the cipherText')
+      if (storedContents === null) {
+        return storedContents
+      } else if (opt.decrypt && !opt.verify) {
+        if (typeof storedContents !== 'string') {
+          throw new Error('Expected to get back a string for the cipherText')
+        }
+        return caller.decryptContent(storedContents)
+      } else if (opt.decrypt && opt.verify) {
+        if (typeof storedContents !== 'string') {
+          throw new Error('Expected to get back a string for the cipherText')
+        }
+        return handleSignedEncryptedContents(caller, path, storedContents,
+                                             opt.app, opt.username, opt.zoneFileLookupURL)
+      } else if (!opt.verify && !opt.decrypt) {
+        return storedContents
+      } else {
+        throw new Error('Should be unreachable.')
       }
-      return caller.decryptContent(storedContents)
-    } else if (opt.decrypt && opt.verify) {
-      if (typeof storedContents !== 'string') {
-        throw new Error('Expected to get back a string for the cipherText')
-      }
-      return handleSignedEncryptedContents(caller, path, storedContents,
-                                           opt.app, opt.username, opt.zoneFileLookupURL)
-    } else if (!opt.verify && !opt.decrypt) {
-      return storedContents
-    } else {
-      throw new Error('Should be unreachable.')
-    }
-  })
+    })
 }
 
 /**
