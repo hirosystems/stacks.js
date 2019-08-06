@@ -35,8 +35,10 @@ export interface PutFileOptions {
    */
   encrypt?: boolean | string;
   /**
-   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
-   * If a string is specified, it is used as the private key. 
+   *
+   * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
+   * app private key. If a string is specified, it is used as the private key instead
+   * of the user's app private key. 
    * @default false
    */
   sign?: boolean | string;
