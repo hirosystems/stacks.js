@@ -148,7 +148,8 @@ export class BlockstackNetwork {
   }
 
   /**
-   * Get the price of a namespace via the legacy /v1/prices API endpoint.
+   * Get the price of a namespace via the legacy /v1/prices API endpoint. This is intended for 
+   * use in third-party wallets or in DApps that register names.
    * @param namespaceID the namespace to query
    * @return a promise to an Object with { units: String, amount: BigInteger }
    * @private
@@ -252,7 +253,8 @@ export class BlockstackNetwork {
   }
 
   /**
-   * Get the price of a name.
+   * Get the price of a name. This is intended for 
+   * use in third-party wallets or in DApps that register names.
    * @param fullyQualifiedName the name to query
    * @return a promise to an Object with { units: String, amount: BigInteger }, where
    *   .units encodes the cryptocurrency units to pay (e.g. BTC, STACKS), and
@@ -283,7 +285,8 @@ export class BlockstackNetwork {
 
   /**
    * How many blocks can pass between a name expiring and the name being able to be
-   * re-registered by a different owner?
+   * re-registered by a different owner. This is intended for 
+   * use in third-party wallets or in DApps that register names.
    * @param fullyQualifiedName unused
    * @return a promise to the number of blocks
    */
@@ -292,7 +295,8 @@ export class BlockstackNetwork {
   }
 
   /**
-   * Get the names -- both on-chain and off-chain -- owned by an address.
+   * Get the names -- both on-chain and off-chain -- owned by an address. This is intended for 
+   * use in third-party wallets or in DApps that register names.
    * @param address the blockchain address (the hash of the owner public key)
    * @return a promise that resolves to a list of names (Strings)
    */
@@ -305,7 +309,8 @@ export class BlockstackNetwork {
 
   /**
    * Get the blockchain address to which a name's registration fee must be sent
-   * (the address will depend on the namespace in which it is registered.)
+   * (the address will depend on the namespace in which it is registered.) This is intended for 
+   * use in third-party wallets or in DApps that register names.
    * @param namespace the namespace ID
    * @return a promise that resolves to an address (String)
    */
@@ -367,7 +372,8 @@ export class BlockstackNetwork {
   }
 
   /**
-   * Get the pricing parameters and creation history of a namespace.
+   * Get the pricing parameters and creation history of a namespace. This is intended for 
+   * use in third-party wallets or in DApps that register names.
    * @param namespaceID the namespace to query
    * @return a promise that resolves to the namespace information.
    */
@@ -1259,7 +1265,8 @@ export const MAINNET_DEFAULT = new BlockstackNetwork(
 
 /**
  * Get WHOIS-like information for a name, including the address that owns it,
- * the block at which it expires, and the zone file anchored to it (if available).
+ * the block at which it expires, and the zone file anchored to it (if available). This is intended for 
+   * use in third-party wallets or in DApps that register names.
  * @param fullyQualifiedName the name to query.  Can be on-chain of off-chain.
  * @return a promise that resolves to the WHOIS-like information 
  */
