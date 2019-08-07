@@ -1265,8 +1265,8 @@ export const MAINNET_DEFAULT = new BlockstackNetwork(
 
 /**
  * Get WHOIS-like information for a name, including the address that owns it,
- * the block at which it expires, and the zone file anchored to it (if available). This is intended for 
-   * use in third-party wallets or in DApps that register names.
+ * the block at which it expires, and the zone file anchored to it (if available). 
+ * This is intended for use in third-party wallets or in DApps that register names.
  * @param fullyQualifiedName the name to query.  Can be on-chain of off-chain.
  * @return a promise that resolves to the WHOIS-like information 
  */
