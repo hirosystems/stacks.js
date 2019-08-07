@@ -389,7 +389,6 @@ export function runAuthTests() {
         t.fail('Should not overwrite existing user');
       })
       .catch((err) => {
-        console.log(err.stack)
         t.pass('Should throw error when overwriting existing user session during handle pending sign in')
       })
   })
