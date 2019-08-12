@@ -4,9 +4,10 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "declaration": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "./lib",
+    "skipLibCheck": true,
     "noEmit": true
   },
   "include": [

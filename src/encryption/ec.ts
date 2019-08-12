@@ -102,7 +102,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   // always copy to buffer
   const plainText = content instanceof Buffer ? Buffer.from(content) : Buffer.from(content)
 
-  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic() as BN
+  const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
   const ephemeralPK = ephemeralSK.getPublic()
   const sharedSecret = ephemeralSK.derive(ecPK) as BN
@@ -120,13 +120,13 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   )
 
   const macData = Buffer.concat([initializationVector,
-                                 Buffer.from(ephemeralPK.encodeCompressed()),
+                                 Buffer.from(ephemeralPK.encode('array', true) as Buffer),
                                  cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
   return {
     iv: initializationVector.toString('hex'),
-    ephemeralPK: ephemeralPK.encodeCompressed('hex'),
+    ephemeralPK: ephemeralPK.encode('hex', true) as string,
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
     wasString: isString
@@ -157,7 +157,7 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 Buffer.from(ephemeralPK.encodeCompressed()),
+                                 Buffer.from(ephemeralPK.encode('array', true) as Buffer),
                                  cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = Buffer.from(cipherObject.mac, 'hex')
