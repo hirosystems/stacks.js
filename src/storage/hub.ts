@@ -35,7 +35,8 @@ export interface GaiaHubConfig {
  * @ignore
  */
 export async function uploadToGaiaHub(
-  filename: string, contents: Blob | Buffer | ArrayBufferView | string,
+  filename: string, 
+  contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
