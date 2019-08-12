@@ -13,7 +13,7 @@ import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../sr
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
-
+import * as util from 'util'
 import * as jsdom from 'jsdom'
 
 
@@ -508,6 +508,122 @@ export function runStorageTests() {
       for (const globalAPI of Object.keys(globalAPIs)) {
         delete (global as any)[globalAPI]
       }
+      FetchMock.restore()
+    }
+  })
+
+  test('putFile unencrypted, using TypedArray content, encrypted', async (t) => {
+    try {
+      const contentDataString = 'file content test1234567'
+      const textEncoder = new util.TextEncoder()
+      const encodedArray = textEncoder.encode(contentDataString)
+      const fileContent = new Uint32Array(encodedArray.buffer)
+
+      const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+      const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+      const blockstack = new UserSession({ appConfig })
+  
+      const path = 'file.json'
+      const gaiaHubConfig = {
+        address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+        server: 'https://hub.blockstack.org',
+        token: '',
+        url_prefix: 'https://gaia.testblockstack.org/hub/'
+      }
+  
+      blockstack.store.getSessionData().userData = <any>{
+        appPrivateKey: privateKey,
+        gaiaHubConfig
+      } // manually set private key for testing
+  
+      const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
+  
+      let postedContent: any
+      const uploadToGaiaHub = (
+        filename: string, 
+        contents: any,
+        hubConfig: any,
+        contentType: string) => {
+          postedContent = Buffer.from(contents.buffer).toString()
+          return Promise.resolve(fullReadUrl)
+      };
+      const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+  
+      const { putFile } = proxyquire('../../../src/storage', {
+        './hub': { uploadToGaiaHub }
+      })
+      const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+        './hub': { getFullReadUrl }
+      })
+  
+      const encryptOptions = { encrypt: false, contentType: 'text/plain; charset=utf-8' }
+      const decryptOptions = { decrypt: false }
+      // put and encrypt the file
+      const publicURL = await putFile(path, fileContent, encryptOptions, blockstack)
+      t.equal(publicURL, fullReadUrl)
+      FetchMock.get(fullReadUrl, { status: 200, body: postedContent, headers: {'Content-Type': 'text/plain; charset=utf-8' } })
+      const readContent = await getFile(path, decryptOptions, blockstack)
+      const readContentStr = readContent.toString()
+      t.equal(readContentStr, contentDataString)
+    } finally {
+      FetchMock.restore()
+    }
+  })
+
+  test('putFile encrypted, using TypedArray content, encrypted', async (t) => {
+    try {
+      const contentDataString = 'file content test1234567'
+      const textEncoder = new util.TextEncoder()
+      const encodedArray = textEncoder.encode(contentDataString)
+      const fileContent = new Uint32Array(encodedArray.buffer)
+
+      const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+      const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+      const blockstack = new UserSession({ appConfig })
+  
+      const path = 'file.json'
+      const gaiaHubConfig = {
+        address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+        server: 'https://hub.blockstack.org',
+        token: '',
+        url_prefix: 'https://gaia.testblockstack.org/hub/'
+      }
+  
+      blockstack.store.getSessionData().userData = <any>{
+        appPrivateKey: privateKey,
+        gaiaHubConfig
+      } // manually set private key for testing
+  
+      const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
+  
+      let encryptedContent: any
+      const uploadToGaiaHub = (
+        filename: string, 
+        contents: any,
+        hubConfig: any,
+        contentType: string) => {
+          encryptedContent = contents
+          return Promise.resolve(fullReadUrl)
+      };
+      const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+  
+      const { putFile } = proxyquire('../../../src/storage', {
+        './hub': { uploadToGaiaHub }
+      })
+      const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
+        './hub': { getFullReadUrl }
+      })
+  
+      const encryptOptions = { encrypt: true }
+      const decryptOptions = { decrypt: true }
+      // put and encrypt the file
+      const publicURL = await putFile(path, fileContent, encryptOptions, blockstack)
+      t.equal(publicURL, fullReadUrl)
+      FetchMock.get(fullReadUrl, encryptedContent)
+      const readContent = await getFile(path, decryptOptions, blockstack)
+      const readContentStr = readContent.toString()
+      t.equal(readContentStr, contentDataString)
+    } finally {
       FetchMock.restore()
     }
   })
