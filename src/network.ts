@@ -1,7 +1,8 @@
 import { TxOutput, address as bjsAddress, networks, crypto as bjsCrypto, Transaction, payments, Network } from 'bitcoinjs-lib'
-import FormData from 'form-data'
-import BN from 'bn.js'
-import RIPEMD160 from 'ripemd160'
+import * as FormData from 'form-data'
+// @ts-ignore
+import * as BN from 'bn.js'
+import * as RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 import { config } from './config'

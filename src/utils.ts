@@ -1,5 +1,5 @@
 
-import url from 'url'
+import * as url from 'url'
 import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'

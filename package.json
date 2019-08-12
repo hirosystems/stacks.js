@@ -9,8 +9,8 @@
     "build:webpack": "shx rm -rf dist/* && cross-env NODE_ENV=production webpack --mode=production",
     "build:webpack:analyze": "shx rm -rf dist/* && cross-env NODE_ENV=production ANALYZE=true webpack --mode=production",
     "build:webpack:watch": "shx rm -rf dist/* && cross-env NODE_ENV=development webpack --mode=development --watch --progress --info-verbosity verbose",
-    "build:node": "shx rm -rf lib && tsc",
-    "build:node:watch": "shx rm -rf lib && tsc --watch",
+    "build:node": "shx rm -rf lib && tsc -b tsconfig.build.json",
+    "build:node:watch": "shx rm -rf lib && tsc -b tsconfig.build.json --watch",
     "prepare": "npm run build:node && npm run build:webpack",
     "test": "npm run lint && cross-env NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
     "integration-test-ops": "cross-env NODE_ENV=test nyc node ./tests/operationsTests/src/index.ts",
@@ -129,6 +129,7 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
+    "@types/bn.js": "^4.11.5",
     "ajv": "^4.11.5",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.0.5",

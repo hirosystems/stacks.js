@@ -1,7 +1,8 @@
 
 import { ec as EllipticCurve } from 'elliptic'
-import BN from 'bn.js'
-import crypto from 'crypto'
+// @ts-ignore
+import * as BN from 'bn.js'
+import * as crypto from 'crypto'
 import { getPublicKeyFromPrivate } from '../keys'
 
 const ecurve = new EllipticCurve('secp256k1')
