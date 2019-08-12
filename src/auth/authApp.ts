@@ -284,11 +284,21 @@ export async function handlePendingSignIn(
   if (!caller) {
     caller = new UserSession()
   }
+
+  const sessionData = caller.store.getSessionData()
+
+  if (sessionData.userData) {
+    throw new LoginFailedError('Existing user session found.')
+  }
+
   if (!transitKey) {
     transitKey = caller.store.getSessionData().transitKey
   }
   if (!nameLookupURL) {
     const tokenPayload = decodeToken(authResponseToken).payload
+    if (typeof tokenPayload === 'string') {
+      throw new Error('Unexpected token payload type of string')
+    }
     if (isLaterVersion(tokenPayload.version, '1.3.0')
        && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
       // override globally
@@ -304,6 +314,10 @@ export async function handlePendingSignIn(
     throw new LoginFailedError('Invalid authentication response.')
   }
   const tokenPayload = decodeToken(authResponseToken).payload
+  if (typeof tokenPayload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
+
   // TODO: real version handling
   let appPrivateKey = tokenPayload.private_key
   let coreSessionToken = tokenPayload.core_token
@@ -372,7 +386,6 @@ export async function handlePendingSignIn(
     userData.profile = tokenPayload.profile
   }
   
-  const sessionData = caller.store.getSessionData()
   sessionData.userData = userData
   caller.store.setSessionData(sessionData)
   
