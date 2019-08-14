@@ -1,3 +1,3 @@
 ```html
-<script src="https://unpkg.com/blockstack@19.1.0/dist/blockstack.js" integrity="sha384-iyP2Q91bL61TbHoDcBUQy5tXDFEhbswcT7syEyDLz9rlIa9hBJnd4YCt0vXFCbmK" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/blockstack@19.2.5/dist/blockstack.js" integrity="sha384-89fUBwtmijI3gv30FamqS32y050s8LlxKvr6qRS/RVVQjijZVvsJ8Q4iMM1Jm9EQ" crossorigin="anonymous"></script>
 ```

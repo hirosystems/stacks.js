@@ -1,6 +1,6 @@
 
 import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './authConstants'
-
+import { getGlobalObject } from '../utils'
 
 /**
  * Configuration data for the current app.
@@ -9,7 +9,7 @@ import { DEFAULT_CORE_NODE, DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } 
  * class without any arguments will use
  * `window.location.origin` as the app domain.
  * On non-browser platforms, you need to
- * specify an app domain as the first argument.
+ * specify an app domain as the second argument.
  * 
  */
 export class AppConfig {
@@ -67,8 +67,8 @@ export class AppConfig {
    * @param {string} authenticatorURL - the web-based fall back authenticator 
    * ([[DEFAULT_BLOCKSTACK_HOST]])
    */
-  constructor(scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
-              appDomain: string = window.location.origin,
+  constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
+              appDomain: string = getGlobalObject('location', { returnEmptyObject: true }).origin,
               redirectPath: string = '',
               manifestPath: string = '/manifest.json',
               coreNode: string | null = null,

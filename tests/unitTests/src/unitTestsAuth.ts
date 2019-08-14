@@ -352,6 +352,46 @@ export function runAuthTests() {
       })
   })
 
+  test('handlePendingSignIn with existing user session', (t) => {
+    t.plan(1)
+
+    const url = `${nameLookupURL}ryan.id`
+
+    FetchMock.get(url, sampleNameRecords.ryan)
+
+    const appPrivateKey = makeECPrivateKey()
+    const transitPrivateKey = makeECPrivateKey()
+    const transitPublicKey = getPublicKeyFromPrivate(transitPrivateKey)
+    const metadata = {}
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().transitKey = transitPrivateKey
+
+    const sessionData = blockstack.store.getSessionData()
+    sessionData.userData = {
+      decentralizedID: 'blockstack.id',
+      username: 'blockstack.id',
+      identityAddress: 'identityaddress',
+      appPrivateKey: appPrivateKey,
+      hubUrl: '',
+      authResponseToken: '',
+      profile: ''
+    }
+    blockstack.store.setSessionData(sessionData)
+
+    const authResponse = makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
+                                          metadata, undefined, appPrivateKey, undefined,
+                                          transitPublicKey)
+
+    blockstack.handlePendingSignIn(authResponse)
+      .then(() => {
+        t.fail('Should not overwrite existing user');
+      })
+      .catch((err) => {
+        t.pass('Should throw error when overwriting existing user session during handle pending sign in')
+      })
+  })
 
   test('app config defaults app domain to origin', (t) => {
     t.plan(5);

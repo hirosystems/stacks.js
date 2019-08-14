@@ -75,7 +75,10 @@ export function wrapProfileToken(token: string) {
 export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
   const decodedToken = decodeToken(token)
   const payload = decodedToken.payload
-
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
+  
   // Inspect and verify the subject
   if (payload.hasOwnProperty('subject')) {
     if (!payload.subject.hasOwnProperty('publicKey')) {
@@ -150,8 +153,11 @@ export function extractProfile(token: string, publicKeyOrAddress: string | null 
   let profile = {}
   if (decodedToken.hasOwnProperty('payload')) {
     const payload = decodedToken.payload
+    if (typeof payload === 'string') {
+      throw new Error('Unexpected token payload type of string')
+    }
     if (payload.hasOwnProperty('claim')) {
-      profile = decodedToken.payload.claim
+      profile = payload.claim
     }
   }
 

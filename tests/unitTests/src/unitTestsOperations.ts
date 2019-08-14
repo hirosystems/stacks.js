@@ -1,6 +1,6 @@
 import test from 'tape'
 import FetchMock from 'fetch-mock'
-import btc from 'bitcoinjs-lib'
+import { Transaction, TransactionBuilder, networks, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
 import BN from 'bn.js'
 
 import { network, InsightClient, BitcoindAPI } from '../../../src/network'
@@ -110,6 +110,7 @@ function networkTests() {
 
     FetchMock.restore()
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://utxo.tester.com'
@@ -121,6 +122,7 @@ function networkTests() {
       }
     })
 
+    // @ts-ignore
     FetchMock.post({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://utxo.tester.com'
@@ -166,7 +168,7 @@ function utilsTests() {
         + 'f363da95bc8d5203d1c07bd87c564a1e6395826cfdfe87cfd31ffa2a3b8101e3e93096f'
         + '2b7c150000000000001976a91441577ec99314a293acbc17d8152137cf4862f7f188ace'
         + '8030000000000001976a9142ebe7b4729185f68c7185c3c6af60fad1b6eeebf88ac00000000'
-    const tx = btc.Transaction.fromHex(txHex)
+    const tx = Transaction.fromHex(txHex)
     tx.ins.forEach((x) => {
       x.script = null
     })
@@ -174,7 +176,7 @@ function utilsTests() {
     const actualLength = txHex.length / 2
     const estimatedLength = estimateTXBytes(tx, 0, 0)
 
-    const tx2 = new btc.TransactionBuilder()
+    const tx2 = new TransactionBuilder()
     tx2.addOutput(tx.outs[0].script, 0)
     const estimatedLength2 = estimateTXBytes(tx2, 2, 2)
 
@@ -217,7 +219,7 @@ function utilsTests() {
   test('not enough UTXOs to fund', (t) => {
     t.plan(1)
 
-    const txB = new btc.TransactionBuilder()
+    const txB = new TransactionBuilder()
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
@@ -236,7 +238,7 @@ function utilsTests() {
   test('addUTXOsToFundSingleUTXO', (t) => {
     t.plan(2)
 
-    const txB = new btc.TransactionBuilder()
+    const txB = new TransactionBuilder()
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
@@ -249,14 +251,14 @@ function utilsTests() {
     const change = addUTXOsToFund(txB, utxos, 10000, 10)
 
     t.equal(change, 38520) // gots to pay the fee!
-    t.equal((<any>txB).__tx.ins[0].hash.toString('hex'),
+    t.equal((<any>txB).__TX.ins[0].hash.toString('hex'),
             Buffer.from(Buffer.from(utxos[0].tx_hash, 'hex').reverse()).toString('hex'))
   })
 
   test('addUTXOsToFundTwoUTXOs', (t) => {
     t.plan(3)
 
-    const txB = new btc.TransactionBuilder()
+    const txB = new TransactionBuilder()
     txB.addOutput(testAddresses[0].address, 10000)
     txB.addOutput(testAddresses[1].address, 0)
 
@@ -273,10 +275,10 @@ function utilsTests() {
 
     const change = addUTXOsToFund(txB, utxos, 55000, 10)
 
-    t.ok(change <= 5000, `${(<any>txB).__tx.outs[1].value} should be less than 5k`)
-    t.equal((<any>txB).__tx.ins[0].hash.toString('hex'),
+    t.ok(change <= 5000, `${(<any>txB).__TX.outs[1].value} should be less than 5k`)
+    t.equal((<any>txB).__TX.ins[0].hash.toString('hex'),
             Buffer.from(Buffer.from(utxos[0].tx_hash, 'hex').reverse()).toString('hex'))
-    t.equal((<any>txB).__tx.ins[1].hash.toString('hex'),
+    t.equal((<any>txB).__TX.ins[1].hash.toString('hex'),
     Buffer.from(Buffer.from(utxos[1].tx_hash, 'hex').reverse()).toString('hex'))
   })
 
@@ -293,7 +295,7 @@ function utilsTests() {
     + '37cf4862f7f188ac39050000000000001976a9142ebe7b4729185f68c7'
     + '185c3c6af60fad1b6eeebf88ac00000000'
 
-    const txStarter = btc.Transaction.fromHex(txStarterHex)
+    const txStarter = Transaction.fromHex(txStarterHex)
 
     const txHash = '22a024f16944d2f568de4a613566fcfab53b86d37f1903668d399f9a366883de'
 
@@ -500,12 +502,12 @@ function transactionTests() {
       const singleSigAddressTest = 'mtpeL28w8WNWWQcXjiYQCM5EFHhijXMF62'
       const multiSigAddressTest  = '2N6GHvciC9M4ze5QXpW2jZxjf5trnPFsyqZ'
       const multiSigAddressMain  = '3Ei5rsnAXtZeSHmz9NQrx1kPsYecbfdKiy'
-      config.network.layer1 = btc.networks.testnet
+      config.network.layer1 = networks.testnet
       t.equal(config.network.coerceAddress(singleSigAddressMain), singleSigAddressTest)
       t.equal(config.network.coerceAddress(singleSigAddressTest), singleSigAddressTest)
       t.equal(config.network.coerceAddress(multiSigAddressMain), multiSigAddressTest)
       t.equal(config.network.coerceAddress(multiSigAddressTest), multiSigAddressTest)
-      config.network.layer1 = btc.networks.bitcoin
+      config.network.layer1 = networks.bitcoin
       t.equal(config.network.coerceAddress(singleSigAddressMain), singleSigAddressMain)
       t.equal(config.network.coerceAddress(singleSigAddressTest), singleSigAddressMain)
       t.equal(config.network.coerceAddress(multiSigAddressMain), multiSigAddressMain)
@@ -556,19 +558,19 @@ function transactionTests() {
     )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, namespaceUtxoSet)
         const fee = inputVals - outputVals
-        const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
+        const burnAddress = bjsAddress.fromOutputScript(tx.outs[2].script, networks.bitcoin)
 
-        const change = tx.outs[1].value
+        const change = (tx.outs[1] as TxOutput).value
 
         t.equal(inputVals - change,
                 estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
-        t.equal(tx.outs[2].value, 5500, 'Output should have paid +DUST_MINIMUM for namespace')
+        t.equal((tx.outs[2] as TxOutput).value, 5500, 'Output should have paid +DUST_MINIMUM for namespace')
         t.equal(tx.ins.length, 2, 'Should use 2 utxos for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
@@ -598,16 +600,16 @@ function transactionTests() {
                                         testAddresses[2].skHex)]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, namespaceUtxoSet)
         const fee = inputVals - outputVals
 
         // change address is the 3rd output usually...
-        const change = tx.outs[2].value
+        const change = (tx.outs[2] as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(tx.outs[2].script), testAddresses[2].address,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[2].script, networks.bitcoin), testAddresses[2].address,
                 'Payer change should be third output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
@@ -633,13 +635,13 @@ function transactionTests() {
     )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, namespaceUtxoSet2)
         const fee = inputVals - outputVals
 
-        const change = tx.outs[3].value
+        const change = (tx.outs[3] as TxOutput).value
         t.equal(inputVals - change,
                 estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
@@ -660,13 +662,13 @@ function transactionTests() {
     )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, namespaceUtxoSet2)
         const fee = inputVals - outputVals
 
-        const change = tx.outs[1].value
+        const change = (tx.outs[1] as TxOutput).value
         t.equal(inputVals - change,
                 estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
@@ -688,13 +690,13 @@ function transactionTests() {
     )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, namespaceUtxoSet2)
         const fee = inputVals - outputVals
 
-        const change = tx.outs[1].value
+        const change = (tx.outs[1] as TxOutput).value
         t.equal(inputVals - change,
                 estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
@@ -720,13 +722,13 @@ function transactionTests() {
                                      testAddresses[4].skHex)])
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, tokenUtxoSet)
         const fee = inputVals - outputVals
-        const change = tx.outs[2].value
-        const recipientAddr = btc.address.fromOutputScript(tx.outs[1].script)
+        const change = (tx.outs[2] as TxOutput).value
+        const recipientAddr = bjsAddress.fromOutputScript(tx.outs[1].script, networks.bitcoin)
         console.log(outputVals)
         console.log(inputVals)
         console.log(fee)
@@ -735,7 +737,7 @@ function transactionTests() {
 
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should be equal')
         t.equal(recipientAddr, testAddresses[1].address, 'Recipient address is correct')
-        t.equal(tx.outs[1].value, 5500, 'Recipient address should have +DUST_MINIMUM')
+        t.equal((tx.outs[1] as TxOutput).value, 5500, 'Recipient address should have +DUST_MINIMUM')
         t.equal(tx.ins.length, 2, 'Should use 2 utxos from the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx length ${txLen} should equal 1K satoshi/byte`)
@@ -759,18 +761,18 @@ function transactionTests() {
                                      testAddresses[5].skHex)])
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx, tokenUtxoSet) + getInputVals(tx, tokenUtxoSet2)
         const fee = inputVals - outputVals
-        const change = tx.outs[3].value
-        const recipientAddr = btc.address.fromOutputScript(tx.outs[1].script)
+        const change = (tx.outs[3] as TxOutput).value
+        const recipientAddr = bjsAddress.fromOutputScript(tx.outs[1].script, networks.bitcoin)
         const funderInputVals = getInputVals(tx, tokenUtxoSet2)
 
         t.equal(funderInputVals - change, estimatedCost, 'Estimated cost should be equal')
         t.equal(recipientAddr, testAddresses[1].address, 'Recipient address is correct')
-        t.equal(tx.outs[1].value, 5500, 'Recipient address should have +DUST_MINIMUM')
+        t.equal((tx.outs[1] as TxOutput).value, 5500, 'Recipient address should have +DUST_MINIMUM')
         t.equal(tx.ins.length, 2, 'Should use 2 utxos from (token-payer, btc-payer)')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx length ${txLen} should equal 1K satoshi/byte`)
@@ -795,19 +797,19 @@ function transactionTests() {
     )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
         const fee = inputVals - outputVals
-        const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
+        const burnAddress = bjsAddress.fromOutputScript(tx.outs[2].script, networks.bitcoin)
 
-        const change = tx.outs[1].value
+        const change = (tx.outs[1] as TxOutput).value
 
         t.equal(inputVals - change,
                 estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, BURN_ADDR, `Burn address should be ${BURN_ADDR}`)
-        t.equal(tx.outs[2].value, BURN_AMT, `Output should have funded name price ${BURN_AMT}`)
+        t.equal((tx.outs[2] as TxOutput).value, BURN_AMT, `Output should have funded name price ${BURN_AMT}`)
         t.equal(tx.ins.length, 1, 'Should use 1 utxo for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
@@ -830,18 +832,18 @@ function transactionTests() {
     )
       .then(([estimatedCost, hexTX]) => {
         t.ok(hexTX)
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
         const fee = inputVals - outputVals
-        const burnAddress = btc.address.fromOutputScript(tx.outs[2].script)
+        const burnAddress = bjsAddress.fromOutputScript(tx.outs[2].script, networks.bitcoin)
 
-        const change = tx.outs[1].value
+        const change = (tx.outs[1] as TxOutput).value
         t.equal(inputVals - change,
                 estimatedCost - 5500, 'Estimated cost should be +DUST_MINIMUM of actual.')
         t.equal(burnAddress, NAMESPACE_BURN_ADDR, `Burn address should be ${NAMESPACE_BURN_ADDR}`)
-        t.equal(tx.outs[2].value, 5500, 'Output should not have burned more than +DUST_MINIMUM')
+        t.equal((tx.outs[2] as TxOutput).value, 5500, 'Output should not have burned more than +DUST_MINIMUM')
         t.equal(tx.ins.length, 2, 'Should use 2 utxos for the payer')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should equal 1k satoshi/byte`)
@@ -862,16 +864,16 @@ function transactionTests() {
                                  testAddresses[1].skHex, 'hello world')]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
         const fee = inputVals - outputVals
 
         // change address is the 3rd output usually...
-        const change = tx.outs[2].value
+        const change = (tx.outs[2] as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(tx.outs[2].script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[2].script, networks.bitcoin), testAddresses[1].address,
                 'Payer change should be third output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 2, 'Should use both payer utxos')
@@ -896,7 +898,7 @@ function transactionTests() {
                                'hello world')]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -905,11 +907,11 @@ function transactionTests() {
         // payer change address is the 3rd output...
         const changeOut = tx.outs[2]
         const ownerChange = tx.outs[1]
-        const change = changeOut.value
+        const change = (changeOut as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(changeOut.script, networks.bitcoin), testAddresses[1].address,
                 'Owner change should be second output')
-        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+        t.equal(bjsAddress.fromOutputScript(ownerChange.script, networks.bitcoin), testAddresses[0].address,
                 'Payer change should be third output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 4, 'Should use all payer utxos and one owner utxo')
@@ -935,7 +937,7 @@ function transactionTests() {
                                  testAddresses[1].skHex)]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -946,13 +948,13 @@ function transactionTests() {
         // old owner change address is the 3rd output
         const ownerChange = tx.outs[2]
 
-        const change = changeOut.value
+        const change = (changeOut as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(tx.outs[1].script), testAddresses[2].address,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[1].script, networks.bitcoin), testAddresses[2].address,
                 'New owner should be second output')
-        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+        t.equal(bjsAddress.fromOutputScript(ownerChange.script, networks.bitcoin), testAddresses[0].address,
                 'Prior owner should be third output')
-        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(changeOut.script, networks.bitcoin), testAddresses[1].address,
                 'Payer change should be fourth output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
@@ -975,16 +977,16 @@ function transactionTests() {
                                testAddresses[1].skHex)]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
         const fee = inputVals - outputVals
 
         // change address is the 3rd output usually...
-        const change = tx.outs[2].value
+        const change = (tx.outs[2] as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(tx.outs[2].script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[2].script, networks.bitcoin), testAddresses[1].address,
                 'Payer change should be third output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should match actual.')
         t.equal(tx.ins.length, 3, 'Should use both payer utxos')
@@ -1005,7 +1007,7 @@ function transactionTests() {
                                   testAddresses[1].skHex,
                                   TEST1_AMOUNT)
       .then((hexTX) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -1013,11 +1015,11 @@ function transactionTests() {
         t.equal(tx.ins.length, 1, 'Should use 1 input')
         t.equal(tx.outs.length, 2, 'Should have a change output')
         const changeOut = tx.outs[1]
-        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(changeOut.script, networks.bitcoin), testAddresses[1].address,
                 'Must be correct change address')
         t.ok(Math.abs(1000 * txLen - fee) <= 2000,
              `Fee should be roughly correct: Actual fee: ${fee}, expected: ${1000 * txLen}`)
-        t.equal(inputVals - changeOut.value, TEST1_AMOUNT, 'Should fund correct amount')
+        t.equal(inputVals - (changeOut as TxOutput).value, TEST1_AMOUNT, 'Should fund correct amount')
       })
       .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
                                                 testAddresses[1].skHex,
@@ -1031,7 +1033,7 @@ function transactionTests() {
                                                 testAddresses[1].skHex,
                                                 TEST3_AMOUNT))
       .then((hexTX) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -1045,7 +1047,7 @@ function transactionTests() {
                                                 testAddresses[1].skHex,
                                                 TEST4_AMOUNT))
       .then((hexTX) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -1075,7 +1077,7 @@ function transactionTests() {
                                 'hello world')]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -1086,15 +1088,15 @@ function transactionTests() {
         // old owner change address is the 3rd output
         const ownerChange = tx.outs[2]
 
-        const change = changeOut.value
+        const change = (changeOut as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(tx.outs[1].script), testAddresses[2].address,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[1].script, networks.bitcoin), testAddresses[2].address,
                 'New owner should be second output')
-        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+        t.equal(bjsAddress.fromOutputScript(ownerChange.script, networks.bitcoin), testAddresses[0].address,
                 'Prior owner should be third output')
-        t.equal(btc.address.fromOutputScript(tx.outs[3].script), BURN_ADDR,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[3].script, networks.bitcoin), BURN_ADDR,
                 'Burn address should be fourth output')
-        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(changeOut.script, networks.bitcoin), testAddresses[1].address,
                 'Payer change should be fifth output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should be accurate.')
         t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
@@ -1122,7 +1124,7 @@ function transactionTests() {
                                 'hello world')]
     )
       .then(([estimatedCost, hexTX]) => {
-        const tx = btc.Transaction.fromHex(hexTX)
+        const tx = Transaction.fromHex(hexTX)
         const txLen = hexTX.length / 2
         const outputVals = sumOutputValues(tx)
         const inputVals = getInputVals(tx)
@@ -1133,19 +1135,19 @@ function transactionTests() {
         // old owner change address is the 3rd output
         const ownerChange = tx.outs[2]
 
-        const change = changeOut.value
+        const change = (changeOut as TxOutput).value
 
-        t.equal(btc.address.fromOutputScript(tx.outs[1].script), testAddresses[2].address,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[1].script, networks.bitcoin), testAddresses[2].address,
                 'New owner should be second output')
-        t.equal(btc.address.fromOutputScript(ownerChange.script), testAddresses[0].address,
+        t.equal(bjsAddress.fromOutputScript(ownerChange.script, networks.bitcoin), testAddresses[0].address,
                 'Prior owner should be third output')
-        t.equal(btc.address.fromOutputScript(tx.outs[3].script), NAMESPACE_BURN_ADDR,
+        t.equal(bjsAddress.fromOutputScript(tx.outs[3].script, networks.bitcoin), NAMESPACE_BURN_ADDR,
                 'Burn address should be fourth output, and it should be 11111....')
-        t.equal(btc.address.fromOutputScript(changeOut.script), testAddresses[1].address,
+        t.equal(bjsAddress.fromOutputScript(changeOut.script, networks.bitcoin), testAddresses[1].address,
                 'Payer change should be fifth output')
         t.equal(inputVals - change, estimatedCost, 'Estimated cost should be accurate.')
         t.equal(tx.ins.length, 4, 'Should use both payer utxos and one owner utxo')
-        t.equal(tx.outs[3].value, 5500, 'Output should not have burned more than +DUST_MINIMUM')
+        t.equal((tx.outs[3] as TxOutput).value, 5500, 'Output should not have burned more than +DUST_MINIMUM')
         t.ok(Math.floor(fee / txLen) > 990 && Math.floor(fee / txLen) < 1010,
              `Paid fee of ${fee} for tx of length ${txLen} should roughly equal 1k satoshi/byte`)
       })
@@ -1214,7 +1216,7 @@ function transactionTests() {
     })
       .then((txs) => {
         for (let i = 0; i < txs.length; i++) {
-          const tx = btc.Transaction.fromHex(txs[i])
+          const tx = Transaction.fromHex(txs[i])
           const nullOut = tx.outs[0].script
           t.equal(network.defaults.MAINNET_DEFAULT.MAGIC_BYTES, 'di')
           t.equal(Buffer.from(nullOut).toString().substring(2, 4), 'di')
@@ -1258,6 +1260,8 @@ function transactionTests() {
       transactionToWatch,
       confirmations
     })
+
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
@@ -1293,6 +1297,7 @@ function transactionTests() {
       confirmations
     })
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
@@ -1319,6 +1324,7 @@ function transactionTests() {
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://blockchain.info/pushtx?cors=true'
@@ -1343,6 +1349,8 @@ function transactionTests() {
     + 'dd32c5f81261c0b13e85f592ff7b0000000000ffffffff02b286a61e00000000'
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
+
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://blockchain.info/pushtx?cors=true'
@@ -1371,7 +1379,7 @@ function transactionTests() {
       zoneFile,
       transactionToWatch
     })
-
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
@@ -1398,7 +1406,7 @@ function transactionTests() {
       zoneFile,
       transactionToWatch
     })
-
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
@@ -1424,6 +1432,7 @@ function transactionTests() {
     const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const expectedBody = JSON.stringify({ zonefile })
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://core.blockstack.org/v1/zonefile/'
@@ -1448,6 +1457,7 @@ function transactionTests() {
     const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const expectedBody = JSON.stringify({ zonefile })
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://core.blockstack.org/v1/zonefile/'
@@ -1489,6 +1499,7 @@ function transactionTests() {
       zoneFile
     })
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
@@ -1520,6 +1531,7 @@ function transactionTests() {
       zoneFile
     })
 
+    // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
       matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
