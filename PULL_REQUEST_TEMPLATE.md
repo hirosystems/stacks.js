@@ -7,7 +7,8 @@ Describe the changes that where made in this pull request. When possible start w
 
 1. Motivation for change
 2. What was changed
-3. Link to relevant issues and documentation
+3. How does this impact application developers
+4. Link to relevant issues and documentation
 
 Example:
 *As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key. For details refer to issue #123* 
@@ -16,11 +17,14 @@ Example:
 ## Type of Change
 - [ ] New feature
 - [ ] Bug fix
-- [ ] Documentation update
+- [ ] API reference/documentation update
 - [ ] Other
 
 
 ## Does this introduce a breaking change?
+List the APIs or describe the functionality that this PR breaks.
+Workarounds for or expected timeline for deprecation
+
 ## Are documentation updates required?
 ## Testing information
 
