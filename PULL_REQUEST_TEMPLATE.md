@@ -34,6 +34,7 @@ Provide context on how tests should be performed.
 
 ## Checklist
 - [ ] Code is commented where needed
-- [ ] Unit tests were added
+- [ ] Unit test coverage for new or modified code paths
 - [ ] `npm run test` passes
+- [ ] Changelog is updated
 - [ ] Tag 1 of @yknl or @zone117x for review
