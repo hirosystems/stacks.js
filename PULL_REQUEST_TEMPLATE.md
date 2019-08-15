@@ -20,7 +20,7 @@ Example:
 - [ ] Other
 
 
-## Does this change introduce a breaking change?
+## Does this introduce a breaking change?
 ## Are documentation updates required?
 ## Testing information
 
