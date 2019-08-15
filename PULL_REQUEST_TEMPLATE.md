@@ -15,6 +15,8 @@ Example:
 ## Type of Change
 [ ] New feature
 [ ] Bug fix
+[ ] Documentation update
+[ ] Other
 
 
 ## Does this change introduce a breaking change?
