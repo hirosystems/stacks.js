@@ -9,6 +9,7 @@ Describe the changes that where made in this pull request. When possible start w
 2. What was changed
 3. How does this impact application developers
 4. Link to relevant issues and documentation
+5. Code examples for new API functions 
 
 Example:
 *As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key. For details refer to issue #123* 
