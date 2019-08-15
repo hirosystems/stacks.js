@@ -2,21 +2,22 @@
 
 ## Description
 
-Describe the changes that where made in this pull request. When possible start with a user story -short, simple descriptions of a feature told from the perspective of the person who desires the new capability. Be sure to also include the following information:
+Describe the changes that where made in this pull request. When possible start with a user story - short, simple descriptions of a feature told from the perspective of the person who desires the new capability. Be sure to also include the following information:
 
 
 1. Motivation for change
 2. What was changed
+3. Link to relevant issues and documentation
 
 Example:
-*As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key.* 
+*As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key. For details refer to issue #123* 
 
 
 ## Type of Change
-[ ] New feature
-[ ] Bug fix
-[ ] Documentation update
-[ ] Other
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Documentation update
+- [ ] Other
 
 
 ## Does this change introduce a breaking change?
@@ -25,7 +26,8 @@ Example:
 
 Provide context on how tests should be performed.
 
-1. If it’s a bug fix, list steps to reproduce the bug
-2. Briefly mention affected code paths
-3. List other affected projects if possible
-4. Things to watch out for when testing
+1. Is testing required for this change?
+2. If it’s a bug fix, list steps to reproduce the bug
+3. Briefly mention affected code paths
+4. List other affected projects if possible
+5. Things to watch out for when testing
