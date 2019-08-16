@@ -9,10 +9,19 @@ Describe the changes that where made in this pull request. When possible start w
 2. What was changed
 3. How does this impact application developers
 4. Link to relevant issues and documentation
-5. Code examples for new API functions 
+5. Provide examples of use cases with code samples and applicable acceptance criteria
 
 Example:
-*As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key. For details refer to issue #123* 
+*As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key.
+
+```
+encryptContent('my data')
+
+// Running the above should result in the following encrypted data object
+{"iv":"c927faf8a37288a7787d5252fca1a1de",  "ephemeralPK":"03186eb470dc0060db7addf642dc0a8d4b5a35649ac2f971058db34ef8a7e81208","cipherText":"d614d629a66b49b470966aa59ae49d17","mac":"8868c09614a6e6921561fbd564658b68844303d3f68d2ce0817d93ee9fe7354c","wasString":true}
+```
+
+For details refer to issue #123* 
 
 
 ## Type of Change
