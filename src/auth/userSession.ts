@@ -445,7 +445,8 @@ export class UserSession {
       return storage.getFile(path, options, this)
         .then((collectionKeyFile) => {
           const collectionKeys = JSON.parse(collectionKeyFile as string)
-          const collectionHubConfig = collectionKeys[collectionName]
+          const collectionKey = collectionKeys[collectionName]
+          const collectionHubConfig = collectionKey.hubConfig
 
           const hubConfig = {
             address: collectionHubConfig.address,

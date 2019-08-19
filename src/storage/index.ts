@@ -236,11 +236,11 @@ export async function getFileUrl(
 function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
                          forceText: boolean,
-                         hubConfig?: GaiaHubConfig,
+                         gaiaHubConfig?: GaiaHubConfig,
                          caller?: UserSession): Promise<string | ArrayBuffer | null> {
   return Promise.resolve()
     .then(() => {
-      const opts = { app, username, zoneFileLookupURL, hubConfig }
+      const opts = { app, username, zoneFileLookupURL, gaiaHubConfig }
       return getFileUrl(path, opts, caller)
     })
     .then(readUrl => fetch(readUrl))
@@ -735,7 +735,7 @@ export function listFiles(
 }
 
 export async function putCollectionItem(item: Collection, caller: UserSession) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionTypeName)
+  let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionName())
   let file = item.serialize()
 
   let opt = {
@@ -744,16 +744,17 @@ export async function putCollectionItem(item: Collection, caller: UserSession) {
   return this.putFile(item.attrs.identifier, file, opt, caller)
 }
 
-export async function getCollectionItem(
+export async function getCollectionItem<T extends Collection>(
+  c: { new(attrs): T, collectionName, fromData },
   identifier: string, 
-  collectionTypeName: string, 
   caller: UserSession
 ) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
+  let hubConfig = await caller.getCollectionGaiaHubConnection(c.collectionName)
   let opt = {
     gaiaHubConfig: hubConfig
   }
   return this.getFile(identifier, opt, caller)
+    .then((fileContent) => c.fromData(fileContent))
 }
 
 export async function listCollectionFiles(
