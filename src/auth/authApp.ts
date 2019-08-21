@@ -1,5 +1,5 @@
 
-import queryString from 'query-string'
+import * as queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
@@ -284,6 +284,13 @@ export async function handlePendingSignIn(
   if (!caller) {
     caller = new UserSession()
   }
+
+  const sessionData = caller.store.getSessionData()
+
+  if (sessionData.userData) {
+    throw new LoginFailedError('Existing user session found.')
+  }
+
   if (!transitKey) {
     transitKey = caller.store.getSessionData().transitKey
   }
@@ -379,7 +386,6 @@ export async function handlePendingSignIn(
     userData.profile = tokenPayload.profile
   }
   
-  const sessionData = caller.store.getSessionData()
   sessionData.userData = userData
   caller.store.setSessionData(sessionData)
   

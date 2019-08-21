@@ -1,6 +1,6 @@
-import test from 'tape-promise/tape'
+import * as test from 'tape-promise/tape'
 
-import elliptic from 'elliptic'
+import * as elliptic from 'elliptic'
 import {
   encryptECIES, decryptECIES, getHexFromBN, signECDSA,
   verifyECDSA,  encryptMnemonic, decryptMnemonic

@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 
 const TEST_DATA_DIR = './tests/testData'
 

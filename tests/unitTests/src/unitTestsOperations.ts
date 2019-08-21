@@ -1,7 +1,8 @@
-import test from 'tape'
-import FetchMock from 'fetch-mock'
+import * as test from 'tape'
+import * as FetchMock from 'fetch-mock'
 import { Transaction, TransactionBuilder, networks, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
-import BN from 'bn.js'
+// @ts-ignore
+import * as BN from 'bn.js'
 
 import { network, InsightClient, BitcoindAPI } from '../../../src/network'
 import {

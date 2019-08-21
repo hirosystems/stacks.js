@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "19.2.2",
+  "version": "19.2.5",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "unpkg": "dist/blockstack.js",
@@ -9,8 +9,8 @@
     "build:webpack": "shx rm -rf dist/* && cross-env NODE_ENV=production webpack --mode=production",
     "build:webpack:analyze": "shx rm -rf dist/* && cross-env NODE_ENV=production ANALYZE=true webpack --mode=production",
     "build:webpack:watch": "shx rm -rf dist/* && cross-env NODE_ENV=development webpack --mode=development --watch --progress --info-verbosity verbose",
-    "build:node": "shx rm -rf lib && tsc",
-    "build:node:watch": "shx rm -rf lib && tsc --watch",
+    "build:node": "shx rm -rf lib && tsc -b tsconfig.build.json",
+    "build:node:watch": "shx rm -rf lib && tsc -b tsconfig.build.json --watch",
     "prepare": "npm run build:node && npm run build:webpack",
     "test": "npm run lint && cross-env NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
     "integration-test-ops": "cross-env NODE_ENV=test nyc node ./tests/operationsTests/src/index.ts",
