@@ -1,7 +1,7 @@
-import test from 'tape'
-import FetchMock from 'fetch-mock'
-import proxyquire from 'proxyquire'
-import sinon from 'sinon'
+import * as test from 'tape'
+import * as FetchMock from 'fetch-mock'
+import * as proxyquire from 'proxyquire'
+import * as sinon from 'sinon'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import {
   uploadToGaiaHub, getFullReadUrl,

@@ -1,7 +1,7 @@
 // import test from 'tape'
-import test from 'tape-promise/tape'
+import * as test from 'tape-promise/tape'
 import { decodeToken, TokenSigner } from 'jsontokens'
-import FetchMock from 'fetch-mock'
+import * as FetchMock from 'fetch-mock'
 
 import {
   makeECPrivateKey,

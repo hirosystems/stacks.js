@@ -3,10 +3,10 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
-    "esModuleInterop": true,
     "declaration": true,
     "noImplicitAny": true,
     "outDir": "lib",
+    "skipLibCheck": true,
     "sourceMap": true
   },
   "include": [
