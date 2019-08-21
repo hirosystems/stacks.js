@@ -80,15 +80,8 @@ module.exports = (env, argv) => {
       globalObject: 'this'
     },
     plugins: [
-      // Can't get this regex exclusion to work...
-      // new webpack.IgnorePlugin(/\.\/wordlists\/(?!.*english.*)\.json/)
-      new webpack.IgnorePlugin(/\.\/wordlists\/chinese_simplified.json/),
-      new webpack.IgnorePlugin(/\.\/wordlists\/chinese_traditional.json/),
-      new webpack.IgnorePlugin(/\.\/wordlists\/korean.json/),
-      new webpack.IgnorePlugin(/\.\/wordlists\/french.json/),
-      new webpack.IgnorePlugin(/\.\/wordlists\/italian.json/),
-      new webpack.IgnorePlugin(/\.\/wordlists\/spanish.json/),
-      new webpack.IgnorePlugin(/\.\/wordlists\/japanese.json/)
+      // BIP39 includes ~240KB of non-english json that we don't currently use.
+      new webpack.IgnorePlugin(/\.\/wordlists\/(?!english\.json)/)
     ]
   }
 
