@@ -18,6 +18,9 @@ import { fetchAppManifest } from './authProvider'
  */
 export function doSignaturesMatchPublicKeys(token: string) {
   const payload = decodeToken(token).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   const publicKeys = payload.public_keys
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]
@@ -50,6 +53,9 @@ export function doSignaturesMatchPublicKeys(token: string) {
  */
 export function doPublicKeysMatchIssuer(token: string) {
   const payload = decodeToken(token).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   const publicKeys = payload.public_keys
   const addressFromIssuer = getAddressFromDID(payload.iss)
 
@@ -83,7 +89,9 @@ export function doPublicKeysMatchUsername(token: string,
                                           nameLookupURL: string) {
   return Promise.resolve().then(() => {
     const payload = decodeToken(token).payload
-
+    if (typeof payload === 'string') {
+      throw new Error('Unexpected token payload type of string')
+    }
     if (!payload.username) {
       return true
     }
@@ -129,6 +137,9 @@ export function doPublicKeysMatchUsername(token: string,
  */
 export function isIssuanceDateValid(token: string) {
   const payload = decodeToken(token).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   if (payload.iat) {
     if (typeof payload.iat !== 'number') {
       return false
@@ -155,6 +166,9 @@ export function isIssuanceDateValid(token: string) {
  */
 export function isExpirationDateValid(token: string) {
   const payload = decodeToken(token).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   if (payload.exp) {
     if (typeof payload.exp !== 'number') {
       return false
@@ -179,6 +193,9 @@ export function isExpirationDateValid(token: string) {
  */
 export function isManifestUriValid(token: string) {
   const payload = decodeToken(token).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   return isSameOriginAbsoluteUrl(payload.domain_name, payload.manifest_uri)
 }
 
@@ -191,6 +208,9 @@ export function isManifestUriValid(token: string) {
  */
 export function isRedirectUriValid(token: string) {
   const payload = decodeToken(token).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   return isSameOriginAbsoluteUrl(payload.domain_name, payload.redirect_uri)
 }
 

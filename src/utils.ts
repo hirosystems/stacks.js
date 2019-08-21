@@ -269,7 +269,7 @@ export function getGlobalObject<K extends keyof Window>(
     Logger.error(`Error getting object '${name}' from global scope '${globalScope}': ${error}`)
   }
   if (throwIfUnavailable) {
-    const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+    const errMsg = getAPIUsageErrorMessage(globalScope, name.toString(), usageDesc)
     Logger.error(errMsg)
     throw new Error(errMsg)
   }
@@ -297,7 +297,7 @@ export function getGlobalObjects<K extends keyof Window>(
   } catch (error) {
     Logger.error(`Error getting global scope: ${error}`)
     if (throwIfUnavailable) {
-      const errMsg = getAPIUsageErrorMessage(globalScope, names[0], usageDesc)
+      const errMsg = getAPIUsageErrorMessage(globalScope, names[0].toString(), usageDesc)
       Logger.error(errMsg)
       throw errMsg
     } else if (returnEmptyObject) {
@@ -314,7 +314,7 @@ export function getGlobalObjects<K extends keyof Window>(
         if (obj) {
           result[name] = obj
         } else if (throwIfUnavailable) {
-          const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+          const errMsg = getAPIUsageErrorMessage(globalScope, name.toString(), usageDesc)
           Logger.error(errMsg)
           throw new Error(errMsg)
         } else if (returnEmptyObject) {
@@ -323,7 +323,7 @@ export function getGlobalObjects<K extends keyof Window>(
       }
     } catch (error) {
       if (throwIfUnavailable) {
-        const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+        const errMsg = getAPIUsageErrorMessage(globalScope, name.toString(), usageDesc)
         Logger.error(errMsg)
         throw new Error(errMsg)
       }
