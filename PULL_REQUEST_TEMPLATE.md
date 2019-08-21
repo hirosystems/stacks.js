@@ -1,9 +1,8 @@
-# Pull Request Template
+Use the following template to create your pull request
 
 ## Description
 
 Describe the changes that where made in this pull request. When possible start with a user story - short, simple descriptions of a feature told from the perspective of the person who desires the new capability. Be sure to also include the following information:
-
 
 1. Motivation for change
 2. What was changed
@@ -12,24 +11,22 @@ Describe the changes that where made in this pull request. When possible start w
 5. Provide examples of use cases with code samples and applicable acceptance criteria
 
 Example:
-*As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the* `*encryptContent*` *function which will take a string and encrypt it using the app private key.
+As a Blockstack developer, I would like to encrypt files using the app private key. This is needed because storing unencrypted files is unacceptable. This pull request adds the `encryptContent` function which will take a string and encrypt it using the app private key.
 
 ```
 encryptContent('my data')
 
 // Running the above should result in the following encrypted data object
-{"iv":"c927faf8a37288a7787d5252fca1a1de",  "ephemeralPK":"03186eb470dc0060db7addf642dc0a8d4b5a35649ac2f971058db34ef8a7e81208","cipherText":"d614d629a66b49b470966aa59ae49d17","mac":"8868c09614a6e6921561fbd564658b68844303d3f68d2ce0817d93ee9fe7354c","wasString":true}
+{"iv":"c91...","ephemeralPK":"031...","cipherText":"d61...","mac":"e73..."}
 ```
 
-For details refer to issue #123* 
-
+For details refer to issue #123
 
 ## Type of Change
 - [ ] New feature
 - [ ] Bug fix
 - [ ] API reference/documentation update
 - [ ] Other
-
 
 ## Does this introduce a breaking change?
 List the APIs or describe the functionality that this PR breaks.
