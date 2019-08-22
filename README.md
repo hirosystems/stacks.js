@@ -85,10 +85,4 @@ Run `npm run compile; npm run browserify` before opening the file `test.html`
 in your browser.
 
 ## Releasing
-
-- `git flow release start <version>`
-- Add section to `CHANGELOG.md`
-- Increment version in `package.json` and commit
-- `npm publish`
-- Commit built documentation and distribution
-- `git flow release finish`
+See `release-checklist.md`
