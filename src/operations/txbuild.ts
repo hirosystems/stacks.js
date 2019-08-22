@@ -1,7 +1,8 @@
 
 
 import { TransactionBuilder, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
-import BN from 'bn.js'
+// @ts-ignore
+import * as BN from 'bn.js'
 
 import {
   addUTXOsToFund, DUST_MINIMUM,
