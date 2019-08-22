@@ -6,7 +6,7 @@
 - [ ] `npm run build`
 - [ ] `npm run test`, make sure all tests are passing
 - [ ] Commit changes
-- [ ] `npm publish --tag beta`
+- [ ] `npm publish` or `npm publish --tag beta` for beta
 - [ ] Enter OTP
 - [ ] Make sure your `master` and `develop` branches are up-to-date
 - [ ] `git flow release finish v19.3.0` (`v19.3.0-beta.1` if beta)
