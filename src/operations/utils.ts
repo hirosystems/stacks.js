@@ -1,12 +1,13 @@
 
 
 import { TransactionBuilder, Transaction, TxOutput, crypto as bjsCrypto } from 'bitcoinjs-lib'
-import RIPEMD160 from 'ripemd160'
-import BN from 'bn.js'
-
+import * as RIPEMD160 from 'ripemd160'
+// @ts-ignore
+import * as BN from 'bn.js'
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
+
 
 /**
  * 

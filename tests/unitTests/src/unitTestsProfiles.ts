@@ -1,6 +1,6 @@
-import test from 'tape'
+import * as test from 'tape'
 import { ECPair } from 'bitcoinjs-lib'
-import FetchMock from 'fetch-mock'
+import * as FetchMock from 'fetch-mock'
 
 import {
   signProfileToken,

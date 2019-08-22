@@ -1,6 +1,6 @@
 
 import { Transaction, script, crypto as bjsCrypto, ECPair } from 'bitcoinjs-lib'
-import crypto from 'crypto'
+import * as crypto from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'

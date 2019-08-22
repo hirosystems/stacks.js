@@ -1,7 +1,8 @@
 
 
 import { TransactionBuilder, payments, address as bjsAddress } from 'bitcoinjs-lib'
-import BN from 'bn.js'
+// @ts-ignore
+import * as BN from 'bn.js'
 import {
   decodeB40, hash160, hash128, DUST_MINIMUM
 } from './utils'

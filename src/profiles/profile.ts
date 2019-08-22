@@ -1,5 +1,5 @@
 // @ts-ignore: Could not find a declaration file for module
-import inspector from 'schema-inspector'
+import * as inspector from 'schema-inspector'
 
 import { signProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'

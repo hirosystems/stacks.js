@@ -1,5 +1,5 @@
 
-import cheerio from 'cheerio'
+import * as cheerio from 'cheerio'
 import { Service } from './service'
 
 class Facebook extends Service {

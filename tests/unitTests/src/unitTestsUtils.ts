@@ -1,4 +1,4 @@
-import test from 'tape-promise/tape'
+import * as test from 'tape-promise/tape'
 import { SECP256K1Client } from 'jsontokens'
 import {
   getEntropy, makeECPrivateKey, publicKeyToAddress, isSameOriginAbsoluteUrl,
