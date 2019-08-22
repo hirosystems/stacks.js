@@ -1,6 +1,6 @@
 # Release checklist
 - [ ] `git flow release start v19.3.0` (`v19.3.0-beta.1` if beta)
-- [ ] Check that all new changes are reflected in the changelog.md
+- [ ] Check that all new changes are reflected in the changelog
 - [ ] Bump package.json version to `v19.3.0` (`v19.3.0-beta.1` if beta)
 - [ ] `nvm ls` Make sure you are on node v10+ 
 - [ ] `npm run build`
@@ -18,4 +18,4 @@
 - [ ] `git push origin master`
 - [ ] `git branch -D master-test`
 - [ ] `git push origin :master-test`
-- [ ] Announce availability of beta in #engineering
+- [ ] Announce availability in #engineering
