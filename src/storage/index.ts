@@ -745,16 +745,16 @@ export async function putCollectionItem(item: Collection, caller: UserSession) {
 }
 
 export async function getCollectionItem<T extends Collection>(
-  c: { new(attrs): T, collectionName, fromData },
+  collection: { new(attrs): T, collectionName, fromData },
   identifier: string, 
   caller: UserSession
 ) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(c.collectionName)
+  let hubConfig = await caller.getCollectionGaiaHubConnection(collection.collectionName)
   let opt = {
     gaiaHubConfig: hubConfig
   }
   return this.getFile(identifier, opt, caller)
-    .then((fileContent) => c.fromData(fileContent))
+    .then((fileContent) => collection.fromData(fileContent))
 }
 
 export async function listCollectionFiles(

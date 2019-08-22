@@ -372,8 +372,11 @@ export class UserSession {
    * @returns {Promise} that resolves to the raw data in the file
    * or rejects with an error
    */
-  getCollectionItem(identifier: string, collectionTypeName: string) {
-    return storage.getCollectionItem(identifier, collectionTypeName, this)
+  getCollectionItem<T extends Collection>(
+    collection: { new(attrs): T, collectionName, fromData },
+    identifier: string
+  ) {
+    return storage.getCollectionItem(collection, identifier, this)
   }
 
   /**

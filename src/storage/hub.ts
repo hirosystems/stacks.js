@@ -25,6 +25,11 @@ export interface GaiaHubConfig {
   server: string,
 }
 
+export interface AuthScope {
+  scope: string,
+  domain: string
+}
+
 /**
  * 
  * @param filename 
@@ -152,7 +157,8 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
 function makeV1GaiaAuthToken(hubInfo: any,
                              signerKeyHex: string,
                              hubUrl: string,
-                             associationToken?: string): string {
+                             associationToken?: string,
+                             scopes?: AuthScope[]): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
                          && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
@@ -168,7 +174,8 @@ function makeV1GaiaAuthToken(hubInfo: any,
     hubUrl,
     iss,
     salt,
-    associationToken
+    associationToken,
+    scopes
   }
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
@@ -181,14 +188,15 @@ function makeV1GaiaAuthToken(hubInfo: any,
 export async function connectToGaiaHub(
   gaiaHubUrl: string,
   challengeSignerHex: string,
-  associationToken?: string
+  associationToken?: string,
+  scopes?: AuthScope[]
 ): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   const response = await fetch(`${gaiaHubUrl}/hub_info`)
   const hubInfo = await response.json()
   const readURL = hubInfo.read_url_prefix
-  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
+  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken, scopes)
   const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {
