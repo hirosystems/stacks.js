@@ -60,7 +60,7 @@ changes for the next release are in `develop`.
 We use the [git-flow-avh](https://github.com/petervanderdoes/gitflow-avh) plugin.
 
 Please send pull requests against `develop`. Pull requests should include tests,
-[flow static type annotations](https://flow.org) and be lint free.
+[flow static type annotations](https://flow.org) and be lint free. Open your pull request using the template in  `PULL_REQUEST_TEMPLATE.md`
 
 Github issues marked [help-wanted](https://github.com/blockstack/blockstack.js/labels/help-wanted)
 are great places to start. Please ask in a github issue or slack before embarking
