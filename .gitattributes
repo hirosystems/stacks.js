@@ -1,0 +1,7 @@
+docs/* linguist-documentation
+docs-theme/* linguist-documentation
+docs/* linguist-documentation
+docs-theme/* linguist-documentation
+
+# Skipping explicit file types
+*.html linguist-vendored
