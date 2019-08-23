@@ -1,0 +1,5 @@
+docs/* linguist-documentation
+docs-theme/* linguist-documentation
+docs/* linguist-vendored
+docs-theme/* linguist-vendored
+tests/**/*.html linguist-vendored
