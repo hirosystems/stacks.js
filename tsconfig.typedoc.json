@@ -18,7 +18,6 @@
     "excludePrivate": true,
     "excludeProtected": true,
     "excludeExternals": true,
-    "excludeNotExported": false,
     "includes" : "mdincludes",
     "includeDeclarations": false,
     "gitRevision": "master",
