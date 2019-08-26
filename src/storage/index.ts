@@ -21,6 +21,8 @@ import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
 import { Collection } from 'blockstack-collection-schemas'
+import { getGlobalObject } from '../utils'
+import { fetchPrivate } from '../fetchUtil'
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -243,7 +245,7 @@ function getFileContents(path: string, app: string, username: string | undefined
       const opts = { app, username, zoneFileLookupURL, gaiaHubConfig }
       return getFileUrl(path, opts, caller)
     })
-    .then(readUrl => fetch(readUrl))
+    .then(readUrl => fetchPrivate(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
       if (response.status !== 200) {
         if (response.status === 404) {
@@ -442,7 +444,7 @@ export function getFile(
     decrypt: true,
     verify: false,
     username: null,
-    app: typeof window !== 'undefined' ? window.location.origin : undefined,
+    app: getGlobalObject('location', { returnEmptyObject: true }).origin,
     zoneFileLookupURL: null
   }
   const opt = Object.assign({}, defaults, options)
@@ -679,7 +681,7 @@ async function listFilesLoop(
       },
       body: pageRequest
     }
-    response = await fetch(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
+    response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
       throw new Error(`listFiles failed with HTTP status ${response.status}`)
     }
@@ -702,21 +704,27 @@ async function listFilesLoop(
     // (i.e. the data is malformed)
     throw new Error('Bad listFiles response: no entries')
   }
+  let entriesLength = 0
   for (let i = 0; i < entries.length; i++) {
-    const rc = callback(entries[i])
-    if (!rc) {
-      // callback indicates that we're done
-      return fileCount + i
+    // An entry array can have null entries, signifying a filtered entry and that there may be
+    // additional pages
+    if (entries[i] !== null) {
+      entriesLength++
+      const rc = callback(entries[i])
+      if (!rc) {
+        // callback indicates that we're done
+        return fileCount + i
+      }
     }
   }
   if (nextPage && entries.length > 0) {
     // keep going -- have more entries
     return listFilesLoop(
-      caller, hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entriesLength, callback
     )
   } else {
     // no more entries -- end of data
-    return fileCount + entries.length
+    return fileCount + entriesLength
   }
 }
 

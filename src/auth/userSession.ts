@@ -23,7 +23,7 @@ import {
   connectToGaiaHub, 
   GAIA_HUB_COLLECTION_KEY_FILE_NAME 
 } from '../storage/hub'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL } from './authConstants'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
 import { Collection } from 'blockstack-collection-schemas'
 
 /**
@@ -56,7 +56,7 @@ export class UserSession {
     sessionOptions?: SessionOptions }) {
     let runningInBrowser = true
 
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' && typeof self === 'undefined') {
       Logger.debug('UserSession: not running in browser')
       runningInBrowser = false
     }
@@ -108,7 +108,7 @@ export class UserSession {
   redirectToSignIn(
     redirectURI?: string,
     manifestURI?: string,
-    scopes?: string[]
+    scopes?: Array<AuthScope | string>
   ) {
     const transitKey = this.generateAndStoreTransitKey()
     const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
@@ -163,7 +163,7 @@ export class UserSession {
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
-    scopes?: string[],
+    scopes?: Array<AuthScope | string>,
     appDomain?: string,
     expiresAt: number = nextHour().getTime(),
     extraParams: any = {}

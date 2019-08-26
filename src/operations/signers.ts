@@ -1,5 +1,5 @@
 
-import bitcoinjs from 'bitcoinjs-lib'
+import { TransactionBuilder, ECPair } from 'bitcoinjs-lib'
 import { hexStringToECPair, ecPairToAddress } from '../utils'
 
 /**
@@ -26,7 +26,7 @@ export interface TransactionSigner {
    * @private
    * @ignore
    */
-  signTransaction(transaction: bitcoinjs.TransactionBuilder, inputIndex: number): Promise<void>;
+  signTransaction(transaction: TransactionBuilder, inputIndex: number): Promise<void>;
 }
 
 /**
@@ -36,9 +36,9 @@ export interface TransactionSigner {
  * @ignore
  */
 export class PubkeyHashSigner implements TransactionSigner {
-  ecPair: bitcoinjs.ECPair
+  ecPair: ECPair.ECPairInterface
 
-  constructor(ecPair: bitcoinjs.ECPair) {
+  constructor(ecPair: ECPair.ECPairInterface) {
     this.ecPair = ecPair
   }
 
@@ -55,7 +55,7 @@ export class PubkeyHashSigner implements TransactionSigner {
       .then(() => ecPairToAddress(this.ecPair))
   }
 
-  signTransaction(transaction: bitcoinjs.TransactionBuilder, inputIndex: number): Promise<void> {
+  signTransaction(transaction: TransactionBuilder, inputIndex: number): Promise<void> {
     return Promise.resolve()
       .then(() => {
         transaction.sign(inputIndex, this.ecPair)

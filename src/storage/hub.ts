@@ -1,10 +1,11 @@
 
-import bitcoin from 'bitcoinjs-lib'
+import { Transaction, script, crypto as bjsCrypto, ECPair } from 'bitcoinjs-lib'
 import crypto from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
 import { ecPairToAddress, hexStringToECPair } from '../utils'
+import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
 import { FileNotFound } from '../errors'
@@ -45,7 +46,7 @@ export async function uploadToGaiaHub(
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
-  const response = await fetch(
+  const response = await fetchPrivate(
     `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
       method: 'POST',
       headers: {
@@ -125,11 +126,11 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = bitcoin.crypto.sha256(Buffer.from(challengeText))
+    const digest = bjsCrypto.sha256(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
-    const signatureWithHash = bitcoin.script.signature.encode(
-      signatureBuffer, bitcoin.Transaction.SIGHASH_NONE)
+    const signatureWithHash = script.signature.encode(
+      signatureBuffer, Transaction.SIGHASH_NONE)
     
     // We only want the DER encoding so remove the sighash version byte at the end.
     // See: https://github.com/bitcoinjs/bitcoinjs-lib/issues/1241#issuecomment-428062912
@@ -193,7 +194,7 @@ export async function connectToGaiaHub(
 ): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
-  const response = await fetch(`${gaiaHubUrl}/hub_info`)
+  const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const hubInfo = await response.json()
   const readURL = hubInfo.read_url_prefix
   const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken, scopes)
@@ -215,8 +216,8 @@ export async function connectToGaiaHub(
  * @ignore
  */
 export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
-  const challengeSigner = bitcoin.ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
-  const response = await fetch(`${gaiaHubUrl}/hub_info`)
+  const challengeSigner = ECPair.fromPrivateKey(Buffer.from(appPrivateKey, 'hex'))
+  const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
   const readURL = responseJSON.read_url_prefix

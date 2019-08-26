@@ -4,11 +4,11 @@ import 'cross-fetch/polyfill'
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner, SECP256K1Client } from 'jsontokens'
 import { makeECPrivateKey, publicKeyToAddress } from '../keys'
-import { makeUUID4, nextMonth } from '../utils'
+import { makeUUID4, nextMonth, getGlobalObject } from '../utils'
 import { makeDIDFromAddress } from '../dids'
 import { encryptECIES, decryptECIES } from '../encryption/ec'
 import { Logger } from '../logger'
-import { DEFAULT_SCOPE } from './authConstants'
+import { DEFAULT_SCOPE, AuthScope } from './authConstants'
 import { UserSession } from './userSession'
 
 
@@ -58,7 +58,7 @@ export function makeAuthRequest(
   transitPrivateKey?: string,
   redirectURI?: string, 
   manifestURI?: string, 
-  scopes: string[] = DEFAULT_SCOPE,
+  scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
   appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
@@ -68,14 +68,11 @@ export function makeAuthRequest(
   }
 
   const getWindowOrigin = (paramName: string) => {
-    const origin = typeof window !== 'undefined' && window.location && window.location.origin
-    if (!origin) {
-      const errMsg = `\`makeAuthRequest\` called without the \`${paramName}\` param specified but`
-        + ' the default value uses `window.location.origin` which is not available in this environment'
-      Logger.error(errMsg)
-      throw new Error(errMsg)
-    }
-    return origin
+    const location = getGlobalObject('location', { 
+      throwIfUnavailable: true, 
+      usageDesc: `makeAuthRequest([${paramName}=undefined])` 
+    })
+    return location.origin
   }
   
   if (!redirectURI) {

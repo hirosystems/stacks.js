@@ -1280,8 +1280,10 @@ export function runStorageTests() {
       }
       callCount += 1
       if (callCount === 1) {
-        return { entries: [path], page: callCount }
+        return { entries: [null], page: callCount }
       } else if (callCount === 2) {
+        return { entries: [path], page: callCount }
+      } else if (callCount === 3) {
         return { entries: [], page: callCount }
       } else {
         throw new Error('Called too many times')

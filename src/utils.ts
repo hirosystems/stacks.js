@@ -101,7 +101,7 @@ export function isLaterVersion(v1: string, v2: string) {
  * @private
  * @ignore
  */
-export function hexStringToECPair(skHex: string) {
+export function hexStringToECPair(skHex: string): ECPair.ECPairInterface {
   const ecPairOptions = {
     network: config.network.layer1,
     compressed: true
@@ -125,7 +125,7 @@ export function hexStringToECPair(skHex: string) {
  * 
  * @ignore
  */
-export function ecPairToHexString(secretKey: ECPair) {
+export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
   const ecPointHex = secretKey.privateKey.toString('hex')
   if (secretKey.compressed) {
     return `${ecPointHex}01`
@@ -139,7 +139,7 @@ export function ecPairToHexString(secretKey: ECPair) {
  * @private
  * @ignore
  */
-export function ecPairToAddress(keyPair: ECPair) {
+export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
   return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
 }
 
@@ -187,19 +187,147 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
 }
 
 /**
- * Runtime check for the existence of the global `window` object and the 
- * given API key (name) on `window`. Throws an error if either are not
- * available in the current environment. 
- * @param fnDesc The function name to include in the thrown error and log.
- * @param name The name of the key on the `window` object to check for.
- * @hidden
+ * Returns the global scope `Window`, `WorkerGlobalScope`, or `NodeJS.Global` if available in the 
+ * currently executing environment. 
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/WorkerGlobalScope/self
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope
+ * 
+ * This could be switched to `globalThis` once it is standardized and widely available. 
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
  */
-export function checkWindowAPI(fnDesc: string, name: string) {
-  const api = typeof window !== 'undefined' && window[name]
-  if (!api) {
-    const errMsg = `\`${fnDesc}\` uses the \`window.${name}\` API which is `
-      + ' not available in the current environment.'
+function getGlobalScope(): Window {
+  if (typeof self !== 'undefined') {
+    return self
+  }
+  if (typeof window !== 'undefined') {
+    return window
+  }
+  // This function is meant to be called when accessing APIs that are typically only available in
+  // web-browser/DOM environments, but we also want to support situations where running in Node.js 
+  // environment, and a polyfill was added to the Node.js `global` object scope without adding the 
+  // `window` global object as well. 
+  if (typeof global !== 'undefined') {
+    return (global as unknown) as Window
+  }
+  throw new Error('Unexpected runtime environment - no supported global scope (`window`, `self`, `global`) available')
+}
+
+
+function getAPIUsageErrorMessage(
+  scopeObject: unknown, 
+  apiName: string, 
+  usageDesc?: string
+): string {
+  if (usageDesc) {
+    return `Use of '${usageDesc}' requires \`${apiName}\` which is unavailable on the '${scopeObject}' object within the currently executing environment.`
+  } else {
+    return `\`${apiName}\` is unavailable on the '${scopeObject}' object within the currently executing environment.`
+  }
+}
+
+interface GetGlobalObjectOptions {
+  /**
+   * Throw an error if the object is not found. 
+   * @default false
+   */
+  throwIfUnavailable?: boolean; 
+  /**
+   * Additional information to include in an error if thrown. 
+   */
+  usageDesc?: string; 
+  /**
+   * If the object is not found, return an new empty object instead of undefined.
+   * Requires [[throwIfUnavailable]] to be falsey. 
+   * @default false
+   */
+  returnEmptyObject?: boolean; 
+}
+
+/**
+ * Returns an object from the global scope (`Window` or `WorkerGlobalScope`) if it 
+ * is available within the currently executing environment. 
+ * When executing within the Node.js runtime these APIs are unavailable and will be 
+ * `undefined` unless the API is provided via polyfill. 
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
+ * @ignore
+ */
+export function getGlobalObject<K extends keyof Window>(
+  name: K, 
+  { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
+): Window[K] {
+  let globalScope: Window
+  try {
+    globalScope = getGlobalScope()
+    if (globalScope) {
+      const obj = globalScope[name]
+      if (obj) {
+        return obj
+      }
+    }
+  } catch (error) {
+    Logger.error(`Error getting object '${name}' from global scope '${globalScope}': ${error}`)
+  }
+  if (throwIfUnavailable) {
+    const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
     Logger.error(errMsg)
     throw new Error(errMsg)
   }
+  if (returnEmptyObject) { 
+    return {}
+  }
+  return undefined
+}
+
+/**
+ * Returns a specified subset of objects from the global scope (`Window` or `WorkerGlobalScope`) 
+ * if they are available within the currently executing environment. 
+ * When executing within the Node.js runtime these APIs are unavailable will be `undefined` 
+ * unless the API is provided via polyfill. 
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
+ * @ignore
+ */
+export function getGlobalObjects<K extends keyof Window>(
+  names: K[], 
+  { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
+): Pick<Window, K> {
+  let globalScope: Window
+  try {
+    globalScope = getGlobalScope()
+  } catch (error) {
+    Logger.error(`Error getting global scope: ${error}`)
+    if (throwIfUnavailable) {
+      const errMsg = getAPIUsageErrorMessage(globalScope, names[0], usageDesc)
+      Logger.error(errMsg)
+      throw errMsg
+    } else if (returnEmptyObject) {
+      globalScope = {} as any
+    }
+  }
+
+  const result: Pick<Window, K> = {} as any
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i]
+    try {
+      if (globalScope) {
+        const obj = globalScope[name]
+        if (obj) {
+          result[name] = obj
+        } else if (throwIfUnavailable) {
+          const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+          Logger.error(errMsg)
+          throw new Error(errMsg)
+        } else if (returnEmptyObject) {
+          result[name] = {}
+        }
+      }
+    } catch (error) {
+      if (throwIfUnavailable) {
+        const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+        Logger.error(errMsg)
+        throw new Error(errMsg)
+      }
+    }
+  }
+  return result
 }
