@@ -350,11 +350,9 @@ export class UserSession {
     return storage.deleteFile(path, options, this)
   }
 
-    /**
-   * Stores the data provided in the app's data store to to the file specified.
-   * @param {String} path - the path to store the data in
-   * @param {String|Buffer} content - the data to store in the file
-   * @param options a [[PutFileOptions]] object
+  /**
+   * Stores the collection object provided in the specified collection data store.
+   * @param {Collection} item - The collection object to store
    * 
    * @returns {Promise} that resolves if the operation succeed and rejects
    * if it failed
@@ -364,10 +362,10 @@ export class UserSession {
   }
 
   /**
-   * Retrieves the specified file from the app's data store.
+   * Retrieves the specified collection object from the collection data store
    * 
-   * @param {String} path - the path to the file to read
-   * @param {Object} options a [[GetFileOptions]] object
+   * @param {Collection} collection - The collection class to retrieve from
+   * @param {String} identifier - The identifier for the collection object to retrieve
    * 
    * @returns {Promise} that resolves to the raw data in the file
    * or rejects with an error
@@ -377,6 +375,30 @@ export class UserSession {
     identifier: string
   ) {
     return storage.getCollectionItem(collection, identifier, this)
+  }
+
+  /**
+   * List the set of files in a collection
+   * 
+   * @param {Collection} collection - The collection class to list files for
+   * @param {function} callback - a callback to invoke on each named file that
+   * returns `true` to continue the listing operation or `false` to end it
+   * 
+   * @returns {Promise} that resolves to the number of files listed
+   */
+  listCollectionFiles(
+    collection: { collectionName },
+    callback: (name: string) => boolean): Promise<number> {
+    return storage.listCollectionFiles(collection, callback, this)
+  }
+
+  /**
+   * Deletes the specified file from the collection. 
+   * @param item - The collection object to delete.
+   * @returns Resolves when the file has been removed or rejects with an error.
+   */
+  public deleteCollectionItem(item: Collection) {
+    return storage.deleteCollectionItem(item, this)
   }
 
   /**

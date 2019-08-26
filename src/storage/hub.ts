@@ -15,6 +15,7 @@ import { FileNotFound } from '../errors'
  */
 export const BLOCKSTACK_GAIA_HUB_LABEL = 'blockstack-gaia-hub-config'
 export const GAIA_HUB_COLLECTION_KEY_FILE_NAME = '.collections.keys'
+export const COLLECTION_GAIA_PREFIX = 'collection'
 
 /**
  * The configuration for the user's Gaia storage provider.

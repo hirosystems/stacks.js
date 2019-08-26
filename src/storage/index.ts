@@ -5,7 +5,8 @@ import {
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
   GaiaHubConfig,
   deleteFromGaiaHub,
-  GAIA_HUB_COLLECTION_KEY_FILE_NAME
+  GAIA_HUB_COLLECTION_KEY_FILE_NAME,
+  COLLECTION_GAIA_PREFIX
 } from './hub'
 
 import {
@@ -601,14 +602,15 @@ export async function putFile(
 export async function deleteFile(
   path: string, 
   options?: {
-    wasSigned?: boolean;
+    wasSigned?: boolean,
+    gaiaHubConfig?: GaiaHubConfig
   },
   caller?: UserSession
 ) {
   if (!caller) {
     caller = new UserSession()
   }
-  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const gaiaHubConfig = options.gaiaHubConfig || await caller.getOrSetLocalGaiaHubConnection()
   const opts = Object.assign({}, options)
   if (opts.wasSigned) {
     // If signed, delete both the content file and the .sig file
@@ -745,11 +747,11 @@ export function listFiles(
 export async function putCollectionItem(item: Collection, caller: UserSession) {
   let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionName())
   let file = item.serialize()
-
+  let normalizedIdentifier = COLLECTION_GAIA_PREFIX + '/' + item.attrs.identifier
   let opt = {
     gaiaHubConfig: hubConfig
   }
-  return this.putFile(item.attrs.identifier, file, opt, caller)
+  return this.putFile(normalizedIdentifier, file, opt, caller)
 }
 
 export async function getCollectionItem<T extends Collection>(
@@ -758,33 +760,34 @@ export async function getCollectionItem<T extends Collection>(
   caller: UserSession
 ) {
   let hubConfig = await caller.getCollectionGaiaHubConnection(collection.collectionName)
+  let normalizedIdentifier = COLLECTION_GAIA_PREFIX + '/' + identifier
   let opt = {
     gaiaHubConfig: hubConfig
   }
-  return this.getFile(identifier, opt, caller)
+  return this.getFile(normalizedIdentifier, opt, caller)
     .then((fileContent) => collection.fromData(fileContent))
 }
 
 export async function listCollectionFiles(
-  collectionTypeName: string, 
+  collection: { collectionName },
   callback: (name: string) => boolean,
   caller?: UserSession,
 ) {
   caller = caller || new UserSession()
-  let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
+  let hubConfig = await caller.getCollectionGaiaHubConnection(collection.collectionName)
   return listFilesLoop(caller, hubConfig, null, 0, 0, callback)
 }
 
-export async function deleteCollectionFile(
-  identifier: string, 
-  collectionTypeName: string, 
+export async function deleteCollectionItem(
+  item: Collection,
   caller: UserSession
 ) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(collectionTypeName)
+  let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionName())
   let opt = {
     gaiaHubConfig: hubConfig
   }
-  return this.deleteFile(identifier, opt, caller)
+  const normalizedIdentifier = COLLECTION_GAIA_PREFIX + '/' + item.attrs.identifier
+  return this.deleteFile(normalizedIdentifier, opt, caller)
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GAIA_HUB_COLLECTION_KEY_FILE_NAME }
