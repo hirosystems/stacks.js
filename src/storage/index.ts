@@ -754,8 +754,8 @@ export async function putCollectionItem(item: Collection, caller: UserSession) {
   return this.putFile(normalizedIdentifier, file, opt, caller)
 }
 
-export async function getCollectionItem<T extends Collection>(
-  collection: { new(attrs): T, collectionName, fromData },
+export async function getCollectionItem<CollectionType extends Collection>(
+  collection: { new(attrs): CollectionType, collectionName, fromData },
   identifier: string, 
   caller: UserSession
 ) {
@@ -768,18 +768,29 @@ export async function getCollectionItem<T extends Collection>(
     .then((fileContent) => collection.fromData(fileContent))
 }
 
-export async function listCollectionFiles(
-  collection: { collectionName },
+export async function listCollection<CollectionType extends Collection>(
+  collection: CollectionType,
   callback: (name: string) => boolean,
   caller?: UserSession,
 ) {
   caller = caller || new UserSession()
   let hubConfig = await caller.getCollectionGaiaHubConnection(collection.collectionName)
-  return listFilesLoop(caller, hubConfig, null, 0, 0, callback)
+
+  return listFilesLoop(caller, hubConfig, null, 0, 0, (name) => {
+    let collectionGaiaPathPrefix = COLLECTION_GAIA_PREFIX + '/'
+    if (name.startsWith(collectionGaiaPathPrefix)) {
+      // Remove collection/ prefix from file names
+      let identifier = name.substr(collectionGaiaPathPrefix.length)
+      return callback(identifier)
+    } else {
+      // Skip non-collection prefix files
+      return true
+    }
+  })
 }
 
-export async function deleteCollectionItem(
-  item: Collection,
+export async function deleteCollectionItem<CollectionType extends Collection>(
+  item: CollectionType,
   caller: UserSession
 ) {
   let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionName())

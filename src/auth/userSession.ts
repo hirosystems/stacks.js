@@ -386,10 +386,10 @@ export class UserSession {
    * 
    * @returns {Promise} that resolves to the number of files listed
    */
-  listCollectionFiles(
+  listCollection(
     collection: { collectionName },
     callback: (name: string) => boolean): Promise<number> {
-    return storage.listCollectionFiles(collection, callback, this)
+    return storage.listCollection(collection, callback, this)
   }
 
   /**
