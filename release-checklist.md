@@ -1,0 +1,20 @@
+# Release checklist
+- [ ] `git flow release start <VERSION_NUMBER>` (`<VERSION_NUMBER>` prefixed with `v` and add `-beta.1` if beta)
+- [ ] Check that all new changes are reflected in the changelog
+- [ ] Bump package.json version to `<VERSION_NUMBER>` without prefix `v`
+- [ ] `nvm ls` Make sure you are on node v10+ 
+- [ ] `npm run build`
+- [ ] `npm run test`, make sure all tests are passing
+- [ ] Commit changes
+- [ ] `npm publish` or `npm publish --tag beta` for beta
+- [ ] Make sure your `master` and `develop` branches are up-to-date
+- [ ] `git flow release finish <VERSION_NUMBER>` 
+- [ ] `git push origin develop`
+- [ ] `git checkout master`
+- [ ] `git checkout -b master-test`
+- [ ] `git push origin master-test`
+- [ ] Wait for checks to finish on pushed `master-test` branch
+- [ ] `git push origin master`
+- [ ] `git branch -D master-test`
+- [ ] `git push origin :master-test`
+- [ ] Announce availability in #engineering and on the forum here: https://forum.blockstack.org/c/releases (Include a link to the changelog)
