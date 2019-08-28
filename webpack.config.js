@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 
@@ -78,7 +79,10 @@ module.exports = (env, argv) => {
       libraryTarget: 'umd',
       globalObject: 'this'
     },
-    plugins: []
+    plugins: [
+      // BIP39 includes ~240KB of non-english json that we don't currently use.
+      new webpack.IgnorePlugin(/\.\/wordlists\/(?!english\.json)/)
+    ]
   }
 
   if (isEnvAnalyze) {
