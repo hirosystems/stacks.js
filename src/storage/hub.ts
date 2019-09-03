@@ -9,6 +9,7 @@ import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
 import { FileNotFound } from '../errors'
+import { getResponseDetails } from '../utils'
 
 /**
  * @ignore
@@ -51,7 +52,8 @@ export async function uploadToGaiaHub(
     }
   )
   if (!response.ok) {
-    throw new Error('Error when uploading to Gaia hub')
+    const responseDetails = await getResponseDetails(response)
+    throw new Error(`Error when uploading to Gaia hub: ${responseDetails}`)
   } 
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
@@ -72,20 +74,13 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    let responseMsg = ''
-    try {
-      responseMsg = await response.text()
-    } catch (error) {
-      Logger.debug(`Error getting bad http response text: ${error}`)
-    }
-    const errorMsg = 'Error deleting file from Gaia hub: '
-      + `${response.status} ${response.statusText}: ${responseMsg}`
-    Logger.error(errorMsg)
+    const responseDetails = await getResponseDetails(response)
+    const errorMsg = 'Error deleting file from Gaia hub: ' + responseDetails
     if (response.status === 404) {
       throw new FileNotFound(errorMsg)
     } else {
       throw new Error(errorMsg)
-    }
+    }  
   }
 }
 

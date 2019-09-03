@@ -331,3 +331,15 @@ export function getGlobalObjects<K extends keyof Window>(
   }
   return result
 }
+
+export async function getResponseDetails(response: Response): Promise<String> {
+  let responseMsg = ''
+  try {
+    responseMsg = await response.text()
+  } catch (error) {
+    Logger.debug(`Error getting bad http response text: ${error}`)
+  }
+  const errorDetails = `${response.status} ${response.statusText}: ${responseMsg}`
+  Logger.error(errorDetails)
+  return errorDetails
+}

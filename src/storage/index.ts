@@ -22,6 +22,7 @@ import { Logger } from '../logger'
 import { UserSession } from '../auth/userSession'
 import { getGlobalObject } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
+import { getResponseDetails } from '../utils'
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -537,13 +538,18 @@ export async function putFile(
       ])
       return fileUrls[0]
     } catch (error) {
-      const freshHubConfig = await caller.setLocalGaiaHubConnection()
-      const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, content, freshHubConfig, contentType),
-        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                        signatureContent, freshHubConfig, 'application/json')
-      ])
-      return fileUrls[0]
+      try {
+        const freshHubConfig = await caller.setLocalGaiaHubConnection()
+        const fileUrls = await Promise.all([
+          uploadToGaiaHub(path, content, freshHubConfig, contentType),
+          uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                          signatureContent, freshHubConfig, 'application/json')
+        ])  
+        return fileUrls[0]
+      } catch (err) {
+        throw err
+        // TODO: Return HTTP error
+      }
     }
   }
 
@@ -665,7 +671,8 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      throw new Error(`listFiles failed with HTTP status ${response.status}`)
+      let responseDetails = await getResponseDetails(response)
+      throw new Error(`listFiles failed: ${responseDetails}`)
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
@@ -708,7 +715,7 @@ async function listFilesLoop(
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
+ * @return {Promise} that resolves to the number of files listed, or rejects with an error.
  */
 export function listFiles(
   callback: (name: string) => boolean,
