@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "19.3.0",
+  "version": "19.4.0-beta.1",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "unpkg": "dist/blockstack.js",
@@ -109,7 +109,7 @@
     "fetch-mock": "^5.5.0",
     "mock-local-storage": "^1.1.8",
     "node-fetch": "^1.6.3",
-    "nyc": "^13.3.0",
+    "nyc": "^14.1.1",
     "opn": "^4.0.2",
     "proxyquire": "^2.1.0",
     "shx": "^0.3.2",
@@ -120,11 +120,11 @@
     "tape-promise": "^4.0.0",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.2",
-    "typedoc": "^0.14.2",
+    "typedoc": "^0.15.0",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6",
     "webpack-assets-manifest": "^3.1.1",
-    "webpack-bundle-analyzer": "^3.1.0",
+    "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
