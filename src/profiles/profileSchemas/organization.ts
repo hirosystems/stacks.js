@@ -1,6 +1,4 @@
-// TODO: replace with 'ajv' - its already a dependency and it is maintained
-// @ts-ignore: Could not find a declaration file for module
-import inspector from 'schema-inspector'
+import * as Ajv from 'ajv'
 
 import { extractProfile } from '../profileTokens'
 import { Profile } from '../profile'
@@ -27,7 +25,7 @@ export class Organization extends Profile {
 
   static validateSchema(profile: any, strict = false) {
     schemaDefinition.strict = strict
-    return inspector.validate(schemaDefinition, profile)
+    return new Ajv().validate(schemaDefinition, profile)
   }
 
   static fromToken(token: string, publicKeyOrAddress: string | null = null) {

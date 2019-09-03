@@ -1,5 +1,4 @@
-// @ts-ignore: Could not find a declaration file for module
-import * as inspector from 'schema-inspector'
+import * as Ajv from 'ajv'
 
 import { signProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'
@@ -36,7 +35,7 @@ export class Profile {
 
   static validateSchema(profile: any, strict = false) {
     schemaDefinition.strict = strict
-    return inspector.validate(schemaDefinition, profile)
+    return new Ajv().validate(schemaDefinition, profile)
   }
 
   static fromToken(token: string, publicKeyOrAddress: string | null = null) {
