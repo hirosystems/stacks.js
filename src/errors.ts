@@ -7,6 +7,12 @@ export const ERROR_CODES = {
   REMOTE_SERVICE_ERROR: 'remote_service_error',
   INVALID_STATE: 'invalid_state',
   NO_SESSION_DATA: 'no_session_data',
+  FILE_NOT_FOUND: 'file_not_found',
+  INVALID_DID_ERROR: 'invalid_did_error',
+  NOT_ENOUGH_FUNDS_ERROR: 'not_enough_error',
+  INVALID_AMOUNT_ERROR: 'invalid_amount_error',
+  LOGIN_FAILED_ERROR: 'login_failed',
+  SIGNATURE_VERIFICATION_ERROR: 'signature_verification_failure',
   UNKNOWN: 'unknown'
 }
 
@@ -32,8 +38,23 @@ export class BlockstackError extends Error {
   parameter?: string
 
   constructor(error: ErrorType) {
-    super(error.message)
-    this.message = error.message
+    let message = error.message
+    let bugMessage = `Error Code: ${error.code}`
+    let stack = null
+    try {
+      throw new Error()
+    } catch (e) {
+      stack = e.stack
+    }
+    if (stack) {
+      bugMessage += `\nStack Trace:\n${stack}`
+    }
+    message += '\nIf you believe this exception is caused by a bug in blockstack.js'
+      + ', please file a bug report: https://community.blockstack.org/bugs?'
+      + `9ndd2=Bug&4ud0i=${encodeURIComponent(bugMessage)}`
+    
+    super(message)
+    this.message = message
     this.code = error.code
     this.parameter = error.parameter ? error.parameter : null
   }
@@ -49,7 +70,7 @@ export class BlockstackError extends Error {
 */
 export class FileNotFound extends BlockstackError {
   constructor(message: string) {
-    super({ message, code: 'file_not_found' })
+    super({ message, code: ERROR_CODES.FILE_NOT_FOUND })
     this.name = 'FileNotFound'
   }
 }
@@ -59,7 +80,7 @@ export class FileNotFound extends BlockstackError {
 */
 export class InvalidParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
-    super({ code: 'missing_parameter', message, parameter: '' })
+    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter: '' })
     this.name = 'MissingParametersError'
   }
 }
@@ -91,7 +112,7 @@ export class RemoteServiceError extends BlockstackError {
 */
 export class InvalidDIDError extends BlockstackError {
   constructor(message: string = '') {
-    super({ code: 'invalid_did_error', message })
+    super({ code: ERROR_CODES.INVALID_DID_ERROR, message })
     this.name = 'InvalidDIDError'
   }
 }
@@ -104,7 +125,7 @@ export class NotEnoughFundsError extends BlockstackError {
 
   constructor(leftToFund: number) {
     const message = `Not enough UTXOs to fund. Left to fund: ${leftToFund}`
-    super({ code: 'not_enough_error', message })
+    super({ code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message })
     this.leftToFund = leftToFund
     this.name = 'NotEnoughFundsError'
     this.message = message
@@ -123,7 +144,7 @@ export class InvalidAmountError extends BlockstackError {
   constructor(fees: number, specifiedAmount: number) {
     const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},`
           + ` specified spend is  ${specifiedAmount}`
-    super({ code: 'invalid_amount_error', message })
+    super({ code: ERROR_CODES.INVALID_AMOUNT_ERROR, message })
     this.specifiedAmount = specifiedAmount
     this.fees = fees
     this.name = 'InvalidAmountError'
@@ -137,7 +158,7 @@ export class InvalidAmountError extends BlockstackError {
 export class LoginFailedError extends BlockstackError {
   constructor(reason: string) {
     const message = `Failed to login: ${reason}`
-    super({ code: 'login_failed', message })
+    super({ code: ERROR_CODES.LOGIN_FAILED_ERROR, message })
     this.message = message
     this.name = 'LoginFailedError'
   }
@@ -149,7 +170,7 @@ export class LoginFailedError extends BlockstackError {
 export class SignatureVerificationError extends BlockstackError {
   constructor(reason: string) {
     const message = `Failed to verify signature: ${reason}`
-    super({ code: 'signature_verification_failure', message })
+    super({ code: ERROR_CODES.SIGNATURE_VERIFICATION_ERROR, message })
     this.message = message
     this.name = 'SignatureVerificationError'
   }
