@@ -1,6 +1,7 @@
 
 import * as cheerio from 'cheerio'
 import { Service } from './service'
+import { Proof } from './proof'
 
 class Instagram extends Service {
   static getBaseUrls() {
@@ -8,7 +9,7 @@ class Instagram extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof: any) {
+  static getProofUrl(proof: Proof) {
     const baseUrls = this.getBaseUrls()
     const normalizedProofUrl = this.normalizeUrl(proof)
 
@@ -20,7 +21,7 @@ class Instagram extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeUrl(proof: any) {
+  static normalizeUrl(proof: Proof) {
     let proofUrl = proof.proof_url
     proofUrl = super.prefixScheme(proofUrl)
 

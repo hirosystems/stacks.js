@@ -1,6 +1,7 @@
 
 import * as cheerio from 'cheerio'
 import { Service } from './service'
+import { Proof } from './proof'
 
 class Twitter extends Service {
   static getBaseUrls() {
@@ -12,7 +13,7 @@ class Twitter extends Service {
     return baseUrls
   }
 
-  static normalizeUrl(proof: any) {
+  static normalizeUrl(proof: Proof) {
     return ''
   }
 

@@ -2,12 +2,13 @@
 import 'cross-fetch/polyfill'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 import { fetchPrivate } from '../../fetchUtil'
+import { Proof } from './proof'
 
 /**
  * @ignore
  */
 export class Service {
-  static validateProof(proof: any,
+  static validateProof(proof: Proof,
                        ownerAddress: string,
                        name: string = null) {
     let proofUrl: string
@@ -67,7 +68,7 @@ export class Service {
     }
   }
 
-  static getProofUrl(proof: any): string {
+  static getProofUrl(proof: Proof): string {
     const baseUrls = this.getBaseUrls()
 
     let proofUrl = proof.proof_url.toLowerCase()

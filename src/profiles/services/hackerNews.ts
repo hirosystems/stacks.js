@@ -1,6 +1,7 @@
 
 import * as cheerio from 'cheerio'
 import { Service } from './service'
+import { Proof } from './proof'
 
 class HackerNews extends Service {
   static getBaseUrls() {
@@ -12,7 +13,7 @@ class HackerNews extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof: any) {
+  static getProofUrl(proof: Proof) {
     const baseUrls = this.getBaseUrls()
 
     const proofUrl = super.prefixScheme(proof.proof_url)
@@ -25,7 +26,7 @@ class HackerNews extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeUrl(proof: any) {
+  static normalizeUrl(proof: Proof) {
     return ''
   }
 

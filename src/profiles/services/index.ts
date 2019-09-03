@@ -5,12 +5,13 @@ import { Instagram } from './instagram'
 import { HackerNews } from './hackerNews'
 import { LinkedIn } from './linkedIn'
 import { Service } from './service'
+import { Proof } from './proof'
 
 interface ValidateProofService {
-  validateProof(proof: any, ownerAddress: string, name?: string): Promise<any>;
-  getProofUrl(proof: any): string;
+  validateProof(proof: Proof, ownerAddress: string, name?: string): Promise<any>;
+  getProofUrl(proof: Proof): string;
   getProofStatement(searchText: string): string;
-  normalizeUrl(proof: any): string;
+  normalizeUrl(proof: Proof): string;
   getProofIdentity(searchText: string): string;
 }
 

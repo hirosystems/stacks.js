@@ -1,5 +1,6 @@
 
 import { Service } from './service'
+import { Proof } from './proof'
 
 class Github extends Service {
   static getBaseUrls() {
@@ -7,11 +8,11 @@ class Github extends Service {
     return baseUrls
   }
 
-  static normalizeUrl(proof: any) {
+  static normalizeUrl(proof: Proof) {
     return ''
   }
 
-  static getProofUrl(proof: any) {
+  static getProofUrl(proof: Proof) {
     const baseUrls = this.getBaseUrls()
     let proofUrl = proof.proof_url.toLowerCase()
 
