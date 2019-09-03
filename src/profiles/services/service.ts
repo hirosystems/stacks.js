@@ -71,7 +71,7 @@ export class Service {
   static getProofUrl(proof: Proof): string {
     const baseUrls = this.getBaseUrls()
 
-    let proofUrl = proof.proof_url.toLowerCase()
+    let proofUrl = proof.proofUrl.toLowerCase()
     proofUrl = this.prefixScheme(proofUrl)
 
     for (let i = 0; i < baseUrls.length; i++) {
@@ -80,6 +80,6 @@ export class Service {
         return proofUrl
       }
     }
-    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+    throw new Error(`Proof url ${proof.proofUrl} is not valid for service ${proof.service}`)
   }
 }

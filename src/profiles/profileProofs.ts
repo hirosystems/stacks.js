@@ -40,7 +40,7 @@ export function validateProofs(profile: any,
 
     const proof = {
       service: account.service,
-      proof_url: account.proofUrl,
+      proofUrl: account.proofUrl,
       identifier: account.identifier,
       valid: false
     }

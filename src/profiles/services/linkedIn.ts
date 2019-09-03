@@ -16,7 +16,7 @@ class LinkedIn extends Service {
   static getProofUrl(proof: Proof) {
     const baseUrls = this.getBaseUrls()
 
-    let proofUrl = proof.proof_url.toLowerCase()
+    let proofUrl = proof.proofUrl.toLowerCase()
     proofUrl = super.prefixScheme(proofUrl)
 
     for (let i = 0; i < baseUrls.length; i++) {
@@ -24,7 +24,7 @@ class LinkedIn extends Service {
         return proofUrl
       }
     }
-    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+    throw new Error(`Proof url ${proof.proofUrl} is not valid for service ${proof.service}`)
   }
 
   static normalizeUrl(proof: Proof) {

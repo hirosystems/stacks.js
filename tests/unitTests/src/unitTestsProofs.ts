@@ -240,7 +240,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
-        proof_url: 'https://www.facebook.com/navalr/posts/10152190734077261',
+        proofUrl: 'https://www.facebook.com/navalr/posts/10152190734077261',
         identifier: 'navalr'
       }
     ),
@@ -249,7 +249,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
-        proof_url: 'https://facebook.com/navalr/posts/10152190734077261',
+        proofUrl: 'https://facebook.com/navalr/posts/10152190734077261',
         identifier: 'navalr'
       }
     ),
@@ -258,7 +258,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
-        proof_url: 'https://www.facebook.com/larrysalibra/posts/10100341028448093',
+        proofUrl: 'https://www.facebook.com/larrysalibra/posts/10100341028448093',
         identifier: 'larrysalibra'
       }
     ),
@@ -267,7 +267,7 @@ export function runProofServicesUnitTests() {
     t.notEqual(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
-        proof_url: 'https://www.facebook.com/larry.salibra/posts/10100341028448093',
+        proofUrl: 'https://www.facebook.com/larry.salibra/posts/10100341028448093',
         identifier: 'larry.salibra'
       }
     ),
@@ -276,7 +276,7 @@ export function runProofServicesUnitTests() {
     t.notEqual(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
-        proof_url: 'https://facebook.com/larry.salibra/posts/10100341028448093',
+        proofUrl: 'https://facebook.com/larry.salibra/posts/10100341028448093',
         identifier: 'larry.salibra'
       }
     ),
@@ -285,7 +285,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.facebook.normalizeUrl(
       {
         service: 'facebook',
-        proof_url: 'https://facebook.com/larrysalibra/posts/10100341028448093',
+        proofUrl: 'https://facebook.com/larrysalibra/posts/10100341028448093',
         identifier: 'larrysalibra'
       }
     ),
@@ -298,7 +298,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
-        proof_url: 'https://www.instagram.com/p/BZ7KMM0A-Qc/',
+        proofUrl: 'https://www.instagram.com/p/BZ7KMM0A-Qc/',
         identifier: 'blckstcktest'
       }
     ),
@@ -307,7 +307,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
-        proof_url: 'https://instagram.com/p/BZ7KMM0A-Qc/',
+        proofUrl: 'https://instagram.com/p/BZ7KMM0A-Qc/',
         identifier: 'blckstcktest'
       }
     ),
@@ -316,7 +316,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
-        proof_url: 'http://www.instagram.com/p/BZ7KMM0A-Qc/',
+        proofUrl: 'http://www.instagram.com/p/BZ7KMM0A-Qc/',
         identifier: 'blckstcktest'
       }
     ),
@@ -325,7 +325,7 @@ export function runProofServicesUnitTests() {
     t.equal(profileServices.instagram.normalizeUrl(
       {
         service: 'instagram',
-        proof_url: 'http://instagram.com/p/BZ7KMM0A-Qc/',
+        proofUrl: 'http://instagram.com/p/BZ7KMM0A-Qc/',
         identifier: 'blckstcktest'
       }
     ),
@@ -363,7 +363,7 @@ export function runProofServicesUnitTests() {
     t.throws(() => {
       const notNavalTwitter = Object.assign({},
                                             sampleProofs.naval[0], {
-                                              proof_url: 'https://twitter.com/not_naval/status/486609266212499456'
+                                              proofUrl: 'https://twitter.com/not_naval/status/486609266212499456'
                                             })
       profileServices.twitter.getProofUrl(notNavalTwitter)
     }, /Error/, 'Not having claimed account identifier in Twitter proof URL should throw exception')
@@ -371,7 +371,7 @@ export function runProofServicesUnitTests() {
     t.throws(() => {
       const notNavalGithub = Object.assign({},
                                            sampleProofs.naval[2], {
-                                             proof_url: 'https://gist.github.com/not_naval/f31a74054f859ec0ac6a'
+                                             proofUrl: 'https://gist.github.com/not_naval/f31a74054f859ec0ac6a'
                                            })
       profileServices.github.getProofUrl(notNavalGithub)
     }, /Error/, 'Not having claimed account identifier in Github proof URL should throw exception')
@@ -379,7 +379,7 @@ export function runProofServicesUnitTests() {
     t.throws(() => {
       const notKenHackerNews = Object.assign({},
                                              sampleProofs.ken[0], {
-                                               proof_url: 'https://news.ycombinator.com/user?id=notken'
+                                               proofUrl: 'https://news.ycombinator.com/user?id=notken'
                                              })
       profileServices.github.getProofUrl(notKenHackerNews)
     }, /Error/,

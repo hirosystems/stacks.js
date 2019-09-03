@@ -16,14 +16,14 @@ class HackerNews extends Service {
   static getProofUrl(proof: Proof) {
     const baseUrls = this.getBaseUrls()
 
-    const proofUrl = super.prefixScheme(proof.proof_url)
+    const proofUrl = super.prefixScheme(proof.proofUrl)
 
     for (let i = 0; i < baseUrls.length; i++) {
       if (proofUrl === `${baseUrls[i]}${proof.identifier}`) {
         return proofUrl
       }
     }
-    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+    throw new Error(`Proof url ${proof.proofUrl} is not valid for service ${proof.service}`)
   }
 
   static normalizeUrl(proof: Proof) {

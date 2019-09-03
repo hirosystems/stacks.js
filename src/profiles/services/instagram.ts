@@ -18,11 +18,11 @@ class Instagram extends Service {
         return normalizedProofUrl
       }
     }
-    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+    throw new Error(`Proof url ${proof.proofUrl} is not valid for service ${proof.service}`)
   }
 
   static normalizeUrl(proof: Proof) {
-    let proofUrl = proof.proof_url
+    let proofUrl = proof.proofUrl
     proofUrl = super.prefixScheme(proofUrl)
 
     if (proofUrl.startsWith('https://instagram.com')) {

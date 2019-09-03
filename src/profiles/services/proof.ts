@@ -1,5 +1,5 @@
 export interface Proof {
-  proof_url: string;
+  proofUrl: string;
   identifier: string;
   service: string;
   valid: boolean;

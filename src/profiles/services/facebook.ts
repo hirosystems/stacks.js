@@ -8,7 +8,7 @@ class Facebook extends Service {
   }
 
   static normalizeUrl(proof: Proof) {
-    let proofUrl = proof.proof_url.toLowerCase()
+    let proofUrl = proof.proofUrl.toLowerCase()
     const urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/
 
     proofUrl = super.prefixScheme(proofUrl)
@@ -24,7 +24,7 @@ class Facebook extends Service {
       const postId = tokens[1]
       proofUrl = `https://www.facebook.com/${proof.identifier}/posts/${postId}`
     } else {
-      throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+      throw new Error(`Proof url ${proof.proofUrl} is not valid for service ${proof.service}`)
     }
 
     return proofUrl

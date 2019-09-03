@@ -14,7 +14,7 @@ class Github extends Service {
 
   static getProofUrl(proof: Proof) {
     const baseUrls = this.getBaseUrls()
-    let proofUrl = proof.proof_url.toLowerCase()
+    let proofUrl = proof.proofUrl.toLowerCase()
 
     proofUrl = super.prefixScheme(proofUrl)
 
@@ -25,7 +25,7 @@ class Github extends Service {
         return `${proofUrl}${raw}`
       }
     }
-    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+    throw new Error(`Proof url ${proof.proofUrl} is not valid for service ${proof.service}`)
   }
 }
 
