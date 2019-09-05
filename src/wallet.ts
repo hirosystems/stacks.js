@@ -1,4 +1,4 @@
-import * as crypto from 'crypto'
+import { randomBytes, createHash } from 'crypto'
 import { ECPair, payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
 import { ecPairToHexString } from './utils'
@@ -125,7 +125,7 @@ export class BlockstackWallet {
    * @return {Promise<string>} space-separated 12 word phrase
    */
   static generateMnemonic() {
-    return bip39.generateMnemonic(128, crypto.randomBytes)
+    return bip39.generateMnemonic(128, randomBytes)
   }
 
   /**
@@ -177,7 +177,7 @@ export class BlockstackWallet {
   getIdentitySalt(): string {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
     const publicKeyHex = getNodePublicKey(identityPrivateKeychain)
-    return crypto.createHash('sha256').update(publicKeyHex).digest('hex')
+    return createHash('sha256').update(publicKeyHex).digest('hex')
   }
 
   /**
@@ -262,8 +262,7 @@ export class BlockstackWallet {
    */
   static getLegacyAppPrivateKey(appsNodeKey: string, 
                                 salt: string, appDomain: string): string {
-    const hash = crypto
-      .createHash('sha256')
+    const hash = createHash('sha256')
       .update(`${appDomain}${salt}`)
       .digest('hex')
     const appIndex = hashCode(hash)
@@ -287,8 +286,7 @@ export class BlockstackWallet {
    * character string
    */
   static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
-    const hash = crypto
-      .createHash('sha256')
+    const hash = createHash('sha256')
       .update(`${appDomain}${salt}`)
       .digest('hex')
     const appIndexHexes: string[] = []

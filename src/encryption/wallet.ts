@@ -1,4 +1,4 @@
-import * as crypto from 'crypto'
+import { randomBytes, pbkdf2Sync, createCipheriv, createHmac, createDecipheriv, createHash } from 'crypto'
 import * as bip39 from 'bip39'
 import * as triplesec from 'triplesec'
 
@@ -23,19 +23,19 @@ export function encryptMnemonic(phrase: string, password: string) {
     )
 
     // AES-128-CBC with SHA256 HMAC
-    const salt = crypto.randomBytes(16)
-    const keysAndIV = crypto.pbkdf2Sync(password, salt, 100000, 48, 'sha512')
+    const salt = randomBytes(16)
+    const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
     const encKey = keysAndIV.slice(0, 16)
     const macKey = keysAndIV.slice(16, 32)
     const iv = keysAndIV.slice(32, 48)
 
-    const cipher = crypto.createCipheriv('aes-128-cbc', encKey, iv)
+    const cipher = createCipheriv('aes-128-cbc', encKey, iv)
     let cipherText = cipher.update(plaintextNormalized).toString('hex')
     cipherText += cipher.final().toString('hex')
 
     const hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')])
 
-    const hmac = crypto.createHmac('sha256', macKey)
+    const hmac = createHmac('sha256', macKey)
     hmac.write(hmacPayload)
     const hmacDigest = hmac.digest()
 
@@ -57,27 +57,27 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
     const cipherText = dataBuffer.slice(48)
     const hmacPayload = Buffer.concat([salt, cipherText])
 
-    const keysAndIV = crypto.pbkdf2Sync(password, salt, 100000, 48, 'sha512')
+    const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
     const encKey = keysAndIV.slice(0, 16)
     const macKey = keysAndIV.slice(16, 32)
     const iv = keysAndIV.slice(32, 48)
 
-    const decipher = crypto.createDecipheriv('aes-128-cbc', encKey, iv)
+    const decipher = createDecipheriv('aes-128-cbc', encKey, iv)
     let plaintext = decipher.update(cipherText).toString('hex')
     plaintext += decipher.final().toString('hex')
 
-    const hmac = crypto.createHmac('sha256', macKey)
+    const hmac = createHmac('sha256', macKey)
     hmac.write(hmacPayload)
     const hmacDigest = hmac.digest()
 
     // hash both hmacSig and hmacDigest so string comparison time
     // is uncorrelated to the ciphertext
-    const hmacSigHash = crypto.createHash('sha256')
+    const hmacSigHash = createHash('sha256')
       .update(hmacSig)
       .digest()
       .toString('hex')
 
-    const hmacDigestHash = crypto.createHash('sha256')
+    const hmacDigestHash = createHash('sha256')
       .update(hmacDigest)
       .digest()
       .toString('hex')

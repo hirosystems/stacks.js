@@ -1,8 +1,8 @@
-import { TxOutput, address as bjsAddress, networks, crypto as bjsCrypto, Transaction, payments, Network } from 'bitcoinjs-lib'
+import { TxOutput, address as bjsAddress, networks, Transaction, payments, Network } from 'bitcoinjs-lib'
+import { createHash } from 'crypto'
 import * as FormData from 'form-data'
 // @ts-ignore
 import * as BN from 'bn.js'
-import * as RIPEMD160 from 'ripemd160'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 import { config } from './config'
@@ -400,8 +400,8 @@ export class BlockstackNetwork {
         if (resp.status === 200) {
           return resp.text()
             .then((body) => {
-              const sha256 = bjsCrypto.sha256(Buffer.from(body))
-              const h = (new RIPEMD160()).update(sha256).digest('hex')
+              const sha256 = createHash('sha256').update(Buffer.from(body)).digest()
+              const h = createHash('rmd160').update(sha256).digest('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)
               }

@@ -1,6 +1,6 @@
 
-import { Transaction, script, crypto as bjsCrypto, ECPair } from 'bitcoinjs-lib'
-import * as crypto from 'crypto'
+import { Transaction, script, ECPair } from 'bitcoinjs-lib'
+import { randomBytes, createHash } from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
@@ -120,7 +120,7 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = bjsCrypto.sha256(Buffer.from(challengeText))
+    const digest = createHash('sha256').update(Buffer.from(challengeText)).digest()
 
     const signatureBuffer = signer.sign(digest)
     const signatureWithHash = script.signature.encode(
@@ -162,7 +162,7 @@ function makeV1GaiaAuthToken(hubInfo: any,
     return makeLegacyAuthToken(challengeText, signerKeyHex)
   }
 
-  const salt = crypto.randomBytes(16).toString('hex')
+  const salt = randomBytes(16).toString('hex')
   const payload = {
     gaiaChallenge: challengeText,
     hubUrl,

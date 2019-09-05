@@ -2,7 +2,7 @@
 import { ec as EllipticCurve } from 'elliptic'
 // @ts-ignore
 import * as BN from 'bn.js'
-import * as crypto from 'crypto'
+import { createCipheriv, createDecipheriv, createHmac, createHash, randomBytes } from 'crypto'
 import { getPublicKeyFromPrivate } from '../keys'
 
 const ecurve = new EllipticCurve('secp256k1')
@@ -22,7 +22,7 @@ export type CipherObject = {
 * @ignore
 */
 function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer) {
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
+  const cipher = createCipheriv('aes-256-cbc', key, iv)
   return Buffer.concat([cipher.update(plaintext), cipher.final()])
 }
 
@@ -30,7 +30,7 @@ function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer) {
 * @ignore
 */
 function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
-  const cipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
+  const cipher = createDecipheriv('aes-256-cbc', key, iv)
   return Buffer.concat([cipher.update(ciphertext), cipher.final()])
 }
 
@@ -38,7 +38,7 @@ function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
 * @ignore
 */
 function hmacSha256(key: Buffer, content: Buffer) {
-  return crypto.createHmac('sha256', key).update(content).digest()
+  return createHmac('sha256', key).update(content).digest()
 }
 
 /**
@@ -60,7 +60,7 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 */
 function sharedSecretToKeys(sharedSecret: Buffer) {
   // generate mac and encryption key from shared secret
-  const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
+  const hashedSecret = createHash('sha512').update(sharedSecret).digest()
   return {
     encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32)
@@ -113,7 +113,7 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
     Buffer.from(sharedSecretHex, 'hex')
   )
 
-  const initializationVector = crypto.randomBytes(16)
+  const initializationVector = randomBytes(16)
 
   const cipherText = aes256CbcEncrypt(
     initializationVector, sharedKeys.encryptionKey, plainText
@@ -192,7 +192,7 @@ export function signECDSA(privateKey: string, content: string | Buffer): {
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
-  const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()
+  const contentHash = createHash('sha256').update(contentBuffer).digest()
   const signature = ecPrivate.sign(contentHash)
   const signatureString = signature.toDER('hex')
 
@@ -225,7 +225,7 @@ export function verifyECDSA(content: string | ArrayBuffer | Buffer,
                             signature: string) {
   const contentBuffer = getBuffer(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
-  const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()
+  const contentHash = createHash('sha256').update(contentBuffer).digest()
 
   return ecPublic.verify(contentHash, <any>signature)
 }

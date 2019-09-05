@@ -1,6 +1,6 @@
 
-import { randomBytes, randomFillSync } from 'crypto'
-import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
+import { randomBytes, randomFillSync, createHash } from 'crypto'
+import { ECPair, address as baddress } from 'bitcoinjs-lib'
 
 /**
  * 
@@ -32,7 +32,9 @@ export function makeECPrivateKey() {
 */
 export function publicKeyToAddress(publicKey: string) {
   const publicKeyBuffer = Buffer.from(publicKey, 'hex')
-  const publicKeyHash160 = bcrypto.hash160(publicKeyBuffer)
+  const publicKeyHash160 = createHash('rmd160').update(
+    createHash('sha256').update(publicKeyBuffer).digest()
+  ).digest() 
   const address = baddress.toBase58Check(publicKeyHash160, 0x00)
   return address
 }

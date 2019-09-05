@@ -1,7 +1,7 @@
 
 
-import { TransactionBuilder, Transaction, TxOutput, crypto as bjsCrypto } from 'bitcoinjs-lib'
-import * as RIPEMD160 from 'ripemd160'
+import { TransactionBuilder, Transaction, TxOutput } from 'bitcoinjs-lib'
+import { createHash } from 'crypto'
 // @ts-ignore
 import * as BN from 'bn.js'
 import { NotEnoughFundsError } from '../errors'
@@ -20,8 +20,8 @@ export const DUST_MINIMUM = 5500
  * @ignore
  */
 export function hash160(buff: Buffer) {
-  const sha256 = bjsCrypto.sha256(buff)
-  return (new RIPEMD160()).update(sha256).digest()
+  const sha256 = createHash('sha256').update(buff).digest()
+  return createHash('rmd160').update(sha256).digest()
 }
 
 /**
@@ -29,7 +29,7 @@ export function hash160(buff: Buffer) {
  * @ignore
  */
 export function hash128(buff: Buffer) {
-  return Buffer.from(bjsCrypto.sha256(buff).slice(0, 16))
+  return Buffer.from(createHash('sha256').update(buff).digest().slice(0, 16))
 }
 
 

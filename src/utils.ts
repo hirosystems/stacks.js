@@ -1,6 +1,6 @@
-
+import { createHash } from 'crypto'
 import * as url from 'url'
-import { ECPair, address, crypto } from 'bitcoinjs-lib'
+import { ECPair, address } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
 
@@ -140,7 +140,9 @@ export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
  * @ignore
  */
 export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
+  const sha256 = createHash('sha256').update(keyPair.publicKey).digest()
+  const hash160 = createHash('rmd160').update(sha256).digest()
+  return address.toBase58Check(hash160, keyPair.network.pubKeyHash)
 }
 
 /**
