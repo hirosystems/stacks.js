@@ -254,7 +254,7 @@ interface GetGlobalObjectOptions {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObject<K extends keyof Window>(
+export function getGlobalObject<K extends Extract<keyof Window, string>>(
   name: K, 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
 ): Window[K] {
@@ -276,7 +276,7 @@ export function getGlobalObject<K extends keyof Window>(
     throw new Error(errMsg)
   }
   if (returnEmptyObject) { 
-    return {}
+    return {} as any
   }
   return undefined
 }
@@ -289,7 +289,7 @@ export function getGlobalObject<K extends keyof Window>(
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObjects<K extends keyof Window>(
+export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   names: K[], 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
 ): Pick<Window, K> {
@@ -320,7 +320,7 @@ export function getGlobalObjects<K extends keyof Window>(
           Logger.error(errMsg)
           throw new Error(errMsg)
         } else if (returnEmptyObject) {
-          result[name] = {}
+          result[name] = {} as any
         }
       }
     } catch (error) {

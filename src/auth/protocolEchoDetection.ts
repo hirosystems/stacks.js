@@ -22,7 +22,7 @@ const AUTH_CONTINUATION_PARAM = 'authContinuation'
  */
 export function protocolEchoReplyDetection(): boolean {
   // Check that the `window` APIs exist
-  let globalScope: Window
+  let globalScope: Window & { URLSearchParams: typeof URLSearchParams }
   if (typeof self !== 'undefined') {
     globalScope = self
   } else if (typeof window !== 'undefined') {
@@ -31,7 +31,7 @@ export function protocolEchoReplyDetection(): boolean {
     // Exit detection function - we are not running in a browser environment.
     return false
   }
-
+  
   if (!globalScope.location || !globalScope.localStorage || !globalScope.URLSearchParams) {
     // Exit detection function - we are not running in a browser environment.
     return false

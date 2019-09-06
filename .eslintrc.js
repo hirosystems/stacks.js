@@ -1,7 +1,13 @@
 module.exports = {
   "extends": [
+    "eslint:recommended",
     "airbnb-base",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -13,7 +19,7 @@ module.exports = {
   ],
   "settings": {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts"]
+      "@typescript-eslint/parser": [ ".ts" ]
     },
     "import/resolver": { "typescript": {} }
   },
@@ -24,14 +30,12 @@ module.exports = {
   "rules": {
     "no-tabs": 0,
     "no-restricted-globals": 0,
-    "import/prefer-default-export": 0,
     "no-buffer-constructor": 0,
     "no-mixed-operators": 0,
     "no-plusplus": 0,
     "no-bitwise": 0,
     "prefer-promise-reject-errors": 0,
     "class-methods-use-this": 0,
-    "import/no-cycle": 0,
     "prefer-destructuring": 0,
     "no-prototype-builtins": 0,
     "comma-dangle": ["error", "never"],
@@ -55,11 +59,14 @@ module.exports = {
     "object-curly-newline": "off",    
     "arrow-parens": "off",
     "function-paren-newline": 0,
+    "max-classes-per-file": "off",
+    "prefer-object-spread": "off",
+    "no-multiple-empty-lines": "off",
     "no-shadow": "off",
     "no-use-before-define": "off",
-    "@typescript-eslint/indent": [2, 2, {
-      "FunctionDeclaration": { "parameters": "first" },
-      "FunctionExpression": { "parameters": "first" },
+    "indent": [2, 2, {
+      "FunctionDeclaration" : { "parameters": "first" },
+      "FunctionExpression" : { "parameters": "first" },
       "ObjectExpression": "first",
       "ArrayExpression": "first",
       "ImportDeclaration": "first",
@@ -74,15 +81,26 @@ module.exports = {
     "@typescript-eslint/no-angle-bracket-type-assertion": "off",
     "@typescript-eslint/prefer-interface": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/consistent-type-assertions": "off",
+    "@typescript-eslint/prefer-regexp-exec": "off",
 
-    // TODO: enable this when reasonable
+    // TODO: enable these when reasonable
     "@typescript-eslint/no-explicit-any": "off",
-
-    // TODO: enable this when reasonable
     "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/prefer-includes": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/prefer-string-starts-ends-with": "off",
+    // ---
 
-    // TODO: enable when this is fixed https://github.com/benmosher/eslint-plugin-import/issues/1282
-    "import/named": "off"
+    "import/no-unresolved": "error",
+    "import/named": "error",
+
+    // TODO: enable these when reasonable -- these can help module dependencies be easier to bundle w/ tree-shaking.
+    "import/no-cycle": "off",
+    "import/prefer-default-export": "off",
+    // ---
+
   }
 }
