@@ -765,7 +765,13 @@ export async function getCollectionItem<CollectionType extends Collection>(
     gaiaHubConfig: hubConfig
   }
   return this.getFile(normalizedIdentifier, opt, caller)
-    .then((fileContent) => collection.fromData(fileContent))
+    .then((fileContent) => {
+      if (fileContent) {
+        return collection.fromData(fileContent)
+      } else {
+        throw new Error('Collection item not found')
+      }
+    })
 }
 
 export async function listCollection<CollectionType extends Collection>(
