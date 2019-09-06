@@ -1,4 +1,4 @@
-
+// eslint-disable-next-line import/no-unassigned-import
 import 'cross-fetch/polyfill'
 
 // @ts-ignore: Could not find a declaration file for module

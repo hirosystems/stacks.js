@@ -11,7 +11,8 @@ module.exports = {
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": __dirname
   },
   "plugins": [
     "import",
@@ -85,22 +86,35 @@ module.exports = {
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/consistent-type-assertions": "off",
     "@typescript-eslint/prefer-regexp-exec": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/require-await": "error",
+    "@typescript-eslint/await-thenable": "error",
 
     // TODO: enable these when reasonable
-    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/promise-function-async": "off",
     "@typescript-eslint/prefer-includes": "off",
-    "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/prefer-string-starts-ends-with": "off",
     // ---
 
+
     "import/no-unresolved": "error",
     "import/named": "error",
+    "import/prefer-default-export": "off",
 
     // TODO: enable these when reasonable -- these can help module dependencies be easier to bundle w/ tree-shaking.
     "import/no-cycle": "off",
-    "import/prefer-default-export": "off",
     // ---
 
+    "import/no-self-import": "error",
+    "import/no-useless-path-segments": ["error", { noUselessIndex: true }],
+    "import/no-unused-modules": ["error", { "missingExports": true }],
+    "import/export": "error",
+    "import/no-extraneous-dependencies": "error",
+    "import/no-duplicates": "error",
+    "import/no-unassigned-import": "error",
+    "import/order": "error",
   }
 }

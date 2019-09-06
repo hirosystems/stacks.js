@@ -1,5 +1,3 @@
-
-import 'cross-fetch/polyfill'
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 import { fetchPrivate } from '../../fetchUtil'
 

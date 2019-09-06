@@ -7,7 +7,7 @@ class Github extends Service {
     return baseUrls
   }
 
-  static normalizeUrl(proof: any) {
+  static normalizeUrl(_proof: any) {
     return ''
   }
 

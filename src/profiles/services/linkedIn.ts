@@ -26,7 +26,7 @@ class LinkedIn extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeUrl(proof: any) {
+  static normalizeUrl(_proof: any) {
     return ''
   }
 

@@ -278,7 +278,7 @@ export class BlockstackNetwork {
    * @param {string} fullyQualifiedName unused
    * @return {Promise} a promise to the number of blocks
    */
-  getGracePeriod(fullyQualifiedName?: string) {
+  getGracePeriod(_fullyQualifiedName?: string) {
     return Promise.resolve(5000)
   }
 
