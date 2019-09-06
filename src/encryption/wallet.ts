@@ -1,6 +1,11 @@
 import { randomBytes, pbkdf2Sync, createCipheriv, createHmac, createDecipheriv, createHash } from 'crypto'
 import * as bip39 from 'bip39'
-import * as triplesec from 'triplesec'
+
+// TODO: triplesec minified JS 186KB.
+//       Tt is only used for legacy mnemonic decryption, and appears to unused by regular apps.
+//       The authenticator and other app that needs it should import the triplesec dependency
+//       themselves and pass the decrypt function to blockstack.js. 
+import { decrypt as triplesecDecrypt } from 'triplesec'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
@@ -107,7 +112,7 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
  */
 function decryptLegacy(dataBuffer: Buffer, password: string) {
   return new Promise<Buffer>((resolve, reject) => {
-    triplesec.decrypt(
+    triplesecDecrypt(
       {
         key: Buffer.from(password),
         data: dataBuffer
