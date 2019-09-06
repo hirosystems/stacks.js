@@ -1,4 +1,6 @@
 
+// TODO: elliptic is only used here for secp256k1 opts. This can be replaced with a faster,
+//       slimmer lib. 
 import { ec as EllipticCurve } from 'elliptic'
 // @ts-ignore
 import * as BN from 'bn.js'

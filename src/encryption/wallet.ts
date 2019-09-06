@@ -1,5 +1,5 @@
 import { randomBytes, pbkdf2Sync, createCipheriv, createHmac, createDecipheriv, createHash } from 'crypto'
-import * as bip39 from 'bip39'
+import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
 
 // TODO: triplesec minified JS 186KB.
 //       Tt is only used for legacy mnemonic decryption, and appears to unused by regular apps.
@@ -18,13 +18,13 @@ import { decrypt as triplesecDecrypt } from 'triplesec'
 export function encryptMnemonic(phrase: string, password: string) {
   return Promise.resolve().then(() => {
     // must be bip39 mnemonic
-    if (!bip39.validateMnemonic(phrase)) {
+    if (!validateMnemonic(phrase)) {
       throw new Error('Not a valid bip39 nmemonic')
     }
 
     // normalize plaintext to fixed length byte string
     const plaintextNormalized = Buffer.from(
-      bip39.mnemonicToEntropy(phrase), 'hex'
+      mnemonicToEntropy(phrase), 'hex'
     )
 
     // AES-128-CBC with SHA256 HMAC
@@ -92,8 +92,8 @@ function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
       throw new PasswordError('Wrong password (HMAC mismatch)')
     }
 
-    const mnemonic = bip39.entropyToMnemonic(plaintext)
-    if (!bip39.validateMnemonic(mnemonic)) {
+    const mnemonic = entropyToMnemonic(plaintext)
+    if (!validateMnemonic(mnemonic)) {
       throw new PasswordError('Wrong password (invalid plaintext)')
     }
 

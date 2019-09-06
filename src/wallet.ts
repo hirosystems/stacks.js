@@ -1,6 +1,6 @@
 import { randomBytes, createHash } from 'crypto'
 import { ECPair, payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
-import * as bip39 from 'bip39'
+import { mnemonicToSeed, generateMnemonic } from 'bip39'
 import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 
@@ -109,7 +109,7 @@ export class BlockstackWallet {
   static async fromEncryptedMnemonic(data: string, password: string) {
     try {
       const mnemonic = await decryptMnemonic(data, password)
-      const seed = await bip39.mnemonicToSeed(mnemonic)
+      const seed = await mnemonicToSeed(mnemonic)
       return new BlockstackWallet(bip32.fromSeed(seed))
     } catch (err) {
       if (err.message && err.message.startsWith('bad header;')) {
@@ -125,7 +125,7 @@ export class BlockstackWallet {
    * @return {Promise<string>} space-separated 12 word phrase
    */
   static generateMnemonic() {
-    return bip39.generateMnemonic(128, randomBytes)
+    return generateMnemonic(128, randomBytes)
   }
 
   /**
