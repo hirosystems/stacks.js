@@ -24,7 +24,6 @@ import {
   GAIA_HUB_COLLECTION_KEY_FILE_NAME 
 } from '../storage/hub'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
-import { Collection } from 'blockstack-collection-schemas'
 
 /**
  * 
@@ -348,57 +347,6 @@ export class UserSession {
    */
   public deleteFile(path: string, options?: { wasSigned?: boolean }) {
     return storage.deleteFile(path, options, this)
-  }
-
-  /**
-   * Stores the collection object provided in the specified collection data store.
-   * @param {Collection} item - The collection object to store
-   * 
-   * @returns {Promise} that resolves if the operation succeed and rejects
-   * if it failed
-   */
-  putCollectionItem(item: Collection) {
-    return storage.putCollectionItem(item, this)
-  }
-
-  /**
-   * Retrieves the specified collection object from the collection data store
-   * 
-   * @param {Collection} collection - The collection class to retrieve from
-   * @param {String} identifier - The identifier for the collection object to retrieve
-   * 
-   * @returns {Promise} that resolves to the raw data in the file
-   * or rejects with an error
-   */
-  getCollectionItem<T extends Collection>(
-    collection: { new(attrs): T, collectionName, fromData },
-    identifier: string
-  ) {
-    return storage.getCollectionItem(collection, identifier, this)
-  }
-
-  /**
-   * List the set of files in a collection
-   * 
-   * @param {Collection} collection - The collection class to list files for
-   * @param {function} callback - a callback to invoke on each named file that
-   * returns `true` to continue the listing operation or `false` to end it
-   * 
-   * @returns {Promise} that resolves to the number of files listed
-   */
-  listCollection(
-    collection: { collectionName },
-    callback: (name: string) => boolean): Promise<number> {
-    return storage.listCollection(collection, callback, this)
-  }
-
-  /**
-   * Deletes the specified file from the collection. 
-   * @param item - The collection object to delete.
-   * @returns Resolves when the file has been removed or rejects with an error.
-   */
-  public deleteCollectionItem(item: Collection) {
-    return storage.deleteCollectionItem(item, this)
   }
 
   /**

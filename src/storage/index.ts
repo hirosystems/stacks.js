@@ -6,7 +6,6 @@ import {
   GaiaHubConfig,
   deleteFromGaiaHub,
   GAIA_HUB_COLLECTION_KEY_FILE_NAME,
-  COLLECTION_GAIA_PREFIX
 } from './hub'
 
 import {
@@ -21,7 +20,6 @@ import {
 import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
-import { Collection } from 'blockstack-collection-schemas'
 import { getGlobalObject } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
@@ -656,7 +654,7 @@ export function getAppBucketUrl(gaiaHubUrl: string, appPrivateKey: string) {
  * @private
  * @ignore
  */
-async function listFilesLoop(
+export async function listFilesLoop(
   caller: UserSession,
   hubConfig: GaiaHubConfig | null,
   page: string | null,
@@ -742,69 +740,6 @@ export function listFiles(
 ): Promise<number> {
   caller = caller || new UserSession()
   return listFilesLoop(caller, null, null, 0, 0, callback)
-}
-
-export async function putCollectionItem(item: Collection, caller: UserSession) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionName())
-  let file = item.serialize()
-  let normalizedIdentifier = COLLECTION_GAIA_PREFIX + '/' + item.attrs.identifier
-  let opt = {
-    gaiaHubConfig: hubConfig
-  }
-  return this.putFile(normalizedIdentifier, file, opt, caller)
-}
-
-export async function getCollectionItem<CollectionType extends Collection>(
-  collection: { new(attrs): CollectionType, collectionName, fromData },
-  identifier: string, 
-  caller: UserSession
-) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(collection.collectionName)
-  let normalizedIdentifier = COLLECTION_GAIA_PREFIX + '/' + identifier
-  let opt = {
-    gaiaHubConfig: hubConfig
-  }
-  return this.getFile(normalizedIdentifier, opt, caller)
-    .then((fileContent) => {
-      if (fileContent) {
-        return collection.fromData(fileContent)
-      } else {
-        throw new Error('Collection item not found')
-      }
-    })
-}
-
-export async function listCollection<CollectionType extends Collection>(
-  collection: CollectionType,
-  callback: (name: string) => boolean,
-  caller?: UserSession,
-) {
-  caller = caller || new UserSession()
-  let hubConfig = await caller.getCollectionGaiaHubConnection(collection.collectionName)
-
-  return listFilesLoop(caller, hubConfig, null, 0, 0, (name) => {
-    let collectionGaiaPathPrefix = COLLECTION_GAIA_PREFIX + '/'
-    if (name.startsWith(collectionGaiaPathPrefix)) {
-      // Remove collection/ prefix from file names
-      let identifier = name.substr(collectionGaiaPathPrefix.length)
-      return callback(identifier)
-    } else {
-      // Skip non-collection prefix files
-      return true
-    }
-  })
-}
-
-export async function deleteCollectionItem<CollectionType extends Collection>(
-  item: CollectionType,
-  caller: UserSession
-) {
-  let hubConfig = await caller.getCollectionGaiaHubConnection(item.collectionName())
-  let opt = {
-    gaiaHubConfig: hubConfig
-  }
-  const normalizedIdentifier = COLLECTION_GAIA_PREFIX + '/' + item.attrs.identifier
-  return this.deleteFile(normalizedIdentifier, opt, caller)
 }
 
 export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GAIA_HUB_COLLECTION_KEY_FILE_NAME }
