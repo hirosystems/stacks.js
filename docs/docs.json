@@ -1,6 +1,6 @@
 {
 	"id": 0,
-	"name": "blockstack.js 19.3.0-beta.1 Library Reference",
+	"name": "blockstack.js 19.4.0-beta.1 Library Reference",
 	"kind": 0,
 	"flags": {},
 	"children": [
@@ -2704,7 +2704,7 @@
 					"sources": [
 						{
 							"fileName": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
-							"line": 964,
+							"line": 974,
 							"character": 11
 						}
 					],
@@ -2726,7 +2726,7 @@
 					"sources": [
 						{
 							"fileName": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
-							"line": 963,
+							"line": 973,
 							"character": 8
 						}
 					],
@@ -2750,7 +2750,7 @@
 					"sources": [
 						{
 							"fileName": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
-							"line": 965,
+							"line": 975,
 							"character": 9
 						}
 					],
@@ -2778,8 +2778,8 @@
 					"sources": [
 						{
 							"fileName": "/Users/Yukan/Desktop/work/blockstack/blockstack.js/node_modules/typedoc/node_modules/typescript/lib/lib.es5.d.ts",
-							"line": 974,
-							"character": 19
+							"line": 984,
+							"character": 17
 						}
 					],
 					"type": {
