@@ -25,6 +25,11 @@ export interface GaiaHubConfig {
   server: string
 }
 
+
+function getUtf8StringByteLength(input: string): string {
+  return Buffer.byteLength(input, 'utf8').toString()
+}
+
 /**
  * 
  * @param filename 
@@ -38,16 +43,42 @@ export async function uploadToGaiaHub(
   filename: string, 
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
-  contentType: string = 'application/octet-stream'
+  contentType?: string,
 ): Promise<string> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
+  const postHeaders: HeadersInit = {
+    'Content-Type': contentType || 'application/octet-stream',
+    Authorization: `bearer ${hubConfig.token}`
+  }
+
+  if (typeof contents === 'string') {
+    if (contentType === 'application/json') {
+      // According to https://www.ietf.org/rfc/rfc4627.txt :
+      // "JSON text SHALL be encoded in Unicode. The default encoding is UTF-8."
+      // For more details see discussion at https://stackoverflow.com/q/9254891/794962
+      postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
+    } else if (!contentType) {
+      // If content is a string and contentType is not specified, then specify UTF8
+      // otherwise string parsers (web servers and browsers) have undefined behavior.
+      postHeaders['Content-Type'] = 'text/plain; charset=UTF-8'
+      postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
+    } else if (contentType.toLowerCase().includes('charset=utf-8')) {
+      // If contentType is some other text format, but specified utf-8 charset,
+      // then the content-length is known. 
+      postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
+    }
+  } else if (ArrayBuffer.isView(contents)) {
+    postHeaders['Content-Length'] = contents.byteLength.toString()
+  } else if (typeof Blob !== 'undefined' && contents instanceof Blob) {
+    if (contents.size) { 
+      postHeaders['Content-Length'] = contents.size.toString()
+    }
+  }
+
   const response = await fetchPrivate(
     `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: `bearer ${hubConfig.token}`
-      },
+      headers: postHeaders,
       body: contents
     }
   )
