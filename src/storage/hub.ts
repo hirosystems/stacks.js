@@ -39,27 +39,30 @@ function determineStringContentHeaders(
   contents: string, 
   contentType: string | undefined, 
   postHeaders: Record<string, string>) {
+  const contentLengthHeader = 'Content-Length'
+  const contentTypeHeader = 'Content-Type'
+  
   if (contentType === 'application/json') {
     // According to https://www.ietf.org/rfc/rfc4627.txt :
     // "JSON text SHALL be encoded in Unicode. The default encoding is UTF-8."
     // For more details see discussion at https://stackoverflow.com/q/9254891/794962
-    postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
+    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
   } else if (!contentType) {
     // If content is a string and contentType is not specified, then specify UTF8
     // otherwise string parsers (web servers and browsers) have undefined behavior.
-    postHeaders['Content-Type'] = 'text/plain; charset=utf-8'
-    postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
-  } else if (contentType.toLowerCase().includes('charset=utf-8')) {
+    postHeaders[contentTypeHeader] = 'text/plain; charset=utf-8'
+    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
+  } else if (contentType.toLowerCase().trim().includes('charset=utf-8')) {
     // If contentType is some other format, but specified utf-8 charset,
     // then the content-length is known. 
-    postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
-  } else if (contentType.toLowerCase() === 'text/html') {
+    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
+  } else if (contentType.toLowerCase().trim() === 'text/html') {
     // Another common contentType that is commonly not specified with the
     // recommended charset encoding, resulting in undefined behavior in different
     // browsers during unicode and localization related scenarios.
     // See https://www.w3.org/International/articles/http-charset/index
-    postHeaders['Content-Type'] = 'text/html; charset=utf-8'
-    postHeaders['Content-Length'] = getUtf8StringByteLength(contents)
+    postHeaders[contentTypeHeader] = 'text/html; charset=utf-8'
+    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
   } else {
     // TODO: should probably console.warn here about likely incorrect usage
     // of string content type, and that content-length cannot be determined. 
