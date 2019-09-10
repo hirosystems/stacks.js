@@ -22,7 +22,7 @@ import { Logger } from '../logger'
 import { UserSession } from '../auth/userSession'
 import { getGlobalObject } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
-import { getResponseDetails } from '../utils'
+import { getResponseDescription } from '../utils'
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -247,7 +247,9 @@ function getFileContents(path: string, app: string, username: string | undefined
           Logger.debug(`getFile ${path} returned 404, returning null`)
           return null
         } else {
-          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
+          getResponseDescription(response).then(responseDescription => {
+            throw new Error(`getFile ${path} failed. ${responseDescription}`)
+          })
         }
       }
       const contentType = response.headers.get('Content-Type')
@@ -538,18 +540,13 @@ export async function putFile(
       ])
       return fileUrls[0]
     } catch (error) {
-      try {
-        const freshHubConfig = await caller.setLocalGaiaHubConnection()
-        const fileUrls = await Promise.all([
-          uploadToGaiaHub(path, content, freshHubConfig, contentType),
-          uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                          signatureContent, freshHubConfig, 'application/json')
-        ])  
-        return fileUrls[0]
-      } catch (err) {
-        throw err
-        // TODO: Return HTTP error
-      }
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      const fileUrls = await Promise.all([
+        uploadToGaiaHub(path, content, freshHubConfig, contentType),
+        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                        signatureContent, freshHubConfig, 'application/json')
+      ])
+      return fileUrls[0]
     }
   }
 
@@ -671,8 +668,8 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      let responseDetails = await getResponseDetails(response)
-      throw new Error(`listFiles failed: ${responseDetails}`)
+      let responseDescription = await getResponseDescription(response)
+      throw new Error(`listFiles failed; ${responseDescription}`)
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.

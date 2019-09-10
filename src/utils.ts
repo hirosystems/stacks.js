@@ -332,14 +332,18 @@ export function getGlobalObjects<K extends keyof Window>(
   return result
 }
 
-export async function getResponseDetails(response: Response): Promise<String> {
+/**
+ * Returns a promise that resolves to a description of a given HTTP response.
+ * The details are in the format "{status code} {status text}: {response text}".
+ */
+export async function getResponseDescription(response: Response): Promise<String> {
   let responseMsg = ''
   try {
     responseMsg = await response.text()
   } catch (error) {
     Logger.debug(`Error getting bad http response text: ${error}`)
   }
-  const errorDetails = `${response.status} ${response.statusText}: ${responseMsg}`
-  Logger.error(errorDetails)
-  return errorDetails
+  const description = `Status: ${response.status}, ${response.statusText}. ${responseMsg}`
+  Logger.error(description)
+  return description
 }
