@@ -51,8 +51,7 @@ export class BlockstackError extends Error {
       bugMessage += `\nStack Trace:\n${stack}`
     }
     message += '\nIf you believe this exception is caused by a bug in blockstack.js'
-      + ', please file a bug report: https://community.blockstack.org/bugs?'
-      + `9ndd2=Bug&4ud0i=${encodeURIComponent(bugMessage)}`
+      + ', please file a bug report: https://github.com/blockstack/blockstack.js/issues'
     
     super(message)
     this.message = message
