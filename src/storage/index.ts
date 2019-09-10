@@ -5,7 +5,7 @@ import {
   connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
   GaiaHubConfig,
   deleteFromGaiaHub,
-  GAIA_HUB_COLLECTION_KEY_FILE_NAME,
+  GAIA_HUB_COLLECTION_KEY_FILE_NAME
 } from './hub'
 
 import {
@@ -218,7 +218,8 @@ export async function getFileUrl(
   if (opts.username) {
     readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    const gaiaHubConfig = options.gaiaHubConfig || await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = options.gaiaHubConfig 
+      || await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
     readUrl = await getFullReadUrl(path, gaiaHubConfig)
   }
 
@@ -459,7 +460,7 @@ export function getFile(
   }
 
   return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, 
-                        !!opt.decrypt, opt.gaiaHubConfig, caller)
+                         !!opt.decrypt, opt.gaiaHubConfig, caller)
     .then<string|ArrayBuffer|Buffer>((storedContents) => {
       if (storedContents === null) {
         return storedContents
@@ -581,7 +582,7 @@ export async function putFile(
   try {
     return await uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
   } catch (error) {
-    if(!opt.gaiaHubConfig) {
+    if (!opt.gaiaHubConfig) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
       return file
@@ -742,4 +743,9 @@ export function listFiles(
   return listFilesLoop(caller, null, null, 0, 0, callback)
 }
 
-export { connectToGaiaHub, uploadToGaiaHub, BLOCKSTACK_GAIA_HUB_LABEL, GAIA_HUB_COLLECTION_KEY_FILE_NAME }
+export { 
+  connectToGaiaHub, 
+  uploadToGaiaHub, 
+  BLOCKSTACK_GAIA_HUB_LABEL, 
+  GAIA_HUB_COLLECTION_KEY_FILE_NAME 
+}

@@ -428,7 +428,7 @@ export class UserSession {
             server: collectionHubConfig.server
           }
 
-          var newHubConfigs = sessionData.userData.collectionGaiaHubConfigs
+          let newHubConfigs = sessionData.userData.collectionGaiaHubConfigs
 
           if (!newHubConfigs) {
             newHubConfigs = {

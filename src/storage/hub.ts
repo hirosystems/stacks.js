@@ -197,7 +197,13 @@ export async function connectToGaiaHub(
   const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const hubInfo = await response.json()
   const readURL = hubInfo.read_url_prefix
-  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken, scopes)
+  const token = makeV1GaiaAuthToken(
+    hubInfo, 
+    challengeSignerHex, 
+    gaiaHubUrl, 
+    associationToken, 
+    scopes
+  )
   const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {
