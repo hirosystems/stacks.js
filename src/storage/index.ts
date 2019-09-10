@@ -220,8 +220,8 @@ export async function getFileUrl(
   if (opts.username) {
     readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    const gaiaHubConfig = options.gaiaHubConfig 
-      || await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
+    const userSession = caller || new UserSession()
+    const gaiaHubConfig = opts.gaiaHubConfig || await userSession.getOrSetLocalGaiaHubConnection()
     readUrl = await getFullReadUrl(path, gaiaHubConfig)
   }
 
