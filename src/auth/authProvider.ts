@@ -1,4 +1,4 @@
-import queryString from 'query-string'
+import * as queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { BLOCKSTACK_HANDLER, getGlobalObject, updateQueryStringParameter } from '../utils'
@@ -40,6 +40,9 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
       reject('Invalid auth request')
     } else {
       const payload = decodeToken(authRequest).payload
+      if (typeof payload === 'string') {
+        throw new Error('Unexpected token payload type of string')
+      }  
       const manifestURI = payload.manifest_uri
       try {
         Logger.debug(`Fetching manifest from ${manifestURI}`)
@@ -75,6 +78,9 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
  */
 export function redirectUserToApp(authRequest: string, authResponse: string) {
   const payload = decodeToken(authRequest).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
   let redirectURI = payload.redirect_uri
   Logger.debug(redirectURI)
   if (redirectURI) {

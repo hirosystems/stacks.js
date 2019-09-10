@@ -1,5 +1,5 @@
-import test from 'tape-promise/tape'
-import FetchMock from 'fetch-mock'
+import * as test from 'tape-promise/tape'
+import * as FetchMock from 'fetch-mock'
 
 import {
   validateProofs, containsValidProofStatement, containsValidAddressProofStatement

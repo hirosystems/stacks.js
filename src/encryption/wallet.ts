@@ -1,6 +1,6 @@
-import crypto from 'crypto'
+import * as crypto from 'crypto'
 import * as bip39 from 'bip39'
-import triplesec from 'triplesec'
+import * as triplesec from 'triplesec'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected

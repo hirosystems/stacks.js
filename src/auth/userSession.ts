@@ -297,7 +297,11 @@ export class UserSession {
    * @returns {Promise} that resolves if the operation succeed and rejects
    * if it failed
    */
-  putFile(path: string, content: string | Buffer, options?: import('../storage').PutFileOptions) {
+  putFile(
+    path: string,
+    content: string | Buffer | ArrayBufferView | Blob, 
+    options?: import('../storage').PutFileOptions
+  ) {
     return storage.putFile(path, content, options, this)
   }
 

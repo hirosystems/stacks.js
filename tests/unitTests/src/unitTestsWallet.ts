@@ -1,4 +1,4 @@
-import test from 'tape-promise/tape'
+import * as test from 'tape-promise/tape'
 
 import {
   BlockstackWallet

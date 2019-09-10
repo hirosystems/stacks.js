@@ -1,5 +1,5 @@
 
-import url from 'url'
+import * as url from 'url'
 import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
@@ -252,7 +252,7 @@ interface GetGlobalObjectOptions {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObject<K extends keyof Window>(
+export function getGlobalObject<K extends Extract<keyof Window, string>>(
   name: K, 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
 ): Window[K] {
@@ -269,7 +269,7 @@ export function getGlobalObject<K extends keyof Window>(
     Logger.error(`Error getting object '${name}' from global scope '${globalScope}': ${error}`)
   }
   if (throwIfUnavailable) {
-    const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+    const errMsg = getAPIUsageErrorMessage(globalScope, name.toString(), usageDesc)
     Logger.error(errMsg)
     throw new Error(errMsg)
   }
@@ -287,7 +287,7 @@ export function getGlobalObject<K extends keyof Window>(
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObjects<K extends keyof Window>(
+export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   names: K[], 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
 ): Pick<Window, K> {
@@ -297,7 +297,7 @@ export function getGlobalObjects<K extends keyof Window>(
   } catch (error) {
     Logger.error(`Error getting global scope: ${error}`)
     if (throwIfUnavailable) {
-      const errMsg = getAPIUsageErrorMessage(globalScope, names[0], usageDesc)
+      const errMsg = getAPIUsageErrorMessage(globalScope, names[0].toString(), usageDesc)
       Logger.error(errMsg)
       throw errMsg
     } else if (returnEmptyObject) {
@@ -314,7 +314,7 @@ export function getGlobalObjects<K extends keyof Window>(
         if (obj) {
           result[name] = obj
         } else if (throwIfUnavailable) {
-          const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+          const errMsg = getAPIUsageErrorMessage(globalScope, name.toString(), usageDesc)
           Logger.error(errMsg)
           throw new Error(errMsg)
         } else if (returnEmptyObject) {
@@ -323,7 +323,7 @@ export function getGlobalObjects<K extends keyof Window>(
       }
     } catch (error) {
       if (throwIfUnavailable) {
-        const errMsg = getAPIUsageErrorMessage(globalScope, name, usageDesc)
+        const errMsg = getAPIUsageErrorMessage(globalScope, name.toString(), usageDesc)
         Logger.error(errMsg)
         throw new Error(errMsg)
       }
