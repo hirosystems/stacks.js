@@ -22,6 +22,7 @@ import { Logger } from '../logger'
 import { UserSession } from '../auth/userSession'
 import { getGlobalObject } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
+import { FileNotFound } from '../errors'
 import { getResponseDescription } from '../utils'
 
 /**
@@ -243,12 +244,13 @@ function getFileContents(path: string, app: string, username: string | undefined
     .then(readUrl => fetchPrivate(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
       if (response.status !== 200) {
+        const errorMsg = `getFile ${path} failed.`
         if (response.status === 404) {
           Logger.debug(`getFile ${path} returned 404, returning null`)
-          return null
+          throw new FileNotFound(errorMsg)
         } else {
           getResponseDescription(response).then(responseDescription => {
-            throw new Error(`getFile ${path} failed. ${responseDescription}`)
+            throw new Error(errorMsg + ' ' + responseDescription)
           })
         }
       }
