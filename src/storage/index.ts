@@ -743,6 +743,7 @@ export async function listFilesLoop(
   page: string | null,
   callCount: number,
   fileCount: number,
+  retryConnection: boolean,
   callback: (name: string) => boolean
 ): Promise<number> {
   if (callCount > 65536) {
@@ -771,9 +772,9 @@ export async function listFilesLoop(
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
     // Same logic as other gaia requests (putFile, getFile, etc).
-    if (callCount === 0) {
+    if (callCount === 0 && retryConnection) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
-      return listFilesLoop(caller, freshHubConfig, page, callCount + 1, 0, callback)
+      return listFilesLoop(caller, freshHubConfig, page, callCount + 1, 0, true, callback)
     }
     throw error
   }
@@ -803,7 +804,7 @@ export async function listFilesLoop(
   if (nextPage && entries.length > 0) {
     // keep going -- have more entries
     return listFilesLoop(
-      caller, hubConfig, nextPage, callCount + 1, fileCount + entriesLength, callback
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entriesLength, true, callback
     )
   } else {
     // no more entries -- end of data
@@ -822,7 +823,7 @@ export function listFiles(
   caller?: UserSession
 ): Promise<number> {
   caller = caller || new UserSession()
-  return listFilesLoop(caller, null, null, 0, 0, callback)
+  return listFilesLoop(caller, null, null, 0, 0, true, callback)
 }
 
 export { 

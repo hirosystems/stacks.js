@@ -1542,4 +1542,67 @@ export function runStorageTests() {
         t.equal(count, 1, 'Count matches number of files')
       })
   })
+
+  test('listFiles does not try to get new gaia config when specified', (t) => {
+    t.plan(1)
+
+    const path = 'file.json'
+    const listFilesUrl = 'https://hub.testblockstack.org/list-files/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabd'
+    const invalidHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabd',
+      server: 'https://hub.testblockstack.org',
+      token: '',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+    const validHubConfig = Object.assign({}, invalidHubConfig, {
+      token: 'valid'
+    })
+    const connectToGaiaHub = () => {
+      t.fail('Should not try to connect to a gaia hub')
+    }
+    
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const UserSessionClass = proxyquire('../../../src/auth/userSession', {
+      '../storage/hub': {
+        connectToGaiaHub
+      }
+    }).UserSession as typeof UserSession
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSessionClass({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      appPrivateKey: privateKey,
+      gaiaHubConfig: invalidHubConfig
+    }
+
+    const { listFilesLoop } = proxyquire('../../../src/storage', {
+      './hub': {
+        connectToGaiaHub
+      }
+    })
+
+    let callCount = 0
+    FetchMock.post(listFilesUrl, (url, { headers }) => {
+      if ((<any>headers).Authorization === 'bearer ') {
+        return 401
+      }
+      callCount += 1
+      if (callCount === 1) {
+        return { entries: [null], page: callCount }
+      } else if (callCount === 2) {
+        return { entries: [path], page: callCount }
+      } else if (callCount === 3) {
+        return { entries: [], page: callCount }
+      } else {
+        throw new Error('Called too many times')
+      }
+    })
+
+    listFilesLoop(blockstack, invalidHubConfig, null, 0, 0, false, () => {
+      t.fail('Should not try to reconnect to gaia hub')
+    })
+      .catch(() => {
+        t.ok('Should fail and not reattempt gaia hub connection')
+      })
+  })
 }
