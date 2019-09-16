@@ -402,20 +402,20 @@ export class UserSession {
   }
 
   /**
-   * Retreive a collection Gaia hub config from local user data
+   * Retreive a collection Gaia hub config and collection private keys from local user data
    * @param collection - the name of the collection to get hub config for
    */
-  getCollectionGaiaHubConnection(collectionName: string): Promise<GaiaHubConfig> {
+  getCollectionConfigs(collectionName: string): Promise<authApp.CollectionConfig> {
     const sessionData = this.store.getSessionData()
     const userData = sessionData.userData
     if (!userData) {
       throw new InvalidStateError('Missing userData')
     }
 
-    const collectionHubConfigs = userData.collectionGaiaHubConfigs    
-    const hubConfig = collectionHubConfigs ? collectionHubConfigs[collectionName] : false
+    const collectionConfigs = userData.collectionConfigs
+    const config = collectionConfigs ? collectionConfigs[collectionName] : false
 
-    if (!hubConfig) {
+    if (!config) {
       const options = {}
       const path = GAIA_HUB_COLLECTION_KEY_FILE_NAME
 
@@ -423,6 +423,7 @@ export class UserSession {
         .then((collectionKeyFile) => {
           const collectionKeys = JSON.parse(collectionKeyFile as string)
           const collectionKey = collectionKeys[collectionName]
+          const collectionEncryptionKey = collectionKey.encryptionKey
           const collectionHubConfig = collectionKey.hubConfig
 
           const hubConfig = {
@@ -432,26 +433,30 @@ export class UserSession {
             server: collectionHubConfig.server
           }
 
-          let newHubConfigs = sessionData.userData.collectionGaiaHubConfigs
-
-          if (!newHubConfigs) {
-            newHubConfigs = {
-              [collectionName]: hubConfig
-            }
-          } else {
-            newHubConfigs[collectionName] = hubConfig
+          let newConfigs = sessionData.userData.collectionConfigs
+          const newConfig = {
+            encryptionKey: collectionEncryptionKey,
+            hubConfig
           }
 
-          sessionData.userData.collectionGaiaHubConfigs = newHubConfigs
+          if (!newConfigs) {
+            newConfigs = {
+              [collectionName]: newConfig 
+            }
+          } else {
+            newConfigs[collectionName] = newConfig
+          }
+
+          sessionData.userData.collectionConfigs = newConfigs
           this.store.setSessionData(sessionData)
 
-          return hubConfig
+          return newConfig
         })
         .catch((error) => {
           throw new InvalidStateError('Unable to fetch collections Gaia hub auth token')
         })
     } else {
-      return Promise.resolve(hubConfig)
+      return Promise.resolve(config)
     }
   }
 }

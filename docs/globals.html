@@ -76,6 +76,7 @@
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-class"><a href="classes/appconfig.html" class="tsd-kind-icon">App<wbr>Config</a></li>
+								<li class="tsd-kind-class"><a href="classes/blockstacknetwork.html" class="tsd-kind-icon">Blockstack<wbr>Network</a></li>
 								<li class="tsd-kind-class tsd-is-not-exported"><a href="classes/facebook.html" class="tsd-kind-icon">Facebook</a></li>
 								<li class="tsd-kind-class tsd-is-not-exported"><a href="classes/github.html" class="tsd-kind-icon">Github</a></li>
 								<li class="tsd-kind-class tsd-is-not-exported"><a href="classes/hackernews.html" class="tsd-kind-icon">Hacker<wbr>News</a></li>
@@ -91,12 +92,18 @@
 						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface"><a href="interfaces/accounttokens.html" class="tsd-kind-icon">Account<wbr>Tokens</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/collectionconfig.html" class="tsd-kind-icon">Collection<wbr>Config</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/collectionconfigarray.html" class="tsd-kind-icon">Collection<wbr>Config<wbr>Array</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/gaiahubconfig.html" class="tsd-kind-icon">Gaia<wbr>Hub<wbr>Config</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/getfileoptions.html" class="tsd-kind-icon">Get<wbr>File<wbr>Options</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/getfileurloptions.html" class="tsd-kind-icon">Get<wbr>File<wbr>Url<wbr>Options</a></li>
 								<li class="tsd-kind-interface tsd-is-not-exported"><a href="interfaces/getglobalobjectoptions.html" class="tsd-kind-icon">Get<wbr>Global<wbr>Object<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/priceinfo.html" class="tsd-kind-icon">Price<wbr>Info</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/putfileoptions.html" class="tsd-kind-icon">Put<wbr>File<wbr>Options</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/sessionoptions.html" class="tsd-kind-icon">Session<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/transactioninfo.html" class="tsd-kind-icon">Transaction<wbr>Info</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/utxo.html" class="tsd-kind-icon">UTXO</a></li>
 								<li class="tsd-kind-interface"><a href="interfaces/userdata.html" class="tsd-kind-icon">User<wbr>Data</a></li>
 								<li class="tsd-kind-interface tsd-is-not-exported"><a href="interfaces/validateproofservice.html" class="tsd-kind-icon">Validate<wbr>Proof<wbr>Service</a></li>
 							</ul>
@@ -124,8 +131,10 @@
 								<li class="tsd-kind-variable"><a href="globals.html#default_blockstack_host" class="tsd-kind-icon">DEFAULT_<wbr>BLOCKSTACK_<wbr>HOST</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#echo_reply_param" class="tsd-kind-icon">ECHO_<wbr>REPLY_<wbr>PARAM</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#external_address" class="tsd-kind-icon">EXTERNAL_<wbr>ADDRESS</a></li>
+								<li class="tsd-kind-variable"><a href="globals.html#gaia_hub_collection_key_file_name" class="tsd-kind-icon">GAIA_<wbr>HUB_<wbr>COLLECTION_<wbr>KEY_<wbr>FILE_<wbr>NAME</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#global_detection_cache_key" class="tsd-kind-icon">GLOBAL_<wbr>DETECTION_<wbr>CACHE_<wbr>KEY</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#identity_keychain" class="tsd-kind-icon">IDENTITY_<wbr>KEYCHAIN</a></li>
+								<li class="tsd-kind-variable"><a href="globals.html#mainnet_default" class="tsd-kind-icon">MAINNET_<wbr>DEFAULT</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#satoshis_per_btc" class="tsd-kind-icon">SATOSHIS_<wbr>PER_<wbr>BTC</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#session_version" class="tsd-kind-icon">SESSION_<wbr>VERSION</a></li>
 								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#signature_file_suffix" class="tsd-kind-icon">SIGNATURE_<wbr>FILE_<wbr>SUFFIX</a></li>
@@ -420,6 +429,16 @@
 						</ul>
 					</aside>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable">
+					<a name="gaia_hub_collection_key_file_name" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> GAIA_<wbr>HUB_<wbr>COLLECTION_<wbr>KEY_<wbr>FILE_<wbr>NAME</h3>
+					<div class="tsd-signature tsd-kind-icon">GAIA_<wbr>HUB_<wbr>COLLECTION_<wbr>KEY_<wbr>FILE_<wbr>NAME<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">".collections.keys"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;.collections.keys&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/hub.ts#L17">storage/hub.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
 					<a name="global_detection_cache_key" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> GLOBAL_<wbr>DETECTION_<wbr>CACHE_<wbr>KEY</h3>
@@ -448,13 +467,28 @@
 						</ul>
 					</aside>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable">
+					<a name="mainnet_default" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> MAINNET_<wbr>DEFAULT</h3>
+					<div class="tsd-signature tsd-kind-icon">MAINNET_<wbr>DEFAULT<span class="tsd-signature-symbol">:</span> <a href="classes/blockstacknetwork.html" class="tsd-signature-type">BlockstackNetwork</a><span class="tsd-signature-symbol"> =&nbsp;new BlockstackNetwork(&#x27;https://core.blockstack.org&#x27;,&#x27;https://broadcast.blockstack.org&#x27;,new BlockchainInfoApi())</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L1293">network.ts:1293</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Instance of <a href="classes/blockstacknetwork.html">BlockstackNetwork</a> set to the default endpoints.</p>
+						</div>
+					</div>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
 					<a name="satoshis_per_btc" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> SATOSHIS_<wbr>PER_<wbr>BTC</h3>
 					<div class="tsd-signature tsd-kind-icon">SATOSHIS_<wbr>PER_<wbr>BTC<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">100000000</span><span class="tsd-signature-symbol"> =&nbsp;100000000</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L21">network.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L32">network.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -474,7 +508,7 @@
 					<div class="tsd-signature tsd-kind-icon">SIGNATURE_<wbr>FILE_<wbr>SUFFIX<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">".sig"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;.sig&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L49">storage/index.ts:49</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L55">storage/index.ts:55</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -484,7 +518,7 @@
 					<div class="tsd-signature tsd-kind-icon">TX_<wbr>BROADCAST_<wbr>SERVICE_<wbr>REGISTRATION_<wbr>ENDPOINT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"registration"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;registration&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L23">network.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L34">network.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -494,7 +528,7 @@
 					<div class="tsd-signature tsd-kind-icon">TX_<wbr>BROADCAST_<wbr>SERVICE_<wbr>TX_<wbr>ENDPOINT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"transaction"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;transaction&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L24">network.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L35">network.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -504,7 +538,7 @@
 					<div class="tsd-signature tsd-kind-icon">TX_<wbr>BROADCAST_<wbr>SERVICE_<wbr>ZONE_<wbr>FILE_<wbr>ENDPOINT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"zone-file"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;zone-file&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L22">network.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L33">network.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -657,7 +691,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L120">storage/index.ts:120</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L126">storage/index.ts:126</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -714,7 +748,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L583">storage/index.ts:583</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L683">storage/index.ts:683</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -736,6 +770,9 @@
 										<p>Optional options object.</p>
 									</div>
 									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> gaia<wbr>Hub<wbr>Config<span class="tsd-signature-symbol">?: </span><a href="interfaces/gaiahubconfig.html" class="tsd-signature-type">GaiaHubConfig</a></h5>
+										</li>
 										<li class="tsd-parameter">
 											<h5><span class="tsd-flag ts-flagOptional">Optional</span> was<wbr>Signed<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span></h5>
 											<div class="tsd-comment tsd-typography">
@@ -764,7 +801,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/hub.ts#L61">storage/hub.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/hub.ts#L68">storage/hub.ts:68</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -790,7 +827,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L91">storage/index.ts:91</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L97">storage/index.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1595,7 +1632,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L622">storage/index.ts:622</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L723">storage/index.ts:723</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1634,7 +1671,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L154">auth/authApp.ts:154</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L171">auth/authApp.ts:171</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1663,7 +1700,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L424">storage/index.ts:424</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L445">storage/index.ts:445</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1696,13 +1733,13 @@
 					<a name="getfilecontents" class="tsd-anchor"></a>
 					<h3>get<wbr>File<wbr>Contents</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Contents<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, zoneFileLookupURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, forceText<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Contents<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, zoneFileLookupURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, forceText<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, gaiaHubConfig<span class="tsd-signature-symbol">?: </span><a href="interfaces/gaiahubconfig.html" class="tsd-signature-type">GaiaHubConfig</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L233">storage/index.ts:233</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L240">storage/index.ts:240</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1723,6 +1760,9 @@
 									<h5>forceText: <span class="tsd-signature-type">boolean</span></h5>
 								</li>
 								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> gaiaHubConfig: <a href="interfaces/gaiahubconfig.html" class="tsd-signature-type">GaiaHubConfig</a></h5>
+								</li>
+								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
@@ -1740,7 +1780,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L269">storage/index.ts:269</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L277">storage/index.ts:277</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1769,7 +1809,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L206">storage/index.ts:206</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L212">storage/index.ts:212</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1812,7 +1852,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L150">storage/index.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L156">storage/index.ts:156</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1905,13 +1945,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L1254">network.ts:1254</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/network.ts#L1306">network.ts:1306</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Get WHOIS-like information for a name, including the address that owns it,
-									the block at which it expires, and the zone file anchored to it (if available).</p>
+										the block at which it expires, and the zone file anchored to it (if available).
+									This is intended for use in third-party wallets or in DApps that register names.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1961,7 +2002,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L62">storage/index.ts:62</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L68">storage/index.ts:68</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2009,7 +2050,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L260">auth/authApp.ts:260</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L277">auth/authApp.ts:277</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2060,13 +2101,13 @@
 					<a name="handlesignedencryptedcontents" class="tsd-anchor"></a>
 					<h3>handle<wbr>Signed<wbr>Encrypted<wbr>Contents</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">handle<wbr>Signed<wbr>Encrypted<wbr>Contents<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, storedContents<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, zoneFileLookupURL<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">handle<wbr>Signed<wbr>Encrypted<wbr>Contents<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, storedContents<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, privateKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, zoneFileLookupURL<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L330">storage/index.ts:330</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L338">storage/index.ts:338</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2082,6 +2123,9 @@
 								</li>
 								<li>
 									<h5>app: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> privateKey: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> username: <span class="tsd-signature-type">string</span></h5>
@@ -2127,7 +2171,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L133">auth/authApp.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L150">auth/authApp.ts:150</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2158,7 +2202,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L77">auth/authApp.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L94">auth/authApp.ts:94</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2255,7 +2299,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L713">storage/index.ts:713</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L820">storage/index.ts:820</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2309,7 +2353,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L170">auth/authApp.ts:170</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L187">auth/authApp.ts:187</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3255,13 +3299,13 @@
 					<a name="putfile" class="tsd-anchor"></a>
 					<h3>put<wbr>File</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">put<wbr>File<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/putfileoptions.html" class="tsd-signature-type">PutFileOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">put<wbr>File<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBufferView</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Blob</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/putfileoptions.html" class="tsd-signature-type">PutFileOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L478">storage/index.ts:478</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L565">storage/index.ts:565</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3278,7 +3322,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>content: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
+									<h5>content: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBufferView</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Blob</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the data to store in the file</p>
 									</div>
@@ -3306,7 +3350,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L112">auth/authApp.ts:112</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L129">auth/authApp.ts:129</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3353,7 +3397,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L213">auth/authApp.ts:213</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L230">auth/authApp.ts:230</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3500,7 +3544,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L187">auth/authApp.ts:187</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L204">auth/authApp.ts:204</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -5248,6 +5292,9 @@
 					<li class=" tsd-kind-class">
 						<a href="classes/appconfig.html" class="tsd-kind-icon">App<wbr>Config</a>
 					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/blockstacknetwork.html" class="tsd-kind-icon">Blockstack<wbr>Network</a>
+					</li>
 					<li class=" tsd-kind-class tsd-is-not-exported">
 						<a href="classes/facebook.html" class="tsd-kind-icon">Facebook</a>
 					</li>
@@ -5279,6 +5326,15 @@
 						<a href="classes/usersession.html" class="tsd-kind-icon">User<wbr>Session</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/accounttokens.html" class="tsd-kind-icon">Account<wbr>Tokens</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/collectionconfig.html" class="tsd-kind-icon">Collection<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/collectionconfigarray.html" class="tsd-kind-icon">Collection<wbr>Config<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/gaiahubconfig.html" class="tsd-kind-icon">Gaia<wbr>Hub<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -5291,10 +5347,19 @@
 						<a href="interfaces/getglobalobjectoptions.html" class="tsd-kind-icon">Get<wbr>Global<wbr>Object<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/priceinfo.html" class="tsd-kind-icon">Price<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/putfileoptions.html" class="tsd-kind-icon">Put<wbr>File<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/sessionoptions.html" class="tsd-kind-icon">Session<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/transactioninfo.html" class="tsd-kind-icon">Transaction<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/utxo.html" class="tsd-kind-icon">UTXO</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/userdata.html" class="tsd-kind-icon">User<wbr>Data</a>
@@ -5347,11 +5412,17 @@
 					<li class=" tsd-kind-variable tsd-is-not-exported">
 						<a href="globals.html#external_address" class="tsd-kind-icon">EXTERNAL_<wbr>ADDRESS</a>
 					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#gaia_hub_collection_key_file_name" class="tsd-kind-icon">GAIA_<wbr>HUB_<wbr>COLLECTION_<wbr>KEY_<wbr>FILE_<wbr>NAME</a>
+					</li>
 					<li class=" tsd-kind-variable tsd-is-not-exported">
 						<a href="globals.html#global_detection_cache_key" class="tsd-kind-icon">GLOBAL_<wbr>DETECTION_<wbr>CACHE_<wbr>KEY</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-not-exported">
 						<a href="globals.html#identity_keychain" class="tsd-kind-icon">IDENTITY_<wbr>KEYCHAIN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#mainnet_default" class="tsd-kind-icon">MAINNET_<wbr>DEFAULT</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-not-exported">
 						<a href="globals.html#satoshis_per_btc" class="tsd-kind-icon">SATOSHIS_<wbr>PER_<wbr>BTC</a>

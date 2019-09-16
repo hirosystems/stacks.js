@@ -89,6 +89,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#contenttype" class="tsd-kind-icon">content<wbr>Type</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#encrypt" class="tsd-kind-icon">encrypt</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#gaiahubconfig" class="tsd-kind-icon">gaia<wbr>Hub<wbr>Config</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#sign" class="tsd-kind-icon">sign</a></li>
 							</ul>
 						</section>
@@ -103,7 +104,7 @@
 					<div class="tsd-signature tsd-kind-icon">content<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L46">storage/index.ts:46</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L48">storage/index.ts:48</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -135,18 +136,34 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="gaiahubconfig" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> gaia<wbr>Hub<wbr>Config</h3>
+					<div class="tsd-signature tsd-kind-icon">gaia<wbr>Hub<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="gaiahubconfig.html" class="tsd-signature-type">GaiaHubConfig</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L52">storage/index.ts:52</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Optionally use a specified Gaia hub configuration</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="sign" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> sign</h3>
 					<div class="tsd-signature tsd-kind-icon">sign<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L42">storage/index.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L44">storage/index.ts:44</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Sign the data using ECDSA on SHA256 hashes with the user&#39;s app private key.
-							If a string is specified, it is used as the private key.</p>
+							<p>If set to <code>true</code> the data is signed using ECDSA on SHA256 hashes with the user&#39;s
+								app private key. If a string is specified, it is used as the private key instead
+							of the user&#39;s app private key.</p>
 						</div>
 						<dl class="tsd-comment-tags">
 							<dt>default</dt>
@@ -177,6 +194,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="putfileoptions.html#encrypt" class="tsd-kind-icon">encrypt</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="putfileoptions.html#gaiahubconfig" class="tsd-kind-icon">gaia<wbr>Hub<wbr>Config</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="putfileoptions.html#sign" class="tsd-kind-icon">sign</a>
