@@ -691,8 +691,8 @@ export async function deleteFile(
   if (!caller) {
     caller = new UserSession()
   }
-  const gaiaHubConfig = options.gaiaHubConfig || await caller.getOrSetLocalGaiaHubConnection()
   const opts = Object.assign({}, options)
+  const gaiaHubConfig = opts.gaiaHubConfig || await caller.getOrSetLocalGaiaHubConnection()
   if (opts.wasSigned) {
     // If signed, delete both the content file and the .sig file
     try {
