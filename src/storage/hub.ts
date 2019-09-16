@@ -22,52 +22,61 @@ export interface GaiaHubConfig {
   address: string,
   url_prefix: string,
   token: string,
+  max_file_upload_size_megabytes: number | undefined,
   server: string
 }
 
 
-function getUtf8StringByteLength(input: string): string {
-  return Buffer.byteLength(input, 'utf8').toString()
+function getUtf8StringByteLength(input: string) {
+  return Buffer.byteLength(input, 'utf8')
 }
 
-/**
- * 
- * @param postHeaders The fetch request headers object that may have its 
- * `Content-Type` and `Content-Length` properties set. 
- */
 function determineStringContentHeaders(
   contents: string, 
-  contentType: string | undefined, 
-  postHeaders: Record<string, string>) {
-  const contentLengthHeader = 'Content-Length'
-  const contentTypeHeader = 'Content-Type'
-  
+  contentType: string | undefined):
+  { contentType?: string; contentLength?: number } {
+  let contentLengthResult: number | undefined
+  let contentTypeResult: string | undefined
+
   if (contentType === 'application/json') {
     // According to https://www.ietf.org/rfc/rfc4627.txt :
     // "JSON text SHALL be encoded in Unicode. The default encoding is UTF-8."
     // For more details see discussion at https://stackoverflow.com/q/9254891/794962
-    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
+    contentLengthResult = getUtf8StringByteLength(contents)
   } else if (!contentType) {
     // If content is a string and contentType is not specified, then specify UTF8
     // otherwise string parsers (web servers and browsers) have undefined behavior.
-    postHeaders[contentTypeHeader] = 'text/plain; charset=utf-8'
-    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
+    contentTypeResult = 'text/plain; charset=utf-8'
+    contentLengthResult = getUtf8StringByteLength(contents)
   } else if (contentType.toLowerCase().trim().includes('charset=utf-8')) {
     // If contentType is some other format, but specified utf-8 charset,
     // then the content-length is known. 
-    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
+    contentLengthResult = getUtf8StringByteLength(contents)
   } else if (contentType.toLowerCase().trim() === 'text/html') {
     // Another common contentType that is commonly not specified with the
     // recommended charset encoding, resulting in undefined behavior in different
     // browsers during unicode and localization related scenarios.
     // See https://www.w3.org/International/articles/http-charset/index
-    postHeaders[contentTypeHeader] = 'text/html; charset=utf-8'
-    postHeaders[contentLengthHeader] = getUtf8StringByteLength(contents)
+    contentTypeResult = 'text/html; charset=utf-8'
+    contentLengthResult = getUtf8StringByteLength(contents)
   } else {
     // TODO: should probably console.warn here about likely incorrect usage
     // of string content type, and that content-length cannot be determined. 
   }
+  return {
+    contentLength: contentLengthResult,
+    contentType: contentTypeResult
+  }
 }
+
+function isPositiveFiniteNumber(num: number | undefined): num is number {
+  return typeof num === 'number' 
+    && isFinite(num) 
+    && num > 0
+}
+
+// TODO: Avoid performing expensive operations like Blob/File memory buffering and encryption
+//       by checking the expected payload size beforehand. 
 
 /**
  * 
@@ -90,13 +99,31 @@ export async function uploadToGaiaHub(
     Authorization: `bearer ${hubConfig.token}`
   }
 
+  let contentLength: number | undefined
   if (typeof contents === 'string') {
-    determineStringContentHeaders(contents, contentType, postHeaders)
+    const stringContentInfo = determineStringContentHeaders(contents, contentType)
+    contentLength = stringContentInfo.contentLength
+    if (stringContentInfo.contentType) {
+      postHeaders['Content-Type'] = stringContentInfo.contentType
+    }
   } else if (ArrayBuffer.isView(contents)) {
-    postHeaders['Content-Length'] = contents.byteLength.toString()
+    contentLength = contents.byteLength
   } else if (typeof Blob !== 'undefined' && contents instanceof Blob) {
     if (contents.size) { 
-      postHeaders['Content-Length'] = contents.size.toString()
+      contentLength = contents.size
+    }
+  }
+
+  // check if hub has a specified max file upload size
+  const maxSizeMegabytes = hubConfig.max_file_upload_size_megabytes
+  if (isPositiveFiniteNumber(maxSizeMegabytes)) {
+    // check if payload body content length is known
+    if (isPositiveFiniteNumber(contentLength)) {
+      const maxSizeBytes = Math.round(maxSizeMegabytes * 1024 * 1024)
+      if (contentLength > maxSizeBytes) {
+        // TODO: Use a specific error class type
+        throw new Error(`The max file upload size for this hub is ${maxSizeBytes} bytes, the given content is ${contentLength} bytes`)
+      }
     }
   }
 
