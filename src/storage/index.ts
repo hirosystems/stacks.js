@@ -35,8 +35,10 @@ export interface PutFileOptions {
    */
   encrypt?: boolean | string;
   /**
-   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
-   * If a string is specified, it is used as the private key. 
+   *
+   * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
+   * app private key. If a string is specified, it is used as the private key instead
+   * of the user's app private key. 
    * @default false
    */
   sign?: boolean | string;
@@ -749,21 +751,27 @@ async function listFilesLoop(
     // (i.e. the data is malformed)
     throw new Error('Bad listFiles response: no entries')
   }
+  let entriesLength = 0
   for (let i = 0; i < entries.length; i++) {
-    const rc = callback(entries[i])
-    if (!rc) {
-      // callback indicates that we're done
-      return fileCount + i
+    // An entry array can have null entries, signifying a filtered entry and that there may be
+    // additional pages
+    if (entries[i] !== null) {
+      entriesLength++
+      const rc = callback(entries[i])
+      if (!rc) {
+        // callback indicates that we're done
+        return fileCount + i
+      }
     }
   }
   if (nextPage && entries.length > 0) {
     // keep going -- have more entries
     return listFilesLoop(
-      caller, hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entriesLength, callback
     )
   } else {
     // no more entries -- end of data
-    return fileCount + entries.length
+    return fileCount + entriesLength
   }
 }
 
