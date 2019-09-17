@@ -3,7 +3,7 @@ import { ec as EllipticCurve } from 'elliptic'
 // @ts-ignore
 import * as BN from 'bn.js'
 import * as crypto from 'crypto'
-import { FailedDecryptionError } from './errors'
+import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
 
 const ecurve = new EllipticCurve('secp256k1')
