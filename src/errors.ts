@@ -40,18 +40,20 @@ export class BlockstackError extends Error {
 
   constructor(error: ErrorType) {
     let message = error.message
-    let bugMessage = `Error Code: ${error.code}`
+    let bugDetails = `Error Code: ${error.code}`
     let stack = null
-    try {
-      throw new Error()
-    } catch (e) {
-      stack = e.stack
-    }
-    if (stack) {
-      bugMessage += `\nStack Trace:\n${stack}`
+    if (!stack) { 
+      try {
+        throw new Error()
+      } catch (e) {
+        stack = e.stack
+      }
+    } else {
+      bugDetails += `Stack Trace:\n${stack}`
     }
     message += '\nIf you believe this exception is caused by a bug in blockstack.js'
       + ', please file a bug report: https://github.com/blockstack/blockstack.js/issues'
+      + '\n\n' + bugDetails
     
     super(message)
     this.message = message
