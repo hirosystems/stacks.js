@@ -8,7 +8,7 @@ import { ecPairToAddress, hexStringToECPair } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
-import { FileNotFound } from '../errors'
+import { FileNotFound, ValidationError, BadPathError, NotEnoughProofError, ConflictError } from '../errors'
 import { getResponseDescription } from '../utils'
 
 /**
@@ -53,8 +53,19 @@ export async function uploadToGaiaHub(
   )
   if (!response.ok) {
     const responseDescription = await getResponseDescription(response)
-    throw new Error(`Error when uploading to Gaia hub. ${responseDescription}`)
-  } 
+    const errorMsg = `Error when uploading to Gaia hub. ${responseDescription}`
+    if (response.status == 401) {
+      throw new ValidationError(errorMsg)
+    } else if (response.status == 402) {
+      throw new NotEnoughProofError(errorMsg)
+    } else if (response.status == 403) {
+      throw new BadPathError(errorMsg)
+    } else if (response.status == 409) {
+      throw new ConflictError(errorMsg)
+    } else {
+      throw new Error(errorMsg)
+    }  
+  }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
   return responseJSON.publicURL

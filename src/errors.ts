@@ -14,6 +14,10 @@ export const ERROR_CODES = {
   INVALID_AMOUNT_ERROR: 'invalid_amount_error',
   LOGIN_FAILED_ERROR: 'login_failed',
   SIGNATURE_VERIFICATION_ERROR: 'signature_verification_failure',
+  CONFLICT_ERROR: 'conflict_error',
+  NOT_ENOUGH_PROOF_ERROR: 'not_enough_proof_error',
+  BAD_PATH_ERROR: 'bad_path_error',
+  VALIDATION_ERROR: 'validation_error',
   UNKNOWN: 'unknown'
 }
 
@@ -175,6 +179,46 @@ export class SignatureVerificationError extends BlockstackError {
     super({ code: ERROR_CODES.SIGNATURE_VERIFICATION_ERROR, message })
     this.message = message
     this.name = 'SignatureVerificationError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class ConflictError extends BlockstackError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.CONFLICT_ERROR })
+    this.name = 'ConflictError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class NotEnoughProofError extends BlockstackError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR })
+    this.name = 'NotEnoughProofError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class BadPathError extends BlockstackError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.BAD_PATH_ERROR })
+    this.name = 'BadPathError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class ValidationError extends BlockstackError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
+    this.name = 'ValidationError'
   }
 }
 
