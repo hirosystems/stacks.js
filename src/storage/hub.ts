@@ -4,12 +4,11 @@ import * as crypto from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
-import { ecPairToAddress, hexStringToECPair } from '../utils'
+import { ecPairToAddress, hexStringToECPair, getResponseDescription } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
 import { FileNotFound, ValidationError, BadPathError, NotEnoughProofError, ConflictError } from '../errors'
-import { getResponseDescription } from '../utils'
 
 /**
  * @ignore
@@ -54,13 +53,13 @@ export async function uploadToGaiaHub(
   if (!response.ok) {
     const responseDescription = await getResponseDescription(response)
     const errorMsg = `Error when uploading to Gaia hub. ${responseDescription}`
-    if (response.status == 401) {
+    if (response.status === 401) {
       throw new ValidationError(errorMsg)
-    } else if (response.status == 402) {
+    } else if (response.status === 402) {
       throw new NotEnoughProofError(errorMsg)
-    } else if (response.status == 403) {
+    } else if (response.status === 403) {
       throw new BadPathError(errorMsg)
-    } else if (response.status == 409) {
+    } else if (response.status === 409) {
       throw new ConflictError(errorMsg)
     } else {
       throw new Error(errorMsg)
@@ -86,7 +85,7 @@ export async function deleteFromGaiaHub(
   )
   if (!response.ok) {
     const responseDescription = await getResponseDescription(response)
-    const errorMsg = 'Error deleting file from Gaia hub. ' + responseDescription
+    const errorMsg = `Error deleting file from Gaia hub. ${responseDescription}`
     if (response.status === 404) {
       throw new FileNotFound(errorMsg)
     } else {
