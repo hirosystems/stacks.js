@@ -43,9 +43,10 @@ export class BlockstackError extends Error {
   parameter?: string
 
   constructor(error: ErrorType) {
+    super()
     let message = error.message
     let bugDetails = `Error Code: ${error.code}`
-    let stack = null
+    let stack = this.stack
     if (!stack) { 
       try {
         throw new Error()
@@ -57,8 +58,6 @@ export class BlockstackError extends Error {
     }
     message += `\nIf you believe this exception is caused by a bug in blockstack.js,
       please file a bug report: https://github.com/blockstack/blockstack.js/issues\n\n${bugDetails}`
-    
-    super(message)
     this.message = message
     this.code = error.code
     this.parameter = error.parameter ? error.parameter : null
