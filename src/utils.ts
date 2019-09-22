@@ -346,15 +346,20 @@ export function getGlobalObjects<K extends keyof Window>(
  * Returns a BlockstackError correlating to the given HTTP response,
  * with the provided errorMsg. Throws if the HTTP response is 'ok'.
  */
-export async function getBlockstackErrorFromResponse(response: Response, errorMsg: string): Promise<Error> {
+export async function getBlockstackErrorFromResponse(
+  response: Response,
+  errorMsg: string
+): Promise<Error> {
   if (response.ok) {
-    throw new Error("Cannot get a BlockstackError from a valid response.")
+    throw new Error('Cannot get a BlockstackError from a valid response.')
   }
+  const status = response.status
+  const statusText = response.statusText
   const body = await response.json()
   const gaiaResponse: GaiaHubErrorResponse = {
-    status: response.status,
-    statusText: response.statusText,
-    body: body
+    status,
+    statusText,
+    body
   }
   if (response.status === 401) {
     return new ValidationError(errorMsg, gaiaResponse)
@@ -366,7 +371,7 @@ export async function getBlockstackErrorFromResponse(response: Response, errorMs
     throw new DoesNotExist(errorMsg, gaiaResponse)
   } else if (response.status === 409) {
     return new ConflictError(errorMsg, gaiaResponse)
-  } else if (response.status == 413) {
+  } else if (response.status === 413) {
     return new PayloadTooLargeError(errorMsg, gaiaResponse)
   } else {
     return new Error(errorMsg)

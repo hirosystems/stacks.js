@@ -16,7 +16,7 @@ import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
   SignatureVerificationError,
-  FileNotFound
+  DoesNotExist
 } from '../errors'
 
 import { UserSession } from '../auth/userSession'
@@ -266,9 +266,10 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
+  const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
   return Promise.all(
     [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
-     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+     getFileContents(sigPath, opt.app, opt.username,
                      opt.zoneFileLookupURL, true, caller),
      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
@@ -310,6 +311,14 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
         )
       } else {
         return fileContents
+      }
+    }).catch((err) => {
+      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
+      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
+        throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+      } else {
+        throw err
       }
     })
 }

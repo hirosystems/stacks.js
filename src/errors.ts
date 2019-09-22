@@ -38,7 +38,9 @@ type ErrorData = {
 */
 export class BlockstackError extends Error {
   message: string
+
   code: string
+
   parameter?: string
 
   constructor(error: ErrorData) {
@@ -130,6 +132,7 @@ export class NotEnoughFundsError extends BlockstackError {
 */
 export class InvalidAmountError extends BlockstackError {
   fees: number
+  
   specifiedAmount: number
 
   constructor(fees: number, specifiedAmount: number) {
