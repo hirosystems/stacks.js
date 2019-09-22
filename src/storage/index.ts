@@ -231,24 +231,23 @@ export async function getFileUrl(
  * @ignore
  */
 async function getFileContents(path: string, app: string, username: string | undefined, 
-                         zoneFileLookupURL: string | undefined,
-                         forceText: boolean,
-                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  await Promise.resolve();
-  const opts = { app, username, zoneFileLookupURL };
-  const readUrl = await getFileUrl(path, opts, caller);
-  const response = await fetchPrivate(readUrl);
+                               zoneFileLookupURL: string | undefined,
+                               forceText: boolean,
+                               caller?: UserSession): Promise<string | ArrayBuffer | null> {
+  await Promise.resolve()
+  const opts = { app, username, zoneFileLookupURL }
+  const readUrl = await getFileUrl(path, opts, caller)
+  const response = await fetchPrivate(readUrl)
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`);
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
   }
-  const contentType = response.headers.get('Content-Type');
+  const contentType = response.headers.get('Content-Type')
   if (forceText || contentType === null
     || contentType.startsWith('text')
     || contentType === 'application/json') {
-    return response.text();
-  }
-  else {
-    return response.arrayBuffer();
+    return response.text()
+  } else {
+    return response.arrayBuffer()
   }
 }
 
