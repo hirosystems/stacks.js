@@ -7,7 +7,7 @@ export const ERROR_CODES = {
   REMOTE_SERVICE_ERROR: 'remote_service_error',
   INVALID_STATE: 'invalid_state',
   NO_SESSION_DATA: 'no_session_data',
-  FILE_NOT_FOUND: 'file_not_found',
+  DOES_NOT_EXIST: 'does_not_exist',
   FAILED_DECRYPTION_ERROR: 'failed_decryption_error',
   INVALID_DID_ERROR: 'invalid_did_error',
   NOT_ENOUGH_FUNDS_ERROR: 'not_enough_error',
@@ -65,16 +65,6 @@ export class BlockstackError extends Error {
   toString() {
     return `${super.toString()}
     code: ${this.code} param: ${this.parameter ? this.parameter : 'n/a'}`
-  }
-}
-
-/**
-* @ignore
-*/
-export class FileNotFound extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.FILE_NOT_FOUND })
-    this.name = 'FileNotFound'
   }
 }
 

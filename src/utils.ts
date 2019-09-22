@@ -4,12 +4,12 @@ import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
 import { 
-  FileNotFound, 
-  ValidationError, 
   BadPathError, 
-  NotEnoughProofError, 
   ConflictError, 
-  PayloadTooLargeError 
+  DoesNotExist,
+  NotEnoughProofError, 
+  PayloadTooLargeError, 
+  ValidationError
 } from './errors'
 
 
@@ -374,7 +374,7 @@ export async function getBlockstackErrorFromResponse(response: Response, errorMs
   } else if (response.status === 403) {
     return new BadPathError(message)
   } else if (response.status === 404) {
-    throw new FileNotFound(message)
+    throw new DoesNotExist(message)
   } else if (response.status === 409) {
     return new ConflictError(message)
   } else if (response.status == 413) {
