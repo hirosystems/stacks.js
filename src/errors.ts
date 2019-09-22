@@ -132,7 +132,7 @@ export class NotEnoughFundsError extends BlockstackError {
 */
 export class InvalidAmountError extends BlockstackError {
   fees: number
-  
+
   specifiedAmount: number
 
   constructor(fees: number, specifiedAmount: number) {
@@ -217,6 +217,7 @@ export interface GaiaHubErrorResponse {
 */
 class GaiaHubError extends BlockstackError {
   hubError: {
+    message?: string
     statusCode: number
     statusText: string
     [prop: string]: any
@@ -228,7 +229,9 @@ class GaiaHubError extends BlockstackError {
       statusCode: response.status,
       statusText: response.statusText
     }
-    if (response.body) {
+    if (typeof response.body === 'string') {
+      this.hubError.message = response.body
+    } else if (typeof response.body === 'object') {
       Object.assign(this.hubError, response.body)
     }
   }
