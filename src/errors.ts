@@ -128,10 +128,8 @@ export class NotEnoughFundsError extends BlockstackError {
 /**
 * @ignore
 */
-
 export class InvalidAmountError extends BlockstackError {
   fees: number
-
   specifiedAmount: number
 
   constructor(fees: number, specifiedAmount: number) {
@@ -172,53 +170,6 @@ export class SignatureVerificationError extends BlockstackError {
 /**
 * @ignore
 */
-export class ConflictError extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.CONFLICT_ERROR })
-    this.name = 'ConflictError'
-  }
-}
-
-/**
-* @ignore
-*/
-export class NotEnoughProofError extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR })
-    this.name = 'NotEnoughProofError'
-  }
-}
-
-/**
-* @ignore
-*/
-export class BadPathError extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.BAD_PATH_ERROR })
-    this.name = 'BadPathError'
-  }
-}
-
-/**
-* @ignore
-*/
-export class ValidationError extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
-    this.name = 'ValidationError'
-  }
-}
-
-/**
- * @ignore
- */
-export class PayloadTooLargeError extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
-    this.name = 'PayloadTooLargeError'
-  }
-}
-
 export class FailedDecryptionError extends BlockstackError {
   constructor(message: string = 'Unable to decrypt cipher object.') {
     super({ code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message })
@@ -246,5 +197,100 @@ export class NoSessionDataError extends BlockstackError {
     super({ code: ERROR_CODES.INVALID_STATE, message })
     this.message = message
     this.name = 'NoSessionDataError'
+  }
+}
+
+/**
+* @ignore
+*/
+interface GaiaHubErrorResponse {
+  status: number, 
+  statusText: string,
+  body?: string | any
+}
+
+/**
+* @ignore
+*/
+class GaiaHubError extends BlockstackError {
+  hubError: {
+    message?: string
+    statusCode: number
+    statusText: string
+    [prop: string]: any
+  }
+
+  constructor(error: ErrorType, response: GaiaHubErrorResponse) {
+    super(error)
+    this.hubError = {
+      statusCode: response.status,
+      statusText: response.statusText
+    }
+    if (typeof response.body === 'string') {
+      this.hubError.message = response.body
+    } else if (typeof response.body === 'object') {
+      Object.assign(this.hubError, response.body)
+    }
+  }
+}
+
+/**
+* @ignore
+*/
+export class DoesNotExist extends GaiaHubError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.DOES_NOT_EXIST })
+    this.name = 'DoesNotExist'
+  }
+}
+
+
+/**
+* @ignore
+*/
+export class ConflictError extends GaiaHubError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.CONFLICT_ERROR })
+    this.name = 'ConflictError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class NotEnoughProofError extends GaiaHubError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR })
+    this.name = 'NotEnoughProofError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class BadPathError extends GaiaHubError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.BAD_PATH_ERROR })
+    this.name = 'BadPathError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class ValidationError extends GaiaHubError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
+    this.name = 'ValidationError'
+  }
+}
+
+/**
+ * @ignore
+ */
+export class PayloadTooLargeError extends GaiaHubError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
+    this.name = 'PayloadTooLargeError'
   }
 }
