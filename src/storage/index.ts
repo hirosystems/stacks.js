@@ -230,7 +230,7 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-function getFileContents(path: string, app: string, username: string | undefined, 
+async function getFileContents(path: string, app: string, username: string | undefined, 
                          zoneFileLookupURL: string | undefined,
                          forceText: boolean,
                          caller?: UserSession): Promise<string | ArrayBuffer | null> {
@@ -261,7 +261,7 @@ function getFileContents(path: string, app: string, username: string | undefined
  * @private
  * @ignore
  */
-function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
+async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
@@ -425,7 +425,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(
+export async function getFile(
   path: string, 
   options?: GetFileOptions,
   caller?: UserSession
