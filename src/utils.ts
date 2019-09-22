@@ -7,6 +7,7 @@ import {
   BadPathError, 
   ConflictError, 
   DoesNotExist,
+  GaiaHubErrorResponse,
   NotEnoughProofError, 
   PayloadTooLargeError, 
   ValidationError
@@ -342,44 +343,32 @@ export function getGlobalObjects<K extends keyof Window>(
 }
 
 /**
- * Returns a promise that resolves to a description of a given HTTP response.
- * The details are in the format "{status code} {status text}: {response text}".
- */
-export async function getResponseDescription(response: Response): Promise<string> {
-  let responseMsg = ''
-  try {
-    responseMsg = await response.text()
-  } catch (error) {
-    Logger.debug(`Error getting bad http response text: ${error}`)
-  }
-  const description = `Status: ${response.status}, ${response.statusText}. ${responseMsg}`
-  Logger.error(description)
-  return description
-}
-
-/**
  * Returns a BlockstackError correlating to the given HTTP response,
  * with the provided errorMsg. Throws if the HTTP response is 'ok'.
  */
-export async function getBlockstackErrorFromResponse(response: Response, errorMsg: String): Error {
+export async function getBlockstackErrorFromResponse(response: Response, errorMsg: string): Promise<Error> {
   if (response.ok) {
     throw new Error("Cannot get a BlockstackError from a valid response.")
   }
-  const responseDescription = await getResponseDescription(response)
-  const message = `${errorMsg} ${responseDescription}`
+  const body = await response.json()
+  const gaiaResponse: GaiaHubErrorResponse = {
+    status: response.status,
+    statusText: response.statusText,
+    body: body
+  }
   if (response.status === 401) {
-    return new ValidationError(message)
+    return new ValidationError(errorMsg, gaiaResponse)
   } else if (response.status === 402) {
-    return new NotEnoughProofError(message)
+    return new NotEnoughProofError(errorMsg, gaiaResponse)
   } else if (response.status === 403) {
-    return new BadPathError(message)
+    return new BadPathError(errorMsg, gaiaResponse)
   } else if (response.status === 404) {
-    throw new DoesNotExist(message)
+    throw new DoesNotExist(errorMsg, gaiaResponse)
   } else if (response.status === 409) {
-    return new ConflictError(message)
+    return new ConflictError(errorMsg, gaiaResponse)
   } else if (response.status == 413) {
-    return new PayloadTooLargeError(message)
+    return new PayloadTooLargeError(errorMsg, gaiaResponse)
   } else {
-    return new Error(message)
+    return new Error(errorMsg)
   }
 }

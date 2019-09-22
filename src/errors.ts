@@ -203,7 +203,7 @@ export class NoSessionDataError extends BlockstackError {
 /**
 * @ignore
 */
-interface GaiaHubErrorResponse {
+export interface GaiaHubErrorResponse {
   status: number, 
   statusText: string,
   body?: string | any
@@ -214,7 +214,6 @@ interface GaiaHubErrorResponse {
 */
 class GaiaHubError extends BlockstackError {
   hubError: {
-    message?: string
     statusCode: number
     statusText: string
     [prop: string]: any
@@ -226,9 +225,7 @@ class GaiaHubError extends BlockstackError {
       statusCode: response.status,
       statusText: response.statusText
     }
-    if (typeof response.body === 'string') {
-      this.hubError.message = response.body
-    } else if (typeof response.body === 'object') {
+    if (response.body) {
       Object.assign(this.hubError, response.body)
     }
   }
