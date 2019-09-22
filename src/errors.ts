@@ -18,6 +18,7 @@ export const ERROR_CODES = {
   NOT_ENOUGH_PROOF_ERROR: 'not_enough_proof_error',
   BAD_PATH_ERROR: 'bad_path_error',
   VALIDATION_ERROR: 'validation_error',
+  PAYLOAD_TOO_LARGE_ERROR: 'payload_too_large_error',
   UNKNOWN: 'unknown'
 }
 
@@ -37,9 +38,7 @@ type ErrorType = {
 */
 export class BlockstackError extends Error {
   message: string
-
   code: string
-
   parameter?: string
 
   constructor(error: ErrorType) {
@@ -62,7 +61,7 @@ export class BlockstackError extends Error {
     this.code = error.code
     this.parameter = error.parameter ? error.parameter : null
   }
-
+  
   toString() {
     return `${super.toString()}
     code: ${this.code} param: ${this.parameter ? this.parameter : 'n/a'}`
@@ -217,6 +216,16 @@ export class ValidationError extends BlockstackError {
   constructor(message: string) {
     super({ message, code: ERROR_CODES.VALIDATION_ERROR })
     this.name = 'ValidationError'
+  }
+}
+
+/**
+ * @ignore
+ */
+export class PayloadTooLargeError extends BlockstackError {
+  constructor(message: string) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
+    this.name = 'PayloadTooLargeError'
   }
 }
 
