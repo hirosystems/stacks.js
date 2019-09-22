@@ -3,6 +3,15 @@ import * as url from 'url'
 import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
+import { 
+  FileNotFound, 
+  ValidationError, 
+  BadPathError, 
+  NotEnoughProofError, 
+  ConflictError, 
+  PayloadTooLargeError 
+} from './errors'
+
 
 /**
  *  @ignore
@@ -346,4 +355,31 @@ export async function getResponseDescription(response: Response): Promise<string
   const description = `Status: ${response.status}, ${response.statusText}. ${responseMsg}`
   Logger.error(description)
   return description
+}
+
+/**
+ * Returns a BlockstackError correlating to the given HTTP response,
+ * with the provided errorMsg. Throws if the HTTP response is 'ok'.
+ */
+export async function getBlockstackErrorFromResponse(response: Response, errorMsg: String): Error {
+  if (response.ok) {
+    throw new Error("Cannot get a BlockstackError from a valid response.")
+  }
+  const responseDescription = await getResponseDescription(response)
+  const message = `${errorMsg} ${responseDescription}`
+  if (response.status === 401) {
+    return new ValidationError(message)
+  } else if (response.status === 402) {
+    return new NotEnoughProofError(message)
+  } else if (response.status === 403) {
+    return new BadPathError(message)
+  } else if (response.status === 404) {
+    throw new FileNotFound(message)
+  } else if (response.status === 409) {
+    return new ConflictError(message)
+  } else if (response.status == 413) {
+    return new PayloadTooLargeError(message)
+  } else {
+    return new Error(message)
+  }
 }

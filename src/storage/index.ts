@@ -18,10 +18,9 @@ import {
   SignatureVerificationError,
   FileNotFound
 } from '../errors'
-import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
-import { getGlobalObject, getResponseDescription } from '../utils'
+import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -242,16 +241,8 @@ function getFileContents(path: string, app: string, username: string | undefined
     })
     .then(readUrl => fetchPrivate(readUrl))
     .then<string | ArrayBuffer | null>((response) => {
-      if (response.status !== 200) {
-        const errorMsg = `getFile ${path} failed.`
-        if (response.status === 404) {
-          Logger.debug(`getFile ${path} returned 404, returning null`)
-          throw new FileNotFound(errorMsg)
-        } else {
-          getResponseDescription(response).then(responseDescription => {
-            throw new Error(`${errorMsg} ${responseDescription}`)
-          })
-        }
+      if (!response.ok) {
+        throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
       }
       const contentType = response.headers.get('Content-Type')
       if (forceText || contentType === null
@@ -669,8 +660,7 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      const responseDescription = await getResponseDescription(response)
-      throw new Error(`listFiles failed; ${responseDescription}`)
+      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.')
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
