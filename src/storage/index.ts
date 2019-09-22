@@ -234,25 +234,22 @@ async function getFileContents(path: string, app: string, username: string | und
                          zoneFileLookupURL: string | undefined,
                          forceText: boolean,
                          caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  return Promise.resolve()
-    .then(() => {
-      const opts = { app, username, zoneFileLookupURL }
-      return getFileUrl(path, opts, caller)
-    })
-    .then(readUrl => fetchPrivate(readUrl))
-    .then<string | ArrayBuffer | null>((response) => {
-      if (!response.ok) {
-        throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
-      }
-      const contentType = response.headers.get('Content-Type')
-      if (forceText || contentType === null
-          || contentType.startsWith('text')
-          || contentType === 'application/json') {
-        return response.text()
-      } else {
-        return response.arrayBuffer()
-      }
-    })
+  await Promise.resolve();
+  const opts = { app, username, zoneFileLookupURL };
+  const readUrl = await getFileUrl(path, opts, caller);
+  const response = await fetchPrivate(readUrl);
+  if (!response.ok) {
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`);
+  }
+  const contentType = response.headers.get('Content-Type');
+  if (forceText || contentType === null
+    || contentType.startsWith('text')
+    || contentType === 'application/json') {
+    return response.text();
+  }
+  else {
+    return response.arrayBuffer();
+  }
 }
 
 /* Handle fetching an unencrypted file, its associated signature
