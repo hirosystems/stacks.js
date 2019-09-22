@@ -238,19 +238,18 @@ class GaiaHubError extends BlockstackError {
 * @ignore
 */
 export class DoesNotExist extends GaiaHubError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.DOES_NOT_EXIST })
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.DOES_NOT_EXIST }, response)
     this.name = 'DoesNotExist'
   }
 }
-
 
 /**
 * @ignore
 */
 export class ConflictError extends GaiaHubError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.CONFLICT_ERROR })
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.CONFLICT_ERROR }, response)
     this.name = 'ConflictError'
   }
 }
@@ -259,8 +258,8 @@ export class ConflictError extends GaiaHubError {
 * @ignore
 */
 export class NotEnoughProofError extends GaiaHubError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR })
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR }, response)
     this.name = 'NotEnoughProofError'
   }
 }
@@ -269,8 +268,8 @@ export class NotEnoughProofError extends GaiaHubError {
 * @ignore
 */
 export class BadPathError extends GaiaHubError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.BAD_PATH_ERROR })
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.BAD_PATH_ERROR }, response)
     this.name = 'BadPathError'
   }
 }
@@ -279,8 +278,8 @@ export class BadPathError extends GaiaHubError {
 * @ignore
 */
 export class ValidationError extends GaiaHubError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR }, response)
     this.name = 'ValidationError'
   }
 }
@@ -289,8 +288,8 @@ export class ValidationError extends GaiaHubError {
  * @ignore
  */
 export class PayloadTooLargeError extends GaiaHubError {
-  constructor(message: string) {
-    super({ message, code: ERROR_CODES.VALIDATION_ERROR })
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR }, response)
     this.name = 'PayloadTooLargeError'
   }
 }
