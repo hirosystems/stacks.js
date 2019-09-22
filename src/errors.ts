@@ -27,7 +27,7 @@ Object.freeze(ERROR_CODES)
 /**
 * @ignore
 */
-type ErrorType = {
+type ErrorData = {
   code: string,
   parameter?: string,
   message: string
@@ -41,7 +41,7 @@ export class BlockstackError extends Error {
   code: string
   parameter?: string
 
-  constructor(error: ErrorType) {
+  constructor(error: ErrorData) {
     super()
     let message = error.message
     let bugDetails = `Error Code: ${error.code}`
@@ -220,7 +220,7 @@ class GaiaHubError extends BlockstackError {
     [prop: string]: any
   }
 
-  constructor(error: ErrorType, response: GaiaHubErrorResponse) {
+  constructor(error: ErrorData, response: GaiaHubErrorResponse) {
     super(error)
     this.hubError = {
       statusCode: response.status,
