@@ -925,7 +925,7 @@ export function runStorageTests() {
   })
 
   test('getFile throw on 404', (t) => {
-    t.plan(3)
+    t.plan(4)
     const config = {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org/hub/',
