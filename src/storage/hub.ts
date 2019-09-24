@@ -74,7 +74,7 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    throw getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.')
+    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.')
   }
 }
 
