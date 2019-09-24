@@ -13,6 +13,7 @@ import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../sr
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
+import { DoesNotExist } from '../../../src/errors';
 
 // class LocalStorage {
 //   constructor() {
@@ -924,7 +925,7 @@ export function runStorageTests() {
   })
 
   test('getFile throw on 404', (t) => {
-    t.plan(2)
+    t.plan(3)
     const config = {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org/hub/',
@@ -951,7 +952,11 @@ export function runStorageTests() {
     const optionsDecrypt = { decrypt: true }
     getFile('foo.json', optionsDecrypt, blockstack)
       .then(() => t.fail('getFile (decrypt) with 404 should fail'))
-      .catch(() => t.pass('getFile (decrypt) with 404 should fail'))
+      .catch((err) => {
+        t.ok(err instanceof DoesNotExist, "DoesNotExist error thrown")
+        t.equal(err.hubError.statusCode, 404)
+        t.equal(err.hubError.statusText, 'Not Found')
+      })
 })
 
   test('uploadToGaiaHub', (t) => {
