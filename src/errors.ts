@@ -292,7 +292,7 @@ export class ValidationError extends GaiaHubError {
  */
 export class PayloadTooLargeError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.VALIDATION_ERROR }, response)
+    super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response)
     this.name = 'PayloadTooLargeError'
   }
 }
