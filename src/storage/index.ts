@@ -319,7 +319,6 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
     })
 }
 
-
 /* Handle signature verification and decryption for contents which are
  *  expected to be signed and encrypted. This works for single and
  *  multiplayer reads. In the case of multiplayer reads, it uses the
