@@ -234,7 +234,6 @@ async function getFileContents(path: string, app: string, username: string | und
                                zoneFileLookupURL: string | undefined,
                                forceText: boolean,
                                caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  await Promise.resolve()
   const opts = { app, username, zoneFileLookupURL }
   const readUrl = await getFileUrl(path, opts, caller)
   const response = await fetchPrivate(readUrl)
