@@ -18,7 +18,16 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 $ npm install blockstack
 ```
 
-You can import `blockstack.js` as a script without using a package manager. To securely use the latest distribution of blockstack.js from a CDN, add [the mdincludes/script-dist-file.md](mdincludes/script-dist-file.md) script in your application. 
+### Using blockstack.js with a CDN
+
+You can import `blockstack.js` as a script without using a package manager. 
+To securely use the latest distribution of blockstack.js from a CDN, use the following script in your application:
+
+<!-- cdn -->
+```html
+<script src="https://unpkg.com/blockstack@19.3.0/dist/blockstack.js" integrity="sha384-kscoAgc5pZqovHWSKndfyn3OeKHfRSh+Xc5wYc+E02BuyQV2zwEEHJ7p5drKnRrX" crossorigin="anonymous"></script>
+```
+<!-- cdnstop -->
 
 
 ## About
