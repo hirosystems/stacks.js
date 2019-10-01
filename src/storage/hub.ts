@@ -37,7 +37,8 @@ export interface GaiaHubConfig {
  * @ignore
  */
 export async function uploadToGaiaHub(
-  filename: string, contents: any,
+  filename: string, 
+  contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
@@ -65,7 +66,7 @@ export async function deleteFromGaiaHub(
   hubConfig: GaiaHubConfig
 ): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`)
-  const response = await fetch(
+  const response = await fetchPrivate(
     `${hubConfig.server}/delete/${hubConfig.address}/${filename}`, {
       method: 'DELETE',
       headers: {

@@ -1,7 +1,9 @@
+import 'cross-fetch/polyfill'
 
 /** @ignore */
-export function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  init = init || { }
-  init.referrerPolicy = 'no-referrer'
-  return fetch(input, init)
+export async function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
+  const fetchOpts = init || { }
+  fetchOpts.referrerPolicy = 'no-referrer'
+  const fetchResult = await fetch(input, fetchOpts)
+  return fetchResult
 }

@@ -35,8 +35,10 @@ export interface PutFileOptions {
    */
   encrypt?: boolean | string;
   /**
-   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
-   * If a string is specified, it is used as the private key. 
+   *
+   * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
+   * app private key. If a string is specified, it is used as the private key instead
+   * of the user's app private key. 
    * @default false
    */
   sign?: boolean | string;
@@ -466,6 +468,61 @@ export async function getFile(
     })
 }
 
+/** @ignore */
+type PutFileContent = string | Buffer | ArrayBufferView | Blob
+
+/** @ignore */
+class FileContentLoader {
+  content: PutFileContent
+  
+  loadedData?: Promise<Buffer | string>
+
+  constructor(content: PutFileContent) {
+    this.content = content
+  }
+
+  getContentType(): string {
+    if (typeof this.content === 'string') {
+      return 'text/plain; charset=utf-8'
+    } else if (typeof Blob !== 'undefined' && this.content instanceof Blob && this.content.type) {
+      return this.content.type
+    } else {
+      return 'application/octet-stream'
+    }
+  }
+
+  private async loadContent(): Promise<Buffer | string> {
+    if (typeof this.content === 'string') {
+      return this.content
+    } else if (ArrayBuffer.isView(this.content)) {
+      return Buffer.from(this.content.buffer)
+    } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
+      const reader = new FileReader()
+      const readPromise = new Promise<Buffer>((resolve, reject) => {
+        reader.onerror = (err) => {
+          reject(err)
+        }
+        reader.onload = () => {
+          const arrayBuffer = reader.result as ArrayBuffer
+          resolve(Buffer.from(arrayBuffer))
+        }
+        reader.readAsArrayBuffer(this.content as Blob)
+      })
+      const result = await readPromise
+      return result
+    }
+    const typeName = Object.prototype.toString.call(this.content)
+    throw new Error(`Unsupported content object type: ${typeName}`)
+  }
+
+  load(): Promise<Buffer | string> {
+    if (this.loadedData === undefined) {
+      this.loadedData = this.loadContent()
+    }
+    return this.loadedData
+  }
+}
+
 /**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
@@ -475,10 +532,12 @@ export async function getFile(
  */
 export async function putFile(
   path: string,
-  content: string | Buffer,
+  content: string | Buffer | ArrayBufferView | Blob,
   options?: PutFileOptions,
   caller?: UserSession,
 ): Promise<string> {
+  const contentLoader = new FileContentLoader(content)
+  
   const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
@@ -489,7 +548,7 @@ export async function putFile(
 
   let { contentType } = opt
   if (!contentType) {
-    contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
+    contentType = contentLoader.getContentType()
   }
 
   if (!caller) {
@@ -523,13 +582,14 @@ export async function putFile(
   //   we perform two uploads. So the control-flow
   //   here will return there.
   if (!opt.encrypt && opt.sign) {
-    const signatureObject = signECDSA(privateKey, content)
+    const contentData = await contentLoader.load()
+    const signatureObject = signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
     const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
 
     try {
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
+        uploadToGaiaHub(path, contentData, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, gaiaHubConfig, 'application/json')
       ])
@@ -537,7 +597,7 @@ export async function putFile(
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, content, freshHubConfig, contentType),
+        uploadToGaiaHub(path, contentData, freshHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, freshHubConfig, 'application/json')
       ])
@@ -546,26 +606,31 @@ export async function putFile(
   }
 
   // In all other cases, we only need one upload.
+  let contentForUpload: Blob | Buffer | ArrayBufferView | string
   if (opt.encrypt && !opt.sign) {
-    content = encryptContent(content, { publicKey })
+    const contentData = await contentLoader.load()
+    contentForUpload = encryptContent(contentData, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const cipherText = encryptContent(content, { publicKey })
+    const contentData = await contentLoader.load()
+    const cipherText = encryptContent(contentData, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,
       publicKey: signatureObject.publicKey,
       cipherText
     }
-    content = JSON.stringify(signedCipherObject)
+    contentForUpload = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
+  } else {
+    contentForUpload = content
   }
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   try {
-    return await uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
+    return await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType)
   } catch (error) {
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
+    const file = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType)
     return file
   }
 }
@@ -684,21 +749,27 @@ async function listFilesLoop(
     // (i.e. the data is malformed)
     throw new Error('Bad listFiles response: no entries')
   }
+  let entriesLength = 0
   for (let i = 0; i < entries.length; i++) {
-    const rc = callback(entries[i])
-    if (!rc) {
-      // callback indicates that we're done
-      return fileCount + i
+    // An entry array can have null entries, signifying a filtered entry and that there may be
+    // additional pages
+    if (entries[i] !== null) {
+      entriesLength++
+      const rc = callback(entries[i])
+      if (!rc) {
+        // callback indicates that we're done
+        return fileCount + i
+      }
     }
   }
   if (nextPage && entries.length > 0) {
     // keep going -- have more entries
     return listFilesLoop(
-      caller, hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entriesLength, callback
     )
   } else {
     // no more entries -- end of data
-    return fileCount + entries.length
+    return fileCount + entriesLength
   }
 }
 
