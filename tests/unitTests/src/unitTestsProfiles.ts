@@ -1,4 +1,4 @@
-import * as test from 'tape'
+import * as test from 'tape-promise/tape'
 import { ECPair } from 'bitcoinjs-lib'
 import * as FetchMock from 'fetch-mock'
 
@@ -17,13 +17,13 @@ import {
 
 import { sampleProfiles, sampleTokenFiles } from './sampleData'
 
-function testTokening(filename, profile) {
+function testTokening(filename: string, profile: any) {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
-  let tokenRecords = []
+  let tokenRecords: any[] = []
 
-  test('profileToToken', (t) => {
+  test('profileToToken', async (t) => {
     t.plan(3)
 
     const token = signProfileToken(profile, privateKey)
@@ -32,11 +32,11 @@ function testTokening(filename, profile) {
     const tokenRecord = wrapProfileToken(token)
     t.ok(tokenRecord, 'Token record must have been created')
 
-    const decodedToken = verifyProfileToken(tokenRecord.token, publicKey)
+    const decodedToken = await verifyProfileToken(tokenRecord.token, publicKey)
     t.ok(decodedToken, 'Token record must have been verified')
   })
 
-  test('profileToTokens', (t) => {
+  test('profileToTokens', async (t) => {
     t.plan(2)
 
     tokenRecords = [wrapProfileToken(signProfileToken(profile, privateKey))]
@@ -47,15 +47,17 @@ function testTokening(filename, profile) {
     const tokensVerified = true
 
     // this will throw an error if one is involid
-    tokenRecords.map(tokenRecord => verifyProfileToken(tokenRecord.token, publicKey))
+    for (const tokenRecord of tokenRecords) {
+      await verifyProfileToken(tokenRecord.token, publicKey)
+    }
 
     t.equal(tokensVerified, true, 'All tokens should be valid')
   })
 
-  test('tokenToProfile', (t) => {
+  test('tokenToProfile', async (t) => {
     t.plan(2)
 
-    const recoveredProfile = extractProfile(tokenRecords[0].token, publicKey)
+    const recoveredProfile = await extractProfile(tokenRecords[0].token, publicKey)
     // console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile),
@@ -81,16 +83,16 @@ function testVerifyToken() {
   const compressedAddress = '1BTku19roxQs2d54kbYKVTv21oBCuHEApF'
   const uncompressedAddress = '12wes6TQpDF2j8zqvAbXV9KNCGQVF2y7G5'
 
-  test('verifyToken', (t) => {
+  test('verifyToken', async (t) => {
     t.plan(3)
 
-    const decodedToken1 = verifyProfileToken(token, publicKey)
+    const decodedToken1 = await verifyProfileToken(token, publicKey)
     t.ok(decodedToken1, 'Token should have been verified against a public key')
 
-    const decodedToken2 = verifyProfileToken(token, compressedAddress)
+    const decodedToken2 = await verifyProfileToken(token, compressedAddress)
     t.ok(decodedToken2, 'Token should have been verified against a compressed address')
 
-    const decodedToken3 = verifyProfileToken(token, uncompressedAddress)
+    const decodedToken3 = await verifyProfileToken(token, uncompressedAddress)
     t.ok(decodedToken3, 'Token should have been verified against an uncompressed address')
   })
 }
@@ -113,7 +115,7 @@ function testSchemas() {
   const privateKey = keyPair.privateKey.toString('hex')
   const publicKey = keyPair.publicKey.toString('hex')
 
-  test('Profile', (t) => {
+  test('Profile', async (t) => {
     t.plan(5)
 
     const profileObject = new Profile(sampleProfiles.naval)
@@ -128,11 +130,11 @@ function testSchemas() {
     const tokenRecords = profileObject.toToken(privateKey)
     t.ok(tokenRecords, 'Profile tokens should have been created')
 
-    const profileObject2 = Profile.fromToken(tokenRecords, publicKey)
+    const profileObject2 = await Profile.fromToken(tokenRecords, publicKey)
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
-  test('Person', (t) => {
+  test('Person', async (t) => {
     t.plan(18)
 
     const personObject = new Person(sampleProfiles.naval)
@@ -145,7 +147,7 @@ function testSchemas() {
     const tokenRecords = [wrapProfileToken(token)]
     t.ok(tokenRecords, 'Person profile tokens should have been created')
 
-    const profileObject2 = Person.fromToken(tokenRecords[0].token, publicKey)
+    const profileObject2 = await Person.fromToken(tokenRecords[0].token, publicKey)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
 
     const name = personObject.name()

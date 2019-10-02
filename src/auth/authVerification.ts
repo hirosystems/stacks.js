@@ -1,4 +1,3 @@
-// @ts-ignore: Could not find a declaration file for module
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import { getAddressFromDID } from '../dids'
 import { publicKeyToAddress } from '../keys'
@@ -51,7 +50,7 @@ export function doSignaturesMatchPublicKeys(token: string) {
  * @private
  * @ignore 
  */
-export function doPublicKeysMatchIssuer(token: string) {
+export async function doPublicKeysMatchIssuer(token: string): Promise<boolean> {
   const payload = decodeToken(token).payload
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
@@ -60,7 +59,7 @@ export function doPublicKeysMatchIssuer(token: string) {
   const addressFromIssuer = getAddressFromDID(payload.iss)
 
   if (publicKeys.length === 1) {
-    const addressFromPublicKeys = publicKeyToAddress(publicKeys[0])
+    const addressFromPublicKeys = await publicKeyToAddress(publicKeys[0])
     if (addressFromPublicKeys === addressFromIssuer) {
       return true
     }

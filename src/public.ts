@@ -42,7 +42,6 @@ export { BlockstackWallet, IdentityKeyPair } from './wallet'
 
 export { network } from './network'
 
-// @ts-ignore: Could not find a declaration file for module
 export { decodeToken } from 'jsontokens'
 
 export { config } from './config'

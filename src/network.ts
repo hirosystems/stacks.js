@@ -1,5 +1,4 @@
 import { TxOutput, address as bjsAddress, networks, Transaction, payments, Network } from 'bitcoinjs-lib'
-import { createHash } from 'crypto'
 import * as FormData from 'form-data'
 // @ts-ignore
 import * as BN from 'bn.js'
@@ -7,6 +6,8 @@ import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 import { config } from './config'
 import { fetchPrivate } from './fetchUtil'
+import { createHashSha256 } from './encryption/hashSha256'
+import { createHashRipemd160 } from './encryption/hashRipemd160'
 
 export interface UTXO {
   value?: number;
@@ -431,9 +432,9 @@ export class BlockstackNetwork {
       .then((resp) => {
         if (resp.status === 200) {
           return resp.text()
-            .then((body) => {
-              const sha256 = createHash('sha256').update(Buffer.from(body)).digest()
-              const h = createHash('rmd160').update(sha256).digest('hex')
+            .then(async (body) => {
+              const sha256 = await createHashSha256().digest(Buffer.from(body))
+              const h = (await createHashRipemd160().digest(sha256)).toString('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)
               }

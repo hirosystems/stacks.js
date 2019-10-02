@@ -1,5 +1,3 @@
-import { createHash } from 'crypto'
-import * as url from 'url'
 import { ECPair, address } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
@@ -12,6 +10,8 @@ import {
   PayloadTooLargeError, 
   ValidationError
 } from './errors'
+import { createHashSha256 } from './encryption/hashSha256'
+import { createHashRipemd160 } from './encryption/hashRipemd160'
 
 
 /**
@@ -149,9 +149,9 @@ export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
  * @private
  * @ignore
  */
-export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  const sha256 = createHash('sha256').update(keyPair.publicKey).digest()
-  const hash160 = createHash('rmd160').update(sha256).digest()
+export async function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
+  const sha256 = await createHashSha256().digest(keyPair.publicKey)
+  const hash160 = await createHashRipemd160().digest(sha256)
   return address.toBase58Check(hash160, keyPair.network.pubKeyHash)
 }
 
@@ -181,21 +181,26 @@ export function makeUUID4() {
  * @ignore
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
-  const parsedUri1 = url.parse(uri1)
-  const parsedUri2 = url.parse(uri2)
+  try {
+    const parsedUri1 = new URL(uri1)
+    const parsedUri2 = new URL(uri2)
 
-  const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
-  const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
+    const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
+    const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
 
-  const match = {
-    scheme: parsedUri1.protocol === parsedUri2.protocol,
-    hostname: parsedUri1.hostname === parsedUri2.hostname,
-    port: port1 === port2,
-    absolute: (uri1.includes('http://') || uri1.includes('https://'))
-    && (uri2.includes('http://') || uri2.includes('https://'))
+    const match = {
+      scheme: parsedUri1.protocol === parsedUri2.protocol,
+      hostname: parsedUri1.hostname === parsedUri2.hostname,
+      port: port1 === port2,
+      absolute: (uri1.includes('http://') || uri1.includes('https://'))
+      && (uri2.includes('http://') || uri2.includes('https://'))
+    }
+
+    return match.scheme && match.hostname && match.port && match.absolute
+  } catch (error) {
+    // Parse error
+    return false
   }
-
-  return match.scheme && match.hostname && match.port && match.absolute
 }
 
 /**

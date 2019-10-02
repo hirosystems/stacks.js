@@ -1,12 +1,13 @@
 
 
 import { TransactionBuilder, Transaction, TxOutput } from 'bitcoinjs-lib'
-import { createHash } from 'crypto'
 // @ts-ignore
 import * as BN from 'bn.js'
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
+import { createHashSha256 } from '../encryption/hashSha256'
+import { createHashRipemd160 } from '../encryption/hashRipemd160'
 
 
 /**
@@ -19,17 +20,17 @@ export const DUST_MINIMUM = 5500
  * 
  * @ignore
  */
-export function hash160(buff: Buffer) {
-  const sha256 = createHash('sha256').update(buff).digest()
-  return createHash('rmd160').update(sha256).digest()
+export async function hash160(buff: Buffer) {
+  const sha256 = await createHashSha256().digest(buff)
+  return createHashRipemd160().digest(sha256)
 }
 
 /**
  * 
  * @ignore
  */
-export function hash128(buff: Buffer) {
-  return Buffer.from(createHash('sha256').update(buff).digest().slice(0, 16))
+export async function hash128(buff: Buffer) {
+  return Buffer.from((await createHashSha256().digest(buff)).slice(0, 16))
 }
 
 

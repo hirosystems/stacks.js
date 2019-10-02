@@ -51,8 +51,7 @@ export class PubkeyHashSigner implements TransactionSigner {
   }
 
   getAddress(): Promise<string> {
-    return Promise.resolve()
-      .then(() => ecPairToAddress(this.ecPair))
+    return ecPairToAddress(this.ecPair)
   }
 
   signTransaction(transaction: TransactionBuilder, inputIndex: number): Promise<void> {

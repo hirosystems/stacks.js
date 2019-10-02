@@ -177,14 +177,15 @@ function estimateRegister(fullyQualifiedName: string,
  *    the update.
  * @private
  */
-function estimateUpdate(fullyQualifiedName: string,
-                        ownerAddress: string,
-                        paymentAddress: string,
-                        paymentUtxos: number = 1
+async function estimateUpdate(
+  fullyQualifiedName: string,
+  ownerAddress: string,
+  paymentAddress: string,
+  paymentUtxos: number = 1
 ): Promise<number> {
   const network = config.network
 
-  const updateTX = makeUpdateSkeleton(
+  const updateTX = await makeUpdateSkeleton(
     fullyQualifiedName, dummyConsensusHash, dummyZonefileHash
   )
 
@@ -210,16 +211,18 @@ function estimateUpdate(fullyQualifiedName: string,
  *    the transfer.
  * @private
  */
-function estimateTransfer(fullyQualifiedName: string,
-                          destinationAddress: string,
-                          ownerAddress: string,
-                          paymentAddress: string,
-                          paymentUtxos: number = 1
+async function estimateTransfer(
+  fullyQualifiedName: string,
+  destinationAddress: string,
+  ownerAddress: string,
+  paymentAddress: string,
+  paymentUtxos: number = 1
 ): Promise<number> {
   const network = config.network
 
-  const transferTX = makeTransferSkeleton(fullyQualifiedName, dummyConsensusHash,
-                                          destinationAddress)
+  const transferTX = await makeTransferSkeleton(
+    fullyQualifiedName, dummyConsensusHash,
+    destinationAddress)
 
   return network.getFeeRate()
     .then((feeRate) => {
@@ -549,12 +552,13 @@ function makePreorder(fullyQualifiedName: string,
  *    the safety module for those.
  * @private
  */
-function makeUpdate(fullyQualifiedName: string,
-                    ownerKeyIn: string | TransactionSigner,
-                    paymentKeyIn: string | TransactionSigner,
-                    zonefile: string,
-                    valueHash: string = '',
-                    buildIncomplete: boolean = false
+async function makeUpdate(
+  fullyQualifiedName: string,
+  ownerKeyIn: string | TransactionSigner,
+  paymentKeyIn: string | TransactionSigner,
+  zonefile: string,
+  valueHash: string = '',
+  buildIncomplete: boolean = false
 ) {
   const network = config.network
   if (!valueHash && !zonefile) {
@@ -568,7 +572,7 @@ function makeUpdate(fullyQualifiedName: string,
         new Error('Need zonefile or valueHash arguments')
       )
     }
-    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+    valueHash = (await hash160(Buffer.from(zonefile))).toString('hex')
   } else if (valueHash.length !== 40) {
     return Promise.reject(
       new Error(`Invalid valueHash ${valueHash}`)
@@ -624,16 +628,17 @@ function makeUpdate(fullyQualifiedName: string,
  *    the safety module for those.
  * @private
  */
-function makeRegister(fullyQualifiedName: string,
-                      registerAddress: string,
-                      paymentKeyIn: string | TransactionSigner,
-                      zonefile: string = null,
-                      valueHash: string = null,
-                      buildIncomplete: boolean = false
+async function makeRegister(
+  fullyQualifiedName: string,
+  registerAddress: string,
+  paymentKeyIn: string | TransactionSigner,
+  zonefile: string = null,
+  valueHash: string = null,
+  buildIncomplete: boolean = false
 ) {
   const network = config.network
   if (!valueHash && !!zonefile) {
-    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+    valueHash = (await hash160(Buffer.from(zonefile))).toString('hex')
   } else if (!!valueHash && valueHash.length !== 40) {
     return Promise.reject(
       new Error(`Invalid zonefile hash ${valueHash}`)
@@ -786,18 +791,19 @@ function makeRevoke(fullyQualifiedName: string,
  *    the safety module for those.
  * @private
  */
-function makeRenewal(fullyQualifiedName: string,
-                     destinationAddress: string,
-                     ownerKeyIn: string | TransactionSigner,
-                     paymentKeyIn: string | TransactionSigner,
-                     zonefile: string = null,
-                     valueHash: string = null,
-                     buildIncomplete: boolean = false
+async function makeRenewal(
+  fullyQualifiedName: string,
+  destinationAddress: string,
+  ownerKeyIn: string | TransactionSigner,
+  paymentKeyIn: string | TransactionSigner,
+  zonefile: string = null,
+  valueHash: string = null,
+  buildIncomplete: boolean = false
 ) {
   const network = config.network
 
   if (!valueHash && !!zonefile) {
-    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
+    valueHash = (await hash160(Buffer.from(zonefile))).toString('hex')
   }
 
   const namespace = fullyQualifiedName.split('.').pop()
@@ -805,6 +811,7 @@ function makeRenewal(fullyQualifiedName: string,
   const paymentKey = getTransactionSigner(paymentKeyIn)
   const ownerKey = getTransactionSigner(ownerKeyIn)
 
+  // TODO: refactor the below into async/await
   return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()])
     .then(([ownerAddress, paymentAddress]) => {
       const txPromise = Promise.all([network.getNamePrice(fullyQualifiedName),

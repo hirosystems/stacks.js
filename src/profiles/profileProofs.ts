@@ -11,7 +11,7 @@ import { profileServices } from './services'
  */
 export function validateProofs(profile: any,
                                ownerAddress: string,
-                               name: string = null) {
+                               name: string = null): Promise<any[]> {
   if (!profile) {
     throw new Error('Profile must not be null')
   }

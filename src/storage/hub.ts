@@ -1,8 +1,5 @@
 
 import { Transaction, script, ECPair } from 'bitcoinjs-lib'
-import { randomBytes, createHash } from 'crypto'
-
-// @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
 import {
   ecPairToAddress,
@@ -11,6 +8,8 @@ import {
 import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
+import { randomBytes } from '../encryption/cryptoRandom'
+import { createHashSha256 } from '../encryption/hashSha256'
 
 /**
  * @ignore
@@ -98,7 +97,7 @@ export function getFullReadUrl(filename: string,
  * 
  * @ignore
  */
-function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): string {
+async function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): Promise<string> {
   // only sign specific legacy auth challenges.
   let parsedChallenge
   try {
@@ -110,7 +109,7 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = createHash('sha256').update(Buffer.from(challengeText)).digest()
+    const digest = await createHashSha256().digest(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
     const signatureWithHash = script.signature.encode(
@@ -139,17 +138,19 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
  * 
  * @ignore
  */
-function makeV1GaiaAuthToken(hubInfo: any,
-                             signerKeyHex: string,
-                             hubUrl: string,
-                             associationToken?: string): string {
+async function makeV1GaiaAuthToken(
+  hubInfo: any,
+  signerKeyHex: string,
+  hubUrl: string,
+  associationToken?: string): Promise<string> {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
                          && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
   const iss = getPublicKeyFromPrivate(signerKeyHex)
 
   if (!handlesV1Auth) {
-    return makeLegacyAuthToken(challengeText, signerKeyHex)
+    const token = await makeLegacyAuthToken(challengeText, signerKeyHex)
+    return token
   }
 
   const salt = randomBytes(16).toString('hex')
@@ -178,8 +179,8 @@ export async function connectToGaiaHub(
   const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const hubInfo = await response.json()
   const readURL = hubInfo.read_url_prefix
-  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
-  const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
+  const token = await makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
+  const address = await ecPairToAddress(hexStringToECPair(challengeSignerHex
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {
     url_prefix: readURL,
@@ -202,7 +203,7 @@ export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): P
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
   const readURL = responseJSON.read_url_prefix
-  const address = ecPairToAddress(challengeSigner)
+  const address = await ecPairToAddress(challengeSigner)
   const bucketUrl = `${readURL}${address}/`
   return bucketUrl
 }

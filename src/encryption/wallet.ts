@@ -1,4 +1,5 @@
-import { randomBytes, pbkdf2Sync, createCipheriv, createHmac, createDecipheriv, createHash } from 'crypto'
+// eslint-disable-next-line import/no-nodejs-modules
+import { pbkdf2Sync, createCipheriv, createDecipheriv } from 'crypto'
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
 
 // TODO: triplesec minified JS 186KB.
@@ -6,6 +7,9 @@ import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
 //       The authenticator and other app that needs it should import the triplesec dependency
 //       themselves and pass the decrypt function to blockstack.js. 
 import { decrypt as triplesecDecrypt } from 'triplesec'
+import { randomBytes } from './cryptoRandom'
+import { createHashSha256 } from './hashSha256'
+import { createHmacSha256 } from './hmacSha256'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
@@ -15,38 +19,33 @@ import { decrypt as triplesecDecrypt } from 'triplesec'
  * @private
  * @ignore 
  * */
-export function encryptMnemonic(phrase: string, password: string) {
-  return Promise.resolve().then(() => {
-    // must be bip39 mnemonic
-    if (!validateMnemonic(phrase)) {
-      throw new Error('Not a valid bip39 nmemonic')
-    }
+export async function encryptMnemonic(phrase: string, password: string): Promise<Buffer> {
+  // must be bip39 mnemonic
+  if (!validateMnemonic(phrase)) {
+    throw new Error('Not a valid bip39 nmemonic')
+  }
 
-    // normalize plaintext to fixed length byte string
-    const plaintextNormalized = Buffer.from(
-      mnemonicToEntropy(phrase), 'hex'
-    )
+  // normalize plaintext to fixed length byte string
+  const plaintextNormalized = Buffer.from(
+    mnemonicToEntropy(phrase), 'hex'
+  )
 
-    // AES-128-CBC with SHA256 HMAC
-    const salt = randomBytes(16)
-    const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
-    const encKey = keysAndIV.slice(0, 16)
-    const macKey = keysAndIV.slice(16, 32)
-    const iv = keysAndIV.slice(32, 48)
+  // AES-128-CBC with SHA256 HMAC
+  const salt = randomBytes(16)
+  const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
+  const encKey = keysAndIV.slice(0, 16)
+  const macKey = keysAndIV.slice(16, 32)
+  const iv = keysAndIV.slice(32, 48)
 
-    const cipher = createCipheriv('aes-128-cbc', encKey, iv)
-    let cipherText = cipher.update(plaintextNormalized).toString('hex')
-    cipherText += cipher.final().toString('hex')
+  const cipher = createCipheriv('aes-128-cbc', encKey, iv)
+  let cipherText = cipher.update(plaintextNormalized).toString('hex')
+  cipherText += cipher.final().toString('hex')
 
-    const hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')])
+  const hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')])
+  const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
 
-    const hmac = createHmac('sha256', macKey)
-    hmac.write(hmacPayload)
-    const hmacDigest = hmac.digest()
-
-    const payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')])
-    return payload
-  })
+  const payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')])
+  return payload
 }
 
 // Used to distinguish bad password during decrypt vs invalid format
@@ -55,50 +54,40 @@ class PasswordError extends Error { }
 /**
 * @ignore
 */
-function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
-  return Promise.resolve().then(() => {
-    const salt = dataBuffer.slice(0, 16)
-    const hmacSig = dataBuffer.slice(16, 48)   // 32 bytes
-    const cipherText = dataBuffer.slice(48)
-    const hmacPayload = Buffer.concat([salt, cipherText])
+async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
+  const salt = dataBuffer.slice(0, 16)
+  const hmacSig = dataBuffer.slice(16, 48)   // 32 bytes
+  const cipherText = dataBuffer.slice(48)
+  const hmacPayload = Buffer.concat([salt, cipherText])
 
-    const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
-    const encKey = keysAndIV.slice(0, 16)
-    const macKey = keysAndIV.slice(16, 32)
-    const iv = keysAndIV.slice(32, 48)
+  const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
+  const encKey = keysAndIV.slice(0, 16)
+  const macKey = keysAndIV.slice(16, 32)
+  const iv = keysAndIV.slice(32, 48)
 
-    const decipher = createDecipheriv('aes-128-cbc', encKey, iv)
-    let plaintext = decipher.update(cipherText).toString('hex')
-    plaintext += decipher.final().toString('hex')
+  const decipher = createDecipheriv('aes-128-cbc', encKey, iv)
+  let plaintext = decipher.update(cipherText).toString('hex')
+  plaintext += decipher.final().toString('hex')
 
-    const hmac = createHmac('sha256', macKey)
-    hmac.write(hmacPayload)
-    const hmacDigest = hmac.digest()
+  const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
 
-    // hash both hmacSig and hmacDigest so string comparison time
-    // is uncorrelated to the ciphertext
-    const hmacSigHash = createHash('sha256')
-      .update(hmacSig)
-      .digest()
-      .toString('hex')
+  // hash both hmacSig and hmacDigest so string comparison time
+  // is uncorrelated to the ciphertext
+  const hmacSigHash = (await createHashSha256().digest(hmacSig)).toString('hex')
 
-    const hmacDigestHash = createHash('sha256')
-      .update(hmacDigest)
-      .digest()
-      .toString('hex')
+  const hmacDigestHash = (await createHashSha256().digest(hmacDigest)).toString('hex')
 
-    if (hmacSigHash !== hmacDigestHash) {
-      // not authentic
-      throw new PasswordError('Wrong password (HMAC mismatch)')
-    }
+  if (hmacSigHash !== hmacDigestHash) {
+    // not authentic
+    throw new PasswordError('Wrong password (HMAC mismatch)')
+  }
 
-    const mnemonic = entropyToMnemonic(plaintext)
-    if (!validateMnemonic(mnemonic)) {
-      throw new PasswordError('Wrong password (invalid plaintext)')
-    }
+  const mnemonic = entropyToMnemonic(plaintext)
+  if (!validateMnemonic(mnemonic)) {
+    throw new PasswordError('Wrong password (invalid plaintext)')
+  }
 
-    return mnemonic
-  })
+  return mnemonic
 }
 
 

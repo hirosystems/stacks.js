@@ -1,9 +1,8 @@
 import { ECPair } from 'bitcoinjs-lib'
-
-// @ts-ignore: Could not find a declaration file for module
 import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens'
-
+import { TokenInterface } from 'jsontokens/lib/decode'
 import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
+
 
 /**
   * Signs a profile token
@@ -72,7 +71,8 @@ export function wrapProfileToken(token: string) {
   * @returns {Object} - the verified, decoded profile token
   * @throws {Error} - throws an error if token verification fails
   */
-export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
+export async function verifyProfileToken(token: string, publicKeyOrAddress: string): 
+  Promise<TokenInterface> {
   const decodedToken = decodeToken(token)
   const payload = decodedToken.payload
   if (typeof payload === 'string') {
@@ -102,13 +102,13 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
     throw new Error('Token doesn\'t have a claim')
   }
 
-  const issuerPublicKey = payload.issuer.publicKey
+  const issuerPublicKey = payload.issuer.publicKey as string
   const publicKeyBuffer = Buffer.from(issuerPublicKey, 'hex')
 
   const compressedKeyPair =  ECPair.fromPublicKey(publicKeyBuffer, { compressed: true })
-  const compressedAddress = ecPairToAddress(compressedKeyPair)
+  const compressedAddress = await ecPairToAddress(compressedKeyPair)
   const uncompressedKeyPair = ECPair.fromPublicKey(publicKeyBuffer, { compressed: false })
-  const uncompressedAddress = ecPairToAddress(uncompressedKeyPair)
+  const uncompressedAddress = await ecPairToAddress(uncompressedKeyPair)
 
   if (publicKeyOrAddress === issuerPublicKey) {
     // pass
@@ -142,10 +142,11 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
   * @returns {Object} - the profile extracted from the encoded token
   * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
   */
-export function extractProfile(token: string, publicKeyOrAddress: string | null = null) {
+export async function extractProfile(token: string, publicKeyOrAddress: string | null = null): 
+  Promise<any> {
   let decodedToken
   if (publicKeyOrAddress) {
-    decodedToken = verifyProfileToken(token, publicKeyOrAddress)
+    decodedToken = await verifyProfileToken(token, publicKeyOrAddress)
   } else {
     decodedToken = decodeToken(token)
   }

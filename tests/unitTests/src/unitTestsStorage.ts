@@ -361,7 +361,7 @@ export function runStorageTests() {
       })
   })
 
-  test('encrypt & decrypt content', (t) => {
+  test('encrypt & decrypt content', async (t) => {
     t.plan(2)
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
@@ -371,22 +371,22 @@ export function runStorageTests() {
     } // manually set private key for testing
 
     const content = 'yellowsubmarine'
-    const ciphertext = blockstack.encryptContent(content)
+    const ciphertext = await blockstack.encryptContent(content)
     t.ok(ciphertext)
-    const deciphered = blockstack.decryptContent(ciphertext)
+    const deciphered = await blockstack.decryptContent(ciphertext)
     t.equal(content, deciphered)
   })
 
-  test('encrypt & decrypt content -- specify key', (t) => {
+  test('encrypt & decrypt content -- specify key', async (t) => {
     t.plan(2)
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
     const publicKey = getPublicKeyFromPrivate(privateKey)
     const content = 'we-all-live-in-a-yellow-submarine'
-    const ciphertext = blockstack.encryptContent(content, { publicKey })
+    const ciphertext = await blockstack.encryptContent(content, { publicKey })
     t.ok(ciphertext)
-    const deciphered = blockstack.decryptContent(ciphertext, { privateKey })
+    const deciphered = await blockstack.decryptContent(ciphertext, { privateKey })
     t.equal(content, deciphered)
   })
 
@@ -708,7 +708,7 @@ export function runStorageTests() {
       })
   })
 
-  test('putFile & getFile encrypted, not signed', (t) => {
+  test('putFile & getFile encrypted, not signed', async (t) => {
     t.plan(2)
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -741,7 +741,7 @@ export function runStorageTests() {
       './hub': { getFullReadUrl }
     })
 
-    FetchMock.get(fullReadUrl, blockstack.encryptContent(fileContent))
+    FetchMock.get(fullReadUrl, await blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: true }
     const decryptOptions = { decrypt: true }
     // put and encrypt the file
@@ -757,7 +757,7 @@ export function runStorageTests() {
       })
   })
 
-  test('putFile encrypt/no-sign using specifying public key & getFile decrypt', (t) => {
+  test('putFile encrypt/no-sign using specifying public key & getFile decrypt', async (t) => {
     t.plan(2)
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -792,7 +792,7 @@ export function runStorageTests() {
       './hub': { getFullReadUrl }
     })
 
-    FetchMock.get(fullReadUrl, blockstack.encryptContent(fileContent))
+    FetchMock.get(fullReadUrl, await blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: publicKey }
     const decryptOptions = { decrypt: true }
     // put and encrypt the file
@@ -1361,7 +1361,7 @@ export function runStorageTests() {
 
     FetchMock.get(`${hubServer}/hub_info`, JSON.stringify(hubInfo))
 
-    getBucketUrl(hubServer, privateKey)
+    return getBucketUrl(hubServer, privateKey)
       .then((bucketUrl) => {
         t.ok(bucketUrl, 'App index file URL returned by getBucketUrl')
         t.equal(bucketUrl, `${hubInfo.read_url_prefix}${address}/`)

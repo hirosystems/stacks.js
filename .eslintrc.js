@@ -116,5 +116,28 @@ module.exports = {
     "import/no-duplicates": "error",
     "import/no-unassigned-import": "error",
     "import/order": "error",
+
+    "import/no-nodejs-modules": ["error", { "allow": [
+
+    ]}],
+
+    // ---- Enforce some blockstack.js specific rules ----
+
+    "no-restricted-globals": ["error", {
+        "name": "fetch",
+        "message": "Use `privateFetch` instead."
+      }, {
+        "name": "fdescribe",
+        "message": "Do not commit fdescribe. Use describe instead."
+      }
+    ],
+
+    "no-restricted-modules": ["error", {
+        "name": "crypto",
+        "message": "Use a specific module from `./src/encryption/` "
+      }
+    ]
+
+    // ----
   }
 }

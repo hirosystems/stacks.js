@@ -1,5 +1,4 @@
 import * as queryString from 'query-string'
-// @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { BLOCKSTACK_HANDLER, getGlobalObject, updateQueryStringParameter } from '../utils'
 import { fetchPrivate } from '../fetchUtil'

@@ -34,21 +34,22 @@ export class Profile {
     return signProfileToken(this.toJSON(), privateKey)
   }
 
-  static validateSchema(profile: any, strict = false) {
+  static validateSchema(profile: any, strict = false): any {
     schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
-    const profile = extractProfile(token, publicKeyOrAddress)
+  static async fromToken(token: string, publicKeyOrAddress: string | null = null): 
+    Promise<Profile> {
+    const profile = await extractProfile(token, publicKeyOrAddress)
     return new Profile(profile)
   }
 
-  static makeZoneFile(domainName: string, tokenFileURL: string) {
+  static makeZoneFile(domainName: string, tokenFileURL: string): string {
     return makeProfileZoneFile(domainName, tokenFileURL)
   }
 
-  static validateProofs(domainName: string) {
+  static async validateProofs(domainName: string): Promise<any[]> {
     return validateProofs(new Profile().toJSON(), domainName)
   }
 }

@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import test from 'tape'
+import test from 'tape-promise/tape'
 
 import {
   transactions, config, network, hexStringToECPair, ecPairToAddress

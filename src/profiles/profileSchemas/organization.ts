@@ -30,8 +30,9 @@ export class Organization extends Profile {
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
-    const profile = extractProfile(token, publicKeyOrAddress)
+  static async fromToken(token: string, publicKeyOrAddress: string | null = null): 
+    Promise<Organization> {
+    const profile = await extractProfile(token, publicKeyOrAddress)
     return new Organization(profile)
   }
 }

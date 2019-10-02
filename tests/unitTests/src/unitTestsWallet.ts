@@ -1,7 +1,7 @@
 import * as test from 'tape-promise/tape'
 
 import {
-  BlockstackWallet
+  BlockstackWallet, IdentityKeyPair
 } from '../../../src'
 
 function testsBlockstackWallet() {
@@ -15,7 +15,7 @@ function testsBlockstackWallet() {
         + 'm69UZ6TwePZRVKrzpBTc4a2CECMwVFhNo5vhEDie1KYsCj'
   const bitcoinAddress = '1QU3Q5CAXAbfKBg52wWYUjhBEcfBy8bUR'
 
-  const identityKeyPairs = [
+  const identityKeyPairs: IdentityKeyPair[] = [
     {
       address: '1E3DgiNVoRQH32VW6T6USsAgcLroquV9xy',
       appsNodeKey: 'xprvA1bXJqMaKqHFnYB3LyLmtJMXgpCKisknF2EuVBrNs6UkvR3U4W2vtdEK9'
@@ -59,22 +59,23 @@ function testsBlockstackWallet() {
                    BlockstackWallet.fromBase58(testSeedB58)]
   wallets
     .forEach((wallet) => {
-      test('wallet matches browser 0.26.2 implementation', (t) => {
+      test('wallet matches browser 0.26.2 implementation', async (t) => {
         t.plan(6)
         t.equals(wallet.getIdentityPublicKeychain().toBase58(), identityXPUB, 'id xpub is correct')
         t.equals(wallet.getBitcoinPublicKeychain().toBase58(), bitcoinXPUB, 'btc xpub is correct')
         t.equals(wallet.getBitcoinAddress(0), bitcoinAddress, 'btc address correct')
+        const testKeyPairs = await Promise.all([0, 1, 2, 3].map(index => wallet.getIdentityKeyPair(index, true)))
         t.deepEquals(
-          [0, 1, 2, 3].map(index => wallet.getIdentityKeyPair(index, true)),
+          testKeyPairs,
           identityKeyPairs, 'keypairs generated correctly'
         )
-        const idKeyPair = wallet.getIdentityKeyPair(0, false)
-        t.equals(BlockstackWallet.getLegacyAppPrivateKey(idKeyPair.appsNodeKey,
+        const idKeyPair = await wallet.getIdentityKeyPair(0, false)
+        t.equals(await BlockstackWallet.getLegacyAppPrivateKey(idKeyPair.appsNodeKey,
                                                          idKeyPair.salt,
                                                          'https://blockstack-todos.appartisan.com'),
                  expectedLegacyAppSK,
                  'blockstack-todos app legacy private key correct')
-        t.equals(BlockstackWallet.getAppPrivateKey(idKeyPair.appsNodeKey,
+        t.equals(await BlockstackWallet.getAppPrivateKey(idKeyPair.appsNodeKey,
                                                    'potato potato',
                                                    'carrot carrot carrot'),
                  expectedNewAppSK,

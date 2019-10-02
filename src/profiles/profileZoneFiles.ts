@@ -12,7 +12,7 @@ import { fetchPrivate } from '../fetchUtil'
  * 
  * @ignore
  */
-export function makeProfileZoneFile(origin: string, tokenFileUrl: string) {
+export function makeProfileZoneFile(origin: string, tokenFileUrl: string): string {
   if (tokenFileUrl.indexOf('://') < 0) {
     throw new Error('Invalid token file url')
   }
@@ -113,9 +113,9 @@ export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: stri
       fetchPrivate(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
-        .then((responseJson) => {
+        .then(async (responseJson) => {
           const tokenRecords = responseJson
-          const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress)
+          const profile = await extractProfile(tokenRecords[0].token, publicKeyOrAddress)
           resolve(profile)
         })
         .catch((error) => {

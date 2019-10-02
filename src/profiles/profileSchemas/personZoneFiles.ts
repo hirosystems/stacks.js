@@ -49,10 +49,10 @@ export function resolveZoneFileToPerson(
     fetchPrivate(tokenFileUrl)
       .then(response => response.text())
       .then(responseText => JSON.parse(responseText))
-      .then((responseJson) => {
+      .then(async (responseJson) => {
         const tokenRecords = responseJson
         const token = tokenRecords[0].token
-        const profile = extractProfile(token, publicKeyOrAddress)
+        const profile = await extractProfile(token, publicKeyOrAddress)
 
         callback(profile)
       })

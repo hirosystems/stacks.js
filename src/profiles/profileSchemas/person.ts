@@ -114,8 +114,8 @@ export class Person extends Profile {
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
-    const profile = extractProfile(token, publicKeyOrAddress)
+  static async fromToken(token: string, publicKeyOrAddress: string | null = null): Promise<Person> {
+    const profile = await extractProfile(token, publicKeyOrAddress)
     return new Person(profile)
   }
 

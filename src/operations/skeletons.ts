@@ -175,7 +175,7 @@ function opEncode(opcode: string): string {
 /**
 * @ignore
 */
-export function makePreorderSkeleton(
+export async function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash: string, preorderAddress: string,
   burnAddress: string, burn: AmountType,
   registerAddress: string = null
@@ -209,7 +209,7 @@ export function makePreorderSkeleton(
 
   const dataBuff = Buffer.concat(dataBuffers)
 
-  const hashed = hash160(dataBuff)
+  const hashed = await hash160(dataBuff)
 
   const opReturnBufferLen = burnAmount.units === 'BTC' ? 39 : 66
   const opReturnBuffer = Buffer.alloc(opReturnBufferLen)
@@ -387,7 +387,7 @@ export function makeRenewalSkeleton(
 /**
 * @ignore
 */
-export function makeTransferSkeleton(
+export async function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
   keepZonefile: boolean = false
 ) {
@@ -418,7 +418,7 @@ export function makeTransferSkeleton(
   opRet.write(opEncode('>'), 0, 3, 'ascii')
   opRet.write(keepChar, 3, 1, 'ascii')
 
-  const hashed = hash128(Buffer.from(fullyQualifiedName, 'ascii'))
+  const hashed = await hash128(Buffer.from(fullyQualifiedName, 'ascii'))
   hashed.copy(opRet, 4)
   opRet.write(consensusHash, 20, 16, 'hex')
 
@@ -435,7 +435,7 @@ export function makeTransferSkeleton(
 /**
 * @ignore
 */
-export function makeUpdateSkeleton(
+export async function makeUpdateSkeleton(
   fullyQualifiedName: string, consensusHash: string, valueHash: string
 ) {
   // Returns an update tx skeleton.
@@ -461,7 +461,7 @@ export function makeUpdateSkeleton(
   const nameBuff = Buffer.from(fullyQualifiedName, 'ascii')
   const consensusBuff = Buffer.from(consensusHash, 'ascii')
 
-  const hashedName = hash128(Buffer.concat(
+  const hashedName = await hash128(Buffer.concat(
     [nameBuff, consensusBuff]
   ))
 
@@ -516,7 +516,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 /**
 * @ignore
 */
-export function makeNamespacePreorderSkeleton(
+export async function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash: string, preorderAddress: string,
   registerAddress: string, burn: AmountType
 ) {
@@ -557,7 +557,7 @@ export function makeNamespacePreorderSkeleton(
   const dataBuffers = [namespaceIDBuff, scriptPublicKey, registerBuff]
   const dataBuff = Buffer.concat(dataBuffers)
 
-  const hashed = hash160(dataBuff)
+  const hashed = await hash160(dataBuff)
   
   let btcBurnAmount = DUST_MINIMUM
   let opReturnBufferLen = 39

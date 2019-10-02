@@ -1,4 +1,4 @@
-import * as test from 'tape'
+import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
 import { Transaction, TransactionBuilder, networks, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
 // @ts-ignore
@@ -190,21 +190,21 @@ function utilsTests() {
            actual: ${actualLength})`)
   })
 
-  test('encoding routines', (t) => {
+  test('encoding routines', async (t) => {
     t.plan(5)
 
-    t.equal(hash160(Buffer.from(
+    t.equal((await hash160(Buffer.from(
       '99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosq'
-    )).toString('hex'),
+    ))).toString('hex'),
             '7ea1fa0f2003c31b015a72af9f4a5f104b5c2840')
 
-    t.equal(hash160(Buffer.from('1234')).toString('hex'),
+    t.equal((await hash160(Buffer.from('1234'))).toString('hex'),
             'fd7a0d80999bedd76c9a0828057817fc6049a507')
 
-    t.equal(hash128(Buffer.from('999')).toString('hex'),
+    t.equal((await hash128(Buffer.from('999'))).toString('hex'),
             '83cf8b609de60036a8277bd0e9613575')
 
-    t.equal(hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa'))
+    t.equal((await hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa')))
       .toString('hex'),
             '740ae7f18c939cf5e7c189a2c77a012f')
 

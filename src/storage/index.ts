@@ -90,19 +90,19 @@ export async function getUserAppFileUrl(
  * key to use for encryption. If not provided, will use user's appPublicKey.
  * @return {String} Stringified ciphertext object
  */
-export function encryptContent(
+export async function encryptContent(
   content: string | Buffer,
   options?: {
     publicKey?: string
   },
   caller?: UserSession
-) {
+): Promise<string> {
   const opts = Object.assign({}, options)
   if (!opts.publicKey) {
     const privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
     opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
-  const cipherObject = encryptECIES(opts.publicKey, content)
+  const cipherObject = await encryptECIES(opts.publicKey, content)
   return JSON.stringify(cipherObject)
 }
 
@@ -125,7 +125,7 @@ export function decryptContent(
     privateKey?: string
   },
   caller?: UserSession
-) {
+): Promise<string | Buffer> {
   const opts = Object.assign({}, options)
   if (!opts.privateKey) {
     opts.privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
@@ -298,11 +298,11 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
         throw err
       }
     }
-    const signerAddress = publicKeyToAddress(publicKey)
+    const signerAddress = await publicKeyToAddress(publicKey)
     if (gaiaAddress !== signerAddress) {
       throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
                                             + ` match gaia address (${gaiaAddress})`)
-    } else if (!verifyECDSA(fileContents, publicKey, signature)) {
+    } else if (!(await verifyECDSA(fileContents, publicKey, signature))) {
       throw new SignatureVerificationError(
         'Contents do not match ECDSA signature: '
           + `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`
@@ -328,56 +328,53 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
  * @private
  * @ignore
  */
-function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
-                                       app: string, username?: string, zoneFileLookupURL?: string) {
+async function handleSignedEncryptedContents(
+  caller: UserSession, path: string, storedContents: string,
+  app: string, username?: string, zoneFileLookupURL?: string) {
   const appPrivateKey = caller.loadUserData().appPrivateKey
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
 
-  let addressPromise: Promise<string>
+  let address: string
   if (username) {
-    addressPromise = getGaiaAddress(app, username, zoneFileLookupURL, caller)
+    address = await getGaiaAddress(app, username, zoneFileLookupURL, caller)
   } else {
-    const address = publicKeyToAddress(appPublicKey)
-    addressPromise = Promise.resolve(address)
+    address = await publicKeyToAddress(appPublicKey)
   }
-
-  return addressPromise.then((address) => {
-    if (!address) {
-      throw new SignatureVerificationError('Failed to get gaia address for verification of: '
-                                           + `${path}`)
-    }
-    let sigObject
-    try {
-      sigObject = JSON.parse(storedContents)
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        throw new Error('Failed to parse encrypted, signed content JSON. The content may not '
-                        + 'be encrypted. If using getFile, try passing'
-                        + ' { verify: false, decrypt: false }.')
-      } else {
-        throw err
-      }
-    }
-    const signature = sigObject.signature
-    const signerPublicKey = sigObject.publicKey
-    const cipherText = sigObject.cipherText
-    const signerAddress = publicKeyToAddress(signerPublicKey)
-
-    if (!signerPublicKey || !cipherText || !signature) {
-      throw new SignatureVerificationError(
-        'Failed to get signature verification data from file:'
-          + ` ${path}`
-      )
-    } else if (signerAddress !== address) {
-      throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
-                                           + ` match gaia address (${address})`)
-    } else if (!verifyECDSA(cipherText, signerPublicKey, signature)) {
-      throw new SignatureVerificationError('Contents do not match ECDSA signature in file:'
-                                           + ` ${path}`)
+  if (!address) {
+    throw new SignatureVerificationError('Failed to get gaia address for verification of: '
+                                          + `${path}`)
+  }
+  let sigObject
+  try {
+    sigObject = JSON.parse(storedContents)
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      throw new Error('Failed to parse encrypted, signed content JSON. The content may not '
+                      + 'be encrypted. If using getFile, try passing'
+                      + ' { verify: false, decrypt: false }.')
     } else {
-      return caller.decryptContent(cipherText)
+      throw err
     }
-  })
+  }
+  const signature = sigObject.signature
+  const signerPublicKey = sigObject.publicKey
+  const cipherText = sigObject.cipherText
+  const signerAddress = await publicKeyToAddress(signerPublicKey)
+
+  if (!signerPublicKey || !cipherText || !signature) {
+    throw new SignatureVerificationError(
+      'Failed to get signature verification data from file:'
+        + ` ${path}`
+    )
+  } else if (signerAddress !== address) {
+    throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
+                                          + ` match gaia address (${address})`)
+  } else if (!(await verifyECDSA(cipherText, signerPublicKey, signature))) {
+    throw new SignatureVerificationError('Contents do not match ECDSA signature in file:'
+                                          + ` ${path}`)
+  } else {
+    return caller.decryptContent(cipherText)
+  }
 }
 
 export interface GetFileUrlOptions {
@@ -583,7 +580,7 @@ export async function putFile(
   //   here will return there.
   if (!opt.encrypt && opt.sign) {
     const contentData = await contentLoader.load()
-    const signatureObject = signECDSA(privateKey, contentData)
+    const signatureObject = await signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
     const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
 
@@ -609,12 +606,12 @@ export async function putFile(
   let contentForUpload: Blob | Buffer | ArrayBufferView | string
   if (opt.encrypt && !opt.sign) {
     const contentData = await contentLoader.load()
-    contentForUpload = encryptContent(contentData, { publicKey })
+    contentForUpload = await encryptContent(contentData, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
     const contentData = await contentLoader.load()
-    const cipherText = encryptContent(contentData, { publicKey })
-    const signatureObject = signECDSA(privateKey, cipherText)
+    const cipherText = await encryptContent(contentData, { publicKey })
+    const signatureObject = await signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,
       publicKey: signatureObject.publicKey,

@@ -1,6 +1,5 @@
 
 import * as queryString from 'query-string'
-// @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
 import { isLaterVersion, hexStringToECPair, getGlobalObject, getGlobalObjects } from '../utils'
@@ -109,14 +108,15 @@ export function isUserSignedIn() {
  * An array of strings indicating which permissions this app is requesting.
  * @return {void}
  */
-export function redirectToSignIn(redirectURI?: string, 
-                                 manifestURI?: string, 
-                                 scopes?: Array<AuthScope | string>) { 
+export async function redirectToSignIn(
+  redirectURI?: string, 
+  manifestURI?: string, 
+  scopes?: Array<AuthScope | string>) { 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
-  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
-  redirectToSignInWithAuthRequest(authRequest)
+  const authRequest = await makeAuthRequest(null, redirectURI, manifestURI, scopes)
+  return redirectToSignInWithAuthRequest(authRequest)
 }
 
 /**
@@ -210,11 +210,11 @@ export function signUserOut(redirectURL?: string, caller?: UserSession) {
  *                                     protocol handler is not detected
  * @return {void}
  */
-export function redirectToSignInWithAuthRequest(
+export async function redirectToSignInWithAuthRequest(
   authRequest?: string,
   blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST,
-) {
-  authRequest = authRequest || makeAuthRequest()
+): Promise<void> {
+  authRequest = authRequest || (await makeAuthRequest())
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
   const { navigator, location } = getGlobalObjects(
@@ -325,7 +325,7 @@ export async function handlePendingSignIn(
     if (transitKey !== undefined && transitKey != null) {
       if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
         try {
-          appPrivateKey = decryptPrivateKey(transitKey, tokenPayload.private_key)
+          appPrivateKey = await decryptPrivateKey(transitKey, tokenPayload.private_key)
         } catch (e) {
           Logger.warn('Failed decryption of appPrivateKey, will try to use as given')
           try {
@@ -338,7 +338,7 @@ export async function handlePendingSignIn(
       }
       if (coreSessionToken !== undefined && coreSessionToken !== null) {
         try {
-          coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+          coreSessionToken = await decryptPrivateKey(transitKey, coreSessionToken)
         } catch (e) {
           Logger.info('Failed decryption of coreSessionToken, will try to use as given')
         }
@@ -379,7 +379,7 @@ export async function handlePendingSignIn(
     } else {
       const responseText = await response.text()
       const wrappedProfile = JSON.parse(responseText)
-      const profile = extractProfile(wrappedProfile[0].token)
+      const profile = await extractProfile(wrappedProfile[0].token)
       userData.profile = profile
     }
   } else {

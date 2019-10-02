@@ -1,4 +1,4 @@
-import * as test from 'tape'
+import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
 // @ts-ignore
 import * as BN from 'bn.js'
