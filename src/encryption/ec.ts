@@ -123,13 +123,13 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
   )
 
   const macData = Buffer.concat([initializationVector,
-                                 Buffer.from(ephemeralPK.encode('array', true) as Buffer),
+                                 Buffer.from(ephemeralPK.encode('array', true)),
                                  cipherText])
   const mac = hmacSha256(sharedKeys.hmacKey, macData)
 
   return {
     iv: initializationVector.toString('hex'),
-    ephemeralPK: ephemeralPK.encode('hex', true) as string,
+    ephemeralPK: ephemeralPK.encode('hex', true),
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
     wasString: isString
@@ -167,7 +167,7 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 Buffer.from(ephemeralPK.encode('array', true) as Buffer),
+                                 Buffer.from(ephemeralPK.encode('array', true)),
                                  cipherTextBuffer])
   const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = Buffer.from(cipherObject.mac, 'hex')

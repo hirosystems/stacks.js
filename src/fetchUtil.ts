@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unassigned-import
 import 'cross-fetch/polyfill'
 
 /** @ignore */

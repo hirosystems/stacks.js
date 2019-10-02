@@ -264,60 +264,61 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
   const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
-  return Promise.all(
-    [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
-     getFileContents(sigPath, opt.app, opt.username,
-                     opt.zoneFileLookupURL, true, caller),
-     getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
-  )
-    .then(([fileContents, signatureContents, gaiaAddress]) => {
-      if (!fileContents) {
-        return fileContents
-      }
-      if (!gaiaAddress) {
-        throw new SignatureVerificationError('Failed to get gaia address for verification of: '
-                                             + `${path}`)
-      }
-      if (!signatureContents || typeof signatureContents !== 'string') {
-        throw new SignatureVerificationError('Failed to obtain signature for file: '
-                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
-      }
-      let signature
-      let publicKey
-      try {
-        const sigObject = JSON.parse(signatureContents)
-        signature = sigObject.signature
-        publicKey = sigObject.publicKey
-      } catch (err) {
-        if (err instanceof SyntaxError) {
-          throw new Error('Failed to parse signature content JSON '
-                          + `(path: ${path}${SIGNATURE_FILE_SUFFIX})`
-                          + ' The content may be corrupted.')
-        } else {
-          throw err
-        }
-      }
-      const signerAddress = publicKeyToAddress(publicKey)
-      if (gaiaAddress !== signerAddress) {
-        throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
-                                             + ` match gaia address (${gaiaAddress})`)
-      } else if (!verifyECDSA(fileContents, publicKey, signature)) {
-        throw new SignatureVerificationError(
-          'Contents do not match ECDSA signature: '
-            + `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`
-        )
-      } else {
-        return fileContents
-      }
-    }).catch((err) => {
-      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
-      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
-        throw new SignatureVerificationError('Failed to obtain signature for file: '
-                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+  try {
+    const [fileContents, signatureContents, gaiaAddress] = await Promise.all([
+      getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
+      getFileContents(sigPath, opt.app, opt.username,
+                      opt.zoneFileLookupURL, true, caller),
+      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)
+    ])
+  
+    if (!fileContents) {
+      return fileContents
+    }
+    if (!gaiaAddress) {
+      throw new SignatureVerificationError('Failed to get gaia address for verification of: '
+                                            + `${path}`)
+    }
+    if (!signatureContents || typeof signatureContents !== 'string') {
+      throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                            + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+    }
+    let signature
+    let publicKey
+    try {
+      const sigObject = JSON.parse(signatureContents)
+      signature = sigObject.signature
+      publicKey = sigObject.publicKey
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        throw new Error('Failed to parse signature content JSON '
+                        + `(path: ${path}${SIGNATURE_FILE_SUFFIX})`
+                        + ' The content may be corrupted.')
       } else {
         throw err
       }
-    })
+    }
+    const signerAddress = publicKeyToAddress(publicKey)
+    if (gaiaAddress !== signerAddress) {
+      throw new SignatureVerificationError(`Signer pubkey address (${signerAddress}) doesn't`
+                                            + ` match gaia address (${gaiaAddress})`)
+    } else if (!verifyECDSA(fileContents, publicKey, signature)) {
+      throw new SignatureVerificationError(
+        'Contents do not match ECDSA signature: '
+          + `path: ${path}, signature: ${path}${SIGNATURE_FILE_SUFFIX}`
+      )
+    } else {
+      return fileContents
+    }
+  } catch (err) {
+    // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
+    if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
+      throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                            + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+    } else {
+      throw err
+    }
+  }
 }
 
 /* Handle signature verification and decryption for contents which are
@@ -445,27 +446,26 @@ export async function getFile(
     return getFileSignedUnencrypted(path, opt, caller)
   }
 
-  return getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, !!opt.decrypt, caller)
-    .then<string|ArrayBuffer|Buffer>((storedContents) => {
-      if (storedContents === null) {
-        return storedContents
-      } else if (opt.decrypt && !opt.verify) {
-        if (typeof storedContents !== 'string') {
-          throw new Error('Expected to get back a string for the cipherText')
-        }
-        return caller.decryptContent(storedContents)
-      } else if (opt.decrypt && opt.verify) {
-        if (typeof storedContents !== 'string') {
-          throw new Error('Expected to get back a string for the cipherText')
-        }
-        return handleSignedEncryptedContents(caller, path, storedContents,
-                                             opt.app, opt.username, opt.zoneFileLookupURL)
-      } else if (!opt.verify && !opt.decrypt) {
-        return storedContents
-      } else {
-        throw new Error('Should be unreachable.')
-      }
-    })
+  const storedContents = await getFileContents(path, opt.app, opt.username, 
+                                               opt.zoneFileLookupURL, !!opt.decrypt, caller)
+  if (storedContents === null) {
+    return storedContents
+  } else if (opt.decrypt && !opt.verify) {
+    if (typeof storedContents !== 'string') {
+      throw new Error('Expected to get back a string for the cipherText')
+    }
+    return caller.decryptContent(storedContents)
+  } else if (opt.decrypt && opt.verify) {
+    if (typeof storedContents !== 'string') {
+      throw new Error('Expected to get back a string for the cipherText')
+    }
+    return handleSignedEncryptedContents(caller, path, storedContents,
+                                         opt.app, opt.username, opt.zoneFileLookupURL)
+  } else if (!opt.verify && !opt.decrypt) {
+    return storedContents
+  } else {
+    throw new Error('Should be unreachable.')
+  }
 }
 
 /** @ignore */
