@@ -4,11 +4,13 @@ import { randomBytes, createHash } from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
-import { ecPairToAddress, hexStringToECPair } from '../utils'
+import {
+  ecPairToAddress,
+  hexStringToECPair,
+  getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
-import { FileNotFound } from '../errors'
 
 /**
  * @ignore
@@ -35,7 +37,8 @@ export interface GaiaHubConfig {
  * @ignore
  */
 export async function uploadToGaiaHub(
-  filename: string, contents: any,
+  filename: string, 
+  contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
@@ -51,8 +54,8 @@ export async function uploadToGaiaHub(
     }
   )
   if (!response.ok) {
-    throw new Error('Error when uploading to Gaia hub')
-  } 
+    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.')
+  }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
   return responseJSON.publicURL
@@ -63,7 +66,7 @@ export async function deleteFromGaiaHub(
   hubConfig: GaiaHubConfig
 ): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`)
-  const response = await fetch(
+  const response = await fetchPrivate(
     `${hubConfig.server}/delete/${hubConfig.address}/${filename}`, {
       method: 'DELETE',
       headers: {
@@ -72,20 +75,7 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    let responseMsg = ''
-    try {
-      responseMsg = await response.text()
-    } catch (error) {
-      Logger.debug(`Error getting bad http response text: ${error}`)
-    }
-    const errorMsg = 'Error deleting file from Gaia hub: '
-      + `${response.status} ${response.statusText}: ${responseMsg}`
-    Logger.error(errorMsg)
-    if (response.status === 404) {
-      throw new FileNotFound(errorMsg)
-    } else {
-      throw new Error(errorMsg)
-    }
+    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.')
   }
 }
 
