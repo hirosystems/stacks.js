@@ -830,5 +830,6 @@ export {
   connectToGaiaHub, 
   uploadToGaiaHub, 
   BLOCKSTACK_GAIA_HUB_LABEL, 
-  GAIA_HUB_COLLECTION_KEY_FILE_NAME 
+  GAIA_HUB_COLLECTION_KEY_FILE_NAME,
+  GaiaHubConfig
 }
