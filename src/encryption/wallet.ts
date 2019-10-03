@@ -1,5 +1,3 @@
-// eslint-disable-next-line import/no-nodejs-modules
-import { pbkdf2Sync } from 'crypto'
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
 
 // TODO: triplesec minified JS 186KB.
@@ -11,6 +9,7 @@ import { randomBytes } from './cryptoRandom'
 import { createHashSha256 } from './hashSha256'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipherAes128Cbc } from './cipherAesCbc'
+import { createPbkdf2 } from './pbkdf2'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
@@ -32,8 +31,9 @@ export async function encryptMnemonic(phrase: string, password: string): Promise
   )
 
   // AES-128-CBC with SHA256 HMAC
+  const pbkdf2 = createPbkdf2()
   const salt = randomBytes(16)
-  const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
+  const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512')
   const encKey = keysAndIV.slice(0, 16)
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
@@ -64,7 +64,8 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
   const cipherText = dataBuffer.slice(48)
   const hmacPayload = Buffer.concat([salt, cipherText])
 
-  const keysAndIV = pbkdf2Sync(password, salt, 100000, 48, 'sha512')
+  const pbkdf2 = createPbkdf2()
+  const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512')
   const encKey = keysAndIV.slice(0, 16)
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
