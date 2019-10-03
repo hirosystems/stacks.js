@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-nodejs-modules
-import { pbkdf2Sync, createCipheriv, createDecipheriv } from 'crypto'
+import { pbkdf2Sync } from 'crypto'
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
 
 // TODO: triplesec minified JS 186KB.
@@ -10,6 +10,7 @@ import { decrypt as triplesecDecrypt } from 'triplesec'
 import { randomBytes } from './cryptoRandom'
 import { createHashSha256 } from './hashSha256'
 import { createHmacSha256 } from './hmacSha256'
+import { createCipherAes128Cbc } from './cipherAesCbc'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
@@ -37,14 +38,17 @@ export async function encryptMnemonic(phrase: string, password: string): Promise
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
 
-  const cipher = createCipheriv('aes-128-cbc', encKey, iv)
-  let cipherText = cipher.update(plaintextNormalized).toString('hex')
-  cipherText += cipher.final().toString('hex')
+  // const cipher = createCipheriv('aes-128-cbc', encKey, iv)
+  // let cipherText = cipher.update(plaintextNormalized).toString('hex')
+  // cipherText += cipher.final().toString('hex')
 
-  const hmacPayload = Buffer.concat([salt, Buffer.from(cipherText, 'hex')])
+  const cipher = createCipherAes128Cbc()
+  const cipherText = await cipher.encrypt(encKey, iv, plaintextNormalized)
+
+  const hmacPayload = Buffer.concat([salt, cipherText])
   const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
 
-  const payload = Buffer.concat([salt, hmacDigest, Buffer.from(cipherText, 'hex')])
+  const payload = Buffer.concat([salt, hmacDigest, cipherText])
   return payload
 }
 
@@ -65,9 +69,9 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
 
-  const decipher = createDecipheriv('aes-128-cbc', encKey, iv)
-  let plaintext = decipher.update(cipherText).toString('hex')
-  plaintext += decipher.final().toString('hex')
+  const decipher = createCipherAes128Cbc()
+  const decryptedResult = await decipher.decrypt(encKey, iv, cipherText)
+  const plaintext = decryptedResult.toString('hex')
 
   const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
 

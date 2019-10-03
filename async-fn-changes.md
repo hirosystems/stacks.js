@@ -31,3 +31,5 @@ encryptContent
 decryptContent
 decryptPrivateKey
 hmacSha256
+aes256CbcEncrypt
+aes256CbcDecrypt

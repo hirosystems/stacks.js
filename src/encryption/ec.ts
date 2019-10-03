@@ -4,14 +4,13 @@
 import { ec as EllipticCurve } from 'elliptic'
 // @ts-ignore
 import * as BN from 'bn.js'
-// eslint-disable-next-line import/no-nodejs-modules
-import { createCipheriv, createDecipheriv } from 'crypto'
 import { randomBytes } from './cryptoRandom'
 import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
 import { createHashSha512 } from './hashSha512'
 import { createHashSha256 } from './hashSha256'
 import { createHmacSha256 } from './hmacSha256'
+import { createCipherAes256Cbc } from './cipherAesCbc'
 
 const ecurve = new EllipticCurve('secp256k1')
 
@@ -29,17 +28,19 @@ export type CipherObject = {
 /**
 * @ignore
 */
-function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer) {
-  const cipher = createCipheriv('aes-256-cbc', key, iv)
-  return Buffer.concat([cipher.update(plaintext), cipher.final()])
+async function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer): Promise<Buffer> {
+  const cipher = createCipherAes256Cbc()
+  const result = await cipher.encrypt(key, iv, plaintext)
+  return result
 }
 
 /**
 * @ignore
 */
-function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
-  const cipher = createDecipheriv('aes-256-cbc', key, iv)
-  return Buffer.concat([cipher.update(ciphertext), cipher.final()])
+async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
+  const cipher = createCipherAes256Cbc()
+  const result = await cipher.decrypt(key, iv, ciphertext)
+  return result
 }
 
 /**
@@ -124,7 +125,7 @@ export async function encryptECIES(publicKey: string, content: string | Buffer):
 
   const initializationVector = randomBytes(16)
 
-  const cipherText = aes256CbcEncrypt(
+  const cipherText = await aes256CbcEncrypt(
     initializationVector, sharedKeys.encryptionKey, plainText
   )
 
@@ -181,7 +182,7 @@ export async function decryptECIES(privateKey: string, cipherObject: CipherObjec
   if (!equalConstTime(expectedMac, actualMac)) {
     throw new FailedDecryptionError('Decryption failed: failure in MAC check')
   }
-  const plainText = aes256CbcDecrypt(
+  const plainText = await aes256CbcDecrypt(
     ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer
   )
 

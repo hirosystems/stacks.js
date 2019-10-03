@@ -33,7 +33,6 @@ export function runAuthTests() {
   const nameLookupURL = 'https://core.blockstack.org/v1/names/'
 
   test('makeAuthRequest && verifyAuthRequest', async (t) => {
-    t.plan(15)
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -88,7 +87,7 @@ export function runAuthTests() {
     const manifestString = JSON.stringify(manifest)
     FetchMock.get(manifiestUrl, manifestString)
 
-    verifyAuthRequestAndLoadManifest(authRequest)
+    await verifyAuthRequestAndLoadManifest(authRequest)
       .then((appManifest) => {
         console.log(appManifest)
         t.equal(appManifest.name, 'App', 'should fetch manifest for valid auth request')
@@ -96,7 +95,6 @@ export function runAuthTests() {
   })
 
   test('make and verify auth request with extraParams', async (t) => {
-    t.plan(4)
 
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -111,15 +109,13 @@ export function runAuthTests() {
 
     t.equal(decodedToken.payload.myCustomParam, 'asdf', 'custom param from extraParams is included in payload')
 
-    verifyAuthRequest(authRequest)
+    await verifyAuthRequest(authRequest)
       .then((verified) => {
         t.true(verified, 'auth request should be verified')
       })
   })
 
   test('invalid auth request - signature not verified', async (t) => {
-    t.plan(3)
-
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
@@ -129,12 +125,12 @@ export function runAuthTests() {
     t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false,
             'Signatures should not match the public keys')
 
-    verifyAuthRequest(invalidAuthRequest)
+    await verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
         t.equal(verified, false, 'auth request should be unverified')
       })
 
-    verifyAuthRequestAndLoadManifest(invalidAuthRequest)
+    await verifyAuthRequestAndLoadManifest(invalidAuthRequest)
       .then(() => {
         // no op
       },
@@ -144,7 +140,6 @@ export function runAuthTests() {
   })
 
   test('invalid auth request - invalid redirect uri', async (t) => {
-    t.plan(3)
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     appConfig.redirectURI = () => 'https://example.com' // monkey patch for test
     const blockstack = new UserSession({ appConfig })
@@ -154,12 +149,12 @@ export function runAuthTests() {
     t.equal(isRedirectUriValid(invalidAuthRequest), false,
             'Redirect URI should be invalid since it does not match origin')
 
-    verifyAuthRequest(invalidAuthRequest)
+    await verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
         t.equal(verified, false, 'auth request should be unverified')
       })
 
-    verifyAuthRequestAndLoadManifest(invalidAuthRequest)
+    await verifyAuthRequestAndLoadManifest(invalidAuthRequest)
       .then(() => {
         // no op
       },
@@ -169,8 +164,6 @@ export function runAuthTests() {
   })
 
   test('invalid auth request - invalid manifest uri', async (t) => {
-    t.plan(2)
-
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     appConfig.manifestURI = () => 'https://example.com/manifest.json' // monkey patch for test
     const blockstack = new UserSession({ appConfig })
@@ -179,15 +172,13 @@ export function runAuthTests() {
     t.equal(isManifestUriValid(invalidAuthRequest), false,
             'Manifest URI should be invalid since it does not match origin')
 
-    verifyAuthRequest(invalidAuthRequest)
+    await verifyAuthRequest(invalidAuthRequest)
       .then((verified) => {
         t.equal(verified, false, 'auth request should be unverified')
       })
   })
 
   test('makeAuthResponse && verifyAuthResponse', async (t) => {
-    t.plan(11)
-
     const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, null, null)
     t.ok(authResponse, 'auth response should have been created')
 
@@ -208,7 +199,7 @@ export function runAuthTests() {
     // const verified = verifyAuthResponse(authResponse)
     // t.equal(verified, true, 'auth response should be verified')
 
-    verifyAuthResponse(authResponse, nameLookupURL)
+    await verifyAuthResponse(authResponse, nameLookupURL)
       .then((verifiedResult) => {
         t.true(verifiedResult, 'auth response should be verified')
       })
@@ -218,14 +209,13 @@ export function runAuthTests() {
     t.true(doSignaturesMatchPublicKeys(authResponse), 'Signatures should match the public keys')
     t.true(await doPublicKeysMatchIssuer(authResponse), 'Public keys should match the issuer')
 
-    doPublicKeysMatchUsername(authResponse, nameLookupURL)
+    await doPublicKeysMatchUsername(authResponse, nameLookupURL)
       .then((verifiedResult) => {
         t.true(verifiedResult, 'Public keys should match the username')
       })
   })
 
   test('auth response with username', async (t) => {
-    t.plan(2)
 
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
@@ -235,20 +225,18 @@ export function runAuthTests() {
     const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null)
     // console.log(decodeToken(authResponse))
 
-    doPublicKeysMatchUsername(authResponse, nameLookupURL)
+    await doPublicKeysMatchUsername(authResponse, nameLookupURL)
       .then((verified) => {
         t.true(verified, 'Public keys should match the username')
       })
 
-    verifyAuthResponse(authResponse, nameLookupURL)
+    await verifyAuthResponse(authResponse, nameLookupURL)
       .then((verifiedResult) => {
         t.true(verifiedResult, 'auth response should be verified')
       })
   })
 
   test('auth response with invalid private key', async (t) => {
-    t.plan(2)
-
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
@@ -269,7 +257,7 @@ export function runAuthTests() {
                                           transitPublicKey)
 
 
-    return blockstack.handlePendingSignIn(authResponse)
+    await blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.fail('Should have failed to decrypt auth response')
       })
@@ -292,8 +280,6 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn with authResponseToken', async (t) => {
-    t.plan(1)
-
     const url = `${nameLookupURL}ryan.id`
 
     FetchMock.get(url, sampleNameRecords.ryan)
@@ -311,7 +297,7 @@ export function runAuthTests() {
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
-    return blockstack.handlePendingSignIn(authResponse)
+    await blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
       })
@@ -322,8 +308,6 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn 2', async (t) => {
-    t.plan(1)
-
     const url = `${nameLookupURL}ryan.id`
 
     FetchMock.get(url, sampleNameRecords.ryan)
@@ -341,7 +325,7 @@ export function runAuthTests() {
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
-    return blockstack.handlePendingSignIn(authResponse)
+    await blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
       })
@@ -352,8 +336,6 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn with existing user session', async (t) => {
-    t.plan(1)
-
     const url = `${nameLookupURL}ryan.id`
 
     FetchMock.get(url, sampleNameRecords.ryan)
@@ -383,7 +365,7 @@ export function runAuthTests() {
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey)
 
-    return blockstack.handlePendingSignIn(authResponse)
+    await blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.fail('Should not overwrite existing user');
       })
@@ -429,8 +411,6 @@ export function runAuthTests() {
   })
 
   test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', async (t) => {
-    t.plan(2)
-
     const customBlockstackAPIUrl = 'https://test.name.lookups'
     const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
     const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
@@ -450,7 +430,7 @@ export function runAuthTests() {
                                           metadata, undefined, appPrivateKey, undefined,
                                           transitPublicKey, undefined, customBlockstackAPIUrl)
 
-    return blockstack.handlePendingSignIn(authResponse)
+    await blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
         t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl,
@@ -466,7 +446,6 @@ export function runAuthTests() {
 
   test('handlePendingSignIn with authResponseToken, transit key, '
     + 'Blockstack API URL, and Gaia association token', async (t) => {
-    t.plan(3)
 
     const customBlockstackAPIUrl = 'https://test.name.lookups'
     const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
@@ -502,7 +481,7 @@ export function runAuthTests() {
     const blockstack = new UserSession({ appConfig })
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
-    return blockstack.handlePendingSignIn(authResponse)
+    await blockstack.handlePendingSignIn(authResponse)
       .then(() => {
         t.pass('Should correctly sign in with auth response')
         t.equal(config.network.blockstackAPIUrl, customBlockstackAPIUrl,

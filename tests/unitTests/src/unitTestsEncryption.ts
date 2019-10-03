@@ -98,8 +98,7 @@ export function runEncryptionTests() {
     t.true(results.every(x => x), 'Evil hexes must all generate 64-len hex strings')
   })
 
-  test('encryptMnemonic & decryptMnemonic', (t) => {
-    t.plan(4)
+  test('encryptMnemonic & decryptMnemonic', async (t) => {
 
     const rawPhrase = 'march eager husband pilot waste rely exclude taste '
       + 'twist donkey actress scene'
@@ -125,7 +124,7 @@ export function runEncryptionTests() {
     // Test encryption -> decryption. Can't be done with hard-coded values
     // due to random salt.
     // TODO: Use generators to allow for inserting the same salt for testing?
-    encryptMnemonic(rawPhrase, rawPassword)
+    await encryptMnemonic(rawPhrase, rawPassword)
       .then(encoded => decryptMnemonic(encoded.toString('hex'), rawPassword),
             (err) => {
               t.fail(`Should encrypt mnemonic phrase, instead errored: ${err}`)
@@ -137,20 +136,20 @@ export function runEncryptionTests() {
       })
 
     // Test valid input (No salt, so it's the same every time)
-    decryptMnemonic(legacyEncrypted, legacyPassword).then((decoded) => {
+    await decryptMnemonic(legacyEncrypted, legacyPassword).then((decoded) => {
       t.true(decoded.toString() === legacyPhrase, 'Should decrypt legacy encrypted phrase')
     }, (err) => {
       t.fail(`Should decrypt legacy encrypted phrase, instead errored: ${err}`)
     })
 
     // Invalid inputs
-    encryptMnemonic('not a mnemonic phrase', 'password').then(() => {
+    await encryptMnemonic('not a mnemonic phrase', 'password').then(() => {
       t.fail('Should have thrown on invalid mnemonic input')
     }, () => {
       t.pass('Should throw on invalid mnemonic input')
     })
 
-    decryptMnemonic(preEncryptedPhrase, 'incorrect password').then(() => {
+    await decryptMnemonic(preEncryptedPhrase, 'incorrect password').then(() => {
       t.fail('Should have thrown on incorrect password for decryption')
     }, () => {
       t.pass('Should throw on incorrect password')
