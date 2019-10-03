@@ -238,8 +238,7 @@ async function getFileContents(path: string, app: string, username: string | und
                                caller?: UserSession): Promise<string | ArrayBuffer | null> {
   const opts = { app, username, zoneFileLookupURL }
   const readUrl = await getFileUrl(path, opts, caller)
-  const headers = { 'Cache-Control': 'no-cache' }
-  const response = await fetchPrivate(readUrl, { headers })
+  const response = await fetchPrivate(readUrl)
   if (!response.ok) {
     throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
   }
