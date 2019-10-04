@@ -8,6 +8,10 @@ import { runOperationsTests }   from './unitTestsOperations'
 import { runWalletTests }       from './unitTestsWallet'
 import { runErrorsTests }       from './unitTestsErrors'
 import { runNetworkTests }      from './unitTestsNetwork'
+import * as crypto              from '@peculiar/webcrypto'
+
+
+// ;(global as any).crypto = new crypto.Crypto()
 
 // Utils tests
 runUtilsTests()

@@ -79,6 +79,9 @@ module.exports = (env, argv) => {
       libraryTarget: 'umd',
       globalObject: 'this'
     },
+    externals: {
+      'crypto': 'crypto'
+    },
     plugins: [
       // BIP39 includes ~240KB of non-english json that we don't currently use.
       new webpack.IgnorePlugin(/\.\/wordlists\/(?!english\.json)/)

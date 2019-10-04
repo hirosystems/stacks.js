@@ -4,6 +4,9 @@
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "unpkg": "dist/blockstack.js",
+  "browser": {
+    "crypto": false
+  },
   "scripts": {
     "build": "run-p build:node build:webpack build:docs",
     "build:webpack": "shx rm -rf dist/* && cross-env NODE_ENV=production webpack --mode=production",
@@ -86,6 +89,7 @@
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-typescript": "^7.6.0",
     "@babel/register": "^7.6.2",
+    "@peculiar/webcrypto": "^1.0.19",
     "@types/cheerio": "^0.22.13",
     "@types/fetch-mock": "^5.8.0",
     "@types/jsdom": "^12.2.4",
