@@ -9,7 +9,7 @@ import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
 import { randomBytes } from '../encryption/cryptoRandom'
-import { createHashSha256 } from '../encryption/hashSha256'
+import { createSha2Hash } from '../encryption/sha2Hash'
 
 /**
  * @ignore
@@ -109,7 +109,7 @@ async function makeLegacyAuthToken(challengeText: string, signerKeyHex: string):
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = await createHashSha256().digest(Buffer.from(challengeText))
+    const digest = await createSha2Hash().digest(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
     const signatureWithHash = script.signature.encode(

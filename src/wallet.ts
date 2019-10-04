@@ -3,7 +3,7 @@ import { mnemonicToSeed, generateMnemonic } from 'bip39'
 import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 import { randomBytes } from './encryption/cryptoRandom'
-import { createHashSha256 } from './encryption/hashSha256'
+import { createSha2Hash } from './encryption/sha2Hash'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888
@@ -179,7 +179,7 @@ export class BlockstackWallet {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
     // TODO: this is being decoded as a utf8 string rather than a hex string?
     const publicKeyHex = Buffer.from(getNodePublicKey(identityPrivateKeychain))
-    const hash = await createHashSha256().digest(publicKeyHex)
+    const hash = await createSha2Hash().digest(publicKeyHex)
     return hash.toString('hex')
   }
 
@@ -266,7 +266,7 @@ export class BlockstackWallet {
   static async getLegacyAppPrivateKey(
     appsNodeKey: string, 
     salt: string, appDomain: string): Promise<string> {
-    const hashBuffer = await createHashSha256().digest(Buffer.from(`${appDomain}${salt}`))
+    const hashBuffer = await createSha2Hash().digest(Buffer.from(`${appDomain}${salt}`))
     const hash = hashBuffer.toString('hex')
     const appIndex = hashCode(hash)
     const appNode = bip32.fromBase58(appsNodeKey).deriveHardened(appIndex)
@@ -290,7 +290,7 @@ export class BlockstackWallet {
    */
   static async getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): 
     Promise<string> {
-    const hashBuffer = await createHashSha256().digest(Buffer.from(`${appDomain}${salt}`))
+    const hashBuffer = await createSha2Hash().digest(Buffer.from(`${appDomain}${salt}`))
     const hash = hashBuffer.toString('hex')
     const appIndexHexes: string[] = []
     // note: there's hardcoded numbers here, precisely because I want this

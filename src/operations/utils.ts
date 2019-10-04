@@ -6,7 +6,7 @@ import * as BN from 'bn.js'
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
-import { createHashSha256 } from '../encryption/hashSha256'
+import { createSha2Hash } from '../encryption/sha2Hash'
 import { createHashRipemd160 } from '../encryption/hashRipemd160'
 
 
@@ -21,7 +21,7 @@ export const DUST_MINIMUM = 5500
  * @ignore
  */
 export async function hash160(buff: Buffer) {
-  const sha256 = await createHashSha256().digest(buff)
+  const sha256 = await createSha2Hash().digest(buff)
   return createHashRipemd160().digest(sha256)
 }
 
@@ -30,7 +30,7 @@ export async function hash160(buff: Buffer) {
  * @ignore
  */
 export async function hash128(buff: Buffer) {
-  return Buffer.from((await createHashSha256().digest(buff)).slice(0, 16))
+  return Buffer.from((await createSha2Hash().digest(buff)).slice(0, 16))
 }
 
 

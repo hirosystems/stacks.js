@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-nodejs-modules
 import { createHmac } from 'crypto'
-import { Hmac } from './cryptoInterfaces'
+import { Hmac } from './cryptoUtils'
 
 // TODO: Create a WebCrypto implementation for browser usage
 

@@ -1,9 +1,3 @@
-/* eslint-disable import/no-unused-modules */
-
-export interface Hash {
-  digest(data: NodeJS.TypedArray): Promise<Buffer>;
-}
-
 export interface Hmac {
   digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer>;
 }
@@ -23,3 +17,9 @@ export interface Pbkdf2 {
     keyLength: number, 
     digest: Pbkdf2Digests): Promise<Buffer>;
 }
+
+export function isWebCryptoAvailable(): boolean {
+  return typeof crypto !== 'undefined' && typeof crypto.subtle !== 'undefined'
+}
+
+export const NO_CRYPTO_LIB = 'Crypto lib not found. Either the WebCrypto "crypto.subtle" or Node.js "crypto" module must be available.'

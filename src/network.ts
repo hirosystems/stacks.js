@@ -6,7 +6,7 @@ import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 import { config } from './config'
 import { fetchPrivate } from './fetchUtil'
-import { createHashSha256 } from './encryption/hashSha256'
+import { createSha2Hash } from './encryption/sha2Hash'
 import { createHashRipemd160 } from './encryption/hashRipemd160'
 
 export interface UTXO {
@@ -433,7 +433,7 @@ export class BlockstackNetwork {
         if (resp.status === 200) {
           return resp.text()
             .then(async (body) => {
-              const sha256 = await createHashSha256().digest(Buffer.from(body))
+              const sha256 = await createSha2Hash().digest(Buffer.from(body))
               const h = (await createHashRipemd160().digest(sha256)).toString('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)

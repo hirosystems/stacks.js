@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-nodejs-modules
 import { createCipheriv, createDecipheriv } from 'crypto'
-import { Cipher } from './cryptoInterfaces'
+import { Cipher } from './cryptoUtils'
 
 // TODO: Create a WebCrypto implementation for browser usage
 

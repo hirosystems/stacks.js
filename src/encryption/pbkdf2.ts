@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-nodejs-modules
 import { pbkdf2Sync } from 'crypto'
-import { Pbkdf2, Pbkdf2Digests } from './cryptoInterfaces'
+import { Pbkdf2, Pbkdf2Digests } from './cryptoUtils'
 
 // TODO: Create a WebCrypto implementation for browser usage
 

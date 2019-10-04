@@ -1,7 +1,7 @@
 
 import { ECPair, address as baddress } from 'bitcoinjs-lib'
 import { randomBytes } from './encryption/cryptoRandom'
-import { createHashSha256 } from './encryption/hashSha256'
+import { createSha2Hash } from './encryption/sha2Hash'
 import { createHashRipemd160 } from './encryption/hashRipemd160'
 
 /**
@@ -31,7 +31,7 @@ export function makeECPrivateKey() {
 export async function publicKeyToAddress(publicKey: string) {
   const publicKeyBuffer = Buffer.from(publicKey, 'hex')
   const publicKeyHash160 = await createHashRipemd160().digest(
-    await createHashSha256().digest(publicKeyBuffer)
+    await createSha2Hash().digest(publicKeyBuffer)
   )
   const address = baddress.toBase58Check(publicKeyHash160, 0x00)
   return address

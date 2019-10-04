@@ -10,7 +10,7 @@ import {
   PayloadTooLargeError, 
   ValidationError
 } from './errors'
-import { createHashSha256 } from './encryption/hashSha256'
+import { createSha2Hash } from './encryption/sha2Hash'
 import { createHashRipemd160 } from './encryption/hashRipemd160'
 
 
@@ -150,7 +150,7 @@ export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
  * @ignore
  */
 export async function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  const sha256 = await createHashSha256().digest(keyPair.publicKey)
+  const sha256 = await createSha2Hash().digest(keyPair.publicKey)
   const hash160 = await createHashRipemd160().digest(sha256)
   return address.toBase58Check(hash160, keyPair.network.pubKeyHash)
 }

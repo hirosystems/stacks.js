@@ -6,7 +6,7 @@ import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
 //       themselves and pass the decrypt function to blockstack.js. 
 import { decrypt as triplesecDecrypt } from 'triplesec'
 import { randomBytes } from './cryptoRandom'
-import { createHashSha256 } from './hashSha256'
+import { createSha2Hash } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipherAes128Cbc } from './cipherAesCbc'
 import { createPbkdf2 } from './pbkdf2'
@@ -78,9 +78,9 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
 
   // hash both hmacSig and hmacDigest so string comparison time
   // is uncorrelated to the ciphertext
-  const hmacSigHash = (await createHashSha256().digest(hmacSig)).toString('hex')
+  const hmacSigHash = (await createSha2Hash().digest(hmacSig)).toString('hex')
 
-  const hmacDigestHash = (await createHashSha256().digest(hmacDigest)).toString('hex')
+  const hmacDigestHash = (await createSha2Hash().digest(hmacDigest)).toString('hex')
 
   if (hmacSigHash !== hmacDigestHash) {
     // not authentic

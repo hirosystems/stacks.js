@@ -7,8 +7,7 @@ import * as BN from 'bn.js'
 import { randomBytes } from './cryptoRandom'
 import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
-import { createHashSha512 } from './hashSha512'
-import { createHashSha256 } from './hashSha256'
+import { createSha2Hash } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipherAes256Cbc } from './cipherAesCbc'
 
@@ -69,7 +68,7 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 */
 async function sharedSecretToKeys(sharedSecret: Buffer) {
   // generate mac and encryption key from shared secret
-  const hashedSecret = await createHashSha512().digest(sharedSecret)
+  const hashedSecret = await createSha2Hash().digest(sharedSecret, 'sha512')
   return {
     encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32)
@@ -210,7 +209,7 @@ export async function signECDSA(privateKey: string, content: string | Buffer): P
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
-  const contentHash = await createHashSha256().digest(contentBuffer)
+  const contentHash = await createSha2Hash().digest(contentBuffer)
   const signature = ecPrivate.sign(contentHash)
   const signatureString = signature.toDER('hex')
 
@@ -244,7 +243,7 @@ export async function verifyECDSA(
   signature: string) {
   const contentBuffer = getBuffer(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
-  const contentHash = await createHashSha256().digest(contentBuffer)
+  const contentHash = await createSha2Hash().digest(contentBuffer)
 
   return ecPublic.verify(contentHash, <any>signature)
 }
