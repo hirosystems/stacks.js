@@ -1,5 +1,5 @@
 import * as test from 'tape-promise/tape'
-
+import * as triplesec from 'triplesec'
 import * as elliptic from 'elliptic'
 import {
   encryptECIES, decryptECIES, getHexFromBN, signECDSA,
@@ -125,7 +125,7 @@ export function runEncryptionTests() {
     // due to random salt.
     // TODO: Use generators to allow for inserting the same salt for testing?
     await encryptMnemonic(rawPhrase, rawPassword)
-      .then(encoded => decryptMnemonic(encoded.toString('hex'), rawPassword),
+      .then(encoded => decryptMnemonic(encoded.toString('hex'), rawPassword, triplesec.decrypt),
             (err) => {
               t.fail(`Should encrypt mnemonic phrase, instead errored: ${err}`)
             })
@@ -136,7 +136,7 @@ export function runEncryptionTests() {
       })
 
     // Test valid input (No salt, so it's the same every time)
-    await decryptMnemonic(legacyEncrypted, legacyPassword).then((decoded) => {
+    await decryptMnemonic(legacyEncrypted, legacyPassword, triplesec.decrypt).then((decoded) => {
       t.true(decoded.toString() === legacyPhrase, 'Should decrypt legacy encrypted phrase')
     }, (err) => {
       t.fail(`Should decrypt legacy encrypted phrase, instead errored: ${err}`)
@@ -149,7 +149,7 @@ export function runEncryptionTests() {
       t.pass('Should throw on invalid mnemonic input')
     })
 
-    await decryptMnemonic(preEncryptedPhrase, 'incorrect password').then(() => {
+    await decryptMnemonic(preEncryptedPhrase, 'incorrect password', triplesec.decrypt).then(() => {
       t.fail('Should have thrown on incorrect password for decryption')
     }, () => {
       t.pass('Should throw on incorrect password')

@@ -1,15 +1,10 @@
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
-
-// TODO: triplesec minified JS 186KB.
-//       Tt is only used for legacy mnemonic decryption, and appears to unused by regular apps.
-//       The authenticator and other app that needs it should import the triplesec dependency
-//       themselves and pass the decrypt function to blockstack.js. 
-import { decrypt as triplesecDecrypt } from 'triplesec'
 import { randomBytes } from './cryptoRandom'
 import { createSha2Hash } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipher } from './aesCipher'
 import { createPbkdf2 } from './pbkdf2'
+import { TriplesecDecryptSignature } from './cryptoUtils'
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
@@ -102,7 +97,11 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
  * @private
  * @ignore 
  */
-function decryptLegacy(dataBuffer: Buffer, password: string) {
+function decryptLegacy(
+  dataBuffer: Buffer, 
+  password: string, 
+  triplesecDecrypt: TriplesecDecryptSignature): 
+  Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     triplesecDecrypt(
       {
@@ -128,13 +127,17 @@ function decryptLegacy(dataBuffer: Buffer, password: string) {
  * @private
  * @ignore 
  */
-export function decryptMnemonic(data: (string | Buffer), password: string): Promise<string> {
+export function decryptMnemonic(
+  data: (string | Buffer), 
+  password: string, 
+  triplesecDecrypt: TriplesecDecryptSignature): 
+  Promise<string> {
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
   return decryptMnemonicBuffer(dataBuffer, password).catch((err) => {
     // If it was a password error, don't even bother with legacy
     if (err instanceof PasswordError) {
       throw err
     }
-    return decryptLegacy(dataBuffer, password).then(data => data.toString())
+    return decryptLegacy(dataBuffer, password, triplesecDecrypt).then(data => data.toString())
   })
 }

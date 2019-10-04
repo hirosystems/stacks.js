@@ -21,6 +21,7 @@
     "dev-proofs": "npm run build:webpack && ts-node ./tests/browserTests/proofs-server.ts",
     "prepublishOnly": "npm run test && npm run build",
     "lint": "eslint --ext .ts ./src -f codeframe",
+    "lint:fix": "eslint --fix --ext .ts ./src -f codeframe",
     "build:docs": "shx rm -rf docs/* && cross-env typedoc --name \"blockstack.js $npm_package_version Library Reference\" --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json src",
     "tsc": "tsc",
     "codecovUpload": "codecov"
@@ -122,6 +123,7 @@
     "source-map-support": "^0.5.13",
     "tape": "^4.11.0",
     "tape-promise": "^4.0.0",
+    "triplesec": "^3.0.27",
     "ts-loader": "^6.2.0",
     "ts-node": "^8.4.1",
     "typedoc": "^0.15.0",
@@ -148,7 +150,6 @@
     "request": "^2.88.0",
     "ripemd160-min": "0.0.4",
     "schema-inspector": "^1.6.8",
-    "triplesec": "^3.0.27",
     "tslib": "^1.10.0",
     "uuid": "^3.3.3",
     "zone-file": "^1.0.0"

@@ -4,6 +4,7 @@ import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 import { randomBytes } from './encryption/cryptoRandom'
 import { createSha2Hash } from './encryption/sha2Hash'
+import { TriplesecDecryptSignature } from './encryption/cryptoUtils'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888
@@ -107,9 +108,12 @@ export class BlockstackWallet {
    * 
    * @ignore
    */
-  static async fromEncryptedMnemonic(data: string, password: string) {
+  static async fromEncryptedMnemonic(
+    data: string, 
+    password: string, 
+    triplesecDecrypt: TriplesecDecryptSignature): Promise<BlockstackWallet> {
     try {
-      const mnemonic = await decryptMnemonic(data, password)
+      const mnemonic = await decryptMnemonic(data, password, triplesecDecrypt)
       const seed = await mnemonicToSeed(mnemonic)
       return new BlockstackWallet(bip32.fromSeed(seed))
     } catch (err) {
