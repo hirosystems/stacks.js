@@ -4,6 +4,7 @@ import * as inspector from 'schema-inspector'
 import { signProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'
 import { makeProfileZoneFile } from './profileZoneFiles'
+import { CheerioModuleType } from './services/service'
 
 const schemaDefinition: {[key: string]: any} = {
   type: 'object',
@@ -49,7 +50,7 @@ export class Profile {
     return makeProfileZoneFile(domainName, tokenFileURL)
   }
 
-  static async validateProofs(domainName: string): Promise<any[]> {
-    return validateProofs(new Profile().toJSON(), domainName)
+  static async validateProofs(domainName: string, cheerio: CheerioModuleType): Promise<any[]> {
+    return validateProofs(new Profile().toJSON(), domainName, cheerio)
   }
 }

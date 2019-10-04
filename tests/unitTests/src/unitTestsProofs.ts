@@ -1,5 +1,6 @@
 import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
+import * as cheerio from 'cheerio'
 
 import {
   validateProofs, containsValidProofStatement, containsValidAddressProofStatement
@@ -26,7 +27,7 @@ function testProofs(profile, username, totalProofs) {
   test(`Profiles ${username}`,
        (t) =>  { // FetchMock.get('https://www.facebook.com/larry.salibra/posts/10100341028448093', 'hi')
          mockRequests()
-         return validateProofs(profile, undefined, username).then((proofs) => {
+         return validateProofs(profile, undefined, cheerio, username).then((proofs) => {
            t.ok(proofs, 'Proofs must have been created')
            t.equal(proofs instanceof Array, true, 'Proofs should be an Array')
            t.equal(proofs.length, totalProofs,
@@ -67,7 +68,7 @@ function brokenProofs() {
     FetchMock.get(`${naval.github.url}b/raw`, naval.github.body)
     FetchMock.get(`${naval.twitter.url}b`, { body: '', status: 400 })
     t.plan(2)
-    validateProofs({ account: navalAccounts }, undefined, 'naval.id')
+    validateProofs({ account: navalAccounts }, undefined, cheerio, 'naval.id')
       .then((proofs) => {
         t.equal(proofs.length, 3)
         t.equal(proofs.filter(x => x.valid).length, 2)
@@ -85,27 +86,27 @@ export function runProofStatementUnitTests() {
     const ken = sampleAddressBasedVerifications.ken
     const oscar = sampleAddressBasedVerifications.oscar
 
-    t.equal(profileServices.facebook.getProofStatement(larry.facebook.body),
+    t.equal(profileServices.facebook.getProofStatement(larry.facebook.body, cheerio),
             'Verifying that "larry.id" is my Blockstack ID.',
             'Should extract proof statement from Facebook page meta tags')
 
-    t.equal(profileServices.twitter.getProofStatement(naval.twitter.body),
+    t.equal(profileServices.twitter.getProofStatement(naval.twitter.body, cheerio),
             'Verifying myself: My Bitcoin username is +naval. https://t.co/DdpZv8tMAH #bitcoin',
             'Should extract proof statement from Twitter page meta tags')
 
-    t.equal(profileServices.twitter.getProofStatement(ken.twitter.body),
+    t.equal(profileServices.twitter.getProofStatement(ken.twitter.body, cheerio),
             'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
             'Should extract address-based proof statement from Twitter page meta tags')
 
-    t.equal(profileServices.instagram.getProofStatement(ken.instagram.body),
+    t.equal(profileServices.instagram.getProofStatement(ken.instagram.body, cheerio),
             'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
             'Should extract address-based proof statement from Instagram meta tags')
 
-    t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body),
+    t.equal(profileServices.hackerNews.getProofStatement(ken.hackerNews.body, cheerio),
             'Verifying my Blockstack ID is secured with the address 1AtFqXxcckuoEN4iMNNe7n83c5nugxpzb5',
             'Should extract address-based proof statement from Hacker News profile')
 
-    t.equal(profileServices.linkedIn.getProofStatement(oscar.linkedIn.body),
+    t.equal(profileServices.linkedIn.getProofStatement(oscar.linkedIn.body, cheerio),
             'Oscar Lafarga on LinkedIn: "Verifying my Blockstack ID is secured with the address 1JbfoCkyyg2yn98jZ9A2HzGPzhHoc34WB7 https://lnkd.in/gM-KvXa"',
             'Should extract address-based proof statement from LinkedIn meta tags')
   })
@@ -119,13 +120,13 @@ export function runOwnerAddressBasedProofsUnitTests() {
     const ken = sampleAddressBasedVerifications.ken
     const oscar = sampleAddressBasedVerifications.oscar
 
-    const facebookProofStatement = profileServices.facebook.getProofStatement(larry.facebook.body)
-    const twitterProofStatement = profileServices.twitter.getProofStatement(ken.twitter.body)
-    const githubProofStatement = profileServices.github.getProofStatement(ken.github.body)
-    const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body)
+    const facebookProofStatement = profileServices.facebook.getProofStatement(larry.facebook.body, cheerio)
+    const twitterProofStatement = profileServices.twitter.getProofStatement(ken.twitter.body, cheerio)
+    const githubProofStatement = profileServices.github.getProofStatement(ken.github.body, cheerio)
+    const instagramProofStatement = profileServices.instagram.getProofStatement(ken.instagram.body, cheerio)
     const hackerNewsProofStatement = profileServices.hackerNews
-      .getProofStatement(ken.hackerNews.body)
-    const linkedInProofStatement = profileServices.linkedIn.getProofStatement(oscar.linkedIn.body)
+      .getProofStatement(ken.hackerNews.body, cheerio)
+    const linkedInProofStatement = profileServices.linkedIn.getProofStatement(oscar.linkedIn.body, cheerio)
 
 
     t.equals(containsValidAddressProofStatement(facebookProofStatement,
@@ -184,15 +185,15 @@ export function runInBodyIdentityVerificationTests() {
     const ken = sampleAddressBasedVerifications.ken
     const oscar = sampleAddressBasedVerifications.oscar
 
-    t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body),
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagram.body, cheerio),
             'blckstcktest',
             'Should extract social proof identity from Instagram proof page body')
 
-    t.equal(profileServices.instagram.getProofIdentity(ken.instagramRegression.body),
+    t.equal(profileServices.instagram.getProofIdentity(ken.instagramRegression.body, cheerio),
             'blckstcktest',
             'Should extract social proof identity from Instagram proof page body')
 
-    t.equal(profileServices.linkedIn.getProofIdentity(oscar.linkedIn.body),
+    t.equal(profileServices.linkedIn.getProofIdentity(oscar.linkedIn.body, cheerio),
             'oscarlafarga',
             'Should extract social proof identity from LinkedIn proof page body')
   })

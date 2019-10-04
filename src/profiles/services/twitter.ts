@@ -1,9 +1,8 @@
-
-import * as cheerio from 'cheerio'
-import { Service } from './service'
+import { Service, CheerioModuleType } from './service'
+import { AccountProofInfo } from '../profileProofs'
 
 class Twitter extends Service {
-  static getBaseUrls() {
+  getBaseUrls() {
     const baseUrls = [
       'https://twitter.com/',
       'http://twitter.com/',
@@ -12,11 +11,11 @@ class Twitter extends Service {
     return baseUrls
   }
 
-  static normalizeUrl(_proof: any) {
+  normalizeUrl(_proof: AccountProofInfo) {
     return ''
   }
 
-  static getProofStatement(searchText: string) {
+  getProofStatement(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[property="og:description"]').attr('content')
     if (statement !== undefined) {
@@ -24,6 +23,25 @@ class Twitter extends Service {
     } else {
       return ''
     }
+  }
+
+  getProofIdentity(searchText: string) {
+    return searchText
+  }
+
+  getProofUrl(proof: AccountProofInfo): string {
+    const baseUrls = this.getBaseUrls()
+
+    let proofUrl = proof.proof_url.toLowerCase()
+    proofUrl = this.prefixScheme(proofUrl)
+
+    for (let i = 0; i < baseUrls.length; i++) {
+      const requiredPrefix = `${baseUrls[i]}${proof.identifier}`.toLowerCase()
+      if (proofUrl.startsWith(requiredPrefix)) {
+        return proofUrl
+      }
+    }
+    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 }
 

@@ -1,13 +1,17 @@
 import { containsValidProofStatement, containsValidAddressProofStatement } from './serviceUtils'
 import { fetchPrivate } from '../../fetchUtil'
+import { AccountProofInfo } from '../profileProofs'
+
+export type CheerioModuleType = typeof import('cheerio')
 
 /**
  * @ignore
  */
-export class Service {
-  static validateProof(proof: any,
-                       ownerAddress: string,
-                       name: string = null) {
+export abstract class Service {
+  validateProof(proof: AccountProofInfo,
+                ownerAddress: string,
+                cheerio: CheerioModuleType,
+                name: string = null) {
     let proofUrl: string
     return Promise.resolve()
       .then(() => {
@@ -24,10 +28,10 @@ export class Service {
       .then((text) => {
         // Validate identity in provided proof body/tags if required
         if (this.shouldValidateIdentityInBody()
-            && proof.identifier !== this.getProofIdentity(text)) {
+            && proof.identifier !== this.getProofIdentity(text, cheerio)) {
           return proof
         }
-        const proofText = this.getProofStatement(text)
+        const proofText = this.getProofStatement(text, cheerio)
         proof.valid = containsValidProofStatement(proofText, name)
           || containsValidAddressProofStatement(proofText, ownerAddress)
         return proof
@@ -39,23 +43,11 @@ export class Service {
       })
   }
 
-  static getBaseUrls(): string[] {
-    return []
-  }
-
-  static getProofIdentity(searchText: string) {
-    return searchText
-  }
-
-  static getProofStatement(searchText: string) {
-    return searchText
-  }
-
-  static shouldValidateIdentityInBody() {
+  shouldValidateIdentityInBody() {
     return false
   }
 
-  static prefixScheme(proofUrl: string) {
+  prefixScheme(proofUrl: string) {
     if (!proofUrl.startsWith('https://') && !proofUrl.startsWith('http://')) {
       return `https://${proofUrl}`
     } else if (proofUrl.startsWith('http://')) {
@@ -65,18 +57,13 @@ export class Service {
     }
   }
 
-  static getProofUrl(proof: any): string {
-    const baseUrls = this.getBaseUrls()
+  abstract getBaseUrls(): string[];
 
-    let proofUrl = proof.proof_url.toLowerCase()
-    proofUrl = this.prefixScheme(proofUrl)
+  abstract getProofUrl(proof: AccountProofInfo): string;
 
-    for (let i = 0; i < baseUrls.length; i++) {
-      const requiredPrefix = `${baseUrls[i]}${proof.identifier}`.toLowerCase()
-      if (proofUrl.startsWith(requiredPrefix)) {
-        return proofUrl
-      }
-    }
-    throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
-  }
+  abstract getProofStatement(searchText: string, cheerio: CheerioModuleType): string;
+
+  abstract normalizeUrl(proof: AccountProofInfo): string;
+
+  abstract getProofIdentity(searchText: string, cheerio: CheerioModuleType): string;
 }

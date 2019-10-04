@@ -1,9 +1,8 @@
-
-import * as cheerio from 'cheerio'
-import { Service } from './service'
+import { Service, CheerioModuleType } from './service'
+import { AccountProofInfo } from '../profileProofs'
 
 class LinkedIn extends Service {
-  static getBaseUrls() {
+  getBaseUrls() {
     const baseUrls = [
       'https://www.linkedin.com/feed/update/',
       'http://www.linkedin.com/feed/update/',
@@ -12,7 +11,7 @@ class LinkedIn extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof: any) {
+  getProofUrl(proof: AccountProofInfo) {
     const baseUrls = this.getBaseUrls()
     
     let proofUrl = proof.proof_url.toLowerCase()
@@ -26,15 +25,15 @@ class LinkedIn extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeUrl(_proof: any) {
+  normalizeUrl(_proof: AccountProofInfo) {
     return ''
   }
 
-  static shouldValidateIdentityInBody() {
+  shouldValidateIdentityInBody() {
     return true
   }
 
-  static getProofIdentity(searchText: string) {
+  getProofIdentity(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const profileLink = $('body > main header a')
 
@@ -53,7 +52,7 @@ class LinkedIn extends Service {
     }
   }
 
-  static getProofStatement(searchText: string) {
+  getProofStatement(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const postContent = $('head > meta[property="og:title"]')
     let statement = ''
