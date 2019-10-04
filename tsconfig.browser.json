@@ -3,7 +3,8 @@
     "target": "es6",
     "module": "commonjs",
     "noImplicitAny": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "importHelpers": true
   },
   "include": [
     "src"

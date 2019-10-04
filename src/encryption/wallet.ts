@@ -8,7 +8,7 @@ import { decrypt as triplesecDecrypt } from 'triplesec'
 import { randomBytes } from './cryptoRandom'
 import { createSha2Hash } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
-import { createCipherAes128Cbc } from './cipherAesCbc'
+import { createCipher } from './aesCipher'
 import { createPbkdf2 } from './pbkdf2'
 
 /**
@@ -38,12 +38,8 @@ export async function encryptMnemonic(phrase: string, password: string): Promise
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
 
-  // const cipher = createCipheriv('aes-128-cbc', encKey, iv)
-  // let cipherText = cipher.update(plaintextNormalized).toString('hex')
-  // cipherText += cipher.final().toString('hex')
-
-  const cipher = createCipherAes128Cbc()
-  const cipherText = await cipher.encrypt(encKey, iv, plaintextNormalized)
+  const cipher = createCipher()
+  const cipherText = await cipher.encrypt('aes-128-cbc', encKey, iv, plaintextNormalized)
 
   const hmacPayload = Buffer.concat([salt, cipherText])
   const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
@@ -70,8 +66,8 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
 
-  const decipher = createCipherAes128Cbc()
-  const decryptedResult = await decipher.decrypt(encKey, iv, cipherText)
+  const decipher = createCipher()
+  const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText)
   const plaintext = decryptedResult.toString('hex')
 
   const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)

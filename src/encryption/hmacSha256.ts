@@ -1,4 +1,8 @@
-import { Hmac, isWebCryptoAvailable, NO_CRYPTO_LIB } from './cryptoUtils'
+import { isWebCryptoAvailable, NO_CRYPTO_LIB } from './cryptoUtils'
+
+export interface Hmac {
+  digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer>;
+}
 
 type NodeCryptoCreateHmac = typeof import('crypto').createHmac
 

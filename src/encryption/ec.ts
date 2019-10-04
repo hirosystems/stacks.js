@@ -9,7 +9,7 @@ import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
 import { createSha2Hash } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
-import { createCipherAes256Cbc } from './cipherAesCbc'
+import { createCipher } from './aesCipher'
 
 const ecurve = new EllipticCurve('secp256k1')
 
@@ -28,17 +28,17 @@ export type CipherObject = {
 * @ignore
 */
 async function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer): Promise<Buffer> {
-  const cipher = createCipherAes256Cbc()
-  const result = await cipher.encrypt(key, iv, plaintext)
+  const cipher = createCipher()
+  const result = await cipher.encrypt('aes-256-cbc', key, iv, plaintext)
   return result
 }
 
 /**
 * @ignore
 */
-async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
-  const cipher = createCipherAes256Cbc()
-  const result = await cipher.decrypt(key, iv, ciphertext)
+async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer): Promise<Buffer> {
+  const cipher = createCipher()
+  const result = await cipher.decrypt('aes-256-cbc', key, iv, ciphertext)
   return result
 }
 
