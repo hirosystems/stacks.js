@@ -3,9 +3,17 @@ import RIPEMD160 from 'ripemd160-min'
 class Ripemd160Digest {
   async digest(data: NodeJS.TypedArray): Promise<Buffer> {
     const instance = new RIPEMD160()
-    const hash = instance.update(Array.from(data)).digest()
-    const buffer = Buffer.from(hash)
-    return Promise.resolve(buffer)
+    if (Buffer.isBuffer(data)) {
+      instance.update(data)
+    } else {
+      instance.update(Buffer.from(data.buffer))
+    }
+    const hash = instance.digest()
+    if (Array.isArray(hash)) {
+      return Promise.resolve(Buffer.from(hash))
+    } else {
+      return Promise.resolve(Buffer.from(hash.buffer))
+    }
   }
 }
 
