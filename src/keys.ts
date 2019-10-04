@@ -30,8 +30,9 @@ export function makeECPrivateKey() {
 */
 export async function publicKeyToAddress(publicKey: string) {
   const publicKeyBuffer = Buffer.from(publicKey, 'hex')
+  const sha2Hash = await createSha2Hash()
   const publicKeyHash160 = await createHashRipemd160().digest(
-    await createSha2Hash().digest(publicKeyBuffer)
+    await sha2Hash.digest(publicKeyBuffer)
   )
   const address = baddress.toBase58Check(publicKeyHash160, 0x00)
   return address

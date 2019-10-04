@@ -1,4 +1,4 @@
-import { isWebCryptoAvailable, NO_CRYPTO_LIB } from './cryptoUtils'
+import { getCryptoLib } from './cryptoUtils'
 
 type NodeCryptoCreateCipher = typeof import('crypto').createCipheriv;
 type NodeCryptoCreateDecipher = typeof import('crypto').createDecipheriv;
@@ -59,6 +59,12 @@ class NodeCryptoCipher implements Cipher {
 }
 
 class WebCryptoCipher implements Cipher {
+  subtleCrypto: SubtleCrypto
+
+  constructor(subtleCrypto: SubtleCrypto) {
+    this.subtleCrypto = subtleCrypto
+  }
+
   async encrypt(
     algorithm: CipherAlgorithm, 
     key: NodeJS.TypedArray, 
@@ -76,15 +82,12 @@ class WebCryptoCipher implements Cipher {
     } else {
       throw new Error(`Unsupported cipher algorithm "${algorithm}"`)
     }
-    const cryptoKey = await crypto.subtle.importKey(
+    const cryptoKey = await this.subtleCrypto.importKey(
       'raw', key,
       { name: algo, length },
       false, ['encrypt']
     )
-    const result = await crypto.subtle.encrypt(
-      { name: algo, iv },
-      cryptoKey, data
-    )
+    const result = await this.subtleCrypto.encrypt({ name: algo, iv }, cryptoKey, data)
     return Buffer.from(result)
   }
 
@@ -105,30 +108,21 @@ class WebCryptoCipher implements Cipher {
     } else {
       throw new Error(`Unsupported cipher algorithm "${algorithm}"`)
     }
-    const cryptoKey = await crypto.subtle.importKey(
+    const cryptoKey = await this.subtleCrypto.importKey(
       'raw', key,
       { name: algo, length },
       false, ['decrypt']
     )
-    const result = await crypto.subtle.decrypt(
-      { name: algo, iv },
-      cryptoKey, data
-    )
+    const result = await this.subtleCrypto.decrypt({ name: algo, iv }, cryptoKey, data)
     return Buffer.from(result)
   }
 }
 
-export function createCipher(): Cipher {
-  if (isWebCryptoAvailable()) {
-    return new WebCryptoCipher()
+export async function createCipher(): Promise<Cipher> {
+  const cryptoLib = await getCryptoLib()
+  if (cryptoLib.name === 'subtleCrypto') {
+    return new WebCryptoCipher(cryptoLib.lib)
   } else {
-    try {
-      // eslint-disable-next-line max-len
-      // eslint-disable-next-line import/no-nodejs-modules,no-restricted-modules,global-require,@typescript-eslint/no-var-requires
-      const nodeCrypto: typeof import('crypto') = require('crypto')
-      return new NodeCryptoCipher(nodeCrypto.createCipheriv, nodeCrypto.createDecipheriv)
-    } catch (error) {
-      throw new Error(NO_CRYPTO_LIB)
-    }
+    return new NodeCryptoCipher(cryptoLib.lib.createCipheriv, cryptoLib.lib.createDecipheriv)
   }
 }

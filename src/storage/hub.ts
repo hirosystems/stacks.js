@@ -109,7 +109,8 @@ async function makeLegacyAuthToken(challengeText: string, signerKeyHex: string):
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = await createSha2Hash().digest(Buffer.from(challengeText))
+    const sha2Hash = await createSha2Hash()
+    const digest = await sha2Hash.digest(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
     const signatureWithHash = script.signature.encode(

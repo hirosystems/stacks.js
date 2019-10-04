@@ -21,7 +21,8 @@ export const DUST_MINIMUM = 5500
  * @ignore
  */
 export async function hash160(buff: Buffer) {
-  const sha256 = await createSha2Hash().digest(buff)
+  const sha2Hash = await createSha2Hash()
+  const sha256 = await sha2Hash.digest(buff)
   return createHashRipemd160().digest(sha256)
 }
 
@@ -30,7 +31,8 @@ export async function hash160(buff: Buffer) {
  * @ignore
  */
 export async function hash128(buff: Buffer) {
-  return Buffer.from((await createSha2Hash().digest(buff)).slice(0, 16))
+  const sha2Hash = await createSha2Hash()
+  return Buffer.from((await sha2Hash.digest(buff)).slice(0, 16))
 }
 
 

@@ -1,4 +1,4 @@
-import { isWebCryptoAvailable, NO_CRYPTO_LIB } from './cryptoUtils'
+import { getCryptoLib } from './cryptoUtils'
 
 export interface Hmac {
   digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer>;
@@ -22,27 +22,28 @@ class NodeCryptoHmacSha256 implements Hmac {
 }
 
 class WebCryptoHmacSha256 implements Hmac {
+  subtleCrypto: SubtleCrypto
+
+  constructor(subtleCrypto: SubtleCrypto) {
+    this.subtleCrypto = subtleCrypto
+  }
+
   async digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer> {
-    const cryptoKey = await crypto.subtle.importKey(
+    const cryptoKey = await this.subtleCrypto.importKey(
       'raw', key, { name: 'HMAC', hash: 'SHA-256' },
       true, ['sign']
     )
-    const sig = await crypto.subtle.sign('HMAC', cryptoKey, data)
+    const sig = await this.subtleCrypto.sign('HMAC', cryptoKey, data)
     return Buffer.from(sig)
   }
 }
 
-export function createHmacSha256(): Hmac {
-  if (isWebCryptoAvailable()) {
-    return new WebCryptoHmacSha256()
+export async function createHmacSha256(): Promise<Hmac> {
+  const cryptoLib = await getCryptoLib()
+  if (cryptoLib.name === 'subtleCrypto') {
+    return new WebCryptoHmacSha256(cryptoLib.lib)
   } else {
-    try {
-      // eslint-disable-next-line import/no-nodejs-modules,no-restricted-modules,global-require
-      const createHmac = require('crypto').createHmac
-      return new NodeCryptoHmacSha256(createHmac)
-    } catch (error) {
-      throw new Error(NO_CRYPTO_LIB)
-    }
+    return new NodeCryptoHmacSha256(cryptoLib.lib.createHmac)
   }
 }
 

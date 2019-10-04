@@ -150,7 +150,8 @@ export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
  * @ignore
  */
 export async function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  const sha256 = await createSha2Hash().digest(keyPair.publicKey)
+  const sha2Hash = await createSha2Hash()
+  const sha256 = await sha2Hash.digest(keyPair.publicKey)
   const hash160 = await createHashRipemd160().digest(sha256)
   return address.toBase58Check(hash160, keyPair.network.pubKeyHash)
 }

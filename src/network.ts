@@ -433,7 +433,8 @@ export class BlockstackNetwork {
         if (resp.status === 200) {
           return resp.text()
             .then(async (body) => {
-              const sha256 = await createSha2Hash().digest(Buffer.from(body))
+              const sha2Hash = await createSha2Hash()
+              const sha256 = await sha2Hash.digest(Buffer.from(body))
               const h = (await createHashRipemd160().digest(sha256)).toString('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)

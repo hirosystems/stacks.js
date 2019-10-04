@@ -31,18 +31,19 @@ export async function encryptMnemonic(phrase: string, password: string): Promise
   )
 
   // AES-128-CBC with SHA256 HMAC
-  const pbkdf2 = createPbkdf2()
+  const pbkdf2 = await createPbkdf2()
   const salt = randomBytes(16)
   const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512')
   const encKey = keysAndIV.slice(0, 16)
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
 
-  const cipher = createCipher()
+  const cipher = await createCipher()
   const cipherText = await cipher.encrypt('aes-128-cbc', encKey, iv, plaintextNormalized)
 
   const hmacPayload = Buffer.concat([salt, cipherText])
-  const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
+  const hmacSha256 = await createHmacSha256()
+  const hmacDigest = await hmacSha256.digest(macKey, hmacPayload)
 
   const payload = Buffer.concat([salt, hmacDigest, cipherText])
   return payload
@@ -60,23 +61,24 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
   const cipherText = dataBuffer.slice(48)
   const hmacPayload = Buffer.concat([salt, cipherText])
 
-  const pbkdf2 = createPbkdf2()
+  const pbkdf2 = await createPbkdf2()
   const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512')
   const encKey = keysAndIV.slice(0, 16)
   const macKey = keysAndIV.slice(16, 32)
   const iv = keysAndIV.slice(32, 48)
 
-  const decipher = createCipher()
+  const decipher = await createCipher()
   const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText)
   const plaintext = decryptedResult.toString('hex')
 
-  const hmacDigest = await createHmacSha256().digest(macKey, hmacPayload)
+  const hmacSha256 = await createHmacSha256()
+  const hmacDigest = await hmacSha256.digest(macKey, hmacPayload)
 
   // hash both hmacSig and hmacDigest so string comparison time
   // is uncorrelated to the ciphertext
-  const hmacSigHash = (await createSha2Hash().digest(hmacSig)).toString('hex')
-
-  const hmacDigestHash = (await createSha2Hash().digest(hmacDigest)).toString('hex')
+  const sha2Hash = await createSha2Hash()
+  const hmacSigHash = (await sha2Hash.digest(hmacSig)).toString('hex')
+  const hmacDigestHash = (await sha2Hash.digest(hmacDigest)).toString('hex')
 
   if (hmacSigHash !== hmacDigestHash) {
     // not authentic

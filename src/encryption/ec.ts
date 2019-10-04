@@ -28,7 +28,7 @@ export type CipherObject = {
 * @ignore
 */
 async function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer): Promise<Buffer> {
-  const cipher = createCipher()
+  const cipher = await createCipher()
   const result = await cipher.encrypt('aes-256-cbc', key, iv, plaintext)
   return result
 }
@@ -37,7 +37,7 @@ async function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer): Pro
 * @ignore
 */
 async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer): Promise<Buffer> {
-  const cipher = createCipher()
+  const cipher = await createCipher()
   const result = await cipher.decrypt('aes-256-cbc', key, iv, ciphertext)
   return result
 }
@@ -46,7 +46,8 @@ async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer): Pr
 * @ignore
 */
 async function hmacSha256(key: Buffer, content: Buffer) {
-  return createHmacSha256().digest(key, content)
+  const hmacSha256 = await createHmacSha256()
+  return hmacSha256.digest(key, content)
 }
 
 /**
@@ -68,7 +69,8 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 */
 async function sharedSecretToKeys(sharedSecret: Buffer) {
   // generate mac and encryption key from shared secret
-  const hashedSecret = await createSha2Hash().digest(sharedSecret, 'sha512')
+  const sha2Hash = await createSha2Hash()
+  const hashedSecret = await sha2Hash.digest(sharedSecret, 'sha512')
   return {
     encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32)
@@ -209,7 +211,8 @@ export async function signECDSA(privateKey: string, content: string | Buffer): P
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
-  const contentHash = await createSha2Hash().digest(contentBuffer)
+  const sha2Hash = await createSha2Hash()
+  const contentHash = await sha2Hash.digest(contentBuffer)
   const signature = ecPrivate.sign(contentHash)
   const signatureString = signature.toDER('hex')
 
@@ -243,7 +246,8 @@ export async function verifyECDSA(
   signature: string) {
   const contentBuffer = getBuffer(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
-  const contentHash = await createSha2Hash().digest(contentBuffer)
+  const sha2Hash = await createSha2Hash()
+  const contentHash = await sha2Hash.digest(contentBuffer)
 
   return ecPublic.verify(contentHash, <any>signature)
 }
