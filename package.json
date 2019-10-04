@@ -145,6 +145,7 @@
     "ripemd160-min": "0.0.3",
     "schema-inspector": "^1.6.8",
     "triplesec": "^3.0.27",
+    "tslib": "^1.10.0",
     "uuid": "^3.3.3",
     "zone-file": "^1.0.0"
   },
