@@ -146,13 +146,15 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
  * @param signerKeyHex 
  * @param hubUrl 
  * @param associationToken 
- * 
+ * @param expiresAt
+ *
  * @ignore
  */
 function makeV1GaiaAuthToken(hubInfo: any,
                              signerKeyHex: string,
                              hubUrl: string,
-                             associationToken?: string): string {
+                             associationToken?: string,
+                             expiresAt?: number): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
                          && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
@@ -164,6 +166,7 @@ function makeV1GaiaAuthToken(hubInfo: any,
 
   const salt = crypto.randomBytes(16).toString('hex')
   const payload = {
+    exp: expiresAt,
     gaiaChallenge: challengeText,
     hubUrl,
     iss,
@@ -176,19 +179,31 @@ function makeV1GaiaAuthToken(hubInfo: any,
 
 /**
  * 
+ * @param gaiaHubUrl
+ * @param challengeSignerHex
+ * @param associationToken
+ * @param tokenValidityBufferTime: Time in seconds for which the generated token should be valid
+ *
  * @ignore
+ *
  */
 export async function connectToGaiaHub(
   gaiaHubUrl: string,
   challengeSignerHex: string,
-  associationToken?: string
+  associationToken?: string,
+  tokenValidityBufferTime?: number,
 ): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const hubInfo = await response.json()
   const readURL = hubInfo.read_url_prefix
-  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
+  let expiresAt
+  if (tokenValidityBufferTime) {
+    expiresAt = (Date.now() / 1000) + tokenValidityBufferTime
+  }
+  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl,
+                                    associationToken, expiresAt)
   const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {
