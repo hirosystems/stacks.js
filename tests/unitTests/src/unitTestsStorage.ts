@@ -794,7 +794,7 @@ export function runStorageTests() {
 
     FetchMock.get(fullReadUrl, blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: publicKey }
-    const decryptOptions = { decrypt: true }
+    const decryptOptions = { decrypt: privateKey }
     // put and encrypt the file
     putFile(path, fileContent, encryptOptions, blockstack)
       .then((publicURL) => {
