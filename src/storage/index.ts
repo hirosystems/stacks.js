@@ -15,12 +15,12 @@ import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
-  SignatureVerificationError
+  SignatureVerificationError,
+  DoesNotExist
 } from '../errors'
-import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
-import { getGlobalObject } from '../utils'
+import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -232,34 +232,24 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-function getFileContents(path: string, app: string, username: string | undefined, 
-                         zoneFileLookupURL: string | undefined,
-                         forceText: boolean,
-                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  return Promise.resolve()
-    .then(() => {
-      const opts = { app, username, zoneFileLookupURL }
-      return getFileUrl(path, opts, caller)
-    })
-    .then(readUrl => fetchPrivate(readUrl))
-    .then<string | ArrayBuffer | null>((response) => {
-      if (response.status !== 200) {
-        if (response.status === 404) {
-          Logger.debug(`getFile ${path} returned 404, returning null`)
-          return null
-        } else {
-          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
-        }
-      }
-      const contentType = response.headers.get('Content-Type')
-      if (forceText || contentType === null
-          || contentType.startsWith('text')
-          || contentType === 'application/json') {
-        return response.text()
-      } else {
-        return response.arrayBuffer()
-      }
-    })
+async function getFileContents(path: string, app: string, username: string | undefined, 
+                               zoneFileLookupURL: string | undefined,
+                               forceText: boolean,
+                               caller?: UserSession): Promise<string | ArrayBuffer | null> {
+  const opts = { app, username, zoneFileLookupURL }
+  const readUrl = await getFileUrl(path, opts, caller)
+  const response = await fetchPrivate(readUrl)
+  if (!response.ok) {
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
+  }
+  const contentType = response.headers.get('Content-Type')
+  if (forceText || contentType === null
+    || contentType.startsWith('text')
+    || contentType === 'application/json') {
+    return response.text()
+  } else {
+    return response.arrayBuffer()
+  }
 }
 
 /* Handle fetching an unencrypted file, its associated signature
@@ -268,14 +258,15 @@ function getFileContents(path: string, app: string, username: string | undefined
  * @private
  * @ignore
  */
-function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
+async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
+  const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
   return Promise.all(
     [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
-     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+     getFileContents(sigPath, opt.app, opt.username,
                      opt.zoneFileLookupURL, true, caller),
      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
@@ -318,9 +309,16 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
       } else {
         return fileContents
       }
+    }).catch((err) => {
+      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
+      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
+        throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+      } else {
+        throw err
+      }
     })
 }
-
 
 /* Handle signature verification and decryption for contents which are
  *  expected to be signed and encrypted. This works for single and
@@ -428,7 +426,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(
+export async function getFile(
   path: string, 
   options?: GetFileOptions,
   caller?: UserSession
@@ -745,7 +743,7 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      throw new Error(`listFiles failed with HTTP status ${response.status}`)
+      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.')
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
@@ -794,7 +792,7 @@ async function listFilesLoop(
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
+ * @return {Promise} that resolves to the number of files listed, or rejects with an error.
  */
 export function listFiles(
   callback: (name: string) => boolean,

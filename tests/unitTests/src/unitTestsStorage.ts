@@ -13,9 +13,9 @@ import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../sr
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
+import { DoesNotExist } from '../../../src/errors'
 import * as util from 'util'
 import * as jsdom from 'jsdom'
-
 
 // class LocalStorage {
 //   constructor() {
@@ -1164,8 +1164,8 @@ export function runStorageTests() {
         'UserSession.getFileUrl should return correct url'))
   })
 
-  test('fetch404null', (t) => {
-    t.plan(2)
+  test('getFile throw on 404', (t) => {
+    t.plan(4)
     const config = {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org/hub/',
@@ -1186,12 +1186,18 @@ export function runStorageTests() {
 
     const optionsNoDecrypt = { decrypt: false }
     getFile('foo.json', optionsNoDecrypt, blockstack)
-      .then(x => t.equal(x, null, '404 should return null'))
+      .then(() => t.fail('getFile (no decrypt) with 404 should fail'))
+      .catch(() => t.pass('getFile (no decrypt) with 404 should fail'))
 
     const optionsDecrypt = { decrypt: true }
     getFile('foo.json', optionsDecrypt, blockstack)
-      .then(x => t.equal(x, null, '404 should return null, even if we try to decrypt'))
-  })
+      .then(() => t.fail('getFile (decrypt) with 404 should fail'))
+      .catch((err) => {
+        t.ok(err instanceof DoesNotExist, "DoesNotExist error thrown")
+        t.equal(err.hubError.statusCode, 404)
+        t.equal(err.hubError.statusText, 'Not Found')
+      })
+})
 
   test('uploadToGaiaHub', (t) => {
     t.plan(2)

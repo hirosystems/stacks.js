@@ -3,22 +3,31 @@ const fs = require('fs');
 const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const WebpackAssetsManifest = require('webpack-assets-manifest');
+const semver = require('semver');
 
 /**
  * Generates markdown example for using the blockstack.js dist file with a CDN 
  * and Subresource Integrity. Uses the lib version specified in the package.json. 
- * Writes the output to `mdincludes/script-dist-file.md`.
+ * Writes the output to a template string defined in `README.md`.
+ * If the version has a prerelease tag, then no changes are written. 
  * @see https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
  * @param {string} sriHash The hash string used for the script `integrity` attribute.
  */
 function writeDistFileDoc(sriHash) {
   const { version } = require(path.resolve(__dirname, 'package.json'));
-  const cdnUrl = `https://unpkg.com/blockstack@${version}/dist/blockstack.js`;
-  const scriptTag = `<script src="${cdnUrl}" integrity="${sriHash}" crossorigin="anonymous"></script>`;
-  const docOutput = "```html\n" + scriptTag + "\n```";
-  const outputDir = path.resolve(__dirname, 'mdincludes');
-  fs.mkdirSync(outputDir, { recursive: true });
-  fs.writeFileSync(path.join(outputDir, 'script-dist-file.md'), docOutput)
+  if (semver.prerelease(version)) {
+    console.warn(`Version ${version} has a prerelease tag, the CDN readme snippet will not be updated`);
+    return;
+  }
+  console.warn(`Updating the CDN readme snippet for version ${version}`);
+  const cdnTemplate = '\n```html\n' + 
+    `<script src="https://unpkg.com/blockstack@${version}/dist/blockstack.js" integrity="${sriHash}" crossorigin="anonymous"></script>` +
+    "\n```\n";
+  const readmePath = path.resolve(__dirname, 'README.md');
+  const readmeContent = fs.readFileSync(readmePath, { encoding: 'utf8' });
+  const replaceRegex = /(<!-- cdn -->)([^]*)(<!-- cdnstop -->)/gi;
+  const updatedReadmeContent = readmeContent.replace(replaceRegex, (...args) => `${args[1]}${cdnTemplate}${args[3]}`);
+  fs.writeFileSync(readmePath, updatedReadmeContent, { encoding: 'utf8' });
 }
 
 module.exports = (env, argv) => {
