@@ -6,7 +6,6 @@
     "declaration": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "outDir": "./lib",
     "skipLibCheck": true,
     "noEmit": true,
     "importHelpers": true
