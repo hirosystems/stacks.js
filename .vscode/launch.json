@@ -10,6 +10,8 @@
             "name": "Tests",
             "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
             "args": ["${workspaceFolder}/tests/unitTests/src/index.ts"],
+            "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tests/unitTests/src/tsconfig.json" },
+            "console": "integratedTerminal"
         }
     ]
 }
