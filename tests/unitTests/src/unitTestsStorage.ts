@@ -210,6 +210,69 @@ export function runStorageTests() {
       })
   })
 
+  test('core node preferences respected for name lookups', async (t) => {
+    FetchMock.restore()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:8080')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const defaultCoreNode = 'https://core.blockstack.org'
+    const appSpecifiedCoreNode = 'https://app-specified-core-node.local'
+    const userSpecifiedCoreNode = 'https://user-specified-core-node.local'
+
+    const nameLookupPath = '/v1/names/yukan.id'
+
+    const options = {
+      username: 'yukan.id',
+      app: 'http://localhost:8080',
+      decrypt: false
+    }
+
+    await new Promise((resolve) => {
+      FetchMock.get(defaultCoreNode + nameLookupPath, () => {
+        resolve()
+        return '_'
+      })
+      getFile(path, options, blockstack).catch(() => {})
+    })
+    t.pass('default core node used for name lookup')
+    FetchMock.restore()
+
+
+    blockstack.appConfig.coreNode = appSpecifiedCoreNode
+    await new Promise((resolve) => {
+      FetchMock.get(appSpecifiedCoreNode + nameLookupPath, () => {
+        resolve()
+        return '_'
+      })
+      getFile(path, options, blockstack).catch(() => {})
+    })
+    t.pass('app specified core node used for name lookup')
+    FetchMock.restore()
+
+
+    blockstack.store.getSessionData().userData.coreNode = userSpecifiedCoreNode
+    await new Promise((resolve) => {
+      FetchMock.get(userSpecifiedCoreNode + nameLookupPath, () => {
+        resolve()
+        return '_'
+      })
+      getFile(path, options, blockstack).catch(() => {})
+    })
+    t.pass('user specified core node used for name lookup')
+    FetchMock.restore()
+  })
+
   test('getFile unencrypted, unsigned - multi-reader', (t) => {
     t.plan(6)
 

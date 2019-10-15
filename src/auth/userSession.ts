@@ -231,8 +231,7 @@ export class UserSession {
    */
   handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
     const transitKey = this.store.getSessionData().transitKey
-    const nameLookupURL = this.store.getSessionData().coreNode
-    return authApp.handlePendingSignIn(nameLookupURL, authResponseToken, transitKey, this)
+    return authApp.handlePendingSignIn(undefined, authResponseToken, transitKey, this)
   }
 
   /**

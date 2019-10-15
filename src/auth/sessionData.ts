@@ -6,11 +6,7 @@ import { UserData } from './authApp'
 const SESSION_VERSION = '1.0.0'
 
 export interface SessionOptions {
-  appPrivateKey?: string,
-  username?: string,
-  identityAddress?: string,
   coreNode?: string,
-  hubUrl?: string,
   userData?: UserData,
   transitKey?: string,
   localStorageKey?: string,
@@ -25,16 +21,6 @@ export interface SessionOptions {
 export class SessionData {
   version: string
 
-  appPrivateKey?: string // required after sign in
-
-  identityAddress?: string // required after sign in
-
-  username?: string
-
-  coreNode?: string
-
-  hubUrl?: string // required after sign in
-
   transitKey?: string
 
   // using this in place of
@@ -43,11 +29,6 @@ export class SessionData {
 
   constructor(options: SessionOptions) {
     this.version = SESSION_VERSION
-    this.appPrivateKey = options.appPrivateKey
-    this.identityAddress = options.identityAddress
-    this.username = options.username
-    this.coreNode = options.coreNode
-    this.hubUrl = options.hubUrl
     this.userData = options.userData
     this.transitKey = options.transitKey
   }
@@ -65,11 +46,7 @@ export class SessionData {
       throw new InvalidStateError(`JSON data version ${json.version} not supported by SessionData`)
     }
     const options: SessionOptions = {
-      appPrivateKey: json.appPrivateKey,
-      identityAddress: json.identityAddress,
-      username: json.username,
       coreNode: json.coreNode,
-      hubUrl: json.hubUrl,
       userData: json.userData,
       transitKey: json.transitKey
     }
