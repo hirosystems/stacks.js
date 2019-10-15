@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>UserSession | blockstack.js 19.2.1 Library Reference</title>
+	<title>UserSession | blockstack.js 19.4.0-beta.1 Library Reference</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">blockstack.js 19.2.1 Library Reference</a>
+					<a href="../index.html" class="title">blockstack.js 19.4.0-beta.1 Library Reference</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -645,7 +645,7 @@
 					<a name="makeauthrequest" class="tsd-anchor"></a>
 					<h3>make<wbr>Auth<wbr>Request</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">make<wbr>Auth<wbr>Request<span class="tsd-signature-symbol">(</span>transitKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, redirectURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, manifestURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, scopes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span>, appDomain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, expiresAt<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, extraParams<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">make<wbr>Auth<wbr>Request<span class="tsd-signature-symbol">(</span>transitKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, redirectURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, manifestURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, scopes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/authscope.html" class="tsd-signature-type">AuthScope</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span>, appDomain<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, expiresAt<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span>, extraParams<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -685,7 +685,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> scopes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> scopes: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/authscope.html" class="tsd-signature-type">AuthScope</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>The permissions this app is requesting. The default is <code>store_write</code>.</p>
 									</div>
@@ -765,7 +765,7 @@
 					<a name="redirecttosignin" class="tsd-anchor"></a>
 					<h3>redirect<wbr>ToSign<wbr>In</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">redirect<wbr>ToSign<wbr>In<span class="tsd-signature-symbol">(</span>redirectURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, manifestURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, scopes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">redirect<wbr>ToSign<wbr>In<span class="tsd-signature-symbol">(</span>redirectURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, manifestURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, scopes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/authscope.html" class="tsd-signature-type">AuthScope</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
@@ -802,7 +802,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> scopes: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> scopes: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/authscope.html" class="tsd-signature-type">AuthScope</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Permissions requested by the application. Possible values are
 										<code>store_write</code> (default) or <code>publish_data</code>.</p>
@@ -1015,6 +1015,7 @@
 				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
 				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
@@ -1063,7 +1064,7 @@
 	</div>
 </footer>
 <div class="container tsd-generator">
-	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
 </div>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>

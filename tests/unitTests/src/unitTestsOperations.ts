@@ -1,7 +1,8 @@
-import test from 'tape'
-import FetchMock from 'fetch-mock'
+import * as test from 'tape'
+import * as FetchMock from 'fetch-mock'
 import { Transaction, TransactionBuilder, networks, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
-import BN from 'bn.js'
+// @ts-ignore
+import * as BN from 'bn.js'
 
 import { network, InsightClient, BitcoindAPI } from '../../../src/network'
 import {
@@ -10,6 +11,7 @@ import {
 } from '../../../src/operations/utils'
 
 import { transactions, safety, config } from '../../../src'
+import { ERROR_CODES } from '../../../src/errors'
 
 const testAddresses = [
   {
@@ -997,7 +999,7 @@ function transactionTests() {
   })
 
   test('fund bitcoin spends', (t) => {
-    t.plan(14)
+    t.plan(15)
     setupMocks()
     const TEST1_AMOUNT = 250000
     const TEST2_AMOUNT = 80000
@@ -1025,10 +1027,14 @@ function transactionTests() {
                                                 testAddresses[1].skHex,
                                                 TEST2_AMOUNT))
       .then(() => t.fail('Should reject with InvalidAmountError if not enough coin to fund fees.'))
-      .catch(err => t.equal(
-        err.name, 'InvalidAmountError',
-        'Should reject with InvalidAmountError if not enough coin to fund fees.'
-      ))
+      .catch((err) => {
+        t.equal(
+          err.name, 'InvalidAmountError',
+          'Should reject with InvalidAmountError if not enough coin to fund fees.'
+        )
+        t.equal(err.code, ERROR_CODES.INVALID_AMOUNT_ERROR,
+                'Should have proper invalid amount error code')
+      })
       .then(() => transactions.makeBitcoinSpend(testAddresses[2].address,
                                                 testAddresses[1].skHex,
                                                 TEST3_AMOUNT))

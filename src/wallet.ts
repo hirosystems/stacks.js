@@ -1,4 +1,4 @@
-import crypto, { randomBytes } from 'crypto'
+import * as crypto from 'crypto'
 import { ECPair, payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
 import { ecPairToHexString } from './utils'
@@ -125,7 +125,7 @@ export class BlockstackWallet {
    * @return {Promise<string>} space-separated 12 word phrase
    */
   static generateMnemonic() {
-    return bip39.generateMnemonic(128, randomBytes)
+    return bip39.generateMnemonic(128, crypto.randomBytes)
   }
 
   /**

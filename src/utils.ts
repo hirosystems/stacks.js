@@ -1,8 +1,18 @@
 
-import url from 'url'
+import * as url from 'url'
 import { ECPair, address, crypto } from 'bitcoinjs-lib'
 import { config } from './config'
 import { Logger } from './logger'
+import { 
+  BadPathError, 
+  ConflictError, 
+  DoesNotExist,
+  GaiaHubErrorResponse,
+  NotEnoughProofError, 
+  PayloadTooLargeError, 
+  ValidationError
+} from './errors'
+
 
 /**
  *  @ignore
@@ -252,7 +262,7 @@ interface GetGlobalObjectOptions {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObject<K extends keyof Window>(
+export function getGlobalObject<K extends Extract<keyof Window, string>>(
   name: K, 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
 ): Window[K] {
@@ -287,7 +297,7 @@ export function getGlobalObject<K extends keyof Window>(
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObjects<K extends keyof Window>(
+export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   names: K[], 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
 ): Pick<Window, K> {
@@ -330,4 +340,52 @@ export function getGlobalObjects<K extends keyof Window>(
     }
   }
   return result
+}
+
+async function getGaiaErrorResponse(response: Response): Promise<GaiaHubErrorResponse> {
+  let responseMsg = ''
+  let responseJson: any | undefined
+  try {
+    responseMsg = await response.text()
+    try {
+      responseJson = JSON.parse(responseMsg)
+    } catch (error) {
+      // Use text instead
+    }
+  } catch (error) {
+    Logger.debug(`Error getting bad http response text: ${error}`)
+  }
+  const status = response.status
+  const statusText = response.statusText
+  const body = responseJson || responseMsg
+  return { status, statusText, body }
+}
+
+/**
+ * Returns a BlockstackError correlating to the given HTTP response,
+ * with the provided errorMsg. Throws if the HTTP response is 'ok'.
+ */
+export async function getBlockstackErrorFromResponse(
+  response: Response,
+  errorMsg: string
+): Promise<Error> {
+  if (response.ok) {
+    throw new Error('Cannot get a BlockstackError from a valid response.')
+  }
+  const gaiaResponse = await getGaiaErrorResponse(response)  
+  if (gaiaResponse.status === 401) {
+    return new ValidationError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 402) {
+    return new NotEnoughProofError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 403) {
+    return new BadPathError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 404) {
+    throw new DoesNotExist(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 409) {
+    return new ConflictError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 413) {
+    return new PayloadTooLargeError(errorMsg, gaiaResponse)
+  } else {
+    return new Error(errorMsg)
+  }
 }

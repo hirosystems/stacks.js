@@ -1,6 +1,7 @@
-import test from 'tape'
-import FetchMock from 'fetch-mock'
-import BN from 'bn.js'
+import * as test from 'tape'
+import * as FetchMock from 'fetch-mock'
+// @ts-ignore
+import * as BN from 'bn.js'
 
 import { network } from '../../../src'
 

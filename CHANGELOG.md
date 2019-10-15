@@ -4,6 +4,24 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Added
+- More Blockstack error codes.
+
+### Changed
+- `getFile` now throws error on 404 instead of returning null.
+- `getFile`, `putFile`, `deleteFile`, `listfiles` now include error info upon failure.
+
+## [19.4.0] - 2019-09-03
+### Changed
+- Excluded unused bip39 wordlist from dist bundle, reducing bundle size.
+
+## [19.3.0] - 2019-08-21
+
+### Changed
+- Fixed deprecated crypto warning in node.js usage.
+- `handlePendingSignIn` now throws an error when overwriting an existing user session. See issue #680
+- Updated jsontokens library to v2.
+
 ## [19.2.2] - 2019-05-12
 
 ### Changed

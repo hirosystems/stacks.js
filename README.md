@@ -18,7 +18,16 @@ Note: If you're looking for the Blockstack CLI repo it was merged with [Blocksta
 $ npm install blockstack
 ```
 
-You can import `blockstack.js` as a script without using a package manager. To securely use the latest distribution of blockstack.js from a CDN, add [the mdincludes/script-dist-file.md](mdincludes/script-dist-file.md) script in your application. 
+### Using blockstack.js with a CDN
+
+You can import `blockstack.js` as a script without using a package manager. 
+To securely use the latest distribution of blockstack.js from a CDN, use the following script in your application:
+
+<!-- cdn -->
+```html
+<script src="https://unpkg.com/blockstack@19.3.0/dist/blockstack.js" integrity="sha384-kscoAgc5pZqovHWSKndfyn3OeKHfRSh+Xc5wYc+E02BuyQV2zwEEHJ7p5drKnRrX" crossorigin="anonymous"></script>
+```
+<!-- cdnstop -->
 
 
 ## About
@@ -60,7 +69,7 @@ changes for the next release are in `develop`.
 We use the [git-flow-avh](https://github.com/petervanderdoes/gitflow-avh) plugin.
 
 Please send pull requests against `develop`. Pull requests should include tests,
-[flow static type annotations](https://flow.org) and be lint free.
+[flow static type annotations](https://flow.org) and be lint free. Open your pull request using the template in  `PULL_REQUEST_TEMPLATE.md`
 
 Github issues marked [help-wanted](https://github.com/blockstack/blockstack.js/labels/help-wanted)
 are great places to start. Please ask in a github issue or slack before embarking
@@ -85,10 +94,4 @@ Run `npm run compile; npm run browserify` before opening the file `test.html`
 in your browser.
 
 ## Releasing
-
-- `git flow release start <version>`
-- Add section to `CHANGELOG.md`
-- Increment version in `package.json` and commit
-- `npm publish`
-- Commit built documentation and distribution
-- `git flow release finish`
+See `release-checklist.md`

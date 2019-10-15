@@ -1,5 +1,5 @@
 
-import queryString from 'query-string'
+import * as queryString from 'query-string'
 // @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
