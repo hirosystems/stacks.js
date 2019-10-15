@@ -20,6 +20,7 @@ import {
 } from '../errors'
 
 import { UserSession } from '../auth/userSession'
+import { NAME_LOOKUP_PATH } from '../auth/authConstants'
 import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
@@ -153,10 +154,10 @@ async function getGaiaAddress(
   app: string, username?: string, zoneFileLookupURL?: string,
   caller?: UserSession
 ): Promise<string> {
-  const opts = normalizeOptions({ app, username }, caller)
+  const opts = normalizeOptions({ app, username, zoneFileLookupURL }, caller)
   let fileUrl: string
   if (username) {
-    fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
+    fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
     if (!caller) {
       caller = new UserSession()
@@ -181,18 +182,34 @@ async function getGaiaAddress(
 function normalizeOptions<T>(
   options?: {
     app?: string, 
-    username?: string
+    username?: string,
+    zoneFileLookupURL?: string
   } & T,
   caller?: UserSession
 ) {
   const opts = Object.assign({}, options)
   if (opts.username) {
     if (!opts.app) {
-      const appConfig = (caller || new UserSession()).appConfig
-      if (!appConfig) {
+      caller = caller || new UserSession()
+      if (!caller.appConfig) {
         throw new InvalidStateError('Missing AppConfig')
       }
-      opts.app = appConfig.appDomain
+      opts.app = caller.appConfig.appDomain
+    }
+    if (!opts.zoneFileLookupURL) {
+      caller = caller || new UserSession()
+      if (!caller.appConfig) {
+        throw new InvalidStateError('Missing AppConfig')
+      }
+      if (!caller.store) {
+        throw new InvalidStateError('Missing store UserSession')
+      }
+      const sessionData = caller.store.getSessionData()
+      // Use the user specified coreNode if available, otherwise use the app specified coreNode. 
+      const configuredCoreNode = sessionData.userData.coreNode || caller.appConfig.coreNode
+      if (configuredCoreNode) {
+        opts.zoneFileLookupURL = `${configuredCoreNode}${NAME_LOOKUP_PATH}`
+      }
     }
   }
   return opts
