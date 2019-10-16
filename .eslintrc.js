@@ -65,6 +65,7 @@ module.exports = {
     "no-multiple-empty-lines": "off",
     "no-shadow": "off",
     "no-use-before-define": "off",
+    "no-return-await": "off",
     "indent": [2, 2, {
       "FunctionDeclaration" : { "parameters": "first" },
       "FunctionExpression" : { "parameters": "first" },
@@ -92,6 +93,7 @@ module.exports = {
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/require-await": "error",
     "@typescript-eslint/await-thenable": "error",
+
 
     // TODO: enable these when reasonable
     "@typescript-eslint/promise-function-async": "off",
@@ -126,9 +128,6 @@ module.exports = {
     "no-restricted-globals": ["error", {
         "name": "fetch",
         "message": "Use `privateFetch` instead."
-      }, {
-        "name": "fdescribe",
-        "message": "Do not commit fdescribe. Use describe instead."
       }
     ],
 

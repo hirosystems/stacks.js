@@ -1315,9 +1315,7 @@ export function runStorageTests() {
     })
   })
 
-  test('connectToGaiaHub', (t) => {
-    t.plan(6)
-
+  test('connectToGaiaHub', async (t) => {
     const hubServer = 'hub.testblockstack.org'
 
     const hubInfo = {
@@ -1339,24 +1337,22 @@ export function runStorageTests() {
       appPrivateKey: privateKey
     } // manually set for testing
 
-    connectToGaiaHub(hubServer, privateKey)
-      .then((config) => {
+    await connectToGaiaHub(hubServer, privateKey)
+      .then(async (config) => {
         t.ok(config, 'Config returned by connectToGaiaHub()')
         t.equal(hubInfo.read_url_prefix, config.url_prefix)
         t.equal(address, config.address)
         t.equal(hubServer, config.server)
         const jsonTokenPart = config.token.slice('v1:'.length)
 
-        const verified = new TokenVerifier('ES256K', publicKey)
+        const verified = await new TokenVerifier('ES256K', publicKey)
           .verify(jsonTokenPart)
         t.ok(verified, 'Verified token')
         t.equal(hubServer, decodeToken(jsonTokenPart).payload.hubUrl, 'Intended hubUrl')
       })
   })
 
-  test('connectToGaiaHub with an association token', (t) => {
-    t.plan(7)
-
+  test('connectToGaiaHub with an association token', async (t) => {
     const hubServer = 'hub.testblockstack.org'
 
     const hubInfo = {
@@ -1380,7 +1376,7 @@ export function runStorageTests() {
       exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
       salt
     }
-    const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
+    const gaiaAssociationToken = await new TokenSigner('ES256K', identityPrivateKey)
       .sign(associationTokenClaim)
 
     FetchMock.get(`${hubServer}/hub_info`,
@@ -1392,21 +1388,20 @@ export function runStorageTests() {
       appPrivateKey: privateKey
     } // manually set for testing
 
-    connectToGaiaHub(hubServer, privateKey, gaiaAssociationToken)
-      .then((config) => {
-        t.ok(config, 'Config returned by connectToGaiaHub()')
-        t.equal(hubInfo.read_url_prefix, config.url_prefix)
-        t.equal(address, config.address)
-        t.equal(hubServer, config.server)
-        const jsonTokenPart = config.token.slice('v1:'.length)
+    const config = await connectToGaiaHub(hubServer, privateKey, gaiaAssociationToken)
+    t.ok(config, 'Config returned by connectToGaiaHub()')
+    t.equal(hubInfo.read_url_prefix, config.url_prefix)
+    t.equal(address, config.address)
+    t.equal(hubServer, config.server)
+    const jsonTokenPart = config.token.slice('v1:'.length)
 
-        const verified = new TokenVerifier('ES256K', publicKey)
-          .verify(jsonTokenPart)
-        t.ok(verified, 'Verified token')
-        t.equal(hubServer, decodeToken(jsonTokenPart).payload.hubUrl, 'Intended hubUrl')
-        t.equal(gaiaAssociationToken, decodeToken(jsonTokenPart).payload.associationToken,
-                'Intended association token')
-      })
+    const verified = await new TokenVerifier('ES256K', publicKey)
+      .verify(jsonTokenPart)
+    t.ok(verified, 'Verified token')
+    t.equal(hubServer, decodeToken(jsonTokenPart).payload.hubUrl, 'Intended hubUrl')
+    t.equal(gaiaAssociationToken, decodeToken(jsonTokenPart).payload.associationToken,
+            'Intended association token')
+      
   })
 
   test('getBucketUrl', (t) => {
@@ -1489,7 +1484,7 @@ export function runStorageTests() {
       }
     })
 
-    const files = []
+    const files: string[] = []
     listFiles((name) => {
       files.push(name)
       return true
@@ -1502,8 +1497,7 @@ export function runStorageTests() {
   })
 
 
-  test('connect to gaia hub with a user session and association token', (t) => {
-    t.plan(1)
+  test('connect to gaia hub with a user session and association token', async (t) => {
     const hubServer = 'hub.testblockstack.org'
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
 
@@ -1527,7 +1521,7 @@ export function runStorageTests() {
       exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
       salt
     }
-    const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
+    const gaiaAssociationToken = await new TokenSigner('ES256K', identityPrivateKey)
       .sign(associationTokenClaim)
 
     FetchMock.get(`${hubServer}/hub_info`, JSON.stringify(hubInfo))

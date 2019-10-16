@@ -110,7 +110,7 @@ export async function makeAuthRequest(
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
-  const token = tokenSigner.sign(payload)
+  const token = await tokenSigner.sign(payload)
 
   return token
 }

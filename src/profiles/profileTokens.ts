@@ -125,7 +125,7 @@ export async function verifyProfileToken(token: string, publicKeyOrAddress: stri
     throw new Error('Invalid token verifier')
   }
 
-  const tokenVerified = tokenVerifier.verify(token)
+  const tokenVerified = await tokenVerifier.verify(token)
   if (!tokenVerified) {
     throw new Error('Token verification failed')
   }

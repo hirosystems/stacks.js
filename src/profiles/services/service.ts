@@ -8,39 +8,34 @@ export type CheerioModuleType = typeof import('cheerio')
  * @ignore
  */
 export abstract class Service {
-  validateProof(proof: AccountProofInfo,
-                ownerAddress: string,
-                cheerio: CheerioModuleType,
-                name: string = null) {
-    let proofUrl: string
-    return Promise.resolve()
-      .then(() => {
-        proofUrl = this.getProofUrl(proof)
-        return fetchPrivate(proofUrl)
-      })
-      .then((res) => {
-        if (res.status !== 200) {
-          throw new Error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
-              Unable to validate proof.`)
-        }
-        return res.text()
-      })
-      .then((text) => {
-        // Validate identity in provided proof body/tags if required
-        if (this.shouldValidateIdentityInBody()
-            && proof.identifier !== this.getProofIdentity(text, cheerio)) {
-          return proof
-        }
-        const proofText = this.getProofStatement(text, cheerio)
-        proof.valid = containsValidProofStatement(proofText, name)
-          || containsValidAddressProofStatement(proofText, ownerAddress)
+  async validateProof(
+    proof: AccountProofInfo,
+    ownerAddress: string,
+    cheerio: CheerioModuleType,
+    name: string = null): Promise<AccountProofInfo> {
+    try {
+      const proofUrl = this.getProofUrl(proof)
+      const res = await fetchPrivate(proofUrl)
+      if (res.status !== 200) {
+        throw new Error(`Proof url ${proofUrl} returned unexpected http status ${res.status}.
+            Unable to validate proof.`)
+      }
+      const text = await res.text()
+
+      // Validate identity in provided proof body/tags if required
+      if (this.shouldValidateIdentityInBody()
+          && proof.identifier !== this.getProofIdentity(text, cheerio)) {
         return proof
-      })
-      .catch((error) => {
-        console.error(error)
-        proof.valid = false
-        return proof
-      })
+      }
+      const proofText = this.getProofStatement(text, cheerio)
+      proof.valid = containsValidProofStatement(proofText, name)
+        || containsValidAddressProofStatement(proofText, ownerAddress)
+      return proof
+    } catch (error) {
+      console.error(error)
+      proof.valid = false
+      return proof
+    }
   }
 
   shouldValidateIdentityInBody() {

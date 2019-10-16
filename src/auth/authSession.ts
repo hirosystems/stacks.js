@@ -16,11 +16,12 @@ import { fetchPrivate } from '../fetchUtil'
  * @private
  * @ignore 
  */
-export function makeCoreSessionRequest(appDomain: string,
-                                       appMethods: Array<string>,
-                                       appPrivateKey: string,
-                                       blockchainID: string = null,
-                                       thisDevice: string = null) {
+export async function makeCoreSessionRequest(
+  appDomain: string,
+  appMethods: Array<string>,
+  appPrivateKey: string,
+  blockchainID: string = null,
+  thisDevice: string = null): Promise<string> {
   if (thisDevice === null) {
     thisDevice = '.default'
   }
@@ -43,7 +44,7 @@ export function makeCoreSessionRequest(appDomain: string,
 
   // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
-  const token = tokenSigner.sign(authBody)
+  const token = await tokenSigner.sign(authBody)
 
   return token
 }
@@ -122,13 +123,14 @@ export function sendCoreSessionRequest(coreHost: string,
  * @private
  * @ignore 
  */
-export function getCoreSession(coreHost: string,
-                               corePort: number,
-                               apiPassword: string,
-                               appPrivateKey: string,
-                               blockchainId: string = null,
-                               authRequest: string = null,
-                               deviceId: string = '0') {
+export async function getCoreSession(
+  coreHost: string,
+  corePort: number,
+  apiPassword: string,
+  appPrivateKey: string,
+  blockchainId: string = null,
+  authRequest: string = null,
+  deviceId: string = '0') {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }
@@ -152,7 +154,7 @@ export function getCoreSession(coreHost: string,
     }
     const appMethods = payload.scopes
 
-    const coreAuthRequest = makeCoreSessionRequest(
+    const coreAuthRequest = await makeCoreSessionRequest(
       appDomain, appMethods, appPrivateKey, blockchainId, deviceId
     )
 

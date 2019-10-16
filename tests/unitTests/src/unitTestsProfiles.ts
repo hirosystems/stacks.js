@@ -26,7 +26,7 @@ function testTokening(filename: string, profile: any) {
   test('profileToToken', async (t) => {
     t.plan(3)
 
-    const token = signProfileToken(profile, privateKey)
+    const token = await signProfileToken(profile, privateKey)
     t.ok(token, 'Token must have been created')
 
     const tokenRecord = wrapProfileToken(token)
@@ -37,9 +37,7 @@ function testTokening(filename: string, profile: any) {
   })
 
   test('profileToTokens', async (t) => {
-    t.plan(2)
-
-    tokenRecords = [wrapProfileToken(signProfileToken(profile, privateKey))]
+    tokenRecords = [wrapProfileToken(await signProfileToken(profile, privateKey))]
     t.ok(tokenRecords, 'Tokens should have been created')
     // console.log(JSON.stringify(tokenRecords, null, 2))
     // fs.writeFileSync('./docs/token-files/' + filename, JSON.stringify(tokenRecords, null, 2))
@@ -127,7 +125,7 @@ function testSchemas() {
     const profileJson = profileObject.toJSON()
     t.ok(profileJson, 'Profile JSON should have been created')
 
-    const tokenRecords = profileObject.toToken(privateKey)
+    const tokenRecords = await profileObject.toToken(privateKey)
     t.ok(tokenRecords, 'Profile tokens should have been created')
 
     const profileObject2 = await Profile.fromToken(tokenRecords, publicKey)
@@ -143,7 +141,7 @@ function testSchemas() {
     const validationResults = Person.validateSchema(sampleProfiles.naval, true)
     t.ok(validationResults.valid, 'Person profile should be valid')
 
-    const token = personObject.toToken(privateKey)
+    const token = await personObject.toToken(privateKey)
     const tokenRecords = [wrapProfileToken(token)]
     t.ok(tokenRecords, 'Person profile tokens should have been created')
 

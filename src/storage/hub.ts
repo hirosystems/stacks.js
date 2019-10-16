@@ -162,7 +162,7 @@ async function makeV1GaiaAuthToken(
     salt,
     associationToken
   }
-  const token = new TokenSigner('ES256K', signerKeyHex).sign(payload)
+  const token = await new TokenSigner('ES256K', signerKeyHex).sign(payload)
   return `v1:${token}`
 }
 

@@ -127,17 +127,20 @@ function decryptLegacy(
  * @private
  * @ignore 
  */
-export function decryptMnemonic(
+export async function decryptMnemonic(
   data: (string | Buffer), 
   password: string, 
   triplesecDecrypt: TriplesecDecryptSignature): 
   Promise<string> {
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
-  return decryptMnemonicBuffer(dataBuffer, password).catch((err) => {
+  try {
+    return await decryptMnemonicBuffer(dataBuffer, password)
+  } catch (err) {
     // If it was a password error, don't even bother with legacy
     if (err instanceof PasswordError) {
       throw err
     }
-    return decryptLegacy(dataBuffer, password, triplesecDecrypt).then(data => data.toString())
-  })
+    const data = await decryptLegacy(dataBuffer, password, triplesecDecrypt)
+    return data.toString()
+  }
 }

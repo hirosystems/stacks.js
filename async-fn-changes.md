@@ -33,3 +33,6 @@ decryptPrivateKey
 hmacSha256
 aes256CbcEncrypt
 aes256CbcDecrypt
+makeCoreSessionRequest
+doSignaturesMatchPublicKeys
+signProfileToken

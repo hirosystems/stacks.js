@@ -15,7 +15,7 @@ import { fetchAppManifest } from './authProvider'
  * @private
  * @ignore 
  */
-export function doSignaturesMatchPublicKeys(token: string) {
+export async function doSignaturesMatchPublicKeys(token: string): Promise<boolean> {
   const payload = decodeToken(token).payload
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
@@ -25,7 +25,7 @@ export function doSignaturesMatchPublicKeys(token: string) {
     const publicKey = publicKeys[0]
     try {
       const tokenVerifier = new TokenVerifier('ES256k', publicKey)
-      const signatureVerified = tokenVerifier.verify(token)
+      const signatureVerified = await tokenVerifier.verify(token)
       if (signatureVerified) {
         return true
       } else {

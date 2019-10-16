@@ -67,7 +67,7 @@ export function runAuthTests() {
 
     t.true(isExpirationDateValid(authRequest), 'Expiration date should be valid')
     t.true(isIssuanceDateValid(authRequest), 'Issuance date should be valid')
-    t.true(doSignaturesMatchPublicKeys(authRequest), 'Signatures should match the public keys')
+    t.true(await doSignaturesMatchPublicKeys(authRequest), 'Signatures should match the public keys')
     t.true(await doPublicKeysMatchIssuer(authRequest), 'Public keys should match the issuer')
     t.true(isManifestUriValid(authRequest), 'Manifest URI should be on the app origin')
     t.true(isRedirectUriValid(authRequest), 'Redirect URL should be to app origin')
@@ -122,7 +122,7 @@ export function runAuthTests() {
     const authRequest = await blockstack.makeAuthRequest(privateKey)
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
 
-    t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false,
+    t.equal(await doSignaturesMatchPublicKeys(invalidAuthRequest), false,
             'Signatures should not match the public keys')
 
     await verifyAuthRequest(invalidAuthRequest)
@@ -206,7 +206,7 @@ export function runAuthTests() {
 
     t.true(isExpirationDateValid(authResponse), 'Expiration date should be valid')
     t.true(isIssuanceDateValid(authResponse), 'Issuance date should be valid')
-    t.true(doSignaturesMatchPublicKeys(authResponse), 'Signatures should match the public keys')
+    t.true(await doSignaturesMatchPublicKeys(authResponse), 'Signatures should match the public keys')
     t.true(await doPublicKeysMatchIssuer(authResponse), 'Public keys should match the issuer')
 
     await doPublicKeysMatchUsername(authResponse, nameLookupURL)
@@ -469,7 +469,7 @@ export function runAuthTests() {
       exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
       salt
     }
-    const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
+    const gaiaAssociationToken = await new TokenSigner('ES256K', identityPrivateKey)
       .sign(associationTokenClaim)
 
     const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
