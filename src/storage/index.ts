@@ -777,7 +777,9 @@ async function listFilesLoop(
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed (excluding the last if ended early), or rejects with an error.
+ * @return {Promise} that resolves to the total number of listed files. 
+ * If the call is ended early by the callback, the last file is excluded. 
+ * If an error occurs the entire call is rejected.
  */
 export function listFiles(
   callback: (name: string) => boolean,
