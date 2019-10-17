@@ -103,6 +103,9 @@ function decryptLegacy(
   triplesecDecrypt: TriplesecDecryptSignature): 
   Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
+    if (!triplesecDecrypt) {
+      reject(new Error('The `triplesec.decrypt` function must be provided'))
+    }
     triplesecDecrypt(
       {
         key: Buffer.from(password),
