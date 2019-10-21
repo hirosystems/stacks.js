@@ -2,7 +2,7 @@ import { ECPair, payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
 import { mnemonicToSeed, generateMnemonic } from 'bip39'
 import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
-import { randomBytes } from './encryption/cryptoRandom'
+import { randomBytes, GetRandomBytes } from './encryption/cryptoRandom'
 import { createSha2Hash } from './encryption/sha2Hash'
 import { TriplesecDecryptSignature } from './encryption/cryptoUtils'
 
@@ -140,8 +140,10 @@ export class BlockstackWallet {
    * @return {Promise<string>} Hex-encoded encrypted mnemonic
    * 
    */
-  static async encryptMnemonic(mnemonic: string, password: string) { 
-    const encryptedBuffer = await encryptMnemonic(mnemonic, password)
+  static async encryptMnemonic(mnemonic: string, password: string, opts?: {
+    getRandomBytes?: GetRandomBytes
+  }) {
+    const encryptedBuffer = await encryptMnemonic(mnemonic, password, opts)
     return encryptedBuffer.toString('hex')
   }
 

@@ -69,7 +69,7 @@ class WebCryptoPbkdf2 implements Pbkdf2 {
     )
     const result = await this.subtleCrypto.deriveBits({
       name: 'PBKDF2', salt, iterations, hash: { name: algo }
-    }, key, keyLength << 3)
+    }, key, keyLength * 8)
     return Buffer.from(result)
   }
 }

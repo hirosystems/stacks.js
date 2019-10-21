@@ -1,5 +1,5 @@
 import { validateMnemonic, mnemonicToEntropy, entropyToMnemonic } from 'bip39'
-import { randomBytes } from './cryptoRandom'
+import { randomBytes, GetRandomBytes } from './cryptoRandom'
 import { createSha2Hash } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipher } from './aesCipher'
@@ -14,7 +14,9 @@ import { TriplesecDecryptSignature } from './cryptoUtils'
  * @private
  * @ignore 
  * */
-export async function encryptMnemonic(phrase: string, password: string): Promise<Buffer> {
+export async function encryptMnemonic(phrase: string, password: string, opts?: {
+  getRandomBytes?: GetRandomBytes
+}): Promise<Buffer> {
   // must be bip39 mnemonic
   if (!validateMnemonic(phrase)) {
     throw new Error('Not a valid bip39 nmemonic')
@@ -27,7 +29,12 @@ export async function encryptMnemonic(phrase: string, password: string): Promise
 
   // AES-128-CBC with SHA256 HMAC
   const pbkdf2 = await createPbkdf2()
-  const salt = randomBytes(16)
+  let salt: Buffer
+  if (opts && opts.getRandomBytes) {
+    salt = opts.getRandomBytes(16)
+  } else {
+    salt = randomBytes(16)
+  }
   const keysAndIV = await pbkdf2.derive(password, salt, 100000, 48, 'sha512')
   const encKey = keysAndIV.slice(0, 16)
   const macKey = keysAndIV.slice(16, 32)

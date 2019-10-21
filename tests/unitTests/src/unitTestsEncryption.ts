@@ -103,6 +103,9 @@ export function runEncryptionTests() {
     const rawPhrase = 'march eager husband pilot waste rely exclude taste '
       + 'twist donkey actress scene'
     const rawPassword = 'testtest'
+    const encryptedPhrase = 'ffffffffffffffffffffffffffffffffca638cc39fc270e8be5c'
+      + 'bf98347e42a52ee955e287ab589c571af5f7c80269295b0039e32ae13adf11bc6506f5ec'
+      + '32dda2f79df4c44276359c6bac178ae393de'
 
     const preEncryptedPhrase = '7573f4f51089ba7ce2b95542552b7504de7305398637733'
      + '0579649dfbc9e664073ba614fac180d3dc237b21eba57f9aee5702ba819fe17a0752c4dc7'
@@ -123,7 +126,6 @@ export function runEncryptionTests() {
 
     // Test encryption -> decryption. Can't be done with hard-coded values
     // due to random salt.
-    // TODO: Use generators to allow for inserting the same salt for testing?
     await encryptMnemonic(rawPhrase, rawPassword)
       .then(encoded => decryptMnemonic(encoded.toString('hex'), rawPassword, triplesec.decrypt),
             (err) => {
@@ -135,9 +137,26 @@ export function runEncryptionTests() {
         t.fail(`Should decrypt encrypted phrase, instead errored: ${err}`)
       })
 
+    // Test encryption with mocked randomBytes generator to use same salt
+    try {
+      const mockSalt = Buffer.from('ff'.repeat(16), 'hex')
+      const encoded = await encryptMnemonic(rawPhrase, rawPassword, {getRandomBytes: () => mockSalt})
+      t.strictEqual(encoded.toString('hex'), encryptedPhrase)
+    } catch (err) {
+      t.fail(`Should have encrypted phrase with deterministic salt, instead errored: ${err}`)
+    }
+
+    // Test decryption with mocked randomBytes generator to use same salt
+    try {
+      const decoded = await decryptMnemonic(Buffer.from(encryptedPhrase, 'hex'), rawPassword, triplesec.decrypt)
+      t.strictEqual(decoded, rawPhrase, 'Should encrypt & decrypt a phrase correctly')
+    } catch (err) {
+      t.fail(`Should have decrypted phrase with deterministic salt, instead errored: ${err}`)
+    }
+
     // Test valid input (No salt, so it's the same every time)
     await decryptMnemonic(legacyEncrypted, legacyPassword, triplesec.decrypt).then((decoded) => {
-      t.true(decoded.toString() === legacyPhrase, 'Should decrypt legacy encrypted phrase')
+      t.strictEqual(decoded, legacyPhrase, 'Should decrypt legacy encrypted phrase')
     }, (err) => {
       t.fail(`Should decrypt legacy encrypted phrase, instead errored: ${err}`)
     })
