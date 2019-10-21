@@ -347,8 +347,10 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
  */
 async function handleSignedEncryptedContents(
   caller: UserSession, path: string, storedContents: string,
-  app: string, username?: string, zoneFileLookupURL?: string) {
-  const appPrivateKey = caller.loadUserData().appPrivateKey
+  app: string, privateKey?: string, username?: string, 
+  zoneFileLookupURL?: string) {
+  const appPrivateKey = privateKey || caller.loadUserData().appPrivateKey
+
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
 
   let address: string
@@ -389,6 +391,9 @@ async function handleSignedEncryptedContents(
   } else if (!(await verifyECDSA(cipherText, signerPublicKey, signature))) {
     throw new SignatureVerificationError('Contents do not match ECDSA signature in file:'
                                           + ` ${path}`)
+  } else if (typeof (privateKey) === 'string') {
+    const decryptOpt = { privateKey }
+    return caller.decryptContent(cipherText, decryptOpt)
   } else {
     return caller.decryptContent(cipherText)
   }
@@ -418,10 +423,11 @@ export interface GetFileUrlOptions {
  */
 export interface GetFileOptions extends GetFileUrlOptions {
   /**
-   * Try to decrypt the data with the app private key.
+  * Try to decrypt the data with the app private key. 
+  * If a string is specified, it is used as the private key. 
    * @default true
    */
-  decrypt?: boolean;
+  decrypt?: boolean | string;
   /**
    * Whether the content should be verified, only to be used 
    * when [[UserSession.putFile]] was set to `sign = true`.
@@ -468,13 +474,23 @@ export async function getFile(
     if (typeof storedContents !== 'string') {
       throw new Error('Expected to get back a string for the cipherText')
     }
-    return caller.decryptContent(storedContents)
+    if (typeof (opt.decrypt) === 'string') {
+      const decryptOpt = { privateKey: opt.decrypt }
+      return caller.decryptContent(storedContents, decryptOpt)
+    } else {
+      return caller.decryptContent(storedContents)
+    }
   } else if (opt.decrypt && opt.verify) {
     if (typeof storedContents !== 'string') {
       throw new Error('Expected to get back a string for the cipherText')
     }
+    let decryptionKey
+    if (typeof (opt.decrypt) === 'string') {
+      decryptionKey = opt.decrypt
+    }
     return handleSignedEncryptedContents(caller, path, storedContents,
-                                         opt.app, opt.username, opt.zoneFileLookupURL)
+                                         opt.app, decryptionKey, opt.username, 
+                                         opt.zoneFileLookupURL)
   } else if (!opt.verify && !opt.decrypt) {
     return storedContents
   } else {

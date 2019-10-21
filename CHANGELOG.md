@@ -4,12 +4,14 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
 ### Added
 - More Blockstack error codes.
 
 ### Changed
 - `getFile` now throws error on 404 instead of returning null.
 - `getFile`, `putFile`, `deleteFile`, `listfiles` now include error info upon failure.
+- `getFile` can now decrypt using a custom private key
 
 ## [19.4.0] - 2019-09-03
 ### Changed
