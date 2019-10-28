@@ -49,7 +49,7 @@ function networkTests() {
 
     FetchMock.restore()
 
-    FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
+    FetchMock.get('https://explorer-api.blockstack.org/api/v2/fee-estimate', { recommended: 1000 })
 
     const txhashFound = 'txhash-found'
     const blockHash = 'block-hash'
@@ -321,7 +321,7 @@ function utilsTests() {
 
     FetchMock.restore()
 
-    FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
+    FetchMock.get('https://explorer-api.blockstack.org/api/v2/fee-estimate', { recommended: 1000 })
 
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}&cors=true`,
                   { unspent_outputs: utxoSet1 })
@@ -448,7 +448,7 @@ function transactionTests() {
 
   function setupMocks() {
     FetchMock.restore()
-    FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
+    FetchMock.get('https://explorer-api.blockstack.org/api/v2/fee-estimate', { recommended: 1000 })
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}&cors=true`,
                   { unspent_outputs: utxoSet })
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}&cors=true`,

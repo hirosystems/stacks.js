@@ -779,9 +779,9 @@ export class BlockstackNetwork {
   }
 
   getFeeRate() : Promise<number> {
-    return fetch('https://bitcoinfees.earn.com/api/v1/fees/recommended')
+    return fetch('https://explorer-api.blockstack.org/api/v2/fee-estimate')
       .then(resp => resp.json())
-      .then(rates => Math.floor(rates.fastestFee))
+      .then(rates => Math.floor(rates.recommended))
   }
 
   countDustOutputs() {
