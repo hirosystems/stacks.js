@@ -57,7 +57,7 @@ class PasswordError extends Error { }
 /**
 * @ignore
 */
-async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string) {
+async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Promise<string> {
   const salt = dataBuffer.slice(0, 16)
   const hmacSig = dataBuffer.slice(16, 48)   // 32 bytes
   const cipherText = dataBuffer.slice(48)

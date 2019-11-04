@@ -48,16 +48,16 @@ export function runAuthTests() {
     const address = await publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
     const origin = 'http://localhost:3000'
-    t.equal(decodedToken.payload.iss,
+    t.equal((decodedToken.payload as any).iss,
             referenceDID, 'auth request issuer should include the public key')
-    t.equal(decodedToken.payload.domain_name,
+    t.equal((decodedToken.payload as any).domain_name,
             origin, 'auth request domain_name should be origin')
-    t.equal(decodedToken.payload.redirect_uri,
+    t.equal((decodedToken.payload as any).redirect_uri,
             'http://localhost:3000', 'auth request redirects to correct uri')
-    t.equal(decodedToken.payload.manifest_uri,
+    t.equal((decodedToken.payload as any).manifest_uri,
             'http://localhost:3000/manifest.json', 'auth request manifest is correct uri')
 
-    t.equal(JSON.stringify(decodedToken.payload.scopes),
+    t.equal(JSON.stringify((decodedToken.payload as any).scopes),
             '["store_write"]', 'auth request scopes should be store_write')
 
     verifyAuthRequest(authRequest)
@@ -107,7 +107,7 @@ export function runAuthTests() {
     const decodedToken = decodeToken(authRequest)
     t.ok(decodedToken, 'auth request token should have been decoded')
 
-    t.equal(decodedToken.payload.myCustomParam, 'asdf', 'custom param from extraParams is included in payload')
+    t.equal((decodedToken.payload as any).myCustomParam, 'asdf', 'custom param from extraParams is included in payload')
 
     await verifyAuthRequest(authRequest)
       .then((verified) => {
@@ -188,13 +188,13 @@ export function runAuthTests() {
 
     const address = await publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
-    t.equal(decodedToken.payload.iss,
+    t.equal((decodedToken.payload as any).iss,
             referenceDID, 'auth response issuer should include the public key')
 
-    t.equal(JSON.stringify(decodedToken.payload.profile),
+    t.equal(JSON.stringify((decodedToken.payload as any).profile),
             JSON.stringify(sampleProfiles.ryan), 'auth response profile should equal the reference value')
 
-    t.equal(decodedToken.payload.username, null, 'auth response username should be null')
+    t.equal((decodedToken.payload as any).username, null, 'auth response username should be null')
 
     // const verified = verifyAuthResponse(authResponse)
     // t.equal(verified, true, 'auth response should be verified')
@@ -350,7 +350,7 @@ export function runAuthTests() {
     blockstack.store.getSessionData().transitKey = transitPrivateKey
 
     const sessionData = blockstack.store.getSessionData()
-    sessionData.userData = {
+    ;(sessionData as any).userData = {
       decentralizedID: 'blockstack.id',
       username: 'blockstack.id',
       identityAddress: 'identityaddress',

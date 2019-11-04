@@ -17,6 +17,7 @@
     "build:node:watch": "shx rm -rf lib && tsc -b tsconfig.build.json --watch",
     "prepare": "npm run build:node && npm run build:webpack",
     "test": "npm run lint && cross-env NODE_ENV=test nyc node ./tests/unitTests/src/index.ts",
+    "test:build": "cross-env NODE_ENV=test tsc -p ./tests/unitTests/src/tsconfig.json",
     "integration-test-ops": "cross-env NODE_ENV=test nyc node ./tests/operationsTests/src/index.ts",
     "dev-auth": "npm run build:webpack && ts-node ./tests/browserTests/auth-server.ts",
     "dev-proofs": "npm run build:webpack && ts-node ./tests/browserTests/proofs-server.ts",

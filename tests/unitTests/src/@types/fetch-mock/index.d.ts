@@ -4,7 +4,7 @@
  * but we should eventually just fix the usage.
  */
 declare module 'fetch-mock' {
-  import orig from 'fetch-mock/index'
+  import * as orig from 'fetch-mock/index'
 
   interface Extras {
     post(arg: any): any;

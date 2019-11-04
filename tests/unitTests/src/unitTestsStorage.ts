@@ -712,15 +712,15 @@ export function runStorageTests() {
     const fileContent = { test: 'test' }
 
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
-
+    
     const { putFile } = proxyquire('../../../src/storage', {
       './hub': { uploadToGaiaHub }
     })
 
     const options = { encrypt: false }
 
-    putFile(path, fileContent, options, blockstack)
-      .then((publicURL) => {
+    putFile(path, fileContent as any, options, blockstack)
+      .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       })
   })
@@ -759,7 +759,7 @@ export function runStorageTests() {
 
     const options = { encrypt: false, contentType: 'text/html' }
     putFile(path, fileContent, options, blockstack)
-      .then((publicURL) => {
+      .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       })
       .then(() => {
@@ -809,11 +809,11 @@ export function runStorageTests() {
     const decryptOptions = { decrypt: true }
     // put and encrypt the file
     putFile(path, fileContent, encryptOptions, blockstack)
-      .then((publicURL) => {
+      .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        getFile(path, decryptOptions, blockstack).then((readContent) => {
+        getFile(path, decryptOptions, blockstack).then((readContent: string) => {
           t.equal(readContent, fileContent)
           // put back whatever was inside before
         })
@@ -860,11 +860,11 @@ export function runStorageTests() {
     const decryptOptions = { decrypt: privateKey }
     // put and encrypt the file
     putFile(path, fileContent, encryptOptions, blockstack)
-      .then((publicURL) => {
+      .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        getFile(path, decryptOptions, blockstack).then((readContent) => {
+        getFile(path, decryptOptions, blockstack).then((readContent: string) => {
           t.equal(readContent, fileContent)
         })
       })
@@ -922,7 +922,7 @@ export function runStorageTests() {
     const decryptOptions = { decrypt: true, verify: true }
     // put and encrypt the file
     putFile('doesnt-matter.json', fileContent, encryptOptions, blockstack)
-      .then((publicURL) => {
+      .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
         FetchMock.get(fullReadUrl, putFiledContents)
         const contentsObj = JSON.parse(putFiledContents)
@@ -936,7 +936,7 @@ export function runStorageTests() {
           publicKey: contentsObj.publicKey,
           cipherText: 'potato potato potato'
         }))
-      }).then(() => getFile('file.json', decryptOptions, blockstack).then((readContent) => {
+      }).then(() => getFile('file.json', decryptOptions, blockstack).then((readContent: string) => {
         t.equal(readContent, fileContent)
       }))
       .then(() => getFile('file.json', {
@@ -945,12 +945,12 @@ export function runStorageTests() {
         username: 'applejacks.id',
         app: 'origin'
       }, blockstack)
-        .then((readContent) => {
+        .then((readContent: string) => {
           t.equal(readContent, fileContent)
         }))
       .then(() => getFile('badPK.json', decryptOptions, blockstack)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
-        .catch(err => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
                            `Should fail with complaint about mismatch PK: ${err.message}`)))
       .then(() => getFile('badPK.json', {
         decrypt: true,
@@ -959,13 +959,13 @@ export function runStorageTests() {
         app: 'origin'
       }, blockstack)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
-        .catch(err => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
                            `Should fail with complaint about mismatch PK: ${err.message}`)))
       .then(() => getFile('badSig.json', decryptOptions, blockstack)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
-        .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                            'Should fail with complaint about bad signature')))
-      .catch(err => console.log(err.stack))
+      .catch((err: Error) => console.log(err.stack))
       .then(() => {
         t.end()
       })
@@ -998,8 +998,8 @@ export function runStorageTests() {
     const fileContent = JSON.stringify({ test: 'test' })
     const badPK = '0288580b020800f421d746f738b221d384f098e911b81939d8c94df89e74cba776'
 
-    const putFiledContents = []
-    const pathToReadUrl = (fname => `${readPrefix}/${fname}`)
+    const putFiledContents: [string, any][] = []
+    const pathToReadUrl = ((fname: string) => `${readPrefix}/${fname}`)
 
     const uploadToGaiaHub = sinon.stub().callsFake( // eslint-disable-line no-shadow
       (fname, contents) => {
@@ -1040,7 +1040,7 @@ export function runStorageTests() {
     }
     // put and encrypt the file
     putFile(goodPath, fileContent, encryptOptions, blockstack)
-      .then((publicURL) => {
+      .then((publicURL: string) => {
         t.equal(publicURL, pathToReadUrl(goodPath))
         t.equal(putFiledContents.length, 2)
 
@@ -1072,38 +1072,38 @@ export function runStorageTests() {
                         publicKey: badPK
                       }))
       })
-      .then(() => getFile(goodPath, decryptOptions, blockstack).then((readContent) => {
+      .then(() => getFile(goodPath, decryptOptions, blockstack).then((readContent: any) => {
         t.equal(readContent, fileContent, 'should read the file')
       }))
       .then(() => getFile(badSigPath, decryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
-        .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                            'Should fail with complaint about bad signature')))
       .then(() => getFile(noSigPath, decryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
-        .catch(err => t.ok(err.message.indexOf('obtain signature for file') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('obtain signature for file') >= 0,
                            'Should fail with complaint about missing signature')))
       .then(() => getFile(badPKPath, decryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
-        .catch(err => t.ok(err.message.indexOf('match gaia address') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('match gaia address') >= 0,
                            'Should fail with complaint about matching addresses')))
       .then(() => getFile(goodPath, multiplayerDecryptOptions, blockstack)
-        .then((readContent) => {
+        .then((readContent: any) => {
           t.equal(readContent, fileContent, 'should read the file')
         }))
       .then(() => getFile(badSigPath, multiplayerDecryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
-        .catch(err => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
                            'Should fail with complaint about bad signature')))
       .then(() => getFile(noSigPath, multiplayerDecryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
-        .catch(err => t.ok(err.message.indexOf('obtain signature for file') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('obtain signature for file') >= 0,
                            'Should fail with complaint about missing signature')))
       .then(() => getFile(badPKPath, multiplayerDecryptOptions, blockstack)
         .then(() => t.fail('Should have failed to read file.'))
-        .catch(err => t.ok(err.message.indexOf('match gaia address') >= 0,
+        .catch((err: Error) => t.ok(err.message.indexOf('match gaia address') >= 0,
                            'Should fail with complaint about matching addresses')))
-      .catch((err) => {
+      .catch((err: Error) => {
         console.log(err.stack)
         t.fail('Unexpected error!')
       })
@@ -1348,7 +1348,7 @@ export function runStorageTests() {
         const verified = await new TokenVerifier('ES256K', publicKey)
           .verify(jsonTokenPart)
         t.ok(verified, 'Verified token')
-        t.equal(hubServer, decodeToken(jsonTokenPart).payload.hubUrl, 'Intended hubUrl')
+        t.equal(hubServer, (decodeToken(jsonTokenPart).payload as any).hubUrl, 'Intended hubUrl')
       })
   })
 
@@ -1398,8 +1398,8 @@ export function runStorageTests() {
     const verified = await new TokenVerifier('ES256K', publicKey)
       .verify(jsonTokenPart)
     t.ok(verified, 'Verified token')
-    t.equal(hubServer, decodeToken(jsonTokenPart).payload.hubUrl, 'Intended hubUrl')
-    t.equal(gaiaAssociationToken, decodeToken(jsonTokenPart).payload.associationToken,
+    t.equal(hubServer, (decodeToken(jsonTokenPart).payload as any).hubUrl, 'Intended hubUrl')
+    t.equal(gaiaAssociationToken, (decodeToken(jsonTokenPart).payload as any).associationToken,
             'Intended association token')
       
   })
@@ -1447,7 +1447,7 @@ export function runStorageTests() {
     })
 
     getUserAppFileUrl(path, name, appOrigin)
-      .then((url) => {
+      .then((url: string) => {
         t.ok(url, 'Returns user app file url')
         t.equals(url, fileUrl)
       })
@@ -1535,8 +1535,8 @@ export function runStorageTests() {
     }
     blockstack.setLocalGaiaHubConnection().then((gaiaConfig) => {
       const { token } = gaiaConfig
-      const { payload } = decodeToken(token.slice(2))
-      t.equal(payload.associationToken, gaiaAssociationToken, 'gaia config includes association token')
+      const assocToken = (decodeToken(token.slice(2)).payload as any).associationToken
+      t.equal(assocToken, gaiaAssociationToken, 'gaia config includes association token')
     })
   })
 
@@ -1594,12 +1594,12 @@ export function runStorageTests() {
       }
     })
 
-    const files = []
-    listFiles((name) => {
+    const files: string[] = []
+    listFiles((name: string) => {
       files.push(name)
       return true
     }, blockstack)
-      .then((count) => {
+      .then((count: number) => {
         t.equal(files.length, 1, 'Got one file back')
         t.equal(files[0], 'file.json', 'Got the right file back')
         t.equal(count, 1, 'Count matches number of files')

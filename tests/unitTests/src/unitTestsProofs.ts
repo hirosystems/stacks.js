@@ -23,7 +23,7 @@ function mockRequests() {
   FetchMock.get(larry.facebook.url, larry.facebook.body)
 }
 
-function testProofs(profile, username, totalProofs) {
+function testProofs(profile: any, username: string, totalProofs: number) {
   test(`Profiles ${username}`,
        (t) =>  { // FetchMock.get('https://www.facebook.com/larry.salibra/posts/10100341028448093', 'hi')
          mockRequests()

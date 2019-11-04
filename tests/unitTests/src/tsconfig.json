@@ -5,12 +5,12 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "noEmit": true
   },
   "include": [
     "./**/*",
-    "../../../**/*"
+    "../../../src/**/*"
   ]
 }

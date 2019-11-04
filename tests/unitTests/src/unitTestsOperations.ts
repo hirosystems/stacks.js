@@ -115,7 +115,7 @@ function networkTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://utxo.tester.com'
+      matcher: (url: any, opts: any) => (url === 'https://utxo.tester.com'
           && opts
           && opts.body.indexOf('importaddress') > 0),
       response: {
@@ -127,7 +127,7 @@ function networkTests() {
     // @ts-ignore
     FetchMock.post({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://utxo.tester.com'
+      matcher: (url: any, opts: any) => (url === 'https://utxo.tester.com'
           && opts
           && opts.body.indexOf('listunspent') > 0),
       response: {
@@ -316,7 +316,7 @@ function utilsTests() {
                       '3387418aaddb4927209c5032f515aa442a6587d6e54677f08a03b8fa7789e688',
                         tx_output_n: 0
                       }]
-    const utxoSet2 = []
+    const utxoSet2: any[] = []
 
     config.network.modifyUTXOSetFrom(txStarterHex)
 
@@ -481,7 +481,7 @@ function transactionTests() {
                   { height: 601 })
   }
 
-  function getInputVals(inputTXArgument, utxoSets = utxoSet) {
+  function getInputVals(inputTXArgument: Transaction, utxoSets = utxoSet) {
     const utxosAll = utxoSets.concat()
     return inputTXArgument.ins.reduce((agg, x) => {
       const inputTX = utxosAll.find(
@@ -1270,7 +1270,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
           && opts
           && opts.body === expectedBody),
       response: {
@@ -1306,7 +1306,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
           && opts
           && opts.body === expectedBody),
       response: {
@@ -1333,7 +1333,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://blockchain.info/pushtx?cors=true'
+      matcher: (url: any, opts: any) => (url === 'https://blockchain.info/pushtx?cors=true'
           && opts
           && opts.body),
       response: {
@@ -1359,7 +1359,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://blockchain.info/pushtx?cors=true'
+      matcher: (url: any, opts: any) => (url === 'https://blockchain.info/pushtx?cors=true'
           && opts
           && opts.body),
       response: {
@@ -1388,7 +1388,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
           && opts
           && opts.body === expectedBody),
       response: {
@@ -1415,7 +1415,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
           && opts
           && opts.body === expectedBody),
       response: {
@@ -1441,7 +1441,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://core.blockstack.org/v1/zonefile/'
+      matcher: (url: any, opts: any) => (url === 'https://core.blockstack.org/v1/zonefile/'
           && opts.body === expectedBody),
       response: {
         body: JSON.stringify({ error: 'core indicates an error like this' }),
@@ -1466,7 +1466,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://core.blockstack.org/v1/zonefile/'
+      matcher: (url: any, opts: any) => (url === 'https://core.blockstack.org/v1/zonefile/'
           && opts
           && opts.body === expectedBody),
       response: {
@@ -1508,7 +1508,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
           && opts
           && opts.body === expectedBody),
       response: {
@@ -1540,7 +1540,7 @@ function transactionTests() {
     // @ts-ignore
     FetchMock.postOnce({
       name: 'Broadcast',
-      matcher: (url, opts) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
           && opts
           && opts.body === expectedBody),
       response: {
