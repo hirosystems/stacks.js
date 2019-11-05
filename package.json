@@ -148,7 +148,7 @@
     "cross-fetch": "^3.0.4",
     "elliptic": "^6.5.1",
     "form-data": "^2.5.1",
-    "jsontokens": "github:blockstack/jsontokens-js#feature/w3c-crypto",
+    "jsontokens": "3.0.0-alpha.0",
     "query-string": "^6.8.3",
     "randombytes": "^2.1.0",
     "request": "^2.88.0",
