@@ -8,12 +8,6 @@
   "browser": {
     "crypto": false
   },
-  "files": [
-    "dist/",
-    "lib/",
-    "src/",
-    "bower.json"
-  ],
   "scripts": {
     "build": "run-p build:node build:webpack build:docs",
     "build:webpack": "rimraf dist && cross-env NODE_ENV=production webpack --mode=production",
