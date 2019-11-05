@@ -109,7 +109,7 @@ export class BlockstackWallet {
    * @ignore
    */
   static async fromEncryptedMnemonic(
-    data: string, 
+    data: string | Buffer, 
     password: string, 
     triplesecDecrypt: TriplesecDecryptSignature): Promise<BlockstackWallet> {
     try {

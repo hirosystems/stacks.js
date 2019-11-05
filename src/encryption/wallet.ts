@@ -17,15 +17,19 @@ import { TriplesecDecryptSignature } from './cryptoUtils'
 export async function encryptMnemonic(phrase: string, password: string, opts?: {
   getRandomBytes?: GetRandomBytes
 }): Promise<Buffer> {
-  // must be bip39 mnemonic
-  if (!validateMnemonic(phrase)) {
-    throw new Error('Not a valid bip39 nmemonic')
+  // hex encoded mnemonic string
+  let mnemonicEntropy: string
+  try {
+    // must be bip39 mnemonic
+    mnemonicEntropy = mnemonicToEntropy(phrase)
+  } catch (error) {
+    console.error('Invalid mnemonic phrase provided')
+    console.error(error)
+    throw new Error('Not a valid bip39 mnemonic')
   }
-
+ 
   // normalize plaintext to fixed length byte string
-  const plaintextNormalized = Buffer.from(
-    mnemonicToEntropy(phrase), 'hex'
-  )
+  const plaintextNormalized = Buffer.from(mnemonicEntropy, 'hex')
 
   // AES-128-CBC with SHA256 HMAC
   const pbkdf2 = await createPbkdf2()
@@ -71,7 +75,6 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
 
   const decipher = await createCipher()
   const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText)
-  const plaintext = decryptedResult.toString('hex')
 
   const hmacSha256 = await createHmacSha256()
   const hmacDigest = await hmacSha256.digest(macKey, hmacPayload)
@@ -79,15 +82,22 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
   // hash both hmacSig and hmacDigest so string comparison time
   // is uncorrelated to the ciphertext
   const sha2Hash = await createSha2Hash()
-  const hmacSigHash = (await sha2Hash.digest(hmacSig)).toString('hex')
-  const hmacDigestHash = (await sha2Hash.digest(hmacDigest)).toString('hex')
+  const hmacSigHash = await sha2Hash.digest(hmacSig)
+  const hmacDigestHash = await sha2Hash.digest(hmacDigest)
 
-  if (hmacSigHash !== hmacDigestHash) {
+  if (!hmacSigHash.equals(hmacDigestHash)) {
     // not authentic
     throw new PasswordError('Wrong password (HMAC mismatch)')
   }
 
-  const mnemonic = entropyToMnemonic(plaintext)
+  let mnemonic: string
+  try {
+    mnemonic = entropyToMnemonic(decryptedResult)
+  } catch (error) {
+    console.error('Error thrown by `entropyToMnemonic`')
+    console.error(error)
+    throw new PasswordError('Wrong password (invalid plaintext)')
+  }
   if (!validateMnemonic(mnemonic)) {
     throw new PasswordError('Wrong password (invalid plaintext)')
   }
