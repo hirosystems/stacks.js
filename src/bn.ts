@@ -17,6 +17,11 @@ export type Endianness = 'le' | 'be';
 
 const BadTypeUsage = new Error('Class only used as an interface')
 
+// TODO: This is terrible, hacky method to declare the class definition for `bn.js` lib
+//       in a way that prevents `@types/bn.js` from publicly leaking from this this lib
+//       and causing issues in other libs. This should be replaced with a PR to fix 
+//       the `@types/bn.js` code.  
+
 class BNClass {
   constructor(number: number | string | number[] | Uint8Array | Buffer | BNClass, endian?: Endianness);
   constructor(number: number | string | number[] | Uint8Array | Buffer | BNClass, base?: number | 'hex', endian?: Endianness);
