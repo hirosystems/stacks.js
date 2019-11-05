@@ -1,7 +1,6 @@
 import { TxOutput, address as bjsAddress, networks, Transaction, payments, Network } from 'bitcoinjs-lib'
 import * as FormData from 'form-data'
-// @ts-ignore
-import * as BN from 'bn.js'
+import { BN, BNConstructor } from './bn'
 import { MissingParameterError, RemoteServiceError } from './errors'
 import { Logger } from './logger'
 import { config } from './config'
@@ -149,7 +148,7 @@ export class BlockstackNetwork {
         }
         const result = {
           units: 'BTC',
-          amount: new BN(String(namePrice.satoshis))
+          amount: new BNConstructor(String(namePrice.satoshis))
         }
         return result
       })
@@ -181,7 +180,7 @@ export class BlockstackNetwork {
         }
         const result = {
           units: 'BTC',
-          amount: new BN(String(namespacePrice.satoshis))
+          amount: new BNConstructor(String(namespacePrice.satoshis))
         }
         return result
       })
@@ -213,11 +212,11 @@ export class BlockstackNetwork {
         }
         const result = {
           units: namePrice.units,
-          amount: new BN(namePrice.amount)
+          amount: new BNConstructor(namePrice.amount)
         }
         if (namePrice.units === 'BTC') {
           // must be at least dust-minimum
-          const dustMin = new BN(String(this.DUST_MINIMUM))
+          const dustMin = new BNConstructor(String(this.DUST_MINIMUM))
           if (result.amount.ucmp(dustMin) < 0) {
             result.amount = dustMin
           }
@@ -249,11 +248,11 @@ export class BlockstackNetwork {
         }
         const result = {
           units: namespacePrice.units,
-          amount: new BN(namespacePrice.amount)
+          amount: new BNConstructor(namespacePrice.amount)
         }
         if (namespacePrice.units === 'BTC') {
           // must be at least dust-minimum
-          const dustMin = new BN(String(this.DUST_MINIMUM))
+          const dustMin = new BNConstructor(String(this.DUST_MINIMUM))
           if (result.amount.ucmp(dustMin) < 0) {
             result.amount = dustMin
           }
@@ -471,8 +470,8 @@ export class BlockstackNetwork {
         // coerce all addresses, and convert credit/debit to biginteger
         const formattedStatus = Object.assign({}, accountStatus, {
           address: this.coerceAddress(accountStatus.address),
-          debit_value: new BN(String(accountStatus.debit_value)),
-          credit_value: new BN(String(accountStatus.credit_value))
+          debit_value: new BNConstructor(String(accountStatus.debit_value)),
+          credit_value: new BNConstructor(String(accountStatus.credit_value))
         })
         return formattedStatus
       })
@@ -507,8 +506,8 @@ export class BlockstackNetwork {
         // coerse all addresses and convert to bigint
         return historyList.map((histEntry: any) => {
           histEntry.address = this.coerceAddress(histEntry.address)
-          histEntry.debit_value = new BN(String(histEntry.debit_value))
-          histEntry.credit_value = new BN(String(histEntry.credit_value))
+          histEntry.debit_value = new BNConstructor(String(histEntry.debit_value))
+          histEntry.credit_value = new BNConstructor(String(histEntry.credit_value))
           return histEntry
         })
       })
@@ -544,8 +543,8 @@ export class BlockstackNetwork {
         // coerce all addresses 
         return historyList.map((histEntry: any) => {
           histEntry.address = this.coerceAddress(histEntry.address)
-          histEntry.debit_value = new BN(String(histEntry.debit_value))
-          histEntry.credit_value = new BN(String(histEntry.credit_value))
+          histEntry.debit_value = new BNConstructor(String(histEntry.debit_value))
+          histEntry.credit_value = new BNConstructor(String(histEntry.credit_value))
           return histEntry
         })
       })
@@ -592,7 +591,7 @@ export class BlockstackNetwork {
       .then((resp) => {
         if (resp.status === 404) {
           // talking to an older blockstack core node without the accounts API
-          return Promise.resolve().then(() => new BN('0'))
+          return Promise.resolve().then(() => new BNConstructor('0'))
         } else if (resp.status !== 200) {
           throw new Error(`Bad response status: ${resp.status}`)
         } else {
@@ -607,7 +606,7 @@ export class BlockstackNetwork {
         if (tokenBalance && tokenBalance.balance) {
           balance = tokenBalance.balance
         }
-        return new BN(balance)
+        return new BNConstructor(balance)
       })
   }
 

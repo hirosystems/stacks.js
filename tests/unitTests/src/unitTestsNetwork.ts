@@ -1,8 +1,6 @@
 import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
-// @ts-ignore
-import * as BN from 'bn.js'
-
+import { BNConstructor } from '../../../src/bn'
 import { network } from '../../../src'
 
 const mynet = new network.BlockstackNetwork(
@@ -54,11 +52,11 @@ export function runNetworkTests() {
 
     mynet.getNamePrice('test.id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: new BN('5500') }))
+        response, { units: 'BTC', amount: new BNConstructor('5500') }))
 
     mynet.getNamespacePrice('id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: new BN('650000') }))
+        response, { units: 'BTC', amount: new BNConstructor('650000') }))
   })
 
   test('prices-v2', (t) => {
@@ -76,15 +74,15 @@ export function runNetworkTests() {
 
     mynet.getNamePrice('test.id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: new BN('5500') }))
+        response, { units: 'BTC', amount: new BNConstructor('5500') }))
 
     mynet.getNamePrice('test-tokens.id')
       .then(response => t.deepEqual(
-        response, { units: 'STACKS', amount: new BN('1733000') }))
+        response, { units: 'STACKS', amount: new BNConstructor('1733000') }))
 
     mynet.getNamespacePrice('id')
       .then(response => t.deepEqual(
-        response, { units: 'BTC', amount: new BN('650000') }))
+        response, { units: 'BTC', amount: new BNConstructor('650000') }))
   })
 
   test('accounts', (t) => {
@@ -118,16 +116,16 @@ export function runNetworkTests() {
       .catch(e => t.equal(e.message, 'Account not found'))
 
     mynet.getAccountBalance(addr, 'STACKS')
-      .then(response => t.deepEqual(response, new BN('69129')))
+      .then(response => t.deepEqual(response, new BNConstructor('69129')))
     mynet.getAccountBalance(addr2, 'NOPE')
-      .then(response => t.deepEqual(response, new BN('0')))
+      .then(response => t.deepEqual(response, new BNConstructor('0')))
 
     mynet.getAccountStatus(addr, 'STACKS')
       .then(response => t.deepEqual(response, 
                                     {
                                       address: addr,
-                                      credit_value: new BN('123450'),
-                                      debit_value: new BN('54321')
+                                      credit_value: new BNConstructor('123450'),
+                                      debit_value: new BNConstructor('54321')
                                     }))
     mynet.getAccountStatus(addr2, 'STACKS')
       .then(() => t.fail('did not get exception when querying status of unknown address'))
@@ -137,8 +135,8 @@ export function runNetworkTests() {
       .then(response => t.deepEqual(response, 
                                     [{
                                       address: addr,
-                                      credit_value: new BN('123450'),
-                                      debit_value: new BN('54321')
+                                      credit_value: new BNConstructor('123450'),
+                                      debit_value: new BNConstructor('54321')
                                     }]))
     mynet.getAccountHistoryPage(addr2, 0)
       .then(() => t.fail('did not get exception when querying history of unknown address'))
@@ -148,8 +146,8 @@ export function runNetworkTests() {
       .then(response => t.deepEqual(response, 
                                     [{
                                       address: addr,
-                                      credit_value: new BN('123450'),
-                                      debit_value: new BN('54321')
+                                      credit_value: new BNConstructor('123450'),
+                                      debit_value: new BNConstructor('54321')
                                     }]))
     mynet.getAccountAt(addr2, 567890)
       .then(() => t.fail('did not get exception when querying block txs of unknown address'))
