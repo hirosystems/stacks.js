@@ -28,8 +28,8 @@ export function makeECPrivateKey() {
 /**
 * @ignore
 */
-export async function publicKeyToAddress(publicKey: string) {
-  const publicKeyBuffer = Buffer.from(publicKey, 'hex')
+export async function publicKeyToAddress(publicKey: string | Buffer) {
+  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex')
   const sha2Hash = await createSha2Hash()
   const publicKeyHash160 = await createHashRipemd160().digest(
     await sha2Hash.digest(publicKeyBuffer)
@@ -41,7 +41,8 @@ export async function publicKeyToAddress(publicKey: string) {
 /**
 * @ignore
 */
-export function getPublicKeyFromPrivate(privateKey: string) {
-  const keyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'))
+export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
+  const privateKeyBuffer = Buffer.isBuffer(privateKey) ? privateKey : Buffer.from(privateKey, 'hex')
+  const keyPair = ECPair.fromPrivateKey(privateKeyBuffer)
   return keyPair.publicKey.toString('hex')
 }
