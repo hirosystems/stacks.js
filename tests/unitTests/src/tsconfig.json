@@ -6,7 +6,6 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "noImplicitAny": true,
-    "skipLibCheck": true,
     "noEmit": true
   },
   "include": [

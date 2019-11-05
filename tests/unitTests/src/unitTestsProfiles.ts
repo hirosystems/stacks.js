@@ -242,6 +242,7 @@ function testSchemas() {
 }
 
 export function runProfilesUnitTests() {
+  FetchMock.config.overwriteRoutes = true
   testVerifyToken()
   testTokening('naval.json', sampleProfiles.naval)
   testTokening('google.json', sampleProfiles.google)

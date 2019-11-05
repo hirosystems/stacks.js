@@ -1158,6 +1158,12 @@ export class InsightClient extends BitcoinNetwork {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(jsonData)
                         })
+      .then(resp => {
+        if (!resp.ok) {
+          throw new Error(`Failed to broadcastTransaction ${resp.statusText}`)
+        }
+        return resp
+      })
       .then(resp => resp.json())
   }
 

@@ -1,6 +1,3 @@
-// eslint-disable-next-line import/no-unassigned-import
-import 'cross-fetch/polyfill'
-
 import { TokenSigner, SECP256K1Client } from 'jsontokens'
 import { makeECPrivateKey, publicKeyToAddress } from '../keys'
 import { makeUUID4, nextMonth, getGlobalObject } from '../utils'

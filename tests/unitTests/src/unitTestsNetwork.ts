@@ -41,6 +41,8 @@ const testAddresses = [
 ]
 
 export function runNetworkTests() {
+  FetchMock.config.overwriteRoutes = true
+  
   test('prices-v1', (t) => {
     t.plan(2)
     FetchMock.restore()

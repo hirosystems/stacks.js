@@ -110,29 +110,21 @@ function networkTests() {
 
     FetchMock.restore()
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://utxo.tester.com'
-          && opts
-          && opts.body.indexOf('importaddress') > 0),
-      response: {
-        body: {},
-        status: 200
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://utxo.tester.com'
+        && opts
+        && opts.body.indexOf('importaddress') > 0),
+      { body: {}, status: 200 },
+      { name: 'Broadcast' }
+    )
 
-    // @ts-ignore
-    FetchMock.post({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://utxo.tester.com'
-          && opts
-          && opts.body.indexOf('listunspent') > 0),
-      response: {
-        body: JSON.stringify({ result: [] }),
-        status: 200
-      }
-    })
+    FetchMock.post(
+      (url: any, opts: any) => (url === 'https://utxo.tester.com'
+        && opts
+        && opts.body.indexOf('listunspent') > 0),
+      { body: JSON.stringify({ result: [] }), status: 200 },
+      { name: 'Broadcast' }
+    )
 
     mynet.getNetworkedUTXOs(testAddresses[0].address)
       .then((utxos) => {
@@ -1253,7 +1245,7 @@ function transactionTests() {
   })
 
   test(`broadcastTransaction:
-    rejects with error when broadcast service has a problem`, (t) => {
+    rejects with error when broadcast service has a problem`, async (t) => {
     t.plan(3)
     FetchMock.restore()
     const transaction = 'abc'
@@ -1265,25 +1257,31 @@ function transactionTests() {
       confirmations
     })
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        result: {},
-        status: 500
+    FetchMock.post(
+      (url, opts) => {
+        const result = (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+        && opts
+        && opts.body === expectedBody) 
+        return result
+      },
+      (url, opts) => {
+        return { ok: false, status: 500 } as FetchMock.MockRequest
       }
-    })
+    )
 
-    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
-                                                          transactionToWatch)
-      .catch((error) => {
-        t.assert(FetchMock.done())
-        t.assert(error.response)
-        t.equal(error.code, 'remote_service_error')
-      })
+    try {
+      const resp = await network.defaults.MAINNET_DEFAULT.broadcastTransaction(
+        transaction,
+        transactionToWatch)
+      console.log(resp)
+    } catch (error) {
+      t.assert(FetchMock.done())
+      t.assert(error.response)
+      t.equal(error.code, 'remote_service_error')
+    } finally {
+      FetchMock.flush()
+      console.log('worked?')
+    }
   })
 
 
@@ -1301,17 +1299,13 @@ function transactionTests() {
       confirmations
     })
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({}),
-        status: 202
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/transaction'
+        && opts
+        && opts.body === expectedBody),
+      { body: JSON.stringify({}), status: 202 },
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
                                                           transactionToWatch, confirmations)
@@ -1328,17 +1322,13 @@ function transactionTests() {
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://blockchain.info/pushtx?cors=true'
-          && opts
-          && opts.body),
-      response: {
-        body: 'transaction submitted',
-        status: 202
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://blockchain.info/pushtx?cors=true'
+        && opts
+        && opts.body),
+      { body: 'transaction submitted', status: 202 },
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
       .then(() => {
@@ -1354,17 +1344,14 @@ function transactionTests() {
     + '1976a9140f39a0043cf7bdbe429c17e8b514599e9ec53dea88ac010000000000'
     + '00001976a9148a8c9fd79173f90cf76410615d2a52d12d27d21288ac00000000'
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://blockchain.info/pushtx?cors=true'
-          && opts
-          && opts.body),
-      response: {
-        body: 'something else',
-        status: 500
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://blockchain.info/pushtx?cors=true'
+        && opts
+        && opts.body),
+      { body: 'something else', status: 500 },
+      { name: 'Broadcast' }
+    )
+
     network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
       .catch((error) => {
         t.assert(FetchMock.done())
@@ -1383,17 +1370,14 @@ function transactionTests() {
       zoneFile,
       transactionToWatch
     })
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({}),
-        status: 202
-      }
-    })
+
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+        && opts
+        && opts.body === expectedBody),
+      { body: JSON.stringify({}), status: 202 }, 
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch).then(() => {
       t.assert(FetchMock.done())
@@ -1410,17 +1394,13 @@ function transactionTests() {
       zoneFile,
       transactionToWatch
     })
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({}),
-        status: 500
-      }
-    })
+
+    FetchMock.postOnce((url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/zone-file'
+      && opts
+      && opts.body === expectedBody), 
+      { body: JSON.stringify({}), status: 500 },
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch)
       .catch((error) => {
@@ -1436,16 +1416,12 @@ function transactionTests() {
     const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const expectedBody = JSON.stringify({ zonefile })
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://core.blockstack.org/v1/zonefile/'
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({ error: 'core indicates an error like this' }),
-        status: 200
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://core.blockstack.org/v1/zonefile/'
+        && opts.body === expectedBody),
+      { body: JSON.stringify({ error: 'core indicates an error like this' }), status: 200 }, 
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile)
       .catch((error) => {
@@ -1461,17 +1437,13 @@ function transactionTests() {
     const zonefile = '$ORIGIN satoshi.id\n$TTL 3600\n_http._tcp	IN	URI	10	1	"https://example.com/satoshi.json"\n\n'
     const expectedBody = JSON.stringify({ zonefile })
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://core.blockstack.org/v1/zonefile/'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({}),
-        status: 202
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://core.blockstack.org/v1/zonefile/'
+        && opts
+        && opts.body === expectedBody),
+      { body: JSON.stringify({}), status: 202 },
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile).then(() => {
       t.assert(FetchMock.done())
@@ -1503,17 +1475,12 @@ function transactionTests() {
       zoneFile
     })
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({}),
-        status: 202
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+        && opts
+        && opts.body === expectedBody),
+      { body: JSON.stringify({}), status: 202 }, 
+      { name: 'Broadcast' })
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
                                                                registerTransaction, zoneFile)
@@ -1535,17 +1502,13 @@ function transactionTests() {
       zoneFile
     })
 
-    // @ts-ignore
-    FetchMock.postOnce({
-      name: 'Broadcast',
-      matcher: (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
-          && opts
-          && opts.body === expectedBody),
-      response: {
-        body: JSON.stringify({}),
-        status: 500
-      }
-    })
+    FetchMock.postOnce(
+      (url: any, opts: any) => (url === 'https://broadcast.blockstack.org/v1/broadcast/registration'
+        && opts
+        && opts.body === expectedBody), 
+      { body: JSON.stringify({}), status: 500 }, 
+      { name: 'Broadcast' }
+    )
 
     network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
                                                                registerTransaction, zoneFile)
@@ -1906,6 +1869,7 @@ function safetyTests() {
 
 
 export function runOperationsTests() {
+  FetchMock.config.overwriteRoutes = true
   networkTests()
   utilsTests()
   transactionTests()

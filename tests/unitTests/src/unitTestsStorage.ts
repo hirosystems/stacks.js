@@ -42,6 +42,7 @@ import * as jsdom from 'jsdom'
 // global.window.location.origin = 'https://myApp.blockstack.org'
 
 export function runStorageTests() {
+  FetchMock.config.overwriteRoutes = true
   test('deleteFile', (t) => {
     t.plan(1)
 
@@ -854,7 +855,7 @@ export function runStorageTests() {
     const { getFile } = proxyquire('../../../src/storage', { // eslint-disable-line no-shadow
       './hub': { getFullReadUrl }
     })
-
+    
     FetchMock.get(fullReadUrl, await blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: publicKey }
     const decryptOptions = { decrypt: privateKey }
