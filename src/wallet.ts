@@ -1,6 +1,5 @@
-import { ECPair, payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
+import { payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
 import { mnemonicToSeed, generateMnemonic } from 'bip39'
-import { ecPairToHexString } from './utils'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 import { randomBytes, GetRandomBytes } from './encryption/cryptoRandom'
 import { createSha2Hash } from './encryption/sha2Hash'
@@ -49,7 +48,7 @@ function hashCode(string: string) {
  * @ignore
  */
 function getNodePrivateKey(node: BIP32Interface): string {
-  return ecPairToHexString(ECPair.fromPrivateKey(node.privateKey))
+  return `${node.privateKey.toString('hex')}01`
 }
 
 /**
@@ -58,6 +57,28 @@ function getNodePrivateKey(node: BIP32Interface): string {
  */
 function getNodePublicKey(node: BIP32Interface): string {
   return node.publicKey.toString('hex')
+}
+
+/**
+ * Get a BIP32 node for an application-specific domain.
+ * @param {String} appsNode - the BIP32Interface ir base58-encoded private key for
+ * applications node
+ * @param {String} salt - a string, used to salt the
+ * application-specific addresses
+ * @param {String} appDomain - the appDomain to generate a key for
+ * @return {String} the private key hex-string. this will be a 64
+ * character string
+ * @ignore
+ */
+export async function getLegacyAppNode(
+  appsNode: string | BIP32Interface, 
+  salt: string, appDomain: string): Promise<BIP32Interface> {
+  const sha2Hash = await createSha2Hash()
+  const hashBuffer = await sha2Hash.digest(Buffer.from(`${appDomain}${salt}`))
+  const hash = hashBuffer.toString('hex')
+  const appIndex = hashCode(hash)
+  const appNodeInstance = typeof appsNode === 'string' ? bip32.fromBase58(appsNode) : appsNode
+  return appNodeInstance.deriveHardened(appIndex)
 }
 
 /**
@@ -273,11 +294,7 @@ export class BlockstackWallet {
   static async getLegacyAppPrivateKey(
     appsNodeKey: string, 
     salt: string, appDomain: string): Promise<string> {
-    const sha2Hash = await createSha2Hash()
-    const hashBuffer = await sha2Hash.digest(Buffer.from(`${appDomain}${salt}`))
-    const hash = hashBuffer.toString('hex')
-    const appIndex = hashCode(hash)
-    const appNode = bip32.fromBase58(appsNodeKey).deriveHardened(appIndex)
+    const appNode = await getLegacyAppNode(appsNodeKey, salt, appDomain)
     return getNodePrivateKey(appNode).slice(0, 64)
   }
 
