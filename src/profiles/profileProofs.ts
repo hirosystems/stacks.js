@@ -5,7 +5,6 @@ export interface AccountProofInfo {
   service: string;
   identifier: string;
   proof_url: string;
-  proofType?: string;
   valid?: boolean;
 }
 
@@ -49,7 +48,6 @@ export function validateProofs(profile: any,
     }
 
     const proof: AccountProofInfo = {
-      proofType: account.proofType,
       service: account.service,
       proof_url: account.proof_url || account.proofUrl,
       identifier: account.identifier,
