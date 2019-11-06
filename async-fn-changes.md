@@ -36,3 +36,7 @@ aes256CbcDecrypt
 makeCoreSessionRequest
 doSignaturesMatchPublicKeys
 signProfileToken
+BlockstackWallet.getIdentityKeyPair
+BlockstackWallet.getIdentitySalt
+BlockstackWallet.getLegacyAppPrivateKey
+

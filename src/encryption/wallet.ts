@@ -140,10 +140,11 @@ function decryptLegacy(
 }
 
 /**
- * Encrypt a raw mnemonic phrase with a password
- * @param {string | Buffer} data - Buffer or hex-encoded string of the encrypted mnemonic
- * @param {string} password - Password for data
- * @return {Promise<string>} the raw mnemonic phrase
+ * Decrypt an encrypted mnemonic phrase with a password. 
+ * Legacy triplesec encrypted payloads are also supported. 
+ * @param data - Buffer or hex-encoded string of the encrypted mnemonic
+ * @param password - Password for data
+ * @return the raw mnemonic phrase
  * @private
  * @ignore 
  */
