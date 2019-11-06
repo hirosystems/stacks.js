@@ -2,7 +2,7 @@
 import * as queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
-import { isLaterVersion, hexStringToECPair, getGlobalObject, getGlobalObjects } from '../utils'
+import { isLaterVersion, getGlobalObject, getGlobalObjects } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 import { getAddressFromDID } from '../dids'
 import { LoginFailedError } from '../errors'
@@ -20,6 +20,7 @@ import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
 import { protocolEchoReplyDetection } from './protocolEchoDetection'
 import { launchCustomProtocol } from './protocolLaunch'
+import { hexStringToECPair } from '../keys'
 
 
 const DEFAULT_PROFILE = {

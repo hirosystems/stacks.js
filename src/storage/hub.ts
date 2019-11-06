@@ -1,12 +1,9 @@
 
 import { Transaction, script, ECPair } from 'bitcoinjs-lib'
 import { TokenSigner } from 'jsontokens'
-import {
-  ecPairToAddress,
-  hexStringToECPair,
-  getBlockstackErrorFromResponse } from '../utils'
+import { getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
-import { getPublicKeyFromPrivate } from '../keys'
+import { getPublicKeyFromPrivate, ecPairToAddress, hexStringToECPair, } from '../keys'
 import { Logger } from '../logger'
 import { randomBytes } from '../encryption/cryptoRandom'
 import { createSha2Hash } from '../encryption/sha2Hash'

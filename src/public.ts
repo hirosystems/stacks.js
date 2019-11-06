@@ -24,13 +24,13 @@ export {
 } from './dids'
 
 export {
-  getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate
+  getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate,
+  hexStringToECPair, ecPairToHexString, ecPairToAddress
 } from './keys'
 
 export {
   nextYear, nextMonth, nextHour, makeUUID4, updateQueryStringParameter,
-  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString,
-  ecPairToAddress
+  isLaterVersion, isSameOriginAbsoluteUrl
 } from './utils'
 
 export {

@@ -16,7 +16,7 @@ import { createHashRipemd160 } from '../encryption/hashRipemd160'
 export const DUST_MINIMUM = 5500
 
 /**
- * 
+ * Creates a RIPEMD160(SHA256(input)) hash.
  * @ignore
  */
 export async function hash160(buff: Buffer) {
@@ -26,7 +26,7 @@ export async function hash160(buff: Buffer) {
 }
 
 /**
- * 
+ * Creates a SHA256 hash, truncated to 128 bits. 
  * @ignore
  */
 export async function hash128(buff: Buffer) {
