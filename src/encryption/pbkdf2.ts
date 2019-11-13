@@ -1,5 +1,5 @@
-import { pbkdf2 as pbkdf2Polyfill } from 'pbkdf2'
 import { getCryptoLib } from './cryptoUtils'
+import pbkdf2Polyfill from './pbkdf2Polyfill'
 
 export type Pbkdf2Digests = 'sha512' | 'sha256'
 
@@ -43,9 +43,6 @@ export class NodeCryptoPbkdf2 implements Pbkdf2 {
 }
 
 export class PolyfillLibPbkdf2 implements Pbkdf2 {
-  // TODO: Create an async implementation for browsers that support 
-  //       WebCrypto hash & hmac but not pbkdf2, rather than dependent on the 
-  //       extremely slow `pbkdf2` lib implementation. 
   async derive(
     password: string, 
     salt: Buffer,
@@ -57,18 +54,7 @@ export class PolyfillLibPbkdf2 implements Pbkdf2 {
       throw new Error(`Unsupported digest "${digest}" for Pbkdf2`)
     }
     const passwordBytes = Buffer.from(password, 'utf8')
-    return new Promise((resolve, reject) => {
-      pbkdf2Polyfill(
-        passwordBytes, salt, iterations, 
-        keyLength, digest, (error, derivedKey) => {
-          if (error) {
-            reject(error)
-          } else {
-            resolve(derivedKey)
-          }
-        }
-      )
-    })
+    return pbkdf2Polyfill(passwordBytes, salt, iterations, keyLength, digest)
   }
 }
 
