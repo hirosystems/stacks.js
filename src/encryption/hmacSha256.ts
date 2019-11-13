@@ -33,7 +33,10 @@ class WebCryptoHmacSha256 implements Hmac {
       'raw', key, { name: 'HMAC', hash: 'SHA-256' },
       true, ['sign']
     )
-    const sig = await this.subtleCrypto.sign('HMAC', cryptoKey, data)
+    const sig = await this.subtleCrypto.sign(
+      { name: 'HMAC', hash: 'SHA-256' }, 
+      cryptoKey, data
+    )
     return Buffer.from(sig)
   }
 }
