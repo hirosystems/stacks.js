@@ -38,6 +38,7 @@ export interface GaiaHubConfig {
  */
 export async function uploadToGaiaHub(
   filename: string, 
+  etag: string,
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream'
@@ -48,6 +49,7 @@ export async function uploadToGaiaHub(
       method: 'POST',
       headers: {
         'Content-Type': contentType,
+        'If-Match': etag,
         Authorization: `bearer ${hubConfig.token}`
       },
       body: contents
