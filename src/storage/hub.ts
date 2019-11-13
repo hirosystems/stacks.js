@@ -38,20 +38,26 @@ export interface GaiaHubConfig {
  */
 export async function uploadToGaiaHub(
   filename: string, 
-  etag: string,
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
-  contentType: string = 'application/octet-stream'
+  contentType: string = 'application/octet-stream',
+  etag?: string
 ): Promise<string> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
+
+  const headers: { [key: string]: string; } = {
+    'Content-Type': contentType,
+    Authorization: `bearer ${hubConfig.token}`
+  }
+
+  if (etag) {
+    headers['If-Match'] = etag
+  }
+
   const response = await fetchPrivate(
     `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        'If-Match': etag,
-        Authorization: `bearer ${hubConfig.token}`
-      },
+      headers: headers,
       body: contents
     }
   )

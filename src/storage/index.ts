@@ -263,7 +263,9 @@ async function getFileContents(path: string, app: string, username: string | und
   }
   const contentType = response.headers.get('Content-Type')
   const etag = JSON.parse(response.headers.get('ETag'))
-  etags[path] = etag
+  if (etag) {
+    etags[path] = etag
+  }
   if (forceText || contentType === null
     || contentType.startsWith('text')
     || contentType === 'application/json') {
@@ -627,17 +629,17 @@ export async function putFile(
 
     try {
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, etag,  contentData, gaiaHubConfig, contentType),
-        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, etag,
-                        signatureContent, gaiaHubConfig, 'application/json')
+        uploadToGaiaHub(path, contentData, gaiaHubConfig, contentType, etag),
+        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                        signatureContent, gaiaHubConfig, 'application/json', etag)
       ])
       return fileUrls[0]
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, etag, contentData, freshHubConfig, contentType),
-        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, etag,
-                        signatureContent, freshHubConfig, 'application/json')
+        uploadToGaiaHub(path, contentData, freshHubConfig, contentType, etag),
+        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
+                        signatureContent, freshHubConfig, 'application/json', etag)
       ])
       return fileUrls[0]
     }
@@ -665,10 +667,10 @@ export async function putFile(
   }
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   try {
-    return await uploadToGaiaHub(path, etag, contentForUpload, gaiaHubConfig, contentType)
+    return await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType, etag)
   } catch (error) {
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const file = await uploadToGaiaHub(path, etag, contentForUpload, freshHubConfig, contentType)
+    const file = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType, etag)
     return file
   }
 }
