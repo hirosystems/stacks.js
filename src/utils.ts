@@ -159,8 +159,9 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
  * 
  * This could be switched to `globalThis` once it is standardized and widely available. 
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+ * @ignore
  */
-function getGlobalScope(): Window {
+export function getGlobalScope(): Window {
   if (typeof self !== 'undefined') {
     return self
   }

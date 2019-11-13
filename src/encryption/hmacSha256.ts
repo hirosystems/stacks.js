@@ -34,6 +34,7 @@ class WebCryptoHmacSha256 implements Hmac {
       true, ['sign']
     )
     const sig = await this.subtleCrypto.sign(
+      // The `hash` is only specified for non-compliant browsers like Edge. 
       { name: 'HMAC', hash: 'SHA-256' }, 
       cryptoKey, data
     )

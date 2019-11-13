@@ -1,4 +1,4 @@
-import { pbkdf2 as pbkdf2Lib } from 'pbkdf2'
+import { pbkdf2 as pbkdf2Polyfill } from 'pbkdf2'
 import { getCryptoLib } from './cryptoUtils'
 
 export type Pbkdf2Digests = 'sha512' | 'sha256'
@@ -6,7 +6,7 @@ export type Pbkdf2Digests = 'sha512' | 'sha256'
 export interface Pbkdf2 {
   derive(
     password: string, 
-    salt: NodeJS.TypedArray,
+    salt: Buffer,
     iterations: number, 
     keyLength: number, 
     digest: Pbkdf2Digests): Promise<Buffer>;
@@ -14,16 +14,16 @@ export interface Pbkdf2 {
 
 type NodePbkdf2Fn = typeof import('crypto').pbkdf2
 
-class NodeCryptoPbkdf2 implements Pbkdf2 {
-  pbkdf2: NodePbkdf2Fn
+export class NodeCryptoPbkdf2 implements Pbkdf2 {
+  nodePbkdf2: NodePbkdf2Fn
 
-  constructor(pbkdf2: NodePbkdf2Fn) {
-    this.pbkdf2 = pbkdf2
+  constructor(nodePbkdf2: NodePbkdf2Fn) {
+    this.nodePbkdf2 = nodePbkdf2
   }
 
   async derive(
     password: string, 
-    salt: NodeJS.TypedArray,
+    salt: Buffer,
     iterations: number, 
     keyLength: number, 
     digest: Pbkdf2Digests): 
@@ -32,7 +32,7 @@ class NodeCryptoPbkdf2 implements Pbkdf2 {
       throw new Error(`Unsupported digest "${digest}" for Pbkdf2`)
     }
     return new Promise((resolve, reject) => {
-      this.pbkdf2(password, salt, iterations, keyLength, digest, (error, result) => {
+      this.nodePbkdf2(password, salt, iterations, keyLength, digest, (error, result) => {
         if (error) {
           reject(error)
         }
@@ -42,7 +42,34 @@ class NodeCryptoPbkdf2 implements Pbkdf2 {
   }
 }
 
-class WebCryptoPbkdf2 implements Pbkdf2 {
+export class PolyfillLibPbkdf2 implements Pbkdf2 {
+  async derive(
+    password: string, 
+    salt: Buffer,
+    iterations: number, 
+    keyLength: number, 
+    digest: Pbkdf2Digests): 
+    Promise<Buffer> {
+    if (digest !== 'sha512' && digest !== 'sha256') {
+      throw new Error(`Unsupported digest "${digest}" for Pbkdf2`)
+    }
+    const passwordBytes = Buffer.from(password, 'utf8')
+    return new Promise((resolve, reject) => {
+      pbkdf2Polyfill(
+        passwordBytes, salt, iterations, 
+        keyLength, digest, (error, derivedKey) => {
+          if (error) {
+            reject(error)
+          } else {
+            resolve(derivedKey)
+          }
+        }
+      )
+    })
+  }
+}
+
+export class WebCryptoPbkdf2 implements Pbkdf2 {
   subtleCrypto: SubtleCrypto
 
   constructor(subtleCrypto: SubtleCrypto) {
@@ -51,7 +78,7 @@ class WebCryptoPbkdf2 implements Pbkdf2 {
 
   async derive(
     password: string, 
-    salt: NodeJS.TypedArray,
+    salt: Buffer,
     iterations: number, 
     keyLength: number, 
     digest: Pbkdf2Digests): 
@@ -65,7 +92,7 @@ class WebCryptoPbkdf2 implements Pbkdf2 {
       throw new Error(`Unsupported Pbkdf2 digest algorithm "${digest}"`)
     }
     let result: ArrayBuffer
-    const passwordBytes = Buffer.from(password)
+    const passwordBytes = Buffer.from(password, 'utf8')
     try {
       const key = await this.subtleCrypto.importKey(
         'raw', passwordBytes, 'PBKDF2', false, ['deriveBits']
@@ -74,18 +101,8 @@ class WebCryptoPbkdf2 implements Pbkdf2 {
         name: 'PBKDF2', salt, iterations, hash: { name: algo }
       }, key, keyLength * 8)
     } catch (error) {
-      result = await new Promise<ArrayBuffer>((resolve, reject) => {
-        pbkdf2Lib(
-          passwordBytes, Buffer.from(salt.buffer), iterations, 
-          keyLength, digest, (err, key) => {
-            if (err) {
-              reject(err)
-            } else {
-              resolve(key)
-            }
-          }
-        )
-      })
+      const libPolyfill = new PolyfillLibPbkdf2()
+      return libPolyfill.derive(password, salt, iterations, keyLength, digest)
     }
     return Buffer.from(result)
   }

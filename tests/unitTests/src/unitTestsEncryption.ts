@@ -6,10 +6,62 @@ import {
   verifyECDSA,  encryptMnemonic, decryptMnemonic
 } from '../../../src/encryption'
 import { ERROR_CODES } from '../../../src/errors'
+import { getGlobalScope } from '../../../src/utils'
+import * as pbkdf2 from '../../../src/encryption/pbkdf2'
+import * as webCryptoPolyfill from '@peculiar/webcrypto'
+
 
 export function runEncryptionTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
+
+  test('pbkdf2 tests', async (t) => {
+    const salt = Buffer.alloc(16, 0xf0)
+    const password = 'password123456'
+    const digestAlgo = 'sha512'
+    const iterations = 100000
+    const keyLength = 48
+
+    const globalScope = getGlobalScope() as any
+
+    // Remove any existing global `crypto` variable for testing
+    const globalCryptoOrig = { defined: 'crypto' in globalScope, value: globalScope.crypto }
+    delete globalScope.crypto
+
+    try {
+
+      const nodeCryptoPbkdf2 = await pbkdf2.createPbkdf2()
+      t.assert(nodeCryptoPbkdf2 instanceof pbkdf2.NodeCryptoPbkdf2, 'should be type NodeCryptoPbkdf2 when global web crypto undefined')
+
+      // Set global web `crypto` polyfill for testing
+      globalScope.crypto = new webCryptoPolyfill.Crypto()
+      const webCryptoPbkdf2 = await pbkdf2.createPbkdf2()
+      t.assert(webCryptoPbkdf2 instanceof pbkdf2.WebCryptoPbkdf2, 'should be type WebCryptoPbkdf2 when global web crypto is available')
+
+      const polyFillPbkdf2 = new pbkdf2.PolyfillLibPbkdf2()
+      
+      const derivedNodeCrypto = (await nodeCryptoPbkdf2
+        .derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
+      const derivedWebCrypto = (await webCryptoPbkdf2
+        .derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
+      const derivedPolyFill = (await polyFillPbkdf2.
+        derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
+
+      const expected = '92f603459cc45a33eeb6ee06bb75d12bb8e61d9f679668392362bb104eab6d95027398e02f500c849a3dd1ccd63fb310'
+      t.equal(expected, derivedNodeCrypto, 'NodeCryptoPbkdf2 should have derived expected key')
+      t.equal(expected, derivedWebCrypto, 'WebCryptoPbkdf2 should have derived expected key')
+      t.equal(expected, derivedPolyFill, 'PolyfillLibPbkdf2 should have derived expected key')
+
+    } finally {
+      // Restore previous `crypto` global var
+      if (globalCryptoOrig.defined) {
+        globalScope.crypto = globalCryptoOrig.value
+      } else {
+        delete globalScope.crypto
+      }
+    }
+    //const ff = new WebCryptoPbkdf2()
+  })
 
   test('encrypt-to-decrypt works', async (t) => {
     t.plan(2)
