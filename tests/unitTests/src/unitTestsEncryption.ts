@@ -8,6 +8,7 @@ import {
 import { ERROR_CODES } from '../../../src/errors'
 import { getGlobalScope } from '../../../src/utils'
 import * as pbkdf2 from '../../../src/encryption/pbkdf2'
+import * as ripemd160 from '../../../src/encryption/hashRipemd160'
 import * as webCryptoPolyfill from '@peculiar/webcrypto'
 
 
@@ -15,7 +16,32 @@ export function runEncryptionTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
-  test('pbkdf2 tests', async (t) => {
+  test('ripemd160 digest tests', async (t) => {
+    const vectors = [
+      ['The quick brown fox jumps over the lazy dog', '37f332f68db77bd9d7edd4969571ad671cf9dd3b'],
+      ['The quick brown fox jumps over the lazy cog', '132072df690933835eb8b6ad0b77e7b6f14acad7'],
+      ['a', '0bdc9d2d256b3ee9daae347be6f4dc835a467ffe'],
+      ['abc', '8eb208f7e05d987a9b044a8e98c6b087f15a0bfc'],
+      ['message digest', '5d0689ef49d2fae572b881b123a85ffa21595f36'],
+      ['', '9c1185a5c5e9fc54612808977ee8f548b2258d31']
+    ]
+    const nodeCryptoHasher = await ripemd160.createHashRipemd160()
+    t.equal(nodeCryptoHasher instanceof ripemd160.NodeCryptoRipemd160Digest, true, 'Node crypto should be detected for ripemd160 hash')
+    for (const [input, expected] of vectors) {
+      const result = await nodeCryptoHasher.digest(Buffer.from(input))
+      const resultHex = result.toString('hex')
+      t.equal(resultHex, expected)
+    }
+
+    const polyfillHasher = new ripemd160.Ripemd160PolyfillDigest()
+    for (const [input, expected] of vectors) {
+      const result = await polyfillHasher.digest(Buffer.from(input))
+      const resultHex = result.toString('hex')
+      t.equal(resultHex, expected)
+    }
+  })
+
+  test('pbkdf2 digest tests', async (t) => {
     const salt = Buffer.alloc(16, 0xf0)
     const password = 'password123456'
     const digestAlgo = 'sha512'
