@@ -1,3 +1,4 @@
+import { pbkdf2 as pbkdf2Lib } from 'pbkdf2'
 import { getCryptoLib } from './cryptoUtils'
 
 export type Pbkdf2Digests = 'sha512' | 'sha256'
@@ -63,13 +64,29 @@ class WebCryptoPbkdf2 implements Pbkdf2 {
     } else {
       throw new Error(`Unsupported Pbkdf2 digest algorithm "${digest}"`)
     }
+    let result: ArrayBuffer
     const passwordBytes = Buffer.from(password)
-    const key = await this.subtleCrypto.importKey(
-      'raw', passwordBytes, 'PBKDF2', false, ['deriveBits']
-    )
-    const result = await this.subtleCrypto.deriveBits({
-      name: 'PBKDF2', salt, iterations, hash: { name: algo }
-    }, key, keyLength * 8)
+    try {
+      const key = await this.subtleCrypto.importKey(
+        'raw', passwordBytes, 'PBKDF2', false, ['deriveBits']
+      )
+      result = await this.subtleCrypto.deriveBits({
+        name: 'PBKDF2', salt, iterations, hash: { name: algo }
+      }, key, keyLength * 8)
+    } catch (error) {
+      result = await new Promise<ArrayBuffer>((resolve, reject) => {
+        pbkdf2Lib(
+          passwordBytes, Buffer.from(salt.buffer), iterations, 
+          keyLength, digest, (err, key) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(key)
+            }
+          }
+        )
+      })
+    }
     return Buffer.from(result)
   }
 }
