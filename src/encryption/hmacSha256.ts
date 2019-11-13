@@ -1,7 +1,7 @@
 import { getCryptoLib } from './cryptoUtils'
 
 export interface Hmac {
-  digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer>;
+  digest(key: Buffer, data: Buffer): Promise<Buffer>;
 }
 
 type NodeCryptoCreateHmac = typeof import('crypto').createHmac
@@ -13,7 +13,7 @@ class NodeCryptoHmacSha256 implements Hmac {
     this.createHmac = createHmac
   }
 
-  async digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer> {
+  async digest(key: Buffer, data: Buffer): Promise<Buffer> {
     const result = this.createHmac('sha256', key)
       .update(data)
       .digest()
@@ -28,7 +28,7 @@ class WebCryptoHmacSha256 implements Hmac {
     this.subtleCrypto = subtleCrypto
   }
 
-  async digest(key: NodeJS.TypedArray, data: NodeJS.TypedArray): Promise<Buffer> {
+  async digest(key: Buffer, data: Buffer): Promise<Buffer> {
     const cryptoKey = await this.subtleCrypto.importKey(
       'raw', key, { name: 'HMAC', hash: 'SHA-256' },
       true, ['sign']

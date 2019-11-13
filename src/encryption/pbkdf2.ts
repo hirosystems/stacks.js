@@ -43,6 +43,9 @@ export class NodeCryptoPbkdf2 implements Pbkdf2 {
 }
 
 export class PolyfillLibPbkdf2 implements Pbkdf2 {
+  // TODO: Create an async implementation for browsers that support 
+  //       WebCrypto hash & hmac but not pbkdf2, rather than dependent on the 
+  //       extremely slow `pbkdf2` lib implementation. 
   async derive(
     password: string, 
     salt: Buffer,

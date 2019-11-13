@@ -8,15 +8,15 @@ export type CipherAlgorithm = 'aes-256-cbc' | 'aes-128-cbc';
 export interface Cipher {
   encrypt(
     algorithm: CipherAlgorithm, 
-    key: NodeJS.TypedArray, 
-    iv: NodeJS.TypedArray, 
-    data: NodeJS.TypedArray): Promise<Buffer>;
+    key: Buffer, 
+    iv: Buffer, 
+    data: Buffer): Promise<Buffer>;
 
   decrypt(
     algorithm: CipherAlgorithm, 
-    key: NodeJS.TypedArray, 
-    iv: NodeJS.TypedArray, 
-    data: NodeJS.TypedArray): Promise<Buffer>;
+    key: Buffer, 
+    iv: Buffer, 
+    data: Buffer): Promise<Buffer>;
 }
 
 class NodeCryptoCipher implements Cipher {
@@ -31,9 +31,9 @@ class NodeCryptoCipher implements Cipher {
 
   async encrypt(
     algorithm: CipherAlgorithm, 
-    key: NodeJS.TypedArray, 
-    iv: NodeJS.TypedArray, 
-    data: NodeJS.TypedArray): 
+    key: Buffer, 
+    iv: Buffer, 
+    data: Buffer): 
     Promise<Buffer> {
     if (algorithm !== 'aes-128-cbc' && algorithm !== 'aes-256-cbc') {
       throw new Error(`Unsupported cipher algorithm "${algorithm}"`)
@@ -45,9 +45,9 @@ class NodeCryptoCipher implements Cipher {
 
   async decrypt(
     algorithm: CipherAlgorithm, 
-    key: NodeJS.TypedArray, 
-    iv: NodeJS.TypedArray, 
-    data: NodeJS.TypedArray): 
+    key: Buffer, 
+    iv: Buffer, 
+    data: Buffer): 
     Promise<Buffer> {
     if (algorithm !== 'aes-128-cbc' && algorithm !== 'aes-256-cbc') {
       throw new Error(`Unsupported cipher algorithm "${algorithm}"`)
@@ -67,9 +67,9 @@ class WebCryptoCipher implements Cipher {
 
   async encrypt(
     algorithm: CipherAlgorithm, 
-    key: NodeJS.TypedArray, 
-    iv: NodeJS.TypedArray, 
-    data: NodeJS.TypedArray): 
+    key: Buffer, 
+    iv: Buffer, 
+    data: Buffer): 
     Promise<Buffer> {
     let algo: string
     let length: number
@@ -93,9 +93,9 @@ class WebCryptoCipher implements Cipher {
 
   async decrypt(
     algorithm: CipherAlgorithm, 
-    key: NodeJS.TypedArray, 
-    iv: NodeJS.TypedArray, 
-    data: NodeJS.TypedArray): 
+    key: Buffer, 
+    iv: Buffer, 
+    data: Buffer): 
     Promise<Buffer> {
     let algo: string
     let length: number

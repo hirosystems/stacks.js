@@ -4,7 +4,7 @@ import { getCryptoLib } from './cryptoUtils'
 type NodeCryptoCreateHash = typeof import('crypto').createHash
 
 export interface Sha2Hash {
-  digest(data: NodeJS.TypedArray, algorithm?: 'sha256' | 'sha512'): Promise<Buffer>;
+  digest(data: Buffer, algorithm?: 'sha256' | 'sha512'): Promise<Buffer>;
 }
 
 class NodeCryptoSha2Hash {
@@ -14,7 +14,7 @@ class NodeCryptoSha2Hash {
     this.createHash = createHash
   }
 
-  async digest(data: NodeJS.TypedArray, algorithm = 'sha256'): Promise<Buffer> {
+  async digest(data: Buffer, algorithm = 'sha256'): Promise<Buffer> {
     const result = this.createHash(algorithm)
       .update(data)
       .digest()
@@ -29,7 +29,7 @@ class WebCryptoSha2Hash implements Sha2Hash {
     this.subtleCrypto = subtleCrypto
   }
 
-  async digest(data: NodeJS.TypedArray, algorithm = 'sha256'): Promise<Buffer> {
+  async digest(data: Buffer, algorithm = 'sha256'): Promise<Buffer> {
     let algo: string
     if (algorithm === 'sha256') {
       algo = 'SHA-256'
