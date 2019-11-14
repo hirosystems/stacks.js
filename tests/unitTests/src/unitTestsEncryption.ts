@@ -55,16 +55,16 @@ export function runEncryptionTests() {
     delete globalScope.crypto
 
     try {
-
       const nodeCryptoPbkdf2 = await pbkdf2.createPbkdf2()
       t.assert(nodeCryptoPbkdf2 instanceof pbkdf2.NodeCryptoPbkdf2, 'should be type NodeCryptoPbkdf2 when global web crypto undefined')
 
       // Set global web `crypto` polyfill for testing
-      globalScope.crypto = new webCryptoPolyfill.Crypto()
+      const webCrypto = new webCryptoPolyfill.Crypto()
+      globalScope.crypto = webCrypto
       const webCryptoPbkdf2 = await pbkdf2.createPbkdf2()
       t.assert(webCryptoPbkdf2 instanceof pbkdf2.WebCryptoPbkdf2, 'should be type WebCryptoPbkdf2 when global web crypto is available')
 
-      const polyFillPbkdf2 = new pbkdf2.PolyfillLibPbkdf2()
+      const polyFillPbkdf2 = new pbkdf2.WebCryptoPartialPbkdf2(webCrypto.subtle)
       
       const derivedNodeCrypto = (await nodeCryptoPbkdf2
         .derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
@@ -86,7 +86,6 @@ export function runEncryptionTests() {
         delete globalScope.crypto
       }
     }
-    //const ff = new WebCryptoPbkdf2()
   })
 
   test('encrypt-to-decrypt works', async (t) => {
