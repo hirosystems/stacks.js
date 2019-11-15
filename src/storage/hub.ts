@@ -11,6 +11,7 @@ import {
 import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
+import { PutFileResponse } from './index'
 
 /**
  * @ignore
@@ -42,7 +43,7 @@ export async function uploadToGaiaHub(
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream',
   etag?: string
-): Promise<string> {
+): Promise<PutFileResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
 
   const headers: { [key: string]: string; } = {
