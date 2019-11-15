@@ -57,7 +57,7 @@ export async function uploadToGaiaHub(
   const response = await fetchPrivate(
     `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
       method: 'POST',
-      headers: headers,
+      headers,
       body: contents
     }
   )
