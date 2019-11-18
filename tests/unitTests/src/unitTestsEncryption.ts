@@ -41,6 +41,15 @@ export function runEncryptionTests() {
       const resultHex = result.toString('hex')
       t.equal(resultHex, expected)
     }
+
+    const nodeCrypto = require('crypto')
+    const createHashOrig = nodeCrypto.createHash
+    nodeCrypto.createHash = () => { throw new Error('Artificial broken hash') }
+    try {
+      await ripemd160.hashRipemd160(Buffer.from('acb'))
+    } finally {
+      nodeCrypto.createHash = createHashOrig
+    }
   })
 
   test('pbkdf2 digest tests', async (t) => {

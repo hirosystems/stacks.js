@@ -1,7 +1,7 @@
 import Ripemd160Polyfill from 'ripemd160-min'
 import { isNodeCryptoAvailable } from './cryptoUtils'
 
-type NodeHash = import('crypto').Hash
+type NodeCryptoCreateHash = typeof import('crypto').createHash
 
 export interface Ripemd160Digest {
   digest(data: Buffer): Buffer
@@ -21,39 +21,37 @@ export class Ripemd160PolyfillDigest implements Ripemd160Digest {
 }
 
 export class NodeCryptoRipemd160Digest implements Ripemd160Digest {
-  nodeRmd160Hasher: () => NodeHash
+  nodeCryptoCreateHash: NodeCryptoCreateHash
 
-  constructor(nodeRmd160Hash: () => NodeHash) {
-    this.nodeRmd160Hasher = nodeRmd160Hash
+  constructor(nodeCryptoCreateHash: NodeCryptoCreateHash) {
+    this.nodeCryptoCreateHash = nodeCryptoCreateHash
   }
 
   digest(data: Buffer): Buffer {
-    const hasher = this.nodeRmd160Hasher()
-    const result = hasher.update(data).digest()
-    return result
+    try {
+      return this.nodeCryptoCreateHash('rmd160').update(data).digest()
+    } catch (error) {
+      try {
+        return this.nodeCryptoCreateHash('ripemd160').update(data).digest()
+      } catch (_err) {
+        console.log(error)
+        console.log('Node.js `crypto.createHash` exists but failing to digest for ripemd160, falling back to js implementation')
+        const polyfill = new Ripemd160PolyfillDigest()
+        return polyfill.digest(data)
+      }
+    }
   }
 }
 
 export function createHashRipemd160() {
-  const hasher = isNodeCryptoAvailable(nodeCrypto => {
-    if (!nodeCrypto.createHash) {
-      return false
-    }
-    try {
-      const hasher = () => nodeCrypto.createHash('rmd160')
-      if (hasher()) {
-        return hasher
-      }
-    } catch (error) {
-      const hasher = () => nodeCrypto.createHash('ripemd160')
-      if (hasher()) {
-        return hasher
-      }
+  const nodeCryptoCreateHash = isNodeCryptoAvailable(nodeCrypto => {
+    if (typeof nodeCrypto.createHash === 'function') {
+      return nodeCrypto.createHash
     }
     return false
   })
-  if (hasher) {
-    return new NodeCryptoRipemd160Digest(hasher)
+  if (nodeCryptoCreateHash) {
+    return new NodeCryptoRipemd160Digest(nodeCryptoCreateHash)
   } else {
     return new Ripemd160PolyfillDigest()
   }
