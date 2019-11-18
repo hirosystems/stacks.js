@@ -43,7 +43,7 @@ const testAddresses = [
 ]
 
 function networkTests() {
-  test('insight-client', (t) => {
+  test('insight-client', async (t) => {
     t.plan(5)
     const mynet = new InsightClient('https://utxo.tester.com')
 
@@ -83,21 +83,21 @@ function networkTests() {
     FetchMock.post('https://utxo.tester.com/tx/send',
                    { body: 'true', status: 202 })
 
-    mynet.broadcastTransaction('test-transaction-text')
+    await mynet.broadcastTransaction('test-transaction-text')
       .then((response) => { t.ok(response, 'Should broadcast successfully') })
 
-    mynet.getBlockHeight()
+    await mynet.getBlockHeight()
       .then((response) => { t.equal(response, 500, 'Should return block height') })
 
-    mynet.getTransactionInfo(txhashNotFound)
+    await mynet.getTransactionInfo(txhashNotFound)
       .then(() => t.ok(false, 'Should not return txinfo for not-found transaction.'))
       .catch(() => t.ok(true, 'Should throw exception for not-found transaction.'))
 
-    mynet.getTransactionInfo(txhashFound)
+    await mynet.getTransactionInfo(txhashFound)
       .then(txInfo => t.equal(txInfo.block_height, 300, 'Should return txinfo.block_height'))
       .catch(() => t.ok(false, 'Should not throw exception for a found transaction.'))
 
-    mynet.getNetworkedUTXOs(testAddresses[0].address)
+    await mynet.getNetworkedUTXOs(testAddresses[0].address)
       .then((utxos) => {
         t.deepEqual(utxos, [{
           value: 1e8, confirmations: 2, tx_hash: 'bar', tx_output_n: 10
@@ -191,18 +191,18 @@ function utilsTests() {
   test('encoding routines', (t) => {
     t.plan(5)
 
-    t.equal((hash160(Buffer.from(
+    t.equal(hash160(Buffer.from(
       '99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosq'
-    ))).toString('hex'),
+    )).toString('hex'),
             '7ea1fa0f2003c31b015a72af9f4a5f104b5c2840')
 
-    t.equal((hash160(Buffer.from('1234'))).toString('hex'),
+    t.equal(hash160(Buffer.from('1234')).toString('hex'),
             'fd7a0d80999bedd76c9a0828057817fc6049a507')
 
-    t.equal((hash128(Buffer.from('999'))).toString('hex'),
+    t.equal(hash128(Buffer.from('999')).toString('hex'),
             '83cf8b609de60036a8277bd0e9613575')
 
-    t.equal((hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa')))
+    t.equal(hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa'))
       .toString('hex'),
             '740ae7f18c939cf5e7c189a2c77a012f')
 
@@ -330,7 +330,7 @@ function utilsTests() {
     FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}&cors=true`,
                   { unspent_outputs: utxoSet2 })
 
-    Promise.all([config.network.getUTXOs(testAddress1),
+    return Promise.all([config.network.getUTXOs(testAddress1),
                  config.network.getUTXOs(testAddress2)])
       .then(([utxos1, utxos2]) => {
         t.equal(utxos1.length, 2)
@@ -520,7 +520,7 @@ function transactionTests() {
   test('build incomplete', (t) => {
     setupMocks()
     t.plan(2)
-    const getAddress = () => testAddresses[2].address
+    const getAddress = () => Promise.resolve(testAddresses[2].address)
     const signTransaction = () => Promise.resolve()
     const nullSigner = { getAddress, signTransaction }
     return transactions.makeNamespacePreorder('hello',
@@ -710,7 +710,7 @@ function transactionTests() {
     t.plan(6)
     setupMocks()
 
-    Promise.all([
+    return Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
                                          new BNConstructor('123'),
@@ -1003,7 +1003,7 @@ function transactionTests() {
     const TEST2_AMOUNT = 80000
     const TEST3_AMOUNT = 288000 + 287825 + 287825
     const TEST4_AMOUNT = 288000 + 287825 + 287825 + 1
-    transactions.makeBitcoinSpend(testAddresses[2].address,
+    return transactions.makeBitcoinSpend(testAddresses[2].address,
                                   testAddresses[1].skHex,
                                   TEST1_AMOUNT)
       .then((hexTX) => {
@@ -1171,7 +1171,7 @@ function transactionTests() {
     ns.setNonalphaDiscount(10)
     ns.setNoVowelDiscount(10)
 
-    Promise.resolve().then(() => {
+    return Promise.resolve().then(() => {
       network.defaults.MAINNET_DEFAULT.MAGIC_BYTES = 'di'
       return Promise.all([
         transactions.makeNamespacePreorder('hello',
@@ -1246,7 +1246,7 @@ function transactionTests() {
                      status: 202
                    })
 
-    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
+    return network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
                                                           transactionToWatch).then(() => {
       t.assert(FetchMock.done())
     })
@@ -1313,7 +1313,7 @@ function transactionTests() {
       }
     })
 
-    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
+    return network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction,
                                                           transactionToWatch, confirmations)
       .then(() => {
         t.assert(FetchMock.done())
@@ -1340,7 +1340,7 @@ function transactionTests() {
       }
     })
 
-    network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
+    return network.defaults.MAINNET_DEFAULT.broadcastTransaction(transaction)
       .then(() => {
         t.assert(FetchMock.done())
       })
@@ -1395,7 +1395,7 @@ function transactionTests() {
       }
     })
 
-    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch).then(() => {
+    return network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zoneFile, transactionToWatch).then(() => {
       t.assert(FetchMock.done())
     })
   })
@@ -1473,7 +1473,7 @@ function transactionTests() {
       }
     })
 
-    network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile).then(() => {
+    return network.defaults.MAINNET_DEFAULT.broadcastZoneFile(zonefile).then(() => {
       t.assert(FetchMock.done())
     })
   })
@@ -1515,7 +1515,7 @@ function transactionTests() {
       }
     })
 
-    network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
+    return network.defaults.MAINNET_DEFAULT.broadcastNameRegistration(preorderTransaction,
                                                                registerTransaction, zoneFile)
       .then(() => {
         t.assert(FetchMock.done())
@@ -1598,7 +1598,7 @@ function transactionTests() {
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { version: 2, address: BURN_ADDR, reveal_block: 600 })
 
-    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+    return network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
       .then((baddr) => {
         t.equal(baddr, BURN_ADDR, 'Pay to namespace creator in year 1')
       })
@@ -1612,7 +1612,7 @@ function transactionTests() {
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { version: 2, address: BURN_ADDR, reveal_block: 600 })
 
-    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+    return network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
       .then((baddr) => {
         t.equal(baddr, BURN_ADDR, 'Pay to namespace creator exactly on year 1')
       })
@@ -1626,7 +1626,7 @@ function transactionTests() {
     FetchMock.get('https://core.blockstack.org/v1/namespaces/test',
                   { version: 2, address: BURN_ADDR, reveal_block: 600 })
 
-    network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
+    return network.defaults.MAINNET_DEFAULT.getNamespaceBurnAddress('test')
       .then((baddr) => {
         t.equal(baddr, NAMESPACE_BURN_ADDR, 'Pay to burn address after year 1')
       })
@@ -1650,7 +1650,7 @@ function safetyTests() {
     FetchMock.get(`https://core.blockstack.org/v1/addresses/bitcoin/${testAddresses[2].address}`,
                   { names: namesWithSubdomains })
 
-    Promise.all([safety.addressCanReceiveName(testAddresses[0].address),
+    return Promise.all([safety.addressCanReceiveName(testAddresses[0].address),
                  safety.addressCanReceiveName(testAddresses[1].address),
                  safety.addressCanReceiveName(testAddresses[2].address)])
       .then(([t0, t1, t2]) => {
@@ -1818,7 +1818,7 @@ function safetyTests() {
                   { body: 'Some error', status: 400 })
 
     const errorCheck = safety.isNamespaceAvailable('test3').then(() => false).catch(() => true)
-    Promise.all([safety.isNamespaceAvailable('test'),
+    return Promise.all([safety.isNamespaceAvailable('test'),
                  safety.isNamespaceAvailable('test2'),
                  errorCheck])
       .then(([t0, t1, t2]) => {
@@ -1843,7 +1843,7 @@ function safetyTests() {
     const errorCheck = safety.revealedNamespace('test3', testAddresses[0].address)
       .then(() => false).catch(() => true)
 
-    Promise.all([safety.revealedNamespace('test', testAddresses[0].address),
+    return Promise.all([safety.revealedNamespace('test', testAddresses[0].address),
                  safety.revealedNamespace('test2', testAddresses[0].address),
                  safety.revealedNamespace('test3', testAddresses[0].address),
                  errorCheck])
@@ -1867,7 +1867,7 @@ function safetyTests() {
 
     const errorCheck = Promise.resolve().then(() => false).catch(() => true)
 
-    Promise.all([safety.namespaceIsReady('test'),
+    return Promise.all([safety.namespaceIsReady('test'),
                  safety.namespaceIsReady('test2'),
                  safety.namespaceIsReady('test3'),
                  errorCheck])
@@ -1891,7 +1891,7 @@ function safetyTests() {
 
     const errorCheck = Promise.resolve().then(() => false).catch(() => true)
 
-    Promise.all([safety.namespaceIsRevealed('test'),
+    return Promise.all([safety.namespaceIsRevealed('test'),
                  safety.namespaceIsRevealed('test2'),
                  safety.namespaceIsRevealed('test3'),
                  errorCheck])

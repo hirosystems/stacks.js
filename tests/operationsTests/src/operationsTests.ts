@@ -88,21 +88,23 @@ function shutdownBlockstackCore(): Promise<any> {
 }
 
 export function runIntegrationTests() {
-  test('registerIdName', async (t) => {
+  test('registerIdName', (t) => {
+    t.plan(8)
+
     config.network = network.defaults.LOCAL_REGTEST
     const myNet = config.network
 
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
-    const destAddress = await ecPairToAddress(hexStringToECPair(dest))
+    const destAddress = ecPairToAddress(hexStringToECPair(dest))
 
 
     const btcDest = '897f1b92041b798580f96b8be379053f6276f04eb7590a9042a62059d46d6fc301'
-    const btcDestAddress = await ecPairToAddress(hexStringToECPair(btcDest))
+    const btcDestAddress = ecPairToAddress(hexStringToECPair(btcDest))
 
     const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
 
     const secondOwner = '54164693e3803223f7fa9a004997bfbf1475f5c44f65593fa45c6783086dafec01'
-    const transferDestination = await ecPairToAddress(hexStringToECPair(secondOwner))
+    const transferDestination = ecPairToAddress(hexStringToECPair(secondOwner))
 
     const renewalDestination = 'myPgwEX2ddQxPPqWBRkXNqL3TwuWbY29DJ'
 
@@ -192,28 +194,30 @@ export function runIntegrationTests() {
       .then(() => t.pass('Finished test'))
   })
 
-  test('helloNamespace', async (t) => {
+  test('helloNamespace', (t) => {
+    t.plan(11)
+
     config.network = network.defaults.LOCAL_REGTEST
     const myNet = config.network
 
     const nsPay = '6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01'
     const nsReveal = 'c244642ce0b4eb68da8e098facfcad889e3063c36a68b7951fb4c085de49df1b01'
 
-    const nsRevealAddress = await ecPairToAddress(hexStringToECPair(nsReveal))
+    const nsRevealAddress = ecPairToAddress(hexStringToECPair(nsReveal))
 
     const dest = '19238846ac60fa62f8f8bb8898b03df79bc6112600181f36061835ad8934086001'
-    const destAddress = await ecPairToAddress(hexStringToECPair(dest))
+    const destAddress = ecPairToAddress(hexStringToECPair(dest))
 
     const btcDest = '3ad9f690cc7694572fe7574526ad260ff2e711d608d3224895efd932b1d47c7201'
-    const btcDestAddress = await ecPairToAddress(hexStringToECPair(btcDest))
+    const btcDestAddress = ecPairToAddress(hexStringToECPair(btcDest))
 
     const payer = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d01'
 
     const secondOwner = '54164693e3803223f7fa9a004997bfbf1475f5c44f65593fa45c6783086dafec01'
-    const transferDestination = await ecPairToAddress(hexStringToECPair(secondOwner))
+    const transferDestination = ecPairToAddress(hexStringToECPair(secondOwner))
 
     const renewalKey = 'bb68eda988e768132bc6c7ca73a87fb9b0918e9a38d3618b74099be25f7cab7d'
-    const renewalDestination = await ecPairToAddress(hexStringToECPair(renewalKey))
+    const renewalDestination = ecPairToAddress(hexStringToECPair(renewalKey))
 
     const zfTest = '$ORIGIN aaron.hello\n$TTL 3600\n_http._tcp URI 10 1 '
           + `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
@@ -254,7 +258,7 @@ export function runIntegrationTests() {
       })
       .then(async () => {
         console.log('NAME_IMPORT import.hello')
-        const zfHash = (await hash160(Buffer.from(importZF))).toString('hex')
+        const zfHash = hash160(Buffer.from(importZF)).toString('hex')
         return transactions.makeNameImport(
           'import.hello', renewalDestination, zfHash, nsReveal
         )

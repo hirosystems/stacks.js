@@ -565,7 +565,7 @@ async function makeUpdate(fullyQualifiedName: string,
         new Error('Need zonefile or valueHash arguments')
       )
     }
-    valueHash = (hash160(Buffer.from(zonefile))).toString('hex')
+    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   } else if (valueHash.length !== 40) {
     return Promise.reject(
       new Error(`Invalid valueHash ${valueHash}`)
