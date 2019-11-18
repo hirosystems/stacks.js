@@ -31,10 +31,6 @@ class Github extends Service {
   getProofStatement(searchText: string, _cheerio: CheerioModuleType) {
     return searchText
   }
-
-  getProofIdentity(searchText: string) {
-    return searchText
-  }
 }
 
 export { Github }

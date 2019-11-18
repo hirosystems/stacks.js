@@ -35,10 +35,6 @@ class Facebook extends Service {
     return (statement !== undefined) ? statement.trim() : ''
   }
 
-  getProofIdentity(searchText: string) {
-    return searchText
-  }
-
   getBaseUrls(): string[] {
     return []
   }

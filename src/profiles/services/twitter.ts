@@ -25,10 +25,6 @@ class Twitter extends Service {
     }
   }
 
-  getProofIdentity(searchText: string) {
-    return searchText
-  }
-
   getProofUrl(proof: AccountProofInfo): string {
     const baseUrls = this.getBaseUrls()
 

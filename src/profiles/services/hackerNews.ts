@@ -57,10 +57,6 @@ class HackerNews extends Service {
 
     return statement
   }
-  
-  getProofIdentity(searchText: string) {
-    return searchText
-  }
 }
 
 export { HackerNews }

@@ -8,11 +8,11 @@ export type CheerioModuleType = typeof import('cheerio')
  * @ignore
  */
 export abstract class Service {
-  async validateProof(
-    proof: AccountProofInfo,
-    ownerAddress: string,
-    cheerio: CheerioModuleType,
-    name: string = null): Promise<AccountProofInfo> {
+  async validateProof(proof: AccountProofInfo,
+                      ownerAddress: string,
+                      cheerio: CheerioModuleType,
+                      name: string = null
+  ): Promise<AccountProofInfo> {
     try {
       const proofUrl = this.getProofUrl(proof)
       const res = await fetchPrivate(proofUrl)
@@ -52,13 +52,13 @@ export abstract class Service {
     }
   }
 
-  abstract getBaseUrls(): string[];
+  getProofIdentity(searchText: string, _cheerio: CheerioModuleType): string {
+    return searchText
+  }
 
   abstract getProofUrl(proof: AccountProofInfo): string;
 
   abstract getProofStatement(searchText: string, cheerio: CheerioModuleType): string;
 
   abstract normalizeUrl(proof: AccountProofInfo): string;
-
-  abstract getProofIdentity(searchText: string, cheerio: CheerioModuleType): string;
 }
