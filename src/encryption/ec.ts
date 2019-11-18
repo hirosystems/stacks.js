@@ -63,7 +63,7 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 /**
 * @ignore
 */
-function sharedSecretToKeys(sharedSecret: Buffer) {
+function sharedSecretToKeys(sharedSecret: Buffer): { encryptionKey: Buffer; hmacKey: Buffer; } {
   // generate mac and encryption key from shared secret
   const hashedSecret = hashSha512Sync(sharedSecret)
   return {
@@ -237,7 +237,7 @@ function getBuffer(content: string | ArrayBuffer | Buffer) {
 export function verifyECDSA(
   content: string | ArrayBuffer | Buffer,
   publicKey: string,
-  signature: string) {
+  signature: string): boolean {
   const contentBuffer = getBuffer(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
   const contentHash = hashSha256Sync(contentBuffer)

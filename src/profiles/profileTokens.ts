@@ -22,7 +22,7 @@ export function signProfileToken(profile: any,
                                  issuer?: any,
                                  signingAlgorithm = 'ES256K',
                                  issuedAt = new Date(),
-                                 expiresAt = nextYear()) {
+                                 expiresAt = nextYear()): string {
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }

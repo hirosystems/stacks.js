@@ -31,7 +31,7 @@ export class Profile {
     return Object.assign({}, this._profile)
   }
 
-  toToken(privateKey: string) {
+  toToken(privateKey: string): string {
     return signProfileToken(this.toJSON(), privateKey)
   }
 
