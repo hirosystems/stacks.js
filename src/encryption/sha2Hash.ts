@@ -7,7 +7,7 @@ export interface Sha2Hash {
   digest(data: Buffer, algorithm?: 'sha256' | 'sha512'): Promise<Buffer>;
 }
 
-class NodeCryptoSha2Hash {
+export class NodeCryptoSha2Hash {
   createHash: NodeCryptoCreateHash
 
   constructor(createHash: NodeCryptoCreateHash) {
@@ -15,14 +15,20 @@ class NodeCryptoSha2Hash {
   }
 
   async digest(data: Buffer, algorithm = 'sha256'): Promise<Buffer> {
-    const result = this.createHash(algorithm)
-      .update(data)
-      .digest()
-    return Promise.resolve(result)
+    try {
+      const result = this.createHash(algorithm)
+        .update(data)
+        .digest()
+      return Promise.resolve(result)
+    } catch (error) {
+      console.log(error)
+      console.log(`Error performing ${algorithm} digest with Node.js 'crypto.createHash', falling back to JS implementation.`)
+      return Promise.resolve(algorithm === 'sha256' ? hashSha256Sync(data) : hashSha512Sync(data))
+    }
   }
 }
 
-class WebCryptoSha2Hash implements Sha2Hash {
+export class WebCryptoSha2Hash implements Sha2Hash {
   subtleCrypto: SubtleCrypto
 
   constructor(subtleCrypto: SubtleCrypto) {
@@ -38,8 +44,14 @@ class WebCryptoSha2Hash implements Sha2Hash {
     } else {
       throw new Error(`Unsupported hash algorithm ${algorithm}`)
     }
-    const hash = await this.subtleCrypto.digest(algo, data)
-    return Buffer.from(hash)
+    try {
+      const hash = await this.subtleCrypto.digest(algo, data)
+      return Buffer.from(hash)
+    } catch (error) {
+      console.log(error)
+      console.log(`Error performing ${algorithm} digest with WebCrypto, falling back to JS implementation.`)
+      return Promise.resolve(algorithm === 'sha256' ? hashSha256Sync(data) : hashSha512Sync(data))
+    }
   }
 }
 

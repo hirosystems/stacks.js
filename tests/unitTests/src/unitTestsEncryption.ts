@@ -10,6 +10,7 @@ import { ERROR_CODES } from '../../../src/errors'
 import { getGlobalScope } from '../../../src/utils'
 import * as pbkdf2 from '../../../src/encryption/pbkdf2'
 import * as aesCipher from '../../../src/encryption/aesCipher'
+import * as sha2Hash from '../../../src/encryption/sha2Hash'
 import * as ripemd160 from '../../../src/encryption/hashRipemd160'
 
 
@@ -52,6 +53,85 @@ export function runEncryptionTests() {
     }
   })
 
+  test('sha2 digest tests', async (t) => {
+    const globalScope = getGlobalScope() as any
+
+    // Remove any existing global `crypto` variable for testing
+    const globalCryptoOrig = { defined: 'crypto' in globalScope, value: globalScope.crypto }
+
+    // Set global web `crypto` polyfill for testing
+    const webCrypto = new webCryptoPolyfill.Crypto()
+    globalScope.crypto = webCrypto
+
+    const vectors = [
+      ['abc', 
+        'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad', 
+        'ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f'],
+      ['', 
+        'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 
+        'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e'],
+      ['abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq', 
+        '248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1', 
+        '204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c33596fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445']
+    ]
+
+    try {
+      const webCryptoHasher = await sha2Hash.createSha2Hash()
+      t.equal(webCryptoHasher instanceof sha2Hash.WebCryptoSha2Hash, true, 'Web crypto should be detected for sha2 hash')
+      for (const [input, expected256, expected512] of vectors) {
+        const result256 = await webCryptoHasher.digest(Buffer.from(input), 'sha256')
+        t.equal(result256.toString('hex'), expected256)
+        const result512 = await webCryptoHasher.digest(Buffer.from(input), 'sha512')
+        t.equal(result512.toString('hex'), expected512)
+      }
+
+      const nodeCryptoHasher = new sha2Hash.NodeCryptoSha2Hash(require('crypto').createHash)
+      for (const [input, expected256, expected512] of vectors) {
+        const result256 = await nodeCryptoHasher.digest(Buffer.from(input), 'sha256')
+        t.equal(result256.toString('hex'), expected256)
+        const result512 = await nodeCryptoHasher.digest(Buffer.from(input), 'sha512')
+        t.equal(result512.toString('hex'), expected512)
+      }
+    } finally {
+      // Restore previous `crypto` global var
+      if (globalCryptoOrig.defined) {
+        globalScope.crypto = globalCryptoOrig.value
+      } else {
+        delete globalScope.crypto
+      }
+    }
+  })
+
+  test('sha2 native digest fallback tests', async (t) => {
+    const input = Buffer.from('abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq')
+    const expectedOutput256 = '248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1'
+    const expectedOutput512 = '204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c33596fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445'
+
+    // Test WebCrypto fallback
+    const webCryptoSubtle = new webCryptoPolyfill.Crypto().subtle
+    webCryptoSubtle.digest = () => { throw new Error('Artificial broken hash') }
+    const nodeCryptoHasher = new sha2Hash.WebCryptoSha2Hash(webCryptoSubtle)
+    const result256 = await nodeCryptoHasher.digest(input, 'sha256')
+    t.equal(result256.toString('hex'), expectedOutput256)
+    const result512 = await nodeCryptoHasher.digest(input, 'sha512')
+    t.equal(result512.toString('hex'), expectedOutput512)
+
+    // Test Node.js `crypto.createHash` fallback
+    const nodeCrypto = require('crypto')
+    const createHashOrig = nodeCrypto.createHash
+    nodeCrypto.createHash = () => { throw new Error('Artificial broken hash') }
+    try {
+      const nodeCryptoHasher = new sha2Hash.NodeCryptoSha2Hash(require('crypto').createHash)
+      const result256 = await nodeCryptoHasher.digest(input, 'sha256')
+      t.equal(result256.toString('hex'), expectedOutput256)
+      const result512 = await nodeCryptoHasher.digest(input, 'sha512')
+      t.equal(result512.toString('hex'), expectedOutput512)
+    } finally {
+      nodeCrypto.createHash = createHashOrig
+    }
+
+  })
+
   test('pbkdf2 digest tests', async (t) => {
     const salt = Buffer.alloc(16, 0xf0)
     const password = 'password123456'
@@ -81,14 +161,13 @@ export function runEncryptionTests() {
         .derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
       const derivedWebCrypto = (await webCryptoPbkdf2
         .derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
-      const derivedPolyFill = (await polyFillPbkdf2.
-        derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
+      const derivedPolyFill = (await polyFillPbkdf2
+        .derive(password, salt, iterations, keyLength, digestAlgo)).toString('hex')
 
       const expected = '92f603459cc45a33eeb6ee06bb75d12bb8e61d9f679668392362bb104eab6d95027398e02f500c849a3dd1ccd63fb310'
       t.equal(expected, derivedNodeCrypto, 'NodeCryptoPbkdf2 should have derived expected key')
       t.equal(expected, derivedWebCrypto, 'WebCryptoPbkdf2 should have derived expected key')
       t.equal(expected, derivedPolyFill, 'PolyfillLibPbkdf2 should have derived expected key')
-
     } finally {
       // Restore previous `crypto` global var
       if (globalCryptoOrig.defined) {
