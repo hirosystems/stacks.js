@@ -5,7 +5,7 @@ type NodeCryptoCreateDecipher = typeof import('crypto').createDecipheriv;
 
 export type CipherAlgorithm = 'aes-256-cbc' | 'aes-128-cbc';
 
-export interface Cipher {
+export interface AesCipher {
   encrypt(
     algorithm: CipherAlgorithm, 
     key: Buffer, 
@@ -19,7 +19,7 @@ export interface Cipher {
     data: Buffer): Promise<Buffer>;
 }
 
-class NodeCryptoCipher implements Cipher {
+export class NodeCryptoAesCipher implements AesCipher {
   createCipher: NodeCryptoCreateCipher
 
   createDecipher: NodeCryptoCreateDecipher
@@ -58,7 +58,7 @@ class NodeCryptoCipher implements Cipher {
   }
 }
 
-class WebCryptoCipher implements Cipher {
+export class WebCryptoAesCipher implements AesCipher {
   subtleCrypto: SubtleCrypto
 
   constructor(subtleCrypto: SubtleCrypto) {
@@ -118,11 +118,11 @@ class WebCryptoCipher implements Cipher {
   }
 }
 
-export async function createCipher(): Promise<Cipher> {
+export async function createCipher(): Promise<AesCipher> {
   const cryptoLib = await getCryptoLib()
   if (cryptoLib.name === 'subtleCrypto') {
-    return new WebCryptoCipher(cryptoLib.lib)
+    return new WebCryptoAesCipher(cryptoLib.lib)
   } else {
-    return new NodeCryptoCipher(cryptoLib.lib.createCipheriv, cryptoLib.lib.createDecipheriv)
+    return new NodeCryptoAesCipher(cryptoLib.lib.createCipheriv, cryptoLib.lib.createDecipheriv)
   }
 }

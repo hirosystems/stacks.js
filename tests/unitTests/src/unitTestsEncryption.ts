@@ -1,6 +1,7 @@
 import * as test from 'tape-promise/tape'
 import * as triplesec from 'triplesec'
 import * as elliptic from 'elliptic'
+import * as webCryptoPolyfill from '@peculiar/webcrypto'
 import {
   encryptECIES, decryptECIES, getHexFromBN, signECDSA,
   verifyECDSA,  encryptMnemonic, decryptMnemonic
@@ -8,8 +9,9 @@ import {
 import { ERROR_CODES } from '../../../src/errors'
 import { getGlobalScope } from '../../../src/utils'
 import * as pbkdf2 from '../../../src/encryption/pbkdf2'
+import * as aesCipher from '../../../src/encryption/aesCipher'
 import * as ripemd160 from '../../../src/encryption/hashRipemd160'
-import * as webCryptoPolyfill from '@peculiar/webcrypto'
+
 
 
 export function runEncryptionTests() {
@@ -77,6 +79,81 @@ export function runEncryptionTests() {
       t.equal(expected, derivedNodeCrypto, 'NodeCryptoPbkdf2 should have derived expected key')
       t.equal(expected, derivedWebCrypto, 'WebCryptoPbkdf2 should have derived expected key')
       t.equal(expected, derivedPolyFill, 'PolyfillLibPbkdf2 should have derived expected key')
+
+    } finally {
+      // Restore previous `crypto` global var
+      if (globalCryptoOrig.defined) {
+        globalScope.crypto = globalCryptoOrig.value
+      } else {
+        delete globalScope.crypto
+      }
+    }
+  })
+
+  test('aes-cbc tests', async (t) => {
+    const globalScope = getGlobalScope() as any
+
+    // Remove any existing global `crypto` variable for testing
+    const globalCryptoOrig = { defined: 'crypto' in globalScope, value: globalScope.crypto }
+    delete globalScope.crypto
+
+    try {
+      const nodeCryptoAesCipher = await aesCipher.createCipher()
+      t.assert(nodeCryptoAesCipher instanceof aesCipher.NodeCryptoAesCipher, 'should be type NodeCryptoAesCipher when global web crypto undefined')
+
+      // Set global web `crypto` polyfill for testing
+      const webCrypto = new webCryptoPolyfill.Crypto()
+      globalScope.crypto = webCrypto
+      const webCryptoAesCipher = await aesCipher.createCipher()
+      t.assert(webCryptoAesCipher instanceof aesCipher.WebCryptoAesCipher, 'should be type WebCryptoAesCipher when global web crypto is available')
+      
+      const key128 = Buffer.from('0f'.repeat(16), 'hex')
+      const key256 = Buffer.from('0f'.repeat(32), 'hex')
+      const iv = Buffer.from('f7'.repeat(16), 'hex')
+      const inputData = Buffer.from('TestData'.repeat(20))
+      const inputDataHex = inputData.toString('hex')
+
+      const expected128Cbc = '5aa1100a0a3133c9184dc661bc95c675a0fe5f02a67880f50702f8c88e7a445248d6dedfca80e72d00c3d277ea025eebde5940265fa00c1bfe80aebf3968b6eaf0564eda6ddd9e97548be1fa6d487e71353b11136193782d76d3b8d1895047e08a121c1706c083ceefdb9605a75a2310cccee1b0aaca632230f45f1172001cad96ae6d15db38ab9eed27b27b6f80353a5f30e3532a526a834a0f8273ffb2e9caaa92843b40c893e298f3b472fb26b11f'
+      const expected128CbcBuffer = Buffer.from(expected128Cbc, 'hex')
+
+      const expected256Cbc = '66a21fa53680d8182a79c1b90cdc38d398fe34d85c7ca5d45b8381fea4a84536e38514b3bcdba06655314607534be7ea370952ed6f334af709efc6504e600ce0b7c20fe3b469c29b63a391983b74aa12f1d859b477092c61e7814bd6c8d143ec21d34f79468c74c97ae9763ec11695e1e9a3a3b33f12561ecef9fbae79ddf7f2701c97ba1531801862662a9ce87a880934318a9e46a3941367fa68da3340f83941211aba7ec741826ff35d4f880243db'
+      const expected256CbcBuffer = Buffer.from(expected256Cbc, 'hex')
+
+      // Test aes-256-cbc encrypt
+      const encrypted256NodeCrypto = (await nodeCryptoAesCipher
+        .encrypt('aes-256-cbc', key256, iv, inputData)).toString('hex')
+      const encrypted256WebCrypto = (await webCryptoAesCipher
+        .encrypt('aes-256-cbc', key256, iv, inputData)).toString('hex')
+
+      t.equal(expected256Cbc, encrypted256NodeCrypto, 'NodeCryptoAesCipher aes-256-cbc should have encrypted to expected ciphertext')
+      t.equal(expected256Cbc, encrypted256WebCrypto, 'WebCryptoAesCipher aes-256-cbc should have encrypted to expected ciphertext')
+
+      // Test aes-256-cbc decrypt
+      const decrypted256NodeCrypto = (await nodeCryptoAesCipher
+        .decrypt('aes-256-cbc', key256, iv, expected256CbcBuffer)).toString('hex')
+      const decrypted256WebCrypto = (await webCryptoAesCipher
+        .decrypt('aes-256-cbc', key256, iv, expected256CbcBuffer)).toString('hex')
+
+      t.equal(inputDataHex, decrypted256NodeCrypto, 'NodeCryptoAesCipher aes-256-cbc should have decrypted to expected ciphertext')
+      t.equal(inputDataHex, decrypted256WebCrypto, 'WebCryptoAesCipher aes-256-cbc should have decrypted to expected ciphertext')
+
+      // Test aes-128-cbc encrypt
+      const encrypted128NodeCrypto = (await nodeCryptoAesCipher
+        .encrypt('aes-128-cbc', key128, iv, inputData)).toString('hex')
+      const encrypted128WebCrypto = (await webCryptoAesCipher
+        .encrypt('aes-128-cbc', key128, iv, inputData)).toString('hex')
+
+      t.equal(expected128Cbc, encrypted128NodeCrypto, 'NodeCryptoAesCipher aes-128-cbc should have encrypted to expected ciphertext')
+      t.equal(expected128Cbc, encrypted128WebCrypto, 'WebCryptoAesCipher aes-128-cbc should have encrypted to expected ciphertext')
+
+      // Test aes-128-cbc decrypt
+      const decrypted128NodeCrypto = (await nodeCryptoAesCipher
+        .decrypt('aes-128-cbc', key128, iv, expected128CbcBuffer)).toString('hex')
+      const decrypted128WebCrypto = (await webCryptoAesCipher
+        .decrypt('aes-128-cbc', key128, iv, expected128CbcBuffer)).toString('hex')
+
+      t.equal(inputDataHex, decrypted128NodeCrypto, 'NodeCryptoAesCipher aes-128-cbc should have decrypted to expected ciphertext')
+      t.equal(inputDataHex, decrypted128WebCrypto, 'WebCryptoAesCipher aes-128-cbc should have decrypted to expected ciphertext')
 
     } finally {
       // Restore previous `crypto` global var
