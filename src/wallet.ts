@@ -1,9 +1,10 @@
-import { payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
+import { payments, bip32, BIP32Interface, ECPair } from 'bitcoinjs-lib'
 import { mnemonicToSeed, generateMnemonic } from 'bip39'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 import { randomBytes, GetRandomBytes } from './encryption/cryptoRandom'
 import { hashSha256Sync } from './encryption/sha2Hash'
 import { TriplesecDecryptSignature } from './encryption/cryptoUtils'
+import { ecPairToHexString } from './keys'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888
@@ -48,7 +49,7 @@ function hashCode(string: string) {
  * @ignore
  */
 function getNodePrivateKey(node: BIP32Interface): string {
-  return `${node.privateKey.toString('hex')}01`
+  return ecPairToHexString(ECPair.fromPrivateKey(node.privateKey))
 }
 
 /**
@@ -70,9 +71,8 @@ function getNodePublicKey(node: BIP32Interface): string {
  * character string
  * @ignore
  */
-export function getLegacyAppNode(
-  appsNode: string | BIP32Interface, 
-  salt: string, appDomain: string): BIP32Interface {
+export function getLegacyAppNode(appsNode: string | BIP32Interface, 
+                                 salt: string, appDomain: string): BIP32Interface {
   const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${salt}`))
   const hash = hashBuffer.toString('hex')
   const appIndex = hashCode(hash)
@@ -128,10 +128,9 @@ export class BlockstackWallet {
    * 
    * @ignore
    */
-  static async fromEncryptedMnemonic(
-    data: string | Buffer, 
-    password: string, 
-    triplesecDecrypt: TriplesecDecryptSignature): Promise<BlockstackWallet> {
+  static async fromEncryptedMnemonic(data: string | Buffer, password: string, 
+                                     triplesecDecrypt: TriplesecDecryptSignature
+  ): Promise<BlockstackWallet> {
     try {
       const mnemonic = await decryptMnemonic(data, password, triplesecDecrypt)
       const seed = await mnemonicToSeed(mnemonic)
@@ -162,7 +161,7 @@ export class BlockstackWallet {
    */
   static async encryptMnemonic(mnemonic: string, password: string, opts?: {
     getRandomBytes?: GetRandomBytes
-  }) {
+  }): Promise<string> {
     const encryptedBuffer = await encryptMnemonic(mnemonic, password, opts)
     return encryptedBuffer.toString('hex')
   }
@@ -203,10 +202,9 @@ export class BlockstackWallet {
    */
   getIdentitySalt(): string {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
-    // TODO: this is being decoded as a utf8 string rather than a hex string?
+    // NOTE: This is being decoded as a utf8 string rather than a hex string
     const publicKeyHex = Buffer.from(getNodePublicKey(identityPrivateKeychain))
-    const hash = hashSha256Sync(publicKeyHex)
-    return hash.toString('hex')
+    return hashSha256Sync(publicKeyHex).toString('hex')
   }
 
   /**
@@ -289,9 +287,8 @@ export class BlockstackWallet {
    * @return {String} the private key hex-string. this will be a 64
    * character string
    */
-  static getLegacyAppPrivateKey(
-    appsNodeKey: string, 
-    salt: string, appDomain: string): string {
+  static getLegacyAppPrivateKey(appsNodeKey: string, 
+                                salt: string, appDomain: string): string {
     const appNode = getLegacyAppNode(appsNodeKey, salt, appDomain)
     return getNodePrivateKey(appNode).slice(0, 64)
   }
@@ -350,9 +347,8 @@ export class BlockstackWallet {
    *   .appsNodeKey {String} - the base-58 encoding of the applications node
    *   .salt {String} - the salt used for creating app-specific addresses
    */
-  getIdentityKeyPair(
-    addressIndex: number, 
-    alwaysUncompressed: boolean = false): IdentityKeyPair {
+  getIdentityKeyPair(addressIndex: number, 
+                     alwaysUncompressed: boolean = false): IdentityKeyPair {
     const identityNode = this.getIdentityAddressNode(addressIndex)
 
     const address = BlockstackWallet.getAddressFromBIP32Node(identityNode)

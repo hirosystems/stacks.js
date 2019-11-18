@@ -110,10 +110,9 @@ export function isUserSignedIn() {
  * An array of strings indicating which permissions this app is requesting.
  * @return {void}
  */
-export function redirectToSignIn(
-  redirectURI?: string, 
-  manifestURI?: string, 
-  scopes?: Array<AuthScope | string>): void { 
+export function redirectToSignIn(redirectURI?: string, 
+                                 manifestURI?: string, 
+                                 scopes?: Array<AuthScope | string>): void { 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')

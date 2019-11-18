@@ -1,6 +1,3 @@
-
-// TODO: elliptic is only used here for secp256k1 opts. This can be replaced with a faster,
-//       slimmer lib. 
 import { ec as EllipticCurve } from 'elliptic'
 import { BN } from '../bn'
 import { randomBytes } from './cryptoRandom'

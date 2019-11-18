@@ -132,7 +132,7 @@ function testSchemas() {
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
-  test('Person', async (t) => {
+  test('Person', (t) => {
     t.plan(18)
 
     const personObject = new Person(sampleProfiles.naval)

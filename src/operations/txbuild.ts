@@ -176,11 +176,10 @@ function estimateRegister(fullyQualifiedName: string,
  *    the update.
  * @private
  */
-async function estimateUpdate(
-  fullyQualifiedName: string,
-  ownerAddress: string,
-  paymentAddress: string,
-  paymentUtxos: number = 1
+async function estimateUpdate(fullyQualifiedName: string,
+                              ownerAddress: string,
+                              paymentAddress: string,
+                              paymentUtxos: number = 1
 ): Promise<number> {
   const network = config.network
 
@@ -208,12 +207,11 @@ async function estimateUpdate(
  *    the transfer.
  * @private
  */
-async function estimateTransfer(
-  fullyQualifiedName: string,
-  destinationAddress: string,
-  ownerAddress: string,
-  paymentAddress: string,
-  paymentUtxos: number = 1
+async function estimateTransfer(fullyQualifiedName: string,
+                                destinationAddress: string,
+                                ownerAddress: string,
+                                paymentAddress: string,
+                                paymentUtxos: number = 1
 ): Promise<number> {
   const network = config.network
 
@@ -491,18 +489,18 @@ function estimateTokenTransfer(recipientAddress: string,
  *    the safety module for those.
  * @private
  */
-function makePreorder(fullyQualifiedName: string,
-                      destinationAddress: string,
-                      paymentKeyIn: string | TransactionSigner,
-                      buildIncomplete: boolean = false
-) {
+async function makePreorder(fullyQualifiedName: string,
+                            destinationAddress: string,
+                            paymentKeyIn: string | TransactionSigner,
+                            buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   const namespace = fullyQualifiedName.split('.').pop()
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  const preorderAddress = paymentKey.getAddress()
+  const preorderAddress = await paymentKey.getAddress()
 
 
   const preorderPromise = Promise.all([network.getConsensusHash(),
@@ -548,14 +546,13 @@ function makePreorder(fullyQualifiedName: string,
  *    the safety module for those.
  * @private
  */
-async function makeUpdate(
-  fullyQualifiedName: string,
-  ownerKeyIn: string | TransactionSigner,
-  paymentKeyIn: string | TransactionSigner,
-  zonefile: string,
-  valueHash: string = '',
-  buildIncomplete: boolean = false
-) {
+async function makeUpdate(fullyQualifiedName: string,
+                          ownerKeyIn: string | TransactionSigner,
+                          paymentKeyIn: string | TransactionSigner,
+                          zonefile: string,
+                          valueHash: string = '',
+                          buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
   if (!valueHash && !zonefile) {
     return Promise.reject(
@@ -624,14 +621,13 @@ async function makeUpdate(
  *    the safety module for those.
  * @private
  */
-async function makeRegister(
-  fullyQualifiedName: string,
-  registerAddress: string,
-  paymentKeyIn: string | TransactionSigner,
-  zonefile: string = null,
-  valueHash: string = null,
-  buildIncomplete: boolean = false
-) {
+async function makeRegister(fullyQualifiedName: string,
+                            registerAddress: string,
+                            paymentKeyIn: string | TransactionSigner,
+                            zonefile: string = null,
+                            valueHash: string = null,
+                            buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
   if (!valueHash && !!zonefile) {
     valueHash = hash160(Buffer.from(zonefile)).toString('hex')
@@ -650,7 +646,7 @@ async function makeRegister(
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  const paymentAddress = paymentKey.getAddress()
+  const paymentAddress = await paymentKey.getAddress()
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
@@ -687,7 +683,7 @@ function makeTransfer(fullyQualifiedName: string,
                       paymentKeyIn: string | TransactionSigner,
                       keepZonefile: boolean = false,
                       buildIncomplete: boolean = false
-) {
+): Promise<string> {
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
@@ -739,7 +735,7 @@ function makeRevoke(fullyQualifiedName: string,
                     ownerKeyIn: string | TransactionSigner,
                     paymentKeyIn: string | TransactionSigner,
                     buildIncomplete: boolean = false
-) {
+): Promise<string> {
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
@@ -787,15 +783,14 @@ function makeRevoke(fullyQualifiedName: string,
  *    the safety module for those.
  * @private
  */
-async function makeRenewal(
-  fullyQualifiedName: string,
-  destinationAddress: string,
-  ownerKeyIn: string | TransactionSigner,
-  paymentKeyIn: string | TransactionSigner,
-  zonefile: string = null,
-  valueHash: string = null,
-  buildIncomplete: boolean = false
-) {
+async function makeRenewal(fullyQualifiedName: string,
+                           destinationAddress: string,
+                           ownerKeyIn: string | TransactionSigner,
+                           paymentKeyIn: string | TransactionSigner,
+                           zonefile: string = null,
+                           valueHash: string = null,
+                           buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   if (!valueHash && !!zonefile) {
@@ -807,7 +802,6 @@ async function makeRenewal(
   const paymentKey = getTransactionSigner(paymentKeyIn)
   const ownerKey = getTransactionSigner(ownerKeyIn)
 
-  // TODO: refactor the below into async/await
   return Promise.all([ownerKey.getAddress(), paymentKey.getAddress()])
     .then(([ownerAddress, paymentAddress]) => {
       const txPromise = Promise.all([network.getNamePrice(fullyQualifiedName),
@@ -865,16 +859,16 @@ async function makeRenewal(
  * 
  * @ignore
  */
-function makeNamespacePreorder(namespaceID: string,
-                               revealAddress: string,
-                               paymentKeyIn: string | TransactionSigner,
-                               buildIncomplete: boolean = false
-) {
+async function makeNamespacePreorder(namespaceID: string,
+                                     revealAddress: string,
+                                     paymentKeyIn: string | TransactionSigner,
+                                     buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  const preorderAddress = paymentKey.getAddress()
+  const preorderAddress = await paymentKey.getAddress()
   const preorderPromise = Promise.all([network.getConsensusHash(),
                                        network.getNamespacePrice(namespaceID)])
     .then(([consensusHash, namespacePrice]) => makeNamespacePreorderSkeleton(
@@ -911,11 +905,11 @@ function makeNamespacePreorder(namespaceID: string,
  *   the safety module for those.
  * @private
  */
-function makeNamespaceReveal(namespace: BlockstackNamespace,
-                             revealAddress: string,
-                             paymentKeyIn: string | TransactionSigner,
-                             buildIncomplete: boolean = false
-) {
+async function makeNamespaceReveal(namespace: BlockstackNamespace,
+                                   revealAddress: string,
+                                   paymentKeyIn: string | TransactionSigner,
+                                   buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   if (!namespace.check()) {
@@ -926,7 +920,7 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  const preorderAddress = paymentKey.getAddress()
+  const preorderAddress = await paymentKey.getAddress()
   return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
       const txB = TransactionBuilder
@@ -953,17 +947,17 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
  *  the safety module for those.
  * @private
  */
-function makeNamespaceReady(namespaceID: string,
-                            revealKeyIn: string | TransactionSigner,
-                            buildIncomplete: boolean = false
-) {
+async function makeNamespaceReady(namespaceID: string,
+                                  revealKeyIn: string | TransactionSigner,
+                                  buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   const namespaceReadyTX = makeNamespaceReadySkeleton(namespaceID)
 
   const revealKey = getTransactionSigner(revealKeyIn)
 
-  const revealAddress = revealKey.getAddress()
+  const revealAddress = await revealKey.getAddress()
   return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
       const txB = TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
@@ -989,19 +983,19 @@ function makeNamespaceReady(namespaceID: string,
  * the safety module for those.
  * @private
  */
-function makeNameImport(name: string,
-                        recipientAddr: string,
-                        zonefileHash: string,
-                        importerKeyIn: string | TransactionSigner,
-                        buildIncomplete: boolean = false
-) {
+async function makeNameImport(name: string,
+                              recipientAddr: string,
+                              zonefileHash: string,
+                              importerKeyIn: string | TransactionSigner,
+                              buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   const nameImportTX = makeNameImportSkeleton(name, recipientAddr, zonefileHash)
 
   const importerKey = getTransactionSigner(importerKeyIn)
 
-  const importerAddress = importerKey.getAddress()
+  const importerAddress = await importerKey.getAddress()
   return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
       const txB = TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
@@ -1026,17 +1020,17 @@ function makeNameImport(name: string,
  * safety module for those.
  * @private
  */
-function makeAnnounce(messageHash: string,
-                      senderKeyIn: string | TransactionSigner,
-                      buildIncomplete: boolean = false
-) {
+async function makeAnnounce(messageHash: string,
+                            senderKeyIn: string | TransactionSigner,
+                            buildIncomplete: boolean = false
+): Promise<string> {
   const network = config.network
 
   const announceTX = makeAnnounceSkeleton(messageHash)
 
   const senderKey = getTransactionSigner(senderKeyIn)
 
-  const senderAddress = senderKey.getAddress()
+  const senderAddress = await senderKey.getAddress()
   return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {
       const txB = TransactionBuilder.fromTransaction(announceTX, network.layer1)
@@ -1071,7 +1065,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
                            senderKeyIn: string | TransactionSigner,
                            btcFunderKeyIn?: string | TransactionSigner,
                            buildIncomplete: boolean = false
-) {
+): Promise<string> {
   const network = config.network
   const separateFunder = !!btcFunderKeyIn
 
@@ -1132,11 +1126,11 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
  */
-function makeBitcoinSpend(destinationAddress: string,
-                          paymentKeyIn: string | TransactionSigner,
-                          amount: number,
-                          buildIncomplete: boolean = false
-) {
+async function makeBitcoinSpend(destinationAddress: string,
+                                paymentKeyIn: string | TransactionSigner,
+                                amount: number,
+                                buildIncomplete: boolean = false
+): Promise<string> {
   if (amount <= 0) {
     return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
   }
@@ -1145,7 +1139,7 @@ function makeBitcoinSpend(destinationAddress: string,
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  const paymentAddress = paymentKey.getAddress()
+  const paymentAddress = await paymentKey.getAddress()
 
   return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
     .then(([utxos, feeRate]) => {

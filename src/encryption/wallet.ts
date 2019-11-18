@@ -114,11 +114,10 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
  * @private
  * @ignore 
  */
-function decryptLegacy(
-  dataBuffer: Buffer, 
-  password: string, 
-  triplesecDecrypt: TriplesecDecryptSignature): 
-  Promise<Buffer> {
+function decryptLegacy(dataBuffer: Buffer, 
+                       password: string, 
+                       triplesecDecrypt: TriplesecDecryptSignature
+): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     if (!triplesecDecrypt) {
       reject(new Error('The `triplesec.decrypt` function must be provided'))
@@ -148,11 +147,10 @@ function decryptLegacy(
  * @private
  * @ignore 
  */
-export async function decryptMnemonic(
-  data: (string | Buffer), 
-  password: string, 
-  triplesecDecrypt: TriplesecDecryptSignature): 
-  Promise<string> {
+export async function decryptMnemonic(data: (string | Buffer), 
+                                      password: string, 
+                                      triplesecDecrypt: TriplesecDecryptSignature
+): Promise<string> {
   const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
   try {
     return await decryptMnemonicBuffer(dataBuffer, password)

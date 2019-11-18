@@ -345,10 +345,11 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
  * @private
  * @ignore
  */
-async function handleSignedEncryptedContents(
-  caller: UserSession, path: string, storedContents: string,
-  app: string, privateKey?: string, username?: string, 
-  zoneFileLookupURL?: string) {
+async function handleSignedEncryptedContents(caller: UserSession, path: string, 
+                                             storedContents: string, app: string, 
+                                             privateKey?: string, username?: string, 
+                                             zoneFileLookupURL?: string
+): Promise<string | Buffer> {
   const appPrivateKey = privateKey || caller.loadUserData().appPrivateKey
 
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)

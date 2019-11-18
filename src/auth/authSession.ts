@@ -16,12 +16,11 @@ import { fetchPrivate } from '../fetchUtil'
  * @private
  * @ignore 
  */
-export function makeCoreSessionRequest(
-  appDomain: string,
-  appMethods: Array<string>,
-  appPrivateKey: string,
-  blockchainID: string = null,
-  thisDevice: string = null): string {
+export function makeCoreSessionRequest(appDomain: string,
+                                       appMethods: Array<string>,
+                                       appPrivateKey: string,
+                                       blockchainID: string = null,
+                                       thisDevice: string = null): string {
   if (thisDevice === null) {
     thisDevice = '.default'
   }
@@ -68,7 +67,8 @@ export function makeCoreSessionRequest(
 export function sendCoreSessionRequest(coreHost: string,
                                        corePort: number,
                                        coreAuthRequest: string,
-                                       apiPassword: string) {
+                                       apiPassword: string
+): Promise<any> {
   return Promise.resolve().then(() => {
     if (!apiPassword) {
       throw new Error('Missing API password')
@@ -123,14 +123,14 @@ export function sendCoreSessionRequest(coreHost: string,
  * @private
  * @ignore 
  */
-export async function getCoreSession(
-  coreHost: string,
-  corePort: number,
-  apiPassword: string,
-  appPrivateKey: string,
-  blockchainId: string = null,
-  authRequest: string = null,
-  deviceId: string = '0') {
+export function getCoreSession(coreHost: string,
+                               corePort: number,
+                               apiPassword: string,
+                               appPrivateKey: string,
+                               blockchainId: string = null,
+                               authRequest: string = null,
+                               deviceId: string = '0'
+): Promise<any> {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }

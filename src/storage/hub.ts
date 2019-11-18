@@ -135,19 +135,17 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
  * 
  * @ignore
  */
-function makeV1GaiaAuthToken(
-  hubInfo: any,
-  signerKeyHex: string,
-  hubUrl: string,
-  associationToken?: string): string {
+function makeV1GaiaAuthToken(hubInfo: any,
+                             signerKeyHex: string,
+                             hubUrl: string,
+                             associationToken?: string): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
                          && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
   const iss = getPublicKeyFromPrivate(signerKeyHex)
 
   if (!handlesV1Auth) {
-    const token = makeLegacyAuthToken(challengeText, signerKeyHex)
-    return token
+    return makeLegacyAuthToken(challengeText, signerKeyHex)
   }
 
   const salt = randomBytes(16).toString('hex')

@@ -280,7 +280,7 @@ export class UserSession {
    * key to use for decryption. If not provided, will use user's appPrivateKey.
    * @returns {String|Buffer} decrypted content.
    */
-  decryptContent(content: string, options?: {privateKey?: string}) {
+  decryptContent(content: string, options?: {privateKey?: string}): Promise<Buffer | string> {
     return storage.decryptContent(content, options, this)
   }
 

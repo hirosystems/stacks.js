@@ -188,21 +188,21 @@ function utilsTests() {
            actual: ${actualLength})`)
   })
 
-  test('encoding routines', async (t) => {
+  test('encoding routines', (t) => {
     t.plan(5)
 
-    t.equal((await hash160(Buffer.from(
+    t.equal((hash160(Buffer.from(
       '99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosq'
     ))).toString('hex'),
             '7ea1fa0f2003c31b015a72af9f4a5f104b5c2840')
 
-    t.equal((await hash160(Buffer.from('1234'))).toString('hex'),
+    t.equal((hash160(Buffer.from('1234'))).toString('hex'),
             'fd7a0d80999bedd76c9a0828057817fc6049a507')
 
-    t.equal((await hash128(Buffer.from('999'))).toString('hex'),
+    t.equal((hash128(Buffer.from('999'))).toString('hex'),
             '83cf8b609de60036a8277bd0e9613575')
 
-    t.equal((await hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa')))
+    t.equal((hash128(Buffer.from('99999566ahjhqwuywqehpzlzlzlzl09189128921jkjlqjosqaaa')))
       .toString('hex'),
             '740ae7f18c939cf5e7c189a2c77a012f')
 

@@ -124,9 +124,9 @@ export function makeAuthRequest(
  * @private
  * @ignore
  */
-export async function encryptPrivateKey(
-  publicKey: string,
-  privateKey: string): Promise<string | null> {
+export async function encryptPrivateKey(publicKey: string,
+                                        privateKey: string
+): Promise<string | null> {
   const encryptedObj = await encryptECIES(publicKey, privateKey)
   const encryptedJSON = JSON.stringify(encryptedObj)
   return (Buffer.from(encryptedJSON)).toString('hex')
@@ -143,9 +143,9 @@ export async function encryptPrivateKey(
  * @private
  * @ignore
  */
-export async function decryptPrivateKey(
-  privateKey: string,
-  hexedEncrypted: string): Promise<string | null> {
+export async function decryptPrivateKey(privateKey: string,
+                                        hexedEncrypted: string
+): Promise<string | null> {
   const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString()
   const encryptedObj = JSON.parse(unhexedString)
   const decrypted = await decryptECIES(privateKey, encryptedObj)
@@ -182,18 +182,18 @@ export async function decryptPrivateKey(
  * @private
  * @ignore
  */
-export async function makeAuthResponse(
-  privateKey: string,
-  profile: {} = {},
-  username: string = null,
-  metadata: AuthMetadata,
-  coreToken: string = null,
-  appPrivateKey: string = null,
-  expiresAt: number = nextMonth().getTime(),
-  transitPublicKey: string = null,
-  hubUrl: string = null,
-  blockstackAPIUrl: string = null,
-  associationToken: string = null): Promise<string> {
+export async function makeAuthResponse(privateKey: string,
+                                       profile: {} = {},
+                                       username: string = null,
+                                       metadata: AuthMetadata,
+                                       coreToken: string = null,
+                                       appPrivateKey: string = null,
+                                       expiresAt: number = nextMonth().getTime(),
+                                       transitPublicKey: string = null,
+                                       hubUrl: string = null,
+                                       blockstackAPIUrl: string = null,
+                                       associationToken: string = null
+): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
   const address = publicKeyToAddress(publicKey)
