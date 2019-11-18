@@ -6,7 +6,7 @@ export interface Hmac {
 
 type NodeCryptoCreateHmac = typeof import('crypto').createHmac
 
-class NodeCryptoHmacSha256 implements Hmac {
+export class NodeCryptoHmacSha256 implements Hmac {
   createHmac: NodeCryptoCreateHmac
 
   constructor(createHmac: NodeCryptoCreateHmac) {
@@ -21,7 +21,7 @@ class NodeCryptoHmacSha256 implements Hmac {
   }
 }
 
-class WebCryptoHmacSha256 implements Hmac {
+export class WebCryptoHmacSha256 implements Hmac {
   subtleCrypto: SubtleCrypto
 
   constructor(subtleCrypto: SubtleCrypto) {

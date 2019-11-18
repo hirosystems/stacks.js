@@ -11,6 +11,7 @@ import { getGlobalScope } from '../../../src/utils'
 import * as pbkdf2 from '../../../src/encryption/pbkdf2'
 import * as aesCipher from '../../../src/encryption/aesCipher'
 import * as sha2Hash from '../../../src/encryption/sha2Hash'
+import * as hmacSha256 from '../../../src/encryption/hmacSha256'
 import * as ripemd160 from '../../../src/encryption/hashRipemd160'
 
 
@@ -129,7 +130,42 @@ export function runEncryptionTests() {
     } finally {
       nodeCrypto.createHash = createHashOrig
     }
+  })
 
+  test('hmac-sha256 tests', async (t) => {
+    const key = Buffer.alloc(32, 0xf5)
+    const data = Buffer.alloc(100, 0x44)
+    const expected = 'fe44c2197eb8a5678daba87ff2aba891d8b12224d8219acd4cfa5cee4f9acc77'
+
+    const globalScope = getGlobalScope() as any
+
+    // Remove any existing global `crypto` variable for testing
+    const globalCryptoOrig = { defined: 'crypto' in globalScope, value: globalScope.crypto }
+    delete globalScope.crypto
+
+    try {
+      const nodeCryptoHmac = await hmacSha256.createHmacSha256()
+      t.assert(nodeCryptoHmac instanceof hmacSha256.NodeCryptoHmacSha256, 'should be type NodeCryptoHmacSha256 when global web crypto undefined')
+
+      // Set global web `crypto` polyfill for testing
+      const webCrypto = new webCryptoPolyfill.Crypto()
+      globalScope.crypto = webCrypto
+      const webCryptoHmac = await hmacSha256.createHmacSha256()
+      t.assert(webCryptoHmac instanceof hmacSha256.WebCryptoHmacSha256, 'should be type WebCryptoHmacSha256 when global web crypto is available')
+
+      const derivedNodeCrypto = (await nodeCryptoHmac.digest(key, data)).toString('hex')
+      const derivedWebCrypto = (await webCryptoHmac.digest(key, data)).toString('hex')
+
+      t.equal(expected, derivedNodeCrypto, 'NodeCryptoHmacSha256 should have digested to expected key')
+      t.equal(expected, derivedWebCrypto, 'WebCryptoHmacSha256 should have digested to expected key')
+    } finally {
+      // Restore previous `crypto` global var
+      if (globalCryptoOrig.defined) {
+        globalScope.crypto = globalCryptoOrig.value
+      } else {
+        delete globalScope.crypto
+      }
+    }
   })
 
   test('pbkdf2 digest tests', async (t) => {
