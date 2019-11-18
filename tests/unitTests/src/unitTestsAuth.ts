@@ -37,7 +37,7 @@ export function runAuthTests() {
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
-    const authRequest = await blockstack.makeAuthRequest(privateKey)
+    const authRequest = blockstack.makeAuthRequest(privateKey)
     t.ok(authRequest, 'auth request should have been created')
     console.log(authRequest)
 
@@ -45,7 +45,7 @@ export function runAuthTests() {
     t.ok(decodedToken, 'auth request token should have been decoded')
     console.log(JSON.stringify(decodedToken, null, 2))
 
-    const address = await publicKeyToAddress(publicKey)
+    const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
     const origin = 'http://localhost:3000'
     t.equal((decodedToken.payload as any).iss,
@@ -60,15 +60,15 @@ export function runAuthTests() {
     t.equal(JSON.stringify((decodedToken.payload as any).scopes),
             '["store_write"]', 'auth request scopes should be store_write')
 
-    verifyAuthRequest(authRequest)
+    await verifyAuthRequest(authRequest)
       .then((verified) => {
         t.true(verified, 'auth request should be verified')
       })
 
     t.true(isExpirationDateValid(authRequest), 'Expiration date should be valid')
     t.true(isIssuanceDateValid(authRequest), 'Issuance date should be valid')
-    t.true(await doSignaturesMatchPublicKeys(authRequest), 'Signatures should match the public keys')
-    t.true(await doPublicKeysMatchIssuer(authRequest), 'Public keys should match the issuer')
+    t.true(doSignaturesMatchPublicKeys(authRequest), 'Signatures should match the public keys')
+    t.true(doPublicKeysMatchIssuer(authRequest), 'Public keys should match the issuer')
     t.true(isManifestUriValid(authRequest), 'Manifest URI should be on the app origin')
     t.true(isRedirectUriValid(authRequest), 'Redirect URL should be to app origin')
 
@@ -99,7 +99,7 @@ export function runAuthTests() {
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
-    const authRequest = await blockstack.makeAuthRequest(
+    const authRequest = blockstack.makeAuthRequest(
       privateKey, undefined, undefined, undefined, undefined, undefined, { myCustomParam: 'asdf' }
     )
     t.ok(authRequest, 'auth request should have been created')
@@ -119,10 +119,10 @@ export function runAuthTests() {
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
 
-    const authRequest = await blockstack.makeAuthRequest(privateKey)
+    const authRequest = blockstack.makeAuthRequest(privateKey)
     const invalidAuthRequest = authRequest.substring(0, authRequest.length - 1)
 
-    t.equal(await doSignaturesMatchPublicKeys(invalidAuthRequest), false,
+    t.equal(doSignaturesMatchPublicKeys(invalidAuthRequest), false,
             'Signatures should not match the public keys')
 
     await verifyAuthRequest(invalidAuthRequest)
@@ -144,7 +144,7 @@ export function runAuthTests() {
     appConfig.redirectURI = () => 'https://example.com' // monkey patch for test
     const blockstack = new UserSession({ appConfig })
 
-    const invalidAuthRequest = await blockstack.makeAuthRequest(privateKey)
+    const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
     console.log(invalidAuthRequest)
     t.equal(isRedirectUriValid(invalidAuthRequest), false,
             'Redirect URI should be invalid since it does not match origin')
@@ -167,7 +167,7 @@ export function runAuthTests() {
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     appConfig.manifestURI = () => 'https://example.com/manifest.json' // monkey patch for test
     const blockstack = new UserSession({ appConfig })
-    const invalidAuthRequest = await blockstack.makeAuthRequest(privateKey)
+    const invalidAuthRequest = blockstack.makeAuthRequest(privateKey)
 
     t.equal(isManifestUriValid(invalidAuthRequest), false,
             'Manifest URI should be invalid since it does not match origin')
@@ -186,7 +186,7 @@ export function runAuthTests() {
     t.ok(decodedToken, 'auth response should have been decoded')
     // console.log(JSON.stringify(decodedToken, null, 2))
 
-    const address = await publicKeyToAddress(publicKey)
+    const address = publicKeyToAddress(publicKey)
     const referenceDID = makeDIDFromAddress(address)
     t.equal((decodedToken.payload as any).iss,
             referenceDID, 'auth response issuer should include the public key')
@@ -206,8 +206,8 @@ export function runAuthTests() {
 
     t.true(isExpirationDateValid(authResponse), 'Expiration date should be valid')
     t.true(isIssuanceDateValid(authResponse), 'Issuance date should be valid')
-    t.true(await doSignaturesMatchPublicKeys(authResponse), 'Signatures should match the public keys')
-    t.true(await doPublicKeysMatchIssuer(authResponse), 'Public keys should match the issuer')
+    t.true(doSignaturesMatchPublicKeys(authResponse), 'Signatures should match the public keys')
+    t.true(doPublicKeysMatchIssuer(authResponse), 'Public keys should match the issuer')
 
     await doPublicKeysMatchUsername(authResponse, nameLookupURL)
       .then((verifiedResult) => {
@@ -469,7 +469,7 @@ export function runAuthTests() {
       exp: FOUR_MONTH_SECONDS + (Date.now() / 1000),
       salt
     }
-    const gaiaAssociationToken = await new TokenSigner('ES256K', identityPrivateKey)
+    const gaiaAssociationToken = new TokenSigner('ES256K', identityPrivateKey)
       .sign(associationTokenClaim)
 
     const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id',
