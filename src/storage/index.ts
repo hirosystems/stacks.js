@@ -267,7 +267,7 @@ async function getFileContents(path: string, app: string, username: string | und
     throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
   }
   const contentType = response.headers.get('Content-Type')
-  const etag = JSON.parse(response.headers.get('ETag'))
+  const etag = response.headers.get('ETag').replace(/^"|"$/g, '')
   if (etag) {
     etags[path] = etag
   }
