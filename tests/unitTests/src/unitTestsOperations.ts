@@ -520,7 +520,7 @@ function transactionTests() {
   test('build incomplete', (t) => {
     setupMocks()
     t.plan(2)
-    const getAddress = () => Promise.resolve(testAddresses[2].address)
+    const getAddress = () => testAddresses[2].address
     const signTransaction = () => Promise.resolve()
     const nullSigner = { getAddress, signTransaction }
     return transactions.makeNamespacePreorder('hello',
@@ -1660,13 +1660,13 @@ function safetyTests() {
       })
   })
 
-  test('ownsName', (t) => {
+  test('ownsName', async (t) => {
     t.plan(2)
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/names/foo.test',
                   { address: testAddresses[0].address })
 
-    Promise.all([safety.ownsName('foo.test', testAddresses[0].address),
+    await Promise.all([safety.ownsName('foo.test', testAddresses[0].address),
                  safety.ownsName('foo.test', testAddresses[1].address)])
       .then(([t0, t1]) => {
         t.ok(t0, `Test address ${testAddresses[0].address} should own foo.test`)
@@ -1707,7 +1707,7 @@ function safetyTests() {
       .catch(err => console.error(err.stack))
   })
 
-  test('nameAvailable', (t) => {
+  test('nameAvailable', async (t) => {
     t.plan(2)
     FetchMock.restore()
     FetchMock.get('https://core.blockstack.org/v1/names/foo.test',
@@ -1715,7 +1715,7 @@ function safetyTests() {
     FetchMock.get('https://core.blockstack.org/v1/names/bar.test',
                   { address: testAddresses[0].address })
 
-    Promise.all([safety.isNameAvailable('foo.test'),
+    await Promise.all([safety.isNameAvailable('foo.test'),
                  safety.isNameAvailable('bar.test')])
       .then(([t0, t1]) => {
         t.ok(t0, 'foo.test should be available')
@@ -1723,7 +1723,7 @@ function safetyTests() {
       })
   })
 
-  test('nameValid', (t) => {
+  test('nameValid', async (t) => {
     t.plan(11)
 
     const shouldFail = [
@@ -1766,11 +1766,11 @@ function safetyTests() {
         passed => t.ok(passed, `${x} should pass`)
       ))
 
-    Promise.all(shouldPass)
+    await Promise.all(shouldPass)
       .then(() => Promise.all(shouldFail))
   })
 
-  test('namespaceValid', (t) => {
+  test('namespaceValid', async (t) => {
     t.plan(8)
 
     const shouldFail = [
@@ -1803,7 +1803,7 @@ function safetyTests() {
         passed => t.ok(passed, `${x} should pass`)
       ))
 
-    Promise.all(shouldPass)
+    await Promise.all(shouldPass)
       .then(() => Promise.all(shouldFail))
   })
 

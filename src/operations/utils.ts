@@ -5,8 +5,8 @@ import { BN, BNConstructor } from '../bn'
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
-import { createSha2Hash } from '../encryption/sha2Hash'
-import { createHashRipemd160 } from '../encryption/hashRipemd160'
+import { hashSha256Sync } from '../encryption/sha2Hash'
+import { hashRipemd160 } from '../encryption/hashRipemd160'
 
 
 /**
@@ -19,19 +19,18 @@ export const DUST_MINIMUM = 5500
  * Creates a RIPEMD160(SHA256(input)) hash.
  * @ignore
  */
-export async function hash160(buff: Buffer) {
-  const sha2Hash = await createSha2Hash()
-  const sha256 = await sha2Hash.digest(buff)
-  return createHashRipemd160().digest(sha256)
+export function hash160(buff: Buffer) {
+  const sha256 = hashSha256Sync(buff)
+  return hashRipemd160(sha256)
 }
 
 /**
  * Creates a SHA256 hash, truncated to 128 bits. 
  * @ignore
  */
-export async function hash128(buff: Buffer) {
-  const sha2Hash = await createSha2Hash()
-  return Buffer.from((await sha2Hash.digest(buff)).slice(0, 16))
+export function hash128(buff: Buffer) {
+  const sha256 = hashSha256Sync(buff)
+  return sha256.slice(0, 16)
 }
 
 

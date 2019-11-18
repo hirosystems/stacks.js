@@ -53,7 +53,7 @@ export function generateTransitKey() {
  * by special authenticators.
  * @return {String} the authentication request
  */
-export async function makeAuthRequest(
+export function makeAuthRequest(
   transitPrivateKey?: string,
   redirectURI?: string, 
   manifestURI?: string, 
@@ -61,7 +61,7 @@ export async function makeAuthRequest(
   appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
-): Promise<string> {
+): string {
   if (!transitPrivateKey) {
     transitPrivateKey = new UserSession().generateAndStoreTransitKey()
   }
@@ -105,12 +105,12 @@ export async function makeAuthRequest(
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
   payload.public_keys = [publicKey]
-  const address = await publicKeyToAddress(publicKey)
+  const address = publicKeyToAddress(publicKey)
   payload.iss = makeDIDFromAddress(address)
 
   /* Sign and return the token */
   const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
-  const token = await tokenSigner.sign(payload)
+  const token = tokenSigner.sign(payload)
 
   return token
 }
@@ -196,7 +196,7 @@ export async function makeAuthResponse(
   associationToken: string = null): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
-  const address = await publicKeyToAddress(publicKey)
+  const address = publicKeyToAddress(publicKey)
 
   /* See if we should encrypt with the transit key */
   let privateKeyPayload = appPrivateKey

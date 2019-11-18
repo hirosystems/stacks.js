@@ -6,7 +6,7 @@ import { BN } from '../bn'
 import { randomBytes } from './cryptoRandom'
 import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
-import { createSha2Hash } from './sha2Hash'
+import { hashSha256Sync, hashSha512Sync } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipher } from './aesCipher'
 
@@ -66,10 +66,9 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 /**
 * @ignore
 */
-async function sharedSecretToKeys(sharedSecret: Buffer) {
+function sharedSecretToKeys(sharedSecret: Buffer) {
   // generate mac and encryption key from shared secret
-  const sha2Hash = await createSha2Hash()
-  const hashedSecret = await sha2Hash.digest(sharedSecret, 'sha512')
+  const hashedSecret = hashSha512Sync(sharedSecret)
   return {
     encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32)
@@ -119,7 +118,7 @@ export async function encryptECIES(publicKey: string, content: string | Buffer):
 
   const sharedSecretHex = getHexFromBN(sharedSecret)
 
-  const sharedKeys = await sharedSecretToKeys(
+  const sharedKeys = sharedSecretToKeys(
     Buffer.from(sharedSecretHex, 'hex')
   )
 
@@ -169,7 +168,7 @@ export async function decryptECIES(privateKey: string, cipherObject: CipherObjec
   const sharedSecret = ecSK.derive(ephemeralPK)
   const sharedSecretBuffer = Buffer.from(getHexFromBN(sharedSecret), 'hex')
 
-  const sharedKeys = await sharedSecretToKeys(sharedSecretBuffer)
+  const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
   const ivBuffer = Buffer.from(cipherObject.iv, 'hex')
   const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
@@ -204,14 +203,13 @@ export async function decryptECIES(privateKey: string, cipherObject: CipherObjec
  * @private
  * @ignore
  */
-export async function signECDSA(privateKey: string, content: string | Buffer): Promise<{ 
+export function signECDSA(privateKey: string, content: string | Buffer): { 
   publicKey: string, signature: string 
-}> {
+} {
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
-  const sha2Hash = await createSha2Hash()
-  const contentHash = await sha2Hash.digest(contentBuffer)
+  const contentHash = hashSha256Sync(contentBuffer)
   const signature = ecPrivate.sign(contentHash)
   const signatureString = signature.toDER('hex')
 
@@ -239,14 +237,13 @@ function getBuffer(content: string | ArrayBuffer | Buffer) {
  * @private
  * @ignore
  */
-export async function verifyECDSA(
+export function verifyECDSA(
   content: string | ArrayBuffer | Buffer,
   publicKey: string,
   signature: string) {
   const contentBuffer = getBuffer(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
-  const sha2Hash = await createSha2Hash()
-  const contentHash = await sha2Hash.digest(contentBuffer)
+  const contentHash = hashSha256Sync(contentBuffer)
 
   return ecPublic.verify(contentHash, <any>signature)
 }

@@ -15,17 +15,17 @@ import { fetchAppManifest } from './authProvider'
  * @private
  * @ignore 
  */
-export async function doSignaturesMatchPublicKeys(token: string): Promise<boolean> {
+export function doSignaturesMatchPublicKeys(token: string): boolean {
   const payload = decodeToken(token).payload
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
   }
-  const publicKeys = payload.public_keys
+  const publicKeys = payload.public_keys as string[]
   if (publicKeys.length === 1) {
     const publicKey = publicKeys[0]
     try {
       const tokenVerifier = new TokenVerifier('ES256k', publicKey)
-      const signatureVerified = await tokenVerifier.verify(token)
+      const signatureVerified = tokenVerifier.verify(token)
       if (signatureVerified) {
         return true
       } else {
@@ -50,16 +50,16 @@ export async function doSignaturesMatchPublicKeys(token: string): Promise<boolea
  * @private
  * @ignore 
  */
-export async function doPublicKeysMatchIssuer(token: string): Promise<boolean> {
+export function doPublicKeysMatchIssuer(token: string): boolean {
   const payload = decodeToken(token).payload
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
   }
-  const publicKeys = payload.public_keys
+  const publicKeys = payload.public_keys as string[]
   const addressFromIssuer = getAddressFromDID(payload.iss)
 
   if (publicKeys.length === 1) {
-    const addressFromPublicKeys = await publicKeyToAddress(publicKeys[0])
+    const addressFromPublicKeys = publicKeyToAddress(publicKeys[0])
     if (addressFromPublicKeys === addressFromIssuer) {
       return true
     }
@@ -195,7 +195,7 @@ export function isManifestUriValid(token: string) {
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
   }
-  return isSameOriginAbsoluteUrl(payload.domain_name, payload.manifest_uri)
+  return isSameOriginAbsoluteUrl(payload.domain_name as string, payload.manifest_uri as string)
 }
 
 /**
@@ -210,7 +210,7 @@ export function isRedirectUriValid(token: string) {
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
   }
-  return isSameOriginAbsoluteUrl(payload.domain_name, payload.redirect_uri)
+  return isSameOriginAbsoluteUrl(payload.domain_name as string, payload.redirect_uri as string)
 }
 
 /**

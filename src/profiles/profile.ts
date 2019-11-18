@@ -40,9 +40,8 @@ export class Profile {
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static async fromToken(token: string, publicKeyOrAddress: string | null = null): 
-    Promise<Profile> {
-    const profile = await extractProfile(token, publicKeyOrAddress)
+  static fromToken(token: string, publicKeyOrAddress: string | null = null): Profile {
+    const profile = extractProfile(token, publicKeyOrAddress)
     return new Profile(profile)
   }
 

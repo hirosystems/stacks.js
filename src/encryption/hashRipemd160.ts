@@ -4,18 +4,18 @@ import { isNodeCryptoAvailable } from './cryptoUtils'
 type NodeHash = import('crypto').Hash
 
 export interface Ripemd160Digest {
-  digest(data: Buffer): Promise<Buffer>
+  digest(data: Buffer): Buffer
 }
 
 export class Ripemd160PolyfillDigest implements Ripemd160Digest {
-  digest(data: Buffer): Promise<Buffer> {
+  digest(data: Buffer): Buffer {
     const instance = new Ripemd160Polyfill()
     instance.update(data)
     const hash = instance.digest()
     if (Array.isArray(hash)) {
-      return Promise.resolve(Buffer.from(hash))
+      return Buffer.from(hash)
     } else {
-      return Promise.resolve(Buffer.from(hash.buffer))
+      return Buffer.from(hash.buffer)
     }
   }
 }
@@ -27,10 +27,10 @@ export class NodeCryptoRipemd160Digest implements Ripemd160Digest {
     this.nodeRmd160Hasher = nodeRmd160Hash
   }
 
-  digest(data: Buffer): Promise<Buffer> {
+  digest(data: Buffer): Buffer {
     const hasher = this.nodeRmd160Hasher()
     const result = hasher.update(data).digest()
-    return Promise.resolve(result)
+    return result
   }
 }
 
@@ -59,3 +59,7 @@ export function createHashRipemd160() {
   }
 }
 
+export function hashRipemd160(data: Buffer) {
+  const hash = createHashRipemd160()
+  return hash.digest(data)
+}

@@ -18,7 +18,7 @@ export interface TransactionSigner {
    * @private
    * @ignore
    */
-  getAddress(): Promise<string>;
+  getAddress(): string;
   /**
    * Signs a transaction input
    * @param {TransactionBuilder} transaction - the transaction to sign
@@ -50,7 +50,7 @@ export class PubkeyHashSigner implements TransactionSigner {
     return 1
   }
 
-  getAddress(): Promise<string> {
+  getAddress(): string {
     return ecPairToAddress(this.ecPair)
   }
 

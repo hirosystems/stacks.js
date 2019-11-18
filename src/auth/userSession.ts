@@ -101,13 +101,13 @@ export class UserSession {
    * 
    * @returns {void}
    */
-  async redirectToSignIn(
+  redirectToSignIn(
     redirectURI?: string,
     manifestURI?: string,
     scopes?: Array<AuthScope | string>
-  ): Promise<void> {
+  ): void {
     const transitKey = this.generateAndStoreTransitKey()
-    const authRequest = await this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
+    const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
     return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
@@ -124,11 +124,11 @@ export class UserSession {
    * @param blockstackIDHost The ID of the Blockstack Browser application.
    * 
    */
-  async redirectToSignInWithAuthRequest(
+  redirectToSignInWithAuthRequest(
     authRequest?: string,
     blockstackIDHost?: string
-  ) {
-    authRequest = authRequest || (await this.makeAuthRequest())
+  ): void {
+    authRequest = authRequest || this.makeAuthRequest()
     const authenticatorURL = blockstackIDHost 
       || (this.appConfig && this.appConfig.authenticatorURL)
     return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
@@ -155,7 +155,7 @@ export class UserSession {
    * 
    * @returns {String} the authentication request
    */
-  async makeAuthRequest(
+  makeAuthRequest(
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
@@ -163,7 +163,7 @@ export class UserSession {
     appDomain?: string,
     expiresAt: number = nextHour().getTime(),
     extraParams: any = {}
-  ): Promise<string> {
+  ): string {
     const appConfig = this.appConfig
     if (!appConfig) {
       throw new InvalidStateError('Missing AppConfig')

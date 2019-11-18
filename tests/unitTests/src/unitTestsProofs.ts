@@ -63,12 +63,12 @@ function brokenProofs() {
                            proofUrl: 'https://gist.github.com/navalr/f31a74054f859ec0ac6ab'
                          }]
 
-  test('brokenProofs', (t) => {
+  test('brokenProofs', async (t) => {
     FetchMock.get(`${naval.facebook.url}b`, naval.facebook.body)
     FetchMock.get(`${naval.github.url}b/raw`, naval.github.body)
     FetchMock.get(`${naval.twitter.url}b`, { body: '', status: 400 })
     t.plan(2)
-    validateProofs({ account: navalAccounts }, undefined, cheerio, 'naval.id')
+    await validateProofs({ account: navalAccounts }, undefined, cheerio, 'naval.id')
       .then((proofs) => {
         t.equal(proofs.length, 3)
         t.equal(proofs.filter(x => x.valid).length, 2)

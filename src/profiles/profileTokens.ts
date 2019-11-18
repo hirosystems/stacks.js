@@ -71,8 +71,8 @@ export function wrapProfileToken(token: string) {
   * @returns {Object} - the verified, decoded profile token
   * @throws {Error} - throws an error if token verification fails
   */
-export async function verifyProfileToken(token: string, publicKeyOrAddress: string): 
-  Promise<TokenInterface> {
+export function verifyProfileToken(token: string, publicKeyOrAddress: string): 
+  TokenInterface {
   const decodedToken = decodeToken(token)
   const payload = decodedToken.payload
   if (typeof payload === 'string') {
@@ -102,13 +102,14 @@ export async function verifyProfileToken(token: string, publicKeyOrAddress: stri
     throw new Error('Token doesn\'t have a claim')
   }
 
-  const issuerPublicKey = payload.issuer.publicKey as string
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const issuerPublicKey = (payload.issuer as Record<string, string>).publicKey as string
   const publicKeyBuffer = Buffer.from(issuerPublicKey, 'hex')
 
   const compressedKeyPair =  ECPair.fromPublicKey(publicKeyBuffer, { compressed: true })
-  const compressedAddress = await ecPairToAddress(compressedKeyPair)
+  const compressedAddress = ecPairToAddress(compressedKeyPair)
   const uncompressedKeyPair = ECPair.fromPublicKey(publicKeyBuffer, { compressed: false })
-  const uncompressedAddress = await ecPairToAddress(uncompressedKeyPair)
+  const uncompressedAddress = ecPairToAddress(uncompressedKeyPair)
 
   if (publicKeyOrAddress === issuerPublicKey) {
     // pass
@@ -125,7 +126,7 @@ export async function verifyProfileToken(token: string, publicKeyOrAddress: stri
     throw new Error('Invalid token verifier')
   }
 
-  const tokenVerified = await tokenVerifier.verify(token)
+  const tokenVerified = tokenVerifier.verify(token)
   if (!tokenVerified) {
     throw new Error('Token verification failed')
   }
@@ -142,11 +143,11 @@ export async function verifyProfileToken(token: string, publicKeyOrAddress: stri
   * @returns {Object} - the profile extracted from the encoded token
   * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
   */
-export async function extractProfile(token: string, publicKeyOrAddress: string | null = null): 
-  Promise<any> {
+export function extractProfile(token: string, publicKeyOrAddress: string | null = null): 
+  Record<string, any> {
   let decodedToken
   if (publicKeyOrAddress) {
-    decodedToken = await verifyProfileToken(token, publicKeyOrAddress)
+    decodedToken = verifyProfileToken(token, publicKeyOrAddress)
   } else {
     decodedToken = decodeToken(token)
   }

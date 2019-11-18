@@ -16,12 +16,12 @@ import { fetchPrivate } from '../fetchUtil'
  * @private
  * @ignore 
  */
-export async function makeCoreSessionRequest(
+export function makeCoreSessionRequest(
   appDomain: string,
   appMethods: Array<string>,
   appPrivateKey: string,
   blockchainID: string = null,
-  thisDevice: string = null): Promise<string> {
+  thisDevice: string = null): string {
   if (thisDevice === null) {
     thisDevice = '.default'
   }
@@ -44,7 +44,7 @@ export async function makeCoreSessionRequest(
 
   // make token
   const tokenSigner = new TokenSigner('ES256k', appPrivateKey)
-  const token = await tokenSigner.sign(authBody)
+  const token = tokenSigner.sign(authBody)
 
   return token
 }
@@ -148,13 +148,13 @@ export async function getCoreSession(
       throw new Error('Unexpected token payload type of string')
     }
 
-    const appDomain = payload.domain_name
+    const appDomain = payload.domain_name as string
     if (!appDomain) {
       return Promise.reject('No domain_name in authRequest')
     }
-    const appMethods = payload.scopes
+    const appMethods = payload.scopes as string[]
 
-    const coreAuthRequest = await makeCoreSessionRequest(
+    const coreAuthRequest = makeCoreSessionRequest(
       appDomain, appMethods, appPrivateKey, blockchainId, deviceId
     )
 

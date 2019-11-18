@@ -6,7 +6,7 @@ import { Logger } from './logger'
 import { config } from './config'
 import { fetchPrivate } from './fetchUtil'
 import { createSha2Hash } from './encryption/sha2Hash'
-import { createHashRipemd160 } from './encryption/hashRipemd160'
+import { hashRipemd160 } from './encryption/hashRipemd160'
 
 export interface UTXO {
   value?: number;
@@ -434,7 +434,7 @@ export class BlockstackNetwork {
             .then(async (body) => {
               const sha2Hash = await createSha2Hash()
               const sha256 = await sha2Hash.digest(Buffer.from(body))
-              const h = (await createHashRipemd160().digest(sha256)).toString('hex')
+              const h = hashRipemd160(sha256).toString('hex')
               if (h !== zonefileHash) {
                 throw new Error(`Zone file contents hash to ${h}, not ${zonefileHash}`)
               }

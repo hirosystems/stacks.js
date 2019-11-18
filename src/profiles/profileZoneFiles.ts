@@ -113,9 +113,9 @@ export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: stri
       fetchPrivate(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
-        .then(async (responseJson) => {
+        .then((responseJson) => {
           const tokenRecords = responseJson
-          const profile = await extractProfile(tokenRecords[0].token, publicKeyOrAddress)
+          const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress)
           resolve(profile)
         })
         .catch((error) => {

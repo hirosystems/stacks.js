@@ -1,8 +1,8 @@
 
 import { ECPair, address, networks } from 'bitcoinjs-lib'
 import { randomBytes } from './encryption/cryptoRandom'
-import { createSha2Hash } from './encryption/sha2Hash'
-import { createHashRipemd160 } from './encryption/hashRipemd160'
+import { hashSha256Sync } from './encryption/sha2Hash'
+import { hashRipemd160 } from './encryption/hashRipemd160'
 import { config } from './config'
 
 /**
@@ -29,12 +29,9 @@ export function makeECPrivateKey() {
 /**
 * @ignore
 */
-export async function publicKeyToAddress(publicKey: string | Buffer) {
+export function publicKeyToAddress(publicKey: string | Buffer) {
   const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex')
-  const sha2Hash = await createSha2Hash()
-  const publicKeyHash160 = await createHashRipemd160().digest(
-    await sha2Hash.digest(publicKeyBuffer)
-  )
+  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer))
   const result = address.toBase58Check(publicKeyHash160, networks.bitcoin.pubKeyHash)
   return result
 }
@@ -91,9 +88,8 @@ export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
  * @private
  * @ignore
  */
-export async function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  const sha2Hash = await createSha2Hash()
-  const sha256 = await sha2Hash.digest(keyPair.publicKey)
-  const hash160 = await createHashRipemd160().digest(sha256)
+export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
+  const sha256 = hashSha256Sync(keyPair.publicKey)
+  const hash160 = hashRipemd160(sha256)
   return address.toBase58Check(hash160, keyPair.network.pubKeyHash)
 }

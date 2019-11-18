@@ -42,7 +42,7 @@ export function fetchAppManifest(authRequest: string): Promise<any> {
       if (typeof payload === 'string') {
         throw new Error('Unexpected token payload type of string')
       }  
-      const manifestURI = payload.manifest_uri
+      const manifestURI = payload.manifest_uri as string
       try {
         Logger.debug(`Fetching manifest from ${manifestURI}`)
         fetchPrivate(manifestURI)
@@ -80,7 +80,7 @@ export function redirectUserToApp(authRequest: string, authResponse: string) {
   if (typeof payload === 'string') {
     throw new Error('Unexpected token payload type of string')
   }
-  let redirectURI = payload.redirect_uri
+  let redirectURI = payload.redirect_uri as string
   Logger.debug(redirectURI)
   if (redirectURI) {
     redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)

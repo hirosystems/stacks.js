@@ -1,4 +1,4 @@
-
+import { sha256, sha512 } from 'sha.js'
 import { getCryptoLib } from './cryptoUtils'
 
 type NodeCryptoCreateHash = typeof import('crypto').createHash
@@ -50,4 +50,16 @@ export async function createSha2Hash(): Promise<Sha2Hash> {
   } else {
     return new NodeCryptoSha2Hash(cryptoLib.lib.createHash)
   }
+}
+
+export function hashSha256Sync(data: Buffer) {
+  const hash = new sha256()
+  hash.update(data)
+  return hash.digest()
+}
+
+export function hashSha512Sync(data: Buffer) {
+  const hash = new sha512()
+  hash.update(data)
+  return hash.digest()
 }

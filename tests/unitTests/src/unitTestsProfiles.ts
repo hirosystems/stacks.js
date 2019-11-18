@@ -23,21 +23,23 @@ function testTokening(filename: string, profile: any) {
 
   let tokenRecords: any[] = []
 
-  test('profileToToken', async (t) => {
+  test('profileToToken', (t) => {
     t.plan(3)
 
-    const token = await signProfileToken(profile, privateKey)
+    const token = signProfileToken(profile, privateKey)
     t.ok(token, 'Token must have been created')
 
     const tokenRecord = wrapProfileToken(token)
     t.ok(tokenRecord, 'Token record must have been created')
 
-    const decodedToken = await verifyProfileToken(tokenRecord.token, publicKey)
+    const decodedToken = verifyProfileToken(tokenRecord.token, publicKey)
     t.ok(decodedToken, 'Token record must have been verified')
   })
 
-  test('profileToTokens', async (t) => {
-    tokenRecords = [wrapProfileToken(await signProfileToken(profile, privateKey))]
+  test('profileToTokens', (t) => {
+    t.plan(2)
+
+    tokenRecords = [wrapProfileToken(signProfileToken(profile, privateKey))]
     t.ok(tokenRecords, 'Tokens should have been created')
     // console.log(JSON.stringify(tokenRecords, null, 2))
     // fs.writeFileSync('./docs/token-files/' + filename, JSON.stringify(tokenRecords, null, 2))
@@ -45,17 +47,15 @@ function testTokening(filename: string, profile: any) {
     const tokensVerified = true
 
     // this will throw an error if one is involid
-    for (const tokenRecord of tokenRecords) {
-      await verifyProfileToken(tokenRecord.token, publicKey)
-    }
+    tokenRecords.map(tokenRecord => verifyProfileToken(tokenRecord.token, publicKey))
 
     t.equal(tokensVerified, true, 'All tokens should be valid')
   })
 
-  test('tokenToProfile', async (t) => {
+  test('tokenToProfile', (t) => {
     t.plan(2)
 
-    const recoveredProfile = await extractProfile(tokenRecords[0].token, publicKey)
+    const recoveredProfile = extractProfile(tokenRecords[0].token, publicKey)
     // console.log(recoveredProfile)
     t.ok(recoveredProfile, 'Profile should have been reconstructed')
     t.equal(JSON.stringify(recoveredProfile),
@@ -81,16 +81,16 @@ function testVerifyToken() {
   const compressedAddress = '1BTku19roxQs2d54kbYKVTv21oBCuHEApF'
   const uncompressedAddress = '12wes6TQpDF2j8zqvAbXV9KNCGQVF2y7G5'
 
-  test('verifyToken', async (t) => {
+  test('verifyToken', (t) => {
     t.plan(3)
 
-    const decodedToken1 = await verifyProfileToken(token, publicKey)
+    const decodedToken1 = verifyProfileToken(token, publicKey)
     t.ok(decodedToken1, 'Token should have been verified against a public key')
 
-    const decodedToken2 = await verifyProfileToken(token, compressedAddress)
+    const decodedToken2 = verifyProfileToken(token, compressedAddress)
     t.ok(decodedToken2, 'Token should have been verified against a compressed address')
 
-    const decodedToken3 = await verifyProfileToken(token, uncompressedAddress)
+    const decodedToken3 = verifyProfileToken(token, uncompressedAddress)
     t.ok(decodedToken3, 'Token should have been verified against an uncompressed address')
   })
 }
@@ -113,7 +113,7 @@ function testSchemas() {
   const privateKey = keyPair.privateKey.toString('hex')
   const publicKey = keyPair.publicKey.toString('hex')
 
-  test('Profile', async (t) => {
+  test('Profile', (t) => {
     t.plan(5)
 
     const profileObject = new Profile(sampleProfiles.naval)
@@ -125,10 +125,10 @@ function testSchemas() {
     const profileJson = profileObject.toJSON()
     t.ok(profileJson, 'Profile JSON should have been created')
 
-    const tokenRecords = await profileObject.toToken(privateKey)
+    const tokenRecords = profileObject.toToken(privateKey)
     t.ok(tokenRecords, 'Profile tokens should have been created')
 
-    const profileObject2 = await Profile.fromToken(tokenRecords, publicKey)
+    const profileObject2 = Profile.fromToken(tokenRecords, publicKey)
     t.ok(profileObject2, 'Profile should have been reconstructed from tokens')
   })
 
@@ -141,11 +141,11 @@ function testSchemas() {
     const validationResults = Person.validateSchema(sampleProfiles.naval, true)
     t.ok(validationResults.valid, 'Person profile should be valid')
 
-    const token = await personObject.toToken(privateKey)
+    const token = personObject.toToken(privateKey)
     const tokenRecords = [wrapProfileToken(token)]
     t.ok(tokenRecords, 'Person profile tokens should have been created')
 
-    const profileObject2 = await Person.fromToken(tokenRecords[0].token, publicKey)
+    const profileObject2 = Person.fromToken(tokenRecords[0].token, publicKey)
     t.ok(profileObject2, 'Person profile should have been reconstructed from tokens')
 
     const name = personObject.name()
@@ -211,7 +211,7 @@ function testSchemas() {
     })
   })
 
-  test('profileLookUp', (t) => {
+  test('profileLookUp', async (t) => {
     t.plan(4)
 
     const name = 'ryan.id'
@@ -226,7 +226,7 @@ function testSchemas() {
     FetchMock.get('http://potato:6270/v1/names/ryan.id', mockZonefile)
     FetchMock.get('https://core.blockstack.org/v1/names/ryan.id', mockZonefile)
     FetchMock.get(sampleTokenFiles.ryan.url, sampleTokenFiles.ryan.body)
-    lookupProfile(name, zoneFileLookupURL)
+    await lookupProfile(name, zoneFileLookupURL)
       .then((profile) => {
         t.ok(profile, 'zonefile resolves to profile with zoneFileLookupUrl specified')
         t.equal(profile.name,

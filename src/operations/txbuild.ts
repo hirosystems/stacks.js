@@ -184,18 +184,16 @@ async function estimateUpdate(
 ): Promise<number> {
   const network = config.network
 
-  const updateTX = await makeUpdateSkeleton(
+  const updateTX = makeUpdateSkeleton(
     fullyQualifiedName, dummyConsensusHash, dummyZonefileHash
   )
 
-  return network.getFeeRate()
-    .then((feeRate) => {
-      const outputsValue = sumOutputValues(updateTX)
-      // 1 additional input for the owner
-      // 2 additional outputs for owner / payer change
-      const txFee = feeRate * estimateTXBytes(updateTX, 1 + paymentUtxos, 2)
-      return txFee + outputsValue
-    })
+  const feeRate = await network.getFeeRate()
+  const outputsValue = sumOutputValues(updateTX)
+  // 1 additional input for the owner
+  // 2 additional outputs for owner / payer change
+  const txFee = feeRate * estimateTXBytes(updateTX, 1 + paymentUtxos, 2)
+  return txFee + outputsValue
 }
 
 /**
@@ -219,18 +217,16 @@ async function estimateTransfer(
 ): Promise<number> {
   const network = config.network
 
-  const transferTX = await makeTransferSkeleton(
+  const transferTX = makeTransferSkeleton(
     fullyQualifiedName, dummyConsensusHash,
     destinationAddress)
 
-  return network.getFeeRate()
-    .then((feeRate) => {
-      const outputsValue = sumOutputValues(transferTX)
-      // 1 additional input for the owner
-      // 2 additional outputs for owner / payer change
-      const txFee = feeRate * estimateTXBytes(transferTX, 1 + paymentUtxos, 2)
-      return txFee + outputsValue
-    })
+  const feeRate = await network.getFeeRate()
+  const outputsValue = sumOutputValues(transferTX)
+  // 1 additional input for the owner
+  // 2 additional outputs for owner / payer change
+  const txFee = feeRate * estimateTXBytes(transferTX, 1 + paymentUtxos, 2)
+  return txFee + outputsValue
 }
 
 /**
@@ -506,27 +502,28 @@ function makePreorder(fullyQualifiedName: string,
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  return paymentKey.getAddress().then((preorderAddress) => {
-    const preorderPromise = Promise.all([network.getConsensusHash(),
-                                         network.getNamePrice(fullyQualifiedName),
-                                         network.getNamespaceBurnAddress(namespace)])
-      .then(([consensusHash, namePrice, burnAddress]) => makePreorderSkeleton(
-        fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
-        namePrice, destinationAddress
-      ))
+  const preorderAddress = paymentKey.getAddress()
 
-    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
-      .then(([utxos, feeRate, preorderSkeleton]) => {
-        const txB = TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
-        txB.setVersion(1)
 
-        const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
-        const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
+  const preorderPromise = Promise.all([network.getConsensusHash(),
+                                       network.getNamePrice(fullyQualifiedName),
+                                       network.getNamespaceBurnAddress(namespace)])
+    .then(([consensusHash, namePrice, burnAddress]) => makePreorderSkeleton(
+      fullyQualifiedName, consensusHash, preorderAddress, burnAddress,
+      namePrice, destinationAddress
+    ))
 
-        return signInputs(signingTxB, paymentKey)
-      })
-      .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
-  })
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
+    .then(([utxos, feeRate, preorderSkeleton]) => {
+      const txB = TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+      txB.setVersion(1)
+
+      const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
+      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
+
+      return signInputs(signingTxB, paymentKey)
+    })
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
 /**
@@ -571,7 +568,7 @@ async function makeUpdate(
         new Error('Need zonefile or valueHash arguments')
       )
     }
-    valueHash = (await hash160(Buffer.from(zonefile))).toString('hex')
+    valueHash = (hash160(Buffer.from(zonefile))).toString('hex')
   } else if (valueHash.length !== 40) {
     return Promise.reject(
       new Error(`Invalid valueHash ${valueHash}`)
@@ -637,7 +634,7 @@ async function makeRegister(
 ) {
   const network = config.network
   if (!valueHash && !!zonefile) {
-    valueHash = (await hash160(Buffer.from(zonefile))).toString('hex')
+    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   } else if (!!valueHash && valueHash.length !== 40) {
     return Promise.reject(
       new Error(`Invalid zonefile hash ${valueHash}`)
@@ -653,14 +650,14 @@ async function makeRegister(
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  return paymentKey.getAddress().then(
-    paymentAddress => Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
-      .then(([utxos, feeRate]) => {
-        const signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0)
+  const paymentAddress = paymentKey.getAddress()
 
-        return signInputs(signingTxB, paymentKey)
-      })
-  )
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const signingTxB = fundTransaction(txB, paymentAddress, utxos, feeRate, 0)
+
+      return signInputs(signingTxB, paymentKey)
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
@@ -802,7 +799,7 @@ async function makeRenewal(
   const network = config.network
 
   if (!valueHash && !!zonefile) {
-    valueHash = (await hash160(Buffer.from(zonefile))).toString('hex')
+    valueHash = hash160(Buffer.from(zonefile)).toString('hex')
   }
 
   const namespace = fullyQualifiedName.split('.').pop()
@@ -877,25 +874,24 @@ function makeNamespacePreorder(namespaceID: string,
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  return paymentKey.getAddress().then((preorderAddress) => {
-    const preorderPromise = Promise.all([network.getConsensusHash(),
-                                         network.getNamespacePrice(namespaceID)])
-      .then(([consensusHash, namespacePrice]) => makeNamespacePreorderSkeleton(
-        namespaceID, consensusHash, preorderAddress, revealAddress,
-        namespacePrice))
+  const preorderAddress = paymentKey.getAddress()
+  const preorderPromise = Promise.all([network.getConsensusHash(),
+                                       network.getNamespacePrice(namespaceID)])
+    .then(([consensusHash, namespacePrice]) => makeNamespacePreorderSkeleton(
+      namespaceID, consensusHash, preorderAddress, revealAddress,
+      namespacePrice))
 
-    return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
-      .then(([utxos, feeRate, preorderSkeleton]) => {
-        const txB = TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
-        txB.setVersion(1)
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate(), preorderPromise])
+    .then(([utxos, feeRate, preorderSkeleton]) => {
+      const txB = TransactionBuilder.fromTransaction(preorderSkeleton, network.layer1)
+      txB.setVersion(1)
 
-        const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
-        const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
+      const changeIndex = 1 // preorder skeleton always creates a change output at index = 1
+      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0, changeIndex)
 
-        return signInputs(signingTxB, paymentKey)
-      })
-      .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
-  })
+      return signInputs(signingTxB, paymentKey)
+    })
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
 
@@ -930,17 +926,16 @@ function makeNamespaceReveal(namespace: BlockstackNamespace,
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  return paymentKey.getAddress().then(
-    preorderAddress => Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
-      .then(([utxos, feeRate]) => {
-        const txB = TransactionBuilder
-          .fromTransaction(namespaceRevealTX, network.layer1)
-        txB.setVersion(1)
-        const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0)
+  const preorderAddress = paymentKey.getAddress()
+  return Promise.all([network.getUTXOs(preorderAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = TransactionBuilder
+        .fromTransaction(namespaceRevealTX, network.layer1)
+      txB.setVersion(1)
+      const signingTxB = fundTransaction(txB, preorderAddress, utxos, feeRate, 0)
 
-        return signInputs(signingTxB, paymentKey)
-      })
-  )
+      return signInputs(signingTxB, paymentKey)
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
@@ -968,15 +963,14 @@ function makeNamespaceReady(namespaceID: string,
 
   const revealKey = getTransactionSigner(revealKeyIn)
 
-  return revealKey.getAddress().then(
-    revealAddress => Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
-      .then(([utxos, feeRate]) => {
-        const txB = TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
-        txB.setVersion(1)
-        const signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0)
-        return signInputs(signingTxB, revealKey)
-      })
-  )
+  const revealAddress = revealKey.getAddress()
+  return Promise.all([network.getUTXOs(revealAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = TransactionBuilder.fromTransaction(namespaceReadyTX, network.layer1)
+      txB.setVersion(1)
+      const signingTxB = fundTransaction(txB, revealAddress, utxos, feeRate, 0)
+      return signInputs(signingTxB, revealKey)
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
@@ -1007,14 +1001,13 @@ function makeNameImport(name: string,
 
   const importerKey = getTransactionSigner(importerKeyIn)
 
-  return importerKey.getAddress().then(
-    importerAddress => Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
-      .then(([utxos, feeRate]) => {
-        const txB = TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
-        const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
-        return signInputs(signingTxB, importerKey)
-      })
-  )
+  const importerAddress = importerKey.getAddress()
+  return Promise.all([network.getUTXOs(importerAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = TransactionBuilder.fromTransaction(nameImportTX, network.layer1)
+      const signingTxB = fundTransaction(txB, importerAddress, utxos, feeRate, 0)
+      return signInputs(signingTxB, importerKey)
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
@@ -1043,14 +1036,13 @@ function makeAnnounce(messageHash: string,
 
   const senderKey = getTransactionSigner(senderKeyIn)
 
-  return senderKey.getAddress().then(
-    senderAddress => Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
-      .then(([utxos, feeRate]) => {
-        const txB = TransactionBuilder.fromTransaction(announceTX, network.layer1)
-        const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
-        return signInputs(signingTxB, senderKey)
-      })
-  )
+  const senderAddress = senderKey.getAddress()
+  return Promise.all([network.getUTXOs(senderAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = TransactionBuilder.fromTransaction(announceTX, network.layer1)
+      const signingTxB = fundTransaction(txB, senderAddress, utxos, feeRate, 0)
+      return signInputs(signingTxB, senderKey)
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
@@ -1153,51 +1145,51 @@ function makeBitcoinSpend(destinationAddress: string,
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
 
-  return paymentKey.getAddress().then(
-    paymentAddress => Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
-      .then(([utxos, feeRate]) => {
-        const txB = new TransactionBuilder(network.layer1)
-        txB.setVersion(1)
-        const destinationIndex = txB.addOutput(destinationAddress, 0)
+  const paymentAddress = paymentKey.getAddress()
 
-        // will add utxos up to _amount_ and return the amount of leftover _change_
-        let change
-        try {
-          change = addUTXOsToFund(txB, utxos, amount, feeRate, false)
-        } catch (err) {
-          if (err.name === 'NotEnoughFundsError') {
-            // actual amount funded = amount requested - remainder
-            amount -= err.leftToFund
-            change = 0
-          } else {
-            throw err
-          }
+  return Promise.all([network.getUTXOs(paymentAddress), network.getFeeRate()])
+    .then(([utxos, feeRate]) => {
+      const txB = new TransactionBuilder(network.layer1)
+      txB.setVersion(1)
+      const destinationIndex = txB.addOutput(destinationAddress, 0)
+
+      // will add utxos up to _amount_ and return the amount of leftover _change_
+      let change
+      try {
+        change = addUTXOsToFund(txB, utxos, amount, feeRate, false)
+      } catch (err) {
+        if (err.name === 'NotEnoughFundsError') {
+          // actual amount funded = amount requested - remainder
+          amount -= err.leftToFund
+          change = 0
+        } else {
+          throw err
         }
+      }
 
-        let feesToPay = feeRate * estimateTXBytes(txB, 0, 0)
-        const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - feesToPay
+      let feesToPay = feeRate * estimateTXBytes(txB, 0, 0)
+      const feeForChange = feeRate * (estimateTXBytes(txB, 0, 1)) - feesToPay
 
-        // it's worthwhile to add a change output
-        if (change > feeForChange) {
-          feesToPay += feeForChange
-          txB.addOutput(paymentAddress, change)
-        }
+      // it's worthwhile to add a change output
+      if (change > feeForChange) {
+        feesToPay += feeForChange
+        txB.addOutput(paymentAddress, change)
+      }
 
-        // now let's compute how much output is leftover once we pay the fees.
-        const outputAmount = amount - feesToPay
-        if (outputAmount < DUST_MINIMUM) {
-          throw new InvalidAmountError(feesToPay, amount)
-        }
+      // now let's compute how much output is leftover once we pay the fees.
+      const outputAmount = amount - feesToPay
+      if (outputAmount < DUST_MINIMUM) {
+        throw new InvalidAmountError(feesToPay, amount)
+      }
 
-        // we need to manually set the output values now
-        const txInner = getTransactionInsideBuilder(txB)
-        const txOut = txInner.outs[destinationIndex] as TxOutput
-        txOut.value = outputAmount
+      // we need to manually set the output values now
+      const txInner = getTransactionInsideBuilder(txB)
+      const txOut = txInner.outs[destinationIndex] as TxOutput
+      txOut.value = outputAmount
 
-        // ready to sign.
-        return signInputs(txB, paymentKey)
-      })
-  )
+      // ready to sign.
+      return signInputs(txB, paymentKey)
+    })
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 

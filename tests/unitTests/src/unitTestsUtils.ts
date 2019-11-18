@@ -6,7 +6,7 @@ import {
 } from '../../../src'
 
 export function runUtilsTests() {
-  test('makeECPrivateKey', async (t) => {
+  test('makeECPrivateKey', (t) => {
     t.plan(5)
 
     const entropy = getEntropy(32)
@@ -18,12 +18,12 @@ export function runUtilsTests() {
 
     const publicKey = SECP256K1Client.derivePublicKey(privateKey)
 
-    const address = await publicKeyToAddress(publicKey)
+    const address = publicKeyToAddress(publicKey)
     t.ok(address, 'Address should have been created')
     t.equal(typeof address, 'string', 'Address should be a string')
   })
 
-  test('ecPairToHexString', async (t) => {
+  test('ecPairToHexString', (t) => {
     t.plan(2)
 
     const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01'
@@ -32,7 +32,7 @@ export function runUtilsTests() {
     const computedECPair = hexStringToECPair(privateKey)
     t.equal(privateKey, ecPairToHexString(computedECPair), 'Should return same hex string')
 
-    t.equal(expectedAddress, await ecPairToAddress(computedECPair), 'Should parse to correct address')
+    t.equal(expectedAddress, ecPairToAddress(computedECPair), 'Should parse to correct address')
   })
 
   test('isLaterVersion', (t) => {

@@ -35,9 +35,9 @@ export class CreativeWork extends Profile {
   /**
    * @ignore
    */
-  static async fromToken(token: string, publicKeyOrAddress: string | null = null): 
-    Promise<CreativeWork> {
-    const profile = await extractProfile(token, publicKeyOrAddress)
+  static fromToken(token: string, publicKeyOrAddress: string | null = null): 
+    CreativeWork {
+    const profile = extractProfile(token, publicKeyOrAddress)
     return new CreativeWork(profile)
   }
 }
