@@ -129,8 +129,25 @@ export function makeUUID4() {
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
   try {
-    const parsedUri1 = new URL(uri1)
-    const parsedUri2 = new URL(uri2)
+    // The globally scoped WHATWG `URL` class is available in modern browsers and
+    // NodeJS v10 or higher. In older NodeJS versions it must be required from the
+    // `url` module.
+    let parseUrl: (url: string) => URL
+    if (typeof URL !== 'undefined') {
+      parseUrl = url => new URL(url)
+    } else {
+      try {
+        // eslint-disable-next-line import/no-nodejs-modules, global-require
+        const nodeUrl = (require('url') as typeof import('url')).URL
+        parseUrl = url => new nodeUrl(url)
+      } catch (error) {
+        console.log(error)
+        console.error('Global URL class is not available')
+      }
+    }
+
+    const parsedUri1 = parseUrl(uri1)
+    const parsedUri2 = parseUrl(uri2)
 
     const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
     const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
@@ -145,6 +162,8 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
 
     return match.scheme && match.hostname && match.port && match.absolute
   } catch (error) {
+    console.log(error)
+    console.log('Parsing error in same URL origin check')
     // Parse error
     return false
   }
