@@ -33,34 +33,25 @@ export function getAuthRequestFromURL() {
  * @private
  * @ignore 
  */
-export function fetchAppManifest(authRequest: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    if (!authRequest) {
-      reject('Invalid auth request')
-    } else {
-      const payload = decodeToken(authRequest).payload
-      if (typeof payload === 'string') {
-        throw new Error('Unexpected token payload type of string')
-      }  
-      const manifestURI = payload.manifest_uri as string
-      try {
-        Logger.debug(`Fetching manifest from ${manifestURI}`)
-        fetchPrivate(manifestURI)
-          .then(response => response.text())
-          .then(responseText => JSON.parse(responseText))
-          .then((responseJSON) => {
-            resolve({ ...responseJSON, manifestURI })
-          })
-          .catch((e) => {
-            Logger.debug(e.stack)
-            reject('Could not fetch manifest.json')
-          })
-      } catch (e) {
-        Logger.debug(e.stack)
-        reject('Could not fetch manifest.json')
-      }
-    }
-  })
+export async function fetchAppManifest(authRequest: string): Promise<any> {
+  if (!authRequest) {
+    throw new Error('Invalid auth request')
+  }
+  const payload = decodeToken(authRequest).payload
+  if (typeof payload === 'string') {
+    throw new Error('Unexpected token payload type of string')
+  }
+  const manifestURI = payload.manifest_uri as string
+  try {
+    Logger.debug(`Fetching manifest from ${manifestURI}`)
+    const response = await fetchPrivate(manifestURI)
+    const responseText = await response.text()
+    const responseJSON = JSON.parse(responseText)
+    return { ...responseJSON, manifestURI }
+  } catch (error) {
+    console.log(error)
+    throw new Error('Could not fetch manifest.json')
+  }
 }
 
 /**

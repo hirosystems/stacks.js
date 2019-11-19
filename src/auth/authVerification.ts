@@ -84,9 +84,9 @@ export function doPublicKeysMatchIssuer(token: string): boolean {
  * @private
  * @ignore 
  */
-export function doPublicKeysMatchUsername(token: string,
-                                          nameLookupURL: string) {
-  return Promise.resolve().then(() => {
+export async function doPublicKeysMatchUsername(token: string,
+                                                nameLookupURL: string): Promise<boolean> {
+  try {
     const payload = decodeToken(token).payload
     if (typeof payload === 'string') {
       throw new Error('Unexpected token payload type of string')
@@ -105,23 +105,25 @@ export function doPublicKeysMatchUsername(token: string,
 
     const username = payload.username
     const url = `${nameLookupURL.replace(/\/$/, '')}/${username}`
-    return fetchPrivate(url)
-      .then(response => response.text())
-      .then((responseText) => {
-        const responseJSON = JSON.parse(responseText)
-        if (responseJSON.hasOwnProperty('address')) {
-          const nameOwningAddress = responseJSON.address
-          const addressFromIssuer = getAddressFromDID(payload.iss)
-          if (nameOwningAddress === addressFromIssuer) {
-            return true
-          } else {
-            return false
-          }
-        } else {
-          return false
-        }
-      })
-  }).catch(() => false)
+    const response = await fetchPrivate(url)
+    const responseText = await response.text()
+    const responseJSON = JSON.parse(responseText)
+    if (responseJSON.hasOwnProperty('address')) {
+      const nameOwningAddress = responseJSON.address
+      const addressFromIssuer = getAddressFromDID(payload.iss)
+      if (nameOwningAddress === addressFromIssuer) {
+        return true
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  } catch (error) {
+    console.log(error)
+    console.log('Error checking `doPublicKeysMatchUsername`')
+    return false
+  }
 }
 
 /**
@@ -228,25 +230,19 @@ export function isRedirectUriValid(token: string) {
  * @private
  * @ignore 
  */
-export function verifyAuthRequest(token: string) {
-  return Promise.resolve().then(() => {
-    if (decodeToken(token).header.alg === 'none') {
-      throw new Error('Token must be signed in order to be verified')
-    }
-  }).then(() => Promise.all([
+export async function verifyAuthRequest(token: string): Promise<boolean> {
+  if (decodeToken(token).header.alg === 'none') {
+    throw new Error('Token must be signed in order to be verified')
+  }
+  const values = await Promise.all([
     isExpirationDateValid(token),
     isIssuanceDateValid(token),
     doSignaturesMatchPublicKeys(token),
     doPublicKeysMatchIssuer(token),
     isManifestUriValid(token),
     isRedirectUriValid(token)
-  ])).then((values) => {
-    if (values.every(Boolean)) {
-      return true
-    } else {
-      return false
-    }
-  })
+  ])
+  return values.every(val => val)
 }
 
 /**
@@ -258,15 +254,12 @@ export function verifyAuthRequest(token: string) {
  * @private
  * @ignore 
  */
-export function verifyAuthRequestAndLoadManifest(token: string) {
-  return Promise.resolve().then(() => verifyAuthRequest(token)
-    .then((valid) => {
-      if (valid) {
-        return fetchAppManifest(token)
-      } else {
-        return Promise.reject()
-      }
-    }))
+export async function verifyAuthRequestAndLoadManifest(token: string): Promise<any> {
+  const valid = await verifyAuthRequest(token)
+  if (!valid) {
+    throw new Error('Token is an invalid auth request')
+  }
+  return fetchAppManifest(token)
 }
 
 /**
@@ -278,18 +271,13 @@ export function verifyAuthRequestAndLoadManifest(token: string) {
  * @private
  * @ignore 
  */
-export function verifyAuthResponse(token: string, nameLookupURL: string) {
-  return Promise.all([
+export async function verifyAuthResponse(token: string, nameLookupURL: string): Promise<boolean> {
+  const values = await Promise.all([
     isExpirationDateValid(token),
     isIssuanceDateValid(token),
     doSignaturesMatchPublicKeys(token),
     doPublicKeysMatchIssuer(token),
     doPublicKeysMatchUsername(token, nameLookupURL)
-  ]).then((values) => {
-    if (values.every(Boolean)) {
-      return true
-    } else {
-      return false
-    }
-  })
+  ])
+  return values.every(val => val)
 }
