@@ -633,20 +633,26 @@ export async function putFile(
     const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
 
     try {
-      const fileUrls = await Promise.all([
+      const writeResponse = (await Promise.all([
         uploadToGaiaHub(path, contentData, gaiaHubConfig, contentType, etag),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, gaiaHubConfig, 'application/json', etag)
-      ])
-      return fileUrls[0]
+      ]))[0]
+      if (writeResponse.etag) {
+        etags[path] = writeResponse.etag
+      }
+      return writeResponse
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
-      const fileUrls = await Promise.all([
+      const writeResponse = (await Promise.all([
         uploadToGaiaHub(path, contentData, freshHubConfig, contentType, etag),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, freshHubConfig, 'application/json', etag)
-      ])
-      return fileUrls[0]
+      ]))[0]
+      if (writeResponse.etag) {
+        etags[path] = writeResponse.etag
+      }
+      return writeResponse
     }
   }
 
@@ -672,18 +678,18 @@ export async function putFile(
   }
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   try {
-    const result = await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType, etag)
-    if (result.etag) {
-      etags[path] = result.etag
+    const writeResponse = await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType, etag)
+    if (writeResponse.etag) {
+      etags[path] = writeResponse.etag
     }
-    return result
+    return writeResponse
   } catch (error) {
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const result = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType, etag)
-    if (result.etag) {
-      etags[path] = result.etag
+    const writeResponse = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType, etag)
+    if (writeResponse.etag) {
+      etags[path] = writeResponse.etag
     }
-    return result
+    return writeResponse
   }
 }
 

@@ -67,7 +67,14 @@ export async function uploadToGaiaHub(
   }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
-  return responseJSON.publicURL
+
+  // Old versions of Gaia respond with objects that include a `publicURL` field, while current
+  // versions response objects include `publicUrl` and `etag`
+  if (responseJSON.publicURL) {
+    return responseJSON.publicURL
+  } else {
+    return responseJSON
+  }
 }
 
 export async function deleteFromGaiaHub(
