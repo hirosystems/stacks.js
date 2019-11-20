@@ -10,14 +10,13 @@ module.exports = function (api) {
   let opts = {
     presets: [
       ["@babel/preset-env", {
-        "targets": {
-          "esmodules": true
+        "useBuiltIns": "usage",
+        "corejs": {
+          "version": 3
         }
       }]
     ],
     plugins: [
-      "@babel/proposal-class-properties",
-      "@babel/proposal-object-rest-spread"
     ]
   };
 
