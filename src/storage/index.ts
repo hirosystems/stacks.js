@@ -678,14 +678,18 @@ export async function putFile(
   }
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   try {
-    const writeResponse = await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType, etag)
+    const writeResponse = await uploadToGaiaHub(
+      path, contentForUpload, gaiaHubConfig, contentType, etag
+    )
     if (writeResponse.etag) {
       etags[path] = writeResponse.etag
     }
     return writeResponse
   } catch (error) {
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const writeResponse = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType, etag)
+    const writeResponse = await uploadToGaiaHub(
+      path, contentForUpload, freshHubConfig, contentType, etag
+    )
     if (writeResponse.etag) {
       etags[path] = writeResponse.etag
     }
