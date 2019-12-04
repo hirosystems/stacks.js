@@ -94,8 +94,12 @@ module.exports = (env, argv) => {
     plugins: [
       // BIP39 includes ~240KB of non-english json that we don't currently use.
       new webpack.IgnorePlugin(/\.\/wordlists\/(?!english\.json)/),
-      new webpack.IgnorePlugin(/crypto/),
-      new webpack.IgnorePlugin(/url/)
+
+      // Ignore require('crypto') because it has browser implementations.
+      new webpack.IgnorePlugin(/^crypto$/),
+
+      // Ignore require('url') because it is only needed in node.js.
+      new webpack.IgnorePlugin(/^url$/)
     ]
   }
 

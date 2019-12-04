@@ -12,7 +12,7 @@ const AUTH_CONTINUATION_PARAM = 'authContinuation'
 
 function getQueryStringParams(query: string): Record<string, string> {
   if (!query) {
-    return undefined
+    return {}
   }
   // Trim a starting `?` character if exists
   const trimmed = /^[?#]/.test(query) ? query.slice(1) : query
