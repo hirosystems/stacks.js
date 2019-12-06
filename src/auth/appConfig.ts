@@ -77,13 +77,7 @@ export class AppConfig {
     this.scopes = scopes
     this.redirectPath = redirectPath
     this.manifestPath = manifestPath
-
-    if (!coreNode) {
-      this.coreNode = DEFAULT_CORE_NODE
-    } else {
-      this.coreNode = coreNode
-    }
-
+    this.coreNode = coreNode
     this.authenticatorURL = authenticatorURL
   }
 

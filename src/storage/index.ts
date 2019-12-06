@@ -15,12 +15,13 @@ import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
-  SignatureVerificationError
+  SignatureVerificationError,
+  DoesNotExist
 } from '../errors'
-import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
-import { getGlobalObject } from '../utils'
+import { NAME_LOOKUP_PATH } from '../auth/authConstants'
+import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -153,10 +154,10 @@ async function getGaiaAddress(
   app: string, username?: string, zoneFileLookupURL?: string,
   caller?: UserSession
 ): Promise<string> {
-  const opts = normalizeOptions({ app, username }, caller)
+  const opts = normalizeOptions({ app, username, zoneFileLookupURL }, caller)
   let fileUrl: string
   if (username) {
-    fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, zoneFileLookupURL)
+    fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
     if (!caller) {
       caller = new UserSession()
@@ -181,18 +182,34 @@ async function getGaiaAddress(
 function normalizeOptions<T>(
   options?: {
     app?: string, 
-    username?: string
+    username?: string,
+    zoneFileLookupURL?: string
   } & T,
   caller?: UserSession
 ) {
   const opts = Object.assign({}, options)
   if (opts.username) {
     if (!opts.app) {
-      const appConfig = (caller || new UserSession()).appConfig
-      if (!appConfig) {
+      caller = caller || new UserSession()
+      if (!caller.appConfig) {
         throw new InvalidStateError('Missing AppConfig')
       }
-      opts.app = appConfig.appDomain
+      opts.app = caller.appConfig.appDomain
+    }
+    if (!opts.zoneFileLookupURL) {
+      caller = caller || new UserSession()
+      if (!caller.appConfig) {
+        throw new InvalidStateError('Missing AppConfig')
+      }
+      if (!caller.store) {
+        throw new InvalidStateError('Missing store UserSession')
+      }
+      const sessionData = caller.store.getSessionData()
+      // Use the user specified coreNode if available, otherwise use the app specified coreNode. 
+      const configuredCoreNode = sessionData.userData.coreNode || caller.appConfig.coreNode
+      if (configuredCoreNode) {
+        opts.zoneFileLookupURL = `${configuredCoreNode}${NAME_LOOKUP_PATH}`
+      }
     }
   }
   return opts
@@ -232,34 +249,24 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-function getFileContents(path: string, app: string, username: string | undefined, 
-                         zoneFileLookupURL: string | undefined,
-                         forceText: boolean,
-                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  return Promise.resolve()
-    .then(() => {
-      const opts = { app, username, zoneFileLookupURL }
-      return getFileUrl(path, opts, caller)
-    })
-    .then(readUrl => fetchPrivate(readUrl))
-    .then<string | ArrayBuffer | null>((response) => {
-      if (response.status !== 200) {
-        if (response.status === 404) {
-          Logger.debug(`getFile ${path} returned 404, returning null`)
-          return null
-        } else {
-          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
-        }
-      }
-      const contentType = response.headers.get('Content-Type')
-      if (forceText || contentType === null
-          || contentType.startsWith('text')
-          || contentType === 'application/json') {
-        return response.text()
-      } else {
-        return response.arrayBuffer()
-      }
-    })
+async function getFileContents(path: string, app: string, username: string | undefined, 
+                               zoneFileLookupURL: string | undefined,
+                               forceText: boolean,
+                               caller?: UserSession): Promise<string | ArrayBuffer | null> {
+  const opts = { app, username, zoneFileLookupURL }
+  const readUrl = await getFileUrl(path, opts, caller)
+  const response = await fetchPrivate(readUrl)
+  if (!response.ok) {
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
+  }
+  const contentType = response.headers.get('Content-Type')
+  if (forceText || contentType === null
+    || contentType.startsWith('text')
+    || contentType === 'application/json') {
+    return response.text()
+  } else {
+    return response.arrayBuffer()
+  }
 }
 
 /* Handle fetching an unencrypted file, its associated signature
@@ -268,14 +275,15 @@ function getFileContents(path: string, app: string, username: string | undefined
  * @private
  * @ignore
  */
-function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
+async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
+  const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
   return Promise.all(
     [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
-     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+     getFileContents(sigPath, opt.app, opt.username,
                      opt.zoneFileLookupURL, true, caller),
      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
@@ -318,9 +326,16 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
       } else {
         return fileContents
       }
+    }).catch((err) => {
+      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
+      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
+        throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+      } else {
+        throw err
+      }
     })
 }
-
 
 /* Handle signature verification and decryption for contents which are
  *  expected to be signed and encrypted. This works for single and
@@ -330,8 +345,9 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
  * @ignore
  */
 function handleSignedEncryptedContents(caller: UserSession, path: string, storedContents: string,
-                                       app: string, username?: string, zoneFileLookupURL?: string) {
-  const appPrivateKey = caller.loadUserData().appPrivateKey
+                                       app: string, privateKey?: string, username?: string, 
+                                       zoneFileLookupURL?: string) {
+  const appPrivateKey = privateKey || caller.loadUserData().appPrivateKey
   const appPublicKey = getPublicKeyFromPrivate(appPrivateKey)
 
   let addressPromise: Promise<string>
@@ -375,6 +391,9 @@ function handleSignedEncryptedContents(caller: UserSession, path: string, stored
     } else if (!verifyECDSA(cipherText, signerPublicKey, signature)) {
       throw new SignatureVerificationError('Contents do not match ECDSA signature in file:'
                                            + ` ${path}`)
+    } else if (typeof (privateKey) === 'string') {
+      const decryptOpt = { privateKey }
+      return caller.decryptContent(cipherText, decryptOpt)
     } else {
       return caller.decryptContent(cipherText)
     }
@@ -405,10 +424,11 @@ export interface GetFileUrlOptions {
  */
 export interface GetFileOptions extends GetFileUrlOptions {
   /**
-   * Try to decrypt the data with the app private key.
+  * Try to decrypt the data with the app private key. 
+  * If a string is specified, it is used as the private key. 
    * @default true
    */
-  decrypt?: boolean;
+  decrypt?: boolean | string;
   /**
    * Whether the content should be verified, only to be used 
    * when [[UserSession.putFile]] was set to `sign = true`.
@@ -423,7 +443,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(
+export async function getFile(
   path: string, 
   options?: GetFileOptions,
   caller?: UserSession
@@ -455,13 +475,23 @@ export function getFile(
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
-        return caller.decryptContent(storedContents)
+        if (typeof (opt.decrypt) === 'string') {
+          const decryptOpt = { privateKey: opt.decrypt }
+          return caller.decryptContent(storedContents, decryptOpt)
+        } else {
+          return caller.decryptContent(storedContents)
+        }
       } else if (opt.decrypt && opt.verify) {
         if (typeof storedContents !== 'string') {
           throw new Error('Expected to get back a string for the cipherText')
         }
+        let decryptionKey
+        if (typeof (opt.decrypt) === 'string') {
+          decryptionKey = opt.decrypt
+        }
         return handleSignedEncryptedContents(caller, path, storedContents,
-                                             opt.app, opt.username, opt.zoneFileLookupURL)
+                                             opt.app, decryptionKey, opt.username, 
+                                             opt.zoneFileLookupURL)
       } else if (!opt.verify && !opt.decrypt) {
         return storedContents
       } else {
@@ -730,7 +760,7 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      throw new Error(`listFiles failed with HTTP status ${response.status}`)
+      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.')
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
@@ -779,7 +809,9 @@ async function listFilesLoop(
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
+ * @return {Promise} that resolves to the total number of listed files. 
+ * If the call is ended early by the callback, the last file is excluded. 
+ * If an error occurs the entire call is rejected.
  */
 export function listFiles(
   callback: (name: string) => boolean,

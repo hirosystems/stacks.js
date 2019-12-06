@@ -4,6 +4,7 @@
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "unpkg": "dist/blockstack.js",
+  "jsdelivr": "dist/blockstack.js",
   "scripts": {
     "build": "npm run build:node && npm run build:webpack && npm run build-documentation",
     "build:webpack": "shx rm -rf dist/* && cross-env NODE_ENV=production webpack --mode=production",
@@ -113,6 +114,7 @@
     "nyc": "^14.1.1",
     "opn": "^4.0.2",
     "proxyquire": "^2.1.0",
+    "semver": "^6.3.0",
     "shx": "^0.3.2",
     "sinon": "^7.2.7",
     "source-map-loader": "^0.2.4",

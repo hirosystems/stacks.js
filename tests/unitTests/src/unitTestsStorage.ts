@@ -13,9 +13,9 @@ import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../sr
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
+import { DoesNotExist } from '../../../src/errors'
 import * as util from 'util'
 import * as jsdom from 'jsdom'
-
 
 // class LocalStorage {
 //   constructor() {
@@ -208,6 +208,69 @@ export function runStorageTests() {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(<string>file), fileContent)
       })
+  })
+
+  test('core node preferences respected for name lookups', async (t) => {
+    FetchMock.restore()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'https://gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:8080')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const defaultCoreNode = 'https://core.blockstack.org'
+    const appSpecifiedCoreNode = 'https://app-specified-core-node.local'
+    const userSpecifiedCoreNode = 'https://user-specified-core-node.local'
+
+    const nameLookupPath = '/v1/names/yukan.id'
+
+    const options = {
+      username: 'yukan.id',
+      app: 'http://localhost:8080',
+      decrypt: false
+    }
+
+    await new Promise((resolve) => {
+      FetchMock.get(defaultCoreNode + nameLookupPath, () => {
+        resolve()
+        return '_'
+      })
+      getFile(path, options, blockstack).catch(() => {})
+    })
+    t.pass('default core node used for name lookup')
+    FetchMock.restore()
+
+
+    blockstack.appConfig.coreNode = appSpecifiedCoreNode
+    await new Promise((resolve) => {
+      FetchMock.get(appSpecifiedCoreNode + nameLookupPath, () => {
+        resolve()
+        return '_'
+      })
+      getFile(path, options, blockstack).catch(() => {})
+    })
+    t.pass('app specified core node used for name lookup')
+    FetchMock.restore()
+
+
+    blockstack.store.getSessionData().userData.coreNode = userSpecifiedCoreNode
+    await new Promise((resolve) => {
+      FetchMock.get(userSpecifiedCoreNode + nameLookupPath, () => {
+        resolve()
+        return '_'
+      })
+      getFile(path, options, blockstack).catch(() => {})
+    })
+    t.pass('user specified core node used for name lookup')
+    FetchMock.restore()
   })
 
   test('getFile unencrypted, unsigned - multi-reader', (t) => {
@@ -794,7 +857,7 @@ export function runStorageTests() {
 
     FetchMock.get(fullReadUrl, blockstack.encryptContent(fileContent))
     const encryptOptions = { encrypt: publicKey }
-    const decryptOptions = { decrypt: true }
+    const decryptOptions = { decrypt: privateKey }
     // put and encrypt the file
     putFile(path, fileContent, encryptOptions, blockstack)
       .then((publicURL) => {
@@ -1164,8 +1227,8 @@ export function runStorageTests() {
         'UserSession.getFileUrl should return correct url'))
   })
 
-  test('fetch404null', (t) => {
-    t.plan(2)
+  test('getFile throw on 404', (t) => {
+    t.plan(4)
     const config = {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
       url_prefix: 'gaia.testblockstack.org/hub/',
@@ -1186,12 +1249,18 @@ export function runStorageTests() {
 
     const optionsNoDecrypt = { decrypt: false }
     getFile('foo.json', optionsNoDecrypt, blockstack)
-      .then(x => t.equal(x, null, '404 should return null'))
+      .then(() => t.fail('getFile (no decrypt) with 404 should fail'))
+      .catch(() => t.pass('getFile (no decrypt) with 404 should fail'))
 
     const optionsDecrypt = { decrypt: true }
     getFile('foo.json', optionsDecrypt, blockstack)
-      .then(x => t.equal(x, null, '404 should return null, even if we try to decrypt'))
-  })
+      .then(() => t.fail('getFile (decrypt) with 404 should fail'))
+      .catch((err) => {
+        t.ok(err instanceof DoesNotExist, "DoesNotExist error thrown")
+        t.equal(err.hubError.statusCode, 404)
+        t.equal(err.hubError.statusText, 'Not Found')
+      })
+})
 
   test('uploadToGaiaHub', (t) => {
     t.plan(2)
