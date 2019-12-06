@@ -12,7 +12,8 @@ import { fetchPrivate } from '../fetchUtil'
  * blockstack.js [[getNameInfo]] function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(username: string, zoneFileLookupURL?: string): Promise<any> {
+export function lookupProfile(username: string, zoneFileLookupURL?: string): 
+  Promise<Record<string, any>> {
   if (!username) {
     return Promise.reject()
   }

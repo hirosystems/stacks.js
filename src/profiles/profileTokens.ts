@@ -1,9 +1,8 @@
 import { ECPair } from 'bitcoinjs-lib'
-
-// @ts-ignore: Could not find a declaration file for module
 import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens'
-
-import { nextYear, makeUUID4, ecPairToAddress } from '../utils'
+import { TokenInterface } from 'jsontokens/lib/decode'
+import { nextYear, makeUUID4 } from '../utils'
+import { ecPairToAddress } from '../keys'
 
 /**
   * Signs a profile token
@@ -23,7 +22,7 @@ export function signProfileToken(profile: any,
                                  issuer?: any,
                                  signingAlgorithm = 'ES256K',
                                  issuedAt = new Date(),
-                                 expiresAt = nextYear()) {
+                                 expiresAt = nextYear()): string {
   if (signingAlgorithm !== 'ES256K') {
     throw new Error('Signing algorithm not supported')
   }
@@ -72,7 +71,8 @@ export function wrapProfileToken(token: string) {
   * @returns {Object} - the verified, decoded profile token
   * @throws {Error} - throws an error if token verification fails
   */
-export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
+export function verifyProfileToken(token: string, publicKeyOrAddress: string): 
+  TokenInterface {
   const decodedToken = decodeToken(token)
   const payload = decodedToken.payload
   if (typeof payload === 'string') {
@@ -102,7 +102,8 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
     throw new Error('Token doesn\'t have a claim')
   }
 
-  const issuerPublicKey = payload.issuer.publicKey
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const issuerPublicKey = (payload.issuer as Record<string, string>).publicKey as string
   const publicKeyBuffer = Buffer.from(issuerPublicKey, 'hex')
 
   const compressedKeyPair =  ECPair.fromPublicKey(publicKeyBuffer, { compressed: true })
@@ -142,7 +143,8 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string) {
   * @returns {Object} - the profile extracted from the encoded token
   * @throws {Error} - if the token isn't signed by the provided `publicKeyOrAddress`
   */
-export function extractProfile(token: string, publicKeyOrAddress: string | null = null) {
+export function extractProfile(token: string, publicKeyOrAddress: string | null = null): 
+  Record<string, any> {
   let decodedToken
   if (publicKeyOrAddress) {
     decodedToken = verifyProfileToken(token, publicKeyOrAddress)

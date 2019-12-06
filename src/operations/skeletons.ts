@@ -1,8 +1,7 @@
 
 
-import { TransactionBuilder, payments, address as bjsAddress } from 'bitcoinjs-lib'
-// @ts-ignore
-import * as BN from 'bn.js'
+import { TransactionBuilder, payments, address as bjsAddress, Transaction } from 'bitcoinjs-lib'
+import { BN, BNConstructor } from '../bn'
 import {
   decodeB40, hash160, hash128, DUST_MINIMUM
 } from './utils'
@@ -145,7 +144,7 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
   // the "units" of a v1 amount type are always 'BTC'
   if (typeof amount === 'number') {
-    return { units: 'BTC', amount: new BN(String(amount)) }
+    return { units: 'BTC', amount: new BNConstructor(String(amount)) }
   } else {
     return { units: amount.units, amount: amount.amount }
   }
@@ -179,7 +178,7 @@ export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash: string, preorderAddress: string,
   burnAddress: string, burn: AmountType,
   registerAddress: string = null
-) {
+): Transaction {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -390,7 +389,7 @@ export function makeRenewalSkeleton(
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
   keepZonefile: boolean = false
-) {
+): Transaction {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -437,7 +436,7 @@ export function makeTransferSkeleton(
 */
 export function makeUpdateSkeleton(
   fullyQualifiedName: string, consensusHash: string, valueHash: string
-) {
+): Transaction {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -519,7 +518,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash: string, preorderAddress: string,
   registerAddress: string, burn: AmountType
-) {
+): Transaction {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*

@@ -1,7 +1,3 @@
-
-import * as url from 'url'
-import { ECPair, address, crypto } from 'bitcoinjs-lib'
-import { config } from './config'
 import { Logger } from './logger'
 import { 
   BadPathError, 
@@ -107,53 +103,6 @@ export function isLaterVersion(v1: string, v2: string) {
 }
 
 /**
- * Time
- * @private
- * @ignore
- */
-export function hexStringToECPair(skHex: string): ECPair.ECPairInterface {
-  const ecPairOptions = {
-    network: config.network.layer1,
-    compressed: true
-  }
-
-  if (skHex.length === 66) {
-    if (skHex.slice(64) !== '01') {
-      throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
-                      + 'indicates compressed key, but last byte must be == 1')
-    }
-    return ECPair.fromPrivateKey(Buffer.from(skHex.slice(0, 64), 'hex'), ecPairOptions)
-  } else if (skHex.length === 64) {
-    ecPairOptions.compressed = false
-    return ECPair.fromPrivateKey(Buffer.from(skHex, 'hex'), ecPairOptions)
-  } else {
-    throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.')
-  }
-}
-
-/**
- * 
- * @ignore
- */
-export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
-  const ecPointHex = secretKey.privateKey.toString('hex')
-  if (secretKey.compressed) {
-    return `${ecPointHex}01`
-  } else {
-    return ecPointHex
-  }
-}
-
-/**
- * Time
- * @private
- * @ignore
- */
-export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
-}
-
-/**
  * UUIDs
  * @private
  * @ignore
@@ -179,21 +128,45 @@ export function makeUUID4() {
  * @ignore
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
-  const parsedUri1 = url.parse(uri1)
-  const parsedUri2 = url.parse(uri2)
+  try {
+    // The globally scoped WHATWG `URL` class is available in modern browsers and
+    // NodeJS v10 or higher. In older NodeJS versions it must be required from the
+    // `url` module.
+    let parseUrl: (url: string) => URL
+    if (typeof URL !== 'undefined') {
+      parseUrl = url => new URL(url)
+    } else {
+      try {
+        // eslint-disable-next-line import/no-nodejs-modules, global-require
+        const nodeUrl = (require('url') as typeof import('url')).URL
+        parseUrl = url => new nodeUrl(url)
+      } catch (error) {
+        console.log(error)
+        console.error('Global URL class is not available')
+      }
+    }
 
-  const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
-  const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
+    const parsedUri1 = parseUrl(uri1)
+    const parsedUri2 = parseUrl(uri2)
 
-  const match = {
-    scheme: parsedUri1.protocol === parsedUri2.protocol,
-    hostname: parsedUri1.hostname === parsedUri2.hostname,
-    port: port1 === port2,
-    absolute: (uri1.includes('http://') || uri1.includes('https://'))
-    && (uri2.includes('http://') || uri2.includes('https://'))
+    const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
+    const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
+
+    const match = {
+      scheme: parsedUri1.protocol === parsedUri2.protocol,
+      hostname: parsedUri1.hostname === parsedUri2.hostname,
+      port: port1 === port2,
+      absolute: (uri1.includes('http://') || uri1.includes('https://'))
+      && (uri2.includes('http://') || uri2.includes('https://'))
+    }
+
+    return match.scheme && match.hostname && match.port && match.absolute
+  } catch (error) {
+    console.log(error)
+    console.log('Parsing error in same URL origin check')
+    // Parse error
+    return false
   }
-
-  return match.scheme && match.hostname && match.port && match.absolute
 }
 
 /**
@@ -205,8 +178,9 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
  * 
  * This could be switched to `globalThis` once it is standardized and widely available. 
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+ * @ignore
  */
-function getGlobalScope(): Window {
+export function getGlobalScope(): Window {
   if (typeof self !== 'undefined') {
     return self
   }
@@ -284,7 +258,7 @@ export function getGlobalObject<K extends Extract<keyof Window, string>>(
     throw new Error(errMsg)
   }
   if (returnEmptyObject) { 
-    return {}
+    return {} as any
   }
   return undefined
 }
@@ -328,7 +302,7 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
           Logger.error(errMsg)
           throw new Error(errMsg)
         } else if (returnEmptyObject) {
-          result[name] = {}
+          result[name] = {} as any
         }
       }
     } catch (error) {

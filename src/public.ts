@@ -24,13 +24,13 @@ export {
 } from './dids'
 
 export {
-  getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate
+  getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate,
+  hexStringToECPair, ecPairToHexString, ecPairToAddress
 } from './keys'
 
 export {
   nextYear, nextMonth, nextHour, makeUUID4, updateQueryStringParameter,
-  isLaterVersion, isSameOriginAbsoluteUrl, hexStringToECPair, ecPairToHexString,
-  ecPairToAddress
+  isLaterVersion, isSameOriginAbsoluteUrl
 } from './utils'
 
 export {
@@ -42,7 +42,6 @@ export { BlockstackWallet, IdentityKeyPair } from './wallet'
 
 export { network } from './network'
 
-// @ts-ignore: Could not find a declaration file for module
 export { decodeToken } from 'jsontokens'
 
 export { config } from './config'

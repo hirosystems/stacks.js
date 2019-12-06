@@ -30,7 +30,8 @@ export class Organization extends Profile {
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
+  static fromToken(token: string, publicKeyOrAddress: string | null = null): 
+    Organization {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new Organization(profile)
   }

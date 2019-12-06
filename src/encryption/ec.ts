@@ -1,10 +1,11 @@
-
 import { ec as EllipticCurve } from 'elliptic'
-// @ts-ignore
-import * as BN from 'bn.js'
-import * as crypto from 'crypto'
+import { BN } from '../bn'
+import { randomBytes } from './cryptoRandom'
 import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
+import { hashSha256Sync, hashSha512Sync } from './sha2Hash'
+import { createHmacSha256 } from './hmacSha256'
+import { createCipher } from './aesCipher'
 
 const ecurve = new EllipticCurve('secp256k1')
 
@@ -22,24 +23,27 @@ export type CipherObject = {
 /**
 * @ignore
 */
-function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer) {
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
-  return Buffer.concat([cipher.update(plaintext), cipher.final()])
+async function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer): Promise<Buffer> {
+  const cipher = await createCipher()
+  const result = await cipher.encrypt('aes-256-cbc', key, iv, plaintext)
+  return result
 }
 
 /**
 * @ignore
 */
-function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer) {
-  const cipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
-  return Buffer.concat([cipher.update(ciphertext), cipher.final()])
+async function aes256CbcDecrypt(iv: Buffer, key: Buffer, ciphertext: Buffer): Promise<Buffer> {
+  const cipher = await createCipher()
+  const result = await cipher.decrypt('aes-256-cbc', key, iv, ciphertext)
+  return result
 }
 
 /**
 * @ignore
 */
-function hmacSha256(key: Buffer, content: Buffer) {
-  return crypto.createHmac('sha256', key).update(content).digest()
+async function hmacSha256(key: Buffer, content: Buffer) {
+  const hmacSha256 = await createHmacSha256()
+  return hmacSha256.digest(key, content)
 }
 
 /**
@@ -59,9 +63,9 @@ function equalConstTime(b1: Buffer, b2: Buffer) {
 /**
 * @ignore
 */
-function sharedSecretToKeys(sharedSecret: Buffer) {
+function sharedSecretToKeys(sharedSecret: Buffer): { encryptionKey: Buffer; hmacKey: Buffer; } {
   // generate mac and encryption key from shared secret
-  const hashedSecret = crypto.createHash('sha512').update(sharedSecret).digest()
+  const hashedSecret = hashSha512Sync(sharedSecret)
   return {
     encryptionKey: hashedSecret.slice(0, 32),
     hmacKey: hashedSecret.slice(32)
@@ -98,7 +102,8 @@ export function getHexFromBN(bnInput: BN) {
  * @private
  * @ignore
  */
-export function encryptECIES(publicKey: string, content: string | Buffer): CipherObject {
+export async function encryptECIES(publicKey: string, content: string | Buffer): 
+  Promise<CipherObject> {
   const isString = (typeof (content) === 'string')
   // always copy to buffer
   const plainText = content instanceof Buffer ? Buffer.from(content) : Buffer.from(content)
@@ -114,20 +119,20 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
     Buffer.from(sharedSecretHex, 'hex')
   )
 
-  const initializationVector = crypto.randomBytes(16)
+  const initializationVector = randomBytes(16)
 
-  const cipherText = aes256CbcEncrypt(
+  const cipherText = await aes256CbcEncrypt(
     initializationVector, sharedKeys.encryptionKey, plainText
   )
 
   const macData = Buffer.concat([initializationVector,
-                                 Buffer.from(ephemeralPK.encode('array', true) as Buffer),
+                                 Buffer.from(ephemeralPK.encode('array', true)),
                                  cipherText])
-  const mac = hmacSha256(sharedKeys.hmacKey, macData)
+  const mac = await hmacSha256(sharedKeys.hmacKey, macData)
 
   return {
     iv: initializationVector.toString('hex'),
-    ephemeralPK: ephemeralPK.encode('hex', true) as string,
+    ephemeralPK: ephemeralPK.encode('hex', true),
     cipherText: cipherText.toString('hex'),
     mac: mac.toString('hex'),
     wasString: isString
@@ -146,7 +151,8 @@ export function encryptECIES(publicKey: string, content: string | Buffer): Ciphe
  * @private
  * @ignore
  */
-export function decryptECIES(privateKey: string, cipherObject: CipherObject): Buffer | string {
+export async function decryptECIES(privateKey: string, cipherObject: CipherObject): 
+  Promise<Buffer | string> {
   const ecSK = ecurve.keyFromPrivate(privateKey, 'hex')
   let ephemeralPK = null
   try {
@@ -165,14 +171,14 @@ export function decryptECIES(privateKey: string, cipherObject: CipherObject): Bu
   const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
 
   const macData = Buffer.concat([ivBuffer,
-                                 Buffer.from(ephemeralPK.encode('array', true) as Buffer),
+                                 Buffer.from(ephemeralPK.encode('array', true)),
                                  cipherTextBuffer])
-  const actualMac = hmacSha256(sharedKeys.hmacKey, macData)
+  const actualMac = await hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = Buffer.from(cipherObject.mac, 'hex')
   if (!equalConstTime(expectedMac, actualMac)) {
     throw new FailedDecryptionError('Decryption failed: failure in MAC check')
   }
-  const plainText = aes256CbcDecrypt(
+  const plainText = await aes256CbcDecrypt(
     ivBuffer, sharedKeys.encryptionKey, cipherTextBuffer
   )
 
@@ -200,7 +206,7 @@ export function signECDSA(privateKey: string, content: string | Buffer): {
   const contentBuffer = content instanceof Buffer ? content : Buffer.from(content)
   const ecPrivate = ecurve.keyFromPrivate(privateKey, 'hex')
   const publicKey = getPublicKeyFromPrivate(privateKey)
-  const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()
+  const contentHash = hashSha256Sync(contentBuffer)
   const signature = ecPrivate.sign(contentHash)
   const signatureString = signature.toDER('hex')
 
@@ -228,12 +234,13 @@ function getBuffer(content: string | ArrayBuffer | Buffer) {
  * @private
  * @ignore
  */
-export function verifyECDSA(content: string | ArrayBuffer | Buffer,
-                            publicKey: string,
-                            signature: string) {
+export function verifyECDSA(
+  content: string | ArrayBuffer | Buffer,
+  publicKey: string,
+  signature: string): boolean {
   const contentBuffer = getBuffer(content)
   const ecPublic = ecurve.keyFromPublic(publicKey, 'hex')
-  const contentHash = crypto.createHash('sha256').update(contentBuffer).digest()
+  const contentHash = hashSha256Sync(contentBuffer)
 
   return ecPublic.verify(contentHash, <any>signature)
 }

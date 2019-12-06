@@ -35,7 +35,8 @@ export class CreativeWork extends Profile {
   /**
    * @ignore
    */
-  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
+  static fromToken(token: string, publicKeyOrAddress: string | null = null): 
+    CreativeWork {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new CreativeWork(profile)
   }
