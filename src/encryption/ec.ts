@@ -16,6 +16,8 @@ export type CipherObject = {
   iv: string,
   ephemeralPK: string,
   cipherText: string,
+  /** If undefined then (legacy) hex encoding is used for the `cipherText` string. */
+  cipherEncoding?: 'b64'
   mac: string,
   wasString: boolean
 }
@@ -91,6 +93,45 @@ export function getHexFromBN(bnInput: BN) {
 }
 
 /**
+ * @ignore
+ */
+export function eciesGetJsonByteLength(contentLength: number, wasString: boolean, cipherEncoding?: 'hex' | 'b64'): number {
+  // Placeholder structure of the ciphertext payload in order to determine the 
+  // stringified JSON length. 
+  const payloadShell: CipherObject = {
+    iv: '', 
+    ephemeralPK: '',
+    mac: '',
+    cipherText: '',
+    wasString,
+  }
+
+  // AES has a fixed block size of 16-bytes regardless key size, and CBC block mode 
+  // rounds up to the next block size. 
+  const cipherTextBufferLength = (Math.floor(contentLength / 16) + 1) * 16
+  let encodedCipherTextLength: number
+  if (cipherEncoding === 'b64') {
+    payloadShell.cipherEncoding = 'b64'
+    // Calculate base64 encoded length
+    encodedCipherTextLength = (Math.ceil(cipherTextBufferLength / 3) * 4)
+  } else {
+    // Hex encoded length
+    encodedCipherTextLength = (cipherTextBufferLength * 2)
+  }
+  // Get the JSON payload wrapper stringified length.
+  const jsonShellLength = JSON.stringify(payloadShell).length
+  // Hex encoded 16 byte buffer.
+  const ivLength = 32
+  // Hex encoded, compressed EC pubkey of 33 bytes
+  const ephemeralPKLength = 66
+  // Hex encoded 32 byte hmac-sha256
+  const macLength = 64
+
+  // Add the length of the JSON structure and expected length of the values.
+  return jsonShellLength + encodedCipherTextLength + ivLength + ephemeralPKLength + macLength
+}
+
+/**
  * Encrypt content to elliptic curve publicKey using ECIES
  * @param {String} publicKey - secp256k1 public key hex string
  * @param {String | Buffer} content - content to encrypt
@@ -102,12 +143,8 @@ export function getHexFromBN(bnInput: BN) {
  * @private
  * @ignore
  */
-export async function encryptECIES(publicKey: string, content: string | Buffer): 
+export async function encryptECIES(publicKey: string, content: Buffer, wasString: boolean): 
   Promise<CipherObject> {
-  const isString = (typeof (content) === 'string')
-  // always copy to buffer
-  const plainText = content instanceof Buffer ? Buffer.from(content) : Buffer.from(content)
-
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
   const ephemeralPK = ephemeralSK.getPublic()
@@ -122,7 +159,7 @@ export async function encryptECIES(publicKey: string, content: string | Buffer):
   const initializationVector = randomBytes(16)
 
   const cipherText = await aes256CbcEncrypt(
-    initializationVector, sharedKeys.encryptionKey, plainText
+    initializationVector, sharedKeys.encryptionKey, content
   )
 
   const macData = Buffer.concat([initializationVector,
@@ -130,13 +167,22 @@ export async function encryptECIES(publicKey: string, content: string | Buffer):
                                  cipherText])
   const mac = await hmacSha256(sharedKeys.hmacKey, macData)
 
-  return {
+  const USE_LEGACY_CIPHER_ENCODING = true
+  const cipherTextString = USE_LEGACY_CIPHER_ENCODING 
+    ? cipherText.toString('hex') 
+    : cipherText.toString('base64')
+  
+  const result: CipherObject = {
     iv: initializationVector.toString('hex'),
     ephemeralPK: ephemeralPK.encode('hex', true),
-    cipherText: cipherText.toString('hex'),
+    cipherText: cipherTextString,
     mac: mac.toString('hex'),
-    wasString: isString
+    wasString
   }
+  if (!USE_LEGACY_CIPHER_ENCODING) {
+    result.cipherEncoding = 'b64'
+  }
+  return result
 }
 
 /**

@@ -29,6 +29,9 @@ To securely use the latest distribution of blockstack.js from a CDN, use the fol
 ```
 <!-- cdnstop -->
 
+_Note: this is script is bundled as standalone (UMD) lib, targeting ES6 (ECMAScript 2015)._
+
+
 
 ## About
 
@@ -48,6 +51,8 @@ The profiles/identity portion of this library can be used to:
 The storage portion of this library can be used to:
 
 1. store and retrieve your app's data in storage that is controlled by the user
+
+_Note: this lib is written in Typescript and is compiled down to ES6 (ECMAScript 2015) syntax and to CommonJS modules. 
 
 _Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var")._
 
