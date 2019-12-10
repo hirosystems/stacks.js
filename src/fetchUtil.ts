@@ -4,7 +4,6 @@ import 'cross-fetch/polyfill'
 /** @ignore */
 export async function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
   const defaultFetchOpts: RequestInit = {
-    mode: 'cors',
     referrer: 'no-referrer',
     referrerPolicy: 'no-referrer'
   }
