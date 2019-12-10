@@ -707,7 +707,7 @@ export function runStorageTests() {
     }
 
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
-    const fileContent = { test: 'test' }
+    const fileContent = JSON.stringify({ test: 'test' })
 
     const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
     
@@ -1003,7 +1003,7 @@ export function runStorageTests() {
       (fname, contents) => {
         putFiledContents.push([fname, contents])
         if (!fname.endsWith('.sig')) {
-          t.equal(contents, fileContent)
+          t.equal(Buffer.from(contents).toString(), fileContent)
         }
         return Promise.resolve(pathToReadUrl(fname))
       }

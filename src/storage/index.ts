@@ -727,19 +727,23 @@ export async function putFile(
     }
     contentForUpload = await contentLoader.load()
   } else {
-    const encryptedSize = eciesGetJsonByteLength(contentLoader.contentByteLength, contentLoader.wasString)
+    const encryptedSize = eciesGetJsonByteLength(contentLoader.contentByteLength, 
+                                                 contentLoader.wasString)
     if (encryptedSize > maxUploadBytes) {
       // TODO: Use a specific error class type
       throw new Error(`The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes`)
     }
     if (!opt.sign) {
       const contentData = await contentLoader.load()
-      contentForUpload = await encryptContent(contentData, { publicKey })
+      contentForUpload = await encryptContent(contentData, 
+                                              { publicKey, wasString: contentLoader.wasString })
       contentType = 'application/json'
     } else {
       const contentData = await contentLoader.load()
-      const cipherText = await encryptContent(contentData, { publicKey })
+      const cipherText = await encryptContent(contentData, 
+                                              { publicKey, wasString: contentLoader.wasString })
       const signatureObject = signECDSA(privateKey, cipherText)
+      // TODO: this needs a separate size check from the double-wrapped json payload
       const signedCipherObject = {
         signature: signatureObject.signature,
         publicKey: signatureObject.publicKey,
