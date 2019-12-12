@@ -52,7 +52,7 @@ export interface PutFileOptions {
 }
 
 export interface PutFileResponse {
-  publicUrl: string,
+  publicURL: string,
   etag?: string
 }
 
@@ -267,7 +267,7 @@ async function getFileContents(path: string, app: string, username: string | und
     throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
   }
   const contentType = response.headers.get('Content-Type')
-  const etag = response.headers.get('ETag').replace(/^"|"$/g, '')
+  const etag = response.headers.get('ETag')
   if (etag) {
     etags[path] = etag
   }
