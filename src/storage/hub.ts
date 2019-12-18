@@ -51,7 +51,7 @@ export async function uploadToGaiaHub(
     }
   )
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.')
+    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.', hubConfig)
   }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
@@ -72,7 +72,7 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.')
+    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.', hubConfig)
   }
 }
 

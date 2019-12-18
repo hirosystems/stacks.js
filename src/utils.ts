@@ -55,6 +55,17 @@ export function nextHour() {
 }
 
 /**
+ * Converts megabytes to bytes. Returns 0 if the input is not a finite number.
+ * @ignore
+ */
+export function megabytesToBytes(megabytes: number): number {
+  if (!Number.isFinite(megabytes)) {
+    return 0
+  }
+  return Math.floor(megabytes * 1024 * 1024)
+}
+
+/**
  * Query Strings
  * @private
  * @ignore
@@ -341,7 +352,8 @@ async function getGaiaErrorResponse(response: Response): Promise<GaiaHubErrorRes
  */
 export async function getBlockstackErrorFromResponse(
   response: Response,
-  errorMsg: string
+  errorMsg: string,
+  hubConfig: import('./storage/hub').GaiaHubConfig | null
 ): Promise<Error> {
   if (response.ok) {
     throw new Error('Cannot get a BlockstackError from a valid response.')
@@ -358,7 +370,8 @@ export async function getBlockstackErrorFromResponse(
   } else if (gaiaResponse.status === 409) {
     return new ConflictError(errorMsg, gaiaResponse)
   } else if (gaiaResponse.status === 413) {
-    return new PayloadTooLargeError(errorMsg, gaiaResponse)
+    const maxBytes = megabytesToBytes(hubConfig?.max_file_upload_size_megabytes)
+    return new PayloadTooLargeError(errorMsg, gaiaResponse, maxBytes)
   } else {
     return new Error(errorMsg)
   }

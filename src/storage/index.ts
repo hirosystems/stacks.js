@@ -17,12 +17,13 @@ import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
   SignatureVerificationError,
-  DoesNotExist
+  DoesNotExist,
+  PayloadTooLargeError
 } from '../errors'
 
 import { UserSession } from '../auth/userSession'
 import { NAME_LOOKUP_PATH } from '../auth/authConstants'
-import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
+import { getGlobalObject, getBlockstackErrorFromResponse, megabytesToBytes } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -282,7 +283,7 @@ async function getFileContents(path: string, app: string, username: string | und
   const readUrl = await getFileUrl(path, opts, caller)
   const response = await fetchPrivate(readUrl)
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`, null)
   }
   let contentType = response.headers.get('Content-Type')
   if (typeof contentType === 'string') {
@@ -658,13 +659,6 @@ class FileContentLoader {
   }
 }
 
-function megabytesToBytes(megabytes: number) {
-  if (!Number.isFinite(megabytes)) {
-    return 0
-  }
-  return Math.floor(megabytes * 1024 * 1024)
-}
-
 /**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
@@ -721,12 +715,16 @@ export async function putFile(
 
   let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
 
+  // When not encrypting the content length can be checked immediately.
+  if (!opt.encrypt && hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
+    const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes`
+    const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
+    console.error(sizeErr)
+    throw sizeErr
+  }
+
   // In the case of signing, but *not* encrypting, we perform two uploads.
   if (!opt.encrypt && opt.sign) {
-    if (hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
-      // TODO: Use a specific error class type
-      throw new Error(`The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes`)
-    }
     const contentData = await contentLoader.load()
     const signatureObject = signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
@@ -743,9 +741,6 @@ export async function putFile(
     // In all other cases, we only need one upload.
     let contentForUpload: string | Buffer | Blob
     if (!opt.encrypt && !opt.sign) {
-      if (hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
-        throw new Error('TODO: size error msg')
-      }
       // If content does not need encrypted or signed, it can be passed directly 
       // to the fetch request without loading into memory. 
       contentForUpload = contentLoader.content
@@ -757,8 +752,10 @@ export async function putFile(
         cipherTextEncoding: opt.cipherTextEncoding
       })
       if (hasMaxUpload && encryptedSize > maxUploadBytes) {
-        // TODO: Use a specific error class type
-        throw new Error(`The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes`)
+        const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes after encryption`
+        const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
+        console.error(sizeErr)
+        throw sizeErr
       }
       if (!opt.sign) {
         const contentData = await contentLoader.load()
@@ -893,7 +890,7 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.')
+      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.', hubConfig)
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
