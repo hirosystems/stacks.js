@@ -9,7 +9,8 @@ import {
 // export { type GaiaHubConfig } from './hub'
 
 import {
-  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonByteLength, SignedCipherObject
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonByteLength, 
+  SignedCipherObject, CipherTextEncoding
 } from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles/profileLookup'
@@ -47,6 +48,27 @@ export interface PutFileOptions {
    * Set a Content-Type header for unencrypted data. 
    */
   contentType?: string;
+  /**
+   * String encoding format for the cipherText buffer.
+   * Currently defaults to 'hex' for legacy backwards-compatibility.
+   * Only used if the `encrypt` option is also used.
+   * Note: in the future this should default to 'base64' for the significant
+   * file size reduction.
+   */
+  cipherTextEncoding?: CipherTextEncoding;
+}
+
+export interface EncryptContentOptions {
+  publicKey?: string;
+  wasString?: boolean;
+  /**
+   * String encoding format for the cipherText buffer.
+   * Currently defaults to 'hex' for legacy backwards-compatibility.
+   * Only used if the `encrypt` option is also used.
+   * Note: in the future this should default to 'base64' for the significant
+   * file size reduction.
+   */
+  cipherTextEncoding?: CipherTextEncoding;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -93,10 +115,7 @@ export async function getUserAppFileUrl(
  */
 export async function encryptContent(
   content: string | Buffer,
-  options?: {
-    publicKey?: string,
-    wasString?: boolean,
-  },
+  options?: EncryptContentOptions,
   caller?: UserSession
 ): Promise<string> {
   const opts = Object.assign({}, options)
@@ -106,7 +125,10 @@ export async function encryptContent(
   }
   const isString = typeof content === 'string' || opts.wasString
   const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
-  const cipherObject = await encryptECIES(opts.publicKey, contentBuffer, isString)
+  const cipherObject = await encryptECIES(opts.publicKey, 
+                                          contentBuffer, 
+                                          isString, 
+                                          opts.cipherTextEncoding)
   return JSON.stringify(cipherObject)
 }
 
@@ -658,7 +680,8 @@ export async function putFile(
 ): Promise<string> {
   const defaults: PutFileOptions = {
     encrypt: true,
-    sign: false
+    sign: false,
+    cipherTextEncoding: 'hex'
   }
   const opt = Object.assign({}, defaults, options)
 
@@ -730,7 +753,8 @@ export async function putFile(
       const encryptedSize = eciesGetJsonByteLength({
         contentLength: contentLoader.contentByteLength, 
         wasString: contentLoader.wasString,
-        useSignedWrapper: !!opt.sign
+        useSignedWrapper: !!opt.sign,
+        cipherTextEncoding: opt.cipherTextEncoding
       })
       if (hasMaxUpload && encryptedSize > maxUploadBytes) {
         // TODO: Use a specific error class type
@@ -738,13 +762,19 @@ export async function putFile(
       }
       if (!opt.sign) {
         const contentData = await contentLoader.load()
-        contentForUpload = await encryptContent(contentData, 
-                                                { publicKey, wasString: contentLoader.wasString })
+        contentForUpload = await encryptContent(contentData, { 
+          publicKey, 
+          wasString: contentLoader.wasString,
+          cipherTextEncoding: opt.cipherTextEncoding
+        })
         contentType = 'application/json'
       } else {
         const contentData = await contentLoader.load()
-        const cipherText = await encryptContent(contentData, 
-                                                { publicKey, wasString: contentLoader.wasString })
+        const cipherText = await encryptContent(contentData, { 
+          publicKey, 
+          wasString: contentLoader.wasString,
+          cipherTextEncoding: opt.cipherTextEncoding
+        })
         const signatureObject = signECDSA(privateKey, cipherText)
         const signedCipherObject: SignedCipherObject = {
           signature: signatureObject.signature,

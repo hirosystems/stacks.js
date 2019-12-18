@@ -13,10 +13,10 @@ const ecurve = new EllipticCurve('secp256k1')
  * Controls how the encrypted data buffer will be encoded as a string in the JSON payload. 
  * Options: 
  *    `hex` -- the legacy default, file size increase 100% (2x). 
- *    `b64` -- base64, file size increased ~33%. 
+ *    `base64` -- file size increased ~33%. 
  * @ignore
  */
-export type CipherTextEncoding = 'hex' | 'b64'
+export type CipherTextEncoding = 'hex' | 'base64'
 
 /**
  * @ignore
@@ -26,7 +26,7 @@ export type CipherObject = {
   ephemeralPK: string,
   cipherText: string,
   /** If undefined then hex encoding is used for the `cipherText` string. */
-  cipherEncoding?: CipherTextEncoding,
+  cipherTextEncoding?: CipherTextEncoding,
   mac: string,
   wasString: boolean
 }
@@ -122,7 +122,7 @@ export function eciesGetJsonByteLength(opts: {
   contentLength: number, 
   wasString: boolean, 
   useSignedWrapper: boolean, 
-  cipherEncoding?: CipherTextEncoding
+  cipherTextEncoding: CipherTextEncoding
 }): number {
   // Placeholder structure of the ciphertext payload, used to determine the 
   // stringified JSON overhead length. 
@@ -141,15 +141,15 @@ export function eciesGetJsonByteLength(opts: {
 
   // Get the encoded string length of the cipherText. 
   let encodedCipherTextLength: number
-  if (!opts.cipherEncoding || opts.cipherEncoding === 'hex') {
+  if (!opts.cipherTextEncoding || opts.cipherTextEncoding === 'hex') {
     // Hex encoded length.
     encodedCipherTextLength = (cipherTextLength * 2)
-  } else if (opts.cipherEncoding === 'b64') {
-    payloadShell.cipherEncoding = 'b64'
+  } else if (opts.cipherTextEncoding === 'base64') {
+    payloadShell.cipherTextEncoding = 'base64'
     // Calculate base64 encoded length.
     encodedCipherTextLength = (Math.ceil(cipherTextLength / 3) * 4)
   } else {
-    throw new Error(`Unknown cipherEncoding "${opts.cipherEncoding}"`)
+    throw new Error(`Unexpected cipherTextEncoding "${opts.cipherTextEncoding}"`)
   }
   // Get the stringified JSON payload wrapper.
   const jsonShell = JSON.stringify(payloadShell)
@@ -188,9 +188,9 @@ export function eciesGetJsonByteLength(opts: {
 
 /**
  * Encrypt content to elliptic curve publicKey using ECIES
- * @param {String} publicKey - secp256k1 public key hex string
- * @param {String | Buffer} content - content to encrypt
- * @return {Object} Object containing (hex encoded):
+ * @param publicKey - secp256k1 public key hex string
+ * @param content - content to encrypt
+ * @return Object containing (hex encoded):
  *  iv (initialization vector), cipherText (cipher text),
  *  mac (message authentication code), ephemeral public key
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
@@ -198,7 +198,10 @@ export function eciesGetJsonByteLength(opts: {
  * @private
  * @ignore
  */
-export async function encryptECIES(publicKey: string, content: Buffer, wasString: boolean): 
+export async function encryptECIES(publicKey: string, 
+                                   content: Buffer, 
+                                   wasString: boolean, 
+                                   cipherTextEncoding?: CipherTextEncoding): 
   Promise<CipherObject> {
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
@@ -222,10 +225,14 @@ export async function encryptECIES(publicKey: string, content: Buffer, wasString
                                  cipherText])
   const mac = await hmacSha256(sharedKeys.hmacKey, macData)
 
-  const USE_LEGACY_CIPHER_ENCODING = true
-  const cipherTextString = USE_LEGACY_CIPHER_ENCODING 
-    ? cipherText.toString('hex') 
-    : cipherText.toString('base64')
+  let cipherTextString: string
+  if (!cipherTextEncoding || cipherTextEncoding === 'hex') {
+    cipherTextString = cipherText.toString('hex') 
+  } else if (cipherTextEncoding === 'base64') {
+    cipherTextString = cipherText.toString('base64')
+  } else {
+    throw new Error(`Unexpected cipherTextEncoding "${cipherTextEncoding}"`)
+  }
   
   const result: CipherObject = {
     iv: initializationVector.toString('hex'),
@@ -234,8 +241,8 @@ export async function encryptECIES(publicKey: string, content: Buffer, wasString
     mac: mac.toString('hex'),
     wasString
   }
-  if (!USE_LEGACY_CIPHER_ENCODING) {
-    result.cipherEncoding = 'b64'
+  if (cipherTextEncoding && cipherTextEncoding !== 'hex') {
+    result.cipherTextEncoding = cipherTextEncoding
   }
   return result
 }
@@ -269,7 +276,15 @@ export async function decryptECIES(privateKey: string, cipherObject: CipherObjec
   const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
   const ivBuffer = Buffer.from(cipherObject.iv, 'hex')
-  const cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
+  let cipherTextBuffer: Buffer
+
+  if (!cipherObject.cipherTextEncoding || cipherObject.cipherTextEncoding === 'hex') {
+    cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'hex')
+  } else if (cipherObject.cipherTextEncoding === 'base64') {
+    cipherTextBuffer = Buffer.from(cipherObject.cipherText, 'base64')
+  } else {
+    throw new Error(`Unexpected cipherTextEncoding "${cipherObject.cipherText}"`)
+  }
 
   const macData = Buffer.concat([ivBuffer,
                                  Buffer.from(ephemeralPK.encode('array', true)),
