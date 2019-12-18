@@ -9,7 +9,7 @@ import {
 // export { type GaiaHubConfig } from './hub'
 
 import {
-  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonByteLength
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonByteLength, SignedCipherObject
 } from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles/profileLookup'
@@ -262,10 +262,13 @@ async function getFileContents(path: string, app: string, username: string | und
   if (!response.ok) {
     throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
   }
-  const contentType = response.headers.get('Content-Type')
+  let contentType = response.headers.get('Content-Type')
+  if (typeof contentType === 'string') {
+    contentType = contentType.toLowerCase()
+  }
   if (forceText || contentType === null
     || contentType.startsWith('text')
-    || contentType === 'application/json') {
+    || contentType.startsWith('application/json')) {
     return response.text()
   } else {
     return response.arrayBuffer()
@@ -634,6 +637,9 @@ class FileContentLoader {
 }
 
 function megabytesToBytes(megabytes: number) {
+  if (!Number.isFinite(megabytes)) {
+    return 0
+  }
   return Math.floor(megabytes * 1024 * 1024)
 }
 
@@ -652,20 +658,20 @@ export async function putFile(
 ): Promise<string> {
   const defaults: PutFileOptions = {
     encrypt: true,
-    sign: false,
-    contentType: ''
+    sign: false
   }
-
   const opt = Object.assign({}, defaults, options)
-  // TODO: if this object missing the max size prop, trigger re-connect hub
-  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
-  const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes)
-  const contentLoader = new FileContentLoader(content, opt.contentType)
-  let contentType = contentLoader.contentType
 
   if (!caller) {
     caller = new UserSession()
   }
+
+  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes)
+  const hasMaxUpload = maxUploadBytes > 0
+
+  const contentLoader = new FileContentLoader(content, opt.contentType)
+  let contentType = contentLoader.contentType
 
   // First, let's figure out if we need to get public/private keys,
   //  or if they were passed in
@@ -690,11 +696,11 @@ export async function putFile(
     }
   }
 
-  // In the case of signing, but *not* encrypting,
-  //   we perform two uploads. So the control-flow
-  //   here will return there.
+  let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
+
+  // In the case of signing, but *not* encrypting, we perform two uploads.
   if (!opt.encrypt && opt.sign) {
-    if (contentLoader.contentByteLength > maxUploadBytes) {
+    if (hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
       // TODO: Use a specific error class type
       throw new Error(`The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes`)
     }
@@ -702,7 +708,7 @@ export async function putFile(
     const signatureObject = signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
 
-    const uploadFn = async (hubConfig: GaiaHubConfig) => {
+    uploadFn = async (hubConfig: GaiaHubConfig) => {
       const fileUrls = await Promise.all([
         uploadToGaiaHub(path, contentData, hubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
@@ -710,53 +716,50 @@ export async function putFile(
       ])
       return fileUrls[0]
     }
-
-    try {
-      return await uploadFn(gaiaHubConfig)
-    } catch (error) {
-      const freshHubConfig = await caller.setLocalGaiaHubConnection()
-      return await uploadFn(freshHubConfig)
-    }
-  }
-
-  // In all other cases, we only need one upload.
-  let contentForUpload: Blob | Buffer | ArrayBufferView | string
-  if (!opt.encrypt) {
-    if (contentLoader.contentByteLength > maxUploadBytes) {
-      throw new Error('TODO: size error msg')
-    }
-    contentForUpload = await contentLoader.load()
   } else {
-    const encryptedSize = eciesGetJsonByteLength(contentLoader.contentByteLength, 
-                                                 contentLoader.wasString)
-    if (encryptedSize > maxUploadBytes) {
-      // TODO: Use a specific error class type
-      throw new Error(`The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes`)
-    }
-    if (!opt.sign) {
-      const contentData = await contentLoader.load()
-      contentForUpload = await encryptContent(contentData, 
-                                              { publicKey, wasString: contentLoader.wasString })
-      contentType = 'application/json'
-    } else {
-      const contentData = await contentLoader.load()
-      const cipherText = await encryptContent(contentData, 
-                                              { publicKey, wasString: contentLoader.wasString })
-      const signatureObject = signECDSA(privateKey, cipherText)
-      // TODO: this needs a separate size check from the double-wrapped json payload
-      const signedCipherObject = {
-        signature: signatureObject.signature,
-        publicKey: signatureObject.publicKey,
-        cipherText
+    // In all other cases, we only need one upload.
+    let contentForUpload: string | Buffer | Blob
+    if (!opt.encrypt && !opt.sign) {
+      if (hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
+        throw new Error('TODO: size error msg')
       }
-      contentForUpload = JSON.stringify(signedCipherObject)
-      contentType = 'application/json'
+      // If content does not need encrypted or signed, it can be passed directly 
+      // to the fetch request without loading into memory. 
+      contentForUpload = contentLoader.content
+    } else {
+      const encryptedSize = eciesGetJsonByteLength({
+        contentLength: contentLoader.contentByteLength, 
+        wasString: contentLoader.wasString,
+        useSignedWrapper: !!opt.sign
+      })
+      if (hasMaxUpload && encryptedSize > maxUploadBytes) {
+        // TODO: Use a specific error class type
+        throw new Error(`The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes`)
+      }
+      if (!opt.sign) {
+        const contentData = await contentLoader.load()
+        contentForUpload = await encryptContent(contentData, 
+                                                { publicKey, wasString: contentLoader.wasString })
+        contentType = 'application/json'
+      } else {
+        const contentData = await contentLoader.load()
+        const cipherText = await encryptContent(contentData, 
+                                                { publicKey, wasString: contentLoader.wasString })
+        const signatureObject = signECDSA(privateKey, cipherText)
+        const signedCipherObject: SignedCipherObject = {
+          signature: signatureObject.signature,
+          publicKey: signatureObject.publicKey,
+          cipherText
+        }
+        contentForUpload = JSON.stringify(signedCipherObject)
+        contentType = 'application/json'
+      }
     }
-  }
 
-  const uploadFn = async (hubConfig: GaiaHubConfig) => {
-    const file = await uploadToGaiaHub(path, contentForUpload, hubConfig, contentType)
-    return file
+    uploadFn = async (hubConfig: GaiaHubConfig) => {
+      const file = await uploadToGaiaHub(path, contentForUpload, hubConfig, contentType)
+      return file
+    }
   }
 
   try {
