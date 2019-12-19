@@ -752,7 +752,7 @@ export async function putFile(
         cipherTextEncoding: opt.cipherTextEncoding
       })
       if (hasMaxUpload && encryptedSize > maxUploadBytes) {
-        const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes after encryption`
+        const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes after encryption`
         const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
         console.error(sizeErr)
         throw sizeErr

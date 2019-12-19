@@ -227,14 +227,16 @@ class GaiaHubError extends BlockstackError {
 
   constructor(error: ErrorData, response: GaiaHubErrorResponse) {
     super(error)
-    this.hubError = {
-      statusCode: response.status,
-      statusText: response.statusText
-    }
-    if (typeof response.body === 'string') {
-      this.hubError.message = response.body
-    } else if (typeof response.body === 'object') {
-      Object.assign(this.hubError, response.body)
+    if (response) {
+      this.hubError = {
+        statusCode: response.status,
+        statusText: response.statusText
+      }
+      if (typeof response.body === 'string') {
+        this.hubError.message = response.body
+      } else if (typeof response.body === 'object') {
+        Object.assign(this.hubError, response.body)
+      }
     }
   }
 }

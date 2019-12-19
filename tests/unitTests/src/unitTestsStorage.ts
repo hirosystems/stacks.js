@@ -1138,6 +1138,202 @@ export function runStorageTests() {
     }
   })
 
+  test('putFile oversized -- unencrypted, signed', async (t) => {
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+
+    const gaiaHubConfig: GaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack2.org/hub/',
+      // 500 bytes
+      max_file_upload_size_megabytes: 0.0005
+    }
+
+    // manually set gaia config and private key for testing
+    const userSession = new UserSession({ 
+      appConfig, 
+      sessionOptions: { 
+        userData: {
+          gaiaHubConfig: gaiaHubConfig,
+          appPrivateKey: privateKey
+        } as UserData 
+      }
+    })
+
+    const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+
+    // 600 bytes
+    const fileContent = Buffer.alloc(600)
+    const pathToReadUrl = ((fname: string) => `${readPrefix}/${fname}`)
+
+    const uploadToGaiaHub = sinon.stub().callsFake(
+      ((fname) => {
+        return Promise.resolve(pathToReadUrl(fname))
+      }) as typeof import('../../../src/storage').uploadToGaiaHub
+    )
+
+    const putFile = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub }
+    }).putFile as typeof import('../../../src/storage').putFile
+
+    const encryptOptions = { encrypt: false, sign: true }
+    try {
+      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      t.fail('should have thrown error with oversized content -- unencrypted, signed')
+    } catch (error) {
+      t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- unencrypted, signed')
+    }
+  })
+
+  test('putFile oversized -- encrypted, signed', async (t) => {
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+
+    const gaiaHubConfig: GaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack2.org/hub/',
+      // 500 bytes
+      max_file_upload_size_megabytes: 0.0005
+    }
+
+    // manually set gaia config and private key for testing
+    const userSession = new UserSession({ 
+      appConfig, 
+      sessionOptions: { 
+        userData: {
+          gaiaHubConfig: gaiaHubConfig,
+          appPrivateKey: privateKey
+        } as UserData 
+      }
+    })
+
+    const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+
+    // 600 bytes
+    const fileContent = Buffer.alloc(600)
+    const pathToReadUrl = ((fname: string) => `${readPrefix}/${fname}`)
+
+    const uploadToGaiaHub = sinon.stub().callsFake(
+      ((fname) => {
+        return Promise.resolve(pathToReadUrl(fname))
+      }) as typeof import('../../../src/storage').uploadToGaiaHub
+    )
+
+    const putFile = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub }
+    }).putFile as typeof import('../../../src/storage').putFile
+
+    const encryptOptions = { encrypt: true, sign: true }
+    try {
+      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      t.fail('should have thrown error with oversized content -- encrypted, signed')
+    } catch (error) {
+      t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- encrypted, signed')
+    }
+  })
+
+  test('putFile oversized -- unencrypted', async (t) => {
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+
+    const gaiaHubConfig: GaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack2.org/hub/',
+      // 500 bytes
+      max_file_upload_size_megabytes: 0.0005
+    }
+
+    // manually set gaia config and private key for testing
+    const userSession = new UserSession({ 
+      appConfig, 
+      sessionOptions: { 
+        userData: {
+          gaiaHubConfig: gaiaHubConfig,
+          appPrivateKey: privateKey
+        } as UserData 
+      }
+    })
+
+    const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+
+    // 600 bytes
+    const fileContent = Buffer.alloc(600)
+    const pathToReadUrl = ((fname: string) => `${readPrefix}/${fname}`)
+
+    const uploadToGaiaHub = sinon.stub().callsFake(
+      ((fname) => {
+        return Promise.resolve(pathToReadUrl(fname))
+      }) as typeof import('../../../src/storage').uploadToGaiaHub
+    )
+
+    const putFile = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub }
+    }).putFile as typeof import('../../../src/storage').putFile
+
+    const encryptOptions = { encrypt: false, sign: false }
+    try {
+      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      t.fail('should have thrown error with oversized content -- unencrypted')
+    } catch (error) {
+      t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- unencrypted')
+    }
+  })
+
+  test('putFile oversized -- encrypted', async (t) => {
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+
+    const gaiaHubConfig: GaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack2.org/hub/',
+      // 500 bytes
+      max_file_upload_size_megabytes: 0.0005
+    }
+
+    // manually set gaia config and private key for testing
+    const userSession = new UserSession({ 
+      appConfig, 
+      sessionOptions: { 
+        userData: {
+          gaiaHubConfig: gaiaHubConfig,
+          appPrivateKey: privateKey
+        } as UserData 
+      }
+    })
+
+    const readPrefix = 'https://gaia.testblockstack4.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+
+    // 600 bytes
+    const fileContent = Buffer.alloc(600)
+    const pathToReadUrl = ((fname: string) => `${readPrefix}/${fname}`)
+
+    const uploadToGaiaHub = sinon.stub().callsFake(
+      ((fname) => {
+        return Promise.resolve(pathToReadUrl(fname))
+      }) as typeof import('../../../src/storage').uploadToGaiaHub
+    )
+
+    const putFile = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub }
+    }).putFile as typeof import('../../../src/storage').putFile
+
+    const encryptOptions = { encrypt: true, sign: false }
+    try {
+      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      t.fail('should have thrown error with oversized content -- encrypted')
+    } catch (error) {
+      t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- encrypted')
+    }
+  })
+
   test('promises reject', async (t) => {
     t.plan(2)
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
