@@ -1,4 +1,4 @@
-import * as test from 'tape-promise/tape'
+import { tapeInit } from './tapeSux'
 import * as FetchMock from 'fetch-mock'
 import * as cheerio from 'cheerio'
 
@@ -12,6 +12,11 @@ import {
   sampleVerifications, sampleAddressBasedVerifications
 } from './sampleData'
 
+const test = tapeInit({
+  beforeEach: () => {
+    FetchMock.reset()
+  }
+})
 
 function mockRequests() {
   const naval = sampleVerifications.naval

@@ -1,4 +1,4 @@
-import * as test from 'tape-promise/tape'
+import { tapeInit } from './tapeSux'
 import { ECPair } from 'bitcoinjs-lib'
 import * as FetchMock from 'fetch-mock'
 
@@ -16,6 +16,12 @@ import {
 } from '../../../src'
 
 import { sampleProfiles, sampleTokenFiles } from './sampleData'
+
+const test = tapeInit({
+  beforeEach: () => {
+    FetchMock.reset()
+  }
+})
 
 function testTokening(filename: string, profile: any) {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'

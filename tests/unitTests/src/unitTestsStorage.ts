@@ -1,4 +1,4 @@
-import * as test from 'tape-promise/tape'
+import { tapeInit } from './tapeSux'
 import * as FetchMock from 'fetch-mock'
 import * as proxyquire from 'proxyquire'
 import * as sinon from 'sinon'
@@ -18,6 +18,12 @@ import { DoesNotExist } from '../../../src/errors'
 import * as util from 'util'
 import * as jsdom from 'jsdom'
 import { UserData } from '../../../src/auth/authApp'
+
+const test = tapeInit({
+  beforeEach: () => {
+    FetchMock.restore()
+  }
+})
 
 // class LocalStorage {
 //   constructor() {
@@ -1196,19 +1202,19 @@ export function runStorageTests() {
       }
     }).putFile as typeof import('../../../src/storage').putFile
 
-    FetchMock.post(fullWriteUrl, (url, { headers }) => {
-      console.log(url, headers)
-      if ((<any>headers).Authorization === 'bearer ') {
+    FetchMock.post(fullWriteUrl, (url, req) => {
+      const authHeader = (req.headers as Record<string, string>)['Authorization'] 
+      if (authHeader === 'bearer ') {
         t.ok(true, 'tries with invalid token')
-        return 401
-      } else if ((<any>headers).Authorization === 'bearer valid') {
+        return { status: 401 }
+      } else if (authHeader === 'bearer valid') {
         t.ok(true, 'Tries with valid hub config')
         return {
           status: 200,
           body: JSON.stringify({ publicURL: 'readURL' })
         }
       }
-      return 401
+      return { status: 401 }
     })
     await putFile(path, 'hello world', { encrypt: false }, blockstack)
       .then(() => t.ok(true, 'Request should pass'))
@@ -1499,9 +1505,9 @@ export function runStorageTests() {
     FetchMock.post(`${gaiaHubConfig.server}/list-files/${gaiaHubConfig.address}`, () => {
       callCount += 1
       if (callCount === 1) {
-        return { entries: [path], page: callCount }
+        return JSON.stringify({ entries: [path], page: callCount })
       } else if (callCount === 2) {
-        return { entries: [], page: callCount }
+        return JSON.stringify({ entries: [], page: callCount })
       } else {
         throw new Error('Called too many times')
       }

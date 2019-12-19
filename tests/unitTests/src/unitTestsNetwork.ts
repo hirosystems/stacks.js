@@ -1,7 +1,13 @@
-import * as test from 'tape-promise/tape'
+import { tapeInit } from './tapeSux'
 import * as FetchMock from 'fetch-mock'
 import { BNConstructor } from '../../../src/bn'
 import { network } from '../../../src'
+
+const test = tapeInit({
+  beforeEach: () => {
+    FetchMock.reset()
+  }
+})
 
 const mynet = new network.BlockstackNetwork(
   'https://core.blockstack.org',

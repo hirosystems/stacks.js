@@ -1,4 +1,4 @@
-import * as test from 'tape-promise/tape'
+import { tapeInit } from './tapeSux'
 import { decodeToken, TokenSigner } from 'jsontokens'
 import * as FetchMock from 'fetch-mock'
 
@@ -24,6 +24,12 @@ import {
 } from '../../../src'
 
 import { sampleProfiles, sampleNameRecords } from './sampleData'
+
+const test = tapeInit({
+  beforeEach: () => {
+    FetchMock.reset()
+  }
+})
 
 // global.window = {}
 
@@ -220,7 +226,7 @@ export function runAuthTests() {
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null)
     // console.log(decodeToken(authResponse))
@@ -243,7 +249,7 @@ export function runAuthTests() {
     const url = `${nameLookupURL}ryan.id`
     // console.log(`URL: ${url}`)
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const appPrivateKey = makeECPrivateKey()
     const transitPrivateKey = makeECPrivateKey()
@@ -282,7 +288,7 @@ export function runAuthTests() {
   test('handlePendingSignIn with authResponseToken', async (t) => {
     const url = `${nameLookupURL}ryan.id`
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const appPrivateKey = makeECPrivateKey()
     const transitPrivateKey = makeECPrivateKey()
@@ -310,7 +316,7 @@ export function runAuthTests() {
   test('handlePendingSignIn 2', async (t) => {
     const url = `${nameLookupURL}ryan.id`
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const appPrivateKey = makeECPrivateKey()
     const transitPrivateKey = makeECPrivateKey()
@@ -338,7 +344,7 @@ export function runAuthTests() {
   test('handlePendingSignIn with existing user session', async (t) => {
     const url = `${nameLookupURL}ryan.id`
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const appPrivateKey = makeECPrivateKey()
     const transitPrivateKey = makeECPrivateKey()
@@ -415,7 +421,7 @@ export function runAuthTests() {
     const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
     const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const appPrivateKey = makeECPrivateKey()
     const transitPrivateKey = makeECPrivateKey()
@@ -451,7 +457,7 @@ export function runAuthTests() {
     const oldBlockstackAPIUrl = config.network.blockstackAPIUrl
     const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
 
-    FetchMock.get(url, sampleNameRecords.ryan)
+    FetchMock.get(url, JSON.stringify(sampleNameRecords.ryan))
 
     const appPrivateKey = makeECPrivateKey()
     const identityPrivateKey = makeECPrivateKey()
