@@ -6,6 +6,7 @@ import { getPublicKeyFromPrivate } from '../keys'
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipher } from './aesCipher'
+import { getAesCbcOutputLength, getBase64OutputLength } from '../utils'
 
 const ecurve = new EllipticCurve('secp256k1')
 
@@ -114,6 +115,72 @@ export function getHexFromBN(bnInput: BN) {
 }
 
 /**
+ * Get details about the JSON envelope size overhead for ciphertext payloads. 
+ * @ignore
+ */
+export function getCipherObjectWrapper(opts: { 
+  wasString: boolean, 
+  cipherTextEncoding: CipherTextEncoding,
+}): {
+  /** The stringified JSON string of an empty `CipherObject`. */
+  payloadShell: string,
+  /** Total string length of all the `CipherObject` values that always have constant lengths. */
+  payloadValuesLength: number,
+ } {
+  // Placeholder structure of the ciphertext payload, used to determine the 
+  // stringified JSON overhead length. 
+  const shell: CipherObject = {
+    iv: '', 
+    ephemeralPK: '',
+    mac: '',
+    cipherText: '',
+    wasString: opts.wasString,
+  }
+  if (opts.cipherTextEncoding === 'base64') {
+    shell.cipherTextEncoding = 'base64'
+  }
+  // Hex encoded 16 byte buffer.
+  const ivLength = 32
+  // Hex encoded, compressed EC pubkey of 33 bytes.
+  const ephemeralPKLength = 66
+  // Hex encoded 32 byte hmac-sha256.
+  const macLength = 64
+  return  {
+    payloadValuesLength: ivLength + ephemeralPKLength + macLength,
+    payloadShell: JSON.stringify(shell)
+  }
+}
+
+/**
+ * Get details about the JSON envelope size overhead for signed ciphertext payloads. 
+ * @param payloadShell - The JSON stringified empty `CipherObject`
+ * @ignore
+ */
+export function getSignedCipherObjectWrapper(payloadShell: string): {
+  /** The stringified JSON string of an empty `SignedCipherObject`. */
+  signedPayloadValuesLength: number;
+  /** Total string length of all the `SignedCipherObject` values 
+   * that always have constant lengths */
+  signedPayloadShell: string;
+} {
+  // Placeholder structure of the signed ciphertext payload, used to determine the 
+  // stringified JSON overhead length. 
+  const shell: SignedCipherObject = {
+    signature: '',
+    publicKey: '',
+    cipherText: payloadShell
+  }
+  // Hex encoded 70 byte DER signature. 
+  const signatureLength = 140
+  // Hex encoded 33 byte public key.
+  const publicKeyLength = 66
+  return {
+    signedPayloadValuesLength: signatureLength + publicKeyLength,
+    signedPayloadShell: JSON.stringify(shell)
+  }
+}
+
+/**
  * Fast function that determines the final ASCII string byte length of the 
  * JSON stringified ECIES encrypted payload. 
  * @ignore
@@ -124,66 +191,38 @@ export function eciesGetJsonByteLength(opts: {
   useSignedWrapper: boolean, 
   cipherTextEncoding: CipherTextEncoding
 }): number {
-  // Placeholder structure of the ciphertext payload, used to determine the 
-  // stringified JSON overhead length. 
-  const payloadShell: CipherObject = {
-    iv: '', 
-    ephemeralPK: '',
-    mac: '',
-    cipherText: '',
-    wasString: opts.wasString,
-  }
+  const { payloadShell, payloadValuesLength } = getCipherObjectWrapper(opts)
 
   // Calculate the AES output length given the input length. 
-  // AES has a fixed block size of 16-bytes regardless key size.
-  // AES-CBC block mode rounds up to the next block size. 
-  const cipherTextLength = (Math.floor(opts.contentLength / 16) + 1) * 16
+  const cipherTextLength = getAesCbcOutputLength(opts.contentLength)
 
   // Get the encoded string length of the cipherText. 
   let encodedCipherTextLength: number
   if (!opts.cipherTextEncoding || opts.cipherTextEncoding === 'hex') {
-    // Hex encoded length.
     encodedCipherTextLength = (cipherTextLength * 2)
   } else if (opts.cipherTextEncoding === 'base64') {
-    payloadShell.cipherTextEncoding = 'base64'
-    // Calculate base64 encoded length.
-    encodedCipherTextLength = (Math.ceil(cipherTextLength / 3) * 4)
+    encodedCipherTextLength = getBase64OutputLength(cipherTextLength)
   } else {
     throw new Error(`Unexpected cipherTextEncoding "${opts.cipherTextEncoding}"`)
   }
-  // Get the stringified JSON payload wrapper.
-  const jsonShell = JSON.stringify(payloadShell)
-  // Hex encoded 16 byte buffer.
-  const ivLength = 32
-  // Hex encoded, compressed EC pubkey of 33 bytes.
-  const ephemeralPKLength = 66
-  // Hex encoded 32 byte hmac-sha256.
-  const macLength = 64
-  // Total size of all the actual payload value lengths
-  let payloadValuesLength = encodedCipherTextLength + ivLength + ephemeralPKLength + macLength
-
+  
   if (!opts.useSignedWrapper) {
-    // Add the length of the JSON structure and length of the values.
-    return jsonShell.length + payloadValuesLength
+    // Add the length of the JSON envelope, ciphertext length, and length of const values.
+    return payloadShell.length 
+      + payloadValuesLength 
+      + encodedCipherTextLength
+  } else {
+    // Get the signed version of the JSON envelope
+    const { 
+      signedPayloadShell, 
+      signedPayloadValuesLength 
+    } = getSignedCipherObjectWrapper(payloadShell)
+    // Add length of the JSON envelope, ciphertext length, and length of the const values. 
+    return signedPayloadShell.length 
+      + signedPayloadValuesLength 
+      + payloadValuesLength 
+      + encodedCipherTextLength
   }
-
-  // Placeholder structure of the signed ciphertext payload, used to determine the 
-  // stringified JSON overhead length. 
-  const signedPayloadShell: SignedCipherObject = {
-    signature: '',
-    publicKey: '',
-    cipherText: jsonShell
-  }
-  // Get the stringified JSON signed payload wrapper.
-  const signedJsonShell = JSON.stringify(signedPayloadShell)
-  // Hex encoded 70 byte DER signature. 
-  const signatureLength = 140
-  // Hex encoded 33 byte public key.
-  const publicKeyLength = 66
-  // Add the signed payload value lengths 
-  payloadValuesLength += signatureLength + publicKeyLength
-  // Add the length of the signed JSON structure and length of the values.
-  return signedJsonShell.length + payloadValuesLength
 }
 
 /**
