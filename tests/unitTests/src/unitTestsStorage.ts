@@ -2,6 +2,7 @@ import { tapeInit } from './tapeSux'
 import * as FetchMock from 'fetch-mock'
 import * as proxyquire from 'proxyquire'
 import * as sinon from 'sinon'
+import * as crypto from 'crypto'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import {
   uploadToGaiaHub, getFullReadUrl,
@@ -10,7 +11,7 @@ import {
   deleteFromGaiaHub,
   GaiaHubConfig
 } from '../../../src/storage/hub'
-import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../src/storage'
+import { getFile, getFileUrl, putFile, listFiles, deleteFile, encryptContent } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -18,6 +19,8 @@ import { DoesNotExist } from '../../../src/errors'
 import * as util from 'util'
 import * as jsdom from 'jsdom'
 import { UserData } from '../../../src/auth/authApp'
+import { eciesGetJsonByteLength, aes256CbcEncrypt } from '../../../src/encryption/ec'
+import { getAesCbcOutputLength, getBase64OutputLength } from '../../../src/utils'
 
 const test = tapeInit({
   beforeEach: () => {
@@ -1332,6 +1335,71 @@ export function runStorageTests() {
     } catch (error) {
       t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- encrypted')
     }
+  })
+
+  test('aes256Cbc output size calculation', async (t) => {
+    const testLengths = [0, 1, 2, 3, 4, 8, 100, 500, 1000]
+    for (let i = 0; i < 10; i++) {
+      testLengths.push(Math.floor(Math.random() * Math.floor(1030)))
+    }
+    const iv = crypto.randomBytes(16)
+    const key = Buffer.from('a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229', 'hex')
+    for (let len of testLengths) {
+      const data = crypto.randomBytes(len)
+      const encryptedData = await aes256CbcEncrypt(iv, key, data)
+      const calculatedLength = getAesCbcOutputLength(len)
+      t.equal(calculatedLength, encryptedData.length, `calculated aes-cbc length for input size ${len} should match actual encrypted ciphertext length`)
+    }
+  })
+
+  test('base64 output size calculation', async (t) => {
+    const testLengths = [0, 1, 2, 3, 4, 8, 100, 500, 1000]
+    for (let i = 0; i < 10; i++) {
+      testLengths.push(Math.floor(Math.random() * Math.floor(1030)))
+    }
+    for (let len of testLengths) {
+      const data = crypto.randomBytes(len)
+      const encodedLength = data.toString('base64')
+      const calculatedLength = getBase64OutputLength(len)
+      t.equal(calculatedLength, encodedLength.length, `calculated base64 length for input size ${len} should match actual encoded buffer length`)
+    } 
+  })
+
+  test('encrypted playload size detection -- hex', async (t) => {
+    const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+
+    const gaiaHubConfig: GaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack2.org/hub/',
+      // 500 bytes
+      max_file_upload_size_megabytes: 0.0005
+    }
+
+    // manually set gaia config and private key for testing
+    const userSession = new UserSession({ 
+      appConfig, 
+      sessionOptions: { 
+        userData: {
+          gaiaHubConfig: gaiaHubConfig,
+          appPrivateKey: privateKey
+        } as UserData 
+      }
+    })
+    const data = Buffer.alloc(100)
+    const encryptedData = await userSession.encryptContent(data, {
+      wasString: false,
+      cipherTextEncoding: 'hex'
+    })
+    const detectedSize = eciesGetJsonByteLength({ 
+      contentLength: data.byteLength, 
+      wasString: false,
+      cipherTextEncoding: 'hex',
+      useSignedWrapper: false
+    })
+    t.equal(detectedSize, encryptedData.length, 'ecies json byte length calculation should match actual encrypted payload byte length')
   })
 
   test('promises reject', async (t) => {

@@ -47,7 +47,10 @@ export type SignedCipherObject = {
 /**
 * @ignore
 */
-async function aes256CbcEncrypt(iv: Buffer, key: Buffer, plaintext: Buffer): Promise<Buffer> {
+export async function aes256CbcEncrypt(iv: Buffer, 
+                                       key: Buffer, 
+                                       plaintext: Buffer
+): Promise<Buffer> {
   const cipher = await createCipher()
   const result = await cipher.encrypt('aes-256-cbc', key, iv, plaintext)
   return result
@@ -134,7 +137,7 @@ export function getCipherObjectWrapper(opts: {
     ephemeralPK: '',
     mac: '',
     cipherText: '',
-    wasString: opts.wasString,
+    wasString: !!opts.wasString,
   }
   if (opts.cipherTextEncoding === 'base64') {
     shell.cipherTextEncoding = 'base64'
@@ -278,7 +281,7 @@ export async function encryptECIES(publicKey: string,
     ephemeralPK: ephemeralPK.encode('hex', true),
     cipherText: cipherTextString,
     mac: mac.toString('hex'),
-    wasString
+    wasString: !!wasString
   }
   if (cipherTextEncoding && cipherTextEncoding !== 'hex') {
     result.cipherTextEncoding = cipherTextEncoding
