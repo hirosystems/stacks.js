@@ -52,9 +52,11 @@ The storage portion of this library can be used to:
 
 1. store and retrieve your app's data in storage that is controlled by the user
 
-_Note: this lib is written in Typescript and is compiled down to ES6 (ECMAScript 2015) syntax and to CommonJS modules. 
+_Note:_ this lib is written in Typescript and is compiled to ES6 (ECMAScript 2015)
+syntax and uses CommonJS modules. The NPM package works out of the box within the 
+Node.js runtime, and within browsers when using a common bundler (e.g. Webpack, 
+Browserify, Rollup, etc).
 
-_Note: this document uses ES6 in its examples but it is compiled down to Javascript (ES5) and is perfectly compatible with it. If you're using the latter, just make a few adjustments to the examples below (e.g. use "let" instead of "var")._
 
 ## Documentation
 
