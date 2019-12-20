@@ -644,10 +644,7 @@ class FileContentLoader {
       return this.content.size
     }
     const typeName = Object.prototype.toString.call(this.content)
-    const error = new Error(`Unexpected type "${typeName}" while getting content length`)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(error)
-    }
+    const error = new Error(`Unexpected type "${typeName}" while detecting content length`)
     console.error(error)
     throw error
   }
@@ -657,7 +654,7 @@ class FileContentLoader {
       if (Buffer.isBuffer(this.content)) {
         return this.content
       } else if (ArrayBuffer.isView(this.content)) {
-        return Buffer.from(this.content.buffer)
+        return Buffer.from(this.content.buffer, this.content.byteOffset, this.content.byteLength)
       } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
         const reader = new FileReader()
         const readPromise = new Promise<Buffer>((resolve, reject) => {

@@ -1,4 +1,4 @@
-import { tapeInit } from './tapeSux'
+import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
 import * as proxyquire from 'proxyquire'
 import * as sinon from 'sinon'
@@ -22,11 +22,6 @@ import { UserData } from '../../../src/auth/authApp'
 import { eciesGetJsonStringLength as eciesGetJsonStringLength, aes256CbcEncrypt } from '../../../src/encryption/ec'
 import { getAesCbcOutputLength, getBase64OutputLength } from '../../../src/utils'
 
-const test = tapeInit({
-  beforeEach: () => {
-    FetchMock.restore()
-  }
-})
 
 // class LocalStorage {
 //   constructor() {
@@ -84,7 +79,7 @@ export function runStorageTests() {
 
   test('deleteFile gets a new gaia config and tries again', async (t) => {
     t.plan(3)
-
+    FetchMock.reset()
     const path = 'file.txt'
     const fullDeleteUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.txt'
     const invalidHubConfig = {
@@ -134,7 +129,7 @@ export function runStorageTests() {
 
   test('deleteFile wasSigned deletes signature file', async (t) => {
     t.plan(3)
-
+    FetchMock.reset()
     const path = 'file.json'
     const fullDeleteUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
     const fullDeleteSigUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json.sig'
@@ -167,7 +162,7 @@ export function runStorageTests() {
 
   test('deleteFile throw on 404', (t) => {
     t.plan(2)
-
+    FetchMock.reset()
     const path = 'missingfile.txt'
     const fullDeleteUrl = 'https://hub.testblockstack.org/delete/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/missingfile.txt'
     const hubConfig = {
@@ -194,7 +189,7 @@ export function runStorageTests() {
 
   test('getFile unencrypted, unsigned', async (t) => {
     t.plan(2)
-
+    FetchMock.reset()
     const path = 'file.json'
     const gaiaHubConfig = {
       address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
@@ -283,6 +278,7 @@ export function runStorageTests() {
   })
 
   test('getFile unencrypted, unsigned - multi-reader', async (t) => {
+    FetchMock.reset()
     t.plan(6)
 
     const path = 'file.json'
@@ -435,6 +431,7 @@ export function runStorageTests() {
 
   test('encrypt & decrypt content', async (t) => {
     t.plan(2)
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -451,6 +448,7 @@ export function runStorageTests() {
 
   test('encrypt & decrypt content -- specify key', async (t) => {
     t.plan(2)
+    FetchMock.reset()
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
     const privateKey = '896adae13a1bf88db0b2ec94339b62382ec6f34cd7e2ff8abae7ec271e05f9d8'
@@ -463,6 +461,7 @@ export function runStorageTests() {
   })
 
   test('putFile unencrypted, using Blob content', async (t) => {
+    FetchMock.reset()
     const path = 'file.json'
     const gaiaHubConfig = {
       address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
@@ -517,6 +516,7 @@ export function runStorageTests() {
   })
 
   test('putFile encrypted, using Blob content, encrypted', async (t) => {
+    FetchMock.reset()
     const dom = new jsdom.JSDOM('', {}).window
     const globalAPIs: {[key: string]: any } = {
       File: dom.File,
@@ -585,6 +585,7 @@ export function runStorageTests() {
   })
 
   test('putFile unencrypted, using TypedArray content, encrypted', async (t) => {
+    FetchMock.reset()
     try {
       const contentDataString = 'file content test1234567'
       const textEncoder = new util.TextEncoder()
@@ -643,6 +644,7 @@ export function runStorageTests() {
   })
 
   test('putFile encrypted, using TypedArray content, encrypted', async (t) => {
+    FetchMock.reset()
     try {
       const contentDataString = 'file content test1234567'
       const textEncoder = new util.TextEncoder()
@@ -701,6 +703,7 @@ export function runStorageTests() {
   })
 
   test('putFile unencrypted, not signed', async (t) => {
+    FetchMock.reset()
     t.plan(1)
 
     const path = 'file.json'
@@ -735,6 +738,7 @@ export function runStorageTests() {
   })
 
   test('putFile & getFile unencrypted, not signed, with contentType', async (t) => {
+    FetchMock.reset()
     t.plan(3)
     const path = 'file.html'
     const gaiaHubConfig = {
@@ -781,6 +785,7 @@ export function runStorageTests() {
   })
 
   test('putFile & getFile encrypted, not signed', async (t) => {
+    FetchMock.reset()
     t.plan(2)
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -830,6 +835,7 @@ export function runStorageTests() {
   })
 
   test('putFile encrypt/no-sign using specifying public key & getFile decrypt', async (t) => {
+    FetchMock.reset()
     t.plan(2)
 
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -880,6 +886,7 @@ export function runStorageTests() {
   })
 
   test('putFile & getFile encrypted, signed', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -982,6 +989,7 @@ export function runStorageTests() {
   })
 
   test('putFile & getFile unencrypted, signed', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1142,6 +1150,7 @@ export function runStorageTests() {
   })
 
   test('putFile oversized -- unencrypted, signed', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1191,6 +1200,7 @@ export function runStorageTests() {
   })
 
   test('putFile oversized -- encrypted, signed', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1240,6 +1250,7 @@ export function runStorageTests() {
   })
 
   test('putFile oversized -- unencrypted', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1289,6 +1300,7 @@ export function runStorageTests() {
   })
 
   test('putFile oversized -- encrypted', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1366,6 +1378,7 @@ export function runStorageTests() {
   })
 
   test('playload size detection', async (t) => {
+    FetchMock.reset()
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1445,6 +1458,7 @@ export function runStorageTests() {
   })
 
   test('promises reject', async (t) => {
+    FetchMock.reset()
     t.plan(2)
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
     const blockstack = new UserSession({ appConfig })
@@ -1474,6 +1488,7 @@ export function runStorageTests() {
   })
 
   test('putFile gets a new gaia config and tries again', async (t) => {
+    FetchMock.reset()
     t.plan(3)
 
     const path = 'file.json'
@@ -1527,6 +1542,7 @@ export function runStorageTests() {
   })
 
   test('getFileUrl', async (t) => { 
+    FetchMock.reset()
     t.plan(2)
     const config = {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
@@ -1560,6 +1576,7 @@ export function runStorageTests() {
   })
 
   test('getFile throw on 404', async (t) => {
+    FetchMock.reset()
     t.plan(4)
     const config = {
       address: '19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk',
@@ -1595,6 +1612,7 @@ export function runStorageTests() {
   })
 
   test('uploadToGaiaHub', async (t) => {
+    FetchMock.reset()
     t.plan(2)
 
     const config = {
@@ -1616,6 +1634,7 @@ export function runStorageTests() {
   })
 
   test('deleteFromGaiaHub', async (t) => {
+    FetchMock.reset()
     t.plan(1)
 
     const config = {
@@ -1635,6 +1654,7 @@ export function runStorageTests() {
   })
 
   test('getFullReadUrl', async (t) => {
+    FetchMock.reset()
     t.plan(1)
 
     const config = {
@@ -1651,6 +1671,7 @@ export function runStorageTests() {
   })
 
   test('connectToGaiaHub', async (t) => {
+    FetchMock.reset()
     const hubServer = 'hub.testblockstack.org'
 
     const hubInfo = {
@@ -1688,6 +1709,7 @@ export function runStorageTests() {
   })
 
   test('connectToGaiaHub with an association token', async (t) => {
+    FetchMock.reset()
     const hubServer = 'hub.testblockstack.org'
 
     const hubInfo = {
@@ -1740,6 +1762,7 @@ export function runStorageTests() {
   })
 
   test('getBucketUrl', (t) => {
+    FetchMock.reset()
     t.plan(2)
     const hubServer = 'hub2.testblockstack.org'
 
@@ -1762,6 +1785,7 @@ export function runStorageTests() {
   })
 
   test('getUserAppFileUrl', async (t) => {
+    FetchMock.reset()
     t.plan(2)
 
     const path = 'file.json'
@@ -1789,6 +1813,7 @@ export function runStorageTests() {
   })
 
   test('listFiles', async (t) => {
+    FetchMock.reset()
     t.plan(3)
 
     const path = 'file.json'
@@ -1833,6 +1858,7 @@ export function runStorageTests() {
 
 
   test('connect to gaia hub with a user session and association token', async (t) => {
+    FetchMock.reset()
     const hubServer = 'hub.testblockstack.org'
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
 
@@ -1875,6 +1901,7 @@ export function runStorageTests() {
   })
 
   test('listFiles gets a new gaia config and tries again', async (t) => {
+    FetchMock.reset()
     t.plan(4)
 
     const path = 'file.json'

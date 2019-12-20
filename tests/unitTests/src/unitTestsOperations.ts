@@ -1,4 +1,4 @@
-import { tapeInit } from './tapeSux'
+import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
 import { Transaction, TransactionBuilder, networks, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
 import { BNConstructor } from '../../../src/bn'
@@ -10,12 +10,6 @@ import {
 
 import { transactions, safety, config } from '../../../src'
 import { ERROR_CODES } from '../../../src/errors'
-
-const test = tapeInit({
-  beforeEach: () => {
-    FetchMock.reset()
-  }
-})
 
 const testAddresses = [
   {

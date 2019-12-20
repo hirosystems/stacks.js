@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - `putFile` performs client-side validation that data size is within the Gaia hub's reported maximum limit. 
+- When a `string` value is passed to `putFile` and the `contentType` option is unspecified, it is set to `text/plain; charset=UTF-8`. 
 - `getFile` now throws error on 404 instead of returning null.
 - `getFile`, `putFile`, `deleteFile`, `listfiles` now include error info upon failure.
 - `getFile` can now decrypt using a custom private key
