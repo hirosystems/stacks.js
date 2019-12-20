@@ -9,7 +9,7 @@ import {
 // export { type GaiaHubConfig } from './hub'
 
 import {
-  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonByteLength, 
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonStringLength, 
   SignedCipherObject, CipherTextEncoding
 } from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
@@ -25,6 +25,8 @@ import { UserSession } from '../auth/userSession'
 import { NAME_LOOKUP_PATH } from '../auth/authConstants'
 import { getGlobalObject, getBlockstackErrorFromResponse, megabytesToBytes } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
+
+// TODO: define common "EncryptOptions" interface for `PutFileOptions` and `EncryptContentOptions`
 
 /**
  * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
@@ -62,6 +64,14 @@ export interface PutFileOptions {
 export interface EncryptContentOptions {
   publicKey?: string;
   wasString?: boolean;
+  /**
+   *
+   * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
+   * app private key. If a string is specified, it is used as the private key instead
+   * of the user's app private key. 
+   * @default false
+   */
+  sign?: boolean | string;
   /**
    * String encoding format for the cipherText buffer.
    * Currently defaults to 'hex' for legacy backwards-compatibility.
@@ -120,17 +130,38 @@ export async function encryptContent(
   caller?: UserSession
 ): Promise<string> {
   const opts = Object.assign({}, options)
+  let privateKey: string
   if (!opts.publicKey) {
-    const privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
     opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
-  const isString = typeof content === 'string' || opts.wasString
+  let wasString: boolean
+  if (typeof opts.wasString === 'boolean') {
+    wasString = opts.wasString
+  } else {
+    wasString = typeof content === 'string'
+  }
   const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
   const cipherObject = await encryptECIES(opts.publicKey, 
                                           contentBuffer, 
-                                          isString, 
+                                          wasString, 
                                           opts.cipherTextEncoding)
-  return JSON.stringify(cipherObject)
+  let cipherPayload = JSON.stringify(cipherObject)
+  if (opts.sign) {
+    if (typeof opts.sign === 'string') {
+      privateKey = opts.sign
+    } else if (!privateKey) {
+      privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    }
+    const signatureObject = signECDSA(privateKey, cipherPayload)
+    const signedCipherObject: SignedCipherObject = {
+      signature: signatureObject.signature,
+      publicKey: signatureObject.publicKey,
+      cipherText: cipherPayload
+    }
+    cipherPayload = JSON.stringify(signedCipherObject)
+  }
+  return cipherPayload
 }
 
 /**
@@ -713,8 +744,6 @@ export async function putFile(
     }
   }
 
-  let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
-
   // When not encrypting the content length can be checked immediately.
   if (!opt.encrypt && hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
     const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes`
@@ -722,6 +751,25 @@ export async function putFile(
     console.error(sizeErr)
     throw sizeErr
   }
+  
+  // When encrypting, the content length must be calculated. Certain types like `Blob`s must
+  // be loaded into memory. 
+  if (opt.encrypt && hasMaxUpload) {
+    const encryptedSize = eciesGetJsonStringLength({
+      contentLength: contentLoader.contentByteLength, 
+      wasString: contentLoader.wasString,
+      sign: !!opt.sign,
+      cipherTextEncoding: opt.cipherTextEncoding
+    })
+    if (encryptedSize > maxUploadBytes) {
+      const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes after encryption`
+      const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
+      console.error(sizeErr)
+      throw sizeErr
+    }
+  }
+
+  let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
 
   // In the case of signing, but *not* encrypting, we perform two uploads.
   if (!opt.encrypt && opt.sign) {
@@ -745,42 +793,14 @@ export async function putFile(
       // to the fetch request without loading into memory. 
       contentForUpload = contentLoader.content
     } else {
-      const encryptedSize = eciesGetJsonByteLength({
-        contentLength: contentLoader.contentByteLength, 
+      const contentData = await contentLoader.load()
+      contentForUpload = await encryptContent(contentData, { 
+        publicKey, 
         wasString: contentLoader.wasString,
-        useSignedWrapper: !!opt.sign,
-        cipherTextEncoding: opt.cipherTextEncoding
+        cipherTextEncoding: opt.cipherTextEncoding,
+        sign: opt.sign
       })
-      if (hasMaxUpload && encryptedSize > maxUploadBytes) {
-        const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes after encryption`
-        const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
-        console.error(sizeErr)
-        throw sizeErr
-      }
-      if (!opt.sign) {
-        const contentData = await contentLoader.load()
-        contentForUpload = await encryptContent(contentData, { 
-          publicKey, 
-          wasString: contentLoader.wasString,
-          cipherTextEncoding: opt.cipherTextEncoding
-        })
-        contentType = 'application/json'
-      } else {
-        const contentData = await contentLoader.load()
-        const cipherText = await encryptContent(contentData, { 
-          publicKey, 
-          wasString: contentLoader.wasString,
-          cipherTextEncoding: opt.cipherTextEncoding
-        })
-        const signatureObject = signECDSA(privateKey, cipherText)
-        const signedCipherObject: SignedCipherObject = {
-          signature: signatureObject.signature,
-          publicKey: signatureObject.publicKey,
-          cipherText
-        }
-        contentForUpload = JSON.stringify(signedCipherObject)
-        contentType = 'application/json'
-      }
+      contentType = 'application/json'
     }
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {

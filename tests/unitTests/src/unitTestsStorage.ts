@@ -19,7 +19,7 @@ import { DoesNotExist } from '../../../src/errors'
 import * as util from 'util'
 import * as jsdom from 'jsdom'
 import { UserData } from '../../../src/auth/authApp'
-import { eciesGetJsonByteLength, aes256CbcEncrypt } from '../../../src/encryption/ec'
+import { eciesGetJsonStringLength as eciesGetJsonStringLength, aes256CbcEncrypt } from '../../../src/encryption/ec'
 import { getAesCbcOutputLength, getBase64OutputLength } from '../../../src/utils'
 
 const test = tapeInit({
@@ -1365,7 +1365,7 @@ export function runStorageTests() {
     } 
   })
 
-  test('encrypted playload size detection -- hex', async (t) => {
+  test('playload size detection', async (t) => {
     const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
     const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
 
@@ -1389,17 +1389,59 @@ export function runStorageTests() {
       }
     })
     const data = Buffer.alloc(100)
-    const encryptedData = await userSession.encryptContent(data, {
+
+    const encryptedData1 = await userSession.encryptContent(data, {
       wasString: false,
-      cipherTextEncoding: 'hex'
+      cipherTextEncoding: 'hex',
     })
-    const detectedSize = eciesGetJsonByteLength({ 
+    const detectedSize1 = eciesGetJsonStringLength({ 
       contentLength: data.byteLength, 
       wasString: false,
       cipherTextEncoding: 'hex',
-      useSignedWrapper: false
+      sign: false,
     })
-    t.equal(detectedSize, encryptedData.length, 'ecies json byte length calculation should match actual encrypted payload byte length')
+    t.equal(detectedSize1, encryptedData1.length, 'ecies config 1 json byte length calculation should match actual encrypted payload byte length')
+
+    const encryptedData2 = await userSession.encryptContent(data, {
+      wasString: true,
+      cipherTextEncoding: 'hex',
+    })
+    const detectedSize2 = eciesGetJsonStringLength({ 
+      contentLength: data.byteLength, 
+      wasString: true,
+      cipherTextEncoding: 'hex',
+      sign: false,
+    })
+    t.equal(detectedSize2, encryptedData2.length, 'ecies config 2 json byte length calculation should match actual encrypted payload byte length')
+
+    const encryptedData3 = await userSession.encryptContent(data, {
+      wasString: true,
+      cipherTextEncoding: 'hex',
+      sign: true,
+    })
+    const detectedSize3 = eciesGetJsonStringLength({ 
+      contentLength: data.byteLength, 
+      wasString: true,
+      cipherTextEncoding: 'hex',
+      sign: true,
+    })
+    t.equal(detectedSize3, 731, 'ecies config 3 json byte length calculation should match actual encrypted payload byte length')
+    // size can vary within 3 bytes (6 hex chars) due to ECDSA signature DER encoding
+    // range: 585 + (146, 140)
+    t.true(encryptedData3.length >= 725 && encryptedData3.length <= 731, 'ecies config 3 json byte range length calculation should match expected')
+    
+    const encryptedData4 = await userSession.encryptContent(data, {
+      wasString: true,
+      cipherTextEncoding: 'base64',
+    })
+    const detectedSize4 = eciesGetJsonStringLength({ 
+      contentLength: data.byteLength, 
+      wasString: true,
+      cipherTextEncoding: 'base64',
+      sign: false,
+    })
+    t.equal(detectedSize4, encryptedData4.length, 'ecies config 4 json byte length calculation should match actual encrypted payload byte length')
+    
   })
 
   test('promises reject', async (t) => {

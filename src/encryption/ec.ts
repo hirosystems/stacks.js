@@ -173,8 +173,8 @@ export function getSignedCipherObjectWrapper(payloadShell: string): {
     publicKey: '',
     cipherText: payloadShell
   }
-  // Hex encoded 70 byte DER signature. 
-  const signatureLength = 140
+  // Hex encoded 70-73 byte DER signature. 
+  const signatureLength = 146
   // Hex encoded 33 byte public key.
   const publicKeyLength = 66
   return {
@@ -188,10 +188,10 @@ export function getSignedCipherObjectWrapper(payloadShell: string): {
  * JSON stringified ECIES encrypted payload. 
  * @ignore
  */
-export function eciesGetJsonByteLength(opts: { 
+export function eciesGetJsonStringLength(opts: { 
   contentLength: number, 
   wasString: boolean, 
-  useSignedWrapper: boolean, 
+  sign: boolean, 
   cipherTextEncoding: CipherTextEncoding
 }): number {
   const { payloadShell, payloadValuesLength } = getCipherObjectWrapper(opts)
@@ -209,7 +209,7 @@ export function eciesGetJsonByteLength(opts: {
     throw new Error(`Unexpected cipherTextEncoding "${opts.cipherTextEncoding}"`)
   }
   
-  if (!opts.useSignedWrapper) {
+  if (!opts.sign) {
     // Add the length of the JSON envelope, ciphertext length, and length of const values.
     return payloadShell.length 
       + payloadValuesLength 
@@ -232,11 +232,12 @@ export function eciesGetJsonByteLength(opts: {
  * Encrypt content to elliptic curve publicKey using ECIES
  * @param publicKey - secp256k1 public key hex string
  * @param content - content to encrypt
- * @return Object containing (hex encoded):
- *  iv (initialization vector), cipherText (cipher text),
- *  mac (message authentication code), ephemeral public key
+ * @return Object containing:
+ *  iv (initialization vector, hex encoding), 
+ *  cipherText (cipher text either hex or base64 encoded), 
+ *  mac (message authentication code, hex encoded), 
+ *  ephemeral public key (hex encoded), 
  *  wasString (boolean indicating with or not to return a buffer or string on decrypt)
- * 
  * @private
  * @ignore
  */
@@ -366,8 +367,7 @@ export function signECDSA(privateKey: string, content: string | Buffer): {
   const publicKey = getPublicKeyFromPrivate(privateKey)
   const contentHash = hashSha256Sync(contentBuffer)
   const signature = ecPrivate.sign(contentHash)
-  const signatureString = signature.toDER('hex')
-
+  const signatureString: string = signature.toDER('hex')
   return {
     signature: signatureString,
     publicKey
