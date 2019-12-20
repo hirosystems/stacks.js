@@ -18,7 +18,8 @@ import {
   InvalidStateError,
   SignatureVerificationError,
   DoesNotExist,
-  PayloadTooLargeError
+  PayloadTooLargeError,
+  GaiaHubError
 } from '../errors'
 
 import { UserSession } from '../auth/userSession'
@@ -26,21 +27,9 @@ import { NAME_LOOKUP_PATH } from '../auth/authConstants'
 import { getGlobalObject, getBlockstackErrorFromResponse, megabytesToBytes } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
-// TODO: define common "EncryptOptions" interface for `PutFileOptions` and `EncryptContentOptions`
 
-/**
- * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
- */
-export interface PutFileOptions {
+export interface EncryptionOptions {
   /**
-  * Encrypt the data with the app public key. 
-  * If a string is specified, it is used as the public key. 
-  * If the boolean `true` is specified then the current user's app public key is used. 
-   * @default true
-   */
-  encrypt?: boolean | string;
-  /**
-   *
    * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
    * app private key. If a string is specified, it is used as the private key instead
    * of the user's app private key. 
@@ -48,38 +37,51 @@ export interface PutFileOptions {
    */
   sign?: boolean | string;
   /**
-   * Set a Content-Type header for unencrypted data. 
+   * String encoding format for the cipherText buffer.
+   * Currently defaults to 'hex' for legacy backwards-compatibility.
+   * Only used if the `encrypt` option is also used.
+   * Note: in the future this should default to 'base64' for the significant
+   * file size reduction.
+   */
+  cipherTextEncoding?: CipherTextEncoding;
+  /**
+   * Specifies if the original unencrypted content is a ASCII or UTF-8 string. 
+   * For example stringified JSON. 
+   * If true, then when the ciphertext is decrypted, it will be returned as 
+   * a `string` type variable, otherwise will be returned as a Buffer.
+   */
+  wasString?: boolean;
+}
+
+/**
+ * Specify encryption options, and whether to sign the ciphertext.
+ */
+export interface EncryptContentOptions extends EncryptionOptions {
+  /**
+   * Encrypt the data with this key. 
+   * If not provided then the current user's app public key is used. 
+   */
+  publicKey?: string;
+}
+
+/**
+ * Specify a valid MIME type, encryption options, and whether to sign the [[UserSession.putFile]].
+ */
+export interface PutFileOptions extends EncryptionOptions {
+  /**
+   * Specifies the Content-Type header for unencrypted data. 
+   * If the `encrypt` is enabled, this option is ignored, and the 
+   * Content-Type header is set to `application/json` for the ciphertext 
+   * JSON envelope. 
    */
   contentType?: string;
   /**
-   * String encoding format for the cipherText buffer.
-   * Currently defaults to 'hex' for legacy backwards-compatibility.
-   * Only used if the `encrypt` option is also used.
-   * Note: in the future this should default to 'base64' for the significant
-   * file size reduction.
+   * Encrypt the data with the app public key. 
+   * If a string is specified, it is used as the public key. 
+   * If the boolean `true` is specified then the current user's app public key is used. 
+   * @default true
    */
-  cipherTextEncoding?: CipherTextEncoding;
-}
-
-export interface EncryptContentOptions {
-  publicKey?: string;
-  wasString?: boolean;
-  /**
-   *
-   * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
-   * app private key. If a string is specified, it is used as the private key instead
-   * of the user's app private key. 
-   * @default false
-   */
-  sign?: boolean | string;
-  /**
-   * String encoding format for the cipherText buffer.
-   * Currently defaults to 'hex' for legacy backwards-compatibility.
-   * Only used if the `encrypt` option is also used.
-   * Note: in the future this should default to 'base64' for the significant
-   * file size reduction.
-   */
-  cipherTextEncoding?: CipherTextEncoding;
+  encrypt?: boolean | string;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -690,6 +692,30 @@ class FileContentLoader {
   }
 }
 
+/** 
+ * Determines if a gaia error response is possible to recover from
+ * by refreshing the gaiaHubConfig, and retrying the request. 
+ */
+function isRecoverableGaiaError(error: GaiaHubError): boolean {
+  if (!error || !error.hubError || !error.hubError.statusCode) {
+    return false
+  }
+  const statusCode = error.hubError.statusCode
+  // 401 Unauthorized: possible expired, but renewable auth token.
+  if (statusCode === 401) {
+    return true
+  }
+  // 409 Conflict: possible concurrent writes to a file.
+  if (statusCode === 409) {
+    return true
+  }
+  // 500s: possible server-side transient error
+  if (statusCode >= 500 && statusCode <= 599) {
+    return true
+  }
+  return false
+}
+
 /**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
@@ -721,29 +747,6 @@ export async function putFile(
   const contentLoader = new FileContentLoader(content, opt.contentType)
   let contentType = contentLoader.contentType
 
-  // First, let's figure out if we need to get public/private keys,
-  //  or if they were passed in
-
-  let privateKey = ''
-  let publicKey = ''
-  if (opt.sign) {
-    if (typeof (opt.sign) === 'string') {
-      privateKey = opt.sign
-    } else {
-      privateKey = caller.loadUserData().appPrivateKey
-    }
-  }
-  if (opt.encrypt) {
-    if (typeof (opt.encrypt) === 'string') {
-      publicKey = opt.encrypt
-    } else {
-      if (!privateKey) {
-        privateKey = caller.loadUserData().appPrivateKey
-      }
-      publicKey = getPublicKeyFromPrivate(privateKey)
-    }
-  }
-
   // When not encrypting the content length can be checked immediately.
   if (!opt.encrypt && hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
     const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes`
@@ -774,6 +777,12 @@ export async function putFile(
   // In the case of signing, but *not* encrypting, we perform two uploads.
   if (!opt.encrypt && opt.sign) {
     const contentData = await contentLoader.load()
+    let privateKey: string
+    if (typeof opt.sign === 'string') {
+      privateKey = opt.sign
+    } else {
+      privateKey = caller.loadUserData().appPrivateKey
+    }
     const signatureObject = signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
 
@@ -793,6 +802,16 @@ export async function putFile(
       // to the fetch request without loading into memory. 
       contentForUpload = contentLoader.content
     } else {
+      // Use the `encrypt` key, otherwise the `sign` key, if neither are specified
+      // then use the current user's app public key. 
+      let publicKey: string
+      if (typeof opt.encrypt === 'string') {
+        publicKey = opt.encrypt
+      } else if (typeof opt.sign === 'string') {
+        publicKey = getPublicKeyFromPrivate(opt.sign)
+      } else {
+        publicKey = getPublicKeyFromPrivate(caller.loadUserData().appPrivateKey)
+      }
       const contentData = await contentLoader.load()
       contentForUpload = await encryptContent(contentData, { 
         publicKey, 
@@ -812,8 +831,16 @@ export async function putFile(
   try {
     return await uploadFn(gaiaHubConfig)
   } catch (error) {
-    const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    return await uploadFn(freshHubConfig)
+    // If the upload fails on first attempt, it could be due to a recoverable
+    // error which may succeed by refreshing the config and retrying.
+    if (isRecoverableGaiaError(error)) {
+      console.error(error)
+      console.error('Possible recoverable error during Gaia upload, retrying...')
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      return await uploadFn(freshHubConfig)
+    } else {
+      throw error
+    }
   }
 }
 

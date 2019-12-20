@@ -222,7 +222,7 @@ export interface HubErrorDetails {
 /**
 * @ignore
 */
-class GaiaHubError extends BlockstackError {
+export class GaiaHubError extends BlockstackError {
   hubError: HubErrorDetails
 
   constructor(error: ErrorData, response: GaiaHubErrorResponse) {
