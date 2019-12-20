@@ -118,32 +118,18 @@ export function makeAuthRequest(
 /**
  * Encrypts the private key for decryption by the given
  * public key.
+ * @param  {String} publicKey  [description]
+ * @param  {String} privateKey [description]
+ * @return {String} hex encoded ciphertext
+ * @private
  * @ignore
  */
 export async function encryptPrivateKey(publicKey: string,
-                                        privateKey: string,
-                                        encoding?: 'hex' | 'base64'
-): Promise<string>;
-export async function encryptPrivateKey(publicKey: string,
-                                        privateKey: string,
-                                        encoding: 'buffer'
-): Promise<Buffer>;
-export async function encryptPrivateKey(publicKey: string,
-                                        privateKey: string,
-                                        encoding?: 'hex' | 'base64' | 'buffer'
-): Promise<string | Buffer> {
+                                        privateKey: string
+): Promise<string> {
   const encryptedObj = await encryptECIES(publicKey, Buffer.from(privateKey), true)
   const encryptedJSON = JSON.stringify(encryptedObj)
-  const buffer = Buffer.from(encryptedJSON)
-  if (!encoding || encoding === 'hex') {
-    return buffer.toString('hex')
-  } else if (encoding === 'base64') {
-    return buffer.toString('base64')
-  } else if (encoding === 'buffer') {
-    return buffer
-  } else {
-    throw new Error(`Unexpected encoding ${encoding}`)
-  }
+  return Buffer.from(encryptedJSON).toString('hex')
 }
 
 /**
