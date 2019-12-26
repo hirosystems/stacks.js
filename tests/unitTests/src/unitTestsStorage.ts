@@ -1438,11 +1438,10 @@ export function runStorageTests() {
       cipherTextEncoding: 'hex',
       sign: true,
     })
-    t.equal(detectedSize3, 731, 'ecies config 3 json byte length calculation should match actual encrypted payload byte length')
-    // size can vary within 3 bytes (6 hex chars) due to ECDSA signature DER encoding
-    // range: 585 + (146, 140)
-    t.true(encryptedData3.length >= 725 && encryptedData3.length <= 731, 'ecies config 3 json byte range length calculation should match expected')
-    
+    t.equal(detectedSize3, 729, 'ecies config 3 json byte length calculation should match actual encrypted payload byte length')
+    // size can vary due to ECDSA signature DER encoding
+    // range: 585 + (144 max)
+    t.true(encryptedData3.length >= 585 && encryptedData3.length <= 729, 'ecies config 3 json byte range length calculation should match expected')
     const encryptedData4 = await userSession.encryptContent(data, {
       wasString: true,
       cipherTextEncoding: 'base64',

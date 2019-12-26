@@ -36,7 +36,7 @@ export type CipherObject = {
  * @ignore
  */
 export type SignedCipherObject = {
-  /** Hex encoded DER signature (140 char) */
+  /** Hex encoded DER signature (up to 144 chars) */
   signature: string,
   /** Hex encoded public key (66 char length) */
   publicKey: string,
@@ -173,8 +173,8 @@ export function getSignedCipherObjectWrapper(payloadShell: string): {
     publicKey: '',
     cipherText: payloadShell
   }
-  // Hex encoded 70-73 byte DER signature. 
-  const signatureLength = 146
+  // Hex encoded DER signature, up to 72 byte length. 
+  const signatureLength = 144
   // Hex encoded 33 byte public key.
   const publicKeyLength = 66
   return {
