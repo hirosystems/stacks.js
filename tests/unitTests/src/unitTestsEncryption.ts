@@ -13,6 +13,8 @@ import * as aesCipher from '../../../src/encryption/aesCipher'
 import * as sha2Hash from '../../../src/encryption/sha2Hash'
 import * as hmacSha256 from '../../../src/encryption/hmacSha256'
 import * as ripemd160 from '../../../src/encryption/hashRipemd160'
+import * as BN from 'bn.js'
+import { getBufferFromBN } from '../../../src/encryption/ec'
 
 
 
@@ -361,7 +363,6 @@ export function runEncryptionTests() {
   })
 
   test('bn-padded-to-64-bytes', (t) => {
-    t.plan(1)
     const ecurve = new elliptic.ec('secp256k1')
 
     const evilHexes = ['ba40f85b152bea8c3812da187bcfcfb0dc6e15f9e27cb073633b1c787b19472f',
@@ -372,8 +373,11 @@ export function runEncryptionTests() {
       const sharedSecret = ephemeralSK.derive(ephemeralPK)
       return getHexFromBN(sharedSecret).length === 64
     })
-
     t.true(results.every(x => x), 'Evil hexes must all generate 64-len hex strings')
+    const bnBuffer = getBufferFromBN(new BN(123))
+    t.equal(bnBuffer.byteLength, 32, 'getBufferFromBN should pad to 32 bytes')
+    t.equal(bnBuffer.toString('hex'), getHexFromBN(new BN(123)), 'getBufferFromBN and getHexFromBN should match')
+    t.end()
   })
 
   test('encryptMnemonic & decryptMnemonic', async (t) => {

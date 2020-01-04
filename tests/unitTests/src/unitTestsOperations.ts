@@ -1,7 +1,7 @@
 import * as test from 'tape-promise/tape'
 import * as FetchMock from 'fetch-mock'
 import { Transaction, TransactionBuilder, networks, address as bjsAddress, TxOutput } from 'bitcoinjs-lib'
-import { BNConstructor } from '../../../src/bn'
+import * as BN from 'bn.js'
 import { network, InsightClient, BitcoindAPI } from '../../../src/network'
 import {
   estimateTXBytes, addUTXOsToFund, sumOutputValues,
@@ -711,11 +711,11 @@ function transactionTests() {
     return Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
-                                         new BNConstructor('123'),
+                                         new BN('123'),
                                          'hello world!', 2),
       transactions.makeTokenTransfer(testAddresses[1].address,
                                      'STACKS',
-                                     new BNConstructor('123'),
+                                     new BN('123'),
                                      'hello world!',
                                      testAddresses[4].skHex)])
       .then(([estimatedCost, hexTX]) => {
@@ -749,11 +749,11 @@ function transactionTests() {
     Promise.all([
       transactions.estimateTokenTransfer(testAddresses[1].address,
                                          'STACKS',
-                                         new BNConstructor('123'),
+                                         new BN('123'),
                                          'hello world!', 2, 2),
       transactions.makeTokenTransfer(testAddresses[1].address,
                                      'STACKS',
-                                     new BNConstructor('123'),
+                                     new BN('123'),
                                      'hello world!',
                                      testAddresses[4].skHex,
                                      testAddresses[5].skHex)])
@@ -1211,7 +1211,7 @@ function transactionTests() {
         ),
         transactions.makeTokenTransfer(testAddresses[1].address,
                                        'STACKS',
-                                       new BNConstructor('123'),
+                                       new BN('123'),
                                        'hello world!',
                                        testAddresses[4].skHex)
       ])

@@ -1,7 +1,7 @@
 
 
 import { TransactionBuilder, Transaction, TxOutput } from 'bitcoinjs-lib'
-import { BN, BNConstructor } from '../bn'
+import * as BN from 'bn.js'
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
@@ -130,15 +130,15 @@ export function decodeB40(input: string): string {
   // hence, we reverse the characters first, and use the index
   //  to compute the value of each digit, then sum
   const characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+'
-  const base = new BNConstructor(40)
+  const base = new BN(40)
   const inputDigits = input.split('').reverse()
   const digitValues = inputDigits.map(
-    ((character: string, exponent: number) => new BNConstructor(characters.indexOf(character))
-      .mul(base.pow(new BNConstructor(exponent))))
+    ((character: string, exponent: number) => new BN(characters.indexOf(character))
+      .mul(base.pow(new BN(exponent))))
   )
   const sum = digitValues.reduce(
     (agg: BN, cur: BN) => agg.add(cur),
-    new BNConstructor(0)
+    new BN(0)
   )
   return sum.toString(16, 2)
 }

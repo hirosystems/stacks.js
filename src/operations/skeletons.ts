@@ -1,7 +1,7 @@
 
 
 import { TransactionBuilder, payments, address as bjsAddress, Transaction } from 'bitcoinjs-lib'
-import { BN, BNConstructor } from '../bn'
+import * as BN from 'bn.js'
 import {
   decodeB40, hash160, hash128, DUST_MINIMUM
 } from './utils'
@@ -144,7 +144,7 @@ function asAmountV2(amount: AmountType): AmountTypeV2 {
   // convert an AmountType v1 or v2 to an AmountTypeV2.
   // the "units" of a v1 amount type are always 'BTC'
   if (typeof amount === 'number') {
-    return { units: 'BTC', amount: new BNConstructor(String(amount)) }
+    return { units: 'BTC', amount: new BN(String(amount)) }
   } else {
     return { units: amount.units, amount: amount.amount }
   }
