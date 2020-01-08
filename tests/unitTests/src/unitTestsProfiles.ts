@@ -1,4 +1,4 @@
-import * as test from 'tape'
+import * as test from 'tape-promise/tape'
 import { ECPair } from 'bitcoinjs-lib'
 import * as FetchMock from 'fetch-mock'
 
@@ -17,11 +17,11 @@ import {
 
 import { sampleProfiles, sampleTokenFiles } from './sampleData'
 
-function testTokening(filename, profile) {
+function testTokening(filename: string, profile: any) {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
-  let tokenRecords = []
+  let tokenRecords: any[] = []
 
   test('profileToToken', (t) => {
     t.plan(3)
@@ -211,7 +211,7 @@ function testSchemas() {
     })
   })
 
-  test('profileLookUp', (t) => {
+  test('profileLookUp', async (t) => {
     t.plan(4)
 
     const name = 'ryan.id'
@@ -226,7 +226,7 @@ function testSchemas() {
     FetchMock.get('http://potato:6270/v1/names/ryan.id', mockZonefile)
     FetchMock.get('https://core.blockstack.org/v1/names/ryan.id', mockZonefile)
     FetchMock.get(sampleTokenFiles.ryan.url, sampleTokenFiles.ryan.body)
-    lookupProfile(name, zoneFileLookupURL)
+    await lookupProfile(name, zoneFileLookupURL)
       .then((profile) => {
         t.ok(profile, 'zonefile resolves to profile with zoneFileLookupUrl specified')
         t.equal(profile.name,

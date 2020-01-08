@@ -1,12 +1,12 @@
 
 
-import { TransactionBuilder, Transaction, TxOutput, crypto as bjsCrypto } from 'bitcoinjs-lib'
-import * as RIPEMD160 from 'ripemd160'
-// @ts-ignore
-import * as BN from 'bn.js'
+import { TransactionBuilder, Transaction, TxOutput } from 'bitcoinjs-lib'
+import { BN, BNConstructor } from '../bn'
 import { NotEnoughFundsError } from '../errors'
 import { TransactionSigner } from './signers'
 import { UTXO } from '../network'
+import { hashSha256Sync } from '../encryption/sha2Hash'
+import { hashRipemd160 } from '../encryption/hashRipemd160'
 
 
 /**
@@ -16,20 +16,21 @@ import { UTXO } from '../network'
 export const DUST_MINIMUM = 5500
 
 /**
- * 
+ * Creates a RIPEMD160(SHA256(input)) hash.
  * @ignore
  */
 export function hash160(buff: Buffer) {
-  const sha256 = bjsCrypto.sha256(buff)
-  return (new RIPEMD160()).update(sha256).digest()
+  const sha256 = hashSha256Sync(buff)
+  return hashRipemd160(sha256)
 }
 
 /**
- * 
+ * Creates a SHA256 hash, truncated to 128 bits. 
  * @ignore
  */
 export function hash128(buff: Buffer) {
-  return Buffer.from(bjsCrypto.sha256(buff).slice(0, 16))
+  const sha256 = hashSha256Sync(buff)
+  return sha256.slice(0, 16)
 }
 
 
@@ -116,7 +117,7 @@ export function sumOutputValues(txIn: Transaction | TransactionBuilder) {
  * 
  * @ignore
  */
-export function decodeB40(input: string) {
+export function decodeB40(input: string): string {
   // treat input as a base40 integer, and output a hex encoding
   // of that integer.
   //
@@ -129,15 +130,15 @@ export function decodeB40(input: string) {
   // hence, we reverse the characters first, and use the index
   //  to compute the value of each digit, then sum
   const characters = '0123456789abcdefghijklmnopqrstuvwxyz-_.+'
-  const base = new BN(40)
+  const base = new BNConstructor(40)
   const inputDigits = input.split('').reverse()
   const digitValues = inputDigits.map(
-    ((character: string, exponent: number) => new BN(characters.indexOf(character))
-      .mul(base.pow(new BN(exponent))))
+    ((character: string, exponent: number) => new BNConstructor(characters.indexOf(character))
+      .mul(base.pow(new BNConstructor(exponent))))
   )
   const sum = digitValues.reduce(
     (agg: BN, cur: BN) => agg.add(cur),
-    new BN(0)
+    new BNConstructor(0)
   )
   return sum.toString(16, 2)
 }

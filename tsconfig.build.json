@@ -1,8 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noEmit": false,
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "outDir": "./lib"
   },
   "include": [
     "src/**/*"

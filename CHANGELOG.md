@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `getFile` now throws error on 404 instead of returning null.
 - `getFile`, `putFile`, `deleteFile`, `listfiles` now include error info upon failure.
 - `getFile` can now decrypt using a custom private key
+- Several cryptographic operations now use the native Web Crypto APIs when available. This primarily
+increases the performance of file encryption and decryption, and account seed phrase encryption and 
+decryption. 
+- The following functions now returns Promises: `handleSignedEncryptedContents`, `makeAuthResponse`, 
+`encryptECIES`, `decryptECIES`, `encryptPrivateKey`, `decryptPrivateKey`, `encryptContent`, 
+`decryptContent`, `aes256CbcEncrypt`, `aes256CbcDecrypt`, `hmacSha256`.
 
 ## [19.4.0] - 2019-09-03
 ### Changed
