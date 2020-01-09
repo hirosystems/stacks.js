@@ -19,6 +19,7 @@ export const ERROR_CODES = {
   BAD_PATH_ERROR: 'bad_path_error',
   VALIDATION_ERROR: 'validation_error',
   PAYLOAD_TOO_LARGE_ERROR: 'payload_too_large_error',
+  PRECONDITION_FAILED_ERROR: 'precondition_failed_error',
   UNKNOWN: 'unknown'
 }
 
@@ -294,5 +295,15 @@ export class PayloadTooLargeError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
     super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response)
     this.name = 'PayloadTooLargeError'
+  }
+}
+
+/**
+ * @ignore
+ */
+export class PreconditionFailedError extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.PRECONDITION_FAILED_ERROR }, response)
+    this.name = 'PreconditionFailedError'
   }
 }
