@@ -488,7 +488,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           uploadContentType = contentType
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
 
       const { putFile } = proxyquire('../../../src/storage', {
@@ -547,7 +547,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           encryptedContent = contents
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
       const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
   
@@ -608,7 +608,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           postedContent = Buffer.from(contents.buffer).toString()
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
       const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
   
@@ -666,7 +666,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           encryptedContent = contents
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
       const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
   
@@ -711,7 +711,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
     const fileContent = { test: 'test' }
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
 
     const { putFile } = proxyquire('../../../src/storage', {
       './hub': { uploadToGaiaHub }
@@ -744,7 +744,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.html'
     const fileContent = '<!DOCTYPE html><html><head><title>Title</title></head><body>Blockstack</body></html>'
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
 
     const { putFile } = proxyquire('../../../src/storage', {
       './hub': { uploadToGaiaHub }
@@ -794,7 +794,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
     const fileContent = JSON.stringify({ test: 'test' })
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
     const { putFile } = proxyquire('../../../src/storage', {
@@ -845,7 +845,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
     const fileContent = JSON.stringify({ test: 'test' })
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
     const { putFile } = proxyquire('../../../src/storage', {
@@ -895,7 +895,7 @@ export function runStorageTests() {
     const uploadToGaiaHub = sinon.stub().callsFake( // eslint-disable-line no-shadow
       (fname, contents) => {
         putFiledContents = contents
-        return Promise.resolve(`${readPrefix}/${fname}`)
+        return Promise.resolve({ publicURL: `${readPrefix}/${fname}` })
       }
     )
 
@@ -1007,7 +1007,7 @@ export function runStorageTests() {
         if (!fname.endsWith('.sig')) {
           t.equal(contents, fileContent)
         }
-        return Promise.resolve(pathToReadUrl(fname))
+        return Promise.resolve({ publicURL: pathToReadUrl(fname) })
       }
     )
 
