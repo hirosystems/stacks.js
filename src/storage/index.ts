@@ -51,11 +51,6 @@ export interface PutFileOptions {
   contentType?: string;
 }
 
-export interface PutFileResponse {
-  publicURL: string,
-  etag?: string
-}
-
 const SIGNATURE_FILE_SUFFIX = '.sig'
 
 /**
@@ -578,7 +573,7 @@ export async function putFile(
   content: string | Buffer | ArrayBufferView | Blob,
   options?: PutFileOptions,
   caller?: UserSession,
-): Promise<PutFileResponse> {
+): Promise<string> {
   const contentLoader = new FileContentLoader(content)
   
   const defaults: PutFileOptions = {
@@ -641,7 +636,7 @@ export async function putFile(
       if (writeResponse.etag) {
         etags[path] = writeResponse.etag
       }
-      return writeResponse
+      return writeResponse.publicURL
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       const writeResponse = (await Promise.all([
@@ -652,7 +647,7 @@ export async function putFile(
       if (writeResponse.etag) {
         etags[path] = writeResponse.etag
       }
-      return writeResponse
+      return writeResponse.publicURL
     }
   }
 
@@ -684,7 +679,7 @@ export async function putFile(
     if (writeResponse.etag) {
       etags[path] = writeResponse.etag
     }
-    return writeResponse
+    return writeResponse.publicURL
   } catch (error) {
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
     const writeResponse = await uploadToGaiaHub(
@@ -693,7 +688,7 @@ export async function putFile(
     if (writeResponse.etag) {
       etags[path] = writeResponse.etag
     }
-    return writeResponse
+    return writeResponse.publicURL
   }
 }
 
