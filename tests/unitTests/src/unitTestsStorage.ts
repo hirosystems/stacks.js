@@ -1272,13 +1272,13 @@ export function runStorageTests() {
       server: 'hub.testblockstack.org'
     }
 
-    FetchMock.post(`${config.server}/store/${config.address}/foo.json`,
-                   JSON.stringify({ publicURL: `${config.url_prefix}/${config.address}/foo.json` }))
+    const resp = JSON.stringify({ publicURL: `${config.url_prefix}/${config.address}/foo.json` })
+    FetchMock.post(`${config.server}/store/${config.address}/foo.json`, resp)
 
     uploadToGaiaHub('foo.json', 'foo the bar', config)
-      .then((url) => {
-        t.ok(url, 'URL returned')
-        t.equal(url, `${config.url_prefix}/${config.address}/foo.json`)
+      .then((res) => {
+        t.ok(res, 'URL returned')
+        t.equal(JSON.stringify(res), resp)
       })
   })
 
