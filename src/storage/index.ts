@@ -9,34 +9,27 @@ import {
 // export { type GaiaHubConfig } from './hub'
 
 import {
-  encryptECIES, decryptECIES, signECDSA, verifyECDSA
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonStringLength, 
+  SignedCipherObject, CipherTextEncoding
 } from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
   SignatureVerificationError,
-  DoesNotExist
+  DoesNotExist,
+  PayloadTooLargeError,
+  GaiaHubError
 } from '../errors'
 
 import { UserSession } from '../auth/userSession'
 import { NAME_LOOKUP_PATH } from '../auth/authConstants'
-import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
+import { getGlobalObject, getBlockstackErrorFromResponse, megabytesToBytes } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
-/**
- * Specify a valid MIME type, encryption, and whether to sign the [[UserSession.putFile]].
- */
-export interface PutFileOptions {
+
+export interface EncryptionOptions {
   /**
-  * Encrypt the data with the app public key. 
-  * If a string is specified, it is used as the public key. 
-  * If the boolean `true` is specified then the current user's app public key is used. 
-   * @default true
-   */
-  encrypt?: boolean | string;
-  /**
-   *
    * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
    * app private key. If a string is specified, it is used as the private key instead
    * of the user's app private key. 
@@ -44,9 +37,51 @@ export interface PutFileOptions {
    */
   sign?: boolean | string;
   /**
-   * Set a Content-Type header for unencrypted data. 
+   * String encoding format for the cipherText buffer.
+   * Currently defaults to 'hex' for legacy backwards-compatibility.
+   * Only used if the `encrypt` option is also used.
+   * Note: in the future this should default to 'base64' for the significant
+   * file size reduction.
+   */
+  cipherTextEncoding?: CipherTextEncoding;
+  /**
+   * Specifies if the original unencrypted content is a ASCII or UTF-8 string. 
+   * For example stringified JSON. 
+   * If true, then when the ciphertext is decrypted, it will be returned as 
+   * a `string` type variable, otherwise will be returned as a Buffer.
+   */
+  wasString?: boolean;
+}
+
+/**
+ * Specify encryption options, and whether to sign the ciphertext.
+ */
+export interface EncryptContentOptions extends EncryptionOptions {
+  /**
+   * Encrypt the data with this key. 
+   * If not provided then the current user's app public key is used. 
+   */
+  publicKey?: string;
+}
+
+/**
+ * Specify a valid MIME type, encryption options, and whether to sign the [[UserSession.putFile]].
+ */
+export interface PutFileOptions extends EncryptionOptions {
+  /**
+   * Specifies the Content-Type header for unencrypted data. 
+   * If the `encrypt` is enabled, this option is ignored, and the 
+   * Content-Type header is set to `application/json` for the ciphertext 
+   * JSON envelope. 
    */
   contentType?: string;
+  /**
+   * Encrypt the data with the app public key. 
+   * If a string is specified, it is used as the public key. 
+   * If the boolean `true` is specified then the current user's app public key is used. 
+   * @default true
+   */
+  encrypt?: boolean | string;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -93,18 +128,42 @@ export async function getUserAppFileUrl(
  */
 export async function encryptContent(
   content: string | Buffer,
-  options?: {
-    publicKey?: string
-  },
+  options?: EncryptContentOptions,
   caller?: UserSession
 ): Promise<string> {
   const opts = Object.assign({}, options)
+  let privateKey: string
   if (!opts.publicKey) {
-    const privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
     opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
-  const cipherObject = await encryptECIES(opts.publicKey, content)
-  return JSON.stringify(cipherObject)
+  let wasString: boolean
+  if (typeof opts.wasString === 'boolean') {
+    wasString = opts.wasString
+  } else {
+    wasString = typeof content === 'string'
+  }
+  const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
+  const cipherObject = await encryptECIES(opts.publicKey, 
+                                          contentBuffer, 
+                                          wasString, 
+                                          opts.cipherTextEncoding)
+  let cipherPayload = JSON.stringify(cipherObject)
+  if (opts.sign) {
+    if (typeof opts.sign === 'string') {
+      privateKey = opts.sign
+    } else if (!privateKey) {
+      privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    }
+    const signatureObject = signECDSA(privateKey, cipherPayload)
+    const signedCipherObject: SignedCipherObject = {
+      signature: signatureObject.signature,
+      publicKey: signatureObject.publicKey,
+      cipherText: cipherPayload
+    }
+    cipherPayload = JSON.stringify(signedCipherObject)
+  }
+  return cipherPayload
 }
 
 /**
@@ -257,12 +316,15 @@ async function getFileContents(path: string, app: string, username: string | und
   const readUrl = await getFileUrl(path, opts, caller)
   const response = await fetchPrivate(readUrl)
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`, null)
   }
-  const contentType = response.headers.get('Content-Type')
+  let contentType = response.headers.get('Content-Type')
+  if (typeof contentType === 'string') {
+    contentType = contentType.toLowerCase()
+  }
   if (forceText || contentType === null
     || contentType.startsWith('text')
-    || contentType === 'application/json') {
+    || contentType.startsWith('application/json')) {
     return response.text()
   } else {
     return response.arrayBuffer()
@@ -500,20 +562,73 @@ export async function getFile(
 }
 
 /** @ignore */
-type PutFileContent = string | Buffer | ArrayBufferView | Blob
+type PutFileContent = string | Buffer | ArrayBufferView | ArrayBufferLike | Blob
 
 /** @ignore */
 class FileContentLoader {
-  content: PutFileContent
-  
-  loadedData?: Promise<Buffer | string>
+  readonly content: Buffer | Blob
 
-  constructor(content: PutFileContent) {
-    this.content = content
+  readonly wasString: boolean
+
+  readonly contentType: string
+
+  readonly contentByteLength: number
+
+  private loadedData?: Promise<Buffer>
+
+  static readonly supportedTypesMsg = 'Supported types are: `string` (to be UTF8 encoded), '
+    + '`Buffer`, `Blob`, `File`, `ArrayBuffer`, `UInt8Array` or any other typed array buffer. '
+
+  constructor(content: PutFileContent, contentType: string) {
+    this.wasString = typeof content === 'string'
+    this.content = FileContentLoader.normalizeContentDataType(content, contentType)
+    this.contentType = contentType || this.detectContentType()
+    this.contentByteLength = this.detectContentLength()
   }
 
-  getContentType(): string {
-    if (typeof this.content === 'string') {
+  private static normalizeContentDataType(content: PutFileContent, 
+                                          contentType: string): Buffer | Blob {
+    try {
+      if (typeof content === 'string') {
+        // If a charset is specified it must be either utf8 or ascii, otherwise the encoded content 
+        // length cannot be reliably detected. If no charset specified it will be treated as utf8. 
+        const charset = (contentType || '').toLowerCase().replace('-', '')
+        if (charset.includes('charset') && !charset.includes('charset=utf8') && !charset.includes('charset=ascii')) {
+          throw new Error(`Unable to determine byte length with charset: ${contentType}`)
+        }
+        if (typeof TextEncoder !== 'undefined') {
+          const encodedString = new TextEncoder().encode(content)
+          return Buffer.from(encodedString.buffer)
+        }
+        return Buffer.from(content)
+      } else if (Buffer.isBuffer(content)) {
+        return content
+      } else if (ArrayBuffer.isView(content)) {
+        return Buffer.from(content.buffer, content.byteOffset, content.byteLength)
+      } else if (typeof Blob !== 'undefined' && content instanceof Blob) {
+        return content
+      } else if (typeof ArrayBuffer !== 'undefined' && content instanceof ArrayBuffer) {
+        return Buffer.from(content)
+      } else if (Array.isArray(content)) {
+        // Provided with a regular number `Array` -- this is either an (old) method 
+        // of representing an octet array, or a dev error. Perform basic check for octet array. 
+        if (content.length > 0 
+          && (!Number.isInteger(content[0]) || content[0] < 0 || content[0] > 255)) {
+          throw new Error(`Unexpected array values provided as file data: value "${content[0]}" at index 0 is not an octet number. ${this.supportedTypesMsg}`)
+        }
+        return Buffer.from(content)
+      } else {
+        const typeName = Object.prototype.toString.call(content)
+        throw new Error(`Unexpected type provided as file data: ${typeName}. ${this.supportedTypesMsg}`)
+      }
+    } catch (error) {
+      console.error(error)
+      throw new Error(`Error processing data: ${error}`)
+    }
+  }
+
+  private detectContentType(): string {
+    if (this.wasString) {
       return 'text/plain; charset=utf-8'
     } else if (typeof Blob !== 'undefined' && this.content instanceof Blob && this.content.type) {
       return this.content.type
@@ -522,28 +637,48 @@ class FileContentLoader {
     }
   }
 
-  private async loadContent(): Promise<Buffer | string> {
-    if (typeof this.content === 'string') {
-      return this.content
-    } else if (ArrayBuffer.isView(this.content)) {
-      return Buffer.from(this.content.buffer)
+  private detectContentLength(): number {
+    if (ArrayBuffer.isView(this.content) || Buffer.isBuffer(this.content)) {
+      return this.content.byteLength
     } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
-      const reader = new FileReader()
-      const readPromise = new Promise<Buffer>((resolve, reject) => {
-        reader.onerror = (err) => {
-          reject(err)
-        }
-        reader.onload = () => {
-          const arrayBuffer = reader.result as ArrayBuffer
-          resolve(Buffer.from(arrayBuffer))
-        }
-        reader.readAsArrayBuffer(this.content as Blob)
-      })
-      const result = await readPromise
-      return result
+      return this.content.size
     }
     const typeName = Object.prototype.toString.call(this.content)
-    throw new Error(`Unsupported content object type: ${typeName}`)
+    const error = new Error(`Unexpected type "${typeName}" while detecting content length`)
+    console.error(error)
+    throw error
+  }
+
+  private async loadContent(): Promise<Buffer> {
+    try {
+      if (Buffer.isBuffer(this.content)) {
+        return this.content
+      } else if (ArrayBuffer.isView(this.content)) {
+        return Buffer.from(this.content.buffer, this.content.byteOffset, this.content.byteLength)
+      } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
+        const reader = new FileReader()
+        const readPromise = new Promise<Buffer>((resolve, reject) => {
+          reader.onerror = (err) => {
+            reject(err)
+          }
+          reader.onload = () => {
+            const arrayBuffer = reader.result as ArrayBuffer
+            resolve(Buffer.from(arrayBuffer))
+          }
+          reader.readAsArrayBuffer(this.content as Blob)
+        })
+        const result = await readPromise
+        return result
+      } else {
+        const typeName = Object.prototype.toString.call(this.content)
+        throw new Error(`Unexpected type ${typeName}`)
+      }
+    } catch (error) {
+      console.error(error)
+      const loadContentError = new Error(`Error loading content: ${error}`)
+      console.error(loadContentError)
+      throw loadContentError
+    }
   }
 
   load(): Promise<Buffer | string> {
@@ -552,6 +687,30 @@ class FileContentLoader {
     }
     return this.loadedData
   }
+}
+
+/** 
+ * Determines if a gaia error response is possible to recover from
+ * by refreshing the gaiaHubConfig, and retrying the request. 
+ */
+function isRecoverableGaiaError(error: GaiaHubError): boolean {
+  if (!error || !error.hubError || !error.hubError.statusCode) {
+    return false
+  }
+  const statusCode = error.hubError.statusCode
+  // 401 Unauthorized: possible expired, but renewable auth token.
+  if (statusCode === 401) {
+    return true
+  }
+  // 409 Conflict: possible concurrent writes to a file.
+  if (statusCode === 409) {
+    return true
+  }
+  // 500s: possible server-side transient error
+  if (statusCode >= 500 && statusCode <= 599) {
+    return true
+  }
+  return false
 }
 
 /**
@@ -567,102 +726,118 @@ export async function putFile(
   options?: PutFileOptions,
   caller?: UserSession,
 ): Promise<string> {
-  const contentLoader = new FileContentLoader(content)
-  
   const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
-    contentType: ''
+    cipherTextEncoding: 'hex'
   }
-
   const opt = Object.assign({}, defaults, options)
-
-  let { contentType } = opt
-  if (!contentType) {
-    contentType = contentLoader.getContentType()
-  }
 
   if (!caller) {
     caller = new UserSession()
   }
 
-  // First, let's figure out if we need to get public/private keys,
-  //  or if they were passed in
+  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes)
+  const hasMaxUpload = maxUploadBytes > 0
 
-  let privateKey = ''
-  let publicKey = ''
-  if (opt.sign) {
-    if (typeof (opt.sign) === 'string') {
+  const contentLoader = new FileContentLoader(content, opt.contentType)
+  let contentType = contentLoader.contentType
+
+  // When not encrypting the content length can be checked immediately.
+  if (!opt.encrypt && hasMaxUpload && contentLoader.contentByteLength > maxUploadBytes) {
+    const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${contentLoader.contentByteLength} bytes`
+    const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
+    console.error(sizeErr)
+    throw sizeErr
+  }
+  
+  // When encrypting, the content length must be calculated. Certain types like `Blob`s must
+  // be loaded into memory. 
+  if (opt.encrypt && hasMaxUpload) {
+    const encryptedSize = eciesGetJsonStringLength({
+      contentLength: contentLoader.contentByteLength, 
+      wasString: contentLoader.wasString,
+      sign: !!opt.sign,
+      cipherTextEncoding: opt.cipherTextEncoding
+    })
+    if (encryptedSize > maxUploadBytes) {
+      const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes after encryption`
+      const sizeErr = new PayloadTooLargeError(sizeErrMsg, null, maxUploadBytes)
+      console.error(sizeErr)
+      throw sizeErr
+    }
+  }
+
+  let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
+
+  // In the case of signing, but *not* encrypting, we perform two uploads.
+  if (!opt.encrypt && opt.sign) {
+    const contentData = await contentLoader.load()
+    let privateKey: string
+    if (typeof opt.sign === 'string') {
       privateKey = opt.sign
     } else {
       privateKey = caller.loadUserData().appPrivateKey
     }
-  }
-  if (opt.encrypt) {
-    if (typeof (opt.encrypt) === 'string') {
-      publicKey = opt.encrypt
-    } else {
-      if (!privateKey) {
-        privateKey = caller.loadUserData().appPrivateKey
-      }
-      publicKey = getPublicKeyFromPrivate(privateKey)
-    }
-  }
-
-  // In the case of signing, but *not* encrypting,
-  //   we perform two uploads. So the control-flow
-  //   here will return there.
-  if (!opt.encrypt && opt.sign) {
-    const contentData = await contentLoader.load()
     const signatureObject = signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
-    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
 
-    try {
+    uploadFn = async (hubConfig: GaiaHubConfig) => {
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, contentData, gaiaHubConfig, contentType),
+        uploadToGaiaHub(path, contentData, hubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                        signatureContent, gaiaHubConfig, 'application/json')
-      ])
-      return fileUrls[0]
-    } catch (error) {
-      const freshHubConfig = await caller.setLocalGaiaHubConnection()
-      const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, contentData, freshHubConfig, contentType),
-        uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
-                        signatureContent, freshHubConfig, 'application/json')
+                        signatureContent, hubConfig, 'application/json')
       ])
       return fileUrls[0]
     }
-  }
-
-  // In all other cases, we only need one upload.
-  let contentForUpload: Blob | Buffer | ArrayBufferView | string
-  if (opt.encrypt && !opt.sign) {
-    const contentData = await contentLoader.load()
-    contentForUpload = await encryptContent(contentData, { publicKey })
-    contentType = 'application/json'
-  } else if (opt.encrypt && opt.sign) {
-    const contentData = await contentLoader.load()
-    const cipherText = await encryptContent(contentData, { publicKey })
-    const signatureObject = signECDSA(privateKey, cipherText)
-    const signedCipherObject = {
-      signature: signatureObject.signature,
-      publicKey: signatureObject.publicKey,
-      cipherText
-    }
-    contentForUpload = JSON.stringify(signedCipherObject)
-    contentType = 'application/json'
   } else {
-    contentForUpload = content
+    // In all other cases, we only need one upload.
+    let contentForUpload: string | Buffer | Blob
+    if (!opt.encrypt && !opt.sign) {
+      // If content does not need encrypted or signed, it can be passed directly 
+      // to the fetch request without loading into memory. 
+      contentForUpload = contentLoader.content
+    } else {
+      // Use the `encrypt` key, otherwise the `sign` key, if neither are specified
+      // then use the current user's app public key. 
+      let publicKey: string
+      if (typeof opt.encrypt === 'string') {
+        publicKey = opt.encrypt
+      } else if (typeof opt.sign === 'string') {
+        publicKey = getPublicKeyFromPrivate(opt.sign)
+      } else {
+        publicKey = getPublicKeyFromPrivate(caller.loadUserData().appPrivateKey)
+      }
+      const contentData = await contentLoader.load()
+      contentForUpload = await encryptContent(contentData, { 
+        publicKey, 
+        wasString: contentLoader.wasString,
+        cipherTextEncoding: opt.cipherTextEncoding,
+        sign: opt.sign
+      })
+      contentType = 'application/json'
+    }
+
+    uploadFn = async (hubConfig: GaiaHubConfig) => {
+      const file = await uploadToGaiaHub(path, contentForUpload, hubConfig, contentType)
+      return file
+    }
   }
-  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+
   try {
-    return await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType)
+    return await uploadFn(gaiaHubConfig)
   } catch (error) {
-    const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const file = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType)
-    return file
+    // If the upload fails on first attempt, it could be due to a recoverable
+    // error which may succeed by refreshing the config and retrying.
+    if (isRecoverableGaiaError(error)) {
+      console.error(error)
+      console.error('Possible recoverable error during Gaia upload, retrying...')
+      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      return await uploadFn(freshHubConfig)
+    } else {
+      throw error
+    }
   }
 }
 
@@ -759,7 +934,7 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.')
+      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.', hubConfig)
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.

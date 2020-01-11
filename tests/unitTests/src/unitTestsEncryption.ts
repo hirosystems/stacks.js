@@ -293,12 +293,12 @@ export function runEncryptionTests() {
     t.plan(2)
 
     const testString = 'all work and no play makes jack a dull boy'
-    let cipherObj = await encryptECIES(publicKey, testString)
+    let cipherObj = await encryptECIES(publicKey, Buffer.from(testString), true)
     let deciphered = await decryptECIES(privateKey, cipherObj)
     t.equal(deciphered, testString, 'Decrypted ciphertext does not match expected plaintext')
 
     const testBuffer = Buffer.from(testString)
-    cipherObj = await encryptECIES(publicKey, testBuffer)
+    cipherObj = await encryptECIES(publicKey, testBuffer, false)
     deciphered = await decryptECIES(privateKey, cipherObj)
     t.equal(deciphered.toString('hex'), testBuffer.toString('hex'),
             'Decrypted cipherbuffer does not match expected plainbuffer')
@@ -308,9 +308,9 @@ export function runEncryptionTests() {
     t.plan(3)
 
     const testString = 'all work and no play makes jack a dull boy'
-    const cipherObj = await encryptECIES(publicKey, testString)
+    const cipherObj = await encryptECIES(publicKey, Buffer.from(testString), true)
     const evilString = 'some work and some play makes jack a dull boy'
-    const evilObj = await encryptECIES(publicKey, evilString)
+    const evilObj = await encryptECIES(publicKey, Buffer.from(evilString), true)
 
     cipherObj.cipherText = evilObj.cipherText
 

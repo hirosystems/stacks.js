@@ -212,27 +212,31 @@ export interface GaiaHubErrorResponse {
   body?: string | any
 }
 
+export interface HubErrorDetails {
+  message?: string
+  statusCode: number
+  statusText: string
+  [prop: string]: any
+}
+
 /**
 * @ignore
 */
-class GaiaHubError extends BlockstackError {
-  hubError: {
-    message?: string
-    statusCode: number
-    statusText: string
-    [prop: string]: any
-  }
+export class GaiaHubError extends BlockstackError {
+  hubError: HubErrorDetails
 
   constructor(error: ErrorData, response: GaiaHubErrorResponse) {
     super(error)
-    this.hubError = {
-      statusCode: response.status,
-      statusText: response.statusText
-    }
-    if (typeof response.body === 'string') {
-      this.hubError.message = response.body
-    } else if (typeof response.body === 'object') {
-      Object.assign(this.hubError, response.body)
+    if (response) {
+      this.hubError = {
+        statusCode: response.status,
+        statusText: response.statusText
+      }
+      if (typeof response.body === 'string') {
+        this.hubError.message = response.body
+      } else if (typeof response.body === 'object') {
+        Object.assign(this.hubError, response.body)
+      }
     }
   }
 }
@@ -291,8 +295,14 @@ export class ValidationError extends GaiaHubError {
  * @ignore
  */
 export class PayloadTooLargeError extends GaiaHubError {
-  constructor(message: string, response: GaiaHubErrorResponse) {
+  /** Can be `null` when an oversized payload is detected client-side. */
+  hubError: HubErrorDetails
+
+  maxUploadByteSize: number;
+
+  constructor(message: string, response: GaiaHubErrorResponse, maxUploadByteSize: number) {
     super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response)
     this.name = 'PayloadTooLargeError'
+    this.maxUploadByteSize = maxUploadByteSize
   }
 }

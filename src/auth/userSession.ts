@@ -267,7 +267,7 @@ export class UserSession {
    */
   encryptContent(
     content: string | Buffer,
-    options?: {publicKey?: string}
+    options?: import('../storage').EncryptContentOptions
   ): Promise<string> {
     return storage.encryptContent(content, options, this)
   }

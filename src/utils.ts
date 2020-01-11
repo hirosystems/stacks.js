@@ -55,6 +55,39 @@ export function nextHour() {
 }
 
 /**
+ * Converts megabytes to bytes. Returns 0 if the input is not a finite number.
+ * @ignore
+ */
+export function megabytesToBytes(megabytes: number): number {
+  if (!Number.isFinite(megabytes)) {
+    return 0
+  }
+  return Math.floor(megabytes * 1024 * 1024)
+}
+
+/**
+ * Calculate the AES-CBC ciphertext output byte length a given input length.
+ * AES has a fixed block size of 16-bytes regardless key size.
+ * @ignore
+ */
+export function getAesCbcOutputLength(inputByteLength: number) {
+  // AES-CBC block mode rounds up to the next block size. 
+  const cipherTextLength = (Math.floor(inputByteLength / 16) + 1) * 16
+  return cipherTextLength
+}
+
+/**
+ * Calculate the base64 encoded string length for a given input length. 
+ * This is equivalent to the byte length when the string is ASCII or UTF8-8 
+ * encoded.  
+ * @param number 
+ */
+export function getBase64OutputLength(inputByteLength: number) {
+  const encodedLength = (Math.ceil(inputByteLength / 3) * 4)
+  return encodedLength
+}
+
+/**
  * Query Strings
  * @private
  * @ignore
@@ -341,7 +374,8 @@ async function getGaiaErrorResponse(response: Response): Promise<GaiaHubErrorRes
  */
 export async function getBlockstackErrorFromResponse(
   response: Response,
-  errorMsg: string
+  errorMsg: string,
+  hubConfig: import('./storage/hub').GaiaHubConfig | null
 ): Promise<Error> {
   if (response.ok) {
     throw new Error('Cannot get a BlockstackError from a valid response.')
@@ -358,7 +392,8 @@ export async function getBlockstackErrorFromResponse(
   } else if (gaiaResponse.status === 409) {
     return new ConflictError(errorMsg, gaiaResponse)
   } else if (gaiaResponse.status === 413) {
-    return new PayloadTooLargeError(errorMsg, gaiaResponse)
+    const maxBytes = megabytesToBytes(hubConfig?.max_file_upload_size_megabytes)
+    return new PayloadTooLargeError(errorMsg, gaiaResponse, maxBytes)
   } else {
     return new Error(errorMsg)
   }

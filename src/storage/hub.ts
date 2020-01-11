@@ -20,6 +20,7 @@ export interface GaiaHubConfig {
   address: string,
   url_prefix: string,
   token: string,
+  max_file_upload_size_megabytes: number | undefined,
   server: string
 }
 
@@ -50,7 +51,7 @@ export async function uploadToGaiaHub(
     }
   )
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.')
+    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.', hubConfig)
   }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
@@ -71,7 +72,7 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.')
+    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.', hubConfig)
   }
 }
 
@@ -179,6 +180,7 @@ export async function connectToGaiaHub(
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {
     url_prefix: readURL,
+    max_file_upload_size_megabytes: hubInfo.max_file_upload_size_megabytes,
     address,
     token,
     server: gaiaHubUrl
