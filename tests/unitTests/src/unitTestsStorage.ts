@@ -737,6 +737,58 @@ export function runStorageTests() {
       })
   })
 
+  test('putFile passes etag to upload function', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const dom = new jsdom.JSDOM('', {}).window
+    const globalAPIs: {[key: string]: any } = {
+      File: dom.File,
+      Blob: dom.Blob,
+      FileReader: (dom as any).FileReader as FileReader
+    }
+    for (const globalAPI of Object.keys(globalAPIs)) {
+      (global as any)[globalAPI] = globalAPIs[globalAPI]
+    }
+    try {
+      const fileContent = new dom.File(['file content test'], 'filenametest.txt', { type: 'text/example' })
+
+      const uploadToGaiaHub = sinon.spy((
+        filename: string, 
+        contents: any,
+        hubConfig: any,
+        contentType: string,
+        etag?: string) => Promise.resolve({ publicURL: 'url', etag: 'test-etag' }));
+
+      const putFile = proxyquire('../../../src/storage', {
+        './hub': { uploadToGaiaHub }
+      }).putFile as typeof import('../../../src/storage').putFile
+
+      const options = { encrypt: false }
+
+      await putFile(path, fileContent, options, blockstack)
+      await putFile(path, fileContent, options, blockstack)
+
+      t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, 'test-etag'))
+    } finally {
+      for (const globalAPI of Object.keys(globalAPIs)) {
+        delete (global as any)[globalAPI]
+      }
+    }
+  })
+
   test('putFile & getFile unencrypted, not signed, with contentType', async (t) => {
     FetchMock.reset()
     t.plan(3)
