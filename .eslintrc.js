@@ -8,6 +8,8 @@ module.exports = {
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier/@typescript-eslint"
+
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -55,7 +57,7 @@ module.exports = {
     "no-console": 0,
     "prefer-const": 2,
     "new-cap": 0,
-    "semi": [2, "never"],
+    "semi": 0,
     "valid-jsdoc": "off",
     "object-curly-newline": "off",    
     "arrow-parens": "off",
