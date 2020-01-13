@@ -5,7 +5,7 @@ import {
   encryptECIES, decryptECIES, getHexFromBN, signECDSA,
   verifyECDSA,  encryptMnemonic, decryptMnemonic
 } from '../../../src/encryption'
-
+import { ERROR_CODES } from '../../../src/errors'
 
 export function runEncryptionTests() {
   const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'
@@ -27,7 +27,7 @@ export function runEncryptionTests() {
   })
 
   test('encrypt-to-decrypt fails on bad mac', (t) => {
-    t.plan(1)
+    t.plan(3)
 
     const testString = 'all work and no play makes jack a dull boy'
     const cipherObj = encryptECIES(publicKey, testString)
@@ -41,6 +41,9 @@ export function runEncryptionTests() {
       t.true(false, 'Decryption should have failed when ciphertext modified')
     } catch (e) {
       t.true(true, 'Decryption correctly fails when ciphertext modified')
+      t.equal(e.code, ERROR_CODES.FAILED_DECRYPTION_ERROR, 'Must have proper error code')
+      const assertionMessage = 'Should indicate MAC error'
+       t.notEqual(e.message.indexOf('failure in MAC check'), -1, assertionMessage)
     }
   })
 

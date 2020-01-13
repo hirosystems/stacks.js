@@ -4,11 +4,13 @@ import * as crypto from 'crypto'
 
 // @ts-ignore: Could not find a declaration file for module
 import { TokenSigner } from 'jsontokens'
-import { ecPairToAddress, hexStringToECPair } from '../utils'
+import {
+  ecPairToAddress,
+  hexStringToECPair,
+  getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 import { getPublicKeyFromPrivate } from '../keys'
 import { Logger } from '../logger'
-import { FileNotFound } from '../errors'
 
 /**
  * @ignore
@@ -35,7 +37,8 @@ export interface GaiaHubConfig {
  * @ignore
  */
 export async function uploadToGaiaHub(
-  filename: string, contents: any,
+  filename: string, 
+  contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream'
 ): Promise<string> {
@@ -51,8 +54,8 @@ export async function uploadToGaiaHub(
     }
   )
   if (!response.ok) {
-    throw new Error('Error when uploading to Gaia hub')
-  } 
+    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.')
+  }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
   return responseJSON.publicURL
@@ -63,7 +66,7 @@ export async function deleteFromGaiaHub(
   hubConfig: GaiaHubConfig
 ): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`)
-  const response = await fetch(
+  const response = await fetchPrivate(
     `${hubConfig.server}/delete/${hubConfig.address}/${filename}`, {
       method: 'DELETE',
       headers: {
@@ -72,20 +75,7 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    let responseMsg = ''
-    try {
-      responseMsg = await response.text()
-    } catch (error) {
-      Logger.debug(`Error getting bad http response text: ${error}`)
-    }
-    const errorMsg = 'Error deleting file from Gaia hub: '
-      + `${response.status} ${response.statusText}: ${responseMsg}`
-    Logger.error(errorMsg)
-    if (response.status === 404) {
-      throw new FileNotFound(errorMsg)
-    } else {
-      throw new Error(errorMsg)
-    }
+    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.')
   }
 }
 
@@ -146,13 +136,15 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
  * @param signerKeyHex 
  * @param hubUrl 
  * @param associationToken 
- * 
+ * @param expiresAt
+ *
  * @ignore
  */
 function makeV1GaiaAuthToken(hubInfo: any,
                              signerKeyHex: string,
                              hubUrl: string,
-                             associationToken?: string): string {
+                             associationToken?: string,
+                             expiresAt?: number): string {
   const challengeText = hubInfo.challenge_text
   const handlesV1Auth = (hubInfo.latest_auth_version
                          && parseInt(hubInfo.latest_auth_version.slice(1), 10) >= 1)
@@ -164,6 +156,7 @@ function makeV1GaiaAuthToken(hubInfo: any,
 
   const salt = crypto.randomBytes(16).toString('hex')
   const payload = {
+    exp: expiresAt,
     gaiaChallenge: challengeText,
     hubUrl,
     iss,
@@ -176,19 +169,31 @@ function makeV1GaiaAuthToken(hubInfo: any,
 
 /**
  * 
+ * @param gaiaHubUrl
+ * @param challengeSignerHex
+ * @param associationToken
+ * @param tokenValidityBufferTime: Time in seconds for which the generated token should be valid
+ *
  * @ignore
+ *
  */
 export async function connectToGaiaHub(
   gaiaHubUrl: string,
   challengeSignerHex: string,
-  associationToken?: string
+  associationToken?: string,
+  tokenValidityBufferTime?: number,
 ): Promise<GaiaHubConfig> {
   Logger.debug(`connectToGaiaHub: ${gaiaHubUrl}/hub_info`)
 
   const response = await fetchPrivate(`${gaiaHubUrl}/hub_info`)
   const hubInfo = await response.json()
   const readURL = hubInfo.read_url_prefix
-  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl, associationToken)
+  let expiresAt
+  if (tokenValidityBufferTime) {
+    expiresAt = (Date.now() / 1000) + tokenValidityBufferTime
+  }
+  const token = makeV1GaiaAuthToken(hubInfo, challengeSignerHex, gaiaHubUrl,
+                                    associationToken, expiresAt)
   const address = ecPairToAddress(hexStringToECPair(challengeSignerHex
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {

@@ -15,12 +15,12 @@ import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
 import { lookupProfile } from '../profiles/profileLookup'
 import {
   InvalidStateError,
-  SignatureVerificationError
+  SignatureVerificationError,
+  DoesNotExist
 } from '../errors'
-import { Logger } from '../logger'
 
 import { UserSession } from '../auth/userSession'
-import { getGlobalObject } from '../utils'
+import { getGlobalObject, getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -35,8 +35,10 @@ export interface PutFileOptions {
    */
   encrypt?: boolean | string;
   /**
-   * Sign the data using ECDSA on SHA256 hashes with the user's app private key. 
-   * If a string is specified, it is used as the private key. 
+   *
+   * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
+   * app private key. If a string is specified, it is used as the private key instead
+   * of the user's app private key. 
    * @default false
    */
   sign?: boolean | string;
@@ -230,34 +232,24 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-function getFileContents(path: string, app: string, username: string | undefined, 
-                         zoneFileLookupURL: string | undefined,
-                         forceText: boolean,
-                         caller?: UserSession): Promise<string | ArrayBuffer | null> {
-  return Promise.resolve()
-    .then(() => {
-      const opts = { app, username, zoneFileLookupURL }
-      return getFileUrl(path, opts, caller)
-    })
-    .then(readUrl => fetchPrivate(readUrl))
-    .then<string | ArrayBuffer | null>((response) => {
-      if (response.status !== 200) {
-        if (response.status === 404) {
-          Logger.debug(`getFile ${path} returned 404, returning null`)
-          return null
-        } else {
-          throw new Error(`getFile ${path} failed with HTTP status ${response.status}`)
-        }
-      }
-      const contentType = response.headers.get('Content-Type')
-      if (forceText || contentType === null
-          || contentType.startsWith('text')
-          || contentType === 'application/json') {
-        return response.text()
-      } else {
-        return response.arrayBuffer()
-      }
-    })
+async function getFileContents(path: string, app: string, username: string | undefined, 
+                               zoneFileLookupURL: string | undefined,
+                               forceText: boolean,
+                               caller?: UserSession): Promise<string | ArrayBuffer | null> {
+  const opts = { app, username, zoneFileLookupURL }
+  const readUrl = await getFileUrl(path, opts, caller)
+  const response = await fetchPrivate(readUrl)
+  if (!response.ok) {
+    throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`)
+  }
+  const contentType = response.headers.get('Content-Type')
+  if (forceText || contentType === null
+    || contentType.startsWith('text')
+    || contentType === 'application/json') {
+    return response.text()
+  } else {
+    return response.arrayBuffer()
+  }
 }
 
 /* Handle fetching an unencrypted file, its associated signature
@@ -266,14 +258,15 @@ function getFileContents(path: string, app: string, username: string | undefined
  * @private
  * @ignore
  */
-function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
+async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
   //    do browsers cache all these requests if Content-Cache is set?
+  const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
   return Promise.all(
     [getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
-     getFileContents(`${path}${SIGNATURE_FILE_SUFFIX}`, opt.app, opt.username,
+     getFileContents(sigPath, opt.app, opt.username,
                      opt.zoneFileLookupURL, true, caller),
      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)]
   )
@@ -316,9 +309,16 @@ function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: Us
       } else {
         return fileContents
       }
+    }).catch((err) => {
+      // For missing .sig files, throw `SignatureVerificationError` instead of `DoesNotExist` error.
+      if (err instanceof DoesNotExist && err.message.indexOf(sigPath) >= 0) {
+        throw new SignatureVerificationError('Failed to obtain signature for file: '
+                                             + `${path} -- looked in ${path}${SIGNATURE_FILE_SUFFIX}`)
+      } else {
+        throw err
+      }
     })
 }
-
 
 /* Handle signature verification and decryption for contents which are
  *  expected to be signed and encrypted. This works for single and
@@ -421,7 +421,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
-export function getFile(
+export async function getFile(
   path: string, 
   options?: GetFileOptions,
   caller?: UserSession
@@ -468,6 +468,61 @@ export function getFile(
     })
 }
 
+/** @ignore */
+type PutFileContent = string | Buffer | ArrayBufferView | Blob
+
+/** @ignore */
+class FileContentLoader {
+  content: PutFileContent
+  
+  loadedData?: Promise<Buffer | string>
+
+  constructor(content: PutFileContent) {
+    this.content = content
+  }
+
+  getContentType(): string {
+    if (typeof this.content === 'string') {
+      return 'text/plain; charset=utf-8'
+    } else if (typeof Blob !== 'undefined' && this.content instanceof Blob && this.content.type) {
+      return this.content.type
+    } else {
+      return 'application/octet-stream'
+    }
+  }
+
+  private async loadContent(): Promise<Buffer | string> {
+    if (typeof this.content === 'string') {
+      return this.content
+    } else if (ArrayBuffer.isView(this.content)) {
+      return Buffer.from(this.content.buffer)
+    } else if (typeof Blob !== 'undefined' && this.content instanceof Blob) {
+      const reader = new FileReader()
+      const readPromise = new Promise<Buffer>((resolve, reject) => {
+        reader.onerror = (err) => {
+          reject(err)
+        }
+        reader.onload = () => {
+          const arrayBuffer = reader.result as ArrayBuffer
+          resolve(Buffer.from(arrayBuffer))
+        }
+        reader.readAsArrayBuffer(this.content as Blob)
+      })
+      const result = await readPromise
+      return result
+    }
+    const typeName = Object.prototype.toString.call(this.content)
+    throw new Error(`Unsupported content object type: ${typeName}`)
+  }
+
+  load(): Promise<Buffer | string> {
+    if (this.loadedData === undefined) {
+      this.loadedData = this.loadContent()
+    }
+    return this.loadedData
+  }
+}
+
 /**
  * Stores the data provided in the app's data store to to the file specified.
  * @param {String} path - the path to store the data in
@@ -477,10 +532,12 @@ export function getFile(
  */
 export async function putFile(
   path: string,
-  content: string | Buffer,
+  content: string | Buffer | ArrayBufferView | Blob,
   options?: PutFileOptions,
   caller?: UserSession,
 ): Promise<string> {
+  const contentLoader = new FileContentLoader(content)
+  
   const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
@@ -491,7 +548,7 @@ export async function putFile(
 
   let { contentType } = opt
   if (!contentType) {
-    contentType = (typeof (content) === 'string') ? 'text/plain; charset=utf-8' : 'application/octet-stream'
+    contentType = contentLoader.getContentType()
   }
 
   if (!caller) {
@@ -525,13 +582,14 @@ export async function putFile(
   //   we perform two uploads. So the control-flow
   //   here will return there.
   if (!opt.encrypt && opt.sign) {
-    const signatureObject = signECDSA(privateKey, content)
+    const contentData = await contentLoader.load()
+    const signatureObject = signECDSA(privateKey, contentData)
     const signatureContent = JSON.stringify(signatureObject)
     const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
 
     try {
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, content, gaiaHubConfig, contentType),
+        uploadToGaiaHub(path, contentData, gaiaHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, gaiaHubConfig, 'application/json')
       ])
@@ -539,7 +597,7 @@ export async function putFile(
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, content, freshHubConfig, contentType),
+        uploadToGaiaHub(path, contentData, freshHubConfig, contentType),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, freshHubConfig, 'application/json')
       ])
@@ -548,26 +606,31 @@ export async function putFile(
   }
 
   // In all other cases, we only need one upload.
+  let contentForUpload: Blob | Buffer | ArrayBufferView | string
   if (opt.encrypt && !opt.sign) {
-    content = encryptContent(content, { publicKey })
+    const contentData = await contentLoader.load()
+    contentForUpload = encryptContent(contentData, { publicKey })
     contentType = 'application/json'
   } else if (opt.encrypt && opt.sign) {
-    const cipherText = encryptContent(content, { publicKey })
+    const contentData = await contentLoader.load()
+    const cipherText = encryptContent(contentData, { publicKey })
     const signatureObject = signECDSA(privateKey, cipherText)
     const signedCipherObject = {
       signature: signatureObject.signature,
       publicKey: signatureObject.publicKey,
       cipherText
     }
-    content = JSON.stringify(signedCipherObject)
+    contentForUpload = JSON.stringify(signedCipherObject)
     contentType = 'application/json'
+  } else {
+    contentForUpload = content
   }
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   try {
-    return await uploadToGaiaHub(path, content, gaiaHubConfig, contentType)
+    return await uploadToGaiaHub(path, contentForUpload, gaiaHubConfig, contentType)
   } catch (error) {
     const freshHubConfig = await caller.setLocalGaiaHubConnection()
-    const file = await uploadToGaiaHub(path, content, freshHubConfig, contentType)
+    const file = await uploadToGaiaHub(path, contentForUpload, freshHubConfig, contentType)
     return file
   }
 }
@@ -665,7 +728,7 @@ async function listFilesLoop(
     }
     response = await fetchPrivate(`${hubConfig.server}/list-files/${hubConfig.address}`, fetchOptions)
     if (!response.ok) {
-      throw new Error(`listFiles failed with HTTP status ${response.status}`)
+      throw await getBlockstackErrorFromResponse(response, 'ListFiles failed.')
     }
   } catch (error) {
     // If error occurs on the first call, perform a gaia re-connection and retry.
@@ -686,21 +749,27 @@ async function listFilesLoop(
     // (i.e. the data is malformed)
     throw new Error('Bad listFiles response: no entries')
   }
+  let entriesLength = 0
   for (let i = 0; i < entries.length; i++) {
-    const rc = callback(entries[i])
-    if (!rc) {
-      // callback indicates that we're done
-      return fileCount + i
+    // An entry array can have null entries, signifying a filtered entry and that there may be
+    // additional pages
+    if (entries[i] !== null) {
+      entriesLength++
+      const rc = callback(entries[i])
+      if (!rc) {
+        // callback indicates that we're done
+        return fileCount + i
+      }
     }
   }
   if (nextPage && entries.length > 0) {
     // keep going -- have more entries
     return listFilesLoop(
-      caller, hubConfig, nextPage, callCount + 1, fileCount + entries.length, callback
+      caller, hubConfig, nextPage, callCount + 1, fileCount + entriesLength, callback
     )
   } else {
     // no more entries -- end of data
-    return fileCount + entries.length
+    return fileCount + entriesLength
   }
 }
 
@@ -708,7 +777,7 @@ async function listFilesLoop(
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the number of files listed
+ * @return {Promise} that resolves to the number of files listed, or rejects with an error.
  */
 export function listFiles(
   callback: (name: string) => boolean,
