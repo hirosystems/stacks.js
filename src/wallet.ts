@@ -1,8 +1,10 @@
-import * as crypto from 'crypto'
-import { ECPair, payments, bip32, BIP32Interface } from 'bitcoinjs-lib'
-import * as bip39 from 'bip39'
-import { ecPairToHexString } from './utils'
+import { payments, bip32, BIP32Interface, ECPair } from 'bitcoinjs-lib'
+import { mnemonicToSeed, generateMnemonic } from 'bip39'
 import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
+import { randomBytes, GetRandomBytes } from './encryption/cryptoRandom'
+import { hashSha256Sync } from './encryption/sha2Hash'
+import { TriplesecDecryptSignature } from './encryption/cryptoUtils'
+import { ecPairToHexString } from './keys'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888
@@ -59,6 +61,26 @@ function getNodePublicKey(node: BIP32Interface): string {
 }
 
 /**
+ * Get a BIP32 node for an application-specific domain.
+ * @param {String} appsNode - the BIP32Interface ir base58-encoded private key for
+ * applications node
+ * @param {String} salt - a string, used to salt the
+ * application-specific addresses
+ * @param {String} appDomain - the appDomain to generate a key for
+ * @return {String} the private key hex-string. this will be a 64
+ * character string
+ * @ignore
+ */
+export function getLegacyAppNode(appsNode: string | BIP32Interface, 
+                                 salt: string, appDomain: string): BIP32Interface {
+  const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${salt}`))
+  const hash = hashBuffer.toString('hex')
+  const appIndex = hashCode(hash)
+  const appNodeInstance = typeof appsNode === 'string' ? bip32.fromBase58(appsNode) : appsNode
+  return appNodeInstance.deriveHardened(appIndex)
+}
+
+/**
  * The `BlockstackWallet` class manages the hierarchical derivation
  * paths for a standard Blockstack client wallet. This includes paths
  * for Bitcoin payment address, Blockstack identity addresses, Blockstack
@@ -106,10 +128,12 @@ export class BlockstackWallet {
    * 
    * @ignore
    */
-  static async fromEncryptedMnemonic(data: string, password: string) {
+  static async fromEncryptedMnemonic(data: string | Buffer, password: string, 
+                                     triplesecDecrypt: TriplesecDecryptSignature
+  ): Promise<BlockstackWallet> {
     try {
-      const mnemonic = await decryptMnemonic(data, password)
-      const seed = await bip39.mnemonicToSeed(mnemonic)
+      const mnemonic = await decryptMnemonic(data, password, triplesecDecrypt)
+      const seed = await mnemonicToSeed(mnemonic)
       return new BlockstackWallet(bip32.fromSeed(seed))
     } catch (err) {
       if (err.message && err.message.startsWith('bad header;')) {
@@ -125,7 +149,7 @@ export class BlockstackWallet {
    * @return {Promise<string>} space-separated 12 word phrase
    */
   static generateMnemonic() {
-    return bip39.generateMnemonic(128, crypto.randomBytes)
+    return generateMnemonic(128, randomBytes)
   }
 
   /**
@@ -135,8 +159,10 @@ export class BlockstackWallet {
    * @return {Promise<string>} Hex-encoded encrypted mnemonic
    * 
    */
-  static async encryptMnemonic(mnemonic: string, password: string) { 
-    const encryptedBuffer = await encryptMnemonic(mnemonic, password)
+  static async encryptMnemonic(mnemonic: string, password: string, opts?: {
+    getRandomBytes?: GetRandomBytes
+  }): Promise<string> {
+    const encryptedBuffer = await encryptMnemonic(mnemonic, password, opts)
     return encryptedBuffer.toString('hex')
   }
 
@@ -176,8 +202,9 @@ export class BlockstackWallet {
    */
   getIdentitySalt(): string {
     const identityPrivateKeychain = this.getIdentityPrivateKeychain()
-    const publicKeyHex = getNodePublicKey(identityPrivateKeychain)
-    return crypto.createHash('sha256').update(publicKeyHex).digest('hex')
+    // NOTE: This is being decoded as a utf8 string rather than a hex string
+    const publicKeyHex = Buffer.from(getNodePublicKey(identityPrivateKeychain))
+    return hashSha256Sync(publicKeyHex).toString('hex')
   }
 
   /**
@@ -262,12 +289,7 @@ export class BlockstackWallet {
    */
   static getLegacyAppPrivateKey(appsNodeKey: string, 
                                 salt: string, appDomain: string): string {
-    const hash = crypto
-      .createHash('sha256')
-      .update(`${appDomain}${salt}`)
-      .digest('hex')
-    const appIndex = hashCode(hash)
-    const appNode = bip32.fromBase58(appsNodeKey).deriveHardened(appIndex)
+    const appNode = getLegacyAppNode(appsNodeKey, salt, appDomain)
     return getNodePrivateKey(appNode).slice(0, 64)
   }
 
@@ -286,11 +308,10 @@ export class BlockstackWallet {
    * @return {String} the private key hex-string. this will be a 64
    * character string
    */
-  static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): string {
-    const hash = crypto
-      .createHash('sha256')
-      .update(`${appDomain}${salt}`)
-      .digest('hex')
+  static getAppPrivateKey(appsNodeKey: string, salt: string, appDomain: string): 
+    string {
+    const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${salt}`))
+    const hash = hashBuffer.toString('hex')
     const appIndexHexes: string[] = []
     // note: there's hardcoded numbers here, precisely because I want this
     //   code to be very specific to the derivation paths we expect.

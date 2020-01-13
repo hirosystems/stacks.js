@@ -1,6 +1,4 @@
-// @ts-ignore: Could not find a declaration file for module
 import { TokenSigner, decodeToken, SECP256K1Client } from 'jsontokens'
-import 'cross-fetch/polyfill'
 import { fetchPrivate } from '../fetchUtil'
 
 /**
@@ -22,7 +20,7 @@ export function makeCoreSessionRequest(appDomain: string,
                                        appMethods: Array<string>,
                                        appPrivateKey: string,
                                        blockchainID: string = null,
-                                       thisDevice: string = null) {
+                                       thisDevice: string = null): string {
   if (thisDevice === null) {
     thisDevice = '.default'
   }
@@ -69,7 +67,8 @@ export function makeCoreSessionRequest(appDomain: string,
 export function sendCoreSessionRequest(coreHost: string,
                                        corePort: number,
                                        coreAuthRequest: string,
-                                       apiPassword: string) {
+                                       apiPassword: string
+): Promise<any> {
   return Promise.resolve().then(() => {
     if (!apiPassword) {
       throw new Error('Missing API password')
@@ -130,7 +129,8 @@ export function getCoreSession(coreHost: string,
                                appPrivateKey: string,
                                blockchainId: string = null,
                                authRequest: string = null,
-                               deviceId: string = '0') {
+                               deviceId: string = '0'
+): Promise<any> {
   if (!authRequest) {
     return Promise.reject('No authRequest provided')
   }
@@ -148,11 +148,11 @@ export function getCoreSession(coreHost: string,
       throw new Error('Unexpected token payload type of string')
     }
 
-    const appDomain = payload.domain_name
+    const appDomain = payload.domain_name as string
     if (!appDomain) {
       return Promise.reject('No domain_name in authRequest')
     }
-    const appMethods = payload.scopes
+    const appMethods = payload.scopes as string[]
 
     const coreAuthRequest = makeCoreSessionRequest(
       appDomain, appMethods, appPrivateKey, blockchainId, deviceId

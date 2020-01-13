@@ -105,7 +105,7 @@ export class UserSession {
     redirectURI?: string,
     manifestURI?: string,
     scopes?: Array<AuthScope | string>
-  ) {
+  ): void {
     const transitKey = this.generateAndStoreTransitKey()
     const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
@@ -127,7 +127,7 @@ export class UserSession {
   redirectToSignInWithAuthRequest(
     authRequest?: string,
     blockstackIDHost?: string
-  ) {
+  ): void {
     authRequest = authRequest || this.makeAuthRequest()
     const authenticatorURL = blockstackIDHost 
       || (this.appConfig && this.appConfig.authenticatorURL)
@@ -267,8 +267,8 @@ export class UserSession {
    */
   encryptContent(
     content: string | Buffer,
-    options?: {publicKey?: string}
-  ) {
+    options?: import('../storage').EncryptContentOptions
+  ): Promise<string> {
     return storage.encryptContent(content, options, this)
   }
 
@@ -280,7 +280,7 @@ export class UserSession {
    * key to use for decryption. If not provided, will use user's appPrivateKey.
    * @returns {String|Buffer} decrypted content.
    */
-  decryptContent(content: string, options?: {privateKey?: string}) {
+  decryptContent(content: string, options?: {privateKey?: string}): Promise<Buffer | string> {
     return storage.decryptContent(content, options, this)
   }
 

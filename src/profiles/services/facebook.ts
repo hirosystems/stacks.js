@@ -1,13 +1,12 @@
-
-import * as cheerio from 'cheerio'
-import { Service } from './service'
+import { Service, CheerioModuleType } from './service'
+import { AccountProofInfo } from '../profileProofs'
 
 class Facebook extends Service {
-  static getProofUrl(proof: any) {
+  getProofUrl(proof: AccountProofInfo) {
     return this.normalizeUrl(proof)
   }
 
-  static normalizeUrl(proof: any) {
+  normalizeUrl(proof: AccountProofInfo) {
     let proofUrl = proof.proof_url.toLowerCase()
     const urlRegex = /(?:http[s]*:\/\/){0,1}(?:[a-zA-Z0-9-]+\.)+facebook\.com/
 
@@ -30,10 +29,14 @@ class Facebook extends Service {
     return proofUrl
   }
 
-  static getProofStatement(searchText: string) {
+  getProofStatement(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[name="description"]').attr('content')
     return (statement !== undefined) ? statement.trim() : ''
+  }
+
+  getBaseUrls(): string[] {
+    return []
   }
 }
 

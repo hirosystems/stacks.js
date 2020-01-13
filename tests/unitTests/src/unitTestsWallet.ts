@@ -1,7 +1,7 @@
 import * as test from 'tape-promise/tape'
 
 import {
-  BlockstackWallet
+  BlockstackWallet, IdentityKeyPair
 } from '../../../src'
 
 function testsBlockstackWallet() {
@@ -15,7 +15,7 @@ function testsBlockstackWallet() {
         + 'm69UZ6TwePZRVKrzpBTc4a2CECMwVFhNo5vhEDie1KYsCj'
   const bitcoinAddress = '1QU3Q5CAXAbfKBg52wWYUjhBEcfBy8bUR'
 
-  const identityKeyPairs = [
+  const identityKeyPairs: IdentityKeyPair[] = [
     {
       address: '1E3DgiNVoRQH32VW6T6USsAgcLroquV9xy',
       appsNodeKey: 'xprvA1bXJqMaKqHFnYB3LyLmtJMXgpCKisknF2EuVBrNs6UkvR3U4W2vtdEK9'
@@ -64,8 +64,9 @@ function testsBlockstackWallet() {
         t.equals(wallet.getIdentityPublicKeychain().toBase58(), identityXPUB, 'id xpub is correct')
         t.equals(wallet.getBitcoinPublicKeychain().toBase58(), bitcoinXPUB, 'btc xpub is correct')
         t.equals(wallet.getBitcoinAddress(0), bitcoinAddress, 'btc address correct')
+        const testKeyPairs = [0, 1, 2, 3].map(index => wallet.getIdentityKeyPair(index, true))
         t.deepEquals(
-          [0, 1, 2, 3].map(index => wallet.getIdentityKeyPair(index, true)),
+          testKeyPairs,
           identityKeyPairs, 'keypairs generated correctly'
         )
         const idKeyPair = wallet.getIdentityKeyPair(0, false)

@@ -9,6 +9,23 @@ const GLOBAL_DETECTION_CACHE_KEY = '_blockstackDidCheckEchoReply'
 const ECHO_REPLY_PARAM = 'echoReply'
 const AUTH_CONTINUATION_PARAM = 'authContinuation'
 
+
+function getQueryStringParams(query: string): Record<string, string> {
+  if (!query) {
+    return {}
+  }
+  // Trim a starting `?` character if exists
+  const trimmed = /^[?#]/.test(query) ? query.slice(1) : query
+  return trimmed
+    .split('&')
+    .reduce((params, param) => {
+      const [key, value] = param.split('=')
+      params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : ''
+      return params
+    }, {} as Record<string, string>)
+}
+
+
 /**
  * Checks if the current window location URL contains an 'echoReply' parameter 
  * which indicates that this page was only opened to signal back to the originating 
@@ -31,8 +48,8 @@ export function protocolEchoReplyDetection(): boolean {
     // Exit detection function - we are not running in a browser environment.
     return false
   }
-
-  if (!globalScope.location || !globalScope.localStorage || !globalScope.URLSearchParams) {
+  
+  if (!globalScope.location || !globalScope.localStorage) {
     // Exit detection function - we are not running in a browser environment.
     return false
   }
@@ -43,8 +60,8 @@ export function protocolEchoReplyDetection(): boolean {
     return existingDetection
   }
 
-  const searchParams = new globalScope.URLSearchParams(globalScope.location.search)
-  const echoReplyParam = searchParams.get(ECHO_REPLY_PARAM)
+  const searchParams = getQueryStringParams(globalScope.location.search)
+  const echoReplyParam = searchParams[ECHO_REPLY_PARAM]
   if (echoReplyParam) {
     (globalScope as any)[GLOBAL_DETECTION_CACHE_KEY] = true
 
@@ -57,7 +74,7 @@ export function protocolEchoReplyDetection(): boolean {
     // Redirect back to the localhost auth url, as opposed to another protocol launch.
     // This will re-use the same tab rather than creating another useless one.
     globalScope.setTimeout(() => {
-      const authContinuationParam = searchParams.get(AUTH_CONTINUATION_PARAM)
+      const authContinuationParam = searchParams[AUTH_CONTINUATION_PARAM]
       globalScope.location.href = authContinuationParam
     }, 10)
 
