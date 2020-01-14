@@ -753,39 +753,53 @@ export function runStorageTests() {
       gaiaHubConfig
     }
 
-    const dom = new jsdom.JSDOM('', {}).window
-    const globalAPIs: {[key: string]: any } = {
-      File: dom.File,
-      Blob: dom.Blob,
-      FileReader: (dom as any).FileReader as FileReader
+    const fileContent = 'test-content'
+    const testEtag = 'test-etag'
+    const options = { encrypt: false }
+
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: 'url', etag: testEtag })
+    const putFile = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub }
+    }).putFile as typeof import('../../../src/storage').putFile
+
+    // create file and save etag
+    await putFile(path, fileContent, options, blockstack)
+    // update file, using saved etag
+    await putFile(path, fileContent, options, blockstack)
+
+    // test that saved etag was passed to upload function
+    t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, testEtag))
+  })
+
+  test('putFile throws correct error when server rejects etag', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
     }
-    for (const globalAPI of Object.keys(globalAPIs)) {
-      (global as any)[globalAPI] = globalAPIs[globalAPI]
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
     }
+
     try {
-      const fileContent = new dom.File(['file content test'], 'filenametest.txt', { type: 'text/example' })
+      const content = 'test-content'
+      const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
 
-      const uploadToGaiaHub = sinon.spy((
-        filename: string, 
-        contents: any,
-        hubConfig: any,
-        contentType: string,
-        etag?: string) => Promise.resolve({ publicURL: 'url', etag: 'test-etag' }));
+      // Mock a PreconditionFailedError
+      FetchMock.post(storeURL, { status: 412, body: 'Precondition Failed' })
 
-      const putFile = proxyquire('../../../src/storage', {
-        './hub': { uploadToGaiaHub }
-      }).putFile as typeof import('../../../src/storage').putFile
-
+      const putFile = require('../../../src/storage').putFile
       const options = { encrypt: false }
 
-      await putFile(path, fileContent, options, blockstack)
-      await putFile(path, fileContent, options, blockstack)
-
-      t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, 'test-etag'))
-    } finally {
-      for (const globalAPI of Object.keys(globalAPIs)) {
-        delete (global as any)[globalAPI]
-      }
+      await putFile(path, content, options, blockstack)
+    } catch(err) {
+      t.equals(err.code, 'precondition_failed_error')
     }
   })
 
