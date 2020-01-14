@@ -776,6 +776,14 @@ export async function putFile(
     }
   }
 
+  let etag: string
+  let newFile = true
+
+  if (etags[path]) {
+    newFile = false
+    etag = etags[path]
+  } 
+
   let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
 
   // In the case of signing, but *not* encrypting, we perform two uploads.
@@ -792,7 +800,7 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = (await Promise.all([
-        uploadToGaiaHub(path, contentData, hubConfig, contentType, etags[path]),
+        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, hubConfig, 'application/json')
       ]))[0]
@@ -831,7 +839,7 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = await uploadToGaiaHub(
-        path, contentForUpload, hubConfig, contentType, etags[path]
+        path, contentForUpload, hubConfig, contentType, newFile, etag
       )
       if (writeResponse.etag) {
         etags[path] = writeResponse.etag
