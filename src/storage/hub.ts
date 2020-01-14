@@ -43,6 +43,7 @@ export async function uploadToGaiaHub(
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream',
+  newFile: boolean = true,
   etag?: string
 ): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
@@ -52,7 +53,9 @@ export async function uploadToGaiaHub(
     Authorization: `bearer ${hubConfig.token}`
   }
 
-  if (etag) {
+  if (newFile) {
+    headers['If-None-Match'] = '*'
+  } else if (etag) {
     headers['If-Match'] = etag
   }
 
