@@ -768,7 +768,37 @@ export function runStorageTests() {
     await putFile(path, fileContent, options, blockstack)
 
     // test that saved etag was passed to upload function
-    t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, testEtag))
+    t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, false, testEtag))
+  })
+
+  test('putFile includes If-None-Match header in request when creating a new file', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const fileContent = 'test-content'
+    const options = { encrypt: false }
+
+    const putFile = require('../../../src/storage').putFile
+
+    const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
+    FetchMock.post(storeURL, { status: 202, body: '{}' })
+
+    // create new file
+    await putFile(path, fileContent, options, blockstack)
+
+    t.equal(FetchMock.lastOptions().headers['If-None-Match'], '*')
   })
 
   test('putFile throws correct error when server rejects etag', async (t) => {
