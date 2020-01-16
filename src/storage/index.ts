@@ -27,6 +27,8 @@ import { NAME_LOOKUP_PATH } from '../auth/authConstants'
 import { getGlobalObject, getBlockstackErrorFromResponse, megabytesToBytes } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
+const etags: { [key: string]: string; } = {}
+
 
 export interface EncryptionOptions {
   /**
@@ -321,6 +323,11 @@ async function getFileContents(path: string, app: string, username: string | und
   let contentType = response.headers.get('Content-Type')
   if (typeof contentType === 'string') {
     contentType = contentType.toLowerCase()
+  }
+  
+  const etag = response.headers.get('ETag')
+  if (etag) {
+    etags[path] = etag
   }
   if (forceText || contentType === null
     || contentType.startsWith('text')
@@ -769,6 +776,14 @@ export async function putFile(
     }
   }
 
+  let etag: string
+  let newFile = true
+
+  if (etags[path]) {
+    newFile = false
+    etag = etags[path]
+  } 
+
   let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
 
   // In the case of signing, but *not* encrypting, we perform two uploads.
@@ -784,12 +799,15 @@ export async function putFile(
     const signatureContent = JSON.stringify(signatureObject)
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
-      const fileUrls = await Promise.all([
-        uploadToGaiaHub(path, contentData, hubConfig, contentType),
+      const writeResponse = (await Promise.all([
+        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, hubConfig, 'application/json')
-      ])
-      return fileUrls[0]
+      ]))[0]
+      if (writeResponse.etag) {
+        etags[path] = writeResponse.etag
+      }
+      return writeResponse.publicURL
     }
   } else {
     // In all other cases, we only need one upload.
@@ -820,8 +838,13 @@ export async function putFile(
     }
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
-      const file = await uploadToGaiaHub(path, contentForUpload, hubConfig, contentType)
-      return file
+      const writeResponse = await uploadToGaiaHub(
+        path, contentForUpload, hubConfig, contentType, newFile, etag
+      )
+      if (writeResponse.etag) {
+        etags[path] = writeResponse.etag
+      }
+      return writeResponse.publicURL
     }
   }
 

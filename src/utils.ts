@@ -6,7 +6,8 @@ import {
   GaiaHubErrorResponse,
   NotEnoughProofError, 
   PayloadTooLargeError, 
-  ValidationError
+  ValidationError,
+  PreconditionFailedError
 } from './errors'
 
 
@@ -391,6 +392,8 @@ export async function getBlockstackErrorFromResponse(
     throw new DoesNotExist(errorMsg, gaiaResponse)
   } else if (gaiaResponse.status === 409) {
     return new ConflictError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 412) {
+    return new PreconditionFailedError(errorMsg, gaiaResponse)
   } else if (gaiaResponse.status === 413) {
     const maxBytes = megabytesToBytes(hubConfig?.max_file_upload_size_megabytes)
     return new PayloadTooLargeError(errorMsg, gaiaResponse, maxBytes)

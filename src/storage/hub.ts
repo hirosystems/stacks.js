@@ -24,6 +24,11 @@ export interface GaiaHubConfig {
   server: string
 }
 
+interface UploadResponse {
+  publicURL: string,
+  etag?: string
+}
+
 /**
  * 
  * @param filename 
@@ -37,16 +42,27 @@ export async function uploadToGaiaHub(
   filename: string, 
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
-  contentType: string = 'application/octet-stream'
-): Promise<string> {
+  contentType: string = 'application/octet-stream',
+  newFile: boolean = true,
+  etag?: string
+): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
+
+  const headers: { [key: string]: string; } = {
+    'Content-Type': contentType,
+    Authorization: `bearer ${hubConfig.token}`
+  }
+
+  if (newFile) {
+    headers['If-None-Match'] = '*'
+  } else if (etag) {
+    headers['If-Match'] = etag
+  }
+
   const response = await fetchPrivate(
     `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: `bearer ${hubConfig.token}`
-      },
+      headers,
       body: contents
     }
   )
@@ -55,7 +71,8 @@ export async function uploadToGaiaHub(
   }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
-  return responseJSON.publicURL
+
+  return responseJSON
 }
 
 export async function deleteFromGaiaHub(

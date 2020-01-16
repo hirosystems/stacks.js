@@ -496,7 +496,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           uploadContentType = contentType
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
 
       const putFile = proxyquire('../../../src/storage', {
@@ -556,7 +556,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           encryptedContent = contents
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
       const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
   
@@ -618,7 +618,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           postedContent = Buffer.from(contents.buffer).toString()
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
       const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
   
@@ -677,7 +677,7 @@ export function runStorageTests() {
         hubConfig: any,
         contentType: string) => {
           encryptedContent = contents
-          return Promise.resolve(fullReadUrl)
+          return Promise.resolve({ publicURL: fullReadUrl })
       };
       const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
   
@@ -723,7 +723,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
     const fileContent = JSON.stringify({ test: 'test' })
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
     
     const putFile = proxyquire('../../../src/storage', {
       './hub': { uploadToGaiaHub }
@@ -735,6 +735,102 @@ export function runStorageTests() {
       .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       })
+  })
+
+  test('putFile passes etag to upload function', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const fileContent = 'test-content'
+    const testEtag = 'test-etag'
+    const options = { encrypt: false }
+
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: 'url', etag: testEtag })
+    const putFile = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub }
+    }).putFile as typeof import('../../../src/storage').putFile
+
+    // create file and save etag
+    await putFile(path, fileContent, options, blockstack)
+    // update file, using saved etag
+    await putFile(path, fileContent, options, blockstack)
+
+    // test that saved etag was passed to upload function
+    t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, false, testEtag))
+  })
+
+  test('putFile includes If-None-Match header in request when creating a new file', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const fileContent = 'test-content'
+    const options = { encrypt: false }
+
+    const putFile = require('../../../src/storage').putFile
+
+    const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
+    FetchMock.post(storeURL, { status: 202, body: '{}' })
+
+    // create new file
+    await putFile(path, fileContent, options, blockstack)
+
+    t.equal(FetchMock.lastOptions().headers['If-None-Match'], '*')
+  })
+
+  test('putFile throws correct error when server rejects etag', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    try {
+      const content = 'test-content'
+      const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
+
+      // Mock a PreconditionFailedError
+      FetchMock.post(storeURL, { status: 412, body: 'Precondition Failed' })
+
+      const putFile = require('../../../src/storage').putFile
+      const options = { encrypt: false }
+
+      await putFile(path, content, options, blockstack)
+    } catch(err) {
+      t.equals(err.code, 'precondition_failed_error')
+    }
   })
 
   test('putFile & getFile unencrypted, not signed, with contentType', async (t) => {
@@ -757,7 +853,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.html'
     const fileContent = '<!DOCTYPE html><html><head><title>Title</title></head><body>Blockstack</body></html>'
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
 
     const putFile = proxyquire('../../../src/storage', {
       './hub': { uploadToGaiaHub }
@@ -808,7 +904,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
     const fileContent = JSON.stringify({ test: 'test' })
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
     const putFile = proxyquire('../../../src/storage', {
@@ -860,7 +956,7 @@ export function runStorageTests() {
     const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8A/file.json'
     const fileContent = JSON.stringify({ test: 'test' })
 
-    const uploadToGaiaHub = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: fullReadUrl }) // eslint-disable-line no-shadow
     const getFullReadUrl = sinon.stub().resolves(fullReadUrl) // eslint-disable-line no-shadow
 
     const putFile = proxyquire('../../../src/storage', {
@@ -912,7 +1008,7 @@ export function runStorageTests() {
     const uploadToGaiaHub = sinon.stub().callsFake( // eslint-disable-line no-shadow
       (fname, contents) => {
         putFiledContents = contents
-        return Promise.resolve(`${readPrefix}/${fname}`)
+        return Promise.resolve({ publicURL: `${readPrefix}/${fname}` })
       }
     )
 
@@ -1032,7 +1128,7 @@ export function runStorageTests() {
         if (!fname.endsWith('.sig')) {
           t.equal(contentString, fileContent)
         }
-        return Promise.resolve(pathToReadUrl(fname))
+        return Promise.resolve({ publicURL: pathToReadUrl(fname) })
       }) as typeof import('../../../src/storage').uploadToGaiaHub
     )
 
@@ -1182,7 +1278,7 @@ export function runStorageTests() {
 
     const uploadToGaiaHub = sinon.stub().callsFake(
       ((fname) => {
-        return Promise.resolve(pathToReadUrl(fname))
+        return Promise.resolve({ publicURL: pathToReadUrl(fname) })
       }) as typeof import('../../../src/storage').uploadToGaiaHub
     )
 
@@ -1232,7 +1328,7 @@ export function runStorageTests() {
 
     const uploadToGaiaHub = sinon.stub().callsFake(
       ((fname) => {
-        return Promise.resolve(pathToReadUrl(fname))
+        return Promise.resolve({ publicURL: pathToReadUrl(fname) })
       }) as typeof import('../../../src/storage').uploadToGaiaHub
     )
 
@@ -1282,7 +1378,7 @@ export function runStorageTests() {
 
     const uploadToGaiaHub = sinon.stub().callsFake(
       ((fname) => {
-        return Promise.resolve(pathToReadUrl(fname))
+        return Promise.resolve({ publicURL: pathToReadUrl(fname) })
       }) as typeof import('../../../src/storage').uploadToGaiaHub
     )
 
@@ -1332,7 +1428,7 @@ export function runStorageTests() {
 
     const uploadToGaiaHub = sinon.stub().callsFake(
       ((fname) => {
-        return Promise.resolve(pathToReadUrl(fname))
+        return Promise.resolve({ publicURL: pathToReadUrl(fname) })
       }) as typeof import('../../../src/storage').uploadToGaiaHub
     )
 
@@ -1621,14 +1717,13 @@ export function runStorageTests() {
       server: 'hub.testblockstack.org',
       max_file_upload_size_megabytes: 20
     }
-
-    FetchMock.post(`${config.server}/store/${config.address}/foo.json`,
-                   JSON.stringify({ publicURL: `${config.url_prefix}/${config.address}/foo.json` }))
+    const resp = JSON.stringify({ publicURL: `${config.url_prefix}/${config.address}/foo.json` })
+    FetchMock.post(`${config.server}/store/${config.address}/foo.json`, resp)
 
     await uploadToGaiaHub('foo.json', 'foo the bar', config)
-      .then((url) => {
-        t.ok(url, 'URL returned')
-        t.equal(url, `${config.url_prefix}/${config.address}/foo.json`)
+      .then((res) => {
+        t.ok(res, 'URL returned')
+        t.equal(JSON.stringify(res), resp)
       })
   })
 
