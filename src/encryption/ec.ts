@@ -1,5 +1,5 @@
 import { ec as EllipticCurve } from 'elliptic'
-import { BN } from '../bn'
+import * as BN from 'bn.js'
 import { randomBytes } from './cryptoRandom'
 import { FailedDecryptionError } from '../errors'
 import { getPublicKeyFromPrivate } from '../keys'
@@ -100,11 +100,12 @@ function sharedSecretToKeys(sharedSecret: Buffer): { encryptionKey: Buffer; hmac
 }
 
 /**
-* @ignore
-*/
-export function getHexFromBN(bnInput: BN) {
-  const hexOut = bnInput.toString('hex')
-
+ * Hex encodes a 32-byte BN.js instance. 
+ * The result string is zero padded and always 64 characters in length. 
+ * @ignore
+ */
+export function getHexFromBN(bnInput: BN): string {
+  const hexOut = bnInput.toString('hex', 64)
   if (hexOut.length === 64) {
     return hexOut
   } else if (hexOut.length < 64) {
@@ -115,6 +116,19 @@ export function getHexFromBN(bnInput: BN) {
   } else {
     throw new Error('Generated a > 32-byte BN for encryption. Failing.')
   }
+}
+
+/**
+ * Returns a big-endian encoded 32-byte BN.js instance. 
+ * The result Buffer is zero padded and always 32 bytes in length. 
+ * @ignore 
+ */
+export function getBufferFromBN(bnInput: BN): Buffer {
+  const result = bnInput.toArrayLike(Buffer, 'be', 32)
+  if (result.byteLength !== 32) {
+    throw new Error('Generated a 32-byte BN for encryption. Failing.')
+  }
+  return result
 }
 
 /**
@@ -248,14 +262,10 @@ export async function encryptECIES(publicKey: string,
   Promise<CipherObject> {
   const ecPK = ecurve.keyFromPublic(publicKey, 'hex').getPublic()
   const ephemeralSK = ecurve.genKeyPair()
-  const ephemeralPK = ephemeralSK.getPublic()
+  const ephemeralPK = Buffer.from(ephemeralSK.getPublic().encodeCompressed())
   const sharedSecret = ephemeralSK.derive(ecPK) as BN
-
-  const sharedSecretHex = getHexFromBN(sharedSecret)
-
-  const sharedKeys = sharedSecretToKeys(
-    Buffer.from(sharedSecretHex, 'hex')
-  )
+  const sharedSecretBuffer = getBufferFromBN(sharedSecret)
+  const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
   const initializationVector = randomBytes(16)
 
@@ -264,7 +274,7 @@ export async function encryptECIES(publicKey: string,
   )
 
   const macData = Buffer.concat([initializationVector,
-                                 Buffer.from(ephemeralPK.encode('array', true)),
+                                 ephemeralPK,
                                  cipherText])
   const mac = await hmacSha256(sharedKeys.hmacKey, macData)
 
@@ -279,7 +289,7 @@ export async function encryptECIES(publicKey: string,
   
   const result: CipherObject = {
     iv: initializationVector.toString('hex'),
-    ephemeralPK: ephemeralPK.encode('hex', true),
+    ephemeralPK: ephemeralPK.toString('hex'),
     cipherText: cipherTextString,
     mac: mac.toString('hex'),
     wasString: !!wasString
@@ -313,8 +323,8 @@ export async function decryptECIES(privateKey: string, cipherObject: CipherObjec
       + 'You might be trying to decrypt an unencrypted object.')
   }
 
-  const sharedSecret = ecSK.derive(ephemeralPK)
-  const sharedSecretBuffer = Buffer.from(getHexFromBN(sharedSecret), 'hex')
+  const sharedSecret = ecSK.derive(ephemeralPK) as BN
+  const sharedSecretBuffer = getBufferFromBN(sharedSecret)
 
   const sharedKeys = sharedSecretToKeys(sharedSecretBuffer)
 
@@ -330,7 +340,7 @@ export async function decryptECIES(privateKey: string, cipherObject: CipherObjec
   }
 
   const macData = Buffer.concat([ivBuffer,
-                                 Buffer.from(ephemeralPK.encode('array', true)),
+                                 Buffer.from(ephemeralPK.encodeCompressed()),
                                  cipherTextBuffer])
   const actualMac = await hmacSha256(sharedKeys.hmacKey, macData)
   const expectedMac = Buffer.from(cipherObject.mac, 'hex')

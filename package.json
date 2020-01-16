@@ -96,7 +96,6 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/register": "^7.7.0",
     "@peculiar/webcrypto": "^1.0.21",
-    "@types/bn.js": "^4.11.5",
     "@types/jsdom": "^12.2.4",
     "@babel/preset-typescript": "^7.7.0",
     "@blockstack/prettier-config": "0.0.3",
@@ -149,6 +148,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
+    "@types/bn.js": "^4.11.6",
     "@types/cheerio": "^0.22.13",
     "@types/elliptic": "^6.4.10",
     "@types/node": "^12.7.12",
