@@ -1,6 +1,6 @@
 {
   "name": "blockstack",
-  "version": "21.0.0-alpha.4",
+  "version": "21.0.0-beta.1",
   "description": "The Blockstack Javascript library for authentication, identity, and storage.",
   "main": "lib/index",
   "unpkg": "dist/blockstack.js",
