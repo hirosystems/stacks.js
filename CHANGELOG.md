@@ -4,6 +4,28 @@ All notable changes to the project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- More Blockstack error codes.
+- `putFile` and `encryptContent` can now optionally base64 encode data, for a ~33% size increase compared to the default hex encoding which has a 100% size increase. 
+
+### Changed
+- `putFile` performs client-side validation that data size is within the Gaia hub's reported maximum limit. 
+- When a `string` value is passed to `putFile` and the `contentType` option is unspecified, it is set to `text/plain; charset=UTF-8`. 
+- `getFile` now throws error on 404 instead of returning null.
+- `getFile`, `putFile`, `deleteFile`, `listfiles` now include error info upon failure.
+- `getFile` can now decrypt using a custom private key
+- Several cryptographic operations now use the native Web Crypto APIs when available. This primarily
+increases the performance of file encryption and decryption, and account seed phrase encryption and 
+decryption. 
+- The following functions now return Promises: `handleSignedEncryptedContents`, `makeAuthResponse`, 
+`encryptECIES`, `decryptECIES`, `encryptPrivateKey`, `decryptPrivateKey`, `encryptContent`, 
+`decryptContent`, `aes256CbcEncrypt`, `aes256CbcDecrypt`, `hmacSha256`.
+- `putfile` now prevents data corruption caused by race conditions by using etag values to verify that the client is updating the latest version of the file.
+- `putFile` now attempts to include `etag` values in the `If-Match` header of its request, and sets the `If-None-Match` header to `*` if it is unaware of an etag for the file it is attempting to write.
+- `putFile` now returns an `etag` in addition to the `publicURL` after successfully writing a file.
+- `PreconditionFailedError` thrown if `putFile` returns with a `412` response.
+
 ## [19.4.0] - 2019-09-03
 ### Changed
 - Excluded unused bip39 wordlist from dist bundle, reducing bundle size.

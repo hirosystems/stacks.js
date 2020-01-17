@@ -1,6 +1,8 @@
+/* eslint-disable import/no-nodejs-modules */
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import test from 'tape'
+import * as test from 'tape-promise/tape'
+import fetch from 'cross-fetch'
 
 import {
   transactions, config, network, hexStringToECPair, ecPairToAddress
@@ -113,7 +115,7 @@ export function runIntegrationTests() {
     const renewalZF = '$ORIGIN aaron.id\n$TTL 3600\n_http._tcp URI 10 1 '
           + `"https://gaia.blockstacktest.org/hub/${destAddress}/4/profile.json"`
 
-    initializeBlockstackCore()
+    return initializeBlockstackCore()
       .then(() => {
         console.log('Blockstack Core initialized.')
         return transactions.makePreorder('aaron.id', destAddress, payer)
@@ -226,7 +228,7 @@ export function runIntegrationTests() {
     const importZF = '$ORIGIN import.hello\n$TTL 3600\n_http._tcp URI 10 1 '
           + `"https://gaia.blockstacktest.org/hub/${destAddress}/0/profile.json"`
 
-    initializeBlockstackCore()
+    return initializeBlockstackCore()
       .then(() => {
         console.log('Blockstack Core initialized.')
         console.log(`Preorder namespace "hello" to ${nsRevealAddress}`)
@@ -254,7 +256,7 @@ export function runIntegrationTests() {
         console.log('NAMESPACE_REVEAL broadcasted, waiting 30 seconds.')
         return nextBlock()
       })
-      .then(() => {
+      .then(async () => {
         console.log('NAME_IMPORT import.hello')
         const zfHash = hash160(Buffer.from(importZF)).toString('hex')
         return transactions.makeNameImport(

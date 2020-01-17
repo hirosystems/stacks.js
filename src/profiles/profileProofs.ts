@@ -1,4 +1,12 @@
 import { profileServices } from './services'
+import { CheerioModuleType } from './services/service'
+
+export interface AccountProofInfo {
+  service: string;
+  identifier: string;
+  proof_url: string;
+  valid?: boolean;
+}
 
 /**
  * Validates the social proofs in a user's profile. Currently supports validation of 
@@ -11,13 +19,14 @@ import { profileServices } from './services'
  */
 export function validateProofs(profile: any,
                                ownerAddress: string,
-                               name: string = null) {
+                               cheerio: CheerioModuleType,
+                               name: string = null): Promise<AccountProofInfo[]> {
   if (!profile) {
     throw new Error('Profile must not be null')
   }
 
-  let accounts: Array<any> = []
-  const proofsToValidate: Promise<any>[] = []
+  let accounts: any[] = []
+  const proofsToValidate: Promise<AccountProofInfo>[] = []
 
   if (profile.hasOwnProperty('account')) {
     accounts = profile.account
@@ -38,15 +47,15 @@ export function validateProofs(profile: any,
       return
     }
 
-    const proof = {
+    const proof: AccountProofInfo = {
       service: account.service,
-      proof_url: account.proofUrl,
+      proof_url: account.proof_url || account.proofUrl,
       identifier: account.identifier,
       valid: false
     }
 
     proofsToValidate.push(profileServices[account.service]
-      .validateProof(proof, ownerAddress, name))
+      .validateProof(proof, ownerAddress, cheerio, name))
   })
 
   return Promise.all(proofsToValidate)

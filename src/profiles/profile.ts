@@ -4,6 +4,7 @@ import * as inspector from 'schema-inspector'
 import { signProfileToken, extractProfile } from './profileTokens'
 import { validateProofs } from './profileProofs'
 import { makeProfileZoneFile } from './profileZoneFiles'
+import { CheerioModuleType } from './services/service'
 
 const schemaDefinition: {[key: string]: any} = {
   type: 'object',
@@ -30,25 +31,25 @@ export class Profile {
     return Object.assign({}, this._profile)
   }
 
-  toToken(privateKey: string) {
+  toToken(privateKey: string): string {
     return signProfileToken(this.toJSON(), privateKey)
   }
 
-  static validateSchema(profile: any, strict = false) {
+  static validateSchema(profile: any, strict = false): any {
     schemaDefinition.strict = strict
     return inspector.validate(schemaDefinition, profile)
   }
 
-  static fromToken(token: string, publicKeyOrAddress: string | null = null) {
+  static fromToken(token: string, publicKeyOrAddress: string | null = null): Profile {
     const profile = extractProfile(token, publicKeyOrAddress)
     return new Profile(profile)
   }
 
-  static makeZoneFile(domainName: string, tokenFileURL: string) {
+  static makeZoneFile(domainName: string, tokenFileURL: string): string {
     return makeProfileZoneFile(domainName, tokenFileURL)
   }
 
-  static validateProofs(domainName: string) {
-    return validateProofs(new Profile().toJSON(), domainName)
+  static async validateProofs(domainName: string, cheerio: CheerioModuleType): Promise<any[]> {
+    return validateProofs(new Profile().toJSON(), domainName, cheerio)
   }
 }

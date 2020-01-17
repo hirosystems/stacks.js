@@ -1,12 +1,20 @@
 module.exports = {
   "extends": [
+    "eslint:recommended",
     "airbnb-base",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier/@typescript-eslint"
+
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": __dirname
   },
   "plugins": [
     "import",
@@ -14,7 +22,7 @@ module.exports = {
   ],
   "settings": {
     "import/parsers": {
-      "@typescript-eslint/parser": [".ts"]
+      "@typescript-eslint/parser": [ ".ts" ]
     },
     "import/resolver": { "typescript": {} }
   },
@@ -25,17 +33,15 @@ module.exports = {
   "rules": {
     "no-tabs": 0,
     "no-restricted-globals": 0,
-    "import/prefer-default-export": 0,
     "no-buffer-constructor": 0,
     "no-mixed-operators": 0,
     "no-plusplus": 0,
     "no-bitwise": 0,
     "prefer-promise-reject-errors": 0,
     "class-methods-use-this": 0,
-    "import/no-cycle": 0,
     "prefer-destructuring": 0,
     "no-prototype-builtins": 0,
-    "comma-dangle": ["error", "never"],
+    "comma-dangle": "off",
     "quotes": [2, "single"],
     "eol-last": 2,
     "no-debugger": 1,
@@ -56,11 +62,16 @@ module.exports = {
     "object-curly-newline": "off",    
     "arrow-parens": "off",
     "function-paren-newline": 0,
+    "max-classes-per-file": "off",
+    "prefer-object-spread": "off",
+    "no-multiple-empty-lines": "off",
     "no-shadow": "off",
     "no-use-before-define": "off",
-    "@typescript-eslint/indent": [2, 2, {
-      "FunctionDeclaration": { "parameters": "first" },
-      "FunctionExpression": { "parameters": "first" },
+    "no-return-await": "off",
+    "no-useless-constructor": "off",
+    "indent": [2, 2, {
+      "FunctionDeclaration" : { "parameters": "first" },
+      "FunctionExpression" : { "parameters": "first" },
       "ObjectExpression": "first",
       "ArrayExpression": "first",
       "ImportDeclaration": "first",
@@ -75,15 +86,61 @@ module.exports = {
     "@typescript-eslint/no-angle-bracket-type-assertion": "off",
     "@typescript-eslint/prefer-interface": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-
-    // TODO: enable this when reasonable
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/consistent-type-assertions": "off",
+    "@typescript-eslint/prefer-regexp-exec": "off",
+    "@typescript-eslint/no-useless-constructor": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/require-await": "error",
+    "@typescript-eslint/await-thenable": "error",
 
-    // TODO: enable this when reasonable
+
+    // TODO: enable these when reasonable
     "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/prefer-includes": "off",
+    "@typescript-eslint/prefer-string-starts-ends-with": "off",
+    // ---
 
-    // TODO: enable when this is fixed https://github.com/benmosher/eslint-plugin-import/issues/1282
-    "import/named": "off"
+
+    "import/no-unresolved": "error",
+    "import/named": "error",
+    "import/prefer-default-export": "off",
+
+    // TODO: enable these when reasonable -- these can help module dependencies be easier to bundle w/ tree-shaking.
+    "import/no-cycle": "off",
+    // ---
+
+    "import/no-self-import": "error",
+    "import/no-useless-path-segments": ["error", { noUselessIndex: true }],
+    "import/no-unused-modules": ["error", { "missingExports": true }],
+    "import/export": "error",
+    "import/no-extraneous-dependencies": "error",
+    "import/no-duplicates": "error",
+    "import/no-unassigned-import": "error",
+    "import/order": "error",
+
+    "import/no-nodejs-modules": ["error", { "allow": [
+
+    ]}],
+
+    // ---- Enforce some blockstack.js specific rules ----
+
+    "no-restricted-globals": ["error", {
+        "name": "fetch",
+        "message": "Use `privateFetch` instead."
+      }
+    ],
+
+    "no-restricted-modules": ["error", {
+        "name": "crypto",
+        "message": "Use a specific module from `./src/encryption/` "
+      }
+    ]
+
+    // ----
   }
 }

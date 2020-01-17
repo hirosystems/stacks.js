@@ -1,17 +1,18 @@
 
-import { Service } from './service'
+import { Service, CheerioModuleType } from './service'
+import { AccountProofInfo } from '../profileProofs'
 
 class Github extends Service {
-  static getBaseUrls() {
+  getBaseUrls() {
     const baseUrls = ['https://gist.github.com/', 'http://gist.github.com', 'gist.github.com']
     return baseUrls
   }
 
-  static normalizeUrl(proof: any) {
+  normalizeUrl(_proof: AccountProofInfo) {
     return ''
   }
 
-  static getProofUrl(proof: any) {
+  getProofUrl(proof: AccountProofInfo) {
     const baseUrls = this.getBaseUrls()
     let proofUrl = proof.proof_url.toLowerCase()
 
@@ -25,6 +26,10 @@ class Github extends Service {
       }
     }
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
+  }
+
+  getProofStatement(searchText: string, _cheerio: CheerioModuleType) {
+    return searchText
   }
 }
 

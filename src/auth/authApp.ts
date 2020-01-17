@@ -1,9 +1,8 @@
 
 import * as queryString from 'query-string'
-// @ts-ignore: Could not find a declaration file for module
 import { decodeToken } from 'jsontokens'
 import { verifyAuthResponse } from './authVerification'
-import { isLaterVersion, hexStringToECPair, getGlobalObject, getGlobalObjects } from '../utils'
+import { isLaterVersion, getGlobalObject, getGlobalObjects } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 import { getAddressFromDID } from '../dids'
 import { LoginFailedError } from '../errors'
@@ -21,6 +20,7 @@ import { Logger } from '../logger'
 import { GaiaHubConfig } from '../storage/hub'
 import { protocolEchoReplyDetection } from './protocolEchoDetection'
 import { launchCustomProtocol } from './protocolLaunch'
+import { hexStringToECPair } from '../keys'
 
 
 const DEFAULT_PROFILE = {
@@ -54,6 +54,7 @@ export interface UserData {
   // maybe public: possibly useful for advanced devs / webapps. I see an opportunity
   // to make a small plug about "user owned data" here, idk. 
   hubUrl: string;
+  coreNode: string;
   // maybe private: this would be an advanced field for app devs to use. 
   authResponseToken: string;
   // private: does not get sent to webapp at all.
@@ -111,12 +112,12 @@ export function isUserSignedIn() {
  */
 export function redirectToSignIn(redirectURI?: string, 
                                  manifestURI?: string, 
-                                 scopes?: Array<AuthScope | string>) { 
+                                 scopes?: Array<AuthScope | string>): void { 
   console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
     + 'next major release of blockstack.js. Create an instance of UserSession and call the '
     + 'instance method redirectToSignIn().')
   const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
-  redirectToSignInWithAuthRequest(authRequest)
+  return redirectToSignInWithAuthRequest(authRequest)
 }
 
 /**
@@ -213,7 +214,7 @@ export function signUserOut(redirectURL?: string, caller?: UserSession) {
 export function redirectToSignInWithAuthRequest(
   authRequest?: string,
   blockstackIDHost: string = DEFAULT_BLOCKSTACK_HOST,
-) {
+): void {
   authRequest = authRequest || makeAuthRequest()
   const httpsURI = `${blockstackIDHost}?authRequest=${authRequest}`
 
@@ -295,18 +296,27 @@ export async function handlePendingSignIn(
     transitKey = caller.store.getSessionData().transitKey
   }
   if (!nameLookupURL) {
+    let coreNode = caller.appConfig && caller.appConfig.coreNode
+    if (!coreNode) {
+      coreNode = config.network.blockstackAPIUrl
+    }
+
     const tokenPayload = decodeToken(authResponseToken).payload
     if (typeof tokenPayload === 'string') {
       throw new Error('Unexpected token payload type of string')
     }
-    if (isLaterVersion(tokenPayload.version, '1.3.0')
+    if (isLaterVersion(tokenPayload.version as string, '1.3.0')
        && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
       // override globally
       Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
         + `with ${tokenPayload.blockstackAPIUrl}`)
-      config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl
+      // TODO: this config is never saved so the user node preference 
+      // is not respected in later sessions..
+      config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl as string
+      coreNode = tokenPayload.blockstackAPIUrl as string
     }
-    nameLookupURL = `${config.network.blockstackAPIUrl}${NAME_LOOKUP_PATH}`
+    
+    nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`
   }
   
   const isValid = await verifyAuthResponse(authResponseToken, nameLookupURL)
@@ -319,17 +329,17 @@ export async function handlePendingSignIn(
   }
 
   // TODO: real version handling
-  let appPrivateKey = tokenPayload.private_key
-  let coreSessionToken = tokenPayload.core_token
-  if (isLaterVersion(tokenPayload.version, '1.1.0')) {
+  let appPrivateKey = tokenPayload.private_key as string
+  let coreSessionToken = tokenPayload.core_token as string
+  if (isLaterVersion(tokenPayload.version as string, '1.1.0')) {
     if (transitKey !== undefined && transitKey != null) {
       if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
         try {
-          appPrivateKey = decryptPrivateKey(transitKey, tokenPayload.private_key)
+          appPrivateKey = await decryptPrivateKey(transitKey, tokenPayload.private_key as string)
         } catch (e) {
           Logger.warn('Failed decryption of appPrivateKey, will try to use as given')
           try {
-            hexStringToECPair(tokenPayload.private_key)
+            hexStringToECPair(tokenPayload.private_key as string)
           } catch (ecPairError) {
             throw new LoginFailedError('Failed decrypting appPrivateKey. Usually means'
                                       + ' that the transit key has changed during login.')
@@ -338,7 +348,7 @@ export async function handlePendingSignIn(
       }
       if (coreSessionToken !== undefined && coreSessionToken !== null) {
         try {
-          coreSessionToken = decryptPrivateKey(transitKey, coreSessionToken)
+          coreSessionToken = await decryptPrivateKey(transitKey, coreSessionToken)
         } catch (e) {
           Logger.info('Failed decryption of coreSessionToken, will try to use as given')
         }
@@ -349,29 +359,30 @@ export async function handlePendingSignIn(
     }
   }
   let hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
-  let gaiaAssociationToken
-  if (isLaterVersion(tokenPayload.version, '1.2.0')
+  let gaiaAssociationToken: string
+  if (isLaterVersion(tokenPayload.version as string, '1.2.0')
     && tokenPayload.hubUrl !== null && tokenPayload.hubUrl !== undefined) {
-    hubUrl = tokenPayload.hubUrl
+    hubUrl = tokenPayload.hubUrl as string
   }
-  if (isLaterVersion(tokenPayload.version, '1.3.0')
+  if (isLaterVersion(tokenPayload.version as string, '1.3.0')
     && tokenPayload.associationToken !== null && tokenPayload.associationToken !== undefined) {
-    gaiaAssociationToken = tokenPayload.associationToken
+    gaiaAssociationToken = tokenPayload.associationToken as string
   }
 
   const userData: UserData = {
-    username: tokenPayload.username,
+    username: tokenPayload.username as string,
     profile: tokenPayload.profile,
-    email: tokenPayload.email,
+    email: tokenPayload.email as string,
     decentralizedID: tokenPayload.iss,
     identityAddress: getAddressFromDID(tokenPayload.iss),
     appPrivateKey,
     coreSessionToken,
     authResponseToken,
     hubUrl,
+    coreNode: tokenPayload.blockstackAPIUrl as string,
     gaiaAssociationToken
   }
-  const profileURL = tokenPayload.profile_url
+  const profileURL = tokenPayload.profile_url as string
   if (!userData.profile && profileURL) {
     const response = await fetchPrivate(profileURL)
     if (!response.ok) { // return blank profile if we fail to fetch

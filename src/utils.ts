@@ -1,8 +1,15 @@
-
-import * as url from 'url'
-import { ECPair, address, crypto } from 'bitcoinjs-lib'
-import { config } from './config'
 import { Logger } from './logger'
+import { 
+  BadPathError, 
+  ConflictError, 
+  DoesNotExist,
+  GaiaHubErrorResponse,
+  NotEnoughProofError, 
+  PayloadTooLargeError, 
+  ValidationError,
+  PreconditionFailedError
+} from './errors'
+
 
 /**
  *  @ignore
@@ -46,6 +53,39 @@ export function nextHour() {
       new Date().getHours() + 1
     )
   )
+}
+
+/**
+ * Converts megabytes to bytes. Returns 0 if the input is not a finite number.
+ * @ignore
+ */
+export function megabytesToBytes(megabytes: number): number {
+  if (!Number.isFinite(megabytes)) {
+    return 0
+  }
+  return Math.floor(megabytes * 1024 * 1024)
+}
+
+/**
+ * Calculate the AES-CBC ciphertext output byte length a given input length.
+ * AES has a fixed block size of 16-bytes regardless key size.
+ * @ignore
+ */
+export function getAesCbcOutputLength(inputByteLength: number) {
+  // AES-CBC block mode rounds up to the next block size. 
+  const cipherTextLength = (Math.floor(inputByteLength / 16) + 1) * 16
+  return cipherTextLength
+}
+
+/**
+ * Calculate the base64 encoded string length for a given input length. 
+ * This is equivalent to the byte length when the string is ASCII or UTF8-8 
+ * encoded.  
+ * @param number 
+ */
+export function getBase64OutputLength(inputByteLength: number) {
+  const encodedLength = (Math.ceil(inputByteLength / 3) * 4)
+  return encodedLength
 }
 
 /**
@@ -97,53 +137,6 @@ export function isLaterVersion(v1: string, v2: string) {
 }
 
 /**
- * Time
- * @private
- * @ignore
- */
-export function hexStringToECPair(skHex: string): ECPair.ECPairInterface {
-  const ecPairOptions = {
-    network: config.network.layer1,
-    compressed: true
-  }
-
-  if (skHex.length === 66) {
-    if (skHex.slice(64) !== '01') {
-      throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
-                      + 'indicates compressed key, but last byte must be == 1')
-    }
-    return ECPair.fromPrivateKey(Buffer.from(skHex.slice(0, 64), 'hex'), ecPairOptions)
-  } else if (skHex.length === 64) {
-    ecPairOptions.compressed = false
-    return ECPair.fromPrivateKey(Buffer.from(skHex, 'hex'), ecPairOptions)
-  } else {
-    throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.')
-  }
-}
-
-/**
- * 
- * @ignore
- */
-export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
-  const ecPointHex = secretKey.privateKey.toString('hex')
-  if (secretKey.compressed) {
-    return `${ecPointHex}01`
-  } else {
-    return ecPointHex
-  }
-}
-
-/**
- * Time
- * @private
- * @ignore
- */
-export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
-  return address.toBase58Check(crypto.hash160(keyPair.publicKey), keyPair.network.pubKeyHash)
-}
-
-/**
  * UUIDs
  * @private
  * @ignore
@@ -169,21 +162,45 @@ export function makeUUID4() {
  * @ignore
  */
 export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
-  const parsedUri1 = url.parse(uri1)
-  const parsedUri2 = url.parse(uri2)
+  try {
+    // The globally scoped WHATWG `URL` class is available in modern browsers and
+    // NodeJS v10 or higher. In older NodeJS versions it must be required from the
+    // `url` module.
+    let parseUrl: (url: string) => URL
+    if (typeof URL !== 'undefined') {
+      parseUrl = url => new URL(url)
+    } else {
+      try {
+        // eslint-disable-next-line import/no-nodejs-modules, global-require
+        const nodeUrl = (require('url') as typeof import('url')).URL
+        parseUrl = url => new nodeUrl(url)
+      } catch (error) {
+        console.log(error)
+        console.error('Global URL class is not available')
+      }
+    }
 
-  const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
-  const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
+    const parsedUri1 = parseUrl(uri1)
+    const parsedUri2 = parseUrl(uri2)
 
-  const match = {
-    scheme: parsedUri1.protocol === parsedUri2.protocol,
-    hostname: parsedUri1.hostname === parsedUri2.hostname,
-    port: port1 === port2,
-    absolute: (uri1.includes('http://') || uri1.includes('https://'))
-    && (uri2.includes('http://') || uri2.includes('https://'))
+    const port1 = parseInt(parsedUri1.port || '0', 10) | 0 || (parsedUri1.protocol === 'https:' ? 443 : 80)
+    const port2 = parseInt(parsedUri2.port || '0', 10) | 0 || (parsedUri2.protocol === 'https:' ? 443 : 80)
+
+    const match = {
+      scheme: parsedUri1.protocol === parsedUri2.protocol,
+      hostname: parsedUri1.hostname === parsedUri2.hostname,
+      port: port1 === port2,
+      absolute: (uri1.includes('http://') || uri1.includes('https://'))
+      && (uri2.includes('http://') || uri2.includes('https://'))
+    }
+
+    return match.scheme && match.hostname && match.port && match.absolute
+  } catch (error) {
+    console.log(error)
+    console.log('Parsing error in same URL origin check')
+    // Parse error
+    return false
   }
-
-  return match.scheme && match.hostname && match.port && match.absolute
 }
 
 /**
@@ -195,8 +212,9 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
  * 
  * This could be switched to `globalThis` once it is standardized and widely available. 
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
+ * @ignore
  */
-function getGlobalScope(): Window {
+export function getGlobalScope(): Window {
   if (typeof self !== 'undefined') {
     return self
   }
@@ -252,7 +270,7 @@ interface GetGlobalObjectOptions {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObject<K extends keyof Window>(
+export function getGlobalObject<K extends Extract<keyof Window, string>>(
   name: K, 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
 ): Window[K] {
@@ -274,7 +292,7 @@ export function getGlobalObject<K extends keyof Window>(
     throw new Error(errMsg)
   }
   if (returnEmptyObject) { 
-    return {}
+    return {} as any
   }
   return undefined
 }
@@ -287,7 +305,7 @@ export function getGlobalObject<K extends keyof Window>(
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/self
  * @ignore
  */
-export function getGlobalObjects<K extends keyof Window>(
+export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   names: K[], 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
 ): Pick<Window, K> {
@@ -318,7 +336,7 @@ export function getGlobalObjects<K extends keyof Window>(
           Logger.error(errMsg)
           throw new Error(errMsg)
         } else if (returnEmptyObject) {
-          result[name] = {}
+          result[name] = {} as any
         }
       }
     } catch (error) {
@@ -330,4 +348,56 @@ export function getGlobalObjects<K extends keyof Window>(
     }
   }
   return result
+}
+
+async function getGaiaErrorResponse(response: Response): Promise<GaiaHubErrorResponse> {
+  let responseMsg = ''
+  let responseJson: any | undefined
+  try {
+    responseMsg = await response.text()
+    try {
+      responseJson = JSON.parse(responseMsg)
+    } catch (error) {
+      // Use text instead
+    }
+  } catch (error) {
+    Logger.debug(`Error getting bad http response text: ${error}`)
+  }
+  const status = response.status
+  const statusText = response.statusText
+  const body = responseJson || responseMsg
+  return { status, statusText, body }
+}
+
+/**
+ * Returns a BlockstackError correlating to the given HTTP response,
+ * with the provided errorMsg. Throws if the HTTP response is 'ok'.
+ */
+export async function getBlockstackErrorFromResponse(
+  response: Response,
+  errorMsg: string,
+  hubConfig: import('./storage/hub').GaiaHubConfig | null
+): Promise<Error> {
+  if (response.ok) {
+    throw new Error('Cannot get a BlockstackError from a valid response.')
+  }
+  const gaiaResponse = await getGaiaErrorResponse(response)  
+  if (gaiaResponse.status === 401) {
+    return new ValidationError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 402) {
+    return new NotEnoughProofError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 403) {
+    return new BadPathError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 404) {
+    throw new DoesNotExist(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 409) {
+    return new ConflictError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 412) {
+    return new PreconditionFailedError(errorMsg, gaiaResponse)
+  } else if (gaiaResponse.status === 413) {
+    const maxBytes = megabytesToBytes(hubConfig?.max_file_upload_size_megabytes)
+    return new PayloadTooLargeError(errorMsg, gaiaResponse, maxBytes)
+  } else {
+    return new Error(errorMsg)
+  }
 }

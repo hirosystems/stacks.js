@@ -1,14 +1,13 @@
-
-import * as cheerio from 'cheerio'
-import { Service } from './service'
+import { Service, CheerioModuleType } from './service'
+import { AccountProofInfo } from '../profileProofs'
 
 class Instagram extends Service {
-  static getBaseUrls() {
+  getBaseUrls() {
     const baseUrls = ['https://www.instagram.com/', 'https://instagram.com/']
     return baseUrls
   }
 
-  static getProofUrl(proof: any) {
+  getProofUrl(proof: AccountProofInfo) {
     const baseUrls = this.getBaseUrls()
     const normalizedProofUrl = this.normalizeUrl(proof)
 
@@ -20,7 +19,7 @@ class Instagram extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeUrl(proof: any) {
+  normalizeUrl(proof: AccountProofInfo) {
     let proofUrl = proof.proof_url
     proofUrl = super.prefixScheme(proofUrl)
 
@@ -31,11 +30,11 @@ class Instagram extends Service {
     return proofUrl
   }
 
-  static shouldValidateIdentityInBody() {
+  shouldValidateIdentityInBody() {
     return true
   }
 
-  static getProofIdentity(searchText: string) {
+  getProofIdentity(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const username = $('meta[property="og:description"]').attr('content')
     if (username !== undefined && username.split(':').length > 1) {
@@ -45,7 +44,7 @@ class Instagram extends Service {
     }
   }
 
-  static getProofStatement(searchText: string) {
+  getProofStatement(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const statement = $('meta[property="og:description"]')
       .attr('content')

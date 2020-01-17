@@ -6,22 +6,16 @@ import { HackerNews } from './hackerNews'
 import { LinkedIn } from './linkedIn'
 import { Service } from './service'
 
-interface ValidateProofService {
-  validateProof(proof: any, ownerAddress: string, name?: string): Promise<any>;
-  getProofUrl(proof: any): string;
-  getProofStatement(searchText: string): string;
-  normalizeUrl(proof: any): string;
-  getProofIdentity(searchText: string): string;
-}
+
 
 /** @ignore */
 export const profileServices: {
-  [serviceName: string]: Service & ValidateProofService
+  [serviceName: string]: Service
 } = {
-  facebook: Facebook,
-  github: Github,
-  twitter: Twitter,
-  instagram: Instagram,
-  hackerNews: HackerNews,
-  linkedIn: LinkedIn
+  facebook: new Facebook(),
+  github: new Github(),
+  twitter: new Twitter(),
+  instagram: new Instagram(),
+  hackerNews: new HackerNews(),
+  linkedIn: new LinkedIn()
 }

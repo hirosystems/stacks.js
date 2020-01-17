@@ -1,6 +1,6 @@
 
 import { TransactionBuilder, ECPair } from 'bitcoinjs-lib'
-import { hexStringToECPair, ecPairToAddress } from '../utils'
+import { hexStringToECPair, ecPairToAddress } from '../keys'
 
 /**
  * @ignore
