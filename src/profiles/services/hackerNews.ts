@@ -1,9 +1,8 @@
-
-import * as cheerio from 'cheerio'
-import { Service } from './service'
+import { Service, CheerioModuleType } from './service'
+import { AccountProofInfo } from '../profileProofs'
 
 class HackerNews extends Service {
-  static getBaseUrls() {
+  getBaseUrls() {
     const baseUrls = [
       'https://news.ycombinator.com/user?id=',
       'http://news.ycombinator.com/user?id=',
@@ -12,7 +11,7 @@ class HackerNews extends Service {
     return baseUrls
   }
 
-  static getProofUrl(proof: any) {
+  getProofUrl(proof: AccountProofInfo) {
     const baseUrls = this.getBaseUrls()
 
     const proofUrl = super.prefixScheme(proof.proof_url)
@@ -25,11 +24,11 @@ class HackerNews extends Service {
     throw new Error(`Proof url ${proof.proof_url} is not valid for service ${proof.service}`)
   }
 
-  static normalizeUrl(proof: any) {
+  normalizeUrl(_proof: AccountProofInfo) {
     return ''
   }
 
-  static getProofStatement(searchText: string) {
+  getProofStatement(searchText: string, cheerio: CheerioModuleType) {
     const $ = cheerio.load(searchText)
     const tables = $('#hnmain').children().find('table')
     let statement = ''

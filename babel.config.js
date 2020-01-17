@@ -9,8 +9,11 @@ module.exports = function (api) {
   // Babel config for web browser lib dist with wide-spread browser support.
   let opts = {
     presets: [
-      "@babel/preset-env",
-      "@babel/preset-typescript"
+      ["@babel/preset-env", {
+        "targets": {
+          "esmodules": true
+        }
+      }]
     ],
     plugins: [
       "@babel/proposal-class-properties",

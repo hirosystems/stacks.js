@@ -1,7 +1,6 @@
 
 
-import { TransactionBuilder, payments, address as bjsAddress } from 'bitcoinjs-lib'
-// @ts-ignore
+import { TransactionBuilder, payments, address as bjsAddress, Transaction } from 'bitcoinjs-lib'
 import * as BN from 'bn.js'
 import {
   decodeB40, hash160, hash128, DUST_MINIMUM
@@ -179,7 +178,7 @@ export function makePreorderSkeleton(
   fullyQualifiedName: string, consensusHash: string, preorderAddress: string,
   burnAddress: string, burn: AmountType,
   registerAddress: string = null
-) {
+): Transaction {
   // Returns a preorder tx skeleton.
   //   with 3 outputs : 1. the Blockstack Preorder OP_RETURN data
   //                    2. the Preorder's change address (5500 satoshi minimum)
@@ -390,7 +389,7 @@ export function makeRenewalSkeleton(
 export function makeTransferSkeleton(
   fullyQualifiedName: string, consensusHash: string, newOwner: string,
   keepZonefile: boolean = false
-) {
+): Transaction {
   // Returns a transfer tx skeleton.
   //   with 2 outputs : 1. the Blockstack Transfer OP_RETURN data
   //                    2. the new owner with a DUST_MINIMUM value (5500 satoshi)
@@ -437,7 +436,7 @@ export function makeTransferSkeleton(
 */
 export function makeUpdateSkeleton(
   fullyQualifiedName: string, consensusHash: string, valueHash: string
-) {
+): Transaction {
   // Returns an update tx skeleton.
   //   with 1 output : 1. the Blockstack update OP_RETURN
   //
@@ -519,7 +518,7 @@ export function makeRevokeSkeleton(fullyQualifiedName: string) {
 export function makeNamespacePreorderSkeleton(
   namespaceID: string, consensusHash: string, preorderAddress: string,
   registerAddress: string, burn: AmountType
-) {
+): Transaction {
   // Returns a namespace preorder tx skeleton.
   // Returns an unsigned serialized transaction.
   /*

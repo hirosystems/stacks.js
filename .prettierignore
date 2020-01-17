@@ -56,3 +56,11 @@ src/dids.ts
 src/fetchUtil.ts
 src/public.ts
 src/address.ts
+src/bn.ts
+src/encryption/aesCipher.ts
+src/encryption/cryptoRandom.ts
+src/encryption/cryptoUtils.ts
+src/encryption/hashRipemd160.ts
+src/encryption/hmacSha256.ts
+src/encryption/pbkdf2.ts
+src/encryption/sha2Hash.ts

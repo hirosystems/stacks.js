@@ -1,14 +1,12 @@
 
-import { Transaction, script, crypto as bjsCrypto, ECPair } from 'bitcoinjs-lib'
-import * as crypto from 'crypto'
-
-// @ts-ignore: Could not find a declaration file for module
+import { Transaction, script, ECPair } from 'bitcoinjs-lib'
 import { TokenSigner } from 'jsontokens'
-import { ecPairToAddress, hexStringToECPair } from '../utils'
+import { getBlockstackErrorFromResponse } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
-import { getPublicKeyFromPrivate } from '../keys'
+import { getPublicKeyFromPrivate, ecPairToAddress, hexStringToECPair, } from '../keys'
 import { Logger } from '../logger'
-import { FileNotFound } from '../errors'
+import { randomBytes } from '../encryption/cryptoRandom'
+import { hashSha256Sync } from '../encryption/sha2Hash'
 
 /**
  * @ignore
@@ -22,7 +20,13 @@ export interface GaiaHubConfig {
   address: string,
   url_prefix: string,
   token: string,
+  max_file_upload_size_megabytes: number | undefined,
   server: string
+}
+
+interface UploadResponse {
+  publicURL: string,
+  etag?: string
 }
 
 /**
@@ -35,27 +39,40 @@ export interface GaiaHubConfig {
  * @ignore
  */
 export async function uploadToGaiaHub(
-  filename: string, contents: any,
+  filename: string, 
+  contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
-  contentType: string = 'application/octet-stream'
-): Promise<string> {
+  contentType: string = 'application/octet-stream',
+  newFile: boolean = true,
+  etag?: string
+): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
+
+  const headers: { [key: string]: string; } = {
+    'Content-Type': contentType,
+    Authorization: `bearer ${hubConfig.token}`
+  }
+
+  if (newFile) {
+    headers['If-None-Match'] = '*'
+  } else if (etag) {
+    headers['If-Match'] = etag
+  }
+
   const response = await fetchPrivate(
     `${hubConfig.server}/store/${hubConfig.address}/${filename}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': contentType,
-        Authorization: `bearer ${hubConfig.token}`
-      },
+      headers,
       body: contents
     }
   )
   if (!response.ok) {
-    throw new Error('Error when uploading to Gaia hub')
-  } 
+    throw await getBlockstackErrorFromResponse(response, 'Error when uploading to Gaia hub.', hubConfig)
+  }
   const responseText = await response.text()
   const responseJSON = JSON.parse(responseText)
-  return responseJSON.publicURL
+
+  return responseJSON
 }
 
 export async function deleteFromGaiaHub(
@@ -63,7 +80,7 @@ export async function deleteFromGaiaHub(
   hubConfig: GaiaHubConfig
 ): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`)
-  const response = await fetch(
+  const response = await fetchPrivate(
     `${hubConfig.server}/delete/${hubConfig.address}/${filename}`, {
       method: 'DELETE',
       headers: {
@@ -72,20 +89,7 @@ export async function deleteFromGaiaHub(
     }
   )
   if (!response.ok) {
-    let responseMsg = ''
-    try {
-      responseMsg = await response.text()
-    } catch (error) {
-      Logger.debug(`Error getting bad http response text: ${error}`)
-    }
-    const errorMsg = 'Error deleting file from Gaia hub: '
-      + `${response.status} ${response.statusText}: ${responseMsg}`
-    Logger.error(errorMsg)
-    if (response.status === 404) {
-      throw new FileNotFound(errorMsg)
-    } else {
-      throw new Error(errorMsg)
-    }
+    throw await getBlockstackErrorFromResponse(response, 'Error deleting file from Gaia hub.', hubConfig)
   }
 }
 
@@ -120,7 +124,7 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
       && parsedChallenge[3] === 'blockstack_storage_please_sign') {
     const signer = hexStringToECPair(signerKeyHex
                                      + (signerKeyHex.length === 64 ? '01' : ''))
-    const digest = bjsCrypto.sha256(Buffer.from(challengeText))
+    const digest = hashSha256Sync(Buffer.from(challengeText))
 
     const signatureBuffer = signer.sign(digest)
     const signatureWithHash = script.signature.encode(
@@ -162,7 +166,7 @@ function makeV1GaiaAuthToken(hubInfo: any,
     return makeLegacyAuthToken(challengeText, signerKeyHex)
   }
 
-  const salt = crypto.randomBytes(16).toString('hex')
+  const salt = randomBytes(16).toString('hex')
   const payload = {
     gaiaChallenge: challengeText,
     hubUrl,
@@ -193,6 +197,7 @@ export async function connectToGaiaHub(
                                     + (challengeSignerHex.length === 64 ? '01' : '')))
   return {
     url_prefix: readURL,
+    max_file_upload_size_megabytes: hubInfo.max_file_upload_size_megabytes,
     address,
     token,
     server: gaiaHubUrl

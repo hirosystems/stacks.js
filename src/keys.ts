@@ -1,6 +1,9 @@
 
-import { randomBytes, randomFillSync } from 'crypto'
-import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
+import { ECPair, address, networks } from 'bitcoinjs-lib'
+import { randomBytes } from './encryption/cryptoRandom'
+import { hashSha256Sync } from './encryption/sha2Hash'
+import { hashRipemd160 } from './encryption/hashRipemd160'
+import { config } from './config'
 
 /**
  * 
@@ -8,15 +11,11 @@ import { ECPair, address as baddress, crypto as bcrypto } from 'bitcoinjs-lib'
  * 
  * @ignore
  */
-export function getEntropy(arg: Buffer | number): Buffer {
+export function getEntropy(arg: number): Buffer {
   if (!arg) {
     arg = 32
   }
-  if (typeof arg === 'number') {
-    return randomBytes(arg)
-  } else {
-    return randomFillSync(arg)
-  }  
+  return randomBytes(arg)
 }
 
 /**
@@ -30,17 +29,67 @@ export function makeECPrivateKey() {
 /**
 * @ignore
 */
-export function publicKeyToAddress(publicKey: string) {
-  const publicKeyBuffer = Buffer.from(publicKey, 'hex')
-  const publicKeyHash160 = bcrypto.hash160(publicKeyBuffer)
-  const address = baddress.toBase58Check(publicKeyHash160, 0x00)
-  return address
+export function publicKeyToAddress(publicKey: string | Buffer) {
+  const publicKeyBuffer = Buffer.isBuffer(publicKey) ? publicKey : Buffer.from(publicKey, 'hex')
+  const publicKeyHash160 = hashRipemd160(hashSha256Sync(publicKeyBuffer))
+  const result = address.toBase58Check(publicKeyHash160, networks.bitcoin.pubKeyHash)
+  return result
 }
 
 /**
 * @ignore
 */
-export function getPublicKeyFromPrivate(privateKey: string) {
-  const keyPair = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'))
+export function getPublicKeyFromPrivate(privateKey: string | Buffer) {
+  const privateKeyBuffer = Buffer.isBuffer(privateKey) ? privateKey : Buffer.from(privateKey, 'hex')
+  const keyPair = ECPair.fromPrivateKey(privateKeyBuffer)
   return keyPair.publicKey.toString('hex')
+}
+
+/**
+ * Time
+ * @private
+ * @ignore
+ */
+export function hexStringToECPair(skHex: string): ECPair.ECPairInterface {
+  const ecPairOptions = {
+    network: config.network.layer1,
+    compressed: true
+  }
+
+  if (skHex.length === 66) {
+    if (skHex.slice(64) !== '01') {
+      throw new Error('Improperly formatted private-key hex string. 66-length hex usually '
+                      + 'indicates compressed key, but last byte must be == 1')
+    }
+    return ECPair.fromPrivateKey(Buffer.from(skHex.slice(0, 64), 'hex'), ecPairOptions)
+  } else if (skHex.length === 64) {
+    ecPairOptions.compressed = false
+    return ECPair.fromPrivateKey(Buffer.from(skHex, 'hex'), ecPairOptions)
+  } else {
+    throw new Error('Improperly formatted private-key hex string: length should be 64 or 66.')
+  }
+}
+
+/**
+ * 
+ * @ignore
+ */
+export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
+  const ecPointHex = secretKey.privateKey.toString('hex')
+  if (secretKey.compressed) {
+    return `${ecPointHex}01`
+  } else {
+    return ecPointHex
+  }
+}
+
+/**
+ * Creates a bitcoin address string from an ECPair
+ * @private
+ * @ignore
+ */
+export function ecPairToAddress(keyPair: ECPair.ECPairInterface) {
+  const sha256 = hashSha256Sync(keyPair.publicKey)
+  const hash160 = hashRipemd160(sha256)
+  return address.toBase58Check(hash160, keyPair.network.pubKeyHash)
 }

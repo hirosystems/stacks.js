@@ -1,7 +1,14 @@
+// eslint-disable-next-line import/no-unassigned-import
+import 'cross-fetch/polyfill'
 
 /** @ignore */
-export function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  init = init || { }
-  init.referrerPolicy = 'no-referrer'
-  return fetch(input, init)
+export async function fetchPrivate(input: RequestInfo, init?: RequestInit): Promise<Response> {
+  const defaultFetchOpts: RequestInit = {
+    referrer: 'no-referrer',
+    referrerPolicy: 'no-referrer'
+  }
+  const fetchOpts = Object.assign(defaultFetchOpts, init)
+  // eslint-disable-next-line no-restricted-globals
+  const fetchResult = await fetch(input, fetchOpts)
+  return fetchResult
 }

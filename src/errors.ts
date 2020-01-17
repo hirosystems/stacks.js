@@ -7,6 +7,19 @@ export const ERROR_CODES = {
   REMOTE_SERVICE_ERROR: 'remote_service_error',
   INVALID_STATE: 'invalid_state',
   NO_SESSION_DATA: 'no_session_data',
+  DOES_NOT_EXIST: 'does_not_exist',
+  FAILED_DECRYPTION_ERROR: 'failed_decryption_error',
+  INVALID_DID_ERROR: 'invalid_did_error',
+  NOT_ENOUGH_FUNDS_ERROR: 'not_enough_error',
+  INVALID_AMOUNT_ERROR: 'invalid_amount_error',
+  LOGIN_FAILED_ERROR: 'login_failed',
+  SIGNATURE_VERIFICATION_ERROR: 'signature_verification_failure',
+  CONFLICT_ERROR: 'conflict_error',
+  NOT_ENOUGH_PROOF_ERROR: 'not_enough_proof_error',
+  BAD_PATH_ERROR: 'bad_path_error',
+  VALIDATION_ERROR: 'validation_error',
+  PAYLOAD_TOO_LARGE_ERROR: 'payload_too_large_error',
+  PRECONDITION_FAILED_ERROR: 'precondition_failed_error',
   UNKNOWN: 'unknown'
 }
 
@@ -15,7 +28,7 @@ Object.freeze(ERROR_CODES)
 /**
 * @ignore
 */
-type ErrorType = {
+type ErrorData = {
   code: string,
   parameter?: string,
   message: string
@@ -31,13 +44,27 @@ export class BlockstackError extends Error {
 
   parameter?: string
 
-  constructor(error: ErrorType) {
-    super(error.message)
-    this.message = error.message
+  constructor(error: ErrorData) {
+    super()
+    let message = error.message
+    let bugDetails = `Error Code: ${error.code}`
+    let stack = this.stack
+    if (!stack) { 
+      try {
+        throw new Error()
+      } catch (e) {
+        stack = e.stack
+      }
+    } else {
+      bugDetails += `Stack Trace:\n${stack}`
+    }
+    message += `\nIf you believe this exception is caused by a bug in blockstack.js,
+      please file a bug report: https://github.com/blockstack/blockstack.js/issues\n\n${bugDetails}`
+    this.message = message
     this.code = error.code
     this.parameter = error.parameter ? error.parameter : null
   }
-
+  
   toString() {
     return `${super.toString()}
     code: ${this.code} param: ${this.parameter ? this.parameter : 'n/a'}`
@@ -47,19 +74,9 @@ export class BlockstackError extends Error {
 /**
 * @ignore
 */
-export class FileNotFound extends BlockstackError {
-  constructor(message: string) {
-    super({ message, code: 'file_not_found' })
-    this.name = 'FileNotFound'
-  }
-}
-
-/**
-* @ignore
-*/
 export class InvalidParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
-    super({ code: 'missing_parameter', message, parameter: '' })
+    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter: '' })
     this.name = 'MissingParametersError'
   }
 }
@@ -91,7 +108,7 @@ export class RemoteServiceError extends BlockstackError {
 */
 export class InvalidDIDError extends BlockstackError {
   constructor(message: string = '') {
-    super({ code: 'invalid_did_error', message })
+    super({ code: ERROR_CODES.INVALID_DID_ERROR, message })
     this.name = 'InvalidDIDError'
   }
 }
@@ -104,7 +121,7 @@ export class NotEnoughFundsError extends BlockstackError {
 
   constructor(leftToFund: number) {
     const message = `Not enough UTXOs to fund. Left to fund: ${leftToFund}`
-    super({ code: 'not_enough_error', message })
+    super({ code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message })
     this.leftToFund = leftToFund
     this.name = 'NotEnoughFundsError'
     this.message = message
@@ -114,7 +131,6 @@ export class NotEnoughFundsError extends BlockstackError {
 /**
 * @ignore
 */
-
 export class InvalidAmountError extends BlockstackError {
   fees: number
 
@@ -123,7 +139,7 @@ export class InvalidAmountError extends BlockstackError {
   constructor(fees: number, specifiedAmount: number) {
     const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},`
           + ` specified spend is  ${specifiedAmount}`
-    super({ code: 'invalid_amount_error', message })
+    super({ code: ERROR_CODES.INVALID_AMOUNT_ERROR, message })
     this.specifiedAmount = specifiedAmount
     this.fees = fees
     this.name = 'InvalidAmountError'
@@ -137,7 +153,7 @@ export class InvalidAmountError extends BlockstackError {
 export class LoginFailedError extends BlockstackError {
   constructor(reason: string) {
     const message = `Failed to login: ${reason}`
-    super({ code: 'login_failed', message })
+    super({ code: ERROR_CODES.LOGIN_FAILED_ERROR, message })
     this.message = message
     this.name = 'LoginFailedError'
   }
@@ -149,9 +165,20 @@ export class LoginFailedError extends BlockstackError {
 export class SignatureVerificationError extends BlockstackError {
   constructor(reason: string) {
     const message = `Failed to verify signature: ${reason}`
-    super({ code: 'signature_verification_failure', message })
+    super({ code: ERROR_CODES.SIGNATURE_VERIFICATION_ERROR, message })
     this.message = message
     this.name = 'SignatureVerificationError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class FailedDecryptionError extends BlockstackError {
+  constructor(message: string = 'Unable to decrypt cipher object.') {
+    super({ code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message })
+    this.message = message
+    this.name = 'FailedDecryptionError'
   }
 }
 
@@ -174,5 +201,119 @@ export class NoSessionDataError extends BlockstackError {
     super({ code: ERROR_CODES.INVALID_STATE, message })
     this.message = message
     this.name = 'NoSessionDataError'
+  }
+}
+
+/**
+* @ignore
+*/
+export interface GaiaHubErrorResponse {
+  status: number, 
+  statusText: string,
+  body?: string | any
+}
+
+export interface HubErrorDetails {
+  message?: string
+  statusCode: number
+  statusText: string
+  [prop: string]: any
+}
+
+/**
+* @ignore
+*/
+export class GaiaHubError extends BlockstackError {
+  hubError: HubErrorDetails
+
+  constructor(error: ErrorData, response: GaiaHubErrorResponse) {
+    super(error)
+    if (response) {
+      this.hubError = {
+        statusCode: response.status,
+        statusText: response.statusText
+      }
+      if (typeof response.body === 'string') {
+        this.hubError.message = response.body
+      } else if (typeof response.body === 'object') {
+        Object.assign(this.hubError, response.body)
+      }
+    }
+  }
+}
+
+/**
+* @ignore
+*/
+export class DoesNotExist extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.DOES_NOT_EXIST }, response)
+    this.name = 'DoesNotExist'
+  }
+}
+
+/**
+* @ignore
+*/
+export class ConflictError extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.CONFLICT_ERROR }, response)
+    this.name = 'ConflictError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class NotEnoughProofError extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR }, response)
+    this.name = 'NotEnoughProofError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class BadPathError extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.BAD_PATH_ERROR }, response)
+    this.name = 'BadPathError'
+  }
+}
+
+/**
+* @ignore
+*/
+export class ValidationError extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR }, response)
+    this.name = 'ValidationError'
+  }
+}
+
+/**
+ * @ignore
+ */
+export class PayloadTooLargeError extends GaiaHubError {
+  /** Can be `null` when an oversized payload is detected client-side. */
+  hubError: HubErrorDetails
+
+  maxUploadByteSize: number;
+
+  constructor(message: string, response: GaiaHubErrorResponse, maxUploadByteSize: number) {
+    super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response)
+    this.name = 'PayloadTooLargeError'
+    this.maxUploadByteSize = maxUploadByteSize
+  }
+}
+
+/**
+ * @ignore
+ */
+export class PreconditionFailedError extends GaiaHubError {
+  constructor(message: string, response: GaiaHubErrorResponse) {
+    super({ message, code: ERROR_CODES.PRECONDITION_FAILED_ERROR }, response)
+    this.name = 'PreconditionFailedError'
   }
 }
