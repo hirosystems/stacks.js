@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## [21.0.0-beta.1]
+## [21.0.0] - 2020-01-17
 ### Added
 - More Blockstack error codes.
 - `putFile` and `encryptContent` can now optionally base64 encode data, for a ~33% size increase compared to the default hex encoding which has a 100% size increase. 
