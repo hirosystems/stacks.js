@@ -21,6 +21,9 @@ decryption.
 - The following functions now return Promises: `handleSignedEncryptedContents`, `makeAuthResponse`, 
 `encryptECIES`, `decryptECIES`, `encryptPrivateKey`, `decryptPrivateKey`, `encryptContent`, 
 `decryptContent`, `aes256CbcEncrypt`, `aes256CbcDecrypt`, `hmacSha256`.
+- `putFile` now attempts to include `etag` values in the `If-Match` header of its request, and sets the `If-None-Match` header to `*` if it is unaware of an etag for the file it is attempting to write.
+- `putFile` now returns an `etag` in addition to the `publicURL` after successfully writing a file.
+- `PreconditionFailedError` thrown if `putFile` returns with a `412` response.
 
 ## [19.4.0] - 2019-09-03
 ### Changed
