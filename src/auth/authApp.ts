@@ -121,9 +121,6 @@ export function redirectToSignIn(redirectURI?: string,
 }
 
 /**
- * @deprecated 
- * #### v19 Use [[UserSession.isSignInPending]] instead. 
- *
  * Check if there is a authentication request that hasn't been handled. 
  *
  * Also checks for a protocol echo reply (which if detected then the page
@@ -146,9 +143,6 @@ export function isSignInPending() {
 }
 
 /**
- * @deprecated 
- * #### v19 Use [[UserSession.getAuthResponseToken]] instead. 
- *
  * Retrieve the authentication token from the URL query
  * @return {String} the authentication token if it exists otherwise `null`
  */
@@ -177,9 +171,6 @@ export function loadUserData() {
 }
 
 /** 
- * @deprecated 
- * #### v19 Use [[UserSession.signUserOut]] instead.
- *
  * Sign the user out and optionally redirect to given location.
  * @param  redirectURL
  * Location to redirect user to after sign out. 
@@ -197,9 +188,6 @@ export function signUserOut(redirectURL?: string, caller?: UserSession) {
 }
 
 /** 
- * @deprecated 
- * #### v19 Use [[UserSession.redirectToSignInWithAuthRequest]] instead.
- *
  * Redirects the user to the Blockstack browser to approve the sign in request
  * given.
  *
@@ -244,9 +232,6 @@ export function redirectToSignInWithAuthRequest(
 }
 
 /** 
- * @deprecated 
- * #### v19 Use [[UserSession.handlePendingSignIn]] instead.
- *
  * Try to process any pending sign in request by returning a `Promise` that resolves
  * to the user data object if the sign in succeeds.
  *

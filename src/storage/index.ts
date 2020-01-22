@@ -116,11 +116,6 @@ export async function getUserAppFileUrl(
 }
 
 /**
- * 
- * 
- * @deprecated 
- * #### v19 Use [[UserSession.encryptContent]].
- *
  * Encrypts the data provided with the app public key.
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
@@ -169,10 +164,6 @@ export async function encryptContent(
 }
 
 /**
- * 
- * @deprecated 
- * #### v19 Use [[UserSession.decryptContent]].
- * 
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
@@ -277,8 +268,6 @@ function normalizeOptions<T>(
 }
 
 /**
- * @deprecated
- * #### v19 Use [[UserSession.getFileUrl]] instead.
  * 
  * @param {String} path - the path to the file to read
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
