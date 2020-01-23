@@ -6,7 +6,6 @@ import {
   InstanceDataStore
 } from './sessionStore'
 
-import * as authApp from './authApp'
 import * as authMessages from './authMessages'
 import * as storage from '../storage'
 
@@ -20,6 +19,7 @@ import {
 import { Logger } from '../logger'
 import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
+import { redirectToSignInWithAuthRequest, isSignInPending, handlePendingSignIn, signUserOut, getAuthResponseToken } from './authApp'
 
 
 /**
@@ -109,7 +109,7 @@ export class UserSession {
     const transitKey = this.generateAndStoreTransitKey()
     const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
-    return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
+    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -131,7 +131,7 @@ export class UserSession {
     authRequest = authRequest || this.makeAuthRequest()
     const authenticatorURL = blockstackIDHost 
       || (this.appConfig && this.appConfig.authenticatorURL)
-    return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
+    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -200,7 +200,7 @@ export class UserSession {
    * @returns {String} the authentication token if it exists otherwise `null`
    */
   getAuthResponseToken(): string {
-    return authApp.getAuthResponseToken()
+    return getAuthResponseToken()
   }
 
   /**
@@ -209,7 +209,7 @@ export class UserSession {
    * @returns{Boolean} `true` if there is a pending sign in, otherwise `false`
    */
   isSignInPending() {
-    return authApp.isSignInPending()
+    return isSignInPending()
   }
 
   /**
@@ -231,7 +231,7 @@ export class UserSession {
    */
   handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
     const transitKey = this.store.getSessionData().transitKey
-    return authApp.handlePendingSignIn(undefined, authResponseToken, transitKey, this)
+    return handlePendingSignIn(undefined, authResponseToken, transitKey, this)
   }
 
   /**
@@ -254,7 +254,7 @@ export class UserSession {
    * Only used in environments with `window` available
    */
   signUserOut(redirectURL?: string) {
-    authApp.signUserOut(redirectURL, this)
+    signUserOut(redirectURL, this)
   }
 
   /**
