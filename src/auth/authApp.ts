@@ -10,8 +10,7 @@ import { decryptPrivateKey, makeAuthRequest } from './authMessages'
 import {
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DEFAULT_BLOCKSTACK_HOST,
-  NAME_LOOKUP_PATH,
-  AuthScope
+  NAME_LOOKUP_PATH
 } from './authConstants'
 import { extractProfile } from '../profiles/profileTokens'
 import { UserSession } from './userSession'
@@ -69,58 +68,6 @@ export interface UserData {
 }
 
 /**
- * @deprecated 
- * #### v19 Use [[UserSession.isUserSignedIn]] instead.
- * 
- * Check if a user is currently signed in.
- * @return {Boolean} `true` if the user is signed in, `false` if not.
- */
-export function isUserSignedIn() {
-  console.warn('DEPRECATION WARNING: The static isUserSignedIn() function will be deprecated in '
-    + 'the next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method isUserSignedIn().')
-  const userSession = new UserSession()
-  return userSession.isUserSignedIn()
-}
-
-/**
- *
- * 
- * @deprecated 
- * #### v19 Use [[UserSession.isUserSignedIn]] instead.
- * 
- * Generates an authentication request and redirects the user to the Blockstack
- * browser to approve the sign in request.
- * 
- * Please note that this requires that the web browser properly handles the
- * `blockstack:` URL protocol handler.
- *
- * Most applications should use this
- * method for sign in unless they require more fine grained control over how the
- * authentication request is generated. If your app falls into this category,
- * use `makeAuthRequest` and `redirectToSignInWithAuthRequest` to build your own sign in process.
- *
- * @param {String} [redirectURI=`${window.location.origin}/`]
- * The location to which the identity provider will redirect the user after
- * the user approves sign in.
- * @param  {String} [manifestURI=`${window.location.origin}/manifest.json`]
- * Location of the manifest file.
- * @param  {Array} [scopes=DEFAULT_SCOPE] Defaults to requesting write access to
- * this app's data store.
- * An array of strings indicating which permissions this app is requesting.
- * @return {void}
- */
-export function redirectToSignIn(redirectURI?: string, 
-                                 manifestURI?: string, 
-                                 scopes?: Array<AuthScope | string>): void { 
-  console.warn('DEPRECATION WARNING: The static redirectToSignIn() function will be deprecated in the '
-    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method redirectToSignIn().')
-  const authRequest = makeAuthRequest(null, redirectURI, manifestURI, scopes)
-  return redirectToSignInWithAuthRequest(authRequest)
-}
-
-/**
  * Check if there is a authentication request that hasn't been handled. 
  *
  * Also checks for a protocol echo reply (which if detected then the page
@@ -153,21 +100,6 @@ export function getAuthResponseToken(): string {
   ).search
   const queryDict = queryString.parse(search)
   return queryDict.authResponse ? <string>queryDict.authResponse : ''
-}
-
-/** 
- * @deprecated 
- * #### v19 Use [[UserSession.loadUserData]] instead.
- *
- * Retrieves the user data object. The user's profile is stored in the key `profile`.
- * @return {Object} User data object.
-*/
-export function loadUserData() {
-  console.warn('DEPRECATION WARNING: The static loadUserData() function will be deprecated in the '
-    + 'next major release of blockstack.js. Create an instance of UserSession and call the '
-    + 'instance method loadUserData().')
-  const userSession = new UserSession()
-  return userSession.loadUserData()
 }
 
 /** 
