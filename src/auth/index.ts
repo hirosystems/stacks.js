@@ -8,17 +8,14 @@ export {
   getAuthRequestFromURL, fetchAppManifest, redirectUserToApp
 } from './authProvider'
 export {
-  makeCoreSessionRequest, sendCoreSessionRequest, getCoreSession
-} from './authSession'
-export {
   verifyAuthRequest, verifyAuthResponse,
   isExpirationDateValid, isIssuanceDateValid, doPublicKeysMatchUsername,
   doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
   isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
 } from './authVerification'
 export {
-  isUserSignedIn, redirectToSignIn, redirectToSignInWithAuthRequest,
-  isSignInPending, handlePendingSignIn, loadUserData, signUserOut
+  redirectToSignInWithAuthRequest,
+  isSignInPending, handlePendingSignIn, signUserOut
 } from './authApp'
 export { 
   makeAuthRequest
