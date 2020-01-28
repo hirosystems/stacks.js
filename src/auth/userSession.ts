@@ -19,7 +19,10 @@ import {
 import { Logger } from '../logger'
 import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
-import { redirectToSignInWithAuthRequest, isSignInPending, handlePendingSignIn, signUserOut, getAuthResponseToken } from './authApp'
+import {
+  redirectToSignInWithAuthRequest, isSignInPending, handlePendingSignIn,
+  signUserOut, getAuthResponseToken
+} from './authApp'
 
 
 /**
