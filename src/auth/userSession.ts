@@ -272,7 +272,7 @@ export class UserSession {
     content: string | Buffer,
     options?: import('../storage').EncryptContentOptions
   ): Promise<string> {
-    return storage.encryptContent(content, options, this)
+    return storage.encryptContent(this, content, options)
   }
 
   /**
@@ -284,7 +284,7 @@ export class UserSession {
    * @returns {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}): Promise<Buffer | string> {
-    return storage.decryptContent(content, options, this)
+    return storage.decryptContent(this, content, options)
   }
 
   /**
@@ -301,7 +301,7 @@ export class UserSession {
     content: string | Buffer | ArrayBufferView | Blob, 
     options?: import('../storage').PutFileOptions
   ) {
-    return storage.putFile(path, content, options, this)
+    return storage.putFile(this, path, content, options)
   }
 
   /**
@@ -314,7 +314,7 @@ export class UserSession {
    * or rejects with an error
    */
   getFile(path: string, options?: import('../storage').GetFileOptions) {
-    return storage.getFile(path, options, this)
+    return storage.getFile(this, path, options)
   }
 
   /**
@@ -325,7 +325,7 @@ export class UserSession {
    * @returns {Promise<string>} that resolves to the URL or rejects with an error
    */
   getFileUrl(path: string, options?: import('../storage').GetFileUrlOptions): Promise<string> {
-    return storage.getFileUrl(path, options, this)
+    return storage.getFileUrl(this, path, options)
   }
 
   /**
@@ -337,7 +337,7 @@ export class UserSession {
    * @returns {Promise} that resolves to the number of files listed
    */
   listFiles(callback: (name: string) => boolean): Promise<number> {
-    return storage.listFiles(callback, this)
+    return storage.listFiles(this, callback)
   }
 
   /**
@@ -349,7 +349,7 @@ export class UserSession {
    * @returns Resolves when the file has been removed or rejects with an error.
    */
   public deleteFile(path: string, options?: { wasSigned?: boolean }) {
-    return storage.deleteFile(path, options, this)
+    return storage.deleteFile(this, path, options)
   }
 
 
