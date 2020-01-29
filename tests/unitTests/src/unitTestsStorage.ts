@@ -11,7 +11,7 @@ import {
   deleteFromGaiaHub,
   GaiaHubConfig
 } from '../../../src/storage/hub'
-import { getFile, getFileUrl, putFile, listFiles, deleteFile, encryptContent } from '../../../src/storage'
+import { getFile, getFileUrl, putFile, listFiles, deleteFile } from '../../../src/storage'
 import { getPublicKeyFromPrivate } from '../../../src/keys'
 
 import { UserSession, AppConfig } from '../../../src'
@@ -71,7 +71,7 @@ export function runStorageTests() {
     }).deleteFile as typeof import('../../../src/storage').deleteFile
 
     const options = { wasSigned: false }
-    await deleteFile(path, options, blockstack)
+    await deleteFile(blockstack, path, options)
       .then(() => {
         t.pass('Delete file')
       })
@@ -123,7 +123,7 @@ export function runStorageTests() {
       }
       return 401
     })
-    await deleteFile(path, { }, blockstack)
+    await deleteFile(blockstack, path, { })
       .then(() => t.ok(true, 'Request should pass'))
   })
 
@@ -156,7 +156,7 @@ export function runStorageTests() {
       return 202
     })
 
-    await deleteFile(path, { wasSigned: true }, blockstack)
+    await deleteFile(blockstack, path, { wasSigned: true })
     t.ok(true, 'Request should pass')
   })
 
@@ -182,7 +182,7 @@ export function runStorageTests() {
       return 404
     })
 
-    return deleteFile(path, { wasSigned: false }, blockstack)
+    return deleteFile(blockstack, path, { wasSigned: false })
       .then(() => t.fail('deleteFile with 404 should fail'))
       .catch(() => t.pass('deleteFile with 404 should fail'))
   })
@@ -209,7 +209,7 @@ export function runStorageTests() {
 
     FetchMock.get(fullReadUrl, fileContent)
     const options = { decrypt: false }
-    const file = await getFile(path, options, blockstack)
+    const file = await getFile(blockstack, path, options)
     t.ok(file, 'Returns file content')
     t.same(JSON.parse(<string>file), fileContent)
   })
@@ -247,7 +247,7 @@ export function runStorageTests() {
         resolve()
         return '_'
       })
-      getFile(path, options, blockstack).catch(() => {})
+      getFile(blockstack, path, options).catch(() => {})
     })
     t.pass('default core node used for name lookup')
     FetchMock.restore()
@@ -259,7 +259,7 @@ export function runStorageTests() {
         resolve()
         return '_'
       })
-      getFile(path, options, blockstack).catch(() => {})
+      getFile(blockstack, path, options).catch(() => {})
     })
     t.pass('app specified core node used for name lookup')
     FetchMock.restore()
@@ -271,7 +271,7 @@ export function runStorageTests() {
         resolve()
         return '_'
       })
-      getFile(path, options, blockstack).catch(() => {})
+      getFile(blockstack, path, options).catch(() => {})
     })
     t.pass('user specified core node used for name lookup')
     FetchMock.restore()
@@ -397,7 +397,7 @@ export function runStorageTests() {
       decrypt: false
     }
 
-    await getFile(path, options, blockstack)
+    await getFile(blockstack, path, options)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(<string>file), JSON.parse(fileContents))
@@ -411,7 +411,7 @@ export function runStorageTests() {
     }
 
     FetchMock.get('https://potato/v1/names/yukan.id', nameRecordContent)
-    await getFile(path, optionsNameLookupUrl, blockstack)
+    await getFile(blockstack, path, optionsNameLookupUrl)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(<string>file), JSON.parse(fileContents))
@@ -422,7 +422,7 @@ export function runStorageTests() {
       decrypt: false
     }
 
-    await getFile(path, optionsNoApp, blockstack)
+    await getFile(blockstack, path, optionsNoApp)
       .then((file) => {
         t.ok(file, 'Returns file content')
         t.same(JSON.parse(<string>file), JSON.parse(fileContents))
@@ -505,7 +505,7 @@ export function runStorageTests() {
 
       const options = { encrypt: false }
 
-      const publicURL = await putFile(path, fileContent, options, blockstack)
+      const publicURL = await putFile(blockstack, path, fileContent, options)
       t.equal(publicURL, fullReadUrl)
       t.equal(uploadContentType, 'text/example')
     } finally {
@@ -570,10 +570,10 @@ export function runStorageTests() {
       const encryptOptions = { encrypt: true }
       const decryptOptions = { decrypt: true }
       // put and encrypt the file
-      const publicURL = await putFile(path, fileContent, encryptOptions, blockstack)
+      const publicURL = await putFile(blockstack, path, fileContent, encryptOptions)
       t.equal(publicURL, fullReadUrl)
       FetchMock.get(fullReadUrl, encryptedContent)
-      const readContent = await getFile(path, decryptOptions, blockstack)
+      const readContent = await getFile(blockstack, path, decryptOptions)
       const readContentStr = readContent.toString()
       t.equal(readContentStr, contentDataString)
     } finally {
@@ -632,10 +632,10 @@ export function runStorageTests() {
       const encryptOptions = { encrypt: false, contentType: 'text/plain; charset=utf-8' }
       const decryptOptions = { decrypt: false }
       // put and encrypt the file
-      const publicURL = await putFile(path, fileContent, encryptOptions, blockstack)
+      const publicURL = await putFile(blockstack, path, fileContent, encryptOptions)
       t.equal(publicURL, fullReadUrl)
       FetchMock.get(fullReadUrl, { status: 200, body: postedContent, headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
-      const readContent = await getFile(path, decryptOptions, blockstack)
+      const readContent = await getFile(blockstack, path, decryptOptions)
       const readContentStr = readContent.toString()
       t.equal(readContentStr, contentDataString)
     } finally {
@@ -691,10 +691,10 @@ export function runStorageTests() {
       const encryptOptions = { encrypt: true }
       const decryptOptions = { decrypt: true }
       // put and encrypt the file
-      const publicURL = await putFile(path, fileContent, encryptOptions, blockstack)
+      const publicURL = await putFile(blockstack, path, fileContent, encryptOptions)
       t.equal(publicURL, fullReadUrl)
       FetchMock.get(fullReadUrl, encryptedContent)
-      const readContent = await getFile(path, decryptOptions, blockstack)
+      const readContent = await getFile(blockstack, path, decryptOptions)
       const readContentStr = readContent.toString()
       t.equal(readContentStr, contentDataString)
     } finally {
@@ -731,7 +731,7 @@ export function runStorageTests() {
 
     const options = { encrypt: false }
 
-    await putFile(path, fileContent as any, options, blockstack)
+    await putFile(blockstack, path, fileContent as any, options)
       .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       })
@@ -763,9 +763,9 @@ export function runStorageTests() {
     }).putFile as typeof import('../../../src/storage').putFile
 
     // create file and save etag
-    await putFile(path, fileContent, options, blockstack)
+    await putFile(blockstack, path, fileContent, options)
     // update file, using saved etag
-    await putFile(path, fileContent, options, blockstack)
+    await putFile(blockstack, path, fileContent, options)
 
     // test that saved etag was passed to upload function
     t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, false, testEtag))
@@ -790,13 +790,11 @@ export function runStorageTests() {
     const fileContent = 'test-content'
     const options = { encrypt: false }
 
-    const putFile = require('../../../src/storage').putFile
-
     const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
     FetchMock.post(storeURL, { status: 202, body: '{}' })
 
     // create new file
-    await putFile(path, fileContent, options, blockstack)
+    await putFile(blockstack, path, fileContent, options)
 
     t.equal(FetchMock.lastOptions().headers['If-None-Match'], '*')
   })
@@ -824,10 +822,9 @@ export function runStorageTests() {
       // Mock a PreconditionFailedError
       FetchMock.post(storeURL, { status: 412, body: 'Precondition Failed' })
 
-      const putFile = require('../../../src/storage').putFile
       const options = { encrypt: false }
 
-      await putFile(path, content, options, blockstack)
+      await putFile(blockstack, path, content, options)
     } catch(err) {
       t.equals(err.code, 'precondition_failed_error')
     }
@@ -867,13 +864,13 @@ export function runStorageTests() {
     FetchMock.get(fullReadUrl, config)
 
     const options = { encrypt: false, contentType: 'text/html' }
-    await putFile(path, fileContent, options, blockstack)
+    await putFile(blockstack, path, fileContent, options)
       .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       })
       .then(() => {
         const decryptOptions = { decrypt: false }
-        return getFile(path, decryptOptions, blockstack).then((readContent) => {
+        return getFile(blockstack, path, decryptOptions).then((readContent) => {
           t.equal(readContent, fileContent)
           t.ok(typeof (readContent) === 'string')
         })
@@ -918,12 +915,12 @@ export function runStorageTests() {
     const encryptOptions = { encrypt: true }
     const decryptOptions = { decrypt: true }
     // put and encrypt the file
-    await putFile(path, fileContent, encryptOptions, blockstack)
+    await putFile(blockstack, path, fileContent, encryptOptions)
       .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        return getFile(path, decryptOptions, blockstack).then((readContent: string) => {
+        return getFile(blockstack, path, decryptOptions).then((readContent: string) => {
           t.equal(readContent, fileContent)
           // put back whatever was inside before
         })
@@ -970,12 +967,12 @@ export function runStorageTests() {
     const encryptOptions = { encrypt: publicKey }
     const decryptOptions = { decrypt: privateKey }
     // put and encrypt the file
-    await putFile(path, fileContent, encryptOptions, blockstack)
+    await putFile(blockstack, path, fileContent, encryptOptions)
       .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
       }).then(() => {
         // read and decrypt the file
-        return getFile(path, decryptOptions, blockstack).then((readContent: string) => {
+        return getFile(blockstack, path, decryptOptions).then((readContent: string) => {
           t.equal(readContent, fileContent)
         })
       })
@@ -1034,7 +1031,7 @@ export function runStorageTests() {
     const encryptOptions = { encrypt: true, sign: true }
     const decryptOptions = { decrypt: true, verify: true }
     // put and encrypt the file
-    return putFile('doesnt-matter.json', fileContent, encryptOptions, blockstack)
+    return putFile(blockstack, 'doesnt-matter.json', fileContent, encryptOptions)
       .then((publicURL: string) => {
         t.ok(publicURL, fullReadUrl)
         FetchMock.get(fullReadUrl, putFiledContents)
@@ -1049,35 +1046,35 @@ export function runStorageTests() {
           publicKey: contentsObj.publicKey,
           cipherText: 'potato potato potato'
         }))
-      }).then(() => getFile('file.json', decryptOptions, blockstack).then((readContent: string) => {
+      }).then(() => getFile(blockstack, 'file.json', decryptOptions).then((readContent: string) => {
         t.equal(readContent, fileContent)
       }))
-      .then(() => getFile('file.json', {
+      .then(() => getFile(blockstack, 'file.json', {
         decrypt: true,
         verify: true,
         username: 'applejacks.id',
         app: 'origin'
-      }, blockstack)
+      })
         .then((readContent: string) => {
           t.equal(readContent, fileContent)
         }))
-      .then(() => getFile('badPK.json', decryptOptions, blockstack)
+      .then(() => getFile(blockstack, 'badPK.json', decryptOptions)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
         .catch((err: Error) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
-                           `Should fail with complaint about mismatch PK: ${err.message}`)))
-      .then(() => getFile('badPK.json', {
+          `Should fail with complaint about mismatch PK: ${err.message}`)))
+      .then(() => getFile(blockstack, 'badPK.json', {
         decrypt: true,
         verify: true,
         username: 'applejacks.id',
         app: 'origin'
-      }, blockstack)
+      })
         .then(() => t.true(false, 'Should not successfully decrypt file'))
         .catch((err: Error) => t.ok(err.message.indexOf('doesn\'t match gaia address') >= 0,
-                           `Should fail with complaint about mismatch PK: ${err.message}`)))
-      .then(() => getFile('badSig.json', decryptOptions, blockstack)
+          `Should fail with complaint about mismatch PK: ${err.message}`)))
+      .then(() => getFile(blockstack, 'badSig.json', decryptOptions)
         .then(() => t.true(false, 'Should not successfully decrypt file'))
         .catch((err: Error) => t.ok(err.message.indexOf('do not match ECDSA') >= 0,
-                           'Should fail with complaint about bad signature')))
+          'Should fail with complaint about bad signature')))
       .catch((err: Error) => console.log(err.stack))
       .then(() => {
         t.end()
@@ -1160,7 +1157,7 @@ export function runStorageTests() {
       app: 'origin'
     }
     // put and encrypt the file
-    const publicURL = await putFile(goodPath, fileContent, encryptOptions, blockstack)
+    const publicURL = await putFile(blockstack, goodPath, fileContent, encryptOptions)
     t.equal(publicURL, pathToReadUrl(goodPath))
     t.equal(putFiledContents.length, 2)
 
@@ -1195,49 +1192,49 @@ export function runStorageTests() {
                     publicKey: badPK
                   }))
     
-    let readContent = await getFile(goodPath, decryptOptions, blockstack)
+    let readContent = await getFile(blockstack, goodPath, decryptOptions)
     t.equal(readContent, fileContent, 'should read the file')
     try {
-      await getFile(badSigPath, decryptOptions, blockstack)
+      await getFile(blockstack, badSigPath, decryptOptions)
       t.fail('Should have failed to read file.')
     } catch (err) {
       t.ok(err.message.indexOf('do not match ECDSA') >= 0,
         'Should fail with complaint about bad signature')
     }
     try {
-      await getFile(noSigPath, decryptOptions, blockstack)
+      await getFile(blockstack, noSigPath, decryptOptions)
       t.fail('Should have failed to read file.')
     } catch (err) {
       t.ok(err.message.indexOf('obtain signature for file') >= 0,
         'Should fail with complaint about missing signature')
     }
     try {
-      await getFile(badPKPath, decryptOptions, blockstack)
+      await getFile(blockstack, badPKPath, decryptOptions)
       t.fail('Should have failed to read file.')
     } catch (err) {
       t.ok(err.message.indexOf('match gaia address') >= 0,
         'Should fail with complaint about matching addresses')
     }
 
-    readContent = await getFile(goodPath, multiplayerDecryptOptions, blockstack)
+    readContent = await getFile(blockstack, goodPath, multiplayerDecryptOptions)
     t.equal(readContent, fileContent, 'should read the file')
 
     try {
-      await getFile(badSigPath, multiplayerDecryptOptions, blockstack)
+      await getFile(blockstack, badSigPath, multiplayerDecryptOptions)
       t.fail('Should have failed to read file.')
     } catch (err) {
       t.ok(err.message.indexOf('do not match ECDSA') >= 0,
       'Should fail with complaint about bad signature')
     }
     try {
-      await getFile(noSigPath, multiplayerDecryptOptions, blockstack)
+      await getFile(blockstack, noSigPath, multiplayerDecryptOptions)
       t.fail('Should have failed to read file.')
     } catch (err) {
       t.ok(err.message.indexOf('obtain signature for file') >= 0,
         'Should fail with complaint about missing signature')
     }
     try {
-      await getFile(badPKPath, multiplayerDecryptOptions, blockstack)
+      await getFile(blockstack, badPKPath, multiplayerDecryptOptions)
       t.fail('Should have failed to read file.')
     } catch (err) {
       t.ok(err.message.indexOf('match gaia address') >= 0,
@@ -1288,7 +1285,7 @@ export function runStorageTests() {
 
     const encryptOptions = { encrypt: false, sign: true }
     try {
-      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      await putFile(userSession, 'file.bin', fileContent, encryptOptions)
       t.fail('should have thrown error with oversized content -- unencrypted, signed')
     } catch (error) {
       t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- unencrypted, signed')
@@ -1338,7 +1335,7 @@ export function runStorageTests() {
 
     const encryptOptions = { encrypt: true, sign: true }
     try {
-      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      await putFile(userSession, 'file.bin', fileContent, encryptOptions)
       t.fail('should have thrown error with oversized content -- encrypted, signed')
     } catch (error) {
       t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- encrypted, signed')
@@ -1388,7 +1385,7 @@ export function runStorageTests() {
 
     const encryptOptions = { encrypt: false, sign: false }
     try {
-      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      await putFile(userSession, 'file.bin', fileContent, encryptOptions)
       t.fail('should have thrown error with oversized content -- unencrypted')
     } catch (error) {
       t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- unencrypted')
@@ -1438,7 +1435,7 @@ export function runStorageTests() {
 
     const encryptOptions = { encrypt: true, sign: false }
     try {
-      await putFile('file.bin', fileContent, encryptOptions, userSession)
+      await putFile(userSession, 'file.bin', fileContent, encryptOptions)
       t.fail('should have thrown error with oversized content -- encrypted')
     } catch (error) {
       t.equal('PayloadTooLargeError', error.name, 'error thrown with oversized content -- encrypted')
@@ -1570,7 +1567,7 @@ export function runStorageTests() {
     }
 
     FetchMock.post(`${fullReadUrl}`, { status: 404, body: 'Not found.' })
-    await putFile(path, 'hello world', { encrypt: false }, blockstack)
+    await putFile(blockstack, path, 'hello world', { encrypt: false })
       .then(() => t.ok(false, 'Should not have returned'))
       .catch(() => t.ok(true, 'Should have rejected promise'))
 
@@ -1632,7 +1629,7 @@ export function runStorageTests() {
       }
       return { status: 401 }
     })
-    await putFile(path, 'hello world', { encrypt: false }, blockstack)
+    await putFile(blockstack, path, 'hello world', { encrypt: false })
       .then(() => t.ok(true, 'Request should pass'))
   })
 
@@ -1657,7 +1654,7 @@ export function runStorageTests() {
     FetchMock.get(`${config.url_prefix}${config.address}/foo.json`,
                   { status: 404 })
 
-    await getFileUrl('foo.json', {}, blockstack)
+    await getFileUrl(blockstack, 'foo.json', {})
       .then(x => t.equal(
         x, 
         'https://gaia.testblockstack.org/hub/19MoWG8u88L6t766j7Vne21Mg4wHsCQ7vk/foo.json', 
@@ -1692,12 +1689,12 @@ export function runStorageTests() {
                   { status: 404 })
 
     const optionsNoDecrypt = { decrypt: false }
-    await getFile('foo.json', optionsNoDecrypt, blockstack)
+    await getFile(blockstack, 'foo.json', optionsNoDecrypt)
       .then(() => t.fail('getFile (no decrypt) with 404 should fail'))
       .catch(() => t.pass('getFile (no decrypt) with 404 should fail'))
 
     const optionsDecrypt = { decrypt: true }
-    await getFile('foo.json', optionsDecrypt, blockstack)
+    await getFile(blockstack, 'foo.json', optionsDecrypt)
       .then(() => t.fail('getFile (decrypt) with 404 should fail'))
       .catch((err) => {
         t.ok(err instanceof DoesNotExist, "DoesNotExist error thrown")
@@ -1939,15 +1936,14 @@ export function runStorageTests() {
     })
 
     const files: string[] = []
-    await listFiles((name) => {
+    await listFiles(blockstack, (name) => {
       files.push(name)
       return true
-    }, blockstack)
-      .then((count) => {
-        t.equal(files.length, 1, 'Got one file back')
-        t.equal(files[0], 'file.json', 'Got the right file back')
-        t.equal(count, 1, 'Count matches number of files')
-      })
+    }).then((count) => {
+      t.equal(files.length, 1, 'Got one file back')
+      t.equal(files[0], 'file.json', 'Got the right file back')
+      t.equal(count, 1, 'Count matches number of files')
+    })
   })
 
 
@@ -2050,14 +2046,13 @@ export function runStorageTests() {
     })
 
     const files: string[] = []
-    await listFiles((name: string) => {
+    await listFiles(blockstack, (name: string) => {
       files.push(name)
       return true
-    }, blockstack)
-      .then((count: number) => {
-        t.equal(files.length, 1, 'Got one file back')
-        t.equal(files[0], 'file.json', 'Got the right file back')
-        t.equal(count, 1, 'Count matches number of files')
-      })
+    }).then((count: number) => {
+      t.equal(files.length, 1, 'Got one file back')
+      t.equal(files[0], 'file.json', 'Got the right file back')
+      t.equal(count, 1, 'Count matches number of files')
+    })
   })
 }
