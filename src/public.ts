@@ -17,7 +17,11 @@ try {
 
 export * from './auth'
 export * from './profiles'
-export * from './storage'
+
+export {
+  EncryptionOptions, EncryptContentOptions,
+  PutFileOptions, getUserAppFileUrl, GetFileUrlOptions, GetFileOptions, getAppBucketUrl
+} from './storage'
 
 export {
   makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID
