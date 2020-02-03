@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Changed
+- Static `storage/` functions used by `UserSession` are no longer globally exported, as they are wrapped by publicly accessible `UserSession` methods. Functions that are no longer accesible are `getFileUrl`, `getFileContents`, `getFile`, `putFile`, `deleteFile`, and `listFiles`. 
+- Removed various static functions that have been replaced by `UserSession` .
 
 ## [21.0.0] - 2020-01-17
 ### Added
