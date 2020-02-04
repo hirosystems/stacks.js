@@ -6,7 +6,6 @@ import {
   InstanceDataStore
 } from './sessionStore'
 
-import * as authApp from './authApp'
 import * as authMessages from './authMessages'
 import * as storage from '../storage'
 
@@ -20,6 +19,10 @@ import {
 import { Logger } from '../logger'
 import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
 import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
+import {
+  redirectToSignInWithAuthRequest, isSignInPending, handlePendingSignIn,
+  signUserOut, getAuthResponseToken
+} from './authApp'
 
 
 /**
@@ -109,7 +112,7 @@ export class UserSession {
     const transitKey = this.generateAndStoreTransitKey()
     const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
     const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
-    return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
+    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -131,7 +134,7 @@ export class UserSession {
     authRequest = authRequest || this.makeAuthRequest()
     const authenticatorURL = blockstackIDHost 
       || (this.appConfig && this.appConfig.authenticatorURL)
-    return authApp.redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
+    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -200,7 +203,7 @@ export class UserSession {
    * @returns {String} the authentication token if it exists otherwise `null`
    */
   getAuthResponseToken(): string {
-    return authApp.getAuthResponseToken()
+    return getAuthResponseToken()
   }
 
   /**
@@ -209,7 +212,7 @@ export class UserSession {
    * @returns{Boolean} `true` if there is a pending sign in, otherwise `false`
    */
   isSignInPending() {
-    return authApp.isSignInPending()
+    return isSignInPending()
   }
 
   /**
@@ -231,7 +234,7 @@ export class UserSession {
    */
   handlePendingSignIn(authResponseToken: string = this.getAuthResponseToken()) {
     const transitKey = this.store.getSessionData().transitKey
-    return authApp.handlePendingSignIn(undefined, authResponseToken, transitKey, this)
+    return handlePendingSignIn(undefined, authResponseToken, transitKey, this)
   }
 
   /**
@@ -254,7 +257,7 @@ export class UserSession {
    * Only used in environments with `window` available
    */
   signUserOut(redirectURL?: string) {
-    authApp.signUserOut(redirectURL, this)
+    signUserOut(redirectURL, this)
   }
 
   /**
@@ -269,7 +272,7 @@ export class UserSession {
     content: string | Buffer,
     options?: import('../storage').EncryptContentOptions
   ): Promise<string> {
-    return storage.encryptContent(content, options, this)
+    return storage.encryptContent(this, content, options)
   }
 
   /**
@@ -281,7 +284,7 @@ export class UserSession {
    * @returns {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}): Promise<Buffer | string> {
-    return storage.decryptContent(content, options, this)
+    return storage.decryptContent(this, content, options)
   }
 
   /**
@@ -298,7 +301,7 @@ export class UserSession {
     content: string | Buffer | ArrayBufferView | Blob, 
     options?: import('../storage').PutFileOptions
   ) {
-    return storage.putFile(path, content, options, this)
+    return storage.putFile(this, path, content, options)
   }
 
   /**
@@ -311,7 +314,7 @@ export class UserSession {
    * or rejects with an error
    */
   getFile(path: string, options?: import('../storage').GetFileOptions) {
-    return storage.getFile(path, options, this)
+    return storage.getFile(this, path, options)
   }
 
   /**
@@ -322,7 +325,7 @@ export class UserSession {
    * @returns {Promise<string>} that resolves to the URL or rejects with an error
    */
   getFileUrl(path: string, options?: import('../storage').GetFileUrlOptions): Promise<string> {
-    return storage.getFileUrl(path, options, this)
+    return storage.getFileUrl(this, path, options)
   }
 
   /**
@@ -334,7 +337,7 @@ export class UserSession {
    * @returns {Promise} that resolves to the number of files listed
    */
   listFiles(callback: (name: string) => boolean): Promise<number> {
-    return storage.listFiles(callback, this)
+    return storage.listFiles(this, callback)
   }
 
   /**
@@ -346,7 +349,7 @@ export class UserSession {
    * @returns Resolves when the file has been removed or rejects with an error.
    */
   public deleteFile(path: string, options?: { wasSigned?: boolean }) {
-    return storage.deleteFile(path, options, this)
+    return storage.deleteFile(this, path, options)
   }
 
 

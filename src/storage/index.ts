@@ -116,11 +116,6 @@ export async function getUserAppFileUrl(
 }
 
 /**
- * 
- * 
- * @deprecated 
- * #### v19 Use [[UserSession.encryptContent]].
- *
  * Encrypts the data provided with the app public key.
  * @param {String|Buffer} content - data to encrypt
  * @param {Object} [options=null] - options object
@@ -129,14 +124,14 @@ export async function getUserAppFileUrl(
  * @return {String} Stringified ciphertext object
  */
 export async function encryptContent(
+  caller: UserSession,
   content: string | Buffer,
-  options?: EncryptContentOptions,
-  caller?: UserSession
+  options?: EncryptContentOptions
 ): Promise<string> {
   const opts = Object.assign({}, options)
   let privateKey: string
   if (!opts.publicKey) {
-    privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    privateKey = caller.loadUserData().appPrivateKey
     opts.publicKey = getPublicKeyFromPrivate(privateKey)
   }
   let wasString: boolean
@@ -155,7 +150,7 @@ export async function encryptContent(
     if (typeof opts.sign === 'string') {
       privateKey = opts.sign
     } else if (!privateKey) {
-      privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+      privateKey = caller.loadUserData().appPrivateKey
     }
     const signatureObject = signECDSA(privateKey, cipherPayload)
     const signedCipherObject: SignedCipherObject = {
@@ -169,10 +164,6 @@ export async function encryptContent(
 }
 
 /**
- * 
- * @deprecated 
- * #### v19 Use [[UserSession.decryptContent]].
- * 
  * Decrypts data encrypted with `encryptContent` with the
  * transit private key.
  * @param {String|Buffer} content - encrypted content.
@@ -182,15 +173,15 @@ export async function encryptContent(
  * @return {String|Buffer} decrypted content.
  */
 export function decryptContent(
+  caller: UserSession,
   content: string,
   options?: {
     privateKey?: string
   },
-  caller?: UserSession
 ): Promise<string | Buffer> {
   const opts = Object.assign({}, options)
   if (!opts.privateKey) {
-    opts.privateKey = (caller || new UserSession()).loadUserData().appPrivateKey
+    opts.privateKey = caller.loadUserData().appPrivateKey
   }
 
   try {
@@ -212,17 +203,14 @@ export function decryptContent(
  * @ignore
  */
 async function getGaiaAddress(
-  app: string, username?: string, zoneFileLookupURL?: string,
-  caller?: UserSession
+  caller: UserSession, app: string,
+  username?: string, zoneFileLookupURL?: string,
 ): Promise<string> {
-  const opts = normalizeOptions({ app, username, zoneFileLookupURL }, caller)
+  const opts = normalizeOptions(caller, { app, username, zoneFileLookupURL })
   let fileUrl: string
   if (username) {
     fileUrl = await getUserAppFileUrl('/', opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    if (!caller) {
-      caller = new UserSession()
-    }
     const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
     fileUrl = await getFullReadUrl('/', gaiaHubConfig)
   }
@@ -241,24 +229,22 @@ async function getGaiaAddress(
  * @ignore
  */
 function normalizeOptions<T>(
+  caller: UserSession,
   options?: {
     app?: string, 
     username?: string,
     zoneFileLookupURL?: string
   } & T,
-  caller?: UserSession
 ) {
   const opts = Object.assign({}, options)
   if (opts.username) {
     if (!opts.app) {
-      caller = caller || new UserSession()
       if (!caller.appConfig) {
         throw new InvalidStateError('Missing AppConfig')
       }
       opts.app = caller.appConfig.appDomain
     }
     if (!opts.zoneFileLookupURL) {
-      caller = caller || new UserSession()
       if (!caller.appConfig) {
         throw new InvalidStateError('Missing AppConfig')
       }
@@ -277,24 +263,22 @@ function normalizeOptions<T>(
 }
 
 /**
- * @deprecated
- * #### v19 Use [[UserSession.getFileUrl]] instead.
  * 
  * @param {String} path - the path to the file to read
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
+  caller: UserSession,
   path: string, 
-  options?: GetFileUrlOptions,
-  caller?: UserSession
+  options?: GetFileUrlOptions
 ): Promise<string> {
-  const opts = normalizeOptions(options, caller)
+  const opts = normalizeOptions(caller, options)
 
   let readUrl: string
   if (opts.username) {
     readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    const gaiaHubConfig = await (caller || new UserSession()).getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
     readUrl = await getFullReadUrl(path, gaiaHubConfig)
   }
 
@@ -310,12 +294,12 @@ export async function getFileUrl(
  * @private
  * @ignore
  */
-async function getFileContents(path: string, app: string, username: string | undefined, 
+async function getFileContents(caller: UserSession, path: string, app: string,
+                               username: string | undefined, 
                                zoneFileLookupURL: string | undefined,
-                               forceText: boolean,
-                               caller?: UserSession): Promise<string | ArrayBuffer | null> {
+                               forceText: boolean): Promise<string | ArrayBuffer | null> {
   const opts = { app, username, zoneFileLookupURL }
-  const readUrl = await getFileUrl(path, opts, caller)
+  const readUrl = await getFileUrl(caller, path, opts)
   const response = await fetchPrivate(readUrl)
   if (!response.ok) {
     throw await getBlockstackErrorFromResponse(response, `getFile ${path} failed.`, null)
@@ -344,7 +328,7 @@ async function getFileContents(path: string, app: string, username: string | und
  * @private
  * @ignore
  */
-async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, caller?: UserSession) {
+async function getFileSignedUnencrypted(caller: UserSession, path: string, opt: GetFileOptions) {
   // future optimization note:
   //    in the case of _multi-player_ reads, this does a lot of excess
   //    profile lookups to figure out where to read files
@@ -352,10 +336,10 @@ async function getFileSignedUnencrypted(path: string, opt: GetFileOptions, calle
   const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
   try {
     const [fileContents, signatureContents, gaiaAddress] = await Promise.all([
-      getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false, caller),
-      getFileContents(sigPath, opt.app, opt.username,
-                      opt.zoneFileLookupURL, true, caller),
-      getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL, caller)
+      getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false),
+      getFileContents(caller, sigPath, opt.app, opt.username,
+                      opt.zoneFileLookupURL, true),
+      getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)
     ])
   
     if (!fileContents) {
@@ -425,7 +409,7 @@ async function handleSignedEncryptedContents(caller: UserSession, path: string,
 
   let address: string
   if (username) {
-    address = await getGaiaAddress(app, username, zoneFileLookupURL, caller)
+    address = await getGaiaAddress(caller, app, username, zoneFileLookupURL)
   } else {
     address = publicKeyToAddress(appPublicKey)
   }
@@ -513,9 +497,9 @@ export interface GetFileOptions extends GetFileUrlOptions {
  * or rejects with an error
  */
 export async function getFile(
+  caller: UserSession,
   path: string, 
   options?: GetFileOptions,
-  caller?: UserSession
 ) {
   const defaults: GetFileOptions = {
     decrypt: true,
@@ -526,18 +510,14 @@ export async function getFile(
   }
   const opt = Object.assign({}, defaults, options)
 
-  if (!caller) {
-    caller = new UserSession()
-  }
-
   // in the case of signature verification, but no
   //  encryption expected, need to fetch _two_ files.
   if (opt.verify && !opt.decrypt) {
-    return getFileSignedUnencrypted(path, opt, caller)
+    return getFileSignedUnencrypted(caller, path, opt)
   }
 
-  const storedContents = await getFileContents(path, opt.app, opt.username, 
-                                               opt.zoneFileLookupURL, !!opt.decrypt, caller)
+  const storedContents = await getFileContents(caller, path, opt.app, opt.username, 
+                                               opt.zoneFileLookupURL, !!opt.decrypt)
   if (storedContents === null) {
     return storedContents
   } else if (opt.decrypt && !opt.verify) {
@@ -728,10 +708,10 @@ function isRecoverableGaiaError(error: GaiaHubError): boolean {
  * if it failed
  */
 export async function putFile(
+  caller: UserSession,
   path: string,
   content: string | Buffer | ArrayBufferView | Blob,
-  options?: PutFileOptions,
-  caller?: UserSession,
+  options?: PutFileOptions
 ): Promise<string> {
   const defaults: PutFileOptions = {
     encrypt: true,
@@ -739,10 +719,6 @@ export async function putFile(
     cipherTextEncoding: 'hex'
   }
   const opt = Object.assign({}, defaults, options)
-
-  if (!caller) {
-    caller = new UserSession()
-  }
 
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes)
@@ -828,7 +804,7 @@ export async function putFile(
         publicKey = getPublicKeyFromPrivate(caller.loadUserData().appPrivateKey)
       }
       const contentData = await contentLoader.load()
-      contentForUpload = await encryptContent(contentData, { 
+      contentForUpload = await encryptContent(caller, contentData, { 
         publicKey, 
         wasString: contentLoader.wasString,
         cipherTextEncoding: opt.cipherTextEncoding,
@@ -873,15 +849,12 @@ export async function putFile(
  * @returns Resolves when the file has been removed or rejects with an error.
  */
 export async function deleteFile(
+  caller: UserSession,
   path: string, 
   options?: {
     wasSigned?: boolean;
-  },
-  caller?: UserSession
-) {
-  if (!caller) {
-    caller = new UserSession()
   }
+) {
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   const opts = Object.assign({}, options)
   if (opts.wasSigned) {
@@ -1011,10 +984,9 @@ async function listFilesLoop(
  * If an error occurs the entire call is rejected.
  */
 export function listFiles(
-  callback: (name: string) => boolean,
-  caller?: UserSession
+  caller: UserSession,
+  callback: (name: string) => boolean
 ): Promise<number> {
-  caller = caller || new UserSession()
   return listFilesLoop(caller, null, null, 0, 0, callback)
 }
 
