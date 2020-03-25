@@ -21,6 +21,7 @@
 - [ ] `git branch -D master-test`
 - [ ] `git push origin :master-test`
 - [ ] Announce availability in #engineering and on the forum here: https://forum.blockstack.org/c/releases (Include a link to the changelog)
+- [ ] Announce availability to the community via Jenny Mith <jenny@blockstack.com> and Mitchell Cuevas <mitchell@blockstack.com>. Provide a succinct list of changes, the like to the changelog and latest release as well as a desired date for the community update.
 
 ## Production Release
 - [ ] `git flow release start <VERSION_NUMBER> master` (`<VERSION_NUMBER>` prefixed with `v`)
@@ -47,3 +48,4 @@
 - [ ] `git branch -D master-test`
 - [ ] `git push origin :master-test`
 - [ ] Announce availability in #engineering and on the forum here: https://forum.blockstack.org/c/releases (Include a link to the changelog)
+- [ ] Announce availability to the community via Jenny Mith <jenny@blockstack.com> and Mitchell Cuevas <mitchell@blockstack.com>. Provide a succinct list of changes, the like to the changelog and latest release as well as a desired date for the community update. Consider doing an AMA with the community.
