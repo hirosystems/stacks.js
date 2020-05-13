@@ -862,17 +862,21 @@ export async function deleteFile(
     try {
       await deleteFromGaiaHub(path, gaiaHubConfig)
       await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
+      delete etags[path];
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       await deleteFromGaiaHub(path, freshHubConfig)
       await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
+      delete etags[path];
     }
   } else {
     try {
       await deleteFromGaiaHub(path, gaiaHubConfig)
+      delete etags[path];
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       await deleteFromGaiaHub(path, freshHubConfig)
+      delete etags[path];
     }
   }
 }
