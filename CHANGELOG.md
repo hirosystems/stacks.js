@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Static `storage/` functions used by `UserSession` are no longer globally exported, as they are wrapped by publicly accessible `UserSession` methods. Functions that are no longer accesible are `getFileUrl`, `getFileContents`, `getFile`, `putFile`, `deleteFile`, and `listFiles`. 
 - Removed various static functions that have been replaced by `UserSession` .
+- Delete etags from cached `etag` map on `deleteFile` so that new files with the same name can be subsequently created.
 
 ## [21.0.0] - 2020-01-17
 ### Added
