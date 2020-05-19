@@ -187,6 +187,49 @@ export function runStorageTests() {
       .catch(() => t.pass('deleteFile with 404 should fail'))
   })
 
+  test('deleteFile removes etag from map', async (t) => {
+    FetchMock.reset()
+    const path = 'file.json'
+    const gaiaHubConfig = {
+      address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
+      server: 'https://hub.blockstack.org',
+      token: '',
+      url_prefix: 'gaia.testblockstack.org/hub/'
+    }
+
+    const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
+    const blockstack = new UserSession({ appConfig })
+    blockstack.store.getSessionData().userData = <any>{
+      gaiaHubConfig
+    }
+
+    const fileContent = 'test-content'
+    const testEtag = 'test-etag'
+
+    const putOptions = { encrypt: false }
+    const uploadToGaiaHub = sinon.stub().resolves({ publicURL: 'url', etag: testEtag })
+
+    const deleteOptions = { wasSigned: false };
+    const deleteFromGaiaHub = sinon.stub().resolves()
+
+    const proxy = proxyquire('../../../src/storage', {
+      './hub': { uploadToGaiaHub, deleteFromGaiaHub }
+    })
+    const putFile = proxy.putFile as typeof import('../../../src/storage').putFile;
+    const deleteFile = proxy.deleteFile as typeof import('../../../src/storage').deleteFile;
+
+    // create file and save etag
+    await putFile(blockstack, path, fileContent, putOptions)
+
+    // delete file
+    await deleteFile(blockstack, path, deleteOptions);
+
+    // create same file
+    await putFile(blockstack, path, fileContent, putOptions)
+
+    t.true(uploadToGaiaHub.calledWith(sinon.match.any, sinon.match.any, sinon.match.any, sinon.match.any, true, undefined))
+  })
+
   test('getFile unencrypted, unsigned', async (t) => {
     t.plan(2)
     FetchMock.reset()
