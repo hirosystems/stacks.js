@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>blockstack.js 21.0.0 Library Reference</title>
+	<title>blockstack.js 21.1.0-beta.1 Library Reference</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">blockstack.js 21.0.0 Library Reference</a>
+					<a href="index.html" class="title">blockstack.js 21.1.0-beta.1 Library Reference</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -55,7 +55,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> blockstack.js 21.0.0 Library Reference</h1>
+			<h1> blockstack.js 21.1.0-beta.1 Library Reference</h1>
 		</div>
 	</div>
 </header>
@@ -238,10 +238,8 @@
 								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#isrecoverablegaiaerror" class="tsd-kind-icon">is<wbr>Recoverable<wbr>Gaia<wbr>Error</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#issigninpending" class="tsd-kind-icon">is<wbr>Sign<wbr>InPending</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#issubtlecryptoavailable" class="tsd-kind-icon">is<wbr>Subtle<wbr>Crypto<wbr>Available</a></li>
-								<li class="tsd-kind-function"><a href="globals.html#isusersignedin" class="tsd-kind-icon">is<wbr>User<wbr>Signed<wbr>In</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#launchcustomprotocol" class="tsd-kind-icon">launch<wbr>Custom<wbr>Protocol</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#listfiles" class="tsd-kind-icon">list<wbr>Files</a></li>
-								<li class="tsd-kind-function"><a href="globals.html#loaduserdata" class="tsd-kind-icon">load<wbr>User<wbr>Data</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#lookupprofile" class="tsd-kind-icon">lookup<wbr>Profile</a></li>
 								<li class="tsd-kind-function tsd-is-private tsd-is-not-exported"><a href="globals.html#makeannounce" class="tsd-kind-icon">make<wbr>Announce</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#makeauthrequest" class="tsd-kind-icon">make<wbr>Auth<wbr>Request</a></li>
@@ -258,7 +256,6 @@
 								<li class="tsd-kind-function tsd-is-private tsd-is-not-exported"><a href="globals.html#makeupdate" class="tsd-kind-icon">make<wbr>Update</a></li>
 								<li class="tsd-kind-function tsd-is-not-exported"><a href="globals.html#outputbytes" class="tsd-kind-icon">output<wbr>Bytes</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#putfile" class="tsd-kind-icon">put<wbr>File</a></li>
-								<li class="tsd-kind-function"><a href="globals.html#redirecttosignin" class="tsd-kind-icon">redirect<wbr>ToSign<wbr>In</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#redirecttosigninwithauthrequest" class="tsd-kind-icon">redirect<wbr>ToSign<wbr>InWith<wbr>Auth<wbr>Request</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#signinputs" class="tsd-kind-icon">sign<wbr>Inputs</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#signprofiletoken" class="tsd-kind-icon">sign<wbr>Profile<wbr>Token</a></li>
@@ -1017,29 +1014,26 @@
 					<a name="decryptcontent" class="tsd-anchor"></a>
 					<h3>decrypt<wbr>Content</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">decrypt<wbr>Content<span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">decrypt<wbr>Content<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L184">src/storage/index.ts:184</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L175">src/storage/index.ts:175</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmldecryptcontentusersessiondecryptcontenta" id="v19-use-a-hrefclassesusersessionhtmldecryptcontentusersessiondecryptcontenta" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#decryptcontent">UserSession.decryptContent</a>.</h4>
-										</a>
-										<p>Decrypts data encrypted with <code>encryptContent</code> with the
-										transit private key.</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Decrypts data encrypted with <code>encryptContent</code> with the
+									transit private key.</p>
+								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>content: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -1058,9 +1052,6 @@
 										</li>
 									</ul>
 								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
-								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>decrypted content.</p>
@@ -1071,13 +1062,13 @@
 					<a name="deletefile" class="tsd-anchor"></a>
 					<h3>delete<wbr>File</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">delete<wbr>File<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>File<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L875">src/storage/index.ts:875</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L851">src/storage/index.ts:851</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1087,6 +1078,9 @@
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>path: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -1107,9 +1101,6 @@
 											</div>
 										</li>
 									</ul>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1147,28 +1138,25 @@
 					<a name="encryptcontent" class="tsd-anchor"></a>
 					<h3>encrypt<wbr>Content</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">encrypt<wbr>Content<span class="tsd-signature-symbol">(</span>content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/encryptcontentoptions.html" class="tsd-signature-type">EncryptContentOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">encrypt<wbr>Content<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/encryptcontentoptions.html" class="tsd-signature-type">EncryptContentOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L131">src/storage/index.ts:131</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L126">src/storage/index.ts:126</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlencryptcontentusersessionencryptcontenta" id="v19-use-a-hrefclassesusersessionhtmlencryptcontentusersessionencryptcontenta" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#encryptcontent">UserSession.encryptContent</a>.</h4>
-										</a>
-										<p>Encrypts the data provided with the app public key.</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Encrypts the data provided with the app public key.</p>
+								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>content: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -1177,9 +1165,6 @@
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="interfaces/encryptcontentoptions.html" class="tsd-signature-type">EncryptContentOptions</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1947,7 +1932,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L914">src/storage/index.ts:914</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L891">src/storage/index.ts:891</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1986,19 +1971,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L155">src/auth/authApp.ts:155</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L96">src/auth/authApp.ts:96</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlgetauthresponsetokenusersessiongetauthresponsetokena-instead" id="v19-use-a-hrefclassesusersessionhtmlgetauthresponsetokenusersessiongetauthresponsetokena-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#getauthresponsetoken">UserSession.getAuthResponseToken</a> instead.</h4>
-										</a>
-										<p>Retrieve the authentication token from the URL query</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Retrieve the authentication token from the URL query</p>
+								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 							<p>the authentication token if it exists otherwise <code>null</code></p>
@@ -2091,13 +2070,13 @@
 					<a name="getfile" class="tsd-anchor"></a>
 					<h3>get<wbr>File</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>File<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/getfileoptions.html" class="tsd-signature-type">GetFileOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>File<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/getfileoptions.html" class="tsd-signature-type">GetFileOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L515">src/storage/index.ts:515</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L499">src/storage/index.ts:499</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2108,6 +2087,9 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
+								<li>
 									<h5>path: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the path to the file to read</p>
@@ -2115,9 +2097,6 @@
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="interfaces/getfileoptions.html" class="tsd-signature-type">GetFileOptions</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -2130,17 +2109,20 @@
 					<a name="getfilecontents" class="tsd-anchor"></a>
 					<h3>get<wbr>File<wbr>Contents</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Contents<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, zoneFileLookupURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, forceText<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Contents<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, zoneFileLookupURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, forceText<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L313">src/storage/index.ts:313</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L297">src/storage/index.ts:297</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>path: <span class="tsd-signature-type">string</span></h5>
 								</li>
@@ -2156,9 +2138,6 @@
 								<li>
 									<h5>forceText: <span class="tsd-signature-type">boolean</span></h5>
 								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
-								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
@@ -2168,25 +2147,25 @@
 					<a name="getfilesignedunencrypted" class="tsd-anchor"></a>
 					<h3>get<wbr>File<wbr>Signed<wbr>Unencrypted</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Signed<wbr>Unencrypted<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, opt<span class="tsd-signature-symbol">: </span><a href="interfaces/getfileoptions.html" class="tsd-signature-type">GetFileOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Signed<wbr>Unencrypted<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, opt<span class="tsd-signature-symbol">: </span><a href="interfaces/getfileoptions.html" class="tsd-signature-type">GetFileOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L347">src/storage/index.ts:347</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L331">src/storage/index.ts:331</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
+								<li>
 									<h5>path: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
 									<h5>opt: <a href="interfaces/getfileoptions.html" class="tsd-signature-type">GetFileOptions</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -2197,27 +2176,22 @@
 					<a name="getfileurl" class="tsd-anchor"></a>
 					<h3>get<wbr>File<wbr>Url</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Url<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/getfileurloptions.html" class="tsd-signature-type">GetFileUrlOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>File<wbr>Url<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/getfileurloptions.html" class="tsd-signature-type">GetFileUrlOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L286">src/storage/index.ts:286</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L270">src/storage/index.ts:270</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlgetfileurlusersessiongetfileurla-instead" id="v19-use-a-hrefclassesusersessionhtmlgetfileurlusersessiongetfileurla-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#getfileurl">UserSession.getFileUrl</a> instead.</h4>
-										</a>
-									</dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>path: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -2226,9 +2200,6 @@
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="interfaces/getfileurloptions.html" class="tsd-signature-type">GetFileUrlOptions</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -2240,17 +2211,20 @@
 					<a name="getgaiaaddress" class="tsd-anchor"></a>
 					<h3>get<wbr>Gaia<wbr>Address</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Gaia<wbr>Address<span class="tsd-signature-symbol">(</span>app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, zoneFileLookupURL<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Gaia<wbr>Address<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, app<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, username<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, zoneFileLookupURL<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L214">src/storage/index.ts:214</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L205">src/storage/index.ts:205</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>app: <span class="tsd-signature-type">string</span></h5>
 								</li>
@@ -2259,9 +2233,6 @@
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> zoneFileLookupURL: <span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -2452,20 +2423,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L261">src/auth/authApp.ts:261</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L178">src/auth/authApp.ts:178</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlhandlependingsigninusersessionhandlependingsignina-instead" id="v19-use-a-hrefclassesusersessionhtmlhandlependingsigninusersessionhandlependingsignina-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#handlependingsignin">UserSession.handlePendingSignIn</a> instead.</h4>
-										</a>
-										<p>Try to process any pending sign in request by returning a <code>Promise</code> that resolves
-										to the user data object if the sign in succeeds.</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Try to process any pending sign in request by returning a <code>Promise</code> that resolves
+									to the user data object if the sign in succeeds.</p>
+								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -2509,7 +2474,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L417">src/storage/index.ts:417</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L401">src/storage/index.ts:401</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -2695,7 +2660,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L703">src/storage/index.ts:703</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L683">src/storage/index.ts:683</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2724,21 +2689,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L134">src/auth/authApp.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L78">src/auth/authApp.ts:78</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlissigninpendingusersessionissigninpendinga-instead" id="v19-use-a-hrefclassesusersessionhtmlissigninpendingusersessionissigninpendinga-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#issigninpending">UserSession.isSignInPending</a> instead.</h4>
-										</a>
-										<p>Check if there is a authentication request that hasn&#39;t been handled.</p>
-										<p>Also checks for a protocol echo reply (which if detected then the page
-										will be automatically redirected after this call).</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Check if there is a authentication request that hasn&#39;t been handled.</p>
+								</div>
+								<p>Also checks for a protocol echo reply (which if detected then the page
+								will be automatically redirected after this call).</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 							<p><code>true</code> if there is a pending sign in, otherwise <code>false</code></p>
@@ -2759,35 +2718,6 @@
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function">
-					<a name="isusersignedin" class="tsd-anchor"></a>
-					<h3>is<wbr>User<wbr>Signed<wbr>In</h3>
-					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>User<wbr>Signed<wbr>In<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L78">src/auth/authApp.ts:78</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlisusersignedinusersessionisusersignedina-instead" id="v19-use-a-hrefclassesusersessionhtmlisusersignedinusersessionisusersignedina-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#isusersignedin">UserSession.isUserSignedIn</a> instead.</h4>
-										</a>
-										<p>Check if a user is currently signed in.</p>
-									</dd>
-								</dl>
-							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
-							<p><code>true</code> if the user is signed in, <code>false</code> if not.</p>
 						</li>
 					</ul>
 				</section>
@@ -2863,13 +2793,13 @@
 					<a name="listfiles" class="tsd-anchor"></a>
 					<h3>list<wbr>Files</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">list<wbr>Files<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">list<wbr>Files<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L1013">src/storage/index.ts:1013</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L990">src/storage/index.ts:990</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -2879,6 +2809,9 @@
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>callback: <span class="tsd-signature-type">function</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -2904,43 +2837,11 @@
 										</li>
 									</ul>
 								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
-								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to the total number of listed files.
 								If the call is ended early by the callback, the last file is excluded.
 							If an error occurs the entire call is rejected.</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function">
-					<a name="loaduserdata" class="tsd-anchor"></a>
-					<h3>load<wbr>User<wbr>Data</h3>
-					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">load<wbr>User<wbr>Data<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="interfaces/userdata.html" class="tsd-signature-type">UserData</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L171">src/auth/authApp.ts:171</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlloaduserdatausersessionloaduserdataa-instead" id="v19-use-a-hrefclassesusersessionhtmlloaduserdatausersessionloaduserdataa-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#loaduserdata">UserSession.loadUserData</a> instead.</h4>
-										</a>
-										<p>Retrieves the user data object. The user&#39;s profile is stored in the key <code>profile</code>.</p>
-									</dd>
-								</dl>
-							</div>
-							<h4 class="tsd-returns-title">Returns <a href="interfaces/userdata.html" class="tsd-signature-type">UserData</a></h4>
-							<p>User data object.</p>
 						</li>
 					</ul>
 				</section>
@@ -3871,13 +3772,13 @@
 					<a name="putfile" class="tsd-anchor"></a>
 					<h3>put<wbr>File</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">put<wbr>File<span class="tsd-signature-symbol">(</span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBufferView</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Blob</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/putfileoptions.html" class="tsd-signature-type">PutFileOptions</a>, caller<span class="tsd-signature-symbol">?: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">put<wbr>File<span class="tsd-signature-symbol">(</span>caller<span class="tsd-signature-symbol">: </span><a href="classes/usersession.html" class="tsd-signature-type">UserSession</a>, path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, content<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">ArrayBufferView</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Blob</span>, options<span class="tsd-signature-symbol">?: </span><a href="interfaces/putfileoptions.html" class="tsd-signature-type">PutFileOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L730">src/storage/index.ts:730</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/storage/index.ts#L710">src/storage/index.ts:710</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -3887,6 +3788,9 @@
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
+								<li>
+									<h5>caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
+								</li>
 								<li>
 									<h5>path: <span class="tsd-signature-type">string</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -3902,60 +3806,10 @@
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="interfaces/putfileoptions.html" class="tsd-signature-type">PutFileOptions</a></h5>
 								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> caller: <a href="classes/usersession.html" class="tsd-signature-type">UserSession</a></h5>
-								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves if the operation succeed and rejects
 							if it failed</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function">
-					<a name="redirecttosignin" class="tsd-anchor"></a>
-					<h3>redirect<wbr>ToSign<wbr>In</h3>
-					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">redirect<wbr>ToSign<wbr>In<span class="tsd-signature-symbol">(</span>redirectURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, manifestURI<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, scopes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="enums/authscope.html" class="tsd-signature-type">AuthScope</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L113">src/auth/authApp.ts:113</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlisusersignedinusersessionisusersignedina-instead" id="v19-use-a-hrefclassesusersessionhtmlisusersignedinusersessionisusersignedina-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#isusersignedin">UserSession.isUserSignedIn</a> instead.</h4>
-										</a>
-										<p>Generates an authentication request and redirects the user to the Blockstack
-										browser to approve the sign in request.</p>
-										<p>Please note that this requires that the web browser properly handles the
-										<code>blockstack:</code> URL protocol handler.</p>
-										<p>Most applications should use this
-											method for sign in unless they require more fine grained control over how the
-											authentication request is generated. If your app falls into this category,
-										use <code>makeAuthRequest</code> and <code>redirectToSignInWithAuthRequest</code> to build your own sign in process.</p>
-									</dd>
-								</dl>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> redirectURI: <span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> manifestURI: <span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> scopes: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><a href="enums/authscope.html" class="tsd-signature-type">AuthScope</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -3969,23 +3823,17 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L214">src/auth/authApp.ts:214</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L134">src/auth/authApp.ts:134</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlredirecttosigninwithauthrequestusersessionredirecttosigninwithauthrequesta-instead" id="v19-use-a-hrefclassesusersessionhtmlredirecttosigninwithauthrequestusersessionredirecttosigninwithauthrequesta-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#redirecttosigninwithauthrequest">UserSession.redirectToSignInWithAuthRequest</a> instead.</h4>
-										</a>
-										<p>Redirects the user to the Blockstack browser to approve the sign in request
-										given.</p>
-										<p>The user is redirected to the <code>blockstackIDHost</code> if the <code>blockstack:</code>
-											protocol handler is not detected. Please note that the protocol handler detection
-										does not work on all browsers.</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Redirects the user to the Blockstack browser to approve the sign in request
+									given.</p>
+								</div>
+								<p>The user is redirected to the <code>blockstackIDHost</code> if the <code>blockstack:</code>
+									protocol handler is not detected. Please note that the protocol handler detection
+								does not work on all browsers.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -4116,19 +3964,13 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L188">src/auth/authApp.ts:188</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L111">src/auth/authApp.ts:111</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<dl class="tsd-comment-tags">
-									<dt>deprecated</dt>
-									<dd>
-										<a href="#v19-use-a-hrefclassesusersessionhtmlsignuseroutusersessionsignuserouta-instead" id="v19-use-a-hrefclassesusersessionhtmlsignuseroutusersessionsignuserouta-instead" style="color: inherit; text-decoration: none;">
-											<h4>v19 Use <a href="classes/usersession.html#signuserout">UserSession.signUserOut</a> instead.</h4>
-										</a>
-										<p>Sign the user out and optionally redirect to given location.</p>
-									</dd>
-								</dl>
+								<div class="lead">
+									<p>Sign the user out and optionally redirect to given location.</p>
+								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -4315,7 +4157,7 @@
 					<div class="tsd-signature tsd-kind-icon">DEFAULT_<wbr>PROFILE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L26">src/auth/authApp.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L25">src/auth/authApp.ts:25</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-not-exported">
@@ -4324,7 +4166,7 @@
 						<div class="tsd-signature tsd-kind-icon">@context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;http://schema.org&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L28">src/auth/authApp.ts:28</a></li>
+								<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L27">src/auth/authApp.ts:27</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -4334,7 +4176,7 @@
 						<div class="tsd-signature tsd-kind-icon">@type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;Person&quot;</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L27">src/auth/authApp.ts:27</a></li>
+								<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/src/auth/authApp.ts#L26">src/auth/authApp.ts:26</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -6294,16 +6136,10 @@
 						<a href="globals.html#issubtlecryptoavailable" class="tsd-kind-icon">is<wbr>Subtle<wbr>Crypto<wbr>Available</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#isusersignedin" class="tsd-kind-icon">is<wbr>User<wbr>Signed<wbr>In</a>
-					</li>
-					<li class=" tsd-kind-function">
 						<a href="globals.html#launchcustomprotocol" class="tsd-kind-icon">launch<wbr>Custom<wbr>Protocol</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#listfiles" class="tsd-kind-icon">list<wbr>Files</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="globals.html#loaduserdata" class="tsd-kind-icon">load<wbr>User<wbr>Data</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#lookupprofile" class="tsd-kind-icon">lookup<wbr>Profile</a>
@@ -6352,9 +6188,6 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#putfile" class="tsd-kind-icon">put<wbr>File</a>
-					</li>
-					<li class=" tsd-kind-function">
-						<a href="globals.html#redirecttosignin" class="tsd-kind-icon">redirect<wbr>ToSign<wbr>In</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#redirecttosigninwithauthrequest" class="tsd-kind-icon">redirect<wbr>ToSign<wbr>InWith<wbr>Auth<wbr>Request</a>
