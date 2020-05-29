@@ -12,7 +12,7 @@ A clear and concise description of what the bug is.
 
 **What version of Blockstack.js are you using?**
 
-**Is the bug present in the Blockstack CLI, Gaia hub ,Connect or Blockstack Browser?**
+**Is the bug present in the Blockstack CLI, Gaia hub, Connect or Blockstack Browser?**
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -26,6 +26,9 @@ A clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
+
+**Console log**
+If applicable, add console log to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
