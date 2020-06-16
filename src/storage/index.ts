@@ -2,14 +2,13 @@
 
 import {
   getFullReadUrl,
-  connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL, 
+  connectToGaiaHub, uploadToGaiaHub, getBucketUrl, BLOCKSTACK_GAIA_HUB_LABEL,
   GaiaHubConfig,
   deleteFromGaiaHub
 } from './hub'
-// export { type GaiaHubConfig } from './hub'
 
 import {
-  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonStringLength, 
+  encryptECIES, decryptECIES, signECDSA, verifyECDSA, eciesGetJsonStringLength,
   SignedCipherObject, CipherTextEncoding
 } from '../encryption/ec'
 import { getPublicKeyFromPrivate, publicKeyToAddress } from '../keys'
@@ -34,7 +33,7 @@ export interface EncryptionOptions {
   /**
    * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
    * app private key. If a string is specified, it is used as the private key instead
-   * of the user's app private key. 
+   * of the user's app private key.
    * @default false
    */
   sign?: boolean | string;
@@ -47,9 +46,9 @@ export interface EncryptionOptions {
    */
   cipherTextEncoding?: CipherTextEncoding;
   /**
-   * Specifies if the original unencrypted content is a ASCII or UTF-8 string. 
-   * For example stringified JSON. 
-   * If true, then when the ciphertext is decrypted, it will be returned as 
+   * Specifies if the original unencrypted content is a ASCII or UTF-8 string.
+   * For example stringified JSON.
+   * If true, then when the ciphertext is decrypted, it will be returned as
    * a `string` type variable, otherwise will be returned as a Buffer.
    */
   wasString?: boolean;
@@ -60,8 +59,8 @@ export interface EncryptionOptions {
  */
 export interface EncryptContentOptions extends EncryptionOptions {
   /**
-   * Encrypt the data with this key. 
-   * If not provided then the current user's app public key is used. 
+   * Encrypt the data with this key.
+   * If not provided then the current user's app public key is used.
    */
   publicKey?: string;
 }
@@ -71,19 +70,20 @@ export interface EncryptContentOptions extends EncryptionOptions {
  */
 export interface PutFileOptions extends EncryptionOptions {
   /**
-   * Specifies the Content-Type header for unencrypted data. 
-   * If the `encrypt` is enabled, this option is ignored, and the 
-   * Content-Type header is set to `application/json` for the ciphertext 
-   * JSON envelope. 
+   * Specifies the Content-Type header for unencrypted data.
+   * If the `encrypt` is enabled, this option is ignored, and the
+   * Content-Type header is set to `application/json` for the ciphertext
+   * JSON envelope.
    */
   contentType?: string;
   /**
-   * Encrypt the data with the app public key. 
-   * If a string is specified, it is used as the public key. 
-   * If the boolean `true` is specified then the current user's app public key is used. 
+   * Encrypt the data with the app public key.
+   * If a string is specified, it is used as the public key.
+   * If the boolean `true` is specified then the current user's app public key is used.
    * @default true
    */
   encrypt?: boolean | string;
+  force?: boolean;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -141,9 +141,9 @@ export async function encryptContent(
     wasString = typeof content === 'string'
   }
   const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
-  const cipherObject = await encryptECIES(opts.publicKey, 
-                                          contentBuffer, 
-                                          wasString, 
+  const cipherObject = await encryptECIES(opts.publicKey,
+                                          contentBuffer,
+                                          wasString,
                                           opts.cipherTextEncoding)
   let cipherPayload = JSON.stringify(cipherObject)
   if (opts.sign) {
@@ -225,13 +225,13 @@ async function getGaiaAddress(
  * @param {String} options.username - the Blockstack ID to lookup for multi-player storage
  * @param {String} options.app - the app to lookup for multi-player storage -
  * defaults to current origin
- * 
+ *
  * @ignore
  */
 function normalizeOptions<T>(
   caller: UserSession,
   options?: {
-    app?: string, 
+    app?: string,
     username?: string,
     zoneFileLookupURL?: string
   } & T,
@@ -252,7 +252,7 @@ function normalizeOptions<T>(
         throw new InvalidStateError('Missing store UserSession')
       }
       const sessionData = caller.store.getSessionData()
-      // Use the user specified coreNode if available, otherwise use the app specified coreNode. 
+      // Use the user specified coreNode if available, otherwise use the app specified coreNode.
       const configuredCoreNode = sessionData.userData.coreNode || caller.appConfig.coreNode
       if (configuredCoreNode) {
         opts.zoneFileLookupURL = `${configuredCoreNode}${NAME_LOOKUP_PATH}`
@@ -263,13 +263,13 @@ function normalizeOptions<T>(
 }
 
 /**
- * 
+ *
  * @param {String} path - the path to the file to read
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
   caller: UserSession,
-  path: string, 
+  path: string,
   options?: GetFileUrlOptions
 ): Promise<string> {
   const opts = normalizeOptions(caller, options)
@@ -295,7 +295,7 @@ export async function getFileUrl(
  * @ignore
  */
 async function getFileContents(caller: UserSession, path: string, app: string,
-                               username: string | undefined, 
+                               username: string | undefined,
                                zoneFileLookupURL: string | undefined,
                                forceText: boolean): Promise<string | ArrayBuffer | null> {
   const opts = { app, username, zoneFileLookupURL }
@@ -308,7 +308,7 @@ async function getFileContents(caller: UserSession, path: string, app: string,
   if (typeof contentType === 'string') {
     contentType = contentType.toLowerCase()
   }
-  
+
   const etag = response.headers.get('ETag')
   if (etag) {
     etags[path] = etag
@@ -341,7 +341,7 @@ async function getFileSignedUnencrypted(caller: UserSession, path: string, opt: 
                       opt.zoneFileLookupURL, true),
       getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)
     ])
-  
+
     if (!fileContents) {
       return fileContents
     }
@@ -398,9 +398,9 @@ async function getFileSignedUnencrypted(caller: UserSession, path: string, opt: 
  * @private
  * @ignore
  */
-async function handleSignedEncryptedContents(caller: UserSession, path: string, 
-                                             storedContents: string, app: string, 
-                                             privateKey?: string, username?: string, 
+async function handleSignedEncryptedContents(caller: UserSession, path: string,
+                                             storedContents: string, app: string,
+                                             privateKey?: string, username?: string,
                                              zoneFileLookupURL?: string
 ): Promise<string | Buffer> {
   const appPrivateKey = privateKey || caller.loadUserData().appPrivateKey
@@ -455,19 +455,19 @@ async function handleSignedEncryptedContents(caller: UserSession, path: string,
 
 export interface GetFileUrlOptions {
   /**
-   * The Blockstack ID to lookup for multi-player storage. 
+   * The Blockstack ID to lookup for multi-player storage.
    * If not specified, the currently signed in username is used.
    */
   username?: string;
   /**
-   * The app to lookup for multi-player storage - defaults to current origin. 
-   * @default `window.location.origin` 
+   * The app to lookup for multi-player storage - defaults to current origin.
+   * @default `window.location.origin`
    * Only if available in the executing environment, otherwise `undefined`.
    */
   app?: string;
   /**
-   * The URL to use for zonefile lookup. If falsey, this will use 
-   * the blockstack.js's [[getNameInfo]] function instead. 
+   * The URL to use for zonefile lookup. If falsey, this will use
+   * the blockstack.js's [[getNameInfo]] function instead.
    */
   zoneFileLookupURL?: string;
 }
@@ -477,13 +477,13 @@ export interface GetFileUrlOptions {
  */
 export interface GetFileOptions extends GetFileUrlOptions {
   /**
-  * Try to decrypt the data with the app private key. 
-  * If a string is specified, it is used as the private key. 
+  * Try to decrypt the data with the app private key.
+  * If a string is specified, it is used as the private key.
    * @default true
    */
   decrypt?: boolean | string;
   /**
-   * Whether the content should be verified, only to be used 
+   * Whether the content should be verified, only to be used
    * when [[UserSession.putFile]] was set to `sign = true`.
    * @default false
    */
@@ -498,7 +498,7 @@ export interface GetFileOptions extends GetFileUrlOptions {
  */
 export async function getFile(
   caller: UserSession,
-  path: string, 
+  path: string,
   options?: GetFileOptions,
 ) {
   const defaults: GetFileOptions = {
@@ -516,7 +516,7 @@ export async function getFile(
     return getFileSignedUnencrypted(caller, path, opt)
   }
 
-  const storedContents = await getFileContents(caller, path, opt.app, opt.username, 
+  const storedContents = await getFileContents(caller, path, opt.app, opt.username,
                                                opt.zoneFileLookupURL, !!opt.decrypt)
   if (storedContents === null) {
     return storedContents
@@ -539,7 +539,7 @@ export async function getFile(
       decryptionKey = opt.decrypt
     }
     return handleSignedEncryptedContents(caller, path, storedContents,
-                                         opt.app, decryptionKey, opt.username, 
+                                         opt.app, decryptionKey, opt.username,
                                          opt.zoneFileLookupURL)
   } else if (!opt.verify && !opt.decrypt) {
     return storedContents
@@ -573,12 +573,12 @@ class FileContentLoader {
     this.contentByteLength = this.detectContentLength()
   }
 
-  private static normalizeContentDataType(content: PutFileContent, 
+  private static normalizeContentDataType(content: PutFileContent,
                                           contentType: string): Buffer | Blob {
     try {
       if (typeof content === 'string') {
-        // If a charset is specified it must be either utf8 or ascii, otherwise the encoded content 
-        // length cannot be reliably detected. If no charset specified it will be treated as utf8. 
+        // If a charset is specified it must be either utf8 or ascii, otherwise the encoded content
+        // length cannot be reliably detected. If no charset specified it will be treated as utf8.
         const charset = (contentType || '').toLowerCase().replace('-', '')
         if (charset.includes('charset') && !charset.includes('charset=utf8') && !charset.includes('charset=ascii')) {
           throw new Error(`Unable to determine byte length with charset: ${contentType}`)
@@ -597,9 +597,9 @@ class FileContentLoader {
       } else if (typeof ArrayBuffer !== 'undefined' && content instanceof ArrayBuffer) {
         return Buffer.from(content)
       } else if (Array.isArray(content)) {
-        // Provided with a regular number `Array` -- this is either an (old) method 
-        // of representing an octet array, or a dev error. Perform basic check for octet array. 
-        if (content.length > 0 
+        // Provided with a regular number `Array` -- this is either an (old) method
+        // of representing an octet array, or a dev error. Perform basic check for octet array.
+        if (content.length > 0
           && (!Number.isInteger(content[0]) || content[0] < 0 || content[0] > 255)) {
           throw new Error(`Unexpected array values provided as file data: value "${content[0]}" at index 0 is not an octet number. ${this.supportedTypesMsg}`)
         }
@@ -676,9 +676,9 @@ class FileContentLoader {
   }
 }
 
-/** 
+/**
  * Determines if a gaia error response is possible to recover from
- * by refreshing the gaiaHubConfig, and retrying the request. 
+ * by refreshing the gaiaHubConfig, and retrying the request.
  */
 function isRecoverableGaiaError(error: GaiaHubError): boolean {
   if (!error || !error.hubError || !error.hubError.statusCode) {
@@ -702,8 +702,10 @@ function isRecoverableGaiaError(error: GaiaHubError): boolean {
 
 /**
  * Stores the data provided in the app's data store to to the file specified.
+ * @param {UserSession} caller - internal use only: the usersession
  * @param {String} path - the path to store the data in
- * @param {String|Buffer} content - the data to store in the file
+ * @param {String|Buffer|ArrayBufferView|Blob} content - the data to store in the file
+ * @param {PutFileOptions} options - the putfile options
  * @return {Promise} that resolves if the operation succeed and rejects
  * if it failed
  */
@@ -711,12 +713,13 @@ export async function putFile(
   caller: UserSession,
   path: string,
   content: string | Buffer | ArrayBufferView | Blob,
-  options?: PutFileOptions
+  options?: PutFileOptions,
 ): Promise<string> {
   const defaults: PutFileOptions = {
     encrypt: true,
     sign: false,
-    cipherTextEncoding: 'hex'
+    cipherTextEncoding: 'hex',
+    force: false
   }
   const opt = Object.assign({}, defaults, options)
 
@@ -734,12 +737,12 @@ export async function putFile(
     console.error(sizeErr)
     throw sizeErr
   }
-  
+
   // When encrypting, the content length must be calculated. Certain types like `Blob`s must
-  // be loaded into memory. 
+  // be loaded into memory.
   if (opt.encrypt && hasMaxUpload) {
     const encryptedSize = eciesGetJsonStringLength({
-      contentLength: contentLoader.contentByteLength, 
+      contentLength: contentLoader.contentByteLength,
       wasString: contentLoader.wasString,
       sign: !!opt.sign,
       cipherTextEncoding: opt.cipherTextEncoding
@@ -755,10 +758,12 @@ export async function putFile(
   let etag: string
   let newFile = true
 
-  if (etags[path]) {
-    newFile = false
-    etag = etags[path]
-  } 
+  if (!opt.force) {
+    if (etags[path]) {
+      newFile = false
+      etag = etags[path]
+    }
+  }
 
   let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
 
@@ -776,7 +781,7 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = (await Promise.all([
-        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag),
+        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag, opt.force),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, hubConfig, 'application/json')
       ]))[0]
@@ -789,12 +794,12 @@ export async function putFile(
     // In all other cases, we only need one upload.
     let contentForUpload: string | Buffer | Blob
     if (!opt.encrypt && !opt.sign) {
-      // If content does not need encrypted or signed, it can be passed directly 
-      // to the fetch request without loading into memory. 
+      // If content does not need encrypted or signed, it can be passed directly
+      // to the fetch request without loading into memory.
       contentForUpload = contentLoader.content
     } else {
       // Use the `encrypt` key, otherwise the `sign` key, if neither are specified
-      // then use the current user's app public key. 
+      // then use the current user's app public key.
       let publicKey: string
       if (typeof opt.encrypt === 'string') {
         publicKey = opt.encrypt
@@ -804,8 +809,8 @@ export async function putFile(
         publicKey = getPublicKeyFromPrivate(caller.loadUserData().appPrivateKey)
       }
       const contentData = await contentLoader.load()
-      contentForUpload = await encryptContent(caller, contentData, { 
-        publicKey, 
+      contentForUpload = await encryptContent(caller, contentData, {
+        publicKey,
         wasString: contentLoader.wasString,
         cipherTextEncoding: opt.cipherTextEncoding,
         sign: opt.sign
@@ -815,7 +820,7 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = await uploadToGaiaHub(
-        path, contentForUpload, hubConfig, contentType, newFile, etag
+        path, contentForUpload, hubConfig, contentType, newFile, etag, opt.force
       )
       if (writeResponse.etag) {
         etags[path] = writeResponse.etag
@@ -841,7 +846,7 @@ export async function putFile(
 }
 
 /**
- * Deletes the specified file from the app's data store. 
+ * Deletes the specified file from the app's data store.
  * @param path - The path to the file to delete.
  * @param options - Optional options object.
  * @param options.wasSigned - Set to true if the file was originally signed
@@ -850,7 +855,7 @@ export async function putFile(
  */
 export async function deleteFile(
   caller: UserSession,
-  path: string, 
+  path: string,
   options?: {
     wasSigned?: boolean;
   }
@@ -983,8 +988,8 @@ async function listFilesLoop(
  * List the set of files in this application's Gaia storage bucket.
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
- * @return {Promise} that resolves to the total number of listed files. 
- * If the call is ended early by the callback, the last file is excluded. 
+ * @return {Promise} that resolves to the total number of listed files.
+ * If the call is ended early by the callback, the last file is excluded.
  * If an error occurs the entire call is rejected.
  */
 export function listFiles(
