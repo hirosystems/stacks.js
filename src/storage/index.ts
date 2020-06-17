@@ -83,7 +83,15 @@ export interface PutFileOptions extends EncryptionOptions {
    * @default true
    */
   encrypt?: boolean | string;
+  /**
+   * Ignore etag requirements for replacing files
+   */
   force?: boolean;
+  /**
+   * Allow the option to pass a custom gaia hub config. This is useful for
+   * collaborative sharing/editing
+   */
+  gaiaHubConfig?: GaiaHubConfig
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -264,7 +272,9 @@ function normalizeOptions<T>(
 
 /**
  *
+ * @param {UserSession} caller - the current userSession
  * @param {String} path - the path to the file to read
+ * @param {GetFileUrlOptions} options - optional options object
  * @returns {Promise<string>} that resolves to the URL or rejects with an error
  */
 export async function getFileUrl(
@@ -278,7 +288,7 @@ export async function getFileUrl(
   if (opts.username) {
     readUrl = await getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
   } else {
-    const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = options.gaiaHubConfig || await caller.getOrSetLocalGaiaHubConnection()
     readUrl = await getFullReadUrl(path, gaiaHubConfig)
   }
 
@@ -297,8 +307,10 @@ export async function getFileUrl(
 async function getFileContents(caller: UserSession, path: string, app: string,
                                username: string | undefined,
                                zoneFileLookupURL: string | undefined,
-                               forceText: boolean): Promise<string | ArrayBuffer | null> {
-  const opts = { app, username, zoneFileLookupURL }
+                               forceText: boolean,
+                               gaiaHubConfig: GaiaHubConfig | null):
+  Promise<string | ArrayBuffer | null> {
+  const opts = { app, username, zoneFileLookupURL, gaiaHubConfig }
   const readUrl = await getFileUrl(caller, path, opts)
   const response = await fetchPrivate(readUrl)
   if (!response.ok) {
@@ -336,9 +348,10 @@ async function getFileSignedUnencrypted(caller: UserSession, path: string, opt: 
   const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`
   try {
     const [fileContents, signatureContents, gaiaAddress] = await Promise.all([
-      getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL, false),
+      getFileContents(caller, path, opt.app, opt.username, opt.zoneFileLookupURL,
+                      false, opt.gaiaHubConfig),
       getFileContents(caller, sigPath, opt.app, opt.username,
-                      opt.zoneFileLookupURL, true),
+                      opt.zoneFileLookupURL, true, opt.gaiaHubConfig),
       getGaiaAddress(caller, opt.app, opt.username, opt.zoneFileLookupURL)
     ])
 
@@ -470,6 +483,10 @@ export interface GetFileUrlOptions {
    * the blockstack.js's [[getNameInfo]] function instead.
    */
   zoneFileLookupURL?: string;
+  /**
+   * Optional gaia hub config, useful for collaborative sharing
+   */
+  gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
@@ -488,11 +505,17 @@ export interface GetFileOptions extends GetFileUrlOptions {
    * @default false
    */
   verify?: boolean;
+    /**
+   * Optional gaia hub config, useful for collaborative sharing
+   */
+  gaiaHubConfig?: GaiaHubConfig;
 }
 
 /**
  * Retrieves the specified file from the app's data store.
+ * @param {UserSession} caller - the current userSession
  * @param {String} path - the path to the file to read
+ * @param {GetFileOptions} options - optional options object for getFile
  * @returns {Promise} that resolves to the raw data in the file
  * or rejects with an error
  */
@@ -506,7 +529,8 @@ export async function getFile(
     verify: false,
     username: null,
     app: getGlobalObject('location', { returnEmptyObject: true }).origin,
-    zoneFileLookupURL: null
+    zoneFileLookupURL: null,
+    gaiaHubConfig: null
   }
   const opt = Object.assign({}, defaults, options)
 
@@ -517,7 +541,8 @@ export async function getFile(
   }
 
   const storedContents = await getFileContents(caller, path, opt.app, opt.username,
-                                               opt.zoneFileLookupURL, !!opt.decrypt)
+                                               opt.zoneFileLookupURL, !!opt.decrypt,
+                                               opt.gaiaHubConfig)
   if (storedContents === null) {
     return storedContents
   } else if (opt.decrypt && !opt.verify) {
@@ -723,7 +748,7 @@ export async function putFile(
   }
   const opt = Object.assign({}, defaults, options)
 
-  const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
+  const gaiaHubConfig = opt.gaiaHubConfig || (await caller.getOrSetLocalGaiaHubConnection())
   const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes)
   const hasMaxUpload = maxUploadBytes > 0
 
@@ -837,7 +862,7 @@ export async function putFile(
     if (isRecoverableGaiaError(error)) {
       console.error(error)
       console.error('Possible recoverable error during Gaia upload, retrying...')
-      const freshHubConfig = await caller.setLocalGaiaHubConnection()
+      const freshHubConfig = opt.gaiaHubConfig || await caller.setLocalGaiaHubConnection()
       return await uploadFn(freshHubConfig)
     } else {
       throw error
@@ -986,6 +1011,7 @@ async function listFilesLoop(
 
 /**
  * List the set of files in this application's Gaia storage bucket.
+ * @param {UserSession} caller - the user session
  * @param {function} callback - a callback to invoke on each named file that
  * returns `true` to continue the listing operation or `false` to end it
  * @return {Promise} that resolves to the total number of listed files.
