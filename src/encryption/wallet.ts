@@ -74,7 +74,7 @@ async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Prom
   const iv = keysAndIV.slice(32, 48)
 
   const decipher = await createCipher()
-  const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText)
+  const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText);
 
   const hmacSha256 = await createHmacSha256()
   const hmacDigest = await hmacSha256.digest(macKey, hmacPayload)
@@ -147,19 +147,19 @@ function decryptLegacy(dataBuffer: Buffer,
  * @private
  * @ignore 
  */
-export async function decryptMnemonic(data: (string | Buffer), 
-                                      password: string, 
-                                      triplesecDecrypt: TriplesecDecryptSignature
-): Promise<string> {
-  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex')
+export async function decryptMnemonic(
+  data: string | Buffer,
+  password: string, 
+  triplesecDecrypt?: TriplesecDecryptSignature
+) {
+  const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'hex');
   try {
-    return await decryptMnemonicBuffer(dataBuffer, password)
+    return await decryptMnemonicBuffer(dataBuffer, password);
   } catch (err) {
-    // If it was a password error, don't even bother with legacy
-    if (err instanceof PasswordError) {
-      throw err
+    if (err instanceof PasswordError) {	
+      throw err;
     }
-    const data = await decryptLegacy(dataBuffer, password, triplesecDecrypt)
-    return data.toString()
+    const data = await decryptLegacy(dataBuffer, password, triplesecDecrypt);
+    return data.toString();
   }
 }
