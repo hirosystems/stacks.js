@@ -1,5 +1,4 @@
 src/wallet.ts
-src/encryption/wallet.ts
 src/encryption/index.ts
 src/encryption/ec.ts
 src/errors.ts
