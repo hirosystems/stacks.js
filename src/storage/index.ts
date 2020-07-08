@@ -27,9 +27,6 @@ import { NAME_LOOKUP_PATH } from '../auth/authConstants'
 import { getGlobalObject, getBlockstackErrorFromResponse, megabytesToBytes } from '../utils'
 import { fetchPrivate } from '../fetchUtil'
 
-const etags: { [key: string]: string; } = {}
-
-
 export interface EncryptionOptions {
   /**
    * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
@@ -311,7 +308,9 @@ async function getFileContents(caller: UserSession, path: string, app: string,
   
   const etag = response.headers.get('ETag')
   if (etag) {
-    etags[path] = etag
+    const sessionData = caller.store.getSessionData()
+    sessionData.etags[path] = etag
+    caller.store.setSessionData(sessionData)
   }
   if (forceText || contentType === null
     || contentType.startsWith('text')
@@ -755,9 +754,10 @@ export async function putFile(
   let etag: string
   let newFile = true
 
-  if (etags[path]) {
+  const sessionData = caller.store.getSessionData();
+  if (sessionData.etags[path]) {
     newFile = false
-    etag = etags[path]
+    etag = sessionData.etags[path]
   } 
 
   let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>
@@ -781,7 +781,8 @@ export async function putFile(
                         signatureContent, hubConfig, 'application/json')
       ]))[0]
       if (writeResponse.etag) {
-        etags[path] = writeResponse.etag
+        sessionData.etags[path] = writeResponse.etag;
+        caller.store.setSessionData(sessionData);
       }
       return writeResponse.publicURL
     }
@@ -818,7 +819,8 @@ export async function putFile(
         path, contentForUpload, hubConfig, contentType, newFile, etag
       )
       if (writeResponse.etag) {
-        etags[path] = writeResponse.etag
+        sessionData.etags[path] = writeResponse.etag;
+        caller.store.setSessionData(sessionData);
       }
       return writeResponse.publicURL
     }
@@ -857,26 +859,31 @@ export async function deleteFile(
 ) {
   const gaiaHubConfig = await caller.getOrSetLocalGaiaHubConnection()
   const opts = Object.assign({}, options)
+  const sessionData = caller.store.getSessionData();
   if (opts.wasSigned) {
     // If signed, delete both the content file and the .sig file
     try {
       await deleteFromGaiaHub(path, gaiaHubConfig)
       await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
-      delete etags[path];
+      delete sessionData.etags[path];
+      caller.store.setSessionData(sessionData);
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       await deleteFromGaiaHub(path, freshHubConfig)
       await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
-      delete etags[path];
+      delete sessionData.etags[path];
+      caller.store.setSessionData(sessionData);
     }
   } else {
     try {
       await deleteFromGaiaHub(path, gaiaHubConfig)
-      delete etags[path];
+      delete sessionData.etags[path];
+      caller.store.setSessionData(sessionData);
     } catch (error) {
       const freshHubConfig = await caller.setLocalGaiaHubConnection()
       await deleteFromGaiaHub(path, freshHubConfig)
-      delete etags[path];
+      delete sessionData.etags[path];
+      caller.store.setSessionData(sessionData);
     }
   }
 }
