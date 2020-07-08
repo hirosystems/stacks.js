@@ -784,7 +784,8 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = (await Promise.all([
-        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag, opt.dangerouslyIgnoreEtag),
+        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag,
+                        opt.dangerouslyIgnoreEtag),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, hubConfig, 'application/json')
       ]))[0]
