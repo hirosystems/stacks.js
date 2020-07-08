@@ -80,7 +80,10 @@ export interface PutFileOptions extends EncryptionOptions {
    * @default true
    */
   encrypt?: boolean | string;
-  force?: boolean;
+  /**
+   * Ignore etag for concurrency control and force file to be written.
+   */
+  dangerouslyIgnoreEtag?: boolean;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig'
@@ -718,7 +721,7 @@ export async function putFile(
     encrypt: true,
     sign: false,
     cipherTextEncoding: 'hex',
-    force: false
+    dangerouslyIgnoreEtag: false
   }
   const opt = Object.assign({}, defaults, options)
 
@@ -757,7 +760,7 @@ export async function putFile(
   let etag: string
   let newFile = true
 
-  if (!opt.force) {
+  if (!opt.dangerouslyIgnoreEtag) {
     const sessionData = caller.store.getSessionData();
     if (sessionData.etags[path]) {
       newFile = false
@@ -781,7 +784,7 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = (await Promise.all([
-        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag, opt.force),
+        uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag, opt.dangerouslyIgnoreEtag),
         uploadToGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`,
                         signatureContent, hubConfig, 'application/json')
       ]))[0]
@@ -821,7 +824,7 @@ export async function putFile(
 
     uploadFn = async (hubConfig: GaiaHubConfig) => {
       const writeResponse = await uploadToGaiaHub(
-        path, contentForUpload, hubConfig, contentType, newFile, etag, opt.force
+        path, contentForUpload, hubConfig, contentType, newFile, etag, opt.dangerouslyIgnoreEtag
       )
       if (writeResponse.etag) {
         sessionData.etags[path] = writeResponse.etag;
