@@ -5,10 +5,13 @@ import { UserData } from './authApp'
 
 const SESSION_VERSION = '1.0.0'
 
+type EtagMap = { [key: string]: string; };
+
 export interface SessionOptions {
   coreNode?: string,
   userData?: UserData,
   transitKey?: string,
+  etags?: EtagMap,
   localStorageKey?: string,
   storeOptions?: {
     localStorageKey?: string
@@ -27,10 +30,13 @@ export class SessionData {
   // window.localStorage.setItem(BLOCKSTACK_STORAGE_LABEL, JSON.stringify(userData))
   userData?: UserData
 
+  etags?: EtagMap
+
   constructor(options: SessionOptions) {
     this.version = SESSION_VERSION
     this.userData = options.userData
     this.transitKey = options.transitKey
+    this.etags = options.etags ? options.etags : {}
   }
 
   getGaiaHubConfig(): GaiaHubConfig {
@@ -48,7 +54,8 @@ export class SessionData {
     const options: SessionOptions = {
       coreNode: json.coreNode,
       userData: json.userData,
-      transitKey: json.transitKey
+      transitKey: json.transitKey,
+      etags: json.etags
     }
     return new SessionData(options)
   }
