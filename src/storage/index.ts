@@ -759,9 +759,9 @@ export async function putFile(
 
   let etag: string
   let newFile = true
+  const sessionData = caller.store.getSessionData();
 
   if (!opt.dangerouslyIgnoreEtag) {
-    const sessionData = caller.store.getSessionData();
     if (sessionData.etags[path]) {
       newFile = false
       etag = sessionData.etags[path]
