@@ -1,10 +1,6 @@
 import * as queryString from 'query-string'
 import { decodeToken } from 'jsontokens'
-import { BLOCKSTACK_HANDLER, getGlobalObject, updateQueryStringParameter } from '../utils'
-import { fetchPrivate } from '../fetchUtil'
-
-
-import { Logger } from '../logger'
+import { BLOCKSTACK_HANDLER, getGlobalObject, fetchPrivate, Logger } from '@stacks/common'
 
 /**
  * Retrieves the authentication request from the query string
@@ -52,32 +48,4 @@ export async function fetchAppManifest(authRequest: string): Promise<any> {
     console.log(error)
     throw new Error('Could not fetch manifest.json')
   }
-}
-
-/**
- * Redirect the user's browser to the app using the `redirect_uri`
- * specified in the authentication request, passing the authentication
- * response token as a query parameter.
- *
- * @param {String} authRequest  encoded and signed authentication request token
- * @param {String} authResponse encoded and signed authentication response token
- * @return {void}
- * @throws {Error} if there is no redirect uri
- * @private
- * @ignore 
- */
-export function redirectUserToApp(authRequest: string, authResponse: string) {
-  const payload = decodeToken(authRequest).payload
-  if (typeof payload === 'string') {
-    throw new Error('Unexpected token payload type of string')
-  }
-  let redirectURI = payload.redirect_uri as string
-  Logger.debug(redirectURI)
-  if (redirectURI) {
-    redirectURI = updateQueryStringParameter(redirectURI, 'authResponse', authResponse)
-  } else {
-    throw new Error('Invalid redirect URI')
-  }
-  const location = getGlobalObject('location', { throwIfUnavailable: true, usageDesc: 'redirectUserToApp' })
-  location.href = redirectURI
 }

@@ -6,23 +6,18 @@ import {
   InstanceDataStore
 } from './sessionStore'
 
-import * as authMessages from './authMessages'
-import * as storage from '../storage'
+import * as authMessages from './messages'
+import * as storage from './legacy/storage'
 
 import {
-  nextHour
-} from '../utils'
-import {
+  nextHour,
   MissingParameterError,
-  InvalidStateError
-} from '../errors'
-import { Logger } from '../logger'
-import { GaiaHubConfig, connectToGaiaHub } from '../storage/hub'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './authConstants'
-import {
-  redirectToSignInWithAuthRequest, isSignInPending, handlePendingSignIn,
-  signUserOut, getAuthResponseToken
-} from './authApp'
+  InvalidStateError,
+  Logger
+} from '@stacks/common'
+import { GaiaHubConfig, connectToGaiaHub } from './legacy/storage/hub'
+import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './constants'
+import { handlePendingSignIn, signUserOut, getAuthResponseToken } from './auth'
 
 
 /**
@@ -81,60 +76,6 @@ export class UserSession {
     } else {
       this.store = new InstanceDataStore()
     }
-  }
-
-  
-  /**
-   * Generates an authentication request and redirects the user to the Blockstack
-   * browser to approve the sign in request.
-   *
-   * Please note that this requires that the web browser properly handles the
-   * `blockstack:` URL protocol handler.
-   *
-   * Most applications should use this
-   * method for sign in unless they require more fine grained control over how the
-   * authentication request is generated. If your app falls into this category,
-   * use [[generateAndStoreTransitKey]], [[makeAuthRequest]],
-   * and [[redirectToSignInWithAuthRequest]] to build your own sign in process.
-   * 
-   * @param redirectURI Location of your application.
-   * @param manifestURI Location of the manifest.json file
-   * @param scopes Permissions requested by the application. Possible values are
-   *  `store_write` (default) or `publish_data`.
-   * 
-   * @returns {void}
-   */
-  redirectToSignIn(
-    redirectURI?: string,
-    manifestURI?: string,
-    scopes?: Array<AuthScope | string>
-  ): void {
-    const transitKey = this.generateAndStoreTransitKey()
-    const authRequest = this.makeAuthRequest(transitKey, redirectURI, manifestURI, scopes)
-    const authenticatorURL = this.appConfig && this.appConfig.authenticatorURL
-    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
-  }
-
-  /**
-   * Redirects the user to the Blockstack browser to approve the sign in request. 
-   * To construct a request see the [[makeAuthRequest]] function.
-   *
-   * The user is redirected to the authenticator URL specified in the `AppConfig`
-   * if the `blockstack:` protocol handler is not detected.
-   * Please note that the protocol handler detection does not work on all browsers.
-   * 
-   * @param authRequest A request string built by the [[makeAuthRequest]] function
-   * @param blockstackIDHost The ID of the Blockstack Browser application.
-   * 
-   */
-  redirectToSignInWithAuthRequest(
-    authRequest?: string,
-    blockstackIDHost?: string
-  ): void {
-    authRequest = authRequest || this.makeAuthRequest()
-    const authenticatorURL = blockstackIDHost 
-      || (this.appConfig && this.appConfig.authenticatorURL)
-    return redirectToSignInWithAuthRequest(authRequest, authenticatorURL)
   }
 
   /**
@@ -207,15 +148,6 @@ export class UserSession {
   }
 
   /**
-   * Check if there is a authentication request that hasn't been handled.
-   * 
-   * @returns{Boolean} `true` if there is a pending sign in, otherwise `false`
-   */
-  isSignInPending() {
-    return isSignInPending()
-  }
-
-  /**
    * Check if a user is currently signed in.
    * 
    * @returns {Boolean} `true` if the user is signed in, `false` if not.
@@ -270,7 +202,7 @@ export class UserSession {
    */
   encryptContent(
     content: string | Buffer,
-    options?: import('../storage').EncryptContentOptions
+    options?: import('./legacy/storage').EncryptContentOptions
   ): Promise<string> {
     return storage.encryptContent(this, content, options)
   }
@@ -299,7 +231,7 @@ export class UserSession {
   putFile(
     path: string,
     content: string | Buffer | ArrayBufferView | Blob, 
-    options?: import('../storage').PutFileOptions
+    options?: import('./legacy/storage').PutFileOptions
   ) {
     return storage.putFile(this, path, content, options)
   }
@@ -313,7 +245,7 @@ export class UserSession {
    * @returns {Promise} that resolves to the raw data in the file
    * or rejects with an error
    */
-  getFile(path: string, options?: import('../storage').GetFileOptions) {
+  getFile(path: string, options?: import('./legacy/storage').GetFileOptions) {
     return storage.getFile(this, path, options)
   }
 
@@ -324,7 +256,7 @@ export class UserSession {
    * 
    * @returns {Promise<string>} that resolves to the URL or rejects with an error
    */
-  getFileUrl(path: string, options?: import('../storage').GetFileUrlOptions): Promise<string> {
+  getFileUrl(path: string, options?: import('./legacy/storage').GetFileUrlOptions): Promise<string> {
     return storage.getFileUrl(this, path, options)
   }
 

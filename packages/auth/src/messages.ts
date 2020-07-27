@@ -2,12 +2,11 @@
 import 'cross-fetch/polyfill'
 
 import { TokenSigner, SECP256K1Client } from 'jsontokens'
-import { makeECPrivateKey, publicKeyToAddress } from '../keys'
-import { makeUUID4, nextMonth, getGlobalObject } from '../utils'
-import { makeDIDFromAddress } from '../dids'
-import { encryptECIES, decryptECIES } from '../encryption/ec'
-import { Logger } from '../logger'
-import { DEFAULT_SCOPE, AuthScope } from './authConstants'
+import { makeECPrivateKey, publicKeyToAddress } from './legacy/keys'
+import { makeUUID4, nextMonth, getGlobalObject, Logger } from '@stacks/common'
+import { makeDIDFromAddress } from './dids'
+import { encryptECIES, decryptECIES } from './legacy/encryption/ec'
+import { DEFAULT_SCOPE, AuthScope } from './constants'
 import { UserSession } from './userSession'
 
 

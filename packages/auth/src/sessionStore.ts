@@ -1,11 +1,9 @@
 
 import { SessionData, SessionOptions } from './sessionData'
-// import { BLOCKSTACK_GAIA_HUB_LABEL } from '../storage/hub'
 import {
   LOCALSTORAGE_SESSION_KEY
-} from './authConstants'
-import { NoSessionDataError } from '../errors'
-// import { Logger } from '../logger'
+} from './constants'
+import { NoSessionDataError } from '@stacks/common'
 
 /**
  * An abstract class representing the SessionDataStore interface.
@@ -112,17 +110,4 @@ export class LocalStorageStore extends SessionDataStore {
     return true
   }
 
-  // checkForLegacyDataAndMigrate(): Promise<SessionData> {
-  //   const legacyTransitKey = localStorage.getItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
-  //   const legacyGaiaConfig = localStorage.getItem(BLOCKSTACK_GAIA_HUB_LABEL)
-  //   const legacyUserData = localStorage.getItem(BLOCKSTACK_STORAGE_LABEL)
-  //
-  //
-  //   if (legacyTransitKey) {
-  //     localStorage.removeItem(BLOCKSTACK_APP_PRIVATE_KEY_LABEL)
-  //   }
-  //
-  //
-  //
-  // }
 }

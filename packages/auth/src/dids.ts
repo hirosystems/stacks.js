@@ -1,4 +1,4 @@
-import { InvalidDIDError } from './errors'
+import { InvalidDIDError } from '@stacks/common'
 
 /**
 * @ignore

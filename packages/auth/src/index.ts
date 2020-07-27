@@ -2,21 +2,17 @@ export {
   AppConfig
 } from './appConfig'
 export {
-  makeAuthResponse
-} from './authMessages'
+  makeAuthRequest, makeAuthResponse
+} from './messages'
 export {
-  getAuthRequestFromURL, fetchAppManifest, redirectUserToApp
-} from './authProvider'
+  getAuthRequestFromURL, fetchAppManifest
+} from './provider'
 export {
   verifyAuthRequest, verifyAuthResponse,
   isExpirationDateValid, isIssuanceDateValid, doPublicKeysMatchUsername,
   doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
   isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
-} from './authVerification'
+} from './verification'
 export {
-  redirectToSignInWithAuthRequest,
-  isSignInPending, handlePendingSignIn, signUserOut
-} from './authApp'
-export { 
-  makeAuthRequest
-} from './authMessages'
+  handlePendingSignIn, signUserOut
+} from './auth'

@@ -1,7 +1,7 @@
 
-import { GaiaHubConfig } from '../storage/hub'
-import { InvalidStateError } from '../errors'
-import { UserData } from './authApp'
+import { GaiaHubConfig } from './legacy/storage/hub'
+import { InvalidStateError } from '@stacks/common'
+import { UserData } from './auth'
 
 const SESSION_VERSION = '1.0.0'
 

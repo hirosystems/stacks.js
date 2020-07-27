@@ -1,6 +1,6 @@
 
-import { DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './authConstants'
-import { getGlobalObject } from '../utils'
+import { DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './constants'
+import { getGlobalObject } from '@stacks/common'
 
 /**
  * Configuration data for the current app.

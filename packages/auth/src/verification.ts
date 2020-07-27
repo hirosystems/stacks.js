@@ -1,9 +1,8 @@
 import { decodeToken, TokenVerifier } from 'jsontokens'
-import { getAddressFromDID } from '../dids'
-import { publicKeyToAddress } from '../keys'
-import { isSameOriginAbsoluteUrl } from '../utils'
-import { fetchPrivate } from '../fetchUtil'
-import { fetchAppManifest } from './authProvider'
+import { getAddressFromDID } from './dids'
+import { publicKeyToAddress } from './legacy/keys'
+import { fetchPrivate, isSameOriginAbsoluteUrl } from '@stacks/common'
+import { fetchAppManifest } from './provider'
 
 /**
  * Checks if the ES256k signature on passed `token` match the claimed public key
