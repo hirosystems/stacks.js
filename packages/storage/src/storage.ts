@@ -9,16 +9,12 @@ import {
 } from './hub';
 
 import {
-  encryptECIES,
-  decryptECIES,
   signECDSA,
   verifyECDSA,
   eciesGetJsonStringLength,
-  SignedCipherObject,
   getPublicKeyFromPrivate,
   publicKeyToAddress,
   EncryptionOptions,
-  EncryptContentOptions
 } from '@stacks/encryption';
 
 import {
@@ -159,9 +155,9 @@ export class Storage {
       }
       if (typeof (opt.decrypt) === 'string') {
         const decryptOpt = { privateKey: opt.decrypt }
-        return this.decryptContent(storedContents, decryptOpt)
+        return this.userSession.decryptContent(storedContents, decryptOpt)
       } else {
-        return this.decryptContent(storedContents)
+        return this.userSession.decryptContent(storedContents)
       }
     } else if (opt.decrypt && opt.verify) {
       if (typeof storedContents !== 'string') {
@@ -178,86 +174,6 @@ export class Storage {
       return storedContents
     } else {
       throw new Error('Should be unreachable.')
-    }
-  }
-
-  /**
-   * Encrypts the data provided with the app public key.
-   * @param {String|Buffer} content - data to encrypt
-   * @param {Object} [options=null] - options object
-   * @param {String} options.publicKey - the hex string of the ECDSA public
-   * key to use for encryption. If not provided, will use user's appPublicKey.
-   * @return {String} Stringified ciphertext object
-   */
-  async encryptContent(
-    content: string | Buffer,
-    options?: EncryptContentOptions
-  ): Promise<string> {
-    const opts = Object.assign({}, options)
-    let privateKey: string
-    if (!opts.publicKey) {
-      privateKey = this.userSession.loadUserData().appPrivateKey
-      opts.publicKey = getPublicKeyFromPrivate(privateKey)
-    }
-    let wasString: boolean
-    if (typeof opts.wasString === 'boolean') {
-      wasString = opts.wasString
-    } else {
-      wasString = typeof content === 'string'
-    }
-    const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
-    const cipherObject = await encryptECIES(opts.publicKey, 
-                                            contentBuffer, 
-                                            wasString, 
-                                            opts.cipherTextEncoding)
-    let cipherPayload = JSON.stringify(cipherObject)
-    if (opts.sign) {
-      if (typeof opts.sign === 'string') {
-        privateKey = opts.sign
-      } else if (!privateKey) {
-        privateKey = this.userSession.loadUserData().appPrivateKey
-      }
-      const signatureObject = signECDSA(privateKey, cipherPayload)
-      const signedCipherObject: SignedCipherObject = {
-        signature: signatureObject.signature,
-        publicKey: signatureObject.publicKey,
-        cipherText: cipherPayload
-      }
-      cipherPayload = JSON.stringify(signedCipherObject)
-    }
-    return cipherPayload
-  }
-
-  /**
-   * Decrypts data encrypted with `encryptContent` with the
-   * transit private key.
-   * @param {String|Buffer} content - encrypted content.
-   * @param {Object} [options=null] - options object
-   * @param {String} options.privateKey - the hex string of the ECDSA private
-   * key to use for decryption. If not provided, will use user's appPrivateKey.
-   * @return {String|Buffer} decrypted content.
-   */
-  decryptContent(
-    content: string,
-    options?: {
-      privateKey?: string
-    },
-  ): Promise<string | Buffer> {
-    const opts = Object.assign({}, options)
-    if (!opts.privateKey) {
-      opts.privateKey = this.userSession.loadUserData().appPrivateKey
-    }
-
-    try {
-      const cipherObject = JSON.parse(content)
-      return decryptECIES(opts.privateKey, cipherObject)
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        throw new Error('Failed to parse encrypted content JSON. The content may not '
-                        + 'be encrypted. If using getFile, try passing { decrypt: false }.')
-      } else {
-        throw err
-      }
     }
   }
 
@@ -305,7 +221,7 @@ export class Storage {
     if (username) {
       fileUrl = await this.getUserAppFileUrl('/', opts.username, opts.app, opts.zoneFileLookupURL)
     } else {
-      const gaiaHubConfig = await this.userSession.getOrSetLocalGaiaHubConnection()
+      const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection()
       fileUrl = await getFullReadUrl('/', gaiaHubConfig)
     }
     const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/)
@@ -332,7 +248,7 @@ export class Storage {
     if (opts.username) {
       readUrl = await this.getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL)
     } else {
-      const gaiaHubConfig = await this.userSession.getOrSetLocalGaiaHubConnection()
+      const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection()
       readUrl = await getFullReadUrl(path, gaiaHubConfig)
     }
 
@@ -509,9 +425,9 @@ export class Storage {
                                             + ` ${path}`)
     } else if (typeof (privateKey) === 'string') {
       const decryptOpt = { privateKey }
-      return this.decryptContent(cipherText, decryptOpt)
+      return this.userSession.decryptContent(cipherText, decryptOpt)
     } else {
-      return this.decryptContent(cipherText)
+      return this.userSession.decryptContent(cipherText)
     }
   }
 
@@ -536,7 +452,7 @@ export class Storage {
     }
     const opt = Object.assign({}, defaults, options)
 
-    const gaiaHubConfig = await this.userSession.getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection()
     const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes)
     const hasMaxUpload = maxUploadBytes > 0
 
@@ -622,7 +538,7 @@ export class Storage {
           publicKey = getPublicKeyFromPrivate(this.userSession.loadUserData().appPrivateKey)
         }
         const contentData = await contentLoader.load()
-        contentForUpload = await this.encryptContent(contentData, { 
+        contentForUpload = await this.userSession.encryptContent(contentData, { 
           publicKey, 
           wasString: contentLoader.wasString,
           cipherTextEncoding: opt.cipherTextEncoding,
@@ -651,7 +567,7 @@ export class Storage {
       if (isRecoverableGaiaError(error)) {
         console.error(error)
         console.error('Possible recoverable error during Gaia upload, retrying...')
-        const freshHubConfig = await this.userSession.setLocalGaiaHubConnection()
+        const freshHubConfig = await this.setLocalGaiaHubConnection()
         return await uploadFn(freshHubConfig)
       } else {
         throw error
@@ -673,7 +589,7 @@ export class Storage {
       wasSigned?: boolean;
     }
   ) {
-    const gaiaHubConfig = await this.userSession.getOrSetLocalGaiaHubConnection()
+    const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection()
     const opts = Object.assign({}, options)
     const sessionData = this.userSession.store.getSessionData();
     if (opts.wasSigned) {
@@ -684,7 +600,7 @@ export class Storage {
         delete sessionData.etags[path];
         this.userSession.store.setSessionData(sessionData);
       } catch (error) {
-        const freshHubConfig = await this.userSession.setLocalGaiaHubConnection()
+        const freshHubConfig = await this.setLocalGaiaHubConnection()
         await deleteFromGaiaHub(path, freshHubConfig)
         await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig)
         delete sessionData.etags[path];
@@ -696,7 +612,7 @@ export class Storage {
         delete sessionData.etags[path];
         this.userSession.store.setSessionData(sessionData);
       } catch (error) {
-        const freshHubConfig = await this.userSession.setLocalGaiaHubConnection()
+        const freshHubConfig = await this.setLocalGaiaHubConnection()
         await deleteFromGaiaHub(path, freshHubConfig)
         delete sessionData.etags[path];
         this.userSession.store.setSessionData(sessionData);
@@ -741,7 +657,7 @@ export class Storage {
       throw new Error('Too many entries to list')
     }
 
-    hubConfig = hubConfig || await this.userSession.getOrSetLocalGaiaHubConnection()
+    hubConfig = hubConfig || await this.getOrSetLocalGaiaHubConnection()
     let response: Response
     try {
       const pageRequest = JSON.stringify({ page })
@@ -762,7 +678,7 @@ export class Storage {
       // If error occurs on the first call, perform a gaia re-connection and retry.
       // Same logic as other gaia requests (putFile, getFile, etc).
       if (callCount === 0) {
-        const freshHubConfig = await this.userSession.setLocalGaiaHubConnection()
+        const freshHubConfig = await this.setLocalGaiaHubConnection()
         return this.listFilesLoop(freshHubConfig, page, callCount + 1, 0, callback)
       }
       throw error
@@ -820,7 +736,7 @@ export class Storage {
   /**
    *  @ignore
    */
-  getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
+  async getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
     const sessionData = this.userSession.store.getSessionData()
     const userData = sessionData.userData
     if (!userData) {

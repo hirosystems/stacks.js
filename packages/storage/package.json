@@ -1,7 +1,7 @@
 {
   "name": "@stacks/storage",
   "version": "1.0.0",
-  "description": "Blockstack storage library",
+  "description": "Stacks storage library",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
