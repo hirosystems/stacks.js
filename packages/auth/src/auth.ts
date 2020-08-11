@@ -6,18 +6,18 @@ import {
   isLaterVersion, 
   getGlobalObject, 
   LoginFailedError,
-  Logger
+  Logger,
+  BLOCKSTACK_DEFAULT_GAIA_HUB_URL
 } from '@stacks/common'
 import { getAddressFromDID } from './dids'
 import { decryptPrivateKey } from './messages'
 import {
-  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   NAME_LOOKUP_PATH
 } from './constants'
 import { extractProfile } from './legacy/profiles/profileTokens'
 import { UserSession } from './userSession'
 import { config } from './legacy/config'
-import { GaiaHubConfig } from './legacy/storage/hub'
+// import { GaiaHubConfig } from './legacy/storage/hub'
 import { hexStringToECPair } from '@stacks/encryption'
 
 
@@ -63,7 +63,7 @@ export interface UserData {
   // This is the data that gets used when the `new blockstack.Person(profile)` class is used.
   profile: any;
   // private: does not get sent to webapp at all.
-  gaiaHubConfig?: GaiaHubConfig;
+  gaiaHubConfig?: any;
 }
 
 /**

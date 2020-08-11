@@ -1,5 +1,5 @@
 
-import { GaiaHubConfig } from './legacy/storage/hub'
+// import { GaiaHubConfig } from './legacy/storage/hub'
 import { InvalidStateError } from '@stacks/common'
 import { UserData } from './auth'
 
@@ -39,13 +39,13 @@ export class SessionData {
     this.etags = options.etags ? options.etags : {}
   }
 
-  getGaiaHubConfig(): GaiaHubConfig {
-    return this.userData && this.userData.gaiaHubConfig
-  }
+  // getGaiaHubConfig(): GaiaHubConfig {
+  //   return this.userData && this.userData.gaiaHubConfig
+  // }
 
-  setGaiaHubConfig(config: GaiaHubConfig): void {
-    this.userData.gaiaHubConfig = config
-  }
+  // setGaiaHubConfig(config: GaiaHubConfig): void {
+  //   this.userData.gaiaHubConfig = config
+  // }
 
   static fromJSON(json: any): SessionData {
     if (json.version !== SESSION_VERSION) {

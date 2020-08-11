@@ -1,11 +1,6 @@
 export * from './profiles'
 
 export {
-  EncryptionOptions, EncryptContentOptions,
-  PutFileOptions, getUserAppFileUrl, GetFileUrlOptions, GetFileOptions, getAppBucketUrl
-} from './storage'
-
-export {
   makeDIDFromAddress, makeDIDFromPublicKey, getDIDType, getAddressFromDID
 } from '../dids'
 
@@ -13,11 +8,6 @@ export {
   getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate,
   hexStringToECPair, ecPairToHexString, ecPairToAddress
 } from './keys'
-
-export {
-  nextYear, nextMonth, nextHour, makeUUID4, updateQueryStringParameter,
-  isLaterVersion, isSameOriginAbsoluteUrl
-} from './utils'
 
 export {
   transactions, safety, TransactionSigner,

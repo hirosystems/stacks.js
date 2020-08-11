@@ -6,7 +6,7 @@ import { getPublicKeyFromPrivate } from '../keys'
 import { hashSha256Sync, hashSha512Sync } from './sha2Hash'
 import { createHmacSha256 } from './hmacSha256'
 import { createCipher } from './aesCipher'
-import { getAesCbcOutputLength, getBase64OutputLength } from '../utils'
+import { getAesCbcOutputLength, getBase64OutputLength } from '@stacks/common'
 
 const ecurve = new EllipticCurve('secp256k1')
 

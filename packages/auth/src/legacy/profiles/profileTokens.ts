@@ -1,7 +1,7 @@
 import { ECPair } from 'bitcoinjs-lib'
 import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens'
 import { TokenInterface } from 'jsontokens/lib/decode'
-import { nextYear, makeUUID4 } from '../utils'
+import { nextYear, makeUUID4 } from '@stacks/common'
 import { ecPairToAddress } from '../keys'
 
 /**
