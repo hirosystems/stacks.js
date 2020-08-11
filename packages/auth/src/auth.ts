@@ -18,7 +18,7 @@ import { extractProfile } from './legacy/profiles/profileTokens'
 import { UserSession } from './userSession'
 import { config } from './legacy/config'
 import { GaiaHubConfig } from './legacy/storage/hub'
-import { hexStringToECPair } from './legacy/keys'
+import { hexStringToECPair } from '@stacks/encryption'
 
 
 const DEFAULT_PROFILE = {

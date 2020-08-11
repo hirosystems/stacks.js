@@ -7,7 +7,7 @@ import {
 } from './sessionStore'
 
 import * as authMessages from './messages'
-import * as storage from './legacy/storage'
+// import * as storage from './legacy/storage'
 
 import {
   nextHour,
@@ -15,9 +15,9 @@ import {
   InvalidStateError,
   Logger
 } from '@stacks/common'
-import { GaiaHubConfig, connectToGaiaHub } from './legacy/storage/hub'
-import { BLOCKSTACK_DEFAULT_GAIA_HUB_URL, AuthScope } from './constants'
+import { AuthScope } from './constants'
 import { handlePendingSignIn, signUserOut, getAuthResponseToken } from './auth'
+import { encryptContent, decryptContent, EncryptContentOptions } from '@stacks/encryption';
 
 
 /**
@@ -202,9 +202,12 @@ export class UserSession {
    */
   encryptContent(
     content: string | Buffer,
-    options?: import('./legacy/storage').EncryptContentOptions
+    options?: EncryptContentOptions
   ): Promise<string> {
-    return storage.encryptContent(this, content, options)
+    if (!options.privateKey) {
+      options.privateKey = this.loadUserData().appPrivateKey;
+    }
+    return encryptContent(content, options)
   }
 
   /**
@@ -216,120 +219,7 @@ export class UserSession {
    * @returns {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}): Promise<Buffer | string> {
-    return storage.decryptContent(this, content, options)
+    return decryptContent(content, options)
   }
 
-  /**
-   * Stores the data provided in the app's data store to to the file specified.
-   * @param {String} path - the path to store the data in
-   * @param {String|Buffer} content - the data to store in the file
-   * @param options a [[PutFileOptions]] object
-   * 
-   * @returns {Promise} that resolves if the operation succeed and rejects
-   * if it failed
-   */
-  putFile(
-    path: string,
-    content: string | Buffer | ArrayBufferView | Blob, 
-    options?: import('./legacy/storage').PutFileOptions
-  ) {
-    return storage.putFile(this, path, content, options)
-  }
-
-  /**
-   * Retrieves the specified file from the app's data store.
-   * 
-   * @param {String} path - the path to the file to read
-   * @param {Object} options a [[GetFileOptions]] object
-   * 
-   * @returns {Promise} that resolves to the raw data in the file
-   * or rejects with an error
-   */
-  getFile(path: string, options?: import('./legacy/storage').GetFileOptions) {
-    return storage.getFile(this, path, options)
-  }
-
-  /**
-   * Get the URL for reading a file from an app's data store.
-   * 
-   * @param {String} path - the path to the file to read
-   * 
-   * @returns {Promise<string>} that resolves to the URL or rejects with an error
-   */
-  getFileUrl(path: string, options?: import('./legacy/storage').GetFileUrlOptions): Promise<string> {
-    return storage.getFileUrl(this, path, options)
-  }
-
-  /**
-   * List the set of files in this application's Gaia storage bucket.
-   * 
-   * @param {function} callback - a callback to invoke on each named file that
-   * returns `true` to continue the listing operation or `false` to end it
-   * 
-   * @returns {Promise} that resolves to the number of files listed
-   */
-  listFiles(callback: (name: string) => boolean): Promise<number> {
-    return storage.listFiles(this, callback)
-  }
-
-  /**
-   * Deletes the specified file from the app's data store. 
-   * @param path - The path to the file to delete.
-   * @param options - Optional options object.
-   * @param options.wasSigned - Set to true if the file was originally signed
-   * in order for the corresponding signature file to also be deleted.
-   * @returns Resolves when the file has been removed or rejects with an error.
-   */
-  public deleteFile(path: string, options?: { wasSigned?: boolean }) {
-    return storage.deleteFile(this, path, options)
-  }
-
-
-  /**
-   *  @ignore
-   */
-  getOrSetLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
-    const sessionData = this.store.getSessionData()
-    const userData = sessionData.userData
-    if (!userData) {
-      throw new InvalidStateError('Missing userData')
-    }
-    const hubConfig = userData.gaiaHubConfig
-    if (hubConfig) {
-      return Promise.resolve(hubConfig)
-    }
-    return this.setLocalGaiaHubConnection()
-  }
-
-  /**
-   * These two functions are app-specific connections to gaia hub,
-   *   they read the user data object for information on setting up
-   *   a hub connection, and store the hub config to localstorage
-   * @private
-   * @returns {Promise} that resolves to the new gaia hub connection
-   */
-  async setLocalGaiaHubConnection(): Promise<GaiaHubConfig> {
-    const userData = this.loadUserData()
-  
-    if (!userData) {
-      throw new InvalidStateError('Missing userData')
-    }
-  
-    if (!userData.hubUrl) {
-      userData.hubUrl = BLOCKSTACK_DEFAULT_GAIA_HUB_URL
-    }
-  
-    const gaiaConfig = await connectToGaiaHub(
-      userData.hubUrl,
-      userData.appPrivateKey,
-      userData.gaiaAssociationToken)
-
-    userData.gaiaHubConfig = gaiaConfig
-
-    const sessionData = this.store.getSessionData()
-    sessionData.userData.gaiaHubConfig = gaiaConfig
-    this.store.setSessionData(sessionData)
-
-    return gaiaConfig
-  }
 }

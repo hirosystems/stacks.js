@@ -43,10 +43,7 @@ export const DEFAULT_SCOPE = [AuthScope.store_write]
 * @ignore
 */
 export const BLOCKSTACK_APP_PRIVATE_KEY_LABEL = 'blockstack-transit-private-key'
-/**
-* @ignore
-*/
-export const BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org'
+
 /**
 * @ignore
 */
