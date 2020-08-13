@@ -1,0 +1,98 @@
+{
+  "name": "@stacks/cli",
+  "version": "1.0.0",
+  "description": "Stacks command line tool",
+  "keywords": [
+    "stacks",
+    "command",
+    "blockchain",
+    "id",
+    "auth",
+    "authentication",
+    "bitcoin",
+    "blockchain auth",
+    "blockchain authentication",
+    "blockchainid",
+    "blockchain id",
+    "bitcoin auth",
+    "bitcoin authentication",
+    "bitcoin login",
+    "blockchain login",
+    "authorization",
+    "login",
+    "signin",
+    "sso",
+    "crypto",
+    "cryptography",
+    "token",
+    "blockstack",
+    "blockstack auth",
+    "profile",
+    "identity",
+    "ethereum"
+  ],
+  "author": {
+    "name": "Jude Nelson",
+    "email": "jude@blockstack.com",
+    "url": "https://blockstack.com"
+  },
+  "homepage": "https://blockstack.org",
+  "contributors": [
+    {
+      "name": "Ken Liao",
+      "email": "yukanliao@gmail.com"
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockstack/blockstack.js.git"
+  },
+  "scripts": {
+    "build": "rimraf lib && tsc -b tsconfig.build.json",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/blockstack/blockstack.js/issues"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^6.5.0",
+    "@types/cors": "^2.8.5",
+    "@types/express": "^4.16.1",
+    "@types/express-winston": "^3.0.1",
+    "@types/node-fetch": "^2.5.0",
+    "@types/ripemd160": "^2.0.0",
+    "minimist": ">=1.2.3"
+  },
+  "dependencies": {
+    "@blockstack/stacks-transactions": "^0.6.0",
+    "ajv": "^4.11.5",
+    "bip32": "^2.0.4",
+    "bip39": "^3.0.2",
+    "bitcoinjs-lib": "^5.1.10",
+    "blockstack": "^19.2.2",
+    "c32check": "^0.0.6",
+    "cors": "^2.8.4",
+    "express": "^4.17.1",
+    "express-winston": "^3.1.0",
+    "inquirer": "^7.1.0",
+    "jsontokens": "^2.0.2",
+    "node-fetch": "^2.6.0",
+    "ripemd160": "^2.0.1",
+    "ts-node": "^8.10.2",
+    "winston": "^3.2.1",
+    "zone-file": "^0.2.2"
+  }
+}
