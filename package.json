@@ -143,7 +143,7 @@
     "tape-promise": "^4.0.0",
     "triplesec": "^4.0.3",
     "ts-loader": "^6.2.1",
-    "ts-node": "^8.5.0",
+    "ts-node": "^8.10.2",
     "typedoc": "^0.15.1",
     "typescript": "^3.7.2",
     "webpack": "^4.41.2",
