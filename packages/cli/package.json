@@ -1,6 +1,6 @@
 {
   "name": "@stacks/cli",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.2",
   "description": "Stacks command line tool",
   "keywords": [
     "stacks",
@@ -44,6 +44,10 @@
     }
   ],
   "license": "GPL-3.0-or-later",
+  "bin": {
+    "stacks": "./bin.js",
+    "stx": "./bin.js"
+  },
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
@@ -68,10 +72,10 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "devDependencies": {
-    "@types/inquirer": "^6.5.0",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.16.1",
     "@types/express-winston": "^3.0.1",
+    "@types/inquirer": "^6.5.0",
     "@types/node-fetch": "^2.5.0",
     "@types/ripemd160": "^2.0.0",
     "minimist": ">=1.2.3"
@@ -92,6 +96,7 @@
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
     "ts-node": "^8.10.2",
+    "typescript": "^3.9.7",
     "winston": "^3.2.1",
     "zone-file": "^0.2.2"
   }
