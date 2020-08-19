@@ -31,7 +31,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://06b76cfb3a7af3943f79d09916e95f33e7c9ebd5@github.com/blockstack/blockstack.js.git"
+    "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
     "clean": "shx rm -rf ./lib*/",
