@@ -62,7 +62,7 @@ export class BlockstackError extends Error {
       please file a bug report: https://github.com/blockstack/blockstack.js/issues\n\n${bugDetails}`
     this.message = message
     this.code = error.code
-    this.parameter = error.parameter ? error.parameter : null
+    this.parameter = error.parameter ? error.parameter : undefined
   }
   
   toString() {
@@ -224,7 +224,7 @@ export interface HubErrorDetails {
 * @ignore
 */
 export class GaiaHubError extends BlockstackError {
-  hubError: HubErrorDetails
+  hubError?: HubErrorDetails
 
   constructor(error: ErrorData, response: GaiaHubErrorResponse) {
     super(error)
@@ -237,8 +237,8 @@ export class GaiaHubError extends BlockstackError {
         this.hubError.message = response.body
       } else if (typeof response.body === 'object') {
         Object.assign(this.hubError, response.body)
-      }
-    }
+      } 
+    } 
   }
 }
 
@@ -297,7 +297,7 @@ export class ValidationError extends GaiaHubError {
  */
 export class PayloadTooLargeError extends GaiaHubError {
   /** Can be `null` when an oversized payload is detected client-side. */
-  hubError: HubErrorDetails
+  hubError?: HubErrorDetails
 
   maxUploadByteSize: number;
 

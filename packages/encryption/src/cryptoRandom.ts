@@ -1,4 +1,6 @@
-import * as randombytes from 'randombytes'
+import * as randombytes_ from 'randombytes'
+
+let randombytes = randombytes_
 
 export { randombytes as randomBytes }
 

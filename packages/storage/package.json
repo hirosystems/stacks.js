@@ -18,7 +18,12 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "rimraf lib && tsc -b tsconfig.build.json",
+    "build": "cross-env NODE_ENV=production tsdx build --format=cjs,esm,umd",
+    "build-all": "run-p build:*",
+    "build:cjs": "tsc --outDir ./lib -m commonjs -t es2017",
+    "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
+    "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
+    "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {

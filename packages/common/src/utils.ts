@@ -165,7 +165,7 @@ export function isSameOriginAbsoluteUrl(uri1: string, uri2: string) {
         parseUrl = url => new nodeUrl(url)
       } catch (error) {
         console.log(error)
-        console.error('Global URL class is not available')
+        throw new Error('Global URL class is not available')
       }
     }
 
@@ -262,8 +262,8 @@ interface GetGlobalObjectOptions {
 export function getGlobalObject<K extends Extract<keyof Window, string>>(
   name: K, 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = { }
-): Window[K] {
-  let globalScope: Window
+): Window[K] | undefined {
+  let globalScope: Window | undefined = undefined;
   try {
     globalScope = getGlobalScope()
     if (globalScope) {
@@ -298,7 +298,7 @@ export function getGlobalObjects<K extends Extract<keyof Window, string>>(
   names: K[], 
   { throwIfUnavailable, usageDesc, returnEmptyObject }: GetGlobalObjectOptions = {}
 ): Pick<Window, K> {
-  let globalScope: Window
+  let globalScope: Window | undefined
   try {
     globalScope = getGlobalScope()
   } catch (error) {
