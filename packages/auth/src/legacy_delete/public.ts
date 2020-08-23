@@ -5,11 +5,6 @@ export {
 } from '../dids'
 
 export {
-  getEntropy, makeECPrivateKey, publicKeyToAddress, getPublicKeyFromPrivate,
-  hexStringToECPair, ecPairToHexString, ecPairToAddress
-} from './keys'
-
-export {
   transactions, safety, TransactionSigner,
   PubkeyHashSigner, addUTXOsToFund, estimateTXBytes
 } from './operations'

@@ -1,6 +1,6 @@
 import { decodeToken, TokenVerifier } from 'jsontokens'
 import { getAddressFromDID } from './dids'
-import { publicKeyToAddress } from './legacy/keys'
+import { publicKeyToAddress } from '@stacks/encryption'
 import { fetchPrivate, isSameOriginAbsoluteUrl } from '@stacks/common'
 import { fetchAppManifest } from './provider'
 

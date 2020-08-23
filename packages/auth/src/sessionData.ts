@@ -1,5 +1,3 @@
-
-// import { GaiaHubConfig } from './legacy/storage/hub'
 import { InvalidStateError } from '@stacks/common'
 import { UserData } from './auth'
 

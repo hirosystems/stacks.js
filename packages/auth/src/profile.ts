@@ -1,7 +1,13 @@
 
-import { resolveZoneFileToProfile } from './legacy/profiles/profileZoneFiles'
-import { fetchPrivate } from '@stacks/common'
-import { config } from './legacy/config'
+import { resolveZoneFileToProfile } from '@stacks/profile'
+import { fetchPrivate} from '@stacks/common'
+import { StacksNetwork, StacksMainnet } from '@stacks/network'
+
+export interface ProfileLookupOptions {
+  username: string;
+  zoneFileLookupURL?: string;
+  network?: StacksNetwork;
+}
 
 /**
  * Look up a user profile by blockstack ID
@@ -12,21 +18,21 @@ import { config } from './legacy/config'
  * blockstack.js [[getNameInfo]] function.
  * @returns {Promise} that resolves to a profile object
  */
-export function lookupProfile(username: string, zoneFileLookupURL?: string): 
-  Promise<Record<string, any>> {
-  if (!username) {
+export function lookupProfile(options: ProfileLookupOptions): Promise<Record<string, any>> {
+  if (!options.username) {
     return Promise.reject()
   }
+  let network: StacksNetwork = options.network ? options.network : new StacksMainnet
   let lookupPromise
-  if (zoneFileLookupURL) {
-    const url = `${zoneFileLookupURL.replace(/\/$/, '')}/${username}`
+  if (options.zoneFileLookupURL) {
+    const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`
     lookupPromise = fetchPrivate(url)
       .then(response => response.json())
   } else {
-    lookupPromise = config.network.getNameInfo(username)
+    lookupPromise = network.getNameInfo(options.username)
   }
   return lookupPromise
-    .then((responseJSON) => {
+    .then((responseJSON: any) => {
       if (responseJSON.hasOwnProperty('zonefile')
           && responseJSON.hasOwnProperty('address')) {
         return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address)

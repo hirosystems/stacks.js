@@ -7,7 +7,6 @@ import {
 } from './sessionStore'
 
 import * as authMessages from './messages'
-// import * as storage from './legacy/storage'
 
 import {
   nextHour,

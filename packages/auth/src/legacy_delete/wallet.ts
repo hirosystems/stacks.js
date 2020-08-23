@@ -4,7 +4,7 @@ import { encryptMnemonic, decryptMnemonic } from './encryption/wallet'
 import { randomBytes, GetRandomBytes } from './encryption/cryptoRandom'
 import { hashSha256Sync } from './encryption/sha2Hash'
 import { TriplesecDecryptSignature } from './encryption/cryptoUtils'
-import { ecPairToHexString } from './keys'
+import { ecPairToHexString } from '@stacks/encryption'
 
 const APPS_NODE_INDEX = 0
 const IDENTITY_KEYCHAIN = 888

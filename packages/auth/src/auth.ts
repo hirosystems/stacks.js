@@ -14,11 +14,10 @@ import { decryptPrivateKey } from './messages'
 import {
   NAME_LOOKUP_PATH
 } from './constants'
-import { extractProfile } from './legacy/profiles/profileTokens'
+import { extractProfile } from '@stacks/profile'
 import { UserSession } from './userSession'
-import { config } from './legacy/config'
-// import { GaiaHubConfig } from './legacy/storage/hub'
 import { hexStringToECPair } from '@stacks/encryption'
+import { StacksMainnet } from '@stacks/network'
 
 
 const DEFAULT_PROFILE = {
@@ -130,23 +129,27 @@ export async function handlePendingSignIn(
   if (!nameLookupURL) {
     let coreNode = caller.appConfig && caller.appConfig.coreNode
     if (!coreNode) {
-      coreNode = config.network.blockstackAPIUrl
+      let network = new StacksMainnet()
+      coreNode = network.coreApiUrl
     }
 
     const tokenPayload = decodeToken(authResponseToken).payload
     if (typeof tokenPayload === 'string') {
       throw new Error('Unexpected token payload type of string')
     }
-    if (isLaterVersion(tokenPayload.version as string, '1.3.0')
-       && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
-      // override globally
-      Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
-        + `with ${tokenPayload.blockstackAPIUrl}`)
-      // TODO: this config is never saved so the user node preference 
-      // is not respected in later sessions..
-      config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl as string
-      coreNode = tokenPayload.blockstackAPIUrl as string
-    }
+    
+    // Section below is removed since the config was never persisted and therefore useless
+
+    // if (isLaterVersion(tokenPayload.version as string, '1.3.0')
+    //    && tokenPayload.blockstackAPIUrl !== null && tokenPayload.blockstackAPIUrl !== undefined) {
+    //   // override globally
+    //   Logger.info(`Overriding ${config.network.blockstackAPIUrl} `
+    //     + `with ${tokenPayload.blockstackAPIUrl}`)
+    //   // TODO: this config is never saved so the user node preference 
+    //   // is not respected in later sessions..
+    //   config.network.blockstackAPIUrl = tokenPayload.blockstackAPIUrl as string
+    //   coreNode = tokenPayload.blockstackAPIUrl as string
+    // }
     
     nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`
   }

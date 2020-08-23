@@ -13,7 +13,9 @@
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
-  "main": "lib/index.js",
+  "main": "./dist/index.js",
+  "umd:main": "./dist/auth.umd.production.js",
+  "module": "./dist/auth.esm.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -26,7 +28,12 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "rimraf lib && tsc -b tsconfig.build.json",
+    "build": "cross-env NODE_ENV=production tsdx build --format=cjs,esm,umd",
+    "build-all": "run-p build:*",
+    "build:cjs": "tsc --outDir ./lib -m commonjs -t es2017",
+    "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
+    "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
+    "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {
@@ -35,6 +42,8 @@
   "dependencies": {
     "@stacks/common": "^1.0.0",
     "@stacks/encryption": "^1.0.0",
+    "@stacks/network": "^1.0.0",
+    "@stacks/profile": "^1.0.0",
     "cross-fetch": "^3.0.5",
     "jsontokens": "^3.0.0",
     "query-string": "^6.13.1"
