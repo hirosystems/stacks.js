@@ -6,8 +6,6 @@ import { makeUUID4, nextMonth, getGlobalObject, Logger } from '@stacks/common'
 import { makeDIDFromAddress } from './dids'
 import { encryptECIES, decryptECIES, makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption'
 import { DEFAULT_SCOPE, AuthScope } from './constants'
-import { UserSession } from './userSession'
-
 
 const VERSION = '1.3.1'
 
@@ -28,7 +26,6 @@ export function generateTransitKey() {
   const transitKey = makeECPrivateKey()
   return transitKey
 }
-
 
 /**
  * Generates an authentication request that can be sent to the Blockstack
@@ -52,7 +49,7 @@ export function generateTransitKey() {
  * @return {String} the authentication request
  */
 export function makeAuthRequest(
-  transitPrivateKey?: string,
+  transitPrivateKey: string,
   redirectURI?: string, 
   manifestURI?: string, 
   scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
@@ -60,10 +57,6 @@ export function makeAuthRequest(
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
 ): string {
-  if (!transitPrivateKey) {
-    transitPrivateKey = new UserSession().generateAndStoreTransitKey()
-  }
-
   const getWindowOrigin = (paramName: string) => {
     const location = getGlobalObject('location', { 
       throwIfUnavailable: true, 

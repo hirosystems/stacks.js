@@ -1,5 +1,5 @@
 import { InvalidStateError } from '@stacks/common'
-import { UserData } from './auth'
+import { UserData } from './userData'
 
 const SESSION_VERSION = '1.0.0'
 

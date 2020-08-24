@@ -13,6 +13,14 @@ export const BLOCKSTACK_STORAGE_LABEL = 'blockstack'
 export const DEFAULT_BLOCKSTACK_HOST = 'https://browser.blockstack.org/auth'
 
 /**
+* Default user profile object
+*/
+export const DEFAULT_PROFILE = {
+  '@type': 'Person',
+  '@context': 'http://schema.org'
+}
+
+/**
  * Non-exhaustive list of common permission scopes. 
  */
 export const enum AuthScope {

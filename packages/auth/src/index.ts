@@ -14,9 +14,6 @@ export {
   isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
 } from './verification'
 export {
-  handlePendingSignIn, signUserOut
-} from './auth'
-export {
   UserSession
 } from './userSession'
 export * from './constants'
