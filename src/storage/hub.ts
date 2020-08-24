@@ -30,21 +30,22 @@ interface UploadResponse {
 }
 
 /**
- * 
- * @param filename 
- * @param contents 
- * @param hubConfig 
- * @param contentType 
- * 
+ *
+ * @param filename
+ * @param contents
+ * @param hubConfig
+ * @param contentType
+ *
  * @ignore
  */
 export async function uploadToGaiaHub(
-  filename: string, 
+  filename: string,
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
   contentType: string = 'application/octet-stream',
   newFile: boolean = true,
-  etag?: string
+  etag?: string,
+  dangerouslyIgnoreEtag?: boolean
 ): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`)
 
@@ -53,10 +54,12 @@ export async function uploadToGaiaHub(
     Authorization: `bearer ${hubConfig.token}`
   }
 
-  if (newFile) {
-    headers['If-None-Match'] = '*'
-  } else if (etag) {
-    headers['If-Match'] = etag
+  if (!dangerouslyIgnoreEtag) {
+    if (newFile) {
+      headers['If-None-Match'] = '*'
+    } else if (etag) {
+      headers['If-Match'] = etag
+    }
   }
 
   const response = await fetchPrivate(
@@ -94,10 +97,10 @@ export async function deleteFromGaiaHub(
 }
 
 /**
- * 
- * @param filename 
- * @param hubConfig 
- * 
+ *
+ * @param filename
+ * @param hubConfig
+ *
  * @ignore
  */
 export function getFullReadUrl(filename: string,
@@ -106,10 +109,10 @@ export function getFullReadUrl(filename: string,
 }
 
 /**
- * 
- * @param challengeText 
- * @param signerKeyHex 
- * 
+ *
+ * @param challengeText
+ * @param signerKeyHex
+ *
  * @ignore
  */
 function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): string {
@@ -129,11 +132,11 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
     const signatureBuffer = signer.sign(digest)
     const signatureWithHash = script.signature.encode(
       signatureBuffer, Transaction.SIGHASH_NONE)
-    
+
     // We only want the DER encoding so remove the sighash version byte at the end.
     // See: https://github.com/bitcoinjs/bitcoinjs-lib/issues/1241#issuecomment-428062912
     const signature = signatureWithHash.toString('hex').slice(0, -2)
-    
+
     const publickey = getPublicKeyFromPrivate(signerKeyHex)
     const token = Buffer.from(JSON.stringify(
       { publickey, signature }
@@ -145,12 +148,12 @@ function makeLegacyAuthToken(challengeText: string, signerKeyHex: string): strin
 }
 
 /**
- * 
- * @param hubInfo 
- * @param signerKeyHex 
- * @param hubUrl 
- * @param associationToken 
- * 
+ *
+ * @param hubInfo
+ * @param signerKeyHex
+ * @param hubUrl
+ * @param associationToken
+ *
  * @ignore
  */
 function makeV1GaiaAuthToken(hubInfo: any,
@@ -179,7 +182,7 @@ function makeV1GaiaAuthToken(hubInfo: any,
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export async function connectToGaiaHub(
@@ -205,10 +208,10 @@ export async function connectToGaiaHub(
 }
 
 /**
- * 
- * @param gaiaHubUrl 
- * @param appPrivateKey 
- * 
+ *
+ * @param gaiaHubUrl
+ * @param appPrivateKey
+ *
  * @ignore
  */
 export async function getBucketUrl(gaiaHubUrl: string, appPrivateKey: string): Promise<string> {
