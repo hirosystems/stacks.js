@@ -25,7 +25,7 @@ To securely use the latest distribution of blockstack.js from a CDN, use the fol
 
 <!-- cdn -->
 ```html
-<script src="https://unpkg.com/blockstack@21.1.1/dist/blockstack.js" integrity="sha384-6xJImnB5DnmALzT1/h3Fg0Ub3ihjiFe3GJAaIBg2ogoaVb3bcu/mUq0hU+McdrA2" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/blockstack@21.1.1/dist/blockstack.js" integrity="sha384-QsRlJlLKvr/Vq4iv1MPwTqoMx5hd0StlnCBCTdwbb0ituqCGaTxjNIkdahGHlnwb" crossorigin="anonymous"></script>
 ```
 <!-- cdnstop -->
 
