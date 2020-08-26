@@ -1,8 +1,7 @@
 // @ts-ignore: Could not find a declaration file for module
 import { parseZoneFile } from 'zone-file'
 
-import { Person } from './person'
-import { getTokenFileUrl } from '../profileZoneFiles'
+import { getTokenFileUrl, Person } from '../profile'
 import { extractProfile } from '../profileTokens'
 import { fetchPrivate } from '@stacks/common'
 

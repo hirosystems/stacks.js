@@ -1,9 +1,12 @@
 export {
-  Profile
+  Profile,
+  Person,
+  makeProfileZoneFile,
+  getTokenFileUrl,
+  resolveZoneFileToProfile
 } from './profile'
 
 export {
-  Person,
   Organization,
   CreativeWork,
   resolveZoneFileToPerson
@@ -15,9 +18,3 @@ export {
   verifyProfileToken,
   extractProfile
 } from './profileTokens'
-
-export {
-  makeProfileZoneFile,
-  getTokenFileUrl,
-  resolveZoneFileToProfile
-} from './profileZoneFiles'
