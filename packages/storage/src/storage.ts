@@ -194,7 +194,7 @@ export class Storage {
     appOrigin: string,
     zoneFileLookupURL?: string
   ): Promise<string|null> {
-    const profile = await lookupProfile(username, zoneFileLookupURL)
+    const profile = await lookupProfile({username, zoneFileLookupURL})
     let bucketUrl: string = null
     if (profile.hasOwnProperty('apps')) {
       if (profile.apps.hasOwnProperty(appOrigin)) {
