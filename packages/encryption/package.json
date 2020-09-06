@@ -37,7 +37,7 @@
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.10",
     "bn.js": "^5.1.2",
-    "elliptic": "^6.5.3",
+    "elliptic": "^6.5.2",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11"
