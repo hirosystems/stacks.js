@@ -13,8 +13,10 @@ export {
   doPublicKeysMatchIssuer, doSignaturesMatchPublicKeys,
   isManifestUriValid, isRedirectUriValid, verifyAuthRequestAndLoadManifest
 } from './verification'
+export * from './dids'
 export {
   UserSession
 } from './userSession'
 export * from './constants'
 export * from './profile'
+export * from './userData'

@@ -24,7 +24,8 @@
     "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
     "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
     "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch --coverage=false"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -33,5 +34,10 @@
     "@stacks/auth": "^1.0.0",
     "@stacks/common": "^1.0.0",
     "@stacks/encryption": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "24.9.0",
+    "jest": "^24.9.0",
+    "jest-fetch-mock": "^3.0.3"
   }
 }

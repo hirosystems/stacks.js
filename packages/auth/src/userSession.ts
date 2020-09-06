@@ -62,7 +62,7 @@ export class UserSession {
     let runningInBrowser = true
 
     if (typeof window === 'undefined' && typeof self === 'undefined') {
-      Logger.debug('UserSession: not running in browser')
+      // Logger.debug('UserSession: not running in browser')
       runningInBrowser = false
     }
 
@@ -323,10 +323,11 @@ export class UserSession {
     content: string | Buffer,
     options?: EncryptContentOptions
   ): Promise<string> {
-    if (!options.privateKey) {
-      options.privateKey = this.loadUserData().appPrivateKey;
+    const opts = Object.assign({}, options)
+    if (!opts.privateKey) {
+      opts.privateKey = this.loadUserData().appPrivateKey;
     }
-    return encryptContent(content, options)
+    return encryptContent(content, opts)
   }
 
   /**
@@ -338,7 +339,11 @@ export class UserSession {
    * @returns {String|Buffer} decrypted content.
    */
   decryptContent(content: string, options?: {privateKey?: string}): Promise<Buffer | string> {
-    return decryptContent(content, options)
+    const opts = Object.assign({}, options)
+    if (!opts.privateKey) {
+      opts.privateKey = this.loadUserData().appPrivateKey
+    }
+    return decryptContent(content, opts)
   }
 
   /** 

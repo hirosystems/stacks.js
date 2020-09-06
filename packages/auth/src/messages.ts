@@ -91,7 +91,7 @@ export function makeAuthRequest(
     scopes
   })
 
-  Logger.info(`blockstack.js: generating v${VERSION} auth request`)
+  // Logger.info(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
@@ -194,7 +194,7 @@ export async function makeAuthResponse(privateKey: string,
   let coreTokenPayload = coreToken
   let additionalProperties = {}
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
-    Logger.info(`blockstack.js: generating v${VERSION} auth response`)
+    // Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
       privateKeyPayload = await encryptPrivateKey(transitPublicKey, appPrivateKey)
       if (coreToken !== undefined && coreToken !== null) {
@@ -210,7 +210,7 @@ export async function makeAuthResponse(privateKey: string,
       version: VERSION
     }
   } else {
-    Logger.info('blockstack.js: generating legacy auth response')
+    // Logger.info('blockstack.js: generating legacy auth response')
   }
 
   /* Create the payload */

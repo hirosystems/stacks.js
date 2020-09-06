@@ -4,5 +4,8 @@ export {
   connectToGaiaHub, 
   uploadToGaiaHub, 
   BLOCKSTACK_GAIA_HUB_LABEL,
-  GaiaHubConfig
+  GaiaHubConfig,
+  getBucketUrl,
+  deleteFromGaiaHub,
+  getFullReadUrl
 } from './hub';

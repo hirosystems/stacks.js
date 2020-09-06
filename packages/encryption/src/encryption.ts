@@ -83,7 +83,7 @@ export async function encryptContent(
     if (typeof opts.sign === 'string') {
       privateKey = opts.sign
     } else if (!privateKey) {
-      throw new Error('Private key is required for signing.')
+      privateKey = opts.privateKey
     }
     const signatureObject = signECDSA(privateKey, cipherPayload)
     const signedCipherObject: SignedCipherObject = {

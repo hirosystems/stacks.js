@@ -45,5 +45,10 @@
     "jsontokens": "^3.0.0",
     "schema-inspector": "^1.7.0",
     "zone-file": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "24.9.0",
+    "jest": "^24.9.0",
+    "jest-fetch-mock": "^3.0.3"
   }
 }

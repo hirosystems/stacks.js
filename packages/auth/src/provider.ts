@@ -39,7 +39,7 @@ export async function fetchAppManifest(authRequest: string): Promise<any> {
   }
   const manifestURI = payload.manifest_uri as string
   try {
-    Logger.debug(`Fetching manifest from ${manifestURI}`)
+    // Logger.debug(`Fetching manifest from ${manifestURI}`)
     const response = await fetchPrivate(manifestURI)
     const responseText = await response.text()
     const responseJSON = JSON.parse(responseText)
