@@ -22,8 +22,7 @@ import {
   estimateTransfer,
   estimateContractDeploy,
   estimateContractFunctionCall,
-  StacksMainnet,
-  StacksTestnet,
+  SignedTokenTransferOptions,
   TokenTransferOptions,
   ContractDeployOptions,
   ContractCallOptions,
@@ -35,7 +34,13 @@ import {
   validateContractCall,
   PostConditionMode,
   cvToString,
-} from '@blockstack/stacks-transactions';
+  StacksTransaction
+} from '@stacks/transactions';
+
+import {
+  StacksMainnet,
+  StacksTestnet,
+} from '@stacks/network';
 
 const c32check = require('c32check');
 
@@ -556,7 +561,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]) : Promise<
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
   txNetwork.coreApiUrl = network.blockstackAPIUrl;
 
-  const options: TokenTransferOptions = {
+  const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
     amount: tokenAmount,
     senderKey: privateKey,
@@ -566,7 +571,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]) : Promise<
     network: txNetwork
   }
 
-  const tx = await makeSTXTokenTransfer(options);
+  const tx: StacksTransaction = await makeSTXTokenTransfer(options);
 
   if (estimateOnly) {
     return estimateTransfer(tx, txNetwork).then((cost) => {

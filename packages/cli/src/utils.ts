@@ -22,9 +22,12 @@ import {
   trueCV,
   falseCV,
   standardPrincipalCV,
-  StacksNetwork,
   TransactionVersion,
-} from '@blockstack/stacks-transactions';
+} from '@stacks/transactions';
+
+import {
+  StacksNetwork,
+} from '@stacks/network';
 
 const ZoneFile = require('zone-file');
 
