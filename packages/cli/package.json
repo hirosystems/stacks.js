@@ -82,8 +82,8 @@
     "minimist": ">=1.2.3"
   },
   "dependencies": {
-    "@stacks/transactions": "^1.0.0",
     "@stacks/network": "^1.0.0",
+    "@stacks/transactions": "^1.0.0",
     "ajv": "^4.11.5",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
@@ -98,6 +98,7 @@
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
     "ts-node": "^8.10.2",
+    "tsdx": "^0.13.3",
     "typescript": "^3.9.7",
     "winston": "^3.2.1",
     "zone-file": "^0.2.2"

@@ -71,7 +71,8 @@
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11",
-    "smart-buffer": "^4.1.0"
+    "smart-buffer": "^4.1.0",
+    "tsdx": "^0.13.3"
   },
   "publishConfig": {
     "access": "public"
