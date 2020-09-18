@@ -66,7 +66,8 @@
   "scripts": {
     "build": "rimraf lib && tsc -b tsconfig.build.json",
     "dev": "ts-node src/index.ts",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch --coverage=false"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
