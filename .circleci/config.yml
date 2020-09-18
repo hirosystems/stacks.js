@@ -26,8 +26,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: npm install
-      - run: lerna bootstrap --hoist
+      - run: npx lerna bootstrap --hoist
 
       - save_cache:
           paths:
@@ -37,9 +36,9 @@ jobs:
       # run tests!  
       #- run: npm run lint:formatting
 
-      - run: lerna run build
+      - run: npx lerna run build
 
-      - run: lerna run test
+      - run: npx lerna run test
 
       #- run: npm run codecovUpload
 
