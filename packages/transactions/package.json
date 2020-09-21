@@ -93,7 +93,6 @@
     "lint:fix": "eslint ./src --ext .ts --fix",
     "test": "jest --coverage",
     "prepublishOnly": "npm run test && npm run build",
-    "prepare": "npm run build",
     "typecheck": "tsc -p tsconfig.build.json --noEmit"
   },
   "bugs": {
