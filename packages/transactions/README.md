@@ -1,14 +1,14 @@
-# Stacks Transactions JS [![npm](https://img.shields.io/npm/v/@blockstack/stacks-transactions?color=red)](https://www.npmjs.com/package/@blockstack/stacks-transactions)
-The JavaScript library for generating Stacks 2.0 transactions. 
+# Stacks Transactions JS [![npm](https://img.shields.io/npm/v/@stacks/transactions?color=red)](https://www.npmjs.com/package/@stacks/transactions)
+The JavaScript library for generating Stacks (v2.0) transactions. 
 
 ## Installation
 
 ```
-npm install @blockstack/stacks-transactions
+npm install @stacks/transactions
 ```
 
 ## Overview
-This library supports the creation of the following Stacks 2.0 transaction types:
+This library supports the creation of the following Stacks transaction types:
 
 1. STX token transfer
 2. Smart contract deploy
@@ -16,7 +16,7 @@ This library supports the creation of the following Stacks 2.0 transaction types
 
 ## Key Generation
 ```javascript
-import { createStacksPrivateKey, makeRandomPrivKey, getPublicKey } from '@blockstack/stacks-transactions';
+import { createStacksPrivateKey, makeRandomPrivKey, getPublicKey } from '@stacks/transactions';
 
 // Random key
 const privateKey = makeRandomPrivKey();
@@ -36,7 +36,7 @@ import {
   makeStandardSTXPostCondition, 
   StacksMainnet, 
   broadcastTransaction
-} from '@blockstack/stacks-transactions';
+} from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const network = new StacksMainnet();
@@ -63,7 +63,7 @@ broadcastTransaction(transaction, network);
 ## Smart Contract Deploy Transaction
 
 ```javascript
-import { makeContractDeploy, StacksMainnet, broadcastTransaction } from '@blockstack/stacks-transactions';
+import { makeContractDeploy, StacksMainnet, broadcastTransaction } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const network = new StacksMainnet();
@@ -83,7 +83,7 @@ broadcastTransaction(transaction, network);
 ## Smart Contract Function Call
 
 ```javascript
-import { makeContractCall, BufferCV, StacksMainnet, broadcastTransaction } from '@blockstack/stacks-transactions';
+import { makeContractCall, BufferCV, StacksMainnet, broadcastTransaction } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const network = new StacksMainnet();
@@ -129,7 +129,7 @@ const abi: ClarityAbi = JSON.parse(readFileSync('abi.json').toString());
 To generate a sponsored transaction, first create and sign the transaction as the origin. The `sponsored` property in the options object must be set to true.
 
 ```javascript
-import { makeContractCall, BufferCV } from '@blockstack/stacks-transactions';
+import { makeContractCall, BufferCV } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const txOptions = {
@@ -149,7 +149,7 @@ const serializedTx = transaction.serialize().toString('hex');
 The serialized transaction can now be passed to the sponsoring party which will sign the sponsor portion of the transaction and set the fee.
 
 ```javascript
-import { sponsorTransaction, BufferReader, deserializeTransaction, broadcastTransaction } from '@blockstack/stacks-transactions';
+import { sponsorTransaction, BufferReader, deserializeTransaction, broadcastTransaction } from '@stacks/transactions';
 const BigNum = require('bn.js');
 
 const bufferReader = new BufferReader(Buffer.from(serializedTx));
@@ -167,6 +167,79 @@ const sponsoredTx = await sponsorTransaction(sponsorOptions);
 
 const network = new StacksMainnet();
 broadcastTransaction(sponsoredTx, network);
+```
+
+## Supporting multi-signature transactions
+To generate a multi-sig transaction, first create an unsigned transaction.
+The `numSignatures` and `publicKeys` properties in the options object must be set:
+
+```typescript
+import {
+  makeUnsignedSTXTokenTransfer,
+  createStacksPrivateKey,
+  pubKeyfromPrivKey,
+  publicKeyToString,
+  TransactionSigner,
+  standardPrincipalCV,
+  BufferReader,
+} from "@stacks/transactions";
+const BigNum = require("bn.js");
+
+const recipient = standardPrincipalCV("SP3FGQ8...");
+const amount = new BigNum(2500000);
+const fee = new BigNum(0);
+const nonce = new BigNum(0);
+const memo = "test memo";
+
+const privKeyStrings = [ "6d430bb9...", "2a584d89...", "d5200dee..."];
+
+// create private key objects from string array
+const privKeys = privKeyStrings.map(createStacksPrivateKey);
+
+// generate public keys from private key string array
+const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+
+// create public key string array from objects
+const pubKeyStrings = pubKeys.map(publicKeyToString);
+
+const transaction = await makeUnsignedSTXTokenTransfer({
+  recipient,
+  amount,
+  fee,
+  nonce,
+  memo,
+  // number of signature required
+  numSignatures: 2,
+  // public key string array with >= numSignatures elements
+  publicKeys: pubKeyStrings,
+});
+
+const serializedTx = transaction.serialize();
+```
+
+This transaction payload can be passed along to other participants to sign. In addition to
+meeting the numSignatures requirement, the public keys of the parties who did not sign the
+transaction must be appended to the signature.
+
+```typescript
+// deserialize and sign transaction
+const bufferReader = new BufferReader(serializedTx);
+const deserializedTx = deserializeTransaction(bufferReader);
+
+const signer = new TransactionSigner(deserializedTx);
+
+// first signature
+signer.signOrigin(privKeys[0]);
+
+// second signature
+signer.signOrigin(privKeys[1]);
+
+// after meeting the numSignatures requirement, the public 
+// keys of the participants who did not sign must be appended
+signer.appendOrigin(pubKeys[2]);
+
+// the serialized multi-sig tx
+const serializedSignedTx = deserializedTx.serialize();
 ```
 
 ## Calling Read-only Contract Functions
