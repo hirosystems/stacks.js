@@ -36,7 +36,21 @@ jobs:
       # run tests!  
       #- run: npm run lint:formatting
 
-      - run: npx lerna run build
+      - run: npx lerna run build --scope=@stacks/common
+
+      - run: npx lerna run build --scope=@stacks/encryption
+
+      - run: npx lerna run build --scope=@stacks/network
+
+      - run: npx lerna run build --scope=@stacks/keychain
+
+      - run: npx lerna run build --scope=@stacks/profile
+
+      - run: npx lerna run build --scope=@stacks/auth
+
+      - run: npx lerna run build --scope=@stacks/storage
+
+      - run: npx lerna run build --scope=@stacks/transaction
 
       - run: npx lerna run test
 
