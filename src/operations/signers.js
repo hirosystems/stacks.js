@@ -33,6 +33,7 @@ export class PubkeyHashSigner implements TransactionSigner {
 
   constructor(ecPair: bitcoinjs.ECPair) {
     this.ecPair = ecPair
+    this.inputIndexesToSign = [];
   }
 
   static fromHexString(keyHex: string) {
