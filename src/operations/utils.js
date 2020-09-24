@@ -193,8 +193,7 @@ export function signInputs(txB: bitcoinjs.TransactionBuilder,
 
 export function signInputsUsingHardware(txB: bitcoinjs.TransactionBuilder,
                                         defaultSigner: TransactionSigner) {
-  const signerArray = txB.__tx.ins.map(() => defaultSigner)
-  let signingPromise = Promise.resolve()
+  const signingPromise = Promise.resolve()
   // ignore input index when signing with hardware
   return signingPromise
     .then(() => defaultSigner.signTransaction(txB, -1))

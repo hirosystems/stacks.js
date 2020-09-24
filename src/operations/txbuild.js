@@ -1111,6 +1111,8 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
  * @param {boolean} buildIncomplete - optional boolean, defaults to false,
  * indicating whether the function should attempt to return an unsigned (or not fully signed)
  * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @param {boolean} hardwareSign - optional boolean, defaults to false,
+ * indicating whether a hardware signer should be used
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
  */
@@ -1123,7 +1125,7 @@ function makeBitcoinSpend(destinationAddress: string,
   if (amount <= 0) {
     return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
   }
-  
+
   const network = config.network
 
   const paymentKey = getTransactionSigner(paymentKeyIn)
@@ -1168,7 +1170,7 @@ function makeBitcoinSpend(destinationAddress: string,
         txB.__tx.outs[destinationIndex].value = outputAmount
 
         // ready to sign.
-        if(hardwareSign) {
+        if (hardwareSign) {
           return signInputsUsingHardware(txB, paymentKey)
         } else {
           return signInputs(txB, paymentKey)

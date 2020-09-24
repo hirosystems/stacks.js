@@ -3840,7 +3840,6 @@ var PubkeyHashSigner = exports.PubkeyHashSigner = function () {
     _classCallCheck(this, PubkeyHashSigner);
 
     this.ecPair = ecPair;
-    this.inputIndexesToSign = [];
   }
 
   _createClass(PubkeyHashSigner, [{
@@ -5654,6 +5653,8 @@ function makeTokenTransfer(recipientAddress, tokenType, tokenAmount, scratchArea
  * @param {boolean} buildIncomplete - optional boolean, defaults to false,
  * indicating whether the function should attempt to return an unsigned (or not fully signed)
  * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @param {boolean} hardwareSign - optional boolean, defaults to false,
+ * indicating whether a hardware signer should be used
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
  */
@@ -5664,8 +5665,6 @@ function makeBitcoinSpend(destinationAddress, paymentKeyIn, amount) {
   if (amount <= 0) {
     return Promise.reject(new _errors.InvalidParameterError('amount', 'amount must be greater than zero'));
   }
-
-  console.log('making a bitcoin spend ########');
 
   var network = _config.config.network;
 
@@ -5978,9 +5977,6 @@ function signInputs(txB, defaultSigner, otherSigners) {
 }
 
 function signInputsUsingHardware(txB, defaultSigner) {
-  var signerArray = txB.__tx.ins.map(function () {
-    return defaultSigner;
-  });
   var signingPromise = Promise.resolve();
   // ignore input index when signing with hardware
   return signingPromise.then(function () {
