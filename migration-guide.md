@@ -36,8 +36,6 @@ See full tutorial [here](https://docs.blockstack.org/authentication/connect)
 ```typescript
 
 // Configuring your app
-import { Connect } from '@stacks/connect';
-
 const authOptions = {
   redirectTo: '/',
   finished: ({ userSession }) => {
@@ -49,12 +47,14 @@ const authOptions = {
   },
 };
 
+import { showBlockstackConnect } from '@stacks/connect';
+import { UserSession, AppConfig } from '@stacks/auth';
+import { Connect } from '@stacks/connect';
+
+// Initiating auth flow - using the Connect component
 const App = () => <Connect authOptions={authOptions}>// the rest of your app's components</Connect>;
 
-// Initiating auth flow
-import { showBlockstackConnect } from '@stacks/connect';
-import { UserSession } from '@stacks/auth';
-
+// Initiating auth flow - alternatively
 showBlockstackConnect(authOptions);
 
 // Handling sign in
