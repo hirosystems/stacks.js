@@ -191,12 +191,13 @@ const fee = new BigNum(0);
 const nonce = new BigNum(0);
 const memo = "test memo";
 
+// private keys of the participants in the transaction
 const privKeyStrings = [ "6d430bb9...", "2a584d89...", "d5200dee..."];
 
 // create private key objects from string array
 const privKeys = privKeyStrings.map(createStacksPrivateKey);
 
-// generate public keys from private key string array
+// corresponding public keys
 const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
 
 // create public key string array from objects
@@ -208,10 +209,8 @@ const transaction = await makeUnsignedSTXTokenTransfer({
   fee,
   nonce,
   memo,
-  // number of signature required
-  numSignatures: 2,
-  // public key string array with >= numSignatures elements
-  publicKeys: pubKeyStrings,
+  numSignatures: 2, // number of signature required
+  publicKeys: pubKeyStrings, // public key string array with >= numSignatures elements
 });
 
 const serializedTx = transaction.serialize();
