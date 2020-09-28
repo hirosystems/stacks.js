@@ -10,6 +10,7 @@
   "module": "./dist/common.esm.js",
   "directories": {
     "lib": "lib",
+    "dist": "dist",
     "test": "__tests__"
   },
   "files": [

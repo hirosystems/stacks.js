@@ -1,6 +1,6 @@
 {
   "name": "@stacks/network",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.3",
   "description": "Library for Stacks network operations",
   "keywords": [
     "stacks",
@@ -15,11 +15,16 @@
   "module": "./dist/common.esm.js",
   "directories": {
     "lib": "lib",
+    "dist": "dist",
     "test": "__tests__"
   },
   "files": [
+    "dist",
     "lib"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockstack/blockstack.js.git"
@@ -38,7 +43,7 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0",
+    "@stacks/common": "^1.0.0-alpha.1",
     "tsdx": "^0.13.3"
   },
   "devDependencies": {

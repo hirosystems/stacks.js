@@ -1,6 +1,6 @@
 {
   "name": "@stacks/common",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.1",
   "description": "Common Stacks utilities",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -9,12 +9,16 @@
   "umd:main": "./dist/common.umd.production.js",
   "module": "./dist/common.esm.js",
   "directories": {
+    "lib": "lib",
     "dist": "dist",
     "test": "__tests__"
   },
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockstack/blockstack.js.git"

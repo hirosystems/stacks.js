@@ -15,6 +15,7 @@
   "module": "./dist/auth.esm.js",
   "directories": {
     "lib": "lib",
+    "dist": "dist",
     "test": "__tests__"
   },
   "files": [
