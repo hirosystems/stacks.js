@@ -136,9 +136,9 @@ export function createStacksPrivateKey(key: string | Buffer): StacksPrivateKey {
   return { data, compressed };
 }
 
-export function makeRandomPrivKey(): StacksPrivateKey {
+export function makeRandomPrivKey(entropy?: Buffer): StacksPrivateKey {
   const ec = new EC('secp256k1');
-  const options = { entropy: randomBytes(32) };
+  const options = { entropy: entropy || randomBytes(32) };
   const keyPair = ec.genKeyPair(options);
   const privateKey = keyPair.getPrivate().toString('hex', 32);
   return createStacksPrivateKey(privateKey);
