@@ -39,7 +39,7 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0",
+    "@stacks/common": "^1.0.0-beta.1",
     "@stacks/encryption": "^1.0.0-beta.1",
     "@stacks/network": "^1.0.0",
     "bitcoinjs-lib": "^5.1.10",

@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@stacks/auth": "^1.0.0-beta.1",
-    "@stacks/common": "^1.0.0",
+    "@stacks/common": "^1.0.0-beta.1",
     "@stacks/encryption": "^1.0.0-beta.1",
     "tsdx": "^0.13.3"
   },
