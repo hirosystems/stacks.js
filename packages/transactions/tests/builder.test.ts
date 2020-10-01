@@ -29,6 +29,8 @@ import { BufferReader } from '../src/bufferReader';
 
 import { createAssetInfo } from '../src/types';
 
+import { SingleSigSpendingCondition } from '../src/authorization';
+
 import {
   DEFAULT_CORE_NODE_API_URL,
   FungibleConditionCode,
@@ -258,6 +260,36 @@ test('Make Multi-Sig STX token transfer', async () => {
     '00000000000000000000000000000000000000000000000000';
 
   expect(serializedSignedTx.toString('hex')).toBe(signedTx);
+});
+
+test('addSignature to an unsigned transaction', async () => {
+  const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+  const amount = new BigNum(2500000);
+  const fee = new BigNum(0);
+  const nonce = new BigNum(0);
+  const publicKey = '021ae7f08f9eaecaaa93f7c6ceac29213bae09588c15e2aded32016b259cfd9a1f';
+
+  const unsignedTx = await makeUnsignedSTXTokenTransfer({
+    recipient,
+    amount,
+    fee,
+    nonce,
+    publicKey,
+  });
+
+  const nullSignature = (unsignedTx.auth.spendingCondition as any).signature.data;
+
+  expect(nullSignature).toEqual(
+    '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+  );
+
+  const sig =
+    '00e4ee626905ee9d04b786e2942a69504dcc0f35ca79b86fb0aafcd47a81fc3bf1547e302c3acf5c89d935a53df334316e6fcdc203cf6bed91288ebf974385398c';
+  const signedTx = unsignedTx.createTxWithSignature(sig);
+  expect((signedTx.auth.spendingCondition as SingleSigSpendingCondition).signature.data).toEqual(
+    sig
+  );
+  expect(unsignedTx).not.toBe(signedTx);
 });
 
 test('Make smart contract deploy', async () => {
