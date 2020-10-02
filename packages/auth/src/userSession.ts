@@ -1,32 +1,35 @@
 import { AppConfig } from './appConfig';
 import { SessionOptions } from './sessionData';
-import { LocalStorageStore, SessionDataStore, InstanceDataStore } from './sessionStore';
+import { InstanceDataStore, LocalStorageStore, SessionDataStore } from './sessionStore';
 import { decodeToken } from 'jsontokens';
 import { verifyAuthResponse } from './verification';
 import * as authMessages from './messages';
-import { hexStringToECPair } from '@stacks/encryption';
+import {
+  decryptContent,
+  encryptContent,
+  EncryptContentOptions,
+  hexStringToECPair,
+} from '@stacks/encryption';
 import { getAddressFromDID } from './dids';
 import {
-  nextHour,
-  MissingParameterError,
-  InvalidStateError,
-  Logger,
-  getGlobalObject,
-  LoginFailedError,
-  isLaterVersion,
-  fetchPrivate,
   BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
+  fetchPrivate,
+  getGlobalObject,
+  InvalidStateError,
+  isLaterVersion,
+  Logger,
+  LoginFailedError,
+  MissingParameterError,
+  nextHour,
 } from '@stacks/common';
 import { extractProfile } from '@stacks/profile';
-import { AuthScope, DEFAULT_PROFILE } from './constants';
-import { encryptContent, decryptContent, EncryptContentOptions } from '@stacks/encryption';
+import { AuthScope, DEFAULT_PROFILE, NAME_LOOKUP_PATH } from './constants';
 import * as queryString from 'query-string';
 import { UserData } from './userData';
 import { StacksMainnet } from '@stacks/network';
-import { NAME_LOOKUP_PATH } from './constants';
 
 /**
- * 
+ *
  * Represents an instance of a signed in user for a particular app.
  *
  * A signed in user has access to two major pieces of information
@@ -35,9 +38,9 @@ import { NAME_LOOKUP_PATH } from './constants';
  *
  * A user can be signed in either directly through the interactive
  * sign in process or by directly providing the app private key.
- * 
+ *
 
- * 
+ *
  */
 export class UserSession {
   appConfig: AppConfig;
@@ -109,7 +112,7 @@ export class UserSession {
     transitKey?: string,
     redirectURI?: string,
     manifestURI?: string,
-    scopes?: Array<AuthScope | string>,
+    scopes?: (AuthScope | string)[],
     appDomain?: string,
     expiresAt: number = nextHour().getTime(),
     extraParams: any = {}
@@ -158,9 +161,12 @@ export class UserSession {
     const search = getGlobalObject('location', {
       throwIfUnavailable: true,
       usageDesc: 'getAuthResponseToken',
-    }).search;
-    const queryDict = queryString.parse(search);
-    return queryDict.authResponse ? <string>queryDict.authResponse : '';
+    })?.search;
+    if (search) {
+      const queryDict = queryString.parse(search);
+      return queryDict.authResponse ? (queryDict.authResponse as string) : '';
+    }
+    return '';
   }
 
   /**
@@ -189,16 +195,16 @@ export class UserSession {
       throw new LoginFailedError('Existing user session found.');
     }
 
-    let transitKey = this.store.getSessionData().transitKey;
+    const transitKey = this.store.getSessionData().transitKey;
 
-    let nameLookupURL;
+    // let nameLookupURL;
     let coreNode = this.appConfig && this.appConfig.coreNode;
     if (!coreNode) {
-      let network = new StacksMainnet();
+      const network = new StacksMainnet();
       coreNode = network.coreApiUrl;
     }
 
-    let tokenPayload = decodeToken(authResponseToken).payload;
+    const tokenPayload = decodeToken(authResponseToken).payload;
 
     if (typeof tokenPayload === 'string') {
       throw new Error('Unexpected token payload type of string');
@@ -217,7 +223,7 @@ export class UserSession {
     //   coreNode = tokenPayload.blockstackAPIUrl as string
     // }
 
-    nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`;
+    const nameLookupURL = `${coreNode}${NAME_LOOKUP_PATH}`;
 
     const isValid = await verifyAuthResponse(authResponseToken, nameLookupURL);
     if (!isValid) {
@@ -225,16 +231,17 @@ export class UserSession {
     }
 
     // TODO: real version handling
-    let appPrivateKey = tokenPayload.private_key as string;
-    let coreSessionToken = tokenPayload.core_token as string;
+    let appPrivateKey: string = tokenPayload.private_key as string;
+    let coreSessionToken: string = tokenPayload.core_token as string;
     if (isLaterVersion(tokenPayload.version as string, '1.1.0')) {
       if (transitKey !== undefined && transitKey != null) {
         if (tokenPayload.private_key !== undefined && tokenPayload.private_key !== null) {
           try {
-            appPrivateKey = await authMessages.decryptPrivateKey(
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            appPrivateKey = (await authMessages.decryptPrivateKey(
               transitKey,
               tokenPayload.private_key as string
-            );
+            )) as string;
           } catch (e) {
             Logger.warn('Failed decryption of appPrivateKey, will try to use as given');
             try {
@@ -249,7 +256,11 @@ export class UserSession {
         }
         if (coreSessionToken !== undefined && coreSessionToken !== null) {
           try {
-            coreSessionToken = await authMessages.decryptPrivateKey(transitKey, coreSessionToken);
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+            coreSessionToken = (await authMessages.decryptPrivateKey(
+              transitKey,
+              coreSessionToken
+            )) as string;
           } catch (e) {
             Logger.info('Failed decryption of coreSessionToken, will try to use as given');
           }
@@ -288,6 +299,8 @@ export class UserSession {
       authResponseToken,
       hubUrl,
       coreNode: tokenPayload.blockstackAPIUrl as string,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
       gaiaAssociationToken,
     };
     const profileURL = tokenPayload.profile_url as string;
@@ -299,8 +312,7 @@ export class UserSession {
       } else {
         const responseText = await response.text();
         const wrappedProfile = JSON.parse(responseText);
-        const profile = extractProfile(wrappedProfile[0].token);
-        userData.profile = profile;
+        userData.profile = extractProfile(wrappedProfile[0].token);
       }
     } else {
       userData.profile = tokenPayload.profile;
@@ -328,6 +340,7 @@ export class UserSession {
   /**
    * Encrypts the data provided with the app public key.
    * @param {String|Buffer} content  the data to encrypt
+   * @param options
    * @param {String} options.publicKey the hex string of the ECDSA public
    * key to use for encryption. If not provided, will use user's appPrivateKey.
    *
@@ -345,6 +358,7 @@ export class UserSession {
    * Decrypts data encrypted with `encryptContent` with the
    * transit private key.
    * @param {String|Buffer} content - encrypted content.
+   * @param options
    * @param {String} options.privateKey - The hex string of the ECDSA private
    * key to use for decryption. If not provided, will use user's appPrivateKey.
    * @returns {String|Buffer} decrypted content.
@@ -363,13 +377,24 @@ export class UserSession {
    * Location to redirect user to after sign out.
    * Only used in environments with `window` available
    */
-  signUserOut(redirectURL?: string, caller?: UserSession) {
+
+  signUserOut(
+    redirectURL?: string,
+    // TODO: this is not used?
+    // caller?: UserSession
+  ) {
     this.store.deleteSessionData();
     if (redirectURL) {
-      getGlobalObject('location', {
-        throwIfUnavailable: true,
-        usageDesc: 'signUserOut',
-      }).href = redirectURL;
+      if (typeof location !== 'undefined' && location.href) {
+        location.href = redirectURL;
+      }
+      // TODO: Invalid left-hand side in assignment expression
+      // // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // // @ts-ignore
+      // getGlobalObject('location', {
+      //   throwIfUnavailable: true,
+      //   usageDesc: 'signUserOut',
+      // })?.href = redirectURL;
     }
   }
 }

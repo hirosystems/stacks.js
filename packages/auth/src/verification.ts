@@ -24,12 +24,7 @@ export function doSignaturesMatchPublicKeys(token: string): boolean {
     const publicKey = publicKeys[0];
     try {
       const tokenVerifier = new TokenVerifier('ES256k', publicKey);
-      const signatureVerified = tokenVerifier.verify(token);
-      if (signatureVerified) {
-        return true;
-      } else {
-        return false;
-      }
+      return tokenVerifier.verify(token);
     } catch (e) {
       return false;
     }

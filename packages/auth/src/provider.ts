@@ -1,6 +1,6 @@
 import * as queryString from 'query-string';
 import { decodeToken } from 'jsontokens';
-import { BLOCKSTACK_HANDLER, getGlobalObject, fetchPrivate, Logger } from '@stacks/common';
+import { BLOCKSTACK_HANDLER, getGlobalObject, fetchPrivate } from '@stacks/common';
 
 /**
  * Retrieves the authentication request from the query string
@@ -14,9 +14,13 @@ export function getAuthRequestFromURL() {
     throwIfUnavailable: true,
     usageDesc: 'getAuthRequestFromURL',
   });
-  const queryDict = queryString.parse(location.search);
-  if (queryDict.authRequest) {
-    return (<string>queryDict.authRequest).split(`${BLOCKSTACK_HANDLER}:`).join('');
+  if (location?.search) {
+    const queryDict = queryString.parse(location?.search);
+    if (queryDict.authRequest) {
+      return (queryDict.authRequest as string).split(`${BLOCKSTACK_HANDLER}:`).join('');
+    } else {
+      return null;
+    }
   } else {
     return null;
   }

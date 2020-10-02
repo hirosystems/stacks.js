@@ -34,14 +34,16 @@ export function getDIDType(decentralizedID: string) {
 /**
  * @ignore
  */
-export function getAddressFromDID(decentralizedID: string) {
-  const didType = getDIDType(decentralizedID);
-
-  if (didType === 'btc-addr') {
-    return decentralizedID.split(':')[2];
-  } else {
-    return null;
+export function getAddressFromDID(decentralizedID?: string): string | undefined {
+  if (decentralizedID) {
+    const didType = getDIDType(decentralizedID);
+    if (didType === 'btc-addr') {
+      return decentralizedID.split(':')[2];
+    } else {
+      return undefined;
+    }
   }
+  return undefined;
 }
 
 /*

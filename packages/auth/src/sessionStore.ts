@@ -19,6 +19,8 @@ export class SessionDataStore {
   }
 
   /* eslint-disable */
+  // @ts-ignore
+  // TODO: fix, not used?
   setSessionData(session: SessionData): boolean {
     throw new Error('Abstract class');
   }

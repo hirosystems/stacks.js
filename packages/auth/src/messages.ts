@@ -2,7 +2,7 @@
 import 'cross-fetch/polyfill';
 
 import { TokenSigner, SECP256K1Client } from 'jsontokens';
-import { makeUUID4, nextMonth, getGlobalObject, Logger } from '@stacks/common';
+import { makeUUID4, nextMonth, getGlobalObject } from '@stacks/common';
 import { makeDIDFromAddress } from './dids';
 import {
   encryptECIES,
@@ -45,7 +45,7 @@ export function generateTransitKey() {
  * @param  {String} transitPrivateKey - hex encoded transit private key
  * @param {String} redirectURI - location to redirect user to after sign in approval
  * @param {String} manifestURI - location of this app's manifest file
- * @param {Array<String>} scopes - the permissions this app is requesting
+ * @param {(AuthScope | string)[]} scopes - the permissions this app is requesting
  * @param {String} appDomain - the origin of this app
  * @param {Number} expiresAt - the time at which this request is no longer valid
  * @param {Object} extraParams - Any extra parameters you'd like to pass to the authenticator.
@@ -57,7 +57,7 @@ export function makeAuthRequest(
   transitPrivateKey: string,
   redirectURI?: string,
   manifestURI?: string,
-  scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
+  scopes: (AuthScope | string)[] = DEFAULT_SCOPE.slice(),
   appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
@@ -67,7 +67,7 @@ export function makeAuthRequest(
       throwIfUnavailable: true,
       usageDesc: `makeAuthRequest([${paramName}=undefined])`,
     });
-    return location.origin;
+    return location?.origin;
   };
 
   if (!redirectURI) {
@@ -180,15 +180,15 @@ export async function decryptPrivateKey(
 export async function makeAuthResponse(
   privateKey: string,
   profile: {} = {},
-  username: string = null,
+  username: string | null = null,
   metadata: AuthMetadata,
-  coreToken: string = null,
-  appPrivateKey: string = null,
+  coreToken: string | null = null,
+  appPrivateKey: string | null = null,
   expiresAt: number = nextMonth().getTime(),
-  transitPublicKey: string = null,
-  hubUrl: string = null,
-  blockstackAPIUrl: string = null,
-  associationToken: string = null
+  transitPublicKey: string | null = null,
+  hubUrl: string | null = null,
+  blockstackAPIUrl: string | null = null,
+  associationToken: string | null = null
 ): Promise<string> {
   /* Convert the private key to a public key to an issuer */
   const publicKey = SECP256K1Client.derivePublicKey(privateKey);

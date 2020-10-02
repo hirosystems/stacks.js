@@ -16,13 +16,13 @@ export class AppConfig {
    * Blockstack apps are uniquely identified by their app domain.
    *
    */
-  appDomain: string;
+  appDomain?: string;
 
   /**
    * An array of string representing permissions requested by the app.
    *
    */
-  scopes: Array<AuthScope | string>;
+  scopes: (AuthScope | string)[];
 
   /**
    * Path on app domain to redirect users to after authentication. The
@@ -46,7 +46,7 @@ export class AppConfig {
    * will be used.
    *
    */
-  coreNode: string;
+  coreNode?: string;
 
   /**
    * The URL of a web-based Blockstack Authenticator to use in the event
@@ -61,16 +61,17 @@ export class AppConfig {
    * @param {string} appDomain - the app domain
    * @param {string} redirectPath - path on app domain to redirect users to after authentication
    * @param {string} manifestPath - path relative to app domain of app's manifest file
-   * @param {string} coreNode - override the default or user selected core node
+   * @param {string | undefined} coreNode - override the default or user selected core node
    * @param {string} authenticatorURL - the web-based fall back authenticator
    * ([[DEFAULT_BLOCKSTACK_HOST]])
    */
   constructor(
-    scopes: Array<string> = DEFAULT_SCOPE.slice(),
-    appDomain: string = getGlobalObject('location', { returnEmptyObject: true }).origin,
-    redirectPath: string = '',
-    manifestPath: string = '/manifest.json',
-    coreNode: string | null = null,
+    scopes: string[] = DEFAULT_SCOPE.slice(),
+    appDomain: string | undefined = getGlobalObject('location', { returnEmptyObject: true })
+      ?.origin,
+    redirectPath = '',
+    manifestPath = '/manifest.json',
+    coreNode: string | undefined = undefined,
     authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST
   ) {
     this.appDomain = appDomain;

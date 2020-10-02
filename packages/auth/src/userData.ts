@@ -13,10 +13,10 @@ export interface UserData {
   email?: string;
   // probably public: (a quick description of what this is, and a link to the
   // DID foundation and/or the blockstack docs related to DID, idk)
-  decentralizedID: string;
+  decentralizedID?: string;
   // probably private: looks like it happens to be the btc address but idk
   // the value of establishing this as a supported field
-  identityAddress: string;
+  identityAddress?: string;
   // probably public: this is an advanced feature, I think many app devs
   // using our more advanced encryption functions (as opposed to putFile/getFile),
   // are probably using this. seems useful to explain.
