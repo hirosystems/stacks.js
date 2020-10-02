@@ -40,7 +40,7 @@ jobs:
 
       - run: npx lerna run test
 
-      - run: npm run codecovUpload
+      - run: npx lerna run codecovUpload
 
       - store_artifacts:
           path: docs
