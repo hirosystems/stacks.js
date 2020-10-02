@@ -53,7 +53,7 @@ import { AssetInfo, createLPList, createStandardPrincipal, createContractPrincip
 
 import { cvToHex, parseReadOnlyResponse, cloneDeep, omit } from './utils';
 
-import { fetchPrivate } from '@stacks/common'
+import { fetchPrivate } from '@stacks/common';
 
 import * as BigNum from 'bn.js';
 import { ClarityValue, PrincipalCV } from './clarity';

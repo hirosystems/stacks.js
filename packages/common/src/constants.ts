@@ -8,12 +8,9 @@ enum TransactionVersion {
   Testnet = 0x80,
 }
 
-export {
-  ChainID,
-  TransactionVersion,
-};
+export { ChainID, TransactionVersion };
 
 /**
-* @ignore
-*/
-export const BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org'
+ * @ignore
+ */
+export const BLOCKSTACK_DEFAULT_GAIA_HUB_URL = 'https://hub.blockstack.org';

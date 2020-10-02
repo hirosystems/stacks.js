@@ -15,9 +15,9 @@ import { c32addressDecode } from 'c32check';
 // @ts-expect-error
 import * as lodashCloneDeep_ from 'lodash/cloneDeep';
 
-let lodashCloneDeep = lodashCloneDeep_
+let lodashCloneDeep = lodashCloneDeep_;
 
-let randombytes = randombytes_
+let randombytes = randombytes_;
 
 export { randombytes as randomBytes };
 

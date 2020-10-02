@@ -1,9 +1,6 @@
 export * from './ec';
 
-export { 
-  encryptMnemonic,
-  decryptMnemonic
-} from './wallet';
+export { encryptMnemonic, decryptMnemonic } from './wallet';
 
 export * from './keys';
 

@@ -1,6 +1,5 @@
-
-import { DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './constants'
-import { getGlobalObject } from '@stacks/common'
+import { DEFAULT_SCOPE, DEFAULT_BLOCKSTACK_HOST, AuthScope } from './constants';
+import { getGlobalObject } from '@stacks/common';
 
 /**
  * Configuration data for the current app.
@@ -10,28 +9,27 @@ import { getGlobalObject } from '@stacks/common'
  * `window.location.origin` as the app domain.
  * On non-browser platforms, you need to
  * specify an app domain as the second argument.
- * 
+ *
  */
 export class AppConfig {
   /**
    * Blockstack apps are uniquely identified by their app domain.
    *
    */
-  appDomain: string
+  appDomain: string;
 
   /**
    * An array of string representing permissions requested by the app.
    *
    */
-  scopes: Array<AuthScope | string>
-
+  scopes: Array<AuthScope | string>;
 
   /**
    * Path on app domain to redirect users to after authentication. The
    * authentication response token will be postpended in a query.
    *
    */
-  redirectPath: string
+  redirectPath: string;
 
   /**
    * Path relative to app domain of app's manifest file.
@@ -40,7 +38,7 @@ export class AppConfig {
    * from any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.
    *
    */
-  manifestPath: string
+  manifestPath: string;
 
   /**
    * The URL of Blockstack core node to use for this app. If this is
@@ -48,7 +46,7 @@ export class AppConfig {
    * will be used.
    *
    */
-  coreNode: string
+  coreNode: string;
 
   /**
    * The URL of a web-based Blockstack Authenticator to use in the event
@@ -56,7 +54,7 @@ export class AppConfig {
    * is not specified, the current default in this library will be used.
    *
    */
-  authenticatorURL?: string
+  authenticatorURL?: string;
 
   /**
    * @param {Array<string>} scopes - permissions this app is requesting
@@ -64,21 +62,23 @@ export class AppConfig {
    * @param {string} redirectPath - path on app domain to redirect users to after authentication
    * @param {string} manifestPath - path relative to app domain of app's manifest file
    * @param {string} coreNode - override the default or user selected core node
-   * @param {string} authenticatorURL - the web-based fall back authenticator 
+   * @param {string} authenticatorURL - the web-based fall back authenticator
    * ([[DEFAULT_BLOCKSTACK_HOST]])
    */
-  constructor(scopes: Array<string> = DEFAULT_SCOPE.slice(),
-              appDomain: string = getGlobalObject('location', { returnEmptyObject: true }).origin,
-              redirectPath: string = '',
-              manifestPath: string = '/manifest.json',
-              coreNode: string | null = null,
-              authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST) {
-    this.appDomain = appDomain
-    this.scopes = scopes
-    this.redirectPath = redirectPath
-    this.manifestPath = manifestPath
-    this.coreNode = coreNode
-    this.authenticatorURL = authenticatorURL
+  constructor(
+    scopes: Array<string> = DEFAULT_SCOPE.slice(),
+    appDomain: string = getGlobalObject('location', { returnEmptyObject: true }).origin,
+    redirectPath: string = '',
+    manifestPath: string = '/manifest.json',
+    coreNode: string | null = null,
+    authenticatorURL: string = DEFAULT_BLOCKSTACK_HOST
+  ) {
+    this.appDomain = appDomain;
+    this.scopes = scopes;
+    this.redirectPath = redirectPath;
+    this.manifestPath = manifestPath;
+    this.coreNode = coreNode;
+    this.authenticatorURL = authenticatorURL;
   }
 
   /**
@@ -87,7 +87,7 @@ export class AppConfig {
    * @returns {string} - URI
    */
   redirectURI(): string {
-    return `${this.appDomain}${this.redirectPath}`
+    return `${this.appDomain}${this.redirectPath}`;
   }
 
   /**
@@ -95,6 +95,6 @@ export class AppConfig {
    * @returns {string} - URI
    */
   manifestURI(): string {
-    return `${this.appDomain}${this.manifestPath}`
+    return `${this.appDomain}${this.manifestPath}`;
   }
 }

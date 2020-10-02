@@ -1,18 +1,23 @@
 // eslint-disable-next-line import/no-unassigned-import
-import 'cross-fetch/polyfill'
+import 'cross-fetch/polyfill';
 
-import { TokenSigner, SECP256K1Client } from 'jsontokens'
-import { makeUUID4, nextMonth, getGlobalObject, Logger } from '@stacks/common'
-import { makeDIDFromAddress } from './dids'
-import { encryptECIES, decryptECIES, makeECPrivateKey, publicKeyToAddress } from '@stacks/encryption'
-import { DEFAULT_SCOPE, AuthScope } from './constants'
+import { TokenSigner, SECP256K1Client } from 'jsontokens';
+import { makeUUID4, nextMonth, getGlobalObject, Logger } from '@stacks/common';
+import { makeDIDFromAddress } from './dids';
+import {
+  encryptECIES,
+  decryptECIES,
+  makeECPrivateKey,
+  publicKeyToAddress,
+} from '@stacks/encryption';
+import { DEFAULT_SCOPE, AuthScope } from './constants';
 
-const VERSION = '1.3.1'
+const VERSION = '1.3.1';
 
 type AuthMetadata = {
-  email?: string,
-  profileUrl?: string
-}
+  email?: string;
+  profileUrl?: string;
+};
 
 /**
  * Generates a ECDSA keypair to
@@ -23,8 +28,8 @@ type AuthMetadata = {
  * @ignore
  */
 export function generateTransitKey() {
-  const transitKey = makeECPrivateKey()
-  return transitKey
+  const transitKey = makeECPrivateKey();
+  return transitKey;
 }
 
 /**
@@ -50,29 +55,29 @@ export function generateTransitKey() {
  */
 export function makeAuthRequest(
   transitPrivateKey: string,
-  redirectURI?: string, 
-  manifestURI?: string, 
+  redirectURI?: string,
+  manifestURI?: string,
   scopes: Array<AuthScope | string> = DEFAULT_SCOPE.slice(),
   appDomain?: string,
   expiresAt: number = nextMonth().getTime(),
   extraParams: any = {}
 ): string {
   const getWindowOrigin = (paramName: string) => {
-    const location = getGlobalObject('location', { 
-      throwIfUnavailable: true, 
-      usageDesc: `makeAuthRequest([${paramName}=undefined])` 
-    })
-    return location.origin
-  }
-  
+    const location = getGlobalObject('location', {
+      throwIfUnavailable: true,
+      usageDesc: `makeAuthRequest([${paramName}=undefined])`,
+    });
+    return location.origin;
+  };
+
   if (!redirectURI) {
-    redirectURI = `${getWindowOrigin('redirectURI')}/`
+    redirectURI = `${getWindowOrigin('redirectURI')}/`;
   }
   if (!manifestURI) {
-    manifestURI = `${getWindowOrigin('manifestURI')}/manifest.json`
+    manifestURI = `${getWindowOrigin('manifestURI')}/manifest.json`;
   }
   if (!appDomain) {
-    appDomain = getWindowOrigin('appDomain')
+    appDomain = getWindowOrigin('appDomain');
   }
 
   /* Create the payload */
@@ -88,22 +93,22 @@ export function makeAuthRequest(
     version: VERSION,
     do_not_include_profile: true,
     supports_hub_url: true,
-    scopes
-  })
+    scopes,
+  });
 
   // Logger.info(`blockstack.js: generating v${VERSION} auth request`)
 
   /* Convert the private key to a public key to an issuer */
-  const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey)
-  payload.public_keys = [publicKey]
-  const address = publicKeyToAddress(publicKey)
-  payload.iss = makeDIDFromAddress(address)
+  const publicKey = SECP256K1Client.derivePublicKey(transitPrivateKey);
+  payload.public_keys = [publicKey];
+  const address = publicKeyToAddress(publicKey);
+  payload.iss = makeDIDFromAddress(address);
 
   /* Sign and return the token */
-  const tokenSigner = new TokenSigner('ES256k', transitPrivateKey)
-  const token = tokenSigner.sign(payload)
+  const tokenSigner = new TokenSigner('ES256k', transitPrivateKey);
+  const token = tokenSigner.sign(payload);
 
-  return token
+  return token;
 }
 
 /**
@@ -115,12 +120,10 @@ export function makeAuthRequest(
  * @private
  * @ignore
  */
-export async function encryptPrivateKey(publicKey: string,
-                                        privateKey: string
-): Promise<string> {
-  const encryptedObj = await encryptECIES(publicKey, Buffer.from(privateKey), true)
-  const encryptedJSON = JSON.stringify(encryptedObj)
-  return Buffer.from(encryptedJSON).toString('hex')
+export async function encryptPrivateKey(publicKey: string, privateKey: string): Promise<string> {
+  const encryptedObj = await encryptECIES(publicKey, Buffer.from(privateKey), true);
+  const encryptedJSON = JSON.stringify(encryptedObj);
+  return Buffer.from(encryptedJSON).toString('hex');
 }
 
 /**
@@ -134,16 +137,17 @@ export async function encryptPrivateKey(publicKey: string,
  * @private
  * @ignore
  */
-export async function decryptPrivateKey(privateKey: string,
-                                        hexedEncrypted: string
+export async function decryptPrivateKey(
+  privateKey: string,
+  hexedEncrypted: string
 ): Promise<string | null> {
-  const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString()
-  const encryptedObj = JSON.parse(unhexedString)
-  const decrypted = await decryptECIES(privateKey, encryptedObj)
+  const unhexedString = Buffer.from(hexedEncrypted, 'hex').toString();
+  const encryptedObj = JSON.parse(unhexedString);
+  const decrypted = await decryptECIES(privateKey, encryptedObj);
   if (typeof decrypted !== 'string') {
-    throw new Error('Unable to correctly decrypt private key')
+    throw new Error('Unable to correctly decrypt private key');
   } else {
-    return decrypted
+    return decrypted;
   }
 }
 
@@ -173,32 +177,33 @@ export async function decryptPrivateKey(privateKey: string,
  * @private
  * @ignore
  */
-export async function makeAuthResponse(privateKey: string,
-                                       profile: {} = {},
-                                       username: string = null,
-                                       metadata: AuthMetadata,
-                                       coreToken: string = null,
-                                       appPrivateKey: string = null,
-                                       expiresAt: number = nextMonth().getTime(),
-                                       transitPublicKey: string = null,
-                                       hubUrl: string = null,
-                                       blockstackAPIUrl: string = null,
-                                       associationToken: string = null
+export async function makeAuthResponse(
+  privateKey: string,
+  profile: {} = {},
+  username: string = null,
+  metadata: AuthMetadata,
+  coreToken: string = null,
+  appPrivateKey: string = null,
+  expiresAt: number = nextMonth().getTime(),
+  transitPublicKey: string = null,
+  hubUrl: string = null,
+  blockstackAPIUrl: string = null,
+  associationToken: string = null
 ): Promise<string> {
   /* Convert the private key to a public key to an issuer */
-  const publicKey = SECP256K1Client.derivePublicKey(privateKey)
-  const address = publicKeyToAddress(publicKey)
+  const publicKey = SECP256K1Client.derivePublicKey(privateKey);
+  const address = publicKeyToAddress(publicKey);
 
   /* See if we should encrypt with the transit key */
-  let privateKeyPayload = appPrivateKey
-  let coreTokenPayload = coreToken
-  let additionalProperties = {}
+  let privateKeyPayload = appPrivateKey;
+  let coreTokenPayload = coreToken;
+  let additionalProperties = {};
   if (appPrivateKey !== undefined && appPrivateKey !== null) {
     // Logger.info(`blockstack.js: generating v${VERSION} auth response`)
     if (transitPublicKey !== undefined && transitPublicKey !== null) {
-      privateKeyPayload = await encryptPrivateKey(transitPublicKey, appPrivateKey)
+      privateKeyPayload = await encryptPrivateKey(transitPublicKey, appPrivateKey);
       if (coreToken !== undefined && coreToken !== null) {
-        coreTokenPayload = await encryptPrivateKey(transitPublicKey, coreToken)
+        coreTokenPayload = await encryptPrivateKey(transitPublicKey, coreToken);
       }
     }
     additionalProperties = {
@@ -207,26 +212,30 @@ export async function makeAuthResponse(privateKey: string,
       hubUrl,
       blockstackAPIUrl,
       associationToken,
-      version: VERSION
-    }
+      version: VERSION,
+    };
   } else {
     // Logger.info('blockstack.js: generating legacy auth response')
   }
 
   /* Create the payload */
-  const payload = Object.assign({}, {
-    jti: makeUUID4(),
-    iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
-    exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
-    iss: makeDIDFromAddress(address),
-    private_key: privateKeyPayload,
-    public_keys: [publicKey],
-    profile,
-    username,
-    core_token: coreTokenPayload
-  }, additionalProperties)
+  const payload = Object.assign(
+    {},
+    {
+      jti: makeUUID4(),
+      iat: Math.floor(new Date().getTime() / 1000), // JWT times are in seconds
+      exp: Math.floor(expiresAt / 1000), // JWT times are in seconds
+      iss: makeDIDFromAddress(address),
+      private_key: privateKeyPayload,
+      public_keys: [publicKey],
+      profile,
+      username,
+      core_token: coreTokenPayload,
+    },
+    additionalProperties
+  );
 
   /* Sign and return the token */
-  const tokenSigner = new TokenSigner('ES256k', privateKey)
-  return tokenSigner.sign(payload)
+  const tokenSigner = new TokenSigner('ES256k', privateKey);
+  return tokenSigner.sign(payload);
 }

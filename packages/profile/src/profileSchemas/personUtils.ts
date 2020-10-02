@@ -1,234 +1,246 @@
 export function getName(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let name = null
+  let name = null;
   if (profile.name) {
-    name = profile.name
+    name = profile.name;
   } else if (profile.givenName || profile.familyName) {
-    name = ''
+    name = '';
     if (profile.givenName) {
-      name = profile.givenName
+      name = profile.givenName;
     }
     if (profile.familyName) {
-      name += ` ${profile.familyName}`
+      name += ` ${profile.familyName}`;
     }
   }
-  return name
+  return name;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getGivenName(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let givenName = null
+  let givenName = null;
   if (profile.givenName) {
-    givenName = profile.givenName
+    givenName = profile.givenName;
   } else if (profile.name) {
-    const nameParts = profile.name.split(' ')
-    givenName = nameParts.slice(0, -1).join(' ')
+    const nameParts = profile.name.split(' ');
+    givenName = nameParts.slice(0, -1).join(' ');
   }
-  return givenName
+  return givenName;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getFamilyName(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let familyName = null
+  let familyName = null;
   if (profile.familyName) {
-    familyName = profile.familyName
+    familyName = profile.familyName;
   } else if (profile.name) {
-    const nameParts = profile.name.split(' ')
-    familyName = nameParts.pop()
+    const nameParts = profile.name.split(' ');
+    familyName = nameParts.pop();
   }
-  return familyName
+  return familyName;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getDescription(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let description = null
+  let description = null;
   if (profile.description) {
-    description = profile.description
+    description = profile.description;
   }
-  return description
+  return description;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getAvatarUrl(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let avatarContentUrl: string | null = null
+  let avatarContentUrl: string | null = null;
   if (profile.image) {
     profile.image.map((image: any) => {
       if (image.name === 'avatar') {
-        avatarContentUrl = image.contentUrl
-        return avatarContentUrl
+        avatarContentUrl = image.contentUrl;
+        return avatarContentUrl;
       } else {
-        return null
+        return null;
       }
-    })
+    });
   }
-  return avatarContentUrl
+  return avatarContentUrl;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getVerifiedAccounts(profile: any, verifications?: any[]) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  const filteredAccounts: any[] = []
+  const filteredAccounts: any[] = [];
   if (profile.hasOwnProperty('account') && verifications) {
     profile.account.map((account: any) => {
-      let accountIsValid = false
-      let proofUrl = null
+      let accountIsValid = false;
+      let proofUrl = null;
 
-      verifications.map((verification) => {
+      verifications.map(verification => {
         if (verification.hasOwnProperty('proof_url')) {
-          verification.proofUrl = verification.proof_url
+          verification.proofUrl = verification.proof_url;
         }
-        if (verification.valid
-            && verification.service === account.service
-            && verification.identifier === account.identifier
-            && verification.proofUrl) {
-          accountIsValid = true
-          proofUrl = verification.proofUrl
-          return true
+        if (
+          verification.valid &&
+          verification.service === account.service &&
+          verification.identifier === account.identifier &&
+          verification.proofUrl
+        ) {
+          accountIsValid = true;
+          proofUrl = verification.proofUrl;
+          return true;
         } else {
-          return false
+          return false;
         }
-      })
+      });
 
       if (accountIsValid) {
-        account.proofUrl = proofUrl
-        filteredAccounts.push(account)
-        return account
+        account.proofUrl = proofUrl;
+        filteredAccounts.push(account);
+        return account;
       } else {
-        return null
+        return null;
       }
-    })
+    });
   }
-  return filteredAccounts
+  return filteredAccounts;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getOrganizations(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  const organizations: any[] = []
+  const organizations: any[] = [];
 
   if (profile.hasOwnProperty('worksFor')) {
-    return profile.worksFor
+    return profile.worksFor;
   }
 
-  return organizations
+  return organizations;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getConnections(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let connections = []
+  let connections = [];
 
   if (profile.hasOwnProperty('knows')) {
-    connections = profile.knows
+    connections = profile.knows;
   }
 
-  return connections
+  return connections;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getAddress(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
-  let addressString = null
+  let addressString = null;
 
   if (profile.hasOwnProperty('address')) {
-    const addressParts = []
+    const addressParts = [];
 
     if (profile.address.hasOwnProperty('streetAddress')) {
-      addressParts.push(profile.address.streetAddress)
+      addressParts.push(profile.address.streetAddress);
     }
     if (profile.address.hasOwnProperty('addressLocality')) {
-      addressParts.push(profile.address.addressLocality)
+      addressParts.push(profile.address.addressLocality);
     }
     if (profile.address.hasOwnProperty('postalCode')) {
-      addressParts.push(profile.address.postalCode)
+      addressParts.push(profile.address.postalCode);
     }
     if (profile.address.hasOwnProperty('addressCountry')) {
-      addressParts.push(profile.address.addressCountry)
+      addressParts.push(profile.address.addressCountry);
     }
 
     if (addressParts.length) {
-      addressString = addressParts.join(', ')
+      addressString = addressParts.join(', ');
     }
   }
 
-  return addressString
+  return addressString;
 }
 
 /**
- * 
+ *
  * @ignore
  */
 export function getBirthDate(profile: any) {
   if (!profile) {
-    return null
+    return null;
   }
 
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ]
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
 
-  let birthDateString = null
+  let birthDateString = null;
 
   if (profile.hasOwnProperty('birthDate')) {
-    const date = new Date(profile.birthDate)
-    birthDateString = `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
+    const date = new Date(profile.birthDate);
+    birthDateString = `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   }
 
-  return birthDateString
+  return birthDateString;
 }

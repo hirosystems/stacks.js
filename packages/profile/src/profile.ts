@@ -1,59 +1,70 @@
 // @ts-ignore: Could not find a declaration file for module
-import * as inspector from 'schema-inspector'
+import * as inspector from 'schema-inspector';
 
-import { signProfileToken, extractProfile } from './profileTokens'
+import { signProfileToken, extractProfile } from './profileTokens';
 
-import { getPersonFromLegacyFormat } from './profileSchemas/personLegacy'
+import { getPersonFromLegacyFormat } from './profileSchemas/personLegacy';
 import {
-  getName, getFamilyName, getGivenName, getAvatarUrl, getDescription,
-  getVerifiedAccounts, getAddress, getBirthDate,
-  getConnections, getOrganizations
-} from './profileSchemas/personUtils'
+  getName,
+  getFamilyName,
+  getGivenName,
+  getAvatarUrl,
+  getDescription,
+  getVerifiedAccounts,
+  getAddress,
+  getBirthDate,
+  getConnections,
+  getOrganizations,
+} from './profileSchemas/personUtils';
 
-import { makeZoneFile, parseZoneFile } from 'zone-file'
-import { Logger, fetchPrivate } from '@stacks/common'
+import { makeZoneFile, parseZoneFile } from 'zone-file';
+import { Logger, fetchPrivate } from '@stacks/common';
 
-const schemaDefinition: {[key: string]: any} = {
+const schemaDefinition: { [key: string]: any } = {
   type: 'object',
   properties: {
     '@context': { type: 'string', optional: true },
-    '@type': { type: 'string' }
-  }
-}
- 
+    '@type': { type: 'string' },
+  },
+};
+
 /**
  * Represents a user profile
- * 
+ *
  */
 export class Profile {
-  _profile: {[key: string]: any}
+  _profile: { [key: string]: any };
 
   constructor(profile = {}) {
-    this._profile = Object.assign({}, {
-      '@context': 'http://schema.org/'
-    }, profile)
+    this._profile = Object.assign(
+      {},
+      {
+        '@context': 'http://schema.org/',
+      },
+      profile
+    );
   }
 
   toJSON() {
-    return Object.assign({}, this._profile)
+    return Object.assign({}, this._profile);
   }
 
   toToken(privateKey: string): string {
-    return signProfileToken(this.toJSON(), privateKey)
+    return signProfileToken(this.toJSON(), privateKey);
   }
 
   static validateSchema(profile: any, strict = false): any {
-    schemaDefinition.strict = strict
-    return inspector.validate(schemaDefinition, profile)
+    schemaDefinition.strict = strict;
+    return inspector.validate(schemaDefinition, profile);
   }
 
   static fromToken(token: string, publicKeyOrAddress: string | null = null): Profile {
-    const profile = extractProfile(token, publicKeyOrAddress)
-    return new Profile(profile)
+    const profile = extractProfile(token, publicKeyOrAddress);
+    return new Profile(profile);
   }
 
   static makeZoneFile(domainName: string, tokenFileURL: string): string {
-    return makeProfileZoneFile(domainName, tokenFileURL)
+    return makeProfileZoneFile(domainName, tokenFileURL);
   }
 }
 
@@ -76,9 +87,9 @@ const personSchemaDefinition = {
         properties: {
           '@type': { type: 'string' },
           name: { type: 'string', optional: true },
-          contentUrl: { type: 'string', optional: true }
-        }
-      }
+          contentUrl: { type: 'string', optional: true },
+        },
+      },
     },
     website: {
       type: 'array',
@@ -87,9 +98,9 @@ const personSchemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
-          url: { type: 'string', optional: true }
-        }
-      }
+          url: { type: 'string', optional: true },
+        },
+      },
     },
     account: {
       type: 'array',
@@ -103,9 +114,9 @@ const personSchemaDefinition = {
           proofType: { type: 'string', optional: true },
           proofUrl: { type: 'string', optional: true },
           proofMessage: { type: 'string', optional: true },
-          proofSignature: { type: 'string', optional: true }
-        }
-      }
+          proofSignature: { type: 'string', optional: true },
+        },
+      },
     },
     worksFor: {
       type: 'array',
@@ -114,9 +125,9 @@ const personSchemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
-          '@id': { type: 'string', optional: true }
-        }
-      }
+          '@id': { type: 'string', optional: true },
+        },
+      },
     },
     knows: {
       type: 'array',
@@ -125,9 +136,9 @@ const personSchemaDefinition = {
         type: 'object',
         properties: {
           '@type': { type: 'string' },
-          '@id': { type: 'string', optional: true }
-        }
-      }
+          '@id': { type: 'string', optional: true },
+        },
+      },
     },
     address: {
       type: 'object',
@@ -137,38 +148,42 @@ const personSchemaDefinition = {
         streetAddress: { type: 'string', optional: true },
         addressLocality: { type: 'string', optional: true },
         postalCode: { type: 'string', optional: true },
-        addressCountry: { type: 'string', optional: true }
-      }
+        addressCountry: { type: 'string', optional: true },
+      },
     },
     birthDate: { type: 'string', optional: true },
-    taxID: { type: 'string', optional: true }
-  }
-}
+    taxID: { type: 'string', optional: true },
+  },
+};
 
 /**
  * @ignore
  */
 export class Person extends Profile {
   constructor(profile = {}) {
-    super(profile)
-    this._profile = Object.assign({}, {
-      '@type': 'Person'
-    }, this._profile)
+    super(profile);
+    this._profile = Object.assign(
+      {},
+      {
+        '@type': 'Person',
+      },
+      this._profile
+    );
   }
 
   static validateSchema(profile: any, strict = false) {
-    personSchemaDefinition.strict = strict
-    return inspector.validate(schemaDefinition, profile)
+    personSchemaDefinition.strict = strict;
+    return inspector.validate(schemaDefinition, profile);
   }
 
   static fromToken(token: string, publicKeyOrAddress: string | null = null): Person {
-    const profile = extractProfile(token, publicKeyOrAddress)
-    return new Person(profile)
+    const profile = extractProfile(token, publicKeyOrAddress);
+    return new Person(profile);
   }
 
   static fromLegacyFormat(legacyProfile: any) {
-    const profile = getPersonFromLegacyFormat(legacyProfile)
-    return new Person(profile)
+    const profile = getPersonFromLegacyFormat(legacyProfile);
+    return new Person(profile);
   }
 
   toJSON() {
@@ -183,71 +198,71 @@ export class Person extends Profile {
       address: this.address(),
       birthDate: this.birthDate(),
       connections: this.connections(),
-      organizations: this.organizations()
-    }
+      organizations: this.organizations(),
+    };
   }
 
   profile() {
-    return Object.assign({}, this._profile)
+    return Object.assign({}, this._profile);
   }
 
   name() {
-    return getName(this.profile())
+    return getName(this.profile());
   }
 
   givenName() {
-    return getGivenName(this.profile())
+    return getGivenName(this.profile());
   }
 
   familyName() {
-    return getFamilyName(this.profile())
+    return getFamilyName(this.profile());
   }
 
   description() {
-    return getDescription(this.profile())
+    return getDescription(this.profile());
   }
 
   avatarUrl() {
-    return getAvatarUrl(this.profile())
+    return getAvatarUrl(this.profile());
   }
 
   verifiedAccounts(verifications?: any[]) {
-    return getVerifiedAccounts(this.profile(), verifications)
+    return getVerifiedAccounts(this.profile(), verifications);
   }
 
   address() {
-    return getAddress(this.profile())
+    return getAddress(this.profile());
   }
 
   birthDate() {
-    return getBirthDate(this.profile())
+    return getBirthDate(this.profile());
   }
 
   connections() {
-    return getConnections(this.profile())
+    return getConnections(this.profile());
   }
 
   organizations() {
-    return getOrganizations(this.profile())
+    return getOrganizations(this.profile());
   }
 }
 
 /**
- * 
- * @param origin 
- * @param tokenFileUrl 
- * 
+ *
+ * @param origin
+ * @param tokenFileUrl
+ *
  * @ignore
  */
 export function makeProfileZoneFile(origin: string, tokenFileUrl: string): string {
   if (tokenFileUrl.indexOf('://') < 0) {
-    throw new Error('Invalid token file url')
+    throw new Error('Invalid token file url');
   }
 
-  const urlScheme = tokenFileUrl.split('://')[0]
-  const urlParts = tokenFileUrl.split('://')[1].split('/')
-  const domain = urlParts[0]
-  const pathname = `/${urlParts.slice(1).join('/')}`
+  const urlScheme = tokenFileUrl.split('://')[0];
+  const urlParts = tokenFileUrl.split('://')[1].split('/');
+  const domain = urlParts[0];
+  const pathname = `/${urlParts.slice(1).join('/')}`;
 
   const zoneFile = {
     $origin: origin,
@@ -257,101 +272,102 @@ export function makeProfileZoneFile(origin: string, tokenFileUrl: string): strin
         name: '_http._tcp',
         priority: 10,
         weight: 1,
-        target: `${urlScheme}://${domain}${pathname}`
-      }
-    ]
-  }
+        target: `${urlScheme}://${domain}${pathname}`,
+      },
+    ],
+  };
 
-  const zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n'
+  const zoneFileTemplate = '{$origin}\n{$ttl}\n{uri}\n';
 
-
-  return makeZoneFile(zoneFile, zoneFileTemplate)
+  return makeZoneFile(zoneFile, zoneFileTemplate);
 }
 
 /**
- * 
- * @param zoneFileJson 
- * 
+ *
+ * @param zoneFileJson
+ *
  * @ignore
  */
 export function getTokenFileUrl(zoneFileJson: any): string | null {
   if (!zoneFileJson.hasOwnProperty('uri')) {
-    return null
+    return null;
   }
   if (!Array.isArray(zoneFileJson.uri)) {
-    return null
+    return null;
   }
   if (zoneFileJson.uri.length < 1) {
-    return null
+    return null;
   }
-  const firstUriRecord = zoneFileJson.uri[0]
+  const firstUriRecord = zoneFileJson.uri[0];
 
   if (!firstUriRecord.hasOwnProperty('target')) {
-    return null
+    return null;
   }
-  let tokenFileUrl = firstUriRecord.target
+  let tokenFileUrl = firstUriRecord.target;
 
   if (tokenFileUrl.startsWith('https')) {
     // pass
   } else if (tokenFileUrl.startsWith('http')) {
     // pass
   } else {
-    tokenFileUrl = `https://${tokenFileUrl}`
+    tokenFileUrl = `https://${tokenFileUrl}`;
   }
 
-  return tokenFileUrl
+  return tokenFileUrl;
 }
 
 /**
- * 
- * @param zoneFile 
- * @param publicKeyOrAddress 
- * 
+ *
+ * @param zoneFile
+ * @param publicKeyOrAddress
+ *
  * @ignore
  */
 export function resolveZoneFileToProfile(zoneFile: any, publicKeyOrAddress: string) {
   return new Promise((resolve, reject) => {
-    let zoneFileJson = null
+    let zoneFileJson = null;
     try {
-      zoneFileJson = parseZoneFile(zoneFile)
+      zoneFileJson = parseZoneFile(zoneFile);
       if (!zoneFileJson.hasOwnProperty('$origin')) {
-        zoneFileJson = null
+        zoneFileJson = null;
       }
     } catch (e) {
-      reject(e)
+      reject(e);
     }
 
-    let tokenFileUrl: string | null = null
+    let tokenFileUrl: string | null = null;
     if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
-      tokenFileUrl = getTokenFileUrl(zoneFileJson)
+      tokenFileUrl = getTokenFileUrl(zoneFileJson);
     } else {
-      let profile = null
+      let profile = null;
       try {
-        profile = JSON.parse(zoneFile)
-        profile = Person.fromLegacyFormat(profile).profile()
+        profile = JSON.parse(zoneFile);
+        profile = Person.fromLegacyFormat(profile).profile();
       } catch (error) {
-        reject(error)
+        reject(error);
       }
-      resolve(profile)
-      return
+      resolve(profile);
+      return;
     }
 
     if (tokenFileUrl) {
       fetchPrivate(tokenFileUrl)
         .then(response => response.text())
         .then(responseText => JSON.parse(responseText))
-        .then((responseJson) => {
-          const tokenRecords = responseJson
-          const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress)
-          resolve(profile)
+        .then(responseJson => {
+          const tokenRecords = responseJson;
+          const profile = extractProfile(tokenRecords[0].token, publicKeyOrAddress);
+          resolve(profile);
         })
-        .catch((error) => {
-          Logger.error(`resolveZoneFileToProfile: error fetching token file ${tokenFileUrl}: ${error}`)
-          reject(error)
-        })
+        .catch(error => {
+          Logger.error(
+            `resolveZoneFileToProfile: error fetching token file ${tokenFileUrl}: ${error}`
+          );
+          reject(error);
+        });
     } else {
-      Logger.debug('Token file url not found. Resolving to blank profile.')
-      resolve({})
+      Logger.debug('Token file url not found. Resolving to blank profile.');
+      resolve({});
     }
-  })
+  });
 }

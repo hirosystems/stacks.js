@@ -14,7 +14,7 @@ export interface StacksNetwork {
   accountEndpoint: string;
 
   contractAbiEndpoint: string;
-  
+
   readOnlyFunctionCallEndpoint: string;
 
   getBroadcastApiUrl: () => string;
@@ -34,10 +34,10 @@ export interface StacksNetwork {
   /**
    * Get WHOIS-like information for a name, including the address that owns it,
    * the block at which it expires, and the zone file anchored to it (if available).
-   * 
+   *
    * This is intended for use in third-party wallets or in DApps that register names.
    * @param fullyQualifiedName the name to query.  Can be on-chain of off-chain.
-   * @return a promise that resolves to the WHOIS-like information 
+   * @return a promise that resolves to the WHOIS-like information
    */
   getNameInfo: (fullyQualifiedName: string) => any;
 }
@@ -77,32 +77,32 @@ export class StacksMainnet implements StacksNetwork {
     `${this.coreApiUrl}${
       this.readOnlyFunctionCallEndpoint
     }/${contractAddress}/${contractName}/${encodeURIComponent(functionName)}`;
-  
+
   getNameInfo(fullyQualifiedName: string) {
     /* 
       TODO: Update to v2 API URL for name lookups
     */
-    const nameLookupURL = `${this.coreApiUrl}/v1/names/${fullyQualifiedName}`
+    const nameLookupURL = `${this.coreApiUrl}/v1/names/${fullyQualifiedName}`;
     return fetchPrivate(nameLookupURL)
-      .then((resp) => {
+      .then(resp => {
         if (resp.status === 404) {
-          throw new Error('Name not found')
+          throw new Error('Name not found');
         } else if (resp.status !== 200) {
-          throw new Error(`Bad response status: ${resp.status}`)
+          throw new Error(`Bad response status: ${resp.status}`);
         } else {
-          return resp.json()
+          return resp.json();
         }
       })
-      .then((nameInfo) => {
+      .then(nameInfo => {
         // the returned address _should_ be in the correct network ---
         //  blockstackd gets into trouble because it tries to coerce back to mainnet
         //  and the regtest transaction generation libraries want to use testnet addresses
         if (nameInfo.address) {
-          return Object.assign({}, nameInfo, { address: nameInfo.address })
+          return Object.assign({}, nameInfo, { address: nameInfo.address });
         } else {
-          return nameInfo
+          return nameInfo;
         }
-      })
+      });
   }
 }
 

@@ -49,12 +49,7 @@ export async function encryptMnemonic(
   const iv = keysAndIV.slice(32, 48);
 
   const cipher = await createCipher();
-  const cipherText = await cipher.encrypt(
-    'aes-128-cbc',
-    encKey,
-    iv,
-    plaintextNormalized
-  );
+  const cipherText = await cipher.encrypt('aes-128-cbc', encKey, iv, plaintextNormalized);
 
   const hmacPayload = Buffer.concat([salt, cipherText]);
   const hmacSha256 = await createHmacSha256();
@@ -70,10 +65,7 @@ class PasswordError extends Error {}
 /**
  * @ignore
  */
-async function decryptMnemonicBuffer(
-  dataBuffer: Buffer,
-  password: string
-): Promise<string> {
+async function decryptMnemonicBuffer(dataBuffer: Buffer, password: string): Promise<string> {
   const salt = dataBuffer.slice(0, 16);
   const hmacSig = dataBuffer.slice(16, 48); // 32 bytes
   const cipherText = dataBuffer.slice(48);
@@ -86,12 +78,7 @@ async function decryptMnemonicBuffer(
   const iv = keysAndIV.slice(32, 48);
 
   const decipher = await createCipher();
-  const decryptedResult = await decipher.decrypt(
-    'aes-128-cbc',
-    encKey,
-    iv,
-    cipherText
-  );
+  const decryptedResult = await decipher.decrypt('aes-128-cbc', encKey, iv, cipherText);
 
   const hmacSha256 = await createHmacSha256();
   const hmacDigest = await hmacSha256.digest(macKey, hmacPayload);
@@ -142,7 +129,7 @@ function decryptLegacy(
     triplesecDecrypt(
       {
         key: Buffer.from(password),
-        data: dataBuffer
+        data: dataBuffer,
       },
       (err, plaintextBuffer) => {
         if (!err) {
