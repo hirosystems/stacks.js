@@ -51,7 +51,8 @@
     "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
     "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "codecovUpload": "codecov"
   },
   "devDependencies": {
     "@babel/compat-data": "^7.10.1",
@@ -82,6 +83,7 @@
     "blockstack": "21.0.0",
     "bn.js": "^5.1.1",
     "c32check": "^1.0.1",
+    "codecov": "^3.7.2",
     "jsontokens": "^3.0.0",
     "prettier": "^2.0.5",
     "triplesec": "^3.0.27",

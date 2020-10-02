@@ -36,7 +36,8 @@
     "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
     "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
     "test": "jest",
-    "test:watch": "jest --watch --coverage=false"
+    "test:watch": "jest --watch --coverage=false",
+    "codecovUpload": "codecov"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -46,6 +47,7 @@
     "@stacks/encryption": "^1.0.0-beta.1",
     "@stacks/network": "^1.0.0-beta.1",
     "@stacks/profile": "^1.0.0-beta.1",
+    "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "jsontokens": "^3.0.0",
     "query-string": "^6.13.1",

@@ -28,7 +28,8 @@
     "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
     "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
     "test": "jest",
-    "test:watch": "jest --watch --coverage=false"
+    "test:watch": "jest --watch --coverage=false",
+    "codecovUpload": "codecov"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -38,6 +39,7 @@
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.10",
     "bn.js": "^5.1.2",
+    "codecov": "^3.7.2",
     "elliptic": "^6.5.2",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",

@@ -67,6 +67,7 @@
     "@types/sha.js": "^2.4.0",
     "bn.js": "^4.11.9",
     "c32check": "^1.1.1",
+    "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "elliptic": "^6.5.3",
     "lodash": "^4.17.20",
@@ -95,7 +96,8 @@
     "lint:fix": "eslint ./src --ext .ts --fix",
     "test": "jest --coverage",
     "prepublishOnly": "npm run test && npm run build",
-    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "codecovUpload": "codecov"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js.gi/issues"

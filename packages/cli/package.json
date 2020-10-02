@@ -67,7 +67,8 @@
     "build": "rimraf lib && tsc -b tsconfig.build.json",
     "dev": "ts-node src/index.ts",
     "test": "jest",
-    "test:watch": "jest --watch --coverage=false"
+    "test:watch": "jest --watch --coverage=false",
+    "codecovUpload": "codecov"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -90,6 +91,7 @@
     "bitcoinjs-lib": "^5.1.10",
     "blockstack": "^19.2.2",
     "c32check": "^0.0.6",
+    "codecov": "^3.7.2",
     "cors": "^2.8.4",
     "express": "^4.17.1",
     "express-winston": "^3.1.0",
