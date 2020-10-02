@@ -10,12 +10,11 @@
     "baseUrl": "./src",
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "lib": ["es2017", "dom"]
   },
   "include": [
+    "packages/**/src/**/*",
+    "packages/**/test/**/*",
     "src/**/*",
     "tests/**/*"
   ]

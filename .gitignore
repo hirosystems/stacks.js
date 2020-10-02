@@ -46,4 +46,5 @@ docs
 .rts2_cache_cjs/
 .rts2_cache_esm/
 .rts2_cache_umd/
+.idea
 
