@@ -5,7 +5,7 @@ import BigInteger from 'bigi'
 
 import {
   addUTXOsToFund, DUST_MINIMUM,
-  estimateTXBytes, sumOutputValues, hash160, signInputs
+  estimateTXBytes, sumOutputValues, hash160, signInputs, signInputsUsingHardware
 } from './utils'
 import {
   makePreorderSkeleton, makeRegisterSkeleton,
@@ -1111,13 +1111,16 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
  * @param {boolean} buildIncomplete - optional boolean, defaults to false,
  * indicating whether the function should attempt to return an unsigned (or not fully signed)
  * transaction. Useful for passing around a TX for multi-sig input signing.
+ * @param {boolean} hardwareSign - optional boolean, defaults to false,
+ * indicating whether a hardware signer should be used
  * @returns {Promise} - a promise which resolves to the hex-encoded transaction.
  * @private
  */
 function makeBitcoinSpend(destinationAddress: string,
                           paymentKeyIn: string | TransactionSigner,
                           amount: number,
-                          buildIncomplete?: boolean = false
+                          buildIncomplete?: boolean = false,
+                          hardwareSign?: boolean = false
 ) {
   if (amount <= 0) {
     return Promise.reject(new InvalidParameterError('amount', 'amount must be greater than zero'))
@@ -1167,7 +1170,11 @@ function makeBitcoinSpend(destinationAddress: string,
         txB.__tx.outs[destinationIndex].value = outputAmount
 
         // ready to sign.
-        return signInputs(txB, paymentKey)
+        if (hardwareSign) {
+          return signInputsUsingHardware(txB, paymentKey)
+        } else {
+          return signInputs(txB, paymentKey)
+        }
       })
   )
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
