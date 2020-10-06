@@ -10,9 +10,6 @@
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
-  "main": "./dist/index.js",
-  "umd:main": "./dist/common.umd.production.js",
-  "module": "./dist/common.esm.js",
   "directories": {
     "lib": "lib",
     "dist": "dist",
@@ -30,12 +27,16 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsdx build --format=cjs,esm,umd",
-    "build-all": "run-p build:*",
-    "build:cjs": "tsc --outDir ./lib -m commonjs -t es2017",
-    "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
-    "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
-    "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
+    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
+    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
+    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
+    "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
+    "build": "tsdx build --format cjs,esm,umd",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch",
+    "prepublishOnly": "yarn build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "codecovUpload": "codecov"
@@ -46,11 +47,18 @@
   "dependencies": {
     "@stacks/common": "^1.0.0-beta.1",
     "codecov": "^3.7.2",
-    "tsdx": "^0.13.3"
+    "tsdx": "^0.14.0"
   },
   "devDependencies": {
     "@types/jest": "24.9.0",
     "jest": "^24.9.0",
     "jest-fetch-mock": "^3.0.3"
-  }
+  },
+  "types": "./dist/network/src/index.d.ts",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/network/src/index.d.ts",
+  "umd:main": "dist/network.umd.production.js",
+  "unpkg": "dist/network.cjs.production.min.js"
 }
