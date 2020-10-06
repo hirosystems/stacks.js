@@ -81,7 +81,7 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string): T
   }
 
   // Inspect and verify the subject
-  if (payload.hasOwnProperty('subject')) {
+  if (payload.hasOwnProperty('subject') && payload.subject) {
     if (!payload.subject.hasOwnProperty('publicKey')) {
       throw new Error("Token doesn't have a subject public key");
     }
@@ -90,7 +90,7 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string): T
   }
 
   // Inspect and verify the issuer
-  if (payload.hasOwnProperty('issuer')) {
+  if (payload.hasOwnProperty('issuer') && payload.issuer) {
     if (!payload.issuer.hasOwnProperty('publicKey')) {
       throw new Error("Token doesn't have an issuer public key");
     }
@@ -122,7 +122,7 @@ export function verifyProfileToken(token: string, publicKeyOrAddress: string): T
     throw new Error('Token issuer public key does not match the verifying value');
   }
 
-  const tokenVerifier = new TokenVerifier(decodedToken.header.alg, issuerPublicKey);
+  const tokenVerifier = new TokenVerifier(decodedToken.header.alg as string, issuerPublicKey);
   if (!tokenVerifier) {
     throw new Error('Invalid token verifier');
   }
@@ -162,7 +162,7 @@ export function extractProfile(
       throw new Error('Unexpected token payload type of string');
     }
     if (payload.hasOwnProperty('claim')) {
-      profile = payload.claim;
+      profile = payload.claim as object;
     }
   }
 

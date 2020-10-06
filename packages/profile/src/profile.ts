@@ -1,9 +1,6 @@
-// @ts-ignore: Could not find a declaration file for module
-import * as inspector from 'schema-inspector';
-
 import { signProfileToken, extractProfile } from './profileTokens';
 
-import { getPersonFromLegacyFormat } from './profileSchemas/personLegacy';
+import { getPersonFromLegacyFormat } from './profileSchemas';
 import {
   getName,
   getFamilyName,
@@ -17,7 +14,16 @@ import {
   getOrganizations,
 } from './profileSchemas/personUtils';
 
+// TODO: bring into this monorepo/convert to ts
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
 import { makeZoneFile, parseZoneFile } from 'zone-file';
+
+// Could not find a declaration file for module
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore
+import * as inspector from 'schema-inspector';
+
 import { Logger, fetchPrivate } from '@stacks/common';
 
 const schemaDefinition: { [key: string]: any } = {
@@ -255,7 +261,7 @@ export class Person extends Profile {
  * @ignore
  */
 export function makeProfileZoneFile(origin: string, tokenFileUrl: string): string {
-  if (tokenFileUrl.indexOf('://') < 0) {
+  if (!tokenFileUrl.includes('://')) {
     throw new Error('Invalid token file url');
   }
 
