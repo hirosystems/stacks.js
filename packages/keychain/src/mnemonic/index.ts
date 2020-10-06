@@ -1,5 +1,5 @@
 import { generateMnemonic as generateBip39Mnemonic, mnemonicToSeed } from 'bip39';
-import { randomBytes } from 'blockstack/lib/encryption/cryptoRandom';
+import randomBytes from 'randombytes';
 import { bip32 } from 'bitcoinjs-lib';
 
 import { encrypt } from '../encryption/encrypt';

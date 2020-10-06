@@ -1,16 +1,48 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "jsx": "react",
+    "importHelpers": true,
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "pretty": true,
+    "removeComments": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "stripInternal": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "emitDecoratorMetadata": false,
+    "noEmit": false,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "rootDirs": ["./src", "./tests"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
     "paths": {
-      "@blockstack/rpc-client": ["../../rpc-client/src"]
-    },
-    "lib": [
-      "es2017",
-      "dom"
-    ],
-    "sourceMap": true
+      "@stacks/auth": ["../../auth/src"],
+      "@stacks/cli": ["../../cli/src"],
+      "@stacks/common": ["../../common/src"],
+      "@stacks/encryption": ["../../encryption/src"],
+      "@stacks/keychain": ["../../keychain/src"],
+      "@stacks/network": ["../../network/src"],
+      "@stacks/profile": ["../../profile/src"],
+      "@stacks/storage": ["../../storage/src"],
+      "@stacks/transactions": ["../../transactions/src"]
+    }
   },
-  "include": [
-    "./src/**/*"
-  ]
+  "include": ["src/**/*", "tests/**/*"]
 }
