@@ -8,13 +8,7 @@ import {
   PostConditionPrincipalID,
 } from './constants';
 
-import {
-  StacksPublicKey,
-  serializePublicKey,
-  deserializePublicKey,
-  isCompressed,
-  publicKeyToString,
-} from './keys';
+import { StacksPublicKey, serializePublicKey, deserializePublicKey, isCompressed } from './keys';
 
 import {
   BufferArray,
@@ -24,7 +18,6 @@ import {
   hashP2PKH,
   rightPadHexToLength,
   hashP2SH,
-  hash160,
 } from './utils';
 
 import { c32addressDecode, c32address } from 'c32check';
@@ -40,7 +33,6 @@ import {
   serializeTransactionAuthField,
   TransactionAuthField,
 } from './authorization';
-import { deserialize } from 'v8';
 
 export type StacksMessage =
   | Address

@@ -48,7 +48,7 @@ import {
 
 import { TransactionSigner } from '../src/signer';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import fetchMock from 'jest-fetch-mock';
 import { BufferReader } from '../src/bufferReader';
 import { standardPrincipalCV } from '../src/clarity';

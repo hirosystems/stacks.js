@@ -1,23 +1,11 @@
 import { sha256, sha512 } from 'sha.js';
-
 import { ClarityValue, serializeCV } from './clarity';
-
 import RIPEMD160 from 'ripemd160-min';
-
-import * as randombytes_ from 'randombytes';
-
+import randombytes from 'randombytes';
 import { deserializeCV } from './clarity';
-
 import fetch from 'cross-fetch';
 import { c32addressDecode } from 'c32check';
-
-// Note: lodash is using old-style ts exports and requires this
-// @ts-expect-error
-import * as lodashCloneDeep_ from 'lodash/cloneDeep';
-
-let lodashCloneDeep = lodashCloneDeep_;
-
-let randombytes = randombytes_;
+import lodashCloneDeep from 'lodash/cloneDeep';
 
 export { randombytes as randomBytes };
 

@@ -18,9 +18,9 @@ import {
 
 import { ClarityValue, serializeCV, deserializeCV } from './clarity/';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
-import { PrincipalCV, standardPrincipalCV, principalCV } from './clarity/types/principalCV';
+import { PrincipalCV, principalCV } from './clarity/types/principalCV';
 
 export type Payload =
   | TokenTransferPayload

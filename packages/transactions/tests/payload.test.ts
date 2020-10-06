@@ -13,7 +13,7 @@ import { serializeDeserialize } from './macros';
 
 import { trueCV, falseCV, standardPrincipalCV, contractPrincipalCV } from '../src/clarity';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 
 import { COINBASE_BUFFER_LENGTH_BYTES, StacksMessageType } from '../src/constants';
 import { principalToString } from '../src/clarity/types/principalCV';

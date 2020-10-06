@@ -4,9 +4,6 @@
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
-  "main": "./dist/index.js",
-  "umd:main": "./dist/auth.umd.production.js",
-  "module": "./dist/auth.esm.js",
   "directories": {
     "lib": "lib",
     "dist": "dist",
@@ -75,7 +72,7 @@
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11",
     "smart-buffer": "^4.1.0",
-    "tsdx": "^0.13.3"
+    "tsdx": "^0.14.0"
   },
   "publishConfig": {
     "access": "public"
@@ -85,18 +82,17 @@
     "url": "git+https://github.com/blockstack/blockstack.js.gi.git"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsdx build --format=cjs,esm,umd",
-    "build-all": "run-p build:*",
-    "build:cjs": "tsc --outDir ./lib -m commonjs -t es2017",
-    "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
-    "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
-    "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
-    "build:docs": "rimraf docs && cross-env typedoc --name \"stacks-transactions-js $npm_package_version Library Reference\" --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json src",
-    "lint": "eslint ./src --ext .ts -f codeframe",
-    "lint:fix": "eslint ./src --ext .ts --fix",
+    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
+    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
+    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
+    "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
+    "build": "tsdx build --format cjs,esm,umd",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch",
     "test": "jest --coverage",
     "prepublishOnly": "npm run test && npm run build",
-    "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "codecovUpload": "codecov"
   },
   "bugs": {

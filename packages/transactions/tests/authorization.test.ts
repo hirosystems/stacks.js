@@ -14,7 +14,7 @@ import { addressFromVersionHash } from '../src/types';
 
 import { AddressHashMode, AddressVersion, PubKeyEncoding } from '../src/constants';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import { BufferReader } from '../src/bufferReader';
 import {
   createStacksPrivateKey,

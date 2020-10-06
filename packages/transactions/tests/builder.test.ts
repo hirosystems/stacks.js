@@ -45,7 +45,7 @@ import { StacksTestnet, StacksMainnet } from '@stacks/network';
 
 import { bufferCV, standardPrincipalCV, bufferCVFromString, serializeCV } from '../src/clarity';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 
 import { ClarityAbi } from '../src/contract-abi';
 import { createStacksPrivateKey, pubKeyfromPrivKey, publicKeyToString } from '../src/keys';

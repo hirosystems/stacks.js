@@ -5,11 +5,10 @@ import {
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   SingleSigHashMode,
   MultiSigHashMode,
-  AddressVersion,
   StacksMessageType,
 } from './constants';
 
-import { BufferArray, txidFromData, sha512_256, leftPadHex, cloneDeep } from './utils';
+import { BufferArray, txidFromData, leftPadHex, cloneDeep } from './utils';
 
 import {
   addressFromPublicKeys,
@@ -31,7 +30,7 @@ import {
   publicKeyFromSignature,
 } from './keys';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
 import { SerializationError, DeserializationError, SigningError } from './errors';
 
@@ -428,7 +427,7 @@ function verifySingleSig(
   initialSigHash: string,
   authType: AuthType
 ): string {
-  const { pubKey, nextSigHash } = nextVerification(
+  const { nextSigHash } = nextVerification(
     initialSigHash,
     authType,
     condition.fee,

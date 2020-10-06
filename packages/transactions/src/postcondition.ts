@@ -18,7 +18,7 @@ import {
   parsePrincipalString,
 } from './types';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
 import { ClarityValue, serializeCV, deserializeCV } from './clarity';
 import { DeserializationError } from './errors';
