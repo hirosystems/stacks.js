@@ -18,7 +18,7 @@ beforeEach(() => {
 });
 
 const keyPair = ECPair.makeRandom({ rng: getEntropy })
-const privateKey = keyPair.privateKey.toString('hex')
+const privateKey = keyPair.privateKey!.toString('hex')
 const publicKey = keyPair.publicKey.toString('hex')
 
 test('Profile', () => {
@@ -72,7 +72,7 @@ test('Person', () => {
 
   const verifiedAccounts = personObject.verifiedAccounts([])
   expect(verifiedAccounts).toBeTruthy()
-  expect(verifiedAccounts.length).toEqual(0)
+  expect(verifiedAccounts!.length).toEqual(0)
 
   const address = personObject.address()
   expect(address).toBeTruthy()

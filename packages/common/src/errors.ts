@@ -75,7 +75,7 @@ export class BlockstackError extends Error {
  */
 export class InvalidParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
-    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter: '' });
+    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter });
     this.name = 'MissingParametersError';
   }
 }
@@ -301,8 +301,8 @@ export class PayloadTooLargeError extends GaiaHubError {
 
   maxUploadByteSize: number;
 
-  constructor(message: string, response: GaiaHubErrorResponse, maxUploadByteSize: number) {
-    super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response);
+  constructor(message: string, response: GaiaHubErrorResponse | null, maxUploadByteSize: number) {
+    super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response!);
     this.name = 'PayloadTooLargeError';
     this.maxUploadByteSize = maxUploadByteSize;
   }

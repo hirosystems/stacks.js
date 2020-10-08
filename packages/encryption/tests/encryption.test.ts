@@ -11,7 +11,7 @@ import * as aesCipher from '../src/aesCipher'
 import * as sha2Hash from '../src/sha2Hash'
 import * as hmacSha256 from '../src/hmacSha256'
 import * as ripemd160 from '../src/hashRipemd160'
-import * as BN from 'bn.js'
+import BN from 'bn.js'
 import { getBufferFromBN } from '../src/ec'
 
 const privateKey = 'a5c61c6ca7b3e7e55edee68566aeab22e4da26baa285c7bd10e8d2218aa3b229'

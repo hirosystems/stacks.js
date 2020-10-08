@@ -108,7 +108,7 @@ export class Storage {
   userSession: UserSession;
 
   constructor(options: StorageOptions) {
-    this.userSession = options.userSession;
+    this.userSession = options.userSession!;
   }
 
   /**
@@ -124,9 +124,7 @@ export class Storage {
     const defaults: GetFileOptions = {
       decrypt: true,
       verify: false,
-      username: null,
-      app: getGlobalObject('location', { returnEmptyObject: true }).origin,
-      zoneFileLookupURL: null,
+      app: getGlobalObject('location', { returnEmptyObject: true })!.origin,
     };
     const opt = Object.assign({}, defaults, options);
 
@@ -138,7 +136,7 @@ export class Storage {
 
     const storedContents = await this.getFileContents(
       path,
-      opt.app,
+      opt.app!,
       opt.username,
       opt.zoneFileLookupURL,
       !!opt.decrypt
@@ -166,7 +164,7 @@ export class Storage {
       return this.handleSignedEncryptedContents(
         path,
         storedContents,
-        opt.app,
+        opt.app!,
         decryptionKey,
         opt.username,
         opt.zoneFileLookupURL
@@ -194,9 +192,9 @@ export class Storage {
     username: string,
     appOrigin: string,
     zoneFileLookupURL?: string
-  ): Promise<string | null> {
+  ): Promise<string | undefined> {
     const profile = await lookupProfile({ username, zoneFileLookupURL });
-    let bucketUrl: string = null;
+    let bucketUrl: string | undefined;
     if (profile.hasOwnProperty('apps')) {
       if (profile.apps.hasOwnProperty(appOrigin)) {
         const url = profile.apps[appOrigin];
@@ -218,14 +216,14 @@ export class Storage {
     zoneFileLookupURL?: string
   ): Promise<string> {
     const opts = normalizeOptions(this.userSession, { app, username, zoneFileLookupURL });
-    let fileUrl: string;
+    let fileUrl: string | undefined;
     if (username) {
-      fileUrl = await this.getUserAppFileUrl('/', opts.username, opts.app, opts.zoneFileLookupURL);
+      fileUrl = await this.getUserAppFileUrl('/', opts.username!, opts.app, opts.zoneFileLookupURL);
     } else {
       const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection();
       fileUrl = await getFullReadUrl('/', gaiaHubConfig);
     }
-    const matches = fileUrl.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/);
+    const matches = fileUrl!.match(/([13][a-km-zA-HJ-NP-Z0-9]{26,35})/);
     if (!matches) {
       throw new Error('Failed to parse gaia address');
     }
@@ -242,9 +240,9 @@ export class Storage {
   async getFileUrl(path: string, options?: GetFileUrlOptions): Promise<string> {
     const opts = normalizeOptions(this.userSession, options);
 
-    let readUrl: string;
+    let readUrl: string | undefined;
     if (opts.username) {
-      readUrl = await this.getUserAppFileUrl(path, opts.username, opts.app, opts.zoneFileLookupURL);
+      readUrl = await this.getUserAppFileUrl(path, opts.username, opts.app!, opts.zoneFileLookupURL);
     } else {
       const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection();
       readUrl = await getFullReadUrl(path, gaiaHubConfig);
@@ -283,7 +281,7 @@ export class Storage {
     const etag = response.headers.get('ETag');
     if (etag) {
       const sessionData = this.userSession.store.getSessionData();
-      sessionData.etags[path] = etag;
+      sessionData.etags![path] = etag;
       this.userSession.store.setSessionData(sessionData);
     }
     if (
@@ -312,9 +310,9 @@ export class Storage {
     const sigPath = `${path}${SIGNATURE_FILE_SUFFIX}`;
     try {
       const [fileContents, signatureContents, gaiaAddress] = await Promise.all([
-        this.getFileContents(path, opt.app, opt.username, opt.zoneFileLookupURL, false),
-        this.getFileContents(sigPath, opt.app, opt.username, opt.zoneFileLookupURL, true),
-        this.getGaiaAddress(opt.app, opt.username, opt.zoneFileLookupURL),
+        this.getFileContents(path, opt.app!, opt.username, opt.zoneFileLookupURL, false),
+        this.getFileContents(sigPath, opt.app!, opt.username, opt.zoneFileLookupURL, true),
+        this.getGaiaAddress(opt.app!, opt.username, opt.zoneFileLookupURL),
       ]);
 
       if (!fileContents) {
@@ -466,10 +464,10 @@ export class Storage {
     const opt = Object.assign({}, defaults, options);
 
     const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection();
-    const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes);
+    const maxUploadBytes = megabytesToBytes(gaiaHubConfig.max_file_upload_size_megabytes!);
     const hasMaxUpload = maxUploadBytes > 0;
 
-    const contentLoader = new FileContentLoader(content, opt.contentType);
+    const contentLoader = new FileContentLoader(content, opt.contentType!);
     let contentType = contentLoader.contentType;
 
     // When not encrypting the content length can be checked immediately.
@@ -487,7 +485,7 @@ export class Storage {
         contentLength: contentLoader.contentByteLength,
         wasString: contentLoader.wasString,
         sign: !!opt.sign,
-        cipherTextEncoding: opt.cipherTextEncoding,
+        cipherTextEncoding: opt.cipherTextEncoding!,
       });
       if (encryptedSize > maxUploadBytes) {
         const sizeErrMsg = `The max file upload size for this hub is ${maxUploadBytes} bytes, the given content is ${encryptedSize} bytes after encryption`;
@@ -501,9 +499,9 @@ export class Storage {
     let newFile = true;
 
     const sessionData = this.userSession.store.getSessionData();
-    if (sessionData.etags[path]) {
+    if (sessionData.etags![path]) {
       newFile = false;
-      etag = sessionData.etags[path];
+      etag = sessionData.etags![path];
     }
 
     let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>;
@@ -533,7 +531,7 @@ export class Storage {
           ])
         )[0];
         if (writeResponse.etag) {
-          sessionData.etags[path] = writeResponse.etag;
+          sessionData.etags![path] = writeResponse.etag;
           this.userSession.store.setSessionData(sessionData);
         }
         return writeResponse.publicURL;
@@ -576,7 +574,7 @@ export class Storage {
           etag
         );
         if (writeResponse.etag) {
-          sessionData.etags[path] = writeResponse.etag;
+          sessionData.etags![path] = writeResponse.etag;
           this.userSession.store.setSessionData(sessionData);
         }
         return writeResponse.publicURL;
@@ -621,24 +619,24 @@ export class Storage {
       try {
         await deleteFromGaiaHub(path, gaiaHubConfig);
         await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig);
-        delete sessionData.etags[path];
+        delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       } catch (error) {
         const freshHubConfig = await this.setLocalGaiaHubConnection();
         await deleteFromGaiaHub(path, freshHubConfig);
         await deleteFromGaiaHub(`${path}${SIGNATURE_FILE_SUFFIX}`, gaiaHubConfig);
-        delete sessionData.etags[path];
+        delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       }
     } else {
       try {
         await deleteFromGaiaHub(path, gaiaHubConfig);
-        delete sessionData.etags[path];
+        delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       } catch (error) {
         const freshHubConfig = await this.setLocalGaiaHubConnection();
         await deleteFromGaiaHub(path, freshHubConfig);
-        delete sessionData.etags[path];
+        delete sessionData.etags![path];
         this.userSession.store.setSessionData(sessionData);
       }
     }
@@ -805,7 +803,7 @@ export class Storage {
     userData.gaiaHubConfig = gaiaConfig;
 
     const sessionData = this.userSession.store.getSessionData();
-    sessionData.userData.gaiaHubConfig = gaiaConfig;
+    sessionData.userData!.gaiaHubConfig = gaiaConfig;
     this.userSession.store.setSessionData(sessionData);
 
     return gaiaConfig;
@@ -845,7 +843,7 @@ function normalizeOptions<T>(
       }
       const sessionData = userSession.store.getSessionData();
       // Use the user specified coreNode if available, otherwise use the app specified coreNode.
-      const configuredCoreNode = sessionData.userData.coreNode || userSession.appConfig.coreNode;
+      const configuredCoreNode = sessionData.userData!.coreNode || userSession.appConfig.coreNode;
       if (configuredCoreNode) {
         opts.zoneFileLookupURL = `${configuredCoreNode}${NAME_LOOKUP_PATH}`;
       }

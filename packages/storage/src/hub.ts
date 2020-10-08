@@ -191,8 +191,9 @@ function makeV1GaiaAuthToken(
     hubUrl,
     iss,
     salt,
-    associationToken,
+    associationToken: associationToken!
   };
+
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload);
   return `v1:${token}`;
 }
@@ -287,7 +288,7 @@ export async function getBlockstackErrorFromResponse(
   } else if (gaiaResponse.status === 412) {
     return new PreconditionFailedError(errorMsg, gaiaResponse);
   } else if (gaiaResponse.status === 413) {
-    const maxBytes = megabytesToBytes(hubConfig?.max_file_upload_size_megabytes);
+    const maxBytes = hubConfig ? megabytesToBytes(hubConfig!.max_file_upload_size_megabytes!) : 0;
     return new PayloadTooLargeError(errorMsg, gaiaResponse, maxBytes);
   } else {
     return new Error(errorMsg);

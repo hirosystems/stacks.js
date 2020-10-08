@@ -1,6 +1,4 @@
-import * as randombytes_ from 'randombytes';
-
-let randombytes = randombytes_;
+import randombytes from 'randombytes';
 
 export { randombytes as randomBytes };
 

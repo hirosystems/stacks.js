@@ -6,7 +6,7 @@ export {
   resolveZoneFileToProfile,
 } from './profile';
 
-export { Organization, CreativeWork, resolveZoneFileToPerson } from './profileSchemas';
+export { resolveZoneFileToPerson } from './profileSchemas';
 
 export {
   signProfileToken,

@@ -21,7 +21,7 @@ export function getEntropy(arg: number): Buffer {
  */
 export function makeECPrivateKey() {
   const keyPair = ECPair.makeRandom({ rng: getEntropy });
-  return keyPair.privateKey.toString('hex');
+  return keyPair.privateKey!.toString('hex');
 }
 
 /**
@@ -77,7 +77,7 @@ export function hexStringToECPair(skHex: string, network?: Network): ECPair.ECPa
  * @ignore
  */
 export function ecPairToHexString(secretKey: ECPair.ECPairInterface) {
-  const ecPointHex = secretKey.privateKey.toString('hex');
+  const ecPointHex = secretKey.privateKey!.toString('hex');
   if (secretKey.compressed) {
     return `${ecPointHex}01`;
   } else {

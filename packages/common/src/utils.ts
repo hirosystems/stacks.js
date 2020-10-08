@@ -91,11 +91,11 @@ export function updateQueryStringParameter(uri: string, key: string, value: stri
  */
 
 export function isLaterVersion(v1: string, v2: string) {
-  if (v1 === undefined) {
+  if (v1 === undefined || v1 === '') {
     v1 = '0.0.0';
   }
 
-  if (v2 === undefined) {
+  if (v2 === undefined || v1 === '') {
     v2 = '0.0.0';
   }
 

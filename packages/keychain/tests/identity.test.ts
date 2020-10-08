@@ -5,8 +5,6 @@ import { decodeToken } from 'jsontokens';
 import { getIdentity, profileResponse, nameInfoResponse } from './helpers';
 import { ecPairToAddress } from 'blockstack';
 import { ECPair } from 'bitcoinjs-lib';
-import { getAddress } from '../src';
-import { TransactionVersion } from '@blockstack/stacks-transactions';
 
 interface Decoded {
   [key: string]: any;
@@ -97,7 +95,7 @@ test('gets default profile URL', async () => {
 test('can get a profile URL from a zone file', async () => {
   const identity = await getIdentity();
   fetchMock.once(JSON.stringify(nameInfoResponse));
-  const profileURL = await identity.profileUrl('asdf');
+  await identity.profileUrl('asdf');
   return;
 });
 
@@ -144,7 +142,7 @@ describe('refresh', () => {
 
     await identity.refresh();
     expect(identity.profile).toBeTruthy();
-    expect(identity.profile?.apps).toBeTruthy();
-    expect(identity.profile?.name).toBeFalsy();
+    expect(identity.profile!.apps).toBeTruthy();
+    expect(identity.profile!.name).toBeFalsy();
   });
 });

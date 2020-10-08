@@ -60,7 +60,7 @@ export async function encryptContent(
   options?: EncryptContentOptions
 ): Promise<string> {
   const opts = Object.assign({}, options);
-  let privateKey: string;
+  let privateKey: string | undefined;
   if (!opts.publicKey) {
     if (!opts.privateKey) {
       throw new Error('Either public key or private key must be supplied for encryption.');
@@ -87,7 +87,7 @@ export async function encryptContent(
     } else if (!privateKey) {
       privateKey = opts.privateKey;
     }
-    const signatureObject = signECDSA(privateKey, cipherPayload);
+    const signatureObject = signECDSA(privateKey!, cipherPayload);
     const signedCipherObject: SignedCipherObject = {
       signature: signatureObject.signature,
       publicKey: signatureObject.publicKey,
