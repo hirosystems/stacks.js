@@ -1,6 +1,5 @@
 import {
   SingleSigSpendingCondition,
-  MessageSignature,
   createSingleSigSpendingCondition,
   serializeSpendingCondition,
   deserializeSpendingCondition,
@@ -10,17 +9,13 @@ import {
   createTransactionAuthField,
 } from '../src/authorization';
 
-import { addressFromVersionHash } from '../src/types';
-
-import { AddressHashMode, AddressVersion, PubKeyEncoding } from '../src/constants';
+import { AddressHashMode, PubKeyEncoding } from '../src/constants';
 
 import BigNum from 'bn.js';
 import { BufferReader } from '../src/bufferReader';
 import {
   createStacksPrivateKey,
   signWithKey,
-  pubKeyfromPrivKey,
-  publicKeyToString,
   createStacksPublicKey,
 } from '../src/keys';
 
@@ -40,7 +35,7 @@ test('Single spending condition serialization and deserialization', () => {
   const nonce = new BigNum(0);
   const fee = new BigNum(0);
   const pubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
-  const secretKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
+  // const secretKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
   const spendingCondition = createSingleSigSpendingCondition(addressHashMode, pubKey, nonce, fee);
   const emptySignature = emptyMessageSignature();
 

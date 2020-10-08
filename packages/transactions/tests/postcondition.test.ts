@@ -10,9 +10,7 @@ import {
 import {
   addressToString,
   createAssetInfo,
-  createLPString,
   createStandardPrincipal,
-  StandardPrincipal,
   createContractPrincipal,
   ContractPrincipal,
 } from '../src/types';

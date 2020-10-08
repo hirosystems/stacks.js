@@ -6,10 +6,7 @@ import {
   SingleSigSpendingCondition,
   createMultiSigSpendingCondition,
   MultiSigSpendingCondition,
-  Authorization,
-  serializeSpendingCondition,
-  deserializeSpendingCondition,
-  SponsoredAuthorization,
+  SponsoredAuthorization
 } from '../src/authorization';
 
 import { TokenTransferPayload, createTokenTransferPayload } from '../src/payload';
@@ -18,9 +15,7 @@ import { STXPostCondition, createSTXPostCondition } from '../src/postcondition';
 
 import {
   createLPList,
-  createStandardPrincipal,
-  serializeLPList,
-  deserializeLPList,
+  createStandardPrincipal
 } from '../src/types';
 
 import {
@@ -30,20 +25,13 @@ import {
   PostConditionMode,
   AuthType,
   FungibleConditionCode,
-  AddressHashMode,
-  AddressVersion,
-  StacksMessageType,
+  AddressHashMode
 } from '../src/constants';
-
-import { hashP2PKH } from '../src/utils';
 
 import {
   createStacksPrivateKey,
   pubKeyfromPrivKey,
-  publicKeyToString,
-  createStacksPublicKey,
-  serializePublicKey,
-  deserializePublicKey,
+  publicKeyToString
 } from '../src/keys';
 
 import { TransactionSigner } from '../src/signer';
@@ -97,9 +85,9 @@ test('STX token transfer transaction serialization and deserialization', () => {
 
   const signer = new TransactionSigner(transaction);
   signer.signOrigin(createStacksPrivateKey(secretKey));
-  const signature =
-    '01051521ac2ac6e6123dcaf9dba000e0005d9855bcc1bc6b96aaf8b6a385238a2317' +
-    'ab21e489aca47af3288cdaebd358b0458a9159cadc314cecb7dd08043c0a6d';
+  // const signature =
+  //   '01051521ac2ac6e6123dcaf9dba000e0005d9855bcc1bc6b96aaf8b6a385238a2317' +
+  //   'ab21e489aca47af3288cdaebd358b0458a9159cadc314cecb7dd08043c0a6d';
 
   const serialized = transaction.serialize();
   const deserialized = deserializeTransaction(new BufferReader(serialized));
@@ -166,9 +154,9 @@ test('STX token transfer transaction fee setting', () => {
 
   const signer = new TransactionSigner(transaction);
   signer.signOrigin(createStacksPrivateKey(secretKey));
-  const signature =
-    '01051521ac2ac6e6123dcaf9dba000e0005d9855bcc1bc6b96aaf8b6a385238a2317' +
-    'ab21e489aca47af3288cdaebd358b0458a9159cadc314cecb7dd08043c0a6d';
+  // const signature =
+  //   '01051521ac2ac6e6123dcaf9dba000e0005d9855bcc1bc6b96aaf8b6a385238a2317' +
+  //   'ab21e489aca47af3288cdaebd358b0458a9159cadc314cecb7dd08043c0a6d';
 
   const serialized = transaction.serialize();
   const deserialized = deserializeTransaction(new BufferReader(serialized));
@@ -278,7 +266,7 @@ test('Sponsored STX token transfer transaction serialization and deserialization
   const postConditionMode = PostConditionMode.Deny;
 
   const address = 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159';
-  const recipient = createStandardPrincipal(address);
+  // const recipient = createStandardPrincipal(address);
   const recipientCV = standardPrincipalCV(address);
   const amount = new BigNum(2500000);
   const memo = 'memo (not included';

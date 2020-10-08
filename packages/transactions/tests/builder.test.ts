@@ -681,11 +681,11 @@ test('Make sponsored STX token transfer with set tx fee', async () => {
   const fee = new BigNum(0);
   const nonce = new BigNum(0);
   const senderKey = '8ca861519c4fa4a08de4beaa41688f60a24b575a976cf84099f38dc099a6d74401';
-  const senderAddress = 'ST2HTEQF50SW4X8077F8RSR8WCT57QG166TVG0GCE';
+  // const senderAddress = 'ST2HTEQF50SW4X8077F8RSR8WCT57QG166TVG0GCE';
   const network = new StacksTestnet();
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
-  const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
+  // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
   const sponsorNonce = new BigNum(0);
   const sponsorFee = new BigNum(500);
 
@@ -734,7 +734,7 @@ test('Make sponsored contract deploy with sponsor fee estimate', async () => {
   const network = new StacksTestnet();
 
   const sponsorKey = '9888d734e6e80a943a6544159e31d6c7e342f695ec867d549c569fa0028892d401';
-  const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
+  // const sponsorAddress = 'ST2TPJ3NEZ63MMJ8AY9S45HZ10QSH51YF93GE89GQ';
   const sponsorNonce = new BigNum(56);
   const sponsorFee = new BigNum(4000);
 
@@ -998,7 +998,7 @@ test('Make contract-call with network ABI validation failure', async () => {
 
   const network = new StacksTestnet();
 
-  const abi = fs.readFileSync('./tests/abi/kv-store-abi.json').toString();
+  // const abi = fs.readFileSync('./tests/abi/kv-store-abi.json').toString();
   // fetchMock.mockOnce(abi);
   fetchMock.mockOnce('failed', { status: 404 });
 

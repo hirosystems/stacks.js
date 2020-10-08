@@ -47,12 +47,12 @@
   "dependencies": {
     "@stacks/common": "^1.0.0-beta.1",
     "codecov": "^3.7.2",
-    "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0"
   },
   "devDependencies": {
-    "@types/jest": "24.9.0",
-    "jest": "^24.9.0",
+    "@types/jest": "^26.0.0",
+    "jest": "^26.0.0",
+    "ts-jest": "^26.4.1",
     "jest-fetch-mock": "^3.0.3"
   },
   "types": "./dist/network/src/index.d.ts",
