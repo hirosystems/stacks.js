@@ -77,6 +77,7 @@
     "jsontokens": "^3.0.0",
     "prettier": "^2.0.5",
     "triplesec": "^3.0.27",
+    "ts-jest": "^26.4.1",
     "zone-file": "^1.0.0"
   },
   "bugs": {

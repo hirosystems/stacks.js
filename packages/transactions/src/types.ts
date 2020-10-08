@@ -303,7 +303,7 @@ export function serializePrincipal(principal: PostConditionPrincipal): Buffer {
 }
 
 export function deserializePrincipal(bufferReader: BufferReader): PostConditionPrincipal {
-  const prefix = bufferReader.readUInt8Enum(PostConditionPrincipalID, n => {
+  const prefix = bufferReader.readUInt8Enum(PostConditionPrincipalID, _ => {
     throw new DeserializationError('Unexpected Principal payload type: ${n}');
   });
   const address = deserializeAddress(bufferReader);

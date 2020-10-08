@@ -47,6 +47,7 @@
   "dependencies": {
     "@stacks/common": "^1.0.0-beta.1",
     "codecov": "^3.7.2",
+    "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0"
   },
   "devDependencies": {

@@ -385,6 +385,7 @@ export function nextVerification(
   authType: AuthType,
   fee: BigNum,
   nonce: BigNum,
+  // @ts-ignore
   pubKeyEncoding: PubKeyEncoding,
   signature: MessageSignature
 ) {
@@ -493,6 +494,8 @@ export class Authorization extends Deserializable {
         return this.spendingCondition!.fee;
       case AuthType.Sponsored:
         return this.sponsorSpendingCondition!.fee;
+      default:
+        return 0;
     }
   }
 

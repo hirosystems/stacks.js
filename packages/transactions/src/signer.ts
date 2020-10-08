@@ -1,7 +1,7 @@
 import { StacksTransaction } from './transaction';
 
 import { StacksPrivateKey, StacksPublicKey } from './keys';
-import { isSingleSig, MultiSigSpendingCondition } from './authorization';
+import { isSingleSig } from './authorization';
 import { cloneDeep } from './utils';
 import { SpendingCondition } from './authorization';
 import { AuthType } from './constants';

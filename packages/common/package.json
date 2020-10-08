@@ -42,7 +42,8 @@
   "dependencies": {
     "bitcoinjs-lib": "^5.1.10",
     "codecov": "^3.7.2",
-    "cross-fetch": "^3.0.5"
+    "cross-fetch": "^3.0.5",
+    "ts-jest": "^26.4.1"
   },
   "devDependencies": {
     "@types/jest": "24.9.0",

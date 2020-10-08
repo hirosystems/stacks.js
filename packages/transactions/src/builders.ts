@@ -51,7 +51,7 @@ import {
 
 import { AssetInfo, createLPList, createStandardPrincipal, createContractPrincipal } from './types';
 
-import { cvToHex, parseReadOnlyResponse, cloneDeep, omit } from './utils';
+import { cvToHex, parseReadOnlyResponse, omit } from './utils';
 
 import { fetchPrivate } from '@stacks/common';
 
