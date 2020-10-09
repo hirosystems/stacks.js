@@ -1,6 +1,6 @@
 {
   "name": "@stacks/transactions",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
@@ -32,6 +32,7 @@
   "devDependencies": {
     "@blockstack/eslint-config": "^1.0.5",
     "@types/common-tags": "^1.8.0",
+    "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.160",
     "@types/node": "^13.13.15",
     "@typescript-eslint/eslint-plugin": "^3.9.1",
@@ -40,6 +41,7 @@
     "core-js": "^3.6.5",
     "cross-env": "^5.2.1",
     "eslint": "^6.8.0",
+    "jest": "^26.0.0",
     "jest-fetch-mock": "^3.0.3",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
@@ -50,13 +52,11 @@
     "ts-loader": "^6.2.2",
     "ts-node": "^8.10.2",
     "typedoc": "^0.16.11",
-    "typescript": "^3.7.2",
-    "@types/jest": "^26.0.0",
-    "jest": "^26.0.0"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0-beta.1",
-    "@stacks/network": "^1.0.0-beta.1",
+    "@stacks/common": "^1.0.0-beta.2",
+    "@stacks/network": "^1.0.0-beta.2",
     "@types/bn.js": "^4.11.6",
     "@types/elliptic": "^6.4.12",
     "@types/randombytes": "^2.0.0",

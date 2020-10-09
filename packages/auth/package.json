@@ -1,6 +1,6 @@
 {
   "name": "@stacks/auth",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Authentication for Stacks apps.",
   "keywords": [
     "Stacks",
@@ -45,10 +45,10 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0-beta.1",
-    "@stacks/encryption": "^1.0.0-beta.1",
-    "@stacks/network": "^1.0.0-beta.1",
-    "@stacks/profile": "^1.0.0-beta.1",
+    "@stacks/common": "^1.0.0-beta.2",
+    "@stacks/encryption": "^1.0.0-beta.2",
+    "@stacks/network": "^1.0.0-beta.2",
+    "@stacks/profile": "^1.0.0-beta.2",
     "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "jsontokens": "^3.0.0",
@@ -57,8 +57,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.0",
     "jest": "^26.0.0",
-    "ts-jest": "^26.4.1",
     "jest-fetch-mock": "^3.0.3",
+    "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0"
   },
   "sideEffects": false,

@@ -1,6 +1,6 @@
 {
   "name": "@stacks/keychain",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "A package for managing Stacks keychains",
   "keywords": [
     "Stacks",
@@ -51,6 +51,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
     "@blockstack/prettier-config": "^0.0.6",
     "@types/bn.js": "^4.11.6",
+    "@types/jest": "^26.0.0",
     "@types/node": "^13.13.10",
     "@types/triplesec": "^3.0.0",
     "codecov": "^3.7.2",
@@ -58,13 +59,12 @@
     "depcheck": "^0.8.3",
     "eslint": "^6.3.0",
     "eslint-plugin-jest": "^23.8.2",
+    "jest": "^26.0.0",
     "jest-fetch-mock": "^2.1.2",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.2",
-    "tsdx": "^0.14.0",
-    "@types/jest": "^26.0.0",
-    "jest": "^26.0.0",
-    "ts-jest": "^26.4.1"
+    "ts-jest": "^26.4.1",
+    "tsdx": "^0.14.0"
   },
   "dependencies": {
     "@blockstack/rpc-client": "^0.3.0-alpha.11",

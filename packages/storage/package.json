@@ -1,6 +1,6 @@
 {
   "name": "@stacks/storage",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Stacks storage library",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -37,16 +37,16 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/auth": "^1.0.0-beta.1",
-    "@stacks/common": "^1.0.0-beta.1",
-    "@stacks/encryption": "^1.0.0-beta.1",
+    "@stacks/auth": "^1.0.0-beta.2",
+    "@stacks/common": "^1.0.0-beta.2",
+    "@stacks/encryption": "^1.0.0-beta.2",
     "codecov": "^3.7.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
     "jest": "^26.0.0",
-    "ts-jest": "^26.4.1",
     "jest-fetch-mock": "^3.0.3",
+    "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0"
   },
   "sideEffects": false,

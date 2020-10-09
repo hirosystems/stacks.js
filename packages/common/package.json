@@ -1,6 +1,6 @@
 {
   "name": "@stacks/common",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Common Stacks utilities",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
@@ -47,8 +47,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.0",
     "jest": "^26.0.0",
-    "ts-jest": "^26.4.1",
     "jest-fetch-mock": "^3.0.3",
+    "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0"
   },
   "sideEffects": false,
