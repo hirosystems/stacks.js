@@ -1,6 +1,6 @@
 {
   "name": "@stacks/cli",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "Stacks command line tool",
   "keywords": [
     "stacks",
@@ -86,8 +86,8 @@
     "ts-jest": "^26.4.1"
   },
   "dependencies": {
-    "@stacks/network": "^1.0.0-beta.2",
-    "@stacks/transactions": "^1.0.0-beta.2",
+    "@stacks/network": "^1.0.0-beta.3",
+    "@stacks/transactions": "^1.0.0-beta.3",
     "ajv": "^4.11.5",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
