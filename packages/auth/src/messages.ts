@@ -181,7 +181,7 @@ export async function makeAuthResponse(
   privateKey: string,
   profile: {} = {},
   username: string | null = null,
-  metadata: AuthMetadata,
+  metadata: AuthMetadata | null,
   coreToken: string | null = null,
   appPrivateKey: string | null = null,
   expiresAt: number = nextMonth().getTime(),
@@ -207,8 +207,8 @@ export async function makeAuthResponse(
       }
     }
     additionalProperties = {
-      email: metadata.email ? metadata.email : null,
-      profile_url: metadata.profileUrl ? metadata.profileUrl : null,
+      email: metadata?.email ? metadata.email : null,
+      profile_url: metadata?.profileUrl ? metadata.profileUrl : null,
       hubUrl,
       blockstackAPIUrl,
       associationToken,

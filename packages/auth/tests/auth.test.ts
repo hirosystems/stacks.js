@@ -205,9 +205,6 @@ test('makeAuthResponse && verifyAuthResponse', async () => {
 })
 
 test('auth response with username', async () => {
-
-  const url = `${nameLookupURL}ryan.id`
-
   fetchMock.mockResponse(JSON.stringify(sampleNameRecords.ryan))
 
   const authResponse = await makeAuthResponse(privateKey, sampleProfiles.ryan, 'ryan.id', null)
@@ -228,8 +225,6 @@ test('auth response with username', async () => {
 test('auth response with invalid private key', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
   const blockstack = new UserSession({ appConfig })
-
-  const url = `${nameLookupURL}ryan.id`
 
   fetchMock.mockResponse(JSON.stringify(sampleNameRecords.ryan))
 
@@ -322,8 +317,6 @@ test('handlePendingSignIn 2', async () => {
 })
 
 test('handlePendingSignIn with existing user session', async () => {
-  const url = `${nameLookupURL}ryan.id`
-
   fetchMock.once(JSON.stringify(sampleNameRecords.ryan))
 
   const appPrivateKey = makeECPrivateKey()
@@ -396,7 +389,6 @@ test('app config works with custom app domain to origin', () => {
 
 test('handlePendingSignIn with authResponseToken, transit key and custom Blockstack API URL', async () => {
   const customBlockstackAPIUrl = 'https://test.name.lookups'
-  const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
 
   fetchMock.once(JSON.stringify(sampleNameRecords.ryan))
 
@@ -426,7 +418,6 @@ test('handlePendingSignIn with authResponseToken, transit key, '
   + 'Blockstack API URL, and Gaia association token', async () => {
 
   const customBlockstackAPIUrl = 'https://test.name.lookups'
-  const url = `${customBlockstackAPIUrl}/v1/names/ryan.id`
   fetchMock.mockResponse(JSON.stringify(sampleNameRecords.ryan))
 
   const appPrivateKey = makeECPrivateKey()
