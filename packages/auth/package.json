@@ -55,8 +55,8 @@
     "query-string": "^6.13.1"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.0",
-    "jest": "^26.0.0",
+    "@types/jest": "^24.9.0",
+    "jest": "^24.9.0",
     "jest-fetch-mock": "^3.0.3",
     "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0"

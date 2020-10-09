@@ -73,6 +73,7 @@
     "tape": "^4.11.0",
     "tape-promise": "^4.0.0",
     "triplesec": "^4.0.3",
+    "ts-jest": "^24.3.0",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.10.2",
     "typedoc": "^0.15.1",
@@ -112,7 +113,6 @@
     "rollup": "^2.28.2",
     "schema-inspector": "^1.7.0",
     "sha.js": "^2.4.11",
-    "ts-jest": "^24.3.0",
     "tsdx": "^0.14.0",
     "winston": "^3.2.1",
     "zone-file": "^1.0.0"

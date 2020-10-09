@@ -27,6 +27,7 @@ import { AuthScope, DEFAULT_PROFILE, NAME_LOOKUP_PATH } from './constants';
 import * as queryString from 'query-string';
 import { UserData } from './userData';
 import { StacksMainnet } from '@stacks/network';
+import { protocolEchoReplyDetection } from './protocolEchoDetection';
 
 /**
  *
@@ -167,6 +168,28 @@ export class UserSession {
       return queryDict.authResponse ? (queryDict.authResponse as string) : '';
     }
     return '';
+  }
+
+  /**
+   * Check if there is a authentication request that hasn't been handled. 
+   *
+   * Also checks for a protocol echo reply (which if detected then the page
+   * will be automatically redirected after this call). 
+   * 
+   * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
+   */
+  isSignInPending() {
+    try {
+      const isProtocolEcho = protocolEchoReplyDetection()
+      if (isProtocolEcho) {
+        Logger.info('protocolEchoReply detected from isSignInPending call, the page is about to redirect.')
+        return true
+      }
+    } catch (error) {
+      Logger.error(`Error checking for protocol echo reply isSignInPending: ${error}`)
+    }
+    
+    return !!this.getAuthResponseToken()
   }
 
   /**
