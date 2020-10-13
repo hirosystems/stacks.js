@@ -117,5 +117,11 @@
       "html",
       "lcov"
     ]
-  }
+  },
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/transactions/src/index.d.ts",
+  "umd:main": "dist/transactions.umd.production.js",
+  "unpkg": "dist/transactions.cjs.production.min.js"
 }
