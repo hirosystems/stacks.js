@@ -5,7 +5,7 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as fs from 'fs';
 import * as blockstack from 'blockstack';
-import { decodeToken, SECP256K1Client, TokenSigner, TokenVerifier } from 'jsontokens';
+import { TokenSigner } from 'jsontokens';
 import {
   getTypeString,
   ClarityAbiType,
@@ -56,7 +56,7 @@ class CLITransactionSigner implements TransactionSigner {
   address: string;
   isComplete: boolean;
 
-  constructor(address: string = '') {
+  constructor(address = '') {
     this.address = address;
     this.isComplete = false;
   }

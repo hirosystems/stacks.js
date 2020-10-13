@@ -3,10 +3,9 @@ import * as bitcoin from 'bitcoinjs-lib';
 import * as process from 'process';
 import * as fs from 'fs';
 import * as winston from 'winston';
-import * as logger from 'winston';
 import cors from 'cors';
-import * as RIPEMD160 from 'ripemd160';
-const BN = require('bn.js');
+
+import BN from 'bn.js';
 import * as crypto from 'crypto';
 import * as bip39 from 'bip39';
 import express from 'express';
@@ -50,7 +49,6 @@ import {
   getStacksWalletKeyInfo,
   getApplicationKeyInfo,
   extractAppKey,
-  STRENGTH,
   STX_WALLET_COMPATIBLE_SEED_STRENGTH,
   PaymentKeyInfoType,
   OwnerKeyInfoType,
@@ -78,44 +76,23 @@ import {
 
 import { encryptBackupPhrase, decryptBackupPhrase } from './encrypt';
 
-import {
-  CLINetworkAdapter,
-  CLI_NETWORK_OPTS,
-  getNetwork,
-  NameInfoType,
-  PriceType,
-} from './network';
+import { CLINetworkAdapter, CLI_NETWORK_OPTS, getNetwork, NameInfoType } from './network';
+
+import { gaiaAuth, gaiaConnect, gaiaUploadProfileAll, getGaiaAddressFromProfile } from './data';
 
 import {
-  gaiaAuth,
-  gaiaConnect,
-  gaiaUploadProfileAll,
-  makeZoneFileFromGaiaUrl,
-  getGaiaAddressFromProfile,
-} from './data';
-
-import {
-  SafetyError,
   JSONStringify,
   getPrivateKeyAddress,
   canonicalPrivateKey,
-  sumUTXOs,
-  hash160,
-  checkUrl,
   decodePrivateKey,
   makeProfileJWT,
-  broadcastTransactionAndZoneFile,
   getNameInfoEasy,
-  nameLookup,
   getpass,
   getBackupPhrase,
   mkdirs,
   getIDAddress,
   IDAppKeys,
   getIDAppKeys,
-  hasKeys,
-  UTXO,
-  makeDIDConfiguration,
   makePromptsFromArgList,
   parseClarityFunctionArgAnswers,
   ClarityFunctionArg,
@@ -133,7 +110,7 @@ let gracePeriod = 5000;
 let noExit = false;
 let maxIDSearchIndex = DEFAULT_MAX_ID_SEARCH_INDEX;
 
-let BLOCKSTACK_TEST = process.env.BLOCKSTACK_TEST ? true : false;
+let BLOCKSTACK_TEST = !!process.env.BLOCKSTACK_TEST;
 
 export function getMaxIDSearchIndex() {
   return maxIDSearchIndex;
@@ -162,6 +139,8 @@ export interface WhoisInfoType {
  * @path (string) path to the profile
  * @privateKey (string) the owner key (must be single-sig)
  */
+// TODO: fix, network is never used
+// @ts-ignore
 function profileSign(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const profilePath = args[0];
   const profileData = JSON.parse(fs.readFileSync(profilePath).toString());
@@ -262,7 +241,7 @@ function profileStore(network: CLINetworkAdapter, args: string[]): Promise<strin
       }
       return gaiaUploadProfileAll(network, [gaiaHubUrl], signedProfileData, args[2], name);
     })
-    .then((gaiaUrls: { dataUrls?: string[] | null; error?: string | null}) => {
+    .then((gaiaUrls: { dataUrls?: string[] | null; error?: string | null }) => {
       if (gaiaUrls.hasOwnProperty('error')) {
         return JSONStringify({ dataUrls: gaiaUrls.dataUrls!, error: gaiaUrls.error! }, true);
       } else {
@@ -576,7 +555,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   }
 
   return broadcastTransaction(tx, txNetwork)
-    .then(response => {
+    .then(() => {
       return {
         txid: tx.txid(),
         transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
@@ -680,7 +659,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         return null;
       }
     })
-    .then((prompts) => prompt(prompts!))
+    .then(prompts => prompt(prompts!))
     .then(answers => {
       functionArgs = parseClarityFunctionArgAnswers(answers, abiArgs);
 
@@ -762,7 +741,7 @@ async function readOnlyContractFunctionCall(
         return null;
       }
     })
-    .then((prompts) => prompt(prompts!))
+    .then(prompts => prompt(prompts!))
     .then(answers => {
       functionArgs = parseClarityFunctionArgAnswers(answers, abiArgs);
 
@@ -1177,12 +1156,14 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
   const hubUrl = args[3];
   const mnemonicPromise = getBackupPhrase(args[4]);
 
-  const nameInfoPromise = getNameInfoEasy(network, blockstackID).then((nameInfo: NameInfoType | null) => {
-    if (!nameInfo) {
-      throw new Error('Name not found');
+  const nameInfoPromise = getNameInfoEasy(network, blockstackID).then(
+    (nameInfo: NameInfoType | null) => {
+      if (!nameInfo) {
+        throw new Error('Name not found');
+      }
+      return nameInfo;
     }
-    return nameInfo;
-  });
+  );
 
   const profilePromise = blockstack.lookupProfile(blockstackID);
 
@@ -1261,7 +1242,10 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
 
   // sign the new profile
   const signedProfile = makeProfileJWT(profile, ownerPrivateKey);
-  const profileUrls: { dataUrls?: string[] | null; error?: string | null } = await gaiaUploadProfileAll(
+  const profileUrls: {
+    dataUrls?: string[] | null;
+    error?: string | null;
+  } = await gaiaUploadProfileAll(
     network,
     [ownerHubUrl],
     signedProfile,
@@ -1388,6 +1372,8 @@ function authDaemon(network: CLINetworkAdapter, args: string[]): Promise<string>
  * @backup_phrase (string) the 12-word phrase to encrypt
  * @password (string) the password (will be interactively prompted if not given)
  */
+// TODO: fix: network is never used
+// @ts-ignore
 function encryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const mnemonic = args[0];
   if (mnemonic.split(/ +/g).length !== 12) {
@@ -1433,6 +1419,8 @@ function encryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<st
  * @encrypted_backup_phrase (string) the encrypted base64-encoded backup phrase
  * @password 9string) the password (will be interactively prompted if not given)
  */
+// TODO: fix: network is never used
+// @ts-ignore
 function decryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const ciphertext = args[0];
 
