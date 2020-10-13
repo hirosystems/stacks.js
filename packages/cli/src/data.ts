@@ -41,6 +41,7 @@ function makeFakeAuthResponseToken(
   const authResponse = blockstack.makeAuthResponse(
     ownerPrivateKey,
     { type: '@Person', accounts: [] },
+    // @ts-ignore
     null,
     {},
     null,
@@ -252,7 +253,7 @@ export function gaiaUploadProfileAll(
   gaiaData: string,
   privateKey: string,
   blockstackID?: string
-): Promise<{ dataUrls?: string[]; error?: string }> {
+): Promise<{ dataUrls?: string[] | null; error?: string | null }> {
   const sanitizedGaiaUrls = gaiaUrls
     .map(gaiaUrl => {
       const urlInfo = URL.parse(gaiaUrl);
@@ -273,7 +274,7 @@ export function gaiaUploadProfileAll(
 
   return Promise.all(uploadPromises)
     .then(publicUrls => {
-      return { error: null, dataUrls: publicUrls };
+      return { error: null, dataUrls: publicUrls! };
     })
     .catch(e => {
       return { error: `Failed to upload: ${e.message}`, dataUrls: null };

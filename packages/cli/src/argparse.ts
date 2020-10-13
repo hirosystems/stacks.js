@@ -1,4 +1,4 @@
-import * as Ajv from 'ajv';
+import Ajv from 'ajv';
 import * as process from 'process';
 import * as fs from 'fs';
 
@@ -3140,7 +3140,7 @@ export function checkArgs(argList: Array<string>): CheckArgsSuccessType | CheckA
   if (!parsedCommandArgs.status) {
     return {
       success: false,
-      error: parsedCommandArgs.error,
+      error: parsedCommandArgs.error!,
       usage: true,
       command: commandName,
     };
@@ -3153,10 +3153,11 @@ export function checkArgs(argList: Array<string>): CheckArgsSuccessType | CheckA
   // them if they're given.
   const commandSchema = JSON.parse(JSON.stringify(CLI_ARGS.properties[commandName]));
   for (let i = commandSchema.minItems; i < commandSchema.maxItems; i++) {
-    if (i < commandArgs.length) {
-      if (commandArgs[i] === null || commandArgs[i] === undefined) {
+    if (i < commandArgs!.length) {
+      if (commandArgs![i] === null || commandArgs![i] === undefined) {
         // optional argument not given.  Update the schema we're checking against
         // to expect this.
+        // @ts-ignore
         commandArgs[i] = null;
         commandSchema.items[i] = { type: 'null' };
       }
@@ -3167,11 +3168,11 @@ export function checkArgs(argList: Array<string>): CheckArgsSuccessType | CheckA
   const valid = ajv.validate(commandSchema, commandArgs);
   if (!valid) {
     let errorMsg = '';
-    for (let i = 0; i < ajv.errors.length; i++) {
+    for (let i = 0; i < ajv.errors!.length; i++) {
       const msg = `Invalid command arguments: Schema "${
-        ajv.errors[0].schemaPath
-      }" failed validation (problem: "${ajv.errors[0].message}", cause: "${JSON.stringify(
-        ajv.errors[0].params
+        ajv.errors![0].schemaPath
+      }" failed validation (problem: "${ajv.errors![0].message}", cause: "${JSON.stringify(
+        ajv.errors![0].params
       )}")\n`;
       errorMsg += msg;
     }
@@ -3186,7 +3187,7 @@ export function checkArgs(argList: Array<string>): CheckArgsSuccessType | CheckA
   return {
     success: true,
     command: commandName,
-    args: commandArgs,
+    args: commandArgs!,
   };
 }
 

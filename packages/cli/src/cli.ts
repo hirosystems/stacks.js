@@ -4,14 +4,14 @@ import * as process from 'process';
 import * as fs from 'fs';
 import * as winston from 'winston';
 import * as logger from 'winston';
-import * as cors from 'cors';
+import cors from 'cors';
 import * as RIPEMD160 from 'ripemd160';
 const BN = require('bn.js');
 import * as crypto from 'crypto';
 import * as bip39 from 'bip39';
-import * as express from 'express';
+import express from 'express';
 import * as path from 'path';
-import * as inquirer from 'inquirer';
+import { prompt } from 'inquirer';
 import fetch from 'node-fetch';
 import {
   makeSTXTokenTransfer,
@@ -23,7 +23,6 @@ import {
   estimateContractDeploy,
   estimateContractFunctionCall,
   SignedTokenTransferOptions,
-  TokenTransferOptions,
   ContractDeployOptions,
   ContractCallOptions,
   ReadOnlyFunctionOptions,
@@ -35,7 +34,7 @@ import {
   PostConditionMode,
   cvToString,
   StacksTransaction,
-} from '@stacks/transactions';
+} from '@blockstack/stacks-transactions';
 
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 
@@ -228,7 +227,7 @@ function profileStore(network: CLINetworkAdapter, args: string[]): Promise<strin
   const ownerAddress = getPrivateKeyAddress(network, privateKey);
   const ownerAddressMainnet = network.coerceMainnetAddress(ownerAddress);
 
-  let nameInfoPromise: Promise<{ address: string }>;
+  let nameInfoPromise: Promise<NameInfoType | null>;
   let name = '';
 
   if (nameOrAddress.startsWith('ID-')) {
@@ -250,7 +249,7 @@ function profileStore(network: CLINetworkAdapter, args: string[]): Promise<strin
   ]);
 
   return Promise.all([nameInfoPromise, verifyProfilePromise])
-    .then(([nameInfo, _verifiedProfile]: [NameInfoType, any]) => {
+    .then(([nameInfo, _verifiedProfile]: [NameInfoType | null, any]) => {
       if (
         safetyChecks &&
         (!nameInfo ||
@@ -263,11 +262,11 @@ function profileStore(network: CLINetworkAdapter, args: string[]): Promise<strin
       }
       return gaiaUploadProfileAll(network, [gaiaHubUrl], signedProfileData, args[2], name);
     })
-    .then((gaiaUrls: { dataUrls?: string[]; error?: string }) => {
+    .then((gaiaUrls: { dataUrls?: string[] | null; error?: string | null}) => {
       if (gaiaUrls.hasOwnProperty('error')) {
-        return JSONStringify(gaiaUrls, true);
+        return JSONStringify({ dataUrls: gaiaUrls.dataUrls!, error: gaiaUrls.error! }, true);
       } else {
-        return JSONStringify({ profileUrls: gaiaUrls.dataUrls });
+        return JSONStringify({ profileUrls: gaiaUrls.dataUrls! });
       }
     });
 }
@@ -681,7 +680,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
         return null;
       }
     })
-    .then(prompts => inquirer.prompt(prompts))
+    .then((prompts) => prompt(prompts!))
     .then(answers => {
       functionArgs = parseClarityFunctionArgAnswers(answers, abiArgs);
 
@@ -763,7 +762,7 @@ async function readOnlyContractFunctionCall(
         return null;
       }
     })
-    .then(prompts => inquirer.prompt(prompts))
+    .then((prompts) => prompt(prompts!))
     .then(answers => {
       functionArgs = parseClarityFunctionArgAnswers(answers, abiArgs);
 
@@ -1178,7 +1177,7 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
   const hubUrl = args[3];
   const mnemonicPromise = getBackupPhrase(args[4]);
 
-  const nameInfoPromise = getNameInfoEasy(network, blockstackID).then((nameInfo: NameInfoType) => {
+  const nameInfoPromise = getNameInfoEasy(network, blockstackID).then((nameInfo: NameInfoType | null) => {
     if (!nameInfo) {
       throw new Error('Name not found');
     }
@@ -1216,7 +1215,7 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
   const ownerKeyInfo = await getOwnerKeyInfo(network, mnemonic, appKeyInfo.ownerKeyIndex);
 
   // do we already have an address set for this app?
-  let existingAppAddress: string;
+  let existingAppAddress: string | null = null;
   let appPrivateKey: string;
   try {
     existingAppAddress = getGaiaAddressFromProfile(network, nameProfile, appOrigin);
@@ -1262,7 +1261,7 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
 
   // sign the new profile
   const signedProfile = makeProfileJWT(profile, ownerPrivateKey);
-  const profileUrls: { dataUrls?: string[]; error?: string } = await gaiaUploadProfileAll(
+  const profileUrls: { dataUrls?: string[] | null; error?: string | null } = await gaiaUploadProfileAll(
     network,
     [ownerHubUrl],
     signedProfile,
@@ -1276,7 +1275,7 @@ async function gaiaSetHub(network: CLINetworkAdapter, args: string[]): Promise<s
     });
   } else {
     return JSONStringify({
-      profileUrls: profileUrls.dataUrls,
+      profileUrls: profileUrls.dataUrls!,
     });
   }
 }
@@ -1395,7 +1394,7 @@ function encryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<st
     throw new Error('Invalid backup phrase: must be 12 words');
   }
 
-  const passwordPromise = new Promise((resolve, reject) => {
+  const passwordPromise: Promise<string> = new Promise((resolve, reject) => {
     let pass = '';
     if (args.length === 2 && !!args[1]) {
       pass = args[1];
@@ -1437,7 +1436,7 @@ function encryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<st
 function decryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<string> {
   const ciphertext = args[0];
 
-  const passwordPromise = new Promise((resolve, reject) => {
+  const passwordPromise: Promise<string> = new Promise((resolve, reject) => {
     if (args.length === 2 && !!args[1]) {
       const pass = args[1];
       resolve(pass);
@@ -1560,7 +1559,7 @@ export function CLIMain() {
   const opts = getCLIOpts(argv);
 
   const cmdArgs: any = checkArgs(
-    CLIOptAsStringArray(opts, '_') ? CLIOptAsStringArray(opts, '_') : []
+    CLIOptAsStringArray(opts, '_') ? CLIOptAsStringArray(opts, '_')! : []
   );
   if (!cmdArgs.success) {
     if (cmdArgs.error) {
@@ -1580,9 +1579,9 @@ export function CLIMain() {
     txOnly = CLIOptAsBool(opts, 'x');
     estimateOnly = CLIOptAsBool(opts, 'e');
     safetyChecks = !CLIOptAsBool(opts, 'U');
-    receiveFeesPeriod = opts['N'] ? parseInt(CLIOptAsString(opts, 'N')) : receiveFeesPeriod;
-    gracePeriod = opts['G'] ? parseInt(CLIOptAsString(opts, 'N')) : gracePeriod;
-    maxIDSearchIndex = opts['M'] ? parseInt(CLIOptAsString(opts, 'M')) : maxIDSearchIndex;
+    receiveFeesPeriod = opts['N'] ? parseInt(CLIOptAsString(opts, 'N')!) : receiveFeesPeriod;
+    gracePeriod = opts['G'] ? parseInt(CLIOptAsString(opts, 'N')!) : gracePeriod;
+    maxIDSearchIndex = opts['M'] ? parseInt(CLIOptAsString(opts, 'M')!) : maxIDSearchIndex;
 
     const debug = CLIOptAsBool(opts, 'd');
     const consensusHash = CLIOptAsString(opts, 'C');
@@ -1609,13 +1608,13 @@ export function CLIMain() {
       : DEFAULT_CONFIG_PATH;
 
     const namespaceBurnAddr = CLIOptAsString(opts, 'B');
-    const feeRate = CLIOptAsString(opts, 'F') ? parseInt(CLIOptAsString(opts, 'F')) : 0;
+    const feeRate = CLIOptAsString(opts, 'F') ? parseInt(CLIOptAsString(opts, 'F')!) : 0;
     const priceToPay = CLIOptAsString(opts, 'P') ? CLIOptAsString(opts, 'P') : '0';
     const priceUnits = CLIOptAsString(opts, 'D');
 
     const networkType = testnet ? 'testnet' : integration_test ? 'regtest' : 'mainnet';
 
-    const configData = loadConfig(configPath, networkType);
+    const configData = loadConfig(configPath!, networkType);
 
     if (debug) {
       configData.logConfig.level = 'debug';

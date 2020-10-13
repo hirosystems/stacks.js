@@ -61,7 +61,7 @@ async function walletFromMnemonic(mnemonic: string): Promise<blockstack.Blocksta
 }
 
 function getNodePrivateKey(node: BIP32Interface): string {
-  return blockstack.ecPairToHexString(bitcoin.ECPair.fromPrivateKey(node.privateKey));
+  return blockstack.ecPairToHexString(bitcoin.ECPair.fromPrivateKey(node.privateKey!));
 }
 
 /*
@@ -137,7 +137,7 @@ export async function getStacksWalletKeyInfo(
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const master = bip32.fromSeed(seed);
   const child = master.derivePath("m/44'/5757'/0'/0/0"); // taken from stacks-wallet. See https://github.com/blockstack/stacks-wallet
-  const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey);
+  const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey!);
   const privkey = blockstack.ecPairToHexString(ecPair);
 
   const addr = getPrivateKeyAddress(network, privkey);
@@ -148,13 +148,13 @@ export async function getStacksWalletKeyInfo(
       pubkey: ecPair.publicKey,
       network: bitcoin.networks.regtest,
     });
-    btcAddress = address;
+    btcAddress = address!;
   } else {
     const { address } = bitcoin.payments.p2pkh({
       pubkey: ecPair.publicKey,
       network: bitcoin.networks.bitcoin,
     });
-    btcAddress = address;
+    btcAddress = address!;
   }
   const result: StacksKeyInfoType = {
     privateKey: privkey,

@@ -64,7 +64,8 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "rimraf lib && tsc -b tsconfig.build.json",
+    "build2": "rimraf lib && tsc -b tsconfig.build.json",
+    "build": "tsdx build --format cjs,esm,umd",
     "dev": "ts-node src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
@@ -83,11 +84,12 @@
     "@types/ripemd160": "^2.0.0",
     "jest": "^24.9.0",
     "minimist": ">=1.2.3",
-    "ts-jest": "^26.4.1"
+    "ts-jest": "^26.4.1",
+    "tsdx": "^0.14.0"
   },
   "dependencies": {
     "@stacks/network": "^1.0.0-beta.4",
-    "@stacks/transactions": "^1.0.0-beta.4",
+    "@blockstack/stacks-transactions": "^v0.7.0",
     "ajv": "^4.11.5",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
@@ -103,7 +105,6 @@
     "node-fetch": "^2.6.0",
     "ripemd160": "^2.0.1",
     "ts-node": "^8.10.2",
-    "tsdx": "^0.13.3",
     "typescript": "^3.9.7",
     "winston": "^3.2.1",
     "zone-file": "^0.2.2"

@@ -29,16 +29,16 @@ export interface PriceType {
 
 export type NameInfoType = {
   address: string;
-  blockchain: string;
-  did: string;
-  expire_block: number;
-  grace_period: number;
-  last_txid: string;
-  renewal_deadline: number;
-  resolver: string | null;
-  status: string;
-  zonefile: string | null;
-  zonefile_hash: string | null;
+  blockchain?: string;
+  did?: string;
+  expire_block?: number;
+  grace_period?: number;
+  last_txid?: string;
+  renewal_deadline?: number;
+  resolver?: string | null;
+  status?: string;
+  zonefile?: string | null;
+  zonefile_hash?: string | null;
 };
 
 /*
@@ -72,7 +72,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
 
     opts = Object.assign({}, optsDefault, opts);
 
-    super(opts.altAPIUrl, opts.altTransactionBroadcasterUrl, network.btc, network.layer1);
+    super(opts.altAPIUrl!, opts.altTransactionBroadcasterUrl!, network.btc, network.layer1);
     this.consensusHash = opts.consensusHash;
     this.feeRate = opts.feeRate;
     this.namespaceBurnAddress = opts.namespaceBurnAddress;
@@ -80,7 +80,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
     this.priceUnits = opts.priceUnits;
     this.receiveFeesPeriod = opts.receiveFeesPeriod;
     this.gracePeriod = opts.gracePeriod;
-    this.nodeAPIUrl = opts.nodeAPIUrl;
+    this.nodeAPIUrl = opts.nodeAPIUrl!;
 
     this.optAlwaysCoerceAddress = false;
   }
@@ -148,6 +148,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
         } as PriceType)
       );
     }
+    // @ts-ignore
     return super.getNamePrice(name).then((priceInfo: PriceType) => {
       // use v2 scheme
       if (!priceInfo.units) {
@@ -170,6 +171,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
         } as PriceType)
       );
     }
+    // @ts-ignore
     return super.getNamespacePrice(namespaceID).then((priceInfo: PriceType) => {
       // use v2 scheme
       if (!priceInfo.units) {
@@ -210,7 +212,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
         if (namespaceInfo.version === 2) {
           // pay-to-namespace-creator if this namespace is less than $receiveFeesPeriod blocks old
           if (receiveFeesPeriod < 0) {
-            receiveFeesPeriod = this.receiveFeesPeriod;
+            receiveFeesPeriod = this.receiveFeesPeriod!;
           }
 
           if (namespaceInfo.reveal_block + receiveFeesPeriod > blockHeight) {

@@ -89,7 +89,7 @@ export class MultiSigKeySigner extends CLITransactionSigner {
     try {
       // try to deduce m (as in m-of-n)
       const chunks = bitcoinjs.script.decompile(this.redeemScript);
-      const firstOp = chunks[0];
+      const firstOp = chunks![0];
       this.m = parseInt(bitcoinjs.script.toASM([firstOp]).slice(3), 10);
       this.address = bitcoinjs.address.toBase58Check(
         bitcoinjs.crypto.hash160(this.redeemScript),
@@ -183,7 +183,7 @@ export class SegwitP2SHKeySigner extends CLITransactionSigner {
         if (this.m === 1) {
           // p2sh-p2wpkh
           const ecPair = blockstack.hexStringToECPair(this.privateKeys[0]);
-          txIn.sign(signingIndex, ecPair, this.redeemScript, null, utxo.value);
+          txIn.sign(signingIndex, ecPair, this.redeemScript, undefined, utxo.value);
         } else {
           // p2sh-p2wsh
           const keysToUse = this.privateKeys.slice(0, this.m);
@@ -193,7 +193,7 @@ export class SegwitP2SHKeySigner extends CLITransactionSigner {
               signingIndex,
               ecPair,
               this.redeemScript,
-              null,
+              undefined,
               utxo.value,
               this.witnessScript
             );
@@ -279,7 +279,7 @@ export function parseMultiSigKeys(serializedPrivateKeys: string): MultiSigKeySig
 
   // generate redeem script
   const multisigInfo = bitcoinjs.payments.p2ms({ m, pubkeys });
-  return new MultiSigKeySigner(multisigInfo.output.toString('hex'), privkeys);
+  return new MultiSigKeySigner(multisigInfo.output!.toString('hex'), privkeys);
 }
 
 /*
@@ -323,15 +323,15 @@ export function parseSegwitP2SHKeys(serializedPrivateKeys: string): SegwitP2SHKe
     const p2wpkh = bitcoinjs.payments.p2wpkh({ pubkey: pubkeys[0] });
     const p2sh = bitcoinjs.payments.p2sh({ redeem: p2wpkh });
 
-    redeemScript = p2sh.redeem.output.toString('hex');
+    redeemScript = p2sh.redeem!.output!.toString('hex');
   } else {
     // p2wsh
     const p2ms = bitcoinjs.payments.p2ms({ m, pubkeys });
     const p2wsh = bitcoinjs.payments.p2wsh({ redeem: p2ms });
     const p2sh = bitcoinjs.payments.p2sh({ redeem: p2wsh });
 
-    redeemScript = p2sh.redeem.output.toString('hex');
-    witnessScript = p2wsh.redeem.output.toString('hex');
+    redeemScript = p2sh.redeem!.output!.toString('hex');
+    witnessScript = p2wsh.redeem!.output!.toString('hex');
   }
 
   return new SegwitP2SHKeySigner(redeemScript, witnessScript, m, privkeys);
@@ -437,7 +437,7 @@ export function canonicalPrivateKey(privkey: string): string {
  * @txIn (object) the transaction
  */
 export function sumUTXOs(utxos: UTXO[]): number {
-  return utxos.reduce((agg, x) => agg + x.value, 0);
+  return utxos.reduce((agg, x) => agg + x.value!, 0);
 }
 
 /*
@@ -482,7 +482,7 @@ export async function makeDIDConfiguration(
 ): Promise<{ entries: { did: string; jwt: string }[] }> {
   const tokenSigner = new TokenSigner('ES256K', privateKey);
   const nameInfo = await network.getNameInfo(blockstackID);
-  const did = nameInfo.did;
+  const did = nameInfo.did!;
   const payload = {
     iss: did,
     domain,
@@ -581,7 +581,7 @@ export async function nameLookup(
     ? blockstack.lookupProfile(name).catch(() => null)
     : Promise.resolve().then(() => null);
 
-  const zonefilePromise = nameInfoPromise.then((nameInfo: NameInfoType) =>
+  const zonefilePromise = nameInfoPromise.then((nameInfo: NameInfoType | null) =>
     nameInfo ? nameInfo.zonefile : null
   );
 
@@ -617,6 +617,7 @@ export async function nameLookup(
     profile: profileObj,
     profileUrl: profileUrl,
   };
+  // @ts-ignore
   return ret;
 }
 
@@ -890,9 +891,9 @@ export function answerToClarityValue(answer: any, arg: ClarityFunctionArg): Clar
 }
 
 export function generateExplorerTxPageUrl(txid: string, network: StacksNetwork): string {
-  if (network.version === TransactionVersion.Mainnet) {
-    return `https://explorer.blockstack.org/txid/0x${txid}`;
-  } else if (network.version === TransactionVersion.Testnet) {
+  if (network.version === TransactionVersion.Testnet) {
     return `https://testnet-explorer.now.sh/txid/0x${txid}`;
+  } else {
+    return `https://explorer.blockstack.org/txid/0x${txid}`;
   }
 }

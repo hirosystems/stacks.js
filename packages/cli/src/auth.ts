@@ -136,8 +136,8 @@ async function makeSignInLink(
     id.privateKey,
     {},
     id.name,
-    { email: null, profileUrl: id.profileUrl },
-    null,
+    { email: undefined, profileUrl: id.profileUrl },
+    undefined,
     appPrivateKey,
     undefined,
     authRequest.public_keys[0],
@@ -150,6 +150,7 @@ async function makeSignInLink(
   const authResponsePayload = jsontokens.decodeToken(authResponseTmp).payload;
   const id_public = Object.assign({}, id);
   id_public.profile = {};
+  // @ts-ignore
   id_public.privateKey = undefined;
 
   (authResponsePayload as any).metadata = {
@@ -327,12 +328,12 @@ async function getIdentityInfo(
     nameDatas = nameDatas.filter(p => p !== null && p !== undefined);
 
     for (let i = 0; i < nameDatas.length; i++) {
-      if (nameDatas[i].hasOwnProperty('error') && (nameDatas[i] as any).error) {
+      if (nameDatas[i]!.hasOwnProperty('error') && (nameDatas[i] as any).error) {
         // no data for this name
         identities[i].profileUrl = '';
       } else {
-        identities[i].profileUrl = nameDatas[i].profileUrl;
-        identities[i].profile = nameDatas[i].profile;
+        identities[i].profileUrl = nameDatas[i]!.profileUrl!;
+        identities[i].profile = nameDatas[i]!.profile;
       }
     }
 
