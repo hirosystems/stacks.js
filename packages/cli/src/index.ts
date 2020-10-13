@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-export { CLIMain } from './cli';
+import { CLIMain } from './cli';
 
+export { CLIMain };
 // implement just enough of window to be useful to blockstack.js.
 // do this here, so we can be *sure* it's in RAM.
 const localStorageRAM: Record<string, any> = {};
@@ -28,4 +29,4 @@ global['window'] = {
 
 global['localStorage'] = global['window'].localStorage;
 
-require('.').CLIMain();
+CLIMain();
