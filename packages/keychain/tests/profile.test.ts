@@ -52,8 +52,9 @@ describe('registerSubdomain', () => {
     expect(fetchMock.mock.calls.length).toEqual(3);
     const [registrarUrl, fetchOpts] = fetchMock.mock.calls[2];
     expect(registrarUrl).toEqual(registrars[Subdomains.TEST].registerUrl);
-    expect(fetchOpts.method).toEqual('POST');
+    expect(fetchOpts!.method).toEqual('POST');
     const zoneFile = makeProfileZoneFile('tester.test-personal.id', 'http://gaia.com/profile.json');
+    // @ts-ignore
     expect(JSON.parse(fetchOpts.body)).toEqual({
       name: 'tester',
       owner_address: identity.address,

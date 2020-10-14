@@ -57,6 +57,7 @@ test('adds to apps in profile if publish_data scope', async () => {
   const decoded = decodeToken(authResponse);
   const { payload } = decoded as Decoded;
   expect(payload.profile.apps['https://banter.pub']).not.toBeFalsy();
+  // @ts-ignore
   const profile = JSON.parse(fetchMock.mock.calls[7][1].body);
   const { apps, appsMeta } = profile[0].decodedToken.payload.claim;
   expect(apps[appDomain]).not.toBeFalsy();

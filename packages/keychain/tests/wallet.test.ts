@@ -161,6 +161,7 @@ test('creates a config', async () => {
   const hubConfig = await wallet.createGaiaConfig('https://gaia.blockstack.org');
   const config = await wallet.getOrCreateConfig({ gaiaConfig: hubConfig });
   expect(Object.keys(config.identities[0].apps).length).toEqual(0);
+  // @ts-ignore
   const { body } = fetchMock.mock.calls[2][1];
   const decrypted = (await decryptContent(body, { privateKey: wallet.configPrivateKey })) as string;
   expect(JSON.parse(decrypted)).toEqual(config);
@@ -195,6 +196,7 @@ test('updates wallet config', async () => {
     gaiaConfig,
   });
   expect(fetchMock.mock.calls.length).toEqual(4);
+  // @ts-ignore
   const body = JSON.parse(fetchMock.mock.calls[3][1].body);
   const decrypted = (await decryptContent(JSON.stringify(body), {
     privateKey: wallet.configPrivateKey,
@@ -223,6 +225,7 @@ test('updates config for reusing id warning', async () => {
   await wallet.updateConfigForReuseWarning({ gaiaConfig });
   expect(wallet.walletConfig?.hideWarningForReusingIdentity).toBeTruthy();
   expect(fetchMock.mock.calls.length).toEqual(4);
+  // @ts-ignore
   const body = JSON.parse(fetchMock.mock.calls[3][1].body);
   const decrypted = (await decryptContent(JSON.stringify(body), {
     privateKey: wallet.configPrivateKey,
