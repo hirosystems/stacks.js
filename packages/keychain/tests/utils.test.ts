@@ -77,6 +77,7 @@ describe(validateSubdomainAvailability.name, () => {
     fetchMock.once(JSON.stringify({ success: true }));
     const response = await validateSubdomainAvailability('slkdjfskldjf', Subdomains.TEST);
     expect(response).toEqual({ success: true });
+    // @ts-ignore
     const url: string = fetchMock.mock.calls[0][0];
     expect(url.includes(registrars[Subdomains.TEST].apiUrl)).toBeTruthy();
   });

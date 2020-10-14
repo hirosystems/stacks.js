@@ -23,7 +23,7 @@ describe('generateEncryptedMnemonicRootKeychain()', () => {
 
 describe('restoreKeychainFromMnemonic()', () => {
   test('it restores keychain from a seed', async () => {
-    const password = '6bd8106ff1704446ba11e31ff3b0ce8b';
+    // const password = '6bd8106ff1704446ba11e31ff3b0ce8b';
     const phrase =
       'eternal army wreck noodle click shock include orchard jungle only middle forget idle pulse give empower iron curtain silent blush blossom chef animal sphere';
 
