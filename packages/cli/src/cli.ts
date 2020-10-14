@@ -354,7 +354,7 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
 
   // temporary hack to use network config from stacks-transactions lib
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.blockstackAPIUrl;
+  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
 
   return fetch(txNetwork.getAccountApiUrl(address))
     .then(response => response.json())
@@ -530,7 +530,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
 
   // temporary hack to use network config from stacks-transactions lib
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.blockstackAPIUrl;
+  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
 
   const options: SignedTokenTransferOptions = {
     recipient: recipientAddress,
@@ -586,7 +586,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
 
   // temporary hack to use network config from stacks-transactions lib
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.blockstackAPIUrl;
+  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
 
   const options: ContractDeployOptions = {
     contractName,
@@ -642,7 +642,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
 
   // temporary hack to use network config from stacks-transactions lib
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.blockstackAPIUrl;
+  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
@@ -724,7 +724,7 @@ async function readOnlyContractFunctionCall(
 
   // temporary hack to use network config from stacks-transactions lib
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  txNetwork.coreApiUrl = network.blockstackAPIUrl;
+  txNetwork.coreApiUrl = network.legacyNetwork.blockstackAPIUrl;
 
   let abi: ClarityAbi;
   let abiArgs: ClarityFunctionArg[];
@@ -1647,10 +1647,10 @@ export function CLIMain() {
     );
     const blockstackNetwork = new CLINetworkAdapter(wrappedNetwork, cliOpts);
     if (magicBytes) {
-      blockstackNetwork.MAGIC_BYTES = magicBytes;
+      // blockstackNetwork.MAGIC_BYTES = magicBytes;
     }
 
-    blockstack.config.network = blockstackNetwork;
+    // blockstack.config.network = blockstackNetwork;
     blockstack.config.logLevel = 'error';
 
     if (cmdArgs.command === 'help') {

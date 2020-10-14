@@ -45,7 +45,7 @@ export type NameInfoType = {
  * Adapter class that allows us to use data obtained
  * from the CLI.
  */
-export class CLINetworkAdapter extends BlockstackNetwork {
+export class CLINetworkAdapter {
   consensusHash: string | null;
   feeRate: number | null;
   namespaceBurnAddress: string | null;
@@ -55,6 +55,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
   receiveFeesPeriod: number | null;
   nodeAPIUrl: string;
   optAlwaysCoerceAddress: boolean;
+  legacyNetwork: BlockstackNetwork;
 
   constructor(network: BlockstackNetwork, opts: CLI_NETWORK_OPTS) {
     const optsDefault: CLI_NETWORK_OPTS = {
@@ -72,7 +73,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
 
     opts = Object.assign({}, optsDefault, opts);
 
-    super(opts.altAPIUrl!, opts.altTransactionBroadcasterUrl!, network.btc, network.layer1);
+    this.legacyNetwork = new BlockstackNetwork(opts.altAPIUrl!, opts.altTransactionBroadcasterUrl!, network.btc, network.layer1)
     this.consensusHash = opts.consensusHash;
     this.feeRate = opts.feeRate;
     this.namespaceBurnAddress = opts.namespaceBurnAddress;
@@ -86,11 +87,11 @@ export class CLINetworkAdapter extends BlockstackNetwork {
   }
 
   isMainnet(): boolean {
-    return this.layer1.pubKeyHash === bitcoin.networks.bitcoin.pubKeyHash;
+    return this.legacyNetwork.layer1.pubKeyHash === bitcoin.networks.bitcoin.pubKeyHash;
   }
 
   isTestnet(): boolean {
-    return this.layer1.pubKeyHash === bitcoin.networks.testnet.pubKeyHash;
+    return this.legacyNetwork.layer1.pubKeyHash === bitcoin.networks.testnet.pubKeyHash;
   }
 
   setCoerceMainnetAddress(value: boolean) {
@@ -103,9 +104,9 @@ export class CLINetworkAdapter extends BlockstackNetwork {
     const addressVersion = addressInfo.version;
     let newVersion = 0;
 
-    if (addressVersion === this.layer1.pubKeyHash) {
+    if (addressVersion === this.legacyNetwork.layer1.pubKeyHash) {
       newVersion = 0;
-    } else if (addressVersion === this.layer1.scriptHash) {
+    } else if (addressVersion === this.legacyNetwork.layer1.scriptHash) {
       newVersion = 5;
     }
     return bitcoin.address.toBase58Check(addressHash, newVersion);
@@ -120,7 +121,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
       // in regtest mode
       return Promise.resolve(Math.floor(0.00001 * SATOSHIS_PER_BTC));
     }
-    return super.getFeeRate();
+    return this.legacyNetwork.getFeeRate();
   }
 
   getConsensusHash(): Promise<string> {
@@ -128,14 +129,14 @@ export class CLINetworkAdapter extends BlockstackNetwork {
     if (this.consensusHash) {
       return new Promise((resolve: any) => resolve(this.consensusHash));
     }
-    return super.getConsensusHash().then((c: string) => c);
+    return this.legacyNetwork.getConsensusHash().then((c: string) => c);
   }
 
   getGracePeriod(): Promise<number> {
     if (this.gracePeriod) {
       return new Promise((resolve: any) => resolve(this.gracePeriod));
     }
-    return super.getGracePeriod().then((g: number) => g);
+    return this.legacyNetwork.getGracePeriod().then((g: number) => g);
   }
 
   getNamePrice(name: string): Promise<PriceType> {
@@ -149,7 +150,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
       );
     }
     // @ts-ignore
-    return super.getNamePrice(name).then((priceInfo: PriceType) => {
+    return this.legacyNetwork.getNamePrice(name).then((priceInfo: PriceType) => {
       // use v2 scheme
       if (!priceInfo.units) {
         priceInfo = {
@@ -195,8 +196,8 @@ export class CLINetworkAdapter extends BlockstackNetwork {
     }
 
     return Promise.all([
-      fetch(`${this.blockstackAPIUrl}/v1/namespaces/${namespace}`),
-      this.getBlockHeight(),
+      fetch(`${this.legacyNetwork.blockstackAPIUrl}/v1/namespaces/${namespace}`),
+      this.legacyNetwork.getBlockHeight(),
     ])
       .then(([resp, blockHeight]: [any, number]) => {
         if (resp.status === 404) {
@@ -221,12 +222,12 @@ export class CLINetworkAdapter extends BlockstackNetwork {
         }
         return address;
       })
-      .then((address: string) => this.coerceAddress(address));
+      .then((address: string) => this.legacyNetwork.coerceAddress(address));
   }
 
   getNameInfo(name: string): Promise<NameInfoType> {
     // optionally coerce addresses
-    return super.getNameInfo(name).then((ni: any) => {
+    return this.legacyNetwork.getNameInfo(name).then((ni: any) => {
       const nameInfo: NameInfoType = {
         address: this.optAlwaysCoerceAddress ? this.coerceMainnetAddress(ni.address) : ni.address,
         blockchain: ni.blockchain,
@@ -246,7 +247,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
 
   getBlockchainNameRecord(name: string): Promise<any> {
     // TODO: send to blockstack.js
-    const url = `${this.blockstackAPIUrl}/v1/blockchains/bitcoin/names/${name}`;
+    const url = `${this.legacyNetwork.blockstackAPIUrl}/v1/blockchains/bitcoin/names/${name}`;
     return fetch(url)
       .then(resp => {
         if (resp.status !== 200) {
@@ -260,7 +261,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
         const fixedAddresses: Record<string, any> = {};
         for (const addrAttr of ['address', 'importer_address', 'recipient_address']) {
           if (nameInfo.hasOwnProperty(addrAttr) && nameInfo[addrAttr]) {
-            fixedAddresses[addrAttr] = this.coerceAddress(nameInfo[addrAttr]);
+            fixedAddresses[addrAttr] = this.legacyNetwork.coerceAddress(nameInfo[addrAttr]);
           }
         }
         return Object.assign(nameInfo, fixedAddresses);
@@ -269,7 +270,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
 
   getNameHistory(name: string, page: number): Promise<Record<string, any[]>> {
     // TODO: send to blockstack.js
-    const url = `${this.blockstackAPIUrl}/v1/names/${name}/history?page=${page}`;
+    const url = `${this.legacyNetwork.blockstackAPIUrl}/v1/names/${name}/history?page=${page}`;
     return fetch(url)
       .then(resp => {
         if (resp.status !== 200) {
@@ -287,7 +288,7 @@ export class CLINetworkAdapter extends BlockstackNetwork {
             let fixedHistoryEntry: any = {};
             for (const addrAttr of ['address', 'importer_address', 'recipient_address']) {
               if (historyEntry.hasOwnProperty(addrAttr) && historyEntry[addrAttr]) {
-                fixedAddresses[addrAttr] = this.coerceAddress(historyEntry[addrAttr]);
+                fixedAddresses[addrAttr] = this.legacyNetwork.coerceAddress(historyEntry[addrAttr]);
               }
             }
             fixedHistoryEntry = Object.assign(historyEntry, fixedAddresses);
@@ -297,6 +298,26 @@ export class CLINetworkAdapter extends BlockstackNetwork {
         }
         return fixedHistory;
       });
+  }
+
+  coerceAddress(address: string) {
+    return this.legacyNetwork.coerceAddress(address);
+  }
+
+  getAccountHistoryPage(address: string, page: number) {
+    return this.legacyNetwork.getAccountHistoryPage(address, page);
+  }
+
+  broadcastTransaction(tx: string) {
+    return this.legacyNetwork.broadcastTransaction(tx);
+  }
+
+  broadcastZoneFile(zonefile: string, txid: string) {
+    return this.legacyNetwork.broadcastZoneFile(zonefile, txid);
+  }
+
+  getNamesOwned(address: string) {
+    return this.legacyNetwork.getNamesOwned(address);
   }
 }
 

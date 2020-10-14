@@ -99,7 +99,7 @@ export function gaiaAuth(
   }
 
   const authSessionToken = makeFakeAuthResponseToken(appPrivateKey, hubUrl, associationToken);
-  const nameLookupUrl = `${network.blockstackAPIUrl}/v1/names/`;
+  const nameLookupUrl = `${network.legacyNetwork.blockstackAPIUrl}/v1/names/`;
   const transitPrivateKey = 'f33fb466154023aba2003c17158985aa6603db68db0f1afc0fcf1d641ea6c2cb'; // same as above
   return blockstack.handlePendingSignIn(nameLookupUrl, authSessionToken, transitPrivateKey);
 }

@@ -599,7 +599,7 @@ export async function handleSignIn(
       sendJSON(res, { error: 'No authResponse given' }, 400);
     });
   }
-  const nameLookupUrl = `${network.blockstackAPIUrl}/v1/names/`;
+  const nameLookupUrl = `${network.legacyNetwork.blockstackAPIUrl}/v1/names/`;
 
   let errorMsg = '';
   let errorStatusCode = 400;
