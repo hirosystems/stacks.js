@@ -1,5 +1,3 @@
-import * as proxyquire from 'proxyquire'
-import * as sinon from 'sinon'
 import * as crypto from 'crypto'
 import { TokenSigner, TokenVerifier, decodeToken } from 'jsontokens'
 import {
@@ -105,10 +103,10 @@ test('deleteFile gets a new gaia config and tries again', async () => {
 
   expect(success).toHaveBeenCalled()
   expect(connectToGaiaHub).toHaveBeenCalledTimes(1)
-  expect(fetchMock.mock.calls[0][1].method).toEqual('DELETE')
-  expect(fetchMock.mock.calls[0][1].headers).toEqual({Authorization: 'bearer '})
-  expect(fetchMock.mock.calls[1][1].method).toEqual('DELETE')
-  expect(fetchMock.mock.calls[1][1].headers).toEqual({Authorization: 'bearer valid'})
+  expect(fetchMock.mock.calls[0][1]!.method).toEqual('DELETE')
+  expect(fetchMock.mock.calls[0][1]!.headers).toEqual({Authorization: 'bearer '})
+  expect(fetchMock.mock.calls[1][1]!.method).toEqual('DELETE')
+  expect(fetchMock.mock.calls[1][1]!.headers).toEqual({Authorization: 'bearer valid'})
   expect(fetchMock.mock.calls[1][0]).toEqual(fullDeleteUrl)
   
 })
@@ -136,9 +134,9 @@ test('deleteFile wasSigned deletes signature file', async () => {
   await storage.deleteFile(path, { wasSigned: true })
 
   expect(fetchMock.mock.calls.length).toEqual(2)
-  expect(fetchMock.mock.calls[0][1].method).toEqual('DELETE')
+  expect(fetchMock.mock.calls[0][1]!.method).toEqual('DELETE')
   expect(fetchMock.mock.calls[0][0]).toEqual(fullDeleteUrl)
-  expect(fetchMock.mock.calls[1][1].method).toEqual('DELETE')
+  expect(fetchMock.mock.calls[1][1]!.method).toEqual('DELETE')
   expect(fetchMock.mock.calls[1][0]).toEqual(fullDeleteSigUrl)
 })
 
@@ -168,7 +166,7 @@ test('deleteFile throw on 404', async () => {
     .catch(error)
 
   expect(error).toHaveBeenCalledTimes(1)
-  expect(fetchMock.mock.calls[0][1].method).toEqual('DELETE')
+  expect(fetchMock.mock.calls[0][1]!.method).toEqual('DELETE')
   expect(fetchMock.mock.calls[0][0]).toEqual(fullDeleteUrl)
 })
 
@@ -233,7 +231,7 @@ test('getFile unencrypted, unsigned', async () => {
     url_prefix: 'https://gaia.testblockstack.org/hub/'
   }
 
-  const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
+  // const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
   const fileContent = { test: 'test' }
 
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
@@ -300,7 +298,7 @@ test('core node preferences respected for name lookups', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual(appSpecifiedCoreNode + nameLookupPath)
   fetchMock.resetMocks()
 
-  userSession.store.getSessionData().userData.coreNode = userSpecifiedCoreNode
+  userSession.store.getSessionData().userData!.coreNode = userSpecifiedCoreNode
   storage = new Storage({ userSession })
   await new Promise((resolve) => {
     fetchMock.once('_')
@@ -327,10 +325,10 @@ test('getFile unencrypted, unsigned - multi-reader', async () => {
     gaiaHubConfig
   }
 
-  const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
-  const fileContent = { test: 'test' }
+  // const fullReadUrl = 'https://gaia.testblockstack.org/hub/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
+  // const fileContent = { test: 'test' }
 
-  const nameLookupUrl = 'https://core.blockstack.org/v1/names/yukan.id'
+  // const nameLookupUrl = 'https://core.blockstack.org/v1/names/yukan.id'
 
   const nameRecord = {
     status: 'registered',
@@ -343,7 +341,7 @@ test('getFile unencrypted, unsigned - multi-reader', async () => {
   }
   const nameRecordContent = JSON.stringify(nameRecord)
 
-  const profileUrl = 'https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json'
+  // const profileUrl = 'https://gaia.blockstack.org/hub/16zVUoP7f15nfTiHw2UNiX8NT5SWYqwNv3/0/profile.json'
 
   /* eslint-disable */
   const profileContent = [
@@ -415,7 +413,7 @@ test('getFile unencrypted, unsigned - multi-reader', async () => {
   ]
   /* eslint-enable */
 
-  const fileUrl = 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/file.json'
+  // const fileUrl = 'https://gaia.blockstack.org/hub/1DDUqfKtQgYNt722wuB4Z2fPC7aiNGQa5R/file.json'
   const fileContents = JSON.stringify({ key: 'value' })
 
   const options = {
@@ -812,7 +810,7 @@ test('putFile includes If-None-Match header in request when creating a new file'
   const fileContent = 'test-content'
   const options = { encrypt: false }
 
-  const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
+  // const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
   fetchMock.once('{}', {
     status: 202
   })
@@ -820,7 +818,8 @@ test('putFile includes If-None-Match header in request when creating a new file'
   const storage = new Storage({ userSession })
   // create new file
   await storage.putFile(path, fileContent, options)
-  expect(fetchMock.mock.calls[0][1].headers['If-None-Match']).toEqual('*')
+  const headers = fetchMock.mock.calls[0][1]!.headers as any;
+  expect(headers['If-None-Match']).toEqual('*')
 })
 
 test('putFile throws correct error when server rejects etag', async () => {
@@ -840,7 +839,7 @@ test('putFile throws correct error when server rejects etag', async () => {
 
   try {
     const content = 'test-content'
-    const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
+    // const storeURL = `${gaiaHubConfig.server}/store/${gaiaHubConfig.address}/${path}`
 
     // Mock a PreconditionFailedError
     fetchMock.once('Precondition Failed', {
@@ -903,7 +902,7 @@ test('putFile & getFile unencrypted, not signed, with contentType', async () => 
     })
     .then(() => {
       const decryptOptions = { decrypt: false }
-      return storage.getFile(path, decryptOptions).then((readContent) => {
+      return storage.getFile(path, decryptOptions).then((readContent: any) => {
         expect(readContent).toEqual(JSON.stringify(fileContent))
         expect(typeof (readContent)).toEqual('string')
       })
@@ -1154,7 +1153,7 @@ test('putFile & getFile unencrypted, signed', async () => {
   const pathToReadUrl = ((fname: string) => `${readPrefix}/${fname}`)
 
   const uploadToGaiaHub = jest.fn().mockImplementation(
-    (fname, contents, hubConfig, contentType) => {
+    (fname, contents, _, contentType) => {
       const contentString = Buffer.from(contents as any).toString()
       putFiledContents.push([fname, contentString, contentType])
       if (!fname.endsWith('.sig')) {
@@ -1599,7 +1598,7 @@ test('promises reject', async () => {
   const appConfig = new AppConfig(['store_write'], 'http://localhost:3000')
   const userSession = new UserSession({ appConfig })
   const path = 'file.json'
-  const fullReadUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
+  // const fullReadUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U/file.json'
   const gaiaHubConfig = {
     address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U',
     server: 'https://hub.testblockstack.org',
@@ -1639,7 +1638,7 @@ test('promises reject', async () => {
 
 test('putFile gets a new gaia config and tries again', async () => {
   const path = 'file.json'
-  const fullWriteUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
+  // const fullWriteUrl = 'https://hub.testblockstack.org/store/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc/file.json'
   const invalidHubConfig = {
     address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
     server: 'https://hub.testblockstack.org',
@@ -1975,7 +1974,7 @@ test('listFiles', async () => {
   } // manually set for testing
 
   let callCount = 0
-  fetchMock.mockResponse(request => {
+  fetchMock.mockResponse(_ => {
     callCount += 1
     if (callCount === 1) {
       return Promise.resolve(JSON.stringify({ entries: [path], page: callCount }))
@@ -2009,7 +2008,7 @@ test('connect to gaia hub with a user session and association token', async () =
     latest_auth_version: 'v1'
   }
 
-  const address = '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
+  // const address = '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yg8U'
   const publicKey = '027d28f9951ce46538951e3697c62588a87f1f1f295de4a14fdd4c780fc52cfe69'
 
   const identityPrivateKey = '4dea04fe440d760664d96f1fd219e7a73324fc8faa28c7babd1a7813d05970aa01'
@@ -2045,7 +2044,7 @@ test('connect to gaia hub with a user session and association token', async () =
 
 test('listFiles gets a new gaia config and tries again', async () => {
   const path = 'file.json'
-  const listFilesUrl = 'https://hub.testblockstack.org/list-files/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc'
+  // const listFilesUrl = 'https://hub.testblockstack.org/list-files/1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc'
   const invalidHubConfig = {
     address: '1NZNxhoxobqwsNvTb16pdeiqvFvce3Yabc',
     server: 'https://hub.testblockstack.org',

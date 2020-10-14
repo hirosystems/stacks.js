@@ -1,6 +1,6 @@
 import { TokenSigner, Json } from 'jsontokens';
 import { getPublicKeyFromPrivate } from 'blockstack/lib/keys';
-import { randomBytes } from 'blockstack/lib/encryption/cryptoRandom';
+import randomBytes from 'randombytes';
 import { ecPairToAddress, hexStringToECPair } from 'blockstack';
 import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
 

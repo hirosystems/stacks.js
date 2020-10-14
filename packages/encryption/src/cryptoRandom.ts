@@ -1,9 +1,6 @@
-import * as randombytes_ from 'randombytes'
+import randombytes from 'randombytes';
 
-let randombytes = randombytes_
-
-export { randombytes as randomBytes }
+export { randombytes as randomBytes };
 
 /** Optional function to generate cryptographically secure random bytes */
-export type GetRandomBytes = (count: number) => Buffer
-
+export type GetRandomBytes = (count: number) => Buffer;

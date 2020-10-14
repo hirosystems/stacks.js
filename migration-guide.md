@@ -93,7 +93,7 @@ import { Storage } from '@stacks/storage';
 
 const appConfig = new AppConfig();
 const userSession = new UserSession({ appConfig });
-const storage = new Storage(userSession);
+const storage = new Storage({userSession});
 
 storage.putFile('my_file.json', my_content));
 storage.getFile('my_file.json').then((file) => {

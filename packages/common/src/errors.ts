@@ -1,7 +1,6 @@
-
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export const ERROR_CODES = {
   MISSING_PARAMETER: 'missing_parameter',
   REMOTE_SERVICE_ERROR: 'remote_service_error',
@@ -20,275 +19,276 @@ export const ERROR_CODES = {
   VALIDATION_ERROR: 'validation_error',
   PAYLOAD_TOO_LARGE_ERROR: 'payload_too_large_error',
   PRECONDITION_FAILED_ERROR: 'precondition_failed_error',
-  UNKNOWN: 'unknown'
-}
+  UNKNOWN: 'unknown',
+};
 
-Object.freeze(ERROR_CODES)
+Object.freeze(ERROR_CODES);
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 type ErrorData = {
-  code: string,
-  parameter?: string,
-  message: string
-}
+  code: string;
+  parameter?: string;
+  message: string;
+};
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class BlockstackError extends Error {
-  message: string
+  message: string;
 
-  code: string
+  code: string;
 
-  parameter?: string
+  parameter?: string;
 
   constructor(error: ErrorData) {
-    super()
-    let message = error.message
-    let bugDetails = `Error Code: ${error.code}`
-    let stack = this.stack
-    if (!stack) { 
+    super();
+    let message = error.message;
+    let bugDetails = `Error Code: ${error.code}`;
+    let stack = this.stack;
+    if (!stack) {
       try {
-        throw new Error()
+        throw new Error();
       } catch (e) {
-        stack = e.stack
+        stack = e.stack;
       }
     } else {
-      bugDetails += `Stack Trace:\n${stack}`
+      bugDetails += `Stack Trace:\n${stack}`;
     }
     message += `\nIf you believe this exception is caused by a bug in blockstack.js,
-      please file a bug report: https://github.com/blockstack/blockstack.js/issues\n\n${bugDetails}`
-    this.message = message
-    this.code = error.code
-    this.parameter = error.parameter ? error.parameter : undefined
+      please file a bug report: https://github.com/blockstack/blockstack.js/issues\n\n${bugDetails}`;
+    this.message = message;
+    this.code = error.code;
+    this.parameter = error.parameter ? error.parameter : undefined;
   }
-  
+
   toString() {
     return `${super.toString()}
-    code: ${this.code} param: ${this.parameter ? this.parameter : 'n/a'}`
+    code: ${this.code} param: ${this.parameter ? this.parameter : 'n/a'}`;
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class InvalidParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
-    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter: '' })
-    this.name = 'MissingParametersError'
+    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter });
+    this.name = 'MissingParametersError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class MissingParameterError extends BlockstackError {
   constructor(parameter: string, message: string = '') {
-    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter })
-    this.name = 'MissingParametersError'
+    super({ code: ERROR_CODES.MISSING_PARAMETER, message, parameter });
+    this.name = 'MissingParametersError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class RemoteServiceError extends BlockstackError {
-  response: Response
+  response: Response;
 
   constructor(response: Response, message: string = '') {
-    super({ code: ERROR_CODES.REMOTE_SERVICE_ERROR, message })
-    this.response = response
+    super({ code: ERROR_CODES.REMOTE_SERVICE_ERROR, message });
+    this.response = response;
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class InvalidDIDError extends BlockstackError {
   constructor(message: string = '') {
-    super({ code: ERROR_CODES.INVALID_DID_ERROR, message })
-    this.name = 'InvalidDIDError'
+    super({ code: ERROR_CODES.INVALID_DID_ERROR, message });
+    this.name = 'InvalidDIDError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class NotEnoughFundsError extends BlockstackError {
-  leftToFund: number
+  leftToFund: number;
 
   constructor(leftToFund: number) {
-    const message = `Not enough UTXOs to fund. Left to fund: ${leftToFund}`
-    super({ code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message })
-    this.leftToFund = leftToFund
-    this.name = 'NotEnoughFundsError'
-    this.message = message
+    const message = `Not enough UTXOs to fund. Left to fund: ${leftToFund}`;
+    super({ code: ERROR_CODES.NOT_ENOUGH_FUNDS_ERROR, message });
+    this.leftToFund = leftToFund;
+    this.name = 'NotEnoughFundsError';
+    this.message = message;
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class InvalidAmountError extends BlockstackError {
-  fees: number
+  fees: number;
 
-  specifiedAmount: number
+  specifiedAmount: number;
 
   constructor(fees: number, specifiedAmount: number) {
-    const message = `Not enough coin to fund fees transaction fees. Fees would be ${fees},`
-          + ` specified spend is  ${specifiedAmount}`
-    super({ code: ERROR_CODES.INVALID_AMOUNT_ERROR, message })
-    this.specifiedAmount = specifiedAmount
-    this.fees = fees
-    this.name = 'InvalidAmountError'
-    this.message = message
+    const message =
+      `Not enough coin to fund fees transaction fees. Fees would be ${fees},` +
+      ` specified spend is  ${specifiedAmount}`;
+    super({ code: ERROR_CODES.INVALID_AMOUNT_ERROR, message });
+    this.specifiedAmount = specifiedAmount;
+    this.fees = fees;
+    this.name = 'InvalidAmountError';
+    this.message = message;
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class LoginFailedError extends BlockstackError {
   constructor(reason: string) {
-    const message = `Failed to login: ${reason}`
-    super({ code: ERROR_CODES.LOGIN_FAILED_ERROR, message })
-    this.message = message
-    this.name = 'LoginFailedError'
+    const message = `Failed to login: ${reason}`;
+    super({ code: ERROR_CODES.LOGIN_FAILED_ERROR, message });
+    this.message = message;
+    this.name = 'LoginFailedError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class SignatureVerificationError extends BlockstackError {
   constructor(reason: string) {
-    const message = `Failed to verify signature: ${reason}`
-    super({ code: ERROR_CODES.SIGNATURE_VERIFICATION_ERROR, message })
-    this.message = message
-    this.name = 'SignatureVerificationError'
+    const message = `Failed to verify signature: ${reason}`;
+    super({ code: ERROR_CODES.SIGNATURE_VERIFICATION_ERROR, message });
+    this.message = message;
+    this.name = 'SignatureVerificationError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class FailedDecryptionError extends BlockstackError {
   constructor(message: string = 'Unable to decrypt cipher object.') {
-    super({ code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message })
-    this.message = message
-    this.name = 'FailedDecryptionError'
+    super({ code: ERROR_CODES.FAILED_DECRYPTION_ERROR, message });
+    this.message = message;
+    this.name = 'FailedDecryptionError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class InvalidStateError extends BlockstackError {
   constructor(message: string) {
-    super({ code: ERROR_CODES.INVALID_STATE, message })
-    this.message = message
-    this.name = 'InvalidStateError'
+    super({ code: ERROR_CODES.INVALID_STATE, message });
+    this.message = message;
+    this.name = 'InvalidStateError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class NoSessionDataError extends BlockstackError {
   constructor(message: string) {
-    super({ code: ERROR_CODES.INVALID_STATE, message })
-    this.message = message
-    this.name = 'NoSessionDataError'
+    super({ code: ERROR_CODES.INVALID_STATE, message });
+    this.message = message;
+    this.name = 'NoSessionDataError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export interface GaiaHubErrorResponse {
-  status: number, 
-  statusText: string,
-  body?: string | any
+  status: number;
+  statusText: string;
+  body?: string | any;
 }
 
 export interface HubErrorDetails {
-  message?: string
-  statusCode: number
-  statusText: string
-  [prop: string]: any
+  message?: string;
+  statusCode: number;
+  statusText: string;
+  [prop: string]: any;
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class GaiaHubError extends BlockstackError {
-  hubError?: HubErrorDetails
+  hubError?: HubErrorDetails;
 
   constructor(error: ErrorData, response: GaiaHubErrorResponse) {
-    super(error)
+    super(error);
     if (response) {
       this.hubError = {
         statusCode: response.status,
-        statusText: response.statusText
-      }
+        statusText: response.statusText,
+      };
       if (typeof response.body === 'string') {
-        this.hubError.message = response.body
+        this.hubError.message = response.body;
       } else if (typeof response.body === 'object') {
-        Object.assign(this.hubError, response.body)
-      } 
-    } 
+        Object.assign(this.hubError, response.body);
+      }
+    }
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class DoesNotExist extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.DOES_NOT_EXIST }, response)
-    this.name = 'DoesNotExist'
+    super({ message, code: ERROR_CODES.DOES_NOT_EXIST }, response);
+    this.name = 'DoesNotExist';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class ConflictError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.CONFLICT_ERROR }, response)
-    this.name = 'ConflictError'
+    super({ message, code: ERROR_CODES.CONFLICT_ERROR }, response);
+    this.name = 'ConflictError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class NotEnoughProofError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR }, response)
-    this.name = 'NotEnoughProofError'
+    super({ message, code: ERROR_CODES.NOT_ENOUGH_PROOF_ERROR }, response);
+    this.name = 'NotEnoughProofError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class BadPathError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.BAD_PATH_ERROR }, response)
-    this.name = 'BadPathError'
+    super({ message, code: ERROR_CODES.BAD_PATH_ERROR }, response);
+    this.name = 'BadPathError';
   }
 }
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 export class ValidationError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.VALIDATION_ERROR }, response)
-    this.name = 'ValidationError'
+    super({ message, code: ERROR_CODES.VALIDATION_ERROR }, response);
+    this.name = 'ValidationError';
   }
 }
 
@@ -297,14 +297,14 @@ export class ValidationError extends GaiaHubError {
  */
 export class PayloadTooLargeError extends GaiaHubError {
   /** Can be `null` when an oversized payload is detected client-side. */
-  hubError?: HubErrorDetails
+  hubError?: HubErrorDetails;
 
   maxUploadByteSize: number;
 
-  constructor(message: string, response: GaiaHubErrorResponse, maxUploadByteSize: number) {
-    super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response)
-    this.name = 'PayloadTooLargeError'
-    this.maxUploadByteSize = maxUploadByteSize
+  constructor(message: string, response: GaiaHubErrorResponse | null, maxUploadByteSize: number) {
+    super({ message, code: ERROR_CODES.PAYLOAD_TOO_LARGE_ERROR }, response!);
+    this.name = 'PayloadTooLargeError';
+    this.maxUploadByteSize = maxUploadByteSize;
   }
 }
 
@@ -313,7 +313,7 @@ export class PayloadTooLargeError extends GaiaHubError {
  */
 export class PreconditionFailedError extends GaiaHubError {
   constructor(message: string, response: GaiaHubErrorResponse) {
-    super({ message, code: ERROR_CODES.PRECONDITION_FAILED_ERROR }, response)
-    this.name = 'PreconditionFailedError'
+    super({ message, code: ERROR_CODES.PRECONDITION_FAILED_ERROR }, response);
+    this.name = 'PreconditionFailedError';
   }
 }

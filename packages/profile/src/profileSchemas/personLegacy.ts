@@ -1,108 +1,110 @@
 /**
- * 
- * @param serviceName 
- * @param data 
- * 
+ *
+ * @param serviceName
+ * @param data
+ *
  * @ignore
  */
 function formatAccount(serviceName: string, data: any) {
-  let proofUrl
+  let proofUrl;
   if (data.proof && data.proof.url) {
-    proofUrl = data.proof.url
+    proofUrl = data.proof.url;
   }
   return {
     '@type': 'Account',
     service: serviceName,
     identifier: data.username,
     proofType: 'http',
-    proofUrl
-  }
+    proofUrl,
+  };
 }
 
 /**
- * 
- * @param profile 
- * 
+ *
+ * @param profile
+ *
  * @ignore
  */
 export function getPersonFromLegacyFormat(profile: any) {
   const profileData: {
-    ['@type']: string, 
-    account?: any[],
-    name?: string,
-    description?: string,
+    ['@type']: string;
+    account?: any[];
+    name?: string;
+    description?: string;
     address?: {
-      ['@type']: string,
-      addressLocality: string
-    },
-    image?: any[],
+      ['@type']: string;
+      addressLocality: string;
+    };
+    image?: any[];
     website?: Array<{
-      ['@type']: string,
-      url: string
-    }>
+      ['@type']: string;
+      url: string;
+    }>;
   } = {
-    '@type': 'Person'
-  }
+    '@type': 'Person',
+  };
 
   if (profile) {
     if (profile.name && profile.name.formatted) {
-      profileData.name = profile.name.formatted
+      profileData.name = profile.name.formatted;
     }
 
     if (profile.bio) {
-      profileData.description = profile.bio
+      profileData.description = profile.bio;
     }
 
     if (profile.location && profile.location.formatted) {
       profileData.address = {
         '@type': 'PostalAddress',
-        addressLocality: profile.location.formatted
-      }
+        addressLocality: profile.location.formatted,
+      };
     }
 
-    const images = []
+    const images = [];
     if (profile.avatar && profile.avatar.url) {
       images.push({
         '@type': 'ImageObject',
         name: 'avatar',
-        contentUrl: profile.avatar.url
-      })
+        contentUrl: profile.avatar.url,
+      });
     }
     if (profile.cover && profile.cover.url) {
       images.push({
         '@type': 'ImageObject',
         name: 'cover',
-        contentUrl: profile.cover.url
-      })
+        contentUrl: profile.cover.url,
+      });
     }
     if (images.length) {
-      profileData.image = images
+      profileData.image = images;
     }
 
     if (profile.website) {
-      profileData.website = [{
-        '@type': 'WebSite',
-        url: profile.website
-      }]
+      profileData.website = [
+        {
+          '@type': 'WebSite',
+          url: profile.website,
+        },
+      ];
     }
 
-    const accounts = []
+    const accounts = [];
     if (profile.bitcoin && profile.bitcoin.address) {
       accounts.push({
         '@type': 'Account',
         role: 'payment',
         service: 'bitcoin',
-        identifier: profile.bitcoin.address
-      })
+        identifier: profile.bitcoin.address,
+      });
     }
     if (profile.twitter && profile.twitter.username) {
-      accounts.push(formatAccount('twitter', profile.twitter))
+      accounts.push(formatAccount('twitter', profile.twitter));
     }
     if (profile.facebook && profile.facebook.username) {
-      accounts.push(formatAccount('facebook', profile.facebook))
+      accounts.push(formatAccount('facebook', profile.facebook));
     }
     if (profile.github && profile.github.username) {
-      accounts.push(formatAccount('github', profile.github))
+      accounts.push(formatAccount('github', profile.github));
     }
 
     if (profile.auth) {
@@ -112,8 +114,8 @@ export function getPersonFromLegacyFormat(profile: any) {
             '@type': 'Account',
             role: 'key',
             service: 'bip32',
-            identifier: profile.auth[0].publicKeychain
-          })
+            identifier: profile.auth[0].publicKeychain,
+          });
         }
       }
     }
@@ -123,12 +125,12 @@ export function getPersonFromLegacyFormat(profile: any) {
         role: 'key',
         service: 'pgp',
         identifier: profile.pgp.fingerprint,
-        contentUrl: profile.pgp.url
-      })
+        contentUrl: profile.pgp.url,
+      });
     }
 
-    profileData.account = accounts
+    profileData.account = accounts;
   }
 
-  return profileData
+  return profileData;
 }

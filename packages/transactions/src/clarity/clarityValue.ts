@@ -16,7 +16,6 @@ import {
 
 import { principalToString } from './types/principalCV';
 import { CLARITY_INT_SIZE } from '../constants';
-import { isClarityName } from '../utils';
 
 /**
  * Type IDs corresponding to each of the Clarity value types as described here:

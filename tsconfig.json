@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "es2015",
+    "target": "esnext",
+    "module": "esnext",
     "moduleResolution": "node",
     "declaration": true,
     "sourceMap": true,
@@ -10,13 +10,18 @@
     "baseUrl": "./src",
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "lib": [
-      "es2017",
-      "dom"
-    ],
+    "lib": ["dom", "esnext"],
+    "paths": {
+      "@stacks/auth": ["./packages/auth/src"],
+      "@stacks/cli": ["./packages/cli/src"],
+      "@stacks/common": ["./packages/common/src"],
+      "@stacks/encryption": ["./packages/encryption/src"],
+      "@stacks/keychain": ["./packages/keychain/src"],
+      "@stacks/network": ["./packages/network/src"],
+      "@stacks/profile": ["./packages/profile/src"],
+      "@stacks/storage": ["./packages/storage/src"],
+      "@stacks/transactions": ["./packages/transactions/src"]
+    }
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*"
-  ]
+  "include": ["packages/**/src/**/*", "packages/**/test/**/*", "src/**/*", "tests/**/*"]
 }

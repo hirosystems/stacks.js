@@ -1,42 +1,7 @@
-// import { SECP256K1Client } from 'jsontokens'
-// import {
-//   getEntropy, makeECPrivateKey, publicKeyToAddress, isSameOriginAbsoluteUrl,
-//   ecPairToHexString, hexStringToECPair, ecPairToAddress, isLaterVersion
-// } from '../src'
-
 import { isSameOriginAbsoluteUrl, isLaterVersion } from '../src'
 
-// test('makeECPrivateKey', () => {
-//   t.plan(5)
-
-//   const entropy = getEntropy(32)
-//   t.ok(entropy, 'Entropy should have been created')
-
-//   const privateKey = makeECPrivateKey()
-//   t.ok(privateKey, 'Private key should have been created')
-//   t.equal(typeof privateKey, 'string', 'Private key should be a string')
-
-//   const publicKey = SECP256K1Client.derivePublicKey(privateKey)
-
-//   const address = publicKeyToAddress(publicKey)
-//   t.ok(address, 'Address should have been created')
-//   t.equal(typeof address, 'string', 'Address should be a string')
-// })
-
-// test('ecPairToHexString', (t) => {
-//   t.plan(2)
-
-//   const privateKey = '00cdce6b5f87d38f2a830cae0da82162e1b487f07c5affa8130f01fe1a2a25fb01'
-//   const expectedAddress = '1WykMawQRnLh7SWmmoRL4qTDNCgAsVRF1'
-
-//   const computedECPair = hexStringToECPair(privateKey)
-//   t.equal(privateKey, ecPairToHexString(computedECPair), 'Should return same hex string')
-
-//   t.equal(expectedAddress, ecPairToAddress(computedECPair), 'Should parse to correct address')
-// })
-
 test('isLaterVersion', () => {
-  expect(isLaterVersion(undefined, '1.1.0')).toEqual(false)
+  expect(isLaterVersion('', '1.1.0')).toEqual(false)
   expect(isLaterVersion('1.2.0', '1.1.0')).toEqual(true)
   expect(isLaterVersion('1.1.0', '1.1.0')).toEqual(true)
   expect(isLaterVersion('1.1.0', '1.2.0')).toEqual(false)

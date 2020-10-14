@@ -1,9 +1,9 @@
-import { 
-  CipherTextEncoding, 
-  SignedCipherObject, 
-  encryptECIES, 
-  decryptECIES, 
-  signECDSA 
+import {
+  CipherTextEncoding,
+  SignedCipherObject,
+  encryptECIES,
+  decryptECIES,
+  signECDSA,
 } from './ec';
 
 import { getPublicKeyFromPrivate } from './keys';
@@ -12,7 +12,7 @@ export interface EncryptionOptions {
   /**
    * If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's
    * app private key. If a string is specified, it is used as the private key instead
-   * of the user's app private key. 
+   * of the user's app private key.
    * @default false
    */
   sign?: boolean | string;
@@ -25,9 +25,9 @@ export interface EncryptionOptions {
    */
   cipherTextEncoding?: CipherTextEncoding;
   /**
-   * Specifies if the original unencrypted content is a ASCII or UTF-8 string. 
-   * For example stringified JSON. 
-   * If true, then when the ciphertext is decrypted, it will be returned as 
+   * Specifies if the original unencrypted content is a ASCII or UTF-8 string.
+   * For example stringified JSON.
+   * If true, then when the ciphertext is decrypted, it will be returned as
    * a `string` type variable, otherwise will be returned as a Buffer.
    */
   wasString?: boolean;
@@ -38,7 +38,7 @@ export interface EncryptionOptions {
  */
 export interface EncryptContentOptions extends EncryptionOptions {
   /**
-   * Encrypt the data with this key. 
+   * Encrypt the data with this key.
    */
   publicKey?: string;
   /**
@@ -59,41 +59,43 @@ export async function encryptContent(
   content: string | Buffer,
   options?: EncryptContentOptions
 ): Promise<string> {
-  const opts = Object.assign({}, options)
-  let privateKey: string
+  const opts = Object.assign({}, options);
+  let privateKey: string | undefined;
   if (!opts.publicKey) {
     if (!opts.privateKey) {
-      throw new Error('Either public key or private key must be supplied for encryption.')
+      throw new Error('Either public key or private key must be supplied for encryption.');
     }
-    opts.publicKey = getPublicKeyFromPrivate(opts.privateKey)
+    opts.publicKey = getPublicKeyFromPrivate(opts.privateKey);
   }
-  let wasString: boolean
+  let wasString: boolean;
   if (typeof opts.wasString === 'boolean') {
-    wasString = opts.wasString
+    wasString = opts.wasString;
   } else {
-    wasString = typeof content === 'string'
+    wasString = typeof content === 'string';
   }
-  const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content
-  const cipherObject = await encryptECIES(opts.publicKey, 
-                                          contentBuffer, 
-                                          wasString, 
-                                          opts.cipherTextEncoding)
-  let cipherPayload = JSON.stringify(cipherObject)
+  const contentBuffer = typeof content === 'string' ? Buffer.from(content) : content;
+  const cipherObject = await encryptECIES(
+    opts.publicKey,
+    contentBuffer,
+    wasString,
+    opts.cipherTextEncoding
+  );
+  let cipherPayload = JSON.stringify(cipherObject);
   if (opts.sign) {
     if (typeof opts.sign === 'string') {
-      privateKey = opts.sign
+      privateKey = opts.sign;
     } else if (!privateKey) {
-      privateKey = opts.privateKey
+      privateKey = opts.privateKey;
     }
-    const signatureObject = signECDSA(privateKey, cipherPayload)
+    const signatureObject = signECDSA(privateKey!, cipherPayload);
     const signedCipherObject: SignedCipherObject = {
       signature: signatureObject.signature,
       publicKey: signatureObject.publicKey,
-      cipherText: cipherPayload
-    }
-    cipherPayload = JSON.stringify(signedCipherObject)
+      cipherText: cipherPayload,
+    };
+    cipherPayload = JSON.stringify(signedCipherObject);
   }
-  return cipherPayload
+  return cipherPayload;
 }
 
 /**
@@ -108,23 +110,25 @@ export async function encryptContent(
 export function decryptContent(
   content: string,
   options?: {
-    privateKey?: string
-  },
+    privateKey?: string;
+  }
 ): Promise<string | Buffer> {
-  const opts = Object.assign({}, options)
+  const opts = Object.assign({}, options);
   if (!opts.privateKey) {
-    throw new Error('Private key is required for decryption.')
+    throw new Error('Private key is required for decryption.');
   }
 
   try {
-    const cipherObject = JSON.parse(content)
-    return decryptECIES(opts.privateKey, cipherObject)
+    const cipherObject = JSON.parse(content);
+    return decryptECIES(opts.privateKey, cipherObject);
   } catch (err) {
     if (err instanceof SyntaxError) {
-      throw new Error('Failed to parse encrypted content JSON. The content may not '
-                      + 'be encrypted. If using getFile, try passing { decrypt: false }.')
+      throw new Error(
+        'Failed to parse encrypted content JSON. The content may not ' +
+          'be encrypted. If using getFile, try passing { decrypt: false }.'
+      );
     } else {
-      throw err
+      throw err;
     }
   }
 }

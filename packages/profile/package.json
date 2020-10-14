@@ -1,6 +1,6 @@
 {
   "name": "@stacks/profile",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.4",
   "description": "Library for Stacks profiles",
   "keywords": [
     "stacks",
@@ -10,28 +10,29 @@
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
-  "main": "./dist/index.js",
-  "umd:main": "./dist/auth.umd.production.js",
-  "module": "./dist/auth.esm.js",
   "directories": {
     "lib": "lib",
     "dist": "dist",
     "test": "__tests__"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production tsdx build --format=cjs,esm,umd",
-    "build-all": "run-p build:*",
-    "build:cjs": "tsc --outDir ./lib -m commonjs -t es2017",
-    "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
-    "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
-    "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
+    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
+    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
+    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
+    "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
+    "build": "tsdx build --format cjs,esm,umd",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch",
+    "prepublishOnly": "yarn build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "codecovUpload": "codecov"
@@ -40,19 +41,27 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0-beta.2",
-    "@stacks/encryption": "^1.0.0-beta.2",
-    "@stacks/network": "^1.0.0-beta.2",
+    "@stacks/common": "^1.0.0-beta.4",
+    "@stacks/encryption": "^1.0.0-beta.4",
+    "@stacks/network": "^1.0.0-beta.4",
     "bitcoinjs-lib": "^5.1.10",
     "codecov": "^3.7.2",
     "jsontokens": "^3.0.0",
     "schema-inspector": "^1.7.0",
-    "tsdx": "^0.13.3",
     "zone-file": "^1.0.0"
   },
   "devDependencies": {
-    "@types/jest": "24.9.0",
+    "@types/jest": "^24.9.0",
     "jest": "^24.9.0",
-    "jest-fetch-mock": "^3.0.3"
-  }
+    "jest-fetch-mock": "^3.0.3",
+    "ts-jest": "^26.4.1",
+    "tsdx": "^0.14.0"
+  },
+  "sideEffects": false,
+  "types": "./dist/profile/src/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/profile/src/index.d.ts",
+  "umd:main": "dist/profile.umd.production.js",
+  "unpkg": "dist/profile.cjs.production.min.js"
 }

@@ -1,65 +1,66 @@
 // @ts-ignore: Could not find a declaration file for module
-import { parseZoneFile } from 'zone-file'
+import { parseZoneFile } from 'zone-file';
 
-import { getTokenFileUrl, Person } from '../profile'
-import { extractProfile } from '../profileTokens'
-import { fetchPrivate } from '@stacks/common'
+import { getTokenFileUrl, Person } from '../profile';
+import { extractProfile } from '../profileTokens';
+import { fetchPrivate } from '@stacks/common';
 
 /**
- * 
- * @param zoneFile 
- * @param publicKeyOrAddress 
- * @param callback 
- * 
+ *
+ * @param zoneFile
+ * @param publicKeyOrAddress
+ * @param callback
+ *
  * @ignore
  */
 export function resolveZoneFileToPerson(
-  zoneFile: any, 
-  publicKeyOrAddress: string, 
-  callback: (profile: any) => void) {
-  let zoneFileJson = null
+  zoneFile: any,
+  publicKeyOrAddress: string,
+  callback: (profile: any) => void
+) {
+  let zoneFileJson = null;
   try {
-    zoneFileJson = parseZoneFile(zoneFile)
+    zoneFileJson = parseZoneFile(zoneFile);
     if (!zoneFileJson.hasOwnProperty('$origin')) {
-      zoneFileJson = null
-      throw new Error('zone file is missing an origin')
+      zoneFileJson = null;
+      throw new Error('zone file is missing an origin');
     }
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
 
-  let tokenFileUrl = null
+  let tokenFileUrl = null;
   if (zoneFileJson && Object.keys(zoneFileJson).length > 0) {
-    tokenFileUrl = getTokenFileUrl(zoneFileJson)
+    tokenFileUrl = getTokenFileUrl(zoneFileJson);
   } else {
-    let profile = null
+    let profile = null;
     try {
-      profile = JSON.parse(zoneFile)
-      const person = Person.fromLegacyFormat(profile)
-      profile = person.profile()
+      profile = JSON.parse(zoneFile);
+      const person = Person.fromLegacyFormat(profile);
+      profile = person.profile();
     } catch (error) {
-      console.warn(error)
+      console.warn(error);
     }
-    callback(profile)
-    return
+    callback(profile);
+    return;
   }
 
   if (tokenFileUrl) {
     fetchPrivate(tokenFileUrl)
       .then(response => response.text())
       .then(responseText => JSON.parse(responseText))
-      .then((responseJson) => {
-        const tokenRecords = responseJson
-        const token = tokenRecords[0].token
-        const profile = extractProfile(token, publicKeyOrAddress)
+      .then(responseJson => {
+        const tokenRecords = responseJson;
+        const token = tokenRecords[0].token;
+        const profile = extractProfile(token, publicKeyOrAddress);
 
-        callback(profile)
+        callback(profile);
       })
-      .catch((error) => {
-        console.warn(error)
-      })
+      .catch(error => {
+        console.warn(error);
+      });
   } else {
-    console.warn('Token file url not found')
-    callback({})
+    console.warn('Token file url not found');
+    callback({});
   }
 }

@@ -7,7 +7,6 @@ import {
   AuthType,
   StacksMessageType,
   ChainID,
-  AddressHashMode,
 } from './constants';
 
 import {
@@ -16,7 +15,6 @@ import {
   nextSignature,
   isSingleSig,
   SingleSigSpendingCondition,
-  MultiSigSpendingCondition,
   createTransactionAuthField,
   createMessageSignature,
 } from './authorization';
@@ -31,7 +29,7 @@ import { StacksPrivateKey, StacksPublicKey } from './keys';
 
 import { BufferReader } from './bufferReader';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import { SerializationError, SigningError } from './errors';
 
 export class StacksTransaction {

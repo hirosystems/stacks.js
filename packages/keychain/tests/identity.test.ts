@@ -5,8 +5,6 @@ import { decodeToken } from 'jsontokens';
 import { getIdentity, profileResponse, nameInfoResponse } from './helpers';
 import { ecPairToAddress } from 'blockstack';
 import { ECPair } from 'bitcoinjs-lib';
-import { getAddress } from '../src';
-import { TransactionVersion } from '@blockstack/stacks-transactions';
 
 interface Decoded {
   [key: string]: any;
@@ -59,6 +57,7 @@ test('adds to apps in profile if publish_data scope', async () => {
   const decoded = decodeToken(authResponse);
   const { payload } = decoded as Decoded;
   expect(payload.profile.apps['https://banter.pub']).not.toBeFalsy();
+  // @ts-ignore
   const profile = JSON.parse(fetchMock.mock.calls[7][1].body);
   const { apps, appsMeta } = profile[0].decodedToken.payload.claim;
   expect(apps[appDomain]).not.toBeFalsy();
@@ -97,7 +96,7 @@ test('gets default profile URL', async () => {
 test('can get a profile URL from a zone file', async () => {
   const identity = await getIdentity();
   fetchMock.once(JSON.stringify(nameInfoResponse));
-  const profileURL = await identity.profileUrl('asdf');
+  await identity.profileUrl('asdf');
   return;
 });
 
@@ -144,7 +143,7 @@ describe('refresh', () => {
 
     await identity.refresh();
     expect(identity.profile).toBeTruthy();
-    expect(identity.profile?.apps).toBeTruthy();
-    expect(identity.profile?.name).toBeFalsy();
+    expect(identity.profile!.apps).toBeTruthy();
+    expect(identity.profile!.name).toBeFalsy();
   });
 });

@@ -5,11 +5,10 @@ import {
   RECOVERABLE_ECDSA_SIG_LENGTH_BYTES,
   SingleSigHashMode,
   MultiSigHashMode,
-  AddressVersion,
   StacksMessageType,
 } from './constants';
 
-import { BufferArray, txidFromData, sha512_256, leftPadHex, cloneDeep } from './utils';
+import { BufferArray, txidFromData, leftPadHex, cloneDeep } from './utils';
 
 import {
   addressFromPublicKeys,
@@ -31,7 +30,7 @@ import {
   publicKeyFromSignature,
 } from './keys';
 
-import * as BigNum from 'bn.js';
+import BigNum from 'bn.js';
 import { BufferReader } from './bufferReader';
 import { SerializationError, DeserializationError, SigningError } from './errors';
 
@@ -386,6 +385,7 @@ export function nextVerification(
   authType: AuthType,
   fee: BigNum,
   nonce: BigNum,
+  // @ts-ignore
   pubKeyEncoding: PubKeyEncoding,
   signature: MessageSignature
 ) {
@@ -428,7 +428,7 @@ function verifySingleSig(
   initialSigHash: string,
   authType: AuthType
 ): string {
-  const { pubKey, nextSigHash } = nextVerification(
+  const { nextSigHash } = nextVerification(
     initialSigHash,
     authType,
     condition.fee,
@@ -494,6 +494,8 @@ export class Authorization extends Deserializable {
         return this.spendingCondition!.fee;
       case AuthType.Sponsored:
         return this.sponsorSpendingCondition!.fee;
+      default:
+        return 0;
     }
   }
 

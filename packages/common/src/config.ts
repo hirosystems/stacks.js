@@ -1,14 +1,14 @@
 // import { network } from './network'
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 const config = {
   // network: network.defaults.MAINNET_DEFAULT,
   network: {
-    layer1: 'placeholder'
+    layer1: 'placeholder',
   },
-  logLevel: 'debug'
-}
+  logLevel: 'debug',
+};
 
-export { config }
+export { config };

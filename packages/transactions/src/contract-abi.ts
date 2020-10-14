@@ -13,7 +13,7 @@ import {
   getCVTypeString,
   bufferCVFromString,
 } from './clarity';
-import { ContractCallPayload, createContractCallPayload } from './payload';
+import { ContractCallPayload } from './payload';
 import { NotImplementedError } from './errors';
 import { stringAsciiCV, stringUtf8CV } from './clarity/types/stringCV';
 
@@ -336,6 +336,8 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
           }
         }
         return true;
+      } else {
+        return false;
       }
     default:
       return false;

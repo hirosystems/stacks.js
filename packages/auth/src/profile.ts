@@ -1,7 +1,6 @@
-
-import { resolveZoneFileToProfile } from '@stacks/profile'
-import { fetchPrivate} from '@stacks/common'
-import { StacksNetwork, StacksMainnet } from '@stacks/network'
+import { resolveZoneFileToProfile } from '@stacks/profile';
+import { fetchPrivate } from '@stacks/common';
+import { StacksNetwork, StacksMainnet } from '@stacks/network';
 
 export interface ProfileLookupOptions {
   username: string;
@@ -20,25 +19,23 @@ export interface ProfileLookupOptions {
  */
 export function lookupProfile(options: ProfileLookupOptions): Promise<Record<string, any>> {
   if (!options.username) {
-    return Promise.reject()
+    return Promise.reject();
   }
-  let network: StacksNetwork = options.network ? options.network : new StacksMainnet
-  let lookupPromise
+  let network: StacksNetwork = options.network ? options.network : new StacksMainnet();
+  let lookupPromise;
   if (options.zoneFileLookupURL) {
-    const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`
-    lookupPromise = fetchPrivate(url)
-      .then(response => response.json())
+    const url = `${options.zoneFileLookupURL.replace(/\/$/, '')}/${options.username}`;
+    lookupPromise = fetchPrivate(url).then(response => response.json());
   } else {
-    lookupPromise = network.getNameInfo(options.username)
+    lookupPromise = network.getNameInfo(options.username);
   }
-  return lookupPromise
-    .then((responseJSON: any) => {
-      if (responseJSON.hasOwnProperty('zonefile')
-          && responseJSON.hasOwnProperty('address')) {
-        return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address)
-      } else {
-        throw new Error('Invalid zonefile lookup response: did not contain `address`'
-                        + ' or `zonefile` field')
-      }
-    })
+  return lookupPromise.then((responseJSON: any) => {
+    if (responseJSON.hasOwnProperty('zonefile') && responseJSON.hasOwnProperty('address')) {
+      return resolveZoneFileToProfile(responseJSON.zonefile, responseJSON.address);
+    } else {
+      throw new Error(
+        'Invalid zonefile lookup response: did not contain `address`' + ' or `zonefile` field'
+      );
+    }
+  });
 }
