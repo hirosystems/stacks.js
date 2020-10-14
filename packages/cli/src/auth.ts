@@ -17,7 +17,7 @@ import { nameLookup, makeProfileJWT } from './utils';
 
 import { CLINetworkAdapter } from './network';
 
-import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
+import { GaiaHubConfig } from '@stacks/storage';
 
 export const SIGNIN_CSS = `
 h1 { 

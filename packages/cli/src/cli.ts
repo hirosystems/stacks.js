@@ -33,15 +33,16 @@ import {
   PostConditionMode,
   cvToString,
   StacksTransaction,
-} from '@blockstack/stacks-transactions';
+  TxBroadcastResult
+} from '@stacks/transactions';
 
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
 
 const c32check = require('c32check');
 
-import { UserData } from 'blockstack/lib/auth/authApp';
+import { UserData } from '@stacks/auth';
 
-import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
+import { GaiaHubConfig } from '@stacks/storage';
 
 import {
   getOwnerKeyInfo,
@@ -555,7 +556,10 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
   }
 
   return broadcastTransaction(tx, txNetwork)
-    .then(() => {
+    .then((response: TxBroadcastResult) => {
+      if (response.hasOwnProperty('error')) {
+        return response;
+      }
       return {
         txid: tx.txid(),
         transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
@@ -611,7 +615,10 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   }
 
   return broadcastTransaction(tx, txNetwork)
-    .then(() => {
+    .then((response) => {
+      if (response.hasOwnProperty('error')) {
+        return response;
+      }
       return {
         txid: tx.txid(),
         transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
@@ -693,7 +700,10 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
       }
 
       return broadcastTransaction(tx, txNetwork)
-        .then(() => {
+        .then((response) => {
+          if (response.hasOwnProperty('error')) {
+            return response;
+          }
           return {
             txid: tx.txid(),
             transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),

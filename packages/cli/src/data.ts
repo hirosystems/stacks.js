@@ -15,9 +15,9 @@ import {
 
 import { CLINetworkAdapter, NameInfoType } from './network';
 
-import { UserData } from 'blockstack/lib/auth/authApp';
+import { UserData } from '@stacks/auth';
 
-import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
+import { GaiaHubConfig, connectToGaiaHub } from '@stacks/storage';
 
 /*
  * Set up a session for Gaia.
@@ -101,6 +101,7 @@ export function gaiaAuth(
   const authSessionToken = makeFakeAuthResponseToken(appPrivateKey, hubUrl, associationToken);
   const nameLookupUrl = `${network.legacyNetwork.blockstackAPIUrl}/v1/names/`;
   const transitPrivateKey = 'f33fb466154023aba2003c17158985aa6603db68db0f1afc0fcf1d641ea6c2cb'; // same as above
+  //@ts-ignore
   return blockstack.handlePendingSignIn(nameLookupUrl, authSessionToken, transitPrivateKey);
 }
 
@@ -128,8 +129,7 @@ export function gaiaConnect(
     associationToken = makeAssociationToken(privateKey, ownerPrivateKey);
   }
 
-  return blockstack
-    .connectToGaiaHub(gaiaHubUrl, canonicalPrivateKey(privateKey), associationToken)
+  return connectToGaiaHub(gaiaHubUrl, canonicalPrivateKey(privateKey), associationToken)
     .then(hubConfig => {
       // ensure that hubConfig always has a mainnet address, even if we're in testnet
       if (network.coerceMainnetAddress(hubConfig.address) === addressMainnet) {
