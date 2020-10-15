@@ -40,8 +40,6 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "bitcoinjs-lib": "^5.1.10",
-    "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5"
   },
   "devDependencies": {
@@ -49,7 +47,8 @@
     "jest": "^24.9.0",
     "jest-fetch-mock": "^3.0.3",
     "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0"
+    "tsdx": "^0.14.0",
+    "codecov": "^3.7.2"
   },
   "sideEffects": false,
   "main": "dist/index.js",
