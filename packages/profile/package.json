@@ -63,5 +63,6 @@
   "module": "dist/index.esm.js",
   "typings": "dist/profile/src/index.d.ts",
   "umd:main": "dist/profile.umd.production.js",
-  "unpkg": "dist/profile.cjs.production.min.js"
+  "unpkg": "dist/profile.cjs.production.min.js",
+  "gitHead": "ce733d62f720db6d59247453bf3bb2942bcb7446"
 }

@@ -87,5 +87,6 @@
   "module": "dist/index.esm.js",
   "typings": "dist/keychain/src/index.d.ts",
   "umd:main": "dist/keychain.umd.production.js",
-  "unpkg": "dist/keychain.cjs.production.min.js"
+  "unpkg": "dist/keychain.cjs.production.min.js",
+  "gitHead": "ce733d62f720db6d59247453bf3bb2942bcb7446"
 }

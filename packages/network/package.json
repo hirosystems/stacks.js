@@ -60,5 +60,6 @@
   "module": "dist/index.esm.js",
   "typings": "dist/network/src/index.d.ts",
   "umd:main": "dist/network.umd.production.js",
-  "unpkg": "dist/network.cjs.production.min.js"
+  "unpkg": "dist/network.cjs.production.min.js",
+  "gitHead": "ce733d62f720db6d59247453bf3bb2942bcb7446"
 }
