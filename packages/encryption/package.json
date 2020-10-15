@@ -41,7 +41,6 @@
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.10",
     "bn.js": "^5.1.2",
-    "codecov": "^3.7.2",
     "elliptic": "^6.5.2",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
@@ -52,7 +51,8 @@
     "jest": "^24.9.0",
     "jest-fetch-mock": "^3.0.3",
     "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0"
+    "tsdx": "^0.14.0",
+    "codecov": "^3.7.2"
   },
   "sideEffects": false,
   "main": "dist/index.js",

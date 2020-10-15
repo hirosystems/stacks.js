@@ -51,7 +51,9 @@
     "ts-loader": "^6.2.2",
     "ts-node": "^8.10.2",
     "typedoc": "^0.16.11",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "codecov": "^3.7.2",
+    "tsdx": "^0.14.0"
   },
   "dependencies": {
     "@stacks/common": "^1.0.0-beta.5",
@@ -62,15 +64,13 @@
     "@types/sha.js": "^2.4.0",
     "bn.js": "^4.11.9",
     "c32check": "^1.1.1",
-    "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "elliptic": "^6.5.3",
     "lodash": "^4.17.20",
     "randombytes": "^2.1.0",
     "ripemd160-min": "^0.0.6",
     "sha.js": "^2.4.11",
-    "smart-buffer": "^4.1.0",
-    "tsdx": "^0.14.0"
+    "smart-buffer": "^4.1.0"
   },
   "publishConfig": {
     "access": "public"
