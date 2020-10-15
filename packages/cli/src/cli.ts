@@ -561,7 +561,7 @@ async function sendTokens(network: CLINetworkAdapter, args: string[]): Promise<s
         return response;
       }
       return {
-        txid: tx.txid(),
+        txid: `0x${tx.txid()}`,
         transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
       };
     })
@@ -620,7 +620,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
         return response;
       }
       return {
-        txid: tx.txid(),
+        txid: `0x${tx.txid()}`,
         transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
       };
     })
@@ -705,7 +705,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
             return response;
           }
           return {
-            txid: tx.txid(),
+            txid: `0x${tx.txid()}`,
             transaction: generateExplorerTxPageUrl(tx.txid(), txNetwork),
           };
         })
