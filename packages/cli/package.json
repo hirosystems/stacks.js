@@ -51,10 +51,12 @@
   "main": "lib/index.js",
   "directories": {
     "lib": "lib",
+    "dist": "dist",
     "test": "__tests__"
   },
   "files": [
-    "lib"
+    "lib",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
@@ -69,7 +71,8 @@
     "dev": "ts-node src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
-    "codecovUpload": "codecov"
+    "codecovUpload": "codecov",
+    "prepublishOnly": "yarn test && yarn build"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"

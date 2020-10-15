@@ -35,7 +35,7 @@
     "build": "tsdx build --format cjs,esm,umd",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "yarn test && yarn build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "codecovUpload": "codecov"

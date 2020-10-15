@@ -38,7 +38,7 @@
     "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
     "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
     "build": "tsdx build --format cjs,esm,umd",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "yarn test && yarn build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",

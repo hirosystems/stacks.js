@@ -90,7 +90,7 @@
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
     "test": "jest --coverage",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly": "yarn test && yarn build",
     "codecovUpload": "codecov"
   },
   "bugs": {
