@@ -1,6 +1,6 @@
 {
   "name": "@stacks/transactions",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "description": "Javascript library for constructing transactions on the Stacks blockchain.",
   "homepage": "https://blockstack.org",
   "license": "GPL-3.0-or-later",
@@ -36,6 +36,7 @@
     "@types/node": "^13.13.15",
     "@typescript-eslint/eslint-plugin": "^3.9.1",
     "babel-loader": "^8.1.0",
+    "codecov": "^3.7.2",
     "common-tags": "^1.8.0",
     "core-js": "^3.6.5",
     "cross-env": "^5.2.1",
@@ -50,14 +51,13 @@
     "ts-jest": "^26.4.1",
     "ts-loader": "^6.2.2",
     "ts-node": "^8.10.2",
+    "tsdx": "^0.14.0",
     "typedoc": "^0.16.11",
-    "typescript": "^3.7.2",
-    "codecov": "^3.7.2",
-    "tsdx": "^0.14.0"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0-beta.5",
-    "@stacks/network": "^1.0.0-beta.5",
+    "@stacks/common": "^1.0.0-beta.6",
+    "@stacks/network": "^1.0.0-beta.6",
     "@types/bn.js": "^4.11.6",
     "@types/elliptic": "^6.4.12",
     "@types/randombytes": "^2.0.0",
