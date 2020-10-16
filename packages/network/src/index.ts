@@ -86,3 +86,9 @@ export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   chainId = ChainID.Testnet;
   coreApiUrl = 'http://testnet-master.blockstack.org:20443';
 }
+
+export class StacksMocknet extends StacksMainnet implements StacksNetwork {
+  version = TransactionVersion.Testnet;
+  chainId = ChainID.Testnet;
+  coreApiUrl = 'http://localhost:3999';
+}
