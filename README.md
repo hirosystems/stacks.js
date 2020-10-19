@@ -1,6 +1,6 @@
 # Stacks.js Monorepo [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack.js/master.svg)](https://circleci.com/gh/blockstack/blockstack.js/tree/master)
 
-This repo is home to the Stacks.js libraries which provides all you need to work with the Stacks blockchain.
+This repo is home to the Stacks.js libraries which provide everything you need to work with the Stacks blockchain.
 
 - [`@stacks/auth`](./packages/auth) Construct and decode authentication requests for Stacks apps.
 - [`@stacks/storage`](./packages/storage) Store and fetch files with Gaia, the decentralized storage system.
