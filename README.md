@@ -9,7 +9,7 @@ This repo is home to the Stacks.js libraries which provides all you need to work
 - [`@stacks/keychain`](./packages/keychain) Create and manage keys/wallets for the Stacks blockchain.
 - [`@stacks/network`](./packages/network) Network and API library for working with Stacks blockchain nodes.
 - [`@stacks/encryption`](./packages/encryption) Encryption functions used by Stacks.js packages.
-- [`@stacks/profile'](./packages/profile) Functions for manipulating user profiles.
+- [`@stacks/profile`](./packages/profile) Functions for manipulating user profiles.
 - [`@stacks/common`](./packages/common) Common utilities used by Stacks.js packages.
 
 See `README` in each package directory for installation instructions and usage.
@@ -37,6 +37,3 @@ Github issues marked [help-wanted](https://github.com/blockstack/stacks.js/label
 are great places to start. Please ask in a github issue or discord before embarking
 on larger issues that aren't labeled as help wanted or adding additional
 functionality so that we can make sure your contribution can be included!
-
-## Releasing
-See `release-checklist.md`
