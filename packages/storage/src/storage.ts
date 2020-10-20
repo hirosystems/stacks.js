@@ -827,6 +827,9 @@ function normalizeOptions<T>(
   } & T
 ) {
   const opts = Object.assign({}, options);
+  if (!userSession) {
+    return opts
+  }
   if (opts.username) {
     if (!opts.app) {
       if (!userSession.appConfig) {
