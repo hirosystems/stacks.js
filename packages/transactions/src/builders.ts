@@ -196,10 +196,11 @@ export async function broadcastRawTransaction(
     }
   }
 
+  const text = await response.text();
   try {
-    return (await response.clone().json()) as TxBroadcastResult;
+    return JSON.parse(text) as TxBroadcastResult;
   } catch (e) {
-    return await response.clone().text();
+    return text;
   }
 }
 
