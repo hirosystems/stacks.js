@@ -54,7 +54,7 @@ export type ClarityValue =
   | StringAsciiCV
   | StringUtf8CV;
 
-export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'tryAscii'): string {
+export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'hex'): string {
   switch (val.type) {
     case ClarityType.BoolTrue:
       return 'true';

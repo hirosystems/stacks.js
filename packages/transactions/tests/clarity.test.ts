@@ -342,7 +342,7 @@ describe('Clarity Types', () => {
         (tuple 
           (a -1) 
           (b u1) 
-          (c "test") 
+          (c 0x74657374) 
           (d true) 
           (e (some true)) 
           (f none) 
