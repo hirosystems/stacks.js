@@ -1,11 +1,9 @@
-# `common`
+# @stacks/common
 
-> TODO: description
+Common utilities used by Stacks.js packages.
 
-## Usage
+## Installation
 
 ```
-const common = require('common');
-
-// TODO: DEMONSTRATE API
+npm install @stacks/common
 ```

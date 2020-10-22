@@ -1,11 +1,9 @@
-# `profile`
+# @stacks/profile
 
-> TODO: description
+Functions for manipulating user profiles.
 
-## Usage
+## Installation
 
 ```
-const profile = require('profile');
-
-// TODO: DEMONSTRATE API
+npm install @stacks/profile
 ```
