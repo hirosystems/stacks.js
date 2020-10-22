@@ -23,7 +23,7 @@ import {
   estimateContractFunctionCall,
   SignedTokenTransferOptions,
   ContractDeployOptions,
-  ContractCallOptions,
+  SignedContractCallOptions,
   ReadOnlyFunctionOptions,
   ContractCallPayload,
   ClarityValue,
@@ -670,7 +670,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
     .then(answers => {
       functionArgs = parseClarityFunctionArgAnswers(answers, abiArgs);
 
-      const options: ContractCallOptions = {
+      const options: SignedContractCallOptions = {
         contractAddress,
         contractName,
         functionName,

@@ -19,6 +19,7 @@ import {
   callReadOnlyFunction,
   sponsorTransaction,
   makeSTXTokenTransfer,
+  makeUnsignedContractCall
 } from '../src/builders';
 
 import { deserializeTransaction } from '../src/transaction';
@@ -477,6 +478,76 @@ test('Make contract-call with post condition allow mode', async () => {
     '5e9bda394a9c5003429086b762d73746f7265096765742d76616c7565000000010200000003666f6f';
 
   expect(serialized).toBe(tx);
+});
+
+test('addSignature to an unsigned contract call transaction', async () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'kv-store';
+  const functionName = 'get-value';
+  const buffer = bufferCV(Buffer.from('foo'));
+  const fee = new BigNum(0);
+  const publicKey = '021ae7f08f9eaecaaa93f7c6ceac29213bae09588c15e2aded32016b259cfd9a1f';
+
+  const unsignedTx = await makeUnsignedContractCall({
+    contractAddress,
+    contractName,
+    functionName,
+    functionArgs: [buffer],
+    publicKey,
+    fee,
+    nonce: new BigNum(1),
+    network: new StacksTestnet(),
+    postConditionMode: PostConditionMode.Allow,
+  });
+
+  const nullSignature = (unsignedTx.auth.spendingCondition as any).signature.data;
+
+  expect(nullSignature).toEqual(
+    '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+  );
+
+  const sig =
+    '00e4ee626905ee9d04b786e2942a69504dcc0f35ca79b86fb0aafcd47a81fc3bf1547e302c3acf5c89d935a53df334316e6fcdc203cf6bed91288ebf974385398c';
+  const signedTx = unsignedTx.createTxWithSignature(sig);
+  expect((signedTx.auth.spendingCondition as SingleSigSpendingCondition).signature.data).toEqual(
+    sig
+  );
+  expect(unsignedTx).not.toBe(signedTx);
+});
+
+test('make a multi-sig contract call', async () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'kv-store';
+  const functionName = 'get-value';
+  const buffer = bufferCV(Buffer.from('foo'));
+  const fee = new BigNum(0);
+  const privKeyStrings = [
+    '6d430bb91222408e7706c9001cfaeb91b08c2be6d5ac95779ab52c6b431950e001',
+    '2a584d899fed1d24e26b524f202763c8ab30260167429f157f1c119f550fa6af01',
+    'd5200dee706ee53ae98a03fba6cf4fdcc5084c30cfa9e1b3462dcdeaa3e0f1d201',
+  ];
+  // const privKeys = privKeyStrings.map(createStacksPrivateKey);
+
+  const pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+  const pubKeyStrings = pubKeys.map(publicKeyToString);
+
+  const tx = await makeContractCall({
+    contractAddress,
+    contractName,
+    functionName,
+    functionArgs: [buffer],
+    publicKeys: pubKeyStrings,
+    numSignatures: 3,
+    signerKeys: privKeyStrings,
+    fee,
+    nonce: new BigNum(1),
+    network: new StacksTestnet(),
+    postConditionMode: PostConditionMode.Allow,
+  });
+
+  expect(tx.auth.spendingCondition!.signer).toEqual(
+    '04128cacf0764f69b1e291f62d1dcdd8f65be5ab'
+  );
 });
 
 test('Estimate token transfer fee', async () => {
