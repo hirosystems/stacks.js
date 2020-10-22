@@ -1,11 +1,13 @@
-# `@stacks/cli`
+# @stacks/cli
 
-> TODO: description
+Command line interface to interact with auth, storage and Stacks transactions.
+
+## Installation
+
+```
+npm install @stacks/cli
+```
 
 ## Usage
 
-```
-const cli = require('@stacks/cli');
-
-// TODO: DEMONSTRATE API
-```
+See [documentation](https://docs.blockstack.org/references/blockstack-cli)

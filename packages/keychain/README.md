@@ -1,11 +1,9 @@
-# `keychain`
+# @stacks/keychain
 
-> TODO: description
+Create and manage keys/wallets for the Stacks blockchain.
 
-## Usage
+## Installation
 
 ```
-const keychain = require('keychain');
-
-// TODO: DEMONSTRATE API
+npm install @stacks/keychain
 ```

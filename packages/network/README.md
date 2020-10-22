@@ -1,11 +1,9 @@
-# `network`
+# @stacks/network
 
-> TODO: description
+Network and API library for working with Stacks blockchain nodes.
 
-## Usage
+## Installation
 
 ```
-const network = require('network');
-
-// TODO: DEMONSTRATE API
+npm install @stacks/network
 ```

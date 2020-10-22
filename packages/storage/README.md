@@ -1,11 +1,9 @@
-# `storage`
+# @stacks/storage
 
-> TODO: description
+Store and fetch files with Gaia, the decentralized storage system.
 
-## Usage
+## Installation
 
 ```
-const storage = require('storage');
-
-// TODO: DEMONSTRATE API
+npm install @stacks/storage
 ```

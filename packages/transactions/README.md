@@ -1,5 +1,5 @@
-# Stacks Transactions JS [![npm](https://img.shields.io/npm/v/@stacks/transactions?color=red)](https://www.npmjs.com/package/@stacks/transactions)
-The JavaScript library for generating Stacks (v2.0) transactions. 
+# @stacks/transactions [![npm](https://img.shields.io/npm/v/@stacks/transactions?color=red)](https://www.npmjs.com/package/@stacks/transactions)
+Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
 
 ## Installation
 

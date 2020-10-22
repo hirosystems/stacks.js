@@ -1,11 +1,9 @@
-# `encryption`
+# @stacks/encryption
 
-> TODO: description
+Encryption functions used by Stacks.js packages.
 
-## Usage
+## Installation
 
 ```
-const encryption = require('encryption');
-
-// TODO: DEMONSTRATE API
+npm install @stacks/cli
 ```
