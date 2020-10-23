@@ -66,14 +66,14 @@ export class CLINetworkAdapter {
       priceUnits: null,
       receiveFeesPeriod: null,
       gracePeriod: null,
-      altAPIUrl: network.blockstackAPIUrl,
+      altAPIUrl: opts.nodeAPIUrl,
       altTransactionBroadcasterUrl: network.broadcastServiceUrl,
-      nodeAPIUrl: null,
+      nodeAPIUrl: opts.nodeAPIUrl,
     };
 
     opts = Object.assign({}, optsDefault, opts);
 
-    this.legacyNetwork = new BlockstackNetwork(opts.altAPIUrl!, opts.altTransactionBroadcasterUrl!, network.btc, network.layer1)
+    this.legacyNetwork = new BlockstackNetwork(opts.nodeAPIUrl!, opts.altTransactionBroadcasterUrl!, network.btc, network.layer1)
     this.consensusHash = opts.consensusHash;
     this.feeRate = opts.feeRate;
     this.namespaceBurnAddress = opts.namespaceBurnAddress;
