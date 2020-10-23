@@ -187,6 +187,9 @@ export async function broadcastRawTransaction(
     body: rawTx,
   };
 
+  console.log('Broadcasting transaction to:');
+  console.log(url);
+
   const response = await fetchPrivate(url, options);
   if (!response.ok) {
     try {
