@@ -34,7 +34,8 @@
     "prepublishOnly": "yarn test && yarn build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
-    "codecovUpload": "codecov"
+    "codecovUpload": "codecov",
+    "build:docs": "rimraf docs && cross-env typedoc --name \"$npm_package_name $npm_package_version Library Reference\" --tsconfig ../../tsconfig.typedoc.json --out docs --json docs/docs.json src"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"
@@ -53,8 +54,8 @@
   "sideEffects": false,
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
-  "typings": "dist/auth/src/index.d.ts",
-  "umd:main": "dist/auth.umd.production.js",
-  "unpkg": "dist/auth.cjs.production.min.js",
+  "typings": "dist/index.d.ts",
+  "umd:main": "dist/common.umd.production.js",
+  "unpkg": "dist/common.cjs.production.min.js",
   "gitHead": "ce733d62f720db6d59247453bf3bb2942bcb7446"
 }

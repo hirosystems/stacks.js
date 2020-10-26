@@ -1,0 +1,5091 @@
+{
+	"id": 0,
+	"name": "@stacks/encryption 1.0.0-beta.7 Library Reference",
+	"kind": 0,
+	"flags": {},
+	"children": [
+		{
+			"id": 44,
+			"name": "NodeCryptoAesCipher",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 47,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 48,
+							"name": "new NodeCryptoAesCipher",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 49,
+									"name": "createCipher",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 80,
+										"name": "NodeCryptoCreateCipher"
+									}
+								},
+								{
+									"id": 50,
+									"name": "createDecipher",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 81,
+										"name": "NodeCryptoCreateDecipher"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 44,
+								"name": "NodeCryptoAesCipher"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 17,
+							"character": 43
+						}
+					]
+				},
+				{
+					"id": 45,
+					"name": "createCipher",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 15,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 80,
+						"name": "NodeCryptoCreateCipher"
+					}
+				},
+				{
+					"id": 46,
+					"name": "createDecipher",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 17,
+							"character": 16
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 81,
+						"name": "NodeCryptoCreateDecipher"
+					}
+				},
+				{
+					"id": 57,
+					"name": "decrypt",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 58,
+							"name": "decrypt",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 59,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 82,
+										"name": "CipherAlgorithm"
+									}
+								},
+								{
+									"id": 60,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 61,
+									"name": "iv",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 62,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 39,
+								"name": "AesCipher.decrypt"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 38,
+							"character": 15
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 38,
+						"name": "AesCipher.decrypt"
+					}
+				},
+				{
+					"id": 51,
+					"name": "encrypt",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 52,
+							"name": "encrypt",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 53,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 82,
+										"name": "CipherAlgorithm"
+									}
+								},
+								{
+									"id": 54,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 55,
+									"name": "iv",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 56,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 33,
+								"name": "AesCipher.encrypt"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 24,
+							"character": 15
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 32,
+						"name": "AesCipher.encrypt"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						47
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						45,
+						46
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						57,
+						51
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 14,
+					"character": 32
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 31,
+					"name": "AesCipher"
+				}
+			]
+		},
+		{
+			"id": 168,
+			"name": "NodeCryptoHmacSha256",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 170,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 171,
+							"name": "new NodeCryptoHmacSha256",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 172,
+									"name": "createHmac",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 186,
+										"name": "NodeCryptoCreateHmac"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 168,
+								"name": "NodeCryptoHmacSha256"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 10,
+							"character": 35
+						}
+					]
+				},
+				{
+					"id": 169,
+					"name": "createHmac",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 10,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 186,
+						"name": "NodeCryptoCreateHmac"
+					}
+				},
+				{
+					"id": 173,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 174,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 175,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 176,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 165,
+								"name": "Hmac.digest"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 16,
+							"character": 14
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 164,
+						"name": "Hmac.digest"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						170
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						169
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						173
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hmacSha256.ts",
+					"line": 9,
+					"character": 33
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 163,
+					"name": "Hmac"
+				}
+			]
+		},
+		{
+			"id": 316,
+			"name": "NodeCryptoPbkdf2",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 318,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 319,
+							"name": "new NodeCryptoPbkdf2",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 320,
+									"name": "nodePbkdf2",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 353,
+										"name": "NodePbkdf2Fn"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 316,
+								"name": "NodeCryptoPbkdf2"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 18,
+							"character": 27
+						}
+					]
+				},
+				{
+					"id": 317,
+					"name": "nodePbkdf2",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 18,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 353,
+						"name": "NodePbkdf2Fn"
+					}
+				},
+				{
+					"id": 321,
+					"name": "derive",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 322,
+							"name": "derive",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 323,
+									"name": "password",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 324,
+									"name": "salt",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 325,
+									"name": "iterations",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 326,
+									"name": "keyLength",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 327,
+									"name": "digest",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 352,
+										"name": "Pbkdf2Digests"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 310,
+								"name": "Pbkdf2.derive"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 24,
+							"character": 14
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 309,
+						"name": "Pbkdf2.derive"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						318
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						317
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						321
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 17,
+					"character": 29
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 308,
+					"name": "Pbkdf2"
+				}
+			]
+		},
+		{
+			"id": 129,
+			"name": "NodeCryptoRipemd160Digest",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 131,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 132,
+							"name": "new NodeCryptoRipemd160Digest",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 133,
+									"name": "nodeCryptoCreateHash",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 112,
+										"name": "NodeCryptoCreateHash"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 129,
+								"name": "NodeCryptoRipemd160Digest"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hashRipemd160.ts",
+							"line": 24,
+							"character": 45
+						}
+					]
+				},
+				{
+					"id": 130,
+					"name": "nodeCryptoCreateHash",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hashRipemd160.ts",
+							"line": 24,
+							"character": 22
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 112,
+						"name": "NodeCryptoCreateHash"
+					}
+				},
+				{
+					"id": 134,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 135,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 136,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 123,
+								"name": "Ripemd160Digest.digest"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hashRipemd160.ts",
+							"line": 30,
+							"character": 8
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 122,
+						"name": "Ripemd160Digest.digest"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						131
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						130
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						134
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hashRipemd160.ts",
+					"line": 23,
+					"character": 38
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 121,
+					"name": "Ripemd160Digest"
+				}
+			]
+		},
+		{
+			"id": 94,
+			"name": "NodeCryptoSha2Hash",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 96,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 97,
+							"name": "new NodeCryptoSha2Hash",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 98,
+									"name": "createHash",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 112,
+										"name": "NodeCryptoCreateHash"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 94,
+								"name": "NodeCryptoSha2Hash"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 11,
+							"character": 35
+						}
+					]
+				},
+				{
+					"id": 95,
+					"name": "createHash",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 11,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 112,
+						"name": "NodeCryptoCreateHash"
+					}
+				},
+				{
+					"id": 99,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 100,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 101,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 102,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									},
+									"defaultValue": "\"sha256\""
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 17,
+							"character": 14
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						96
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						95
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						99
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 10,
+					"character": 31
+				}
+			]
+		},
+		{
+			"id": 356,
+			"name": "PasswordError",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 358,
+					"name": "message",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 974,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"id": 358,
+						"name": "Error.message"
+					}
+				},
+				{
+					"id": 357,
+					"name": "name",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 973,
+							"character": 8
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"id": 357,
+						"name": "Error.name"
+					}
+				},
+				{
+					"id": 359,
+					"name": "stack",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 975,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					},
+					"overwrites": {
+						"type": "reference",
+						"id": 359,
+						"name": "Error.stack"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"id": 359,
+						"name": "Error.stack"
+					}
+				},
+				{
+					"id": 360,
+					"name": "Error",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isStatic": true,
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 984,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "ErrorConstructor"
+					},
+					"extendedBy": [
+						{
+							"type": "reference",
+							"id": 356,
+							"name": "PasswordError"
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						358,
+						357,
+						359,
+						360
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/wallet.ts",
+					"line": 63,
+					"character": 19
+				}
+			],
+			"extendedTypes": [
+				{
+					"type": "reference",
+					"id": 360,
+					"name": "Error"
+				}
+			]
+		},
+		{
+			"id": 125,
+			"name": "Ripemd160PolyfillDigest",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 126,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 127,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 128,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 123,
+								"name": "Ripemd160Digest.digest"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hashRipemd160.ts",
+							"line": 11,
+							"character": 8
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 122,
+						"name": "Ripemd160Digest.digest"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						126
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hashRipemd160.ts",
+					"line": 10,
+					"character": 36
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 121,
+					"name": "Ripemd160Digest"
+				}
+			]
+		},
+		{
+			"id": 63,
+			"name": "WebCryptoAesCipher",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 65,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 66,
+							"name": "new WebCryptoAesCipher",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 67,
+									"name": "subtleCrypto",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "SubtleCrypto"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 63,
+								"name": "WebCryptoAesCipher"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 54,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 64,
+					"name": "subtleCrypto",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 54,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "SubtleCrypto"
+					}
+				},
+				{
+					"id": 74,
+					"name": "decrypt",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 75,
+							"name": "decrypt",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 76,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 82,
+										"name": "CipherAlgorithm"
+									}
+								},
+								{
+									"id": 77,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 78,
+									"name": "iv",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 79,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 39,
+								"name": "AesCipher.decrypt"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 84,
+							"character": 15
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 38,
+						"name": "AesCipher.decrypt"
+					}
+				},
+				{
+					"id": 68,
+					"name": "encrypt",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 69,
+							"name": "encrypt",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 70,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 82,
+										"name": "CipherAlgorithm"
+									}
+								},
+								{
+									"id": 71,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 72,
+									"name": "iv",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 73,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 33,
+								"name": "AesCipher.encrypt"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 60,
+							"character": 15
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 32,
+						"name": "AesCipher.encrypt"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						65
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						64
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						74,
+						68
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 53,
+					"character": 31
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 31,
+					"name": "AesCipher"
+				}
+			]
+		},
+		{
+			"id": 177,
+			"name": "WebCryptoHmacSha256",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 179,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 180,
+							"name": "new WebCryptoHmacSha256",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 181,
+									"name": "subtleCrypto",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "SubtleCrypto"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 177,
+								"name": "WebCryptoHmacSha256"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 25,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 178,
+					"name": "subtleCrypto",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 25,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "SubtleCrypto"
+					}
+				},
+				{
+					"id": 182,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 183,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 184,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 185,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 165,
+								"name": "Hmac.digest"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 31,
+							"character": 14
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 164,
+						"name": "Hmac.digest"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						179
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						178
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						182
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hmacSha256.ts",
+					"line": 24,
+					"character": 32
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 163,
+					"name": "Hmac"
+				}
+			]
+		},
+		{
+			"id": 340,
+			"name": "WebCryptoPartialPbkdf2",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 342,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 343,
+							"name": "new WebCryptoPartialPbkdf2",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 344,
+									"name": "subtleCrypto",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "SubtleCrypto"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 340,
+								"name": "WebCryptoPartialPbkdf2"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 98,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 341,
+					"name": "subtleCrypto",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 98,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "SubtleCrypto"
+					}
+				},
+				{
+					"id": 345,
+					"name": "derive",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 346,
+							"name": "derive",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 347,
+									"name": "password",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 348,
+									"name": "salt",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 349,
+									"name": "iterations",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 350,
+									"name": "keyLength",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 351,
+									"name": "digest",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 352,
+										"name": "Pbkdf2Digests"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 310,
+								"name": "Pbkdf2.derive"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 104,
+							"character": 14
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 309,
+						"name": "Pbkdf2.derive"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						342
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						341
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						345
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 92,
+					"character": 35
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 308,
+					"name": "Pbkdf2"
+				}
+			]
+		},
+		{
+			"id": 328,
+			"name": "WebCryptoPbkdf2",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 330,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 331,
+							"name": "new WebCryptoPbkdf2",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 332,
+									"name": "subtleCrypto",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "SubtleCrypto"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 328,
+								"name": "WebCryptoPbkdf2"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 46,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 329,
+					"name": "subtleCrypto",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 46,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "SubtleCrypto"
+					}
+				},
+				{
+					"id": 333,
+					"name": "derive",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 334,
+							"name": "derive",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 335,
+									"name": "password",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 336,
+									"name": "salt",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 337,
+									"name": "iterations",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 338,
+									"name": "keyLength",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 339,
+									"name": "digest",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 352,
+										"name": "Pbkdf2Digests"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							},
+							"implementationOf": {
+								"type": "reference",
+								"id": 310,
+								"name": "Pbkdf2.derive"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 52,
+							"character": 14
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 309,
+						"name": "Pbkdf2.derive"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						330
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						329
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						333
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 45,
+					"character": 28
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 308,
+					"name": "Pbkdf2"
+				}
+			]
+		},
+		{
+			"id": 103,
+			"name": "WebCryptoSha2Hash",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 105,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 106,
+							"name": "new WebCryptoSha2Hash",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 107,
+									"name": "subtleCrypto",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "SubtleCrypto"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 103,
+								"name": "WebCryptoSha2Hash"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 34,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 104,
+					"name": "subtleCrypto",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 34,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "SubtleCrypto"
+					}
+				},
+				{
+					"id": 108,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 109,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 110,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 111,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									},
+									"defaultValue": "\"sha256\""
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 40,
+							"character": 14
+						}
+					],
+					"implementationOf": {
+						"type": "reference",
+						"id": 90,
+						"name": "Sha2Hash.digest"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						105
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						104
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						108
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 33,
+					"character": 30
+				}
+			],
+			"implementedTypes": [
+				{
+					"type": "reference",
+					"id": 89,
+					"name": "Sha2Hash"
+				}
+			]
+		},
+		{
+			"id": 31,
+			"name": "AesCipher",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 38,
+					"name": "decrypt",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 39,
+							"name": "decrypt",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 40,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 82,
+										"name": "CipherAlgorithm"
+									}
+								},
+								{
+									"id": 41,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 42,
+									"name": "iv",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 43,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 11,
+							"character": 9
+						}
+					]
+				},
+				{
+					"id": 32,
+					"name": "encrypt",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 33,
+							"name": "encrypt",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 34,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 82,
+										"name": "CipherAlgorithm"
+									}
+								},
+								{
+									"id": 35,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 36,
+									"name": "iv",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 37,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/aesCipher.ts",
+							"line": 9,
+							"character": 9
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						38,
+						32
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 8,
+					"character": 26
+				}
+			],
+			"implementedBy": [
+				{
+					"type": "reference",
+					"id": 44,
+					"name": "NodeCryptoAesCipher"
+				},
+				{
+					"type": "reference",
+					"id": 63,
+					"name": "WebCryptoAesCipher"
+				}
+			]
+		},
+		{
+			"id": 292,
+			"name": "EncryptContentOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": "Specify encryption options, and whether to sign the ciphertext."
+			},
+			"children": [
+				{
+					"id": 296,
+					"name": "cipherTextEncoding",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "String encoding format for the cipherText buffer.\nCurrently defaults to 'hex' for legacy backwards-compatibility.\nOnly used if the `encrypt` option is also used.\nNote: in the future this should default to 'base64' for the significant\nfile size reduction."
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 26,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "CipherTextEncoding"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"id": 290,
+						"name": "EncryptionOptions.cipherTextEncoding"
+					}
+				},
+				{
+					"id": 294,
+					"name": "privateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "Encrypt the data with the public key corresponding to the supplied private key"
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 47,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 293,
+					"name": "publicKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "Encrypt the data with this key."
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 43,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 295,
+					"name": "sign",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's\napp private key. If a string is specified, it is used as the private key instead\nof the user's app private key.",
+						"tags": [
+							{
+								"tag": "default",
+								"text": "false\n"
+							}
+						]
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 18,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "boolean"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"id": 289,
+						"name": "EncryptionOptions.sign"
+					}
+				},
+				{
+					"id": 297,
+					"name": "wasString",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "Specifies if the original unencrypted content is a ASCII or UTF-8 string.\nFor example stringified JSON.\nIf true, then when the ciphertext is decrypted, it will be returned as\na `string` type variable, otherwise will be returned as a Buffer."
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 33,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "false"
+							},
+							{
+								"type": "intrinsic",
+								"name": "true"
+							}
+						]
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"id": 291,
+						"name": "EncryptionOptions.wasString"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						296,
+						294,
+						293,
+						295,
+						297
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/encryption.ts",
+					"line": 39,
+					"character": 38
+				}
+			],
+			"extendedTypes": [
+				{
+					"type": "reference",
+					"id": 288,
+					"name": "EncryptionOptions"
+				}
+			]
+		},
+		{
+			"id": 288,
+			"name": "EncryptionOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 290,
+					"name": "cipherTextEncoding",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "String encoding format for the cipherText buffer.\nCurrently defaults to 'hex' for legacy backwards-compatibility.\nOnly used if the `encrypt` option is also used.\nNote: in the future this should default to 'base64' for the significant\nfile size reduction."
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 26,
+							"character": 20
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "CipherTextEncoding"
+					}
+				},
+				{
+					"id": 289,
+					"name": "sign",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "If set to `true` the data is signed using ECDSA on SHA256 hashes with the user's\napp private key. If a string is specified, it is used as the private key instead\nof the user's app private key.",
+						"tags": [
+							{
+								"tag": "default",
+								"text": "false\n"
+							}
+						]
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 18,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "boolean"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 291,
+					"name": "wasString",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "Specifies if the original unencrypted content is a ASCII or UTF-8 string.\nFor example stringified JSON.\nIf true, then when the ciphertext is decrypted, it will be returned as\na `string` type variable, otherwise will be returned as a Buffer."
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/encryption.ts",
+							"line": 33,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "false"
+							},
+							{
+								"type": "intrinsic",
+								"name": "true"
+							}
+						]
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						290,
+						289,
+						291
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/encryption.ts",
+					"line": 11,
+					"character": 34
+				}
+			],
+			"extendedBy": [
+				{
+					"type": "reference",
+					"id": 292,
+					"name": "EncryptContentOptions"
+				}
+			]
+		},
+		{
+			"id": 163,
+			"name": "Hmac",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 164,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 165,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 166,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 167,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hmacSha256.ts",
+							"line": 4,
+							"character": 8
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						164
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hmacSha256.ts",
+					"line": 3,
+					"character": 21
+				}
+			],
+			"implementedBy": [
+				{
+					"type": "reference",
+					"id": 168,
+					"name": "NodeCryptoHmacSha256"
+				},
+				{
+					"type": "reference",
+					"id": 177,
+					"name": "WebCryptoHmacSha256"
+				}
+			]
+		},
+		{
+			"id": 4,
+			"name": "NodeCryptoLib",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 5,
+					"name": "lib",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/cryptoUtils.ts",
+							"line": 45,
+							"character": 5
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "\"crypto\""
+					}
+				},
+				{
+					"id": 6,
+					"name": "name",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/cryptoUtils.ts",
+							"line": 46,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "stringLiteral",
+						"value": "nodeCrypto"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						5,
+						6
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 44,
+					"character": 30
+				}
+			]
+		},
+		{
+			"id": 308,
+			"name": "Pbkdf2",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 309,
+					"name": "derive",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 310,
+							"name": "derive",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 311,
+									"name": "password",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 312,
+									"name": "salt",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 313,
+									"name": "iterations",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 314,
+									"name": "keyLength",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 315,
+									"name": "digest",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 352,
+										"name": "Pbkdf2Digests"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/pbkdf2.ts",
+							"line": 6,
+							"character": 8
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						309
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 5,
+					"character": 23
+				}
+			],
+			"implementedBy": [
+				{
+					"type": "reference",
+					"id": 316,
+					"name": "NodeCryptoPbkdf2"
+				},
+				{
+					"type": "reference",
+					"id": 340,
+					"name": "WebCryptoPartialPbkdf2"
+				},
+				{
+					"type": "reference",
+					"id": 328,
+					"name": "WebCryptoPbkdf2"
+				}
+			]
+		},
+		{
+			"id": 121,
+			"name": "Ripemd160Digest",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 122,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 123,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 124,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/hashRipemd160.ts",
+							"line": 7,
+							"character": 8
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						122
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hashRipemd160.ts",
+					"line": 6,
+					"character": 32
+				}
+			],
+			"implementedBy": [
+				{
+					"type": "reference",
+					"id": 129,
+					"name": "NodeCryptoRipemd160Digest"
+				},
+				{
+					"type": "reference",
+					"id": 125,
+					"name": "Ripemd160PolyfillDigest"
+				}
+			]
+		},
+		{
+			"id": 89,
+			"name": "Sha2Hash",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 90,
+					"name": "digest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 91,
+							"name": "digest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 92,
+									"name": "data",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Buffer"
+									}
+								},
+								{
+									"id": 93,
+									"name": "algorithm",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "sha256"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "sha512"
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/sha2Hash.ts",
+							"line": 7,
+							"character": 8
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						90
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 6,
+					"character": 25
+				}
+			],
+			"implementedBy": [
+				{
+					"type": "reference",
+					"id": 103,
+					"name": "WebCryptoSha2Hash"
+				}
+			]
+		},
+		{
+			"id": 1,
+			"name": "WebCryptoLib",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 2,
+					"name": "lib",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/cryptoUtils.ts",
+							"line": 40,
+							"character": 5
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "SubtleCrypto"
+					}
+				},
+				{
+					"id": 3,
+					"name": "name",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/cryptoUtils.ts",
+							"line": 41,
+							"character": 6
+						}
+					],
+					"type": {
+						"type": "stringLiteral",
+						"value": "subtleCrypto"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						2,
+						3
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 39,
+					"character": 29
+				}
+			]
+		},
+		{
+			"id": 82,
+			"name": "CipherAlgorithm",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 6,
+					"character": 27
+				}
+			],
+			"type": {
+				"type": "union",
+				"types": [
+					{
+						"type": "stringLiteral",
+						"value": "aes-256-cbc"
+					},
+					{
+						"type": "stringLiteral",
+						"value": "aes-128-cbc"
+					}
+				]
+			}
+		},
+		{
+			"id": 85,
+			"name": "GetRandomBytes",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": "Optional function to generate cryptographically secure random bytes"
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoRandom.ts",
+					"line": 6,
+					"character": 26
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 86,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 87,
+							"name": "__call",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 88,
+									"name": "count",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/cryptoRandom.ts",
+							"line": 6,
+							"character": 28
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 80,
+			"name": "NodeCryptoCreateCipher",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 3,
+					"character": 27
+				}
+			],
+			"type": {
+				"type": "reference",
+				"name": "createCipheriv"
+			}
+		},
+		{
+			"id": 81,
+			"name": "NodeCryptoCreateDecipher",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 4,
+					"character": 29
+				}
+			],
+			"type": {
+				"type": "reference",
+				"name": "createDecipheriv"
+			}
+		},
+		{
+			"id": 112,
+			"name": "NodeCryptoCreateHash",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 4,
+					"character": 25
+				},
+				{
+					"fileName": "packages/encryption/src/hashRipemd160.ts",
+					"line": 4,
+					"character": 25
+				}
+			],
+			"type": {
+				"type": "reference",
+				"name": "createHash"
+			}
+		},
+		{
+			"id": 186,
+			"name": "NodeCryptoCreateHmac",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hmacSha256.ts",
+					"line": 7,
+					"character": 25
+				}
+			],
+			"type": {
+				"type": "reference",
+				"name": "createHmac"
+			}
+		},
+		{
+			"id": 353,
+			"name": "NodePbkdf2Fn",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 15,
+					"character": 17
+				}
+			],
+			"type": {
+				"type": "reference",
+				"name": "pbkdf2"
+			}
+		},
+		{
+			"id": 352,
+			"name": "Pbkdf2Digests",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 3,
+					"character": 25
+				}
+			],
+			"type": {
+				"type": "union",
+				"types": [
+					{
+						"type": "stringLiteral",
+						"value": "sha512"
+					},
+					{
+						"type": "stringLiteral",
+						"value": "sha256"
+					}
+				]
+			}
+		},
+		{
+			"id": 17,
+			"name": "TriplesecDecryptSignature",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 34,
+					"character": 37
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 18,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 19,
+							"name": "__call",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 20,
+									"name": "arg",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 21,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"children": [
+												{
+													"id": 22,
+													"name": "data",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "packages/encryption/src/cryptoUtils.ts",
+															"line": 35,
+															"character": 13
+														}
+													],
+													"type": {
+														"type": "reference",
+														"name": "Buffer"
+													}
+												},
+												{
+													"id": 23,
+													"name": "key",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true
+													},
+													"sources": [
+														{
+															"fileName": "packages/encryption/src/cryptoUtils.ts",
+															"line": 35,
+															"character": 26
+														}
+													],
+													"type": {
+														"type": "reference",
+														"name": "Buffer"
+													}
+												}
+											],
+											"groups": [
+												{
+													"title": "Variables",
+													"kind": 32,
+													"children": [
+														22,
+														23
+													]
+												}
+											],
+											"sources": [
+												{
+													"fileName": "packages/encryption/src/cryptoUtils.ts",
+													"line": 35,
+													"character": 6
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 24,
+									"name": "cb",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 25,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"signatures": [
+												{
+													"id": 26,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {
+														"isExported": true
+													},
+													"parameters": [
+														{
+															"id": 27,
+															"name": "err",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isExported": true
+															},
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"id": 360,
+																		"name": "Error"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														},
+														{
+															"id": 28,
+															"name": "buff",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isExported": true
+															},
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"name": "Buffer"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "null"
+																	}
+																]
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "void"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "packages/encryption/src/cryptoUtils.ts",
+													"line": 36,
+													"character": 5
+												}
+											]
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "void"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/encryption/src/cryptoUtils.ts",
+							"line": 34,
+							"character": 39
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 16,
+			"name": "NO_CRYPTO_LIB",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 31,
+					"character": 26
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "Crypto lib not found. Either the WebCrypto \"crypto.subtle\" or Node.js \"crypto\" module must be available."
+			},
+			"defaultValue": "\"Crypto lib not found. Either the WebCrypto \"crypto.subtle\" or Node.js \"crypto\" module must be available.\""
+		},
+		{
+			"id": 195,
+			"name": "ecurve",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/ec.ts",
+					"line": 11,
+					"character": 12
+				}
+			],
+			"type": {
+				"type": "reference",
+				"name": "ec"
+			},
+			"defaultValue": "new EllipticCurve('secp256k1')"
+		},
+		{
+			"id": 83,
+			"name": "createCipher",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 84,
+					"name": "createCipher",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 31,
+								"name": "AesCipher"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/aesCipher.ts",
+					"line": 109,
+					"character": 34
+				}
+			]
+		},
+		{
+			"id": 137,
+			"name": "createHashRipemd160",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 138,
+					"name": "createHashRipemd160",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "reference",
+								"id": 125,
+								"name": "Ripemd160PolyfillDigest"
+							},
+							{
+								"type": "reference",
+								"id": 129,
+								"name": "NodeCryptoRipemd160Digest"
+							}
+						]
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hashRipemd160.ts",
+					"line": 52,
+					"character": 35
+				}
+			]
+		},
+		{
+			"id": 187,
+			"name": "createHmacSha256",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 188,
+					"name": "createHmacSha256",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 163,
+								"name": "Hmac"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hmacSha256.ts",
+					"line": 49,
+					"character": 38
+				}
+			]
+		},
+		{
+			"id": 354,
+			"name": "createPbkdf2",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 355,
+					"name": "createPbkdf2",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 308,
+								"name": "Pbkdf2"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/pbkdf2.ts",
+					"line": 160,
+					"character": 34
+				}
+			]
+		},
+		{
+			"id": 113,
+			"name": "createSha2Hash",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 114,
+					"name": "createSha2Hash",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"id": 89,
+								"name": "Sha2Hash"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 62,
+					"character": 36
+				}
+			]
+		},
+		{
+			"id": 302,
+			"name": "decryptContent",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 303,
+					"name": "decryptContent",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Decrypts data encrypted with `encryptContent` with the\ntransit private key.",
+						"returns": "decrypted content.\n"
+					},
+					"parameters": [
+						{
+							"id": 304,
+							"name": "content",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"text": "encrypted content."
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 305,
+							"name": "options",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "reflection",
+										"declaration": {
+											"id": 306,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {
+												"isExported": true
+											},
+											"children": [
+												{
+													"id": 307,
+													"name": "privateKey",
+													"kind": 32,
+													"kindString": "Variable",
+													"flags": {
+														"isExported": true,
+														"isOptional": true
+													},
+													"comment": {
+														"text": "the hex string of the ECDSA private\nkey to use for decryption. If not provided, will use user's appPrivateKey."
+													},
+													"sources": [
+														{
+															"fileName": "packages/encryption/src/encryption.ts",
+															"line": 113,
+															"character": 14
+														}
+													],
+													"type": {
+														"type": "union",
+														"types": [
+															{
+																"type": "intrinsic",
+																"name": "undefined"
+															},
+															{
+																"type": "intrinsic",
+																"name": "string"
+															}
+														]
+													}
+												}
+											],
+											"groups": [
+												{
+													"title": "Variables",
+													"kind": 32,
+													"children": [
+														307
+													]
+												}
+											]
+										}
+									}
+								]
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								]
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/encryption.ts",
+					"line": 110,
+					"character": 30
+				}
+			]
+		},
+		{
+			"id": 298,
+			"name": "encryptContent",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 299,
+					"name": "encryptContent",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Encrypts the data provided with the app public key.",
+						"returns": "Stringified ciphertext object\n"
+					},
+					"parameters": [
+						{
+							"id": 300,
+							"name": "content",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"text": "data to encrypt"
+							},
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "reference",
+										"name": "Buffer"
+									}
+								]
+							}
+						},
+						{
+							"id": 301,
+							"name": "options",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"type": {
+								"type": "reference",
+								"id": 292,
+								"name": "EncryptContentOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/encryption.ts",
+					"line": 58,
+					"character": 36
+				}
+			]
+		},
+		{
+			"id": 192,
+			"name": "getBase64OutputLength",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 193,
+					"name": "getBase64OutputLength",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Calculate the base64 encoded string length for a given input length.\nThis is equivalent to the byte length when the string is ASCII or UTF8-8\nencoded."
+					},
+					"parameters": [
+						{
+							"id": 194,
+							"name": "inputByteLength",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "number"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/utils.ts",
+					"line": 18,
+					"character": 37
+				}
+			]
+		},
+		{
+			"id": 29,
+			"name": "getCryptoLib",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 30,
+					"name": "getCryptoLib",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "union",
+								"types": [
+									{
+										"type": "reference",
+										"id": 1,
+										"name": "WebCryptoLib"
+									},
+									{
+										"type": "reference",
+										"id": 4,
+										"name": "NodeCryptoLib"
+									}
+								]
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 51,
+					"character": 34
+				}
+			]
+		},
+		{
+			"id": 139,
+			"name": "hashRipemd160",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 140,
+					"name": "hashRipemd160",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"parameters": [
+						{
+							"id": 141,
+							"name": "data",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Buffer"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/hashRipemd160.ts",
+					"line": 66,
+					"character": 29
+				}
+			]
+		},
+		{
+			"id": 115,
+			"name": "hashSha256Sync",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 116,
+					"name": "hashSha256Sync",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"parameters": [
+						{
+							"id": 117,
+							"name": "data",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Buffer"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 71,
+					"character": 30
+				}
+			]
+		},
+		{
+			"id": 118,
+			"name": "hashSha512Sync",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 119,
+					"name": "hashSha512Sync",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"parameters": [
+						{
+							"id": 120,
+							"name": "data",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "reference",
+								"name": "Buffer"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "Buffer"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/sha2Hash.ts",
+					"line": 77,
+					"character": 30
+				}
+			]
+		},
+		{
+			"id": 9,
+			"name": "isNodeCryptoAvailable",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 10,
+					"name": "isNodeCryptoAvailable",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"typeParameter": [
+						{
+							"id": 11,
+							"name": "T",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {
+								"isExported": true
+							}
+						}
+					],
+					"parameters": [
+						{
+							"id": 12,
+							"name": "withFeature",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 13,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"signatures": [
+										{
+											"id": 14,
+											"name": "__call",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {
+												"isExported": true
+											},
+											"parameters": [
+												{
+													"id": 15,
+													"name": "nodeCrypto",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {
+														"isExported": true
+													},
+													"type": {
+														"type": "reference",
+														"name": "\"crypto\""
+													}
+												}
+											],
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "boolean"
+													},
+													{
+														"type": "typeParameter",
+														"name": "T"
+													}
+												]
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "packages/encryption/src/cryptoUtils.ts",
+											"line": 6,
+											"character": 14
+										}
+									]
+								}
+							}
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "false"
+							},
+							{
+								"type": "typeParameter",
+								"name": "T"
+							}
+						]
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 5,
+					"character": 37
+				},
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 8,
+					"character": 37
+				}
+			]
+		},
+		{
+			"id": 7,
+			"name": "isSubtleCryptoAvailable",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 8,
+					"name": "isSubtleCryptoAvailable",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"type": {
+						"type": "intrinsic",
+						"name": "boolean"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/encryption/src/cryptoUtils.ts",
+					"line": 1,
+					"character": 39
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "Classes",
+			"kind": 128,
+			"children": [
+				44,
+				168,
+				316,
+				129,
+				94,
+				356,
+				125,
+				63,
+				177,
+				340,
+				328,
+				103
+			]
+		},
+		{
+			"title": "Interfaces",
+			"kind": 256,
+			"children": [
+				31,
+				292,
+				288,
+				163,
+				4,
+				308,
+				121,
+				89,
+				1
+			]
+		},
+		{
+			"title": "Type aliases",
+			"kind": 4194304,
+			"children": [
+				82,
+				85,
+				80,
+				81,
+				112,
+				186,
+				353,
+				352,
+				17
+			]
+		},
+		{
+			"title": "Variables",
+			"kind": 32,
+			"children": [
+				16,
+				195
+			]
+		},
+		{
+			"title": "Functions",
+			"kind": 64,
+			"children": [
+				83,
+				137,
+				187,
+				354,
+				113,
+				302,
+				298,
+				192,
+				29,
+				139,
+				115,
+				118,
+				9,
+				7
+			]
+		}
+	]
+}

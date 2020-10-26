@@ -1,0 +1,812 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Wallet | @stacks/keychain 1.0.0-beta.7 Library Reference</title>
+	<meta name="description" content="Documentation for @stacks/keychain 1.0.0-beta.7 Library Reference">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<link rel="stylesheet" href="../assets/css/custom-style.css">
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@stacks/keychain 1.0.0-beta.7 Library Reference</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="wallet.html">Wallet</a>
+				</li>
+			</ul>
+			<h1>Class Wallet</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">Wallet</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="wallet.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#bitcoinpublickeychain" class="tsd-kind-icon">bitcoin<wbr>Public<wbr>Keychain</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#chain" class="tsd-kind-icon">chain</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#configprivatekey" class="tsd-kind-icon">config<wbr>Private<wbr>Key</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#encryptedbackupphrase" class="tsd-kind-icon">encrypted<wbr>Backup<wbr>Phrase</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#firstbitcoinaddress" class="tsd-kind-icon">first<wbr>Bitcoin<wbr>Address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#identities" class="tsd-kind-icon">identities</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#identityaddresses" class="tsd-kind-icon">identity<wbr>Addresses</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#identitykeypairs" class="tsd-kind-icon">identity<wbr>Keypairs</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#identitypublickeychain" class="tsd-kind-icon">identity<wbr>Public<wbr>Keychain</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#stacksprivatekey" class="tsd-kind-icon">stacks<wbr>Private<wbr>Key</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="wallet.html#walletconfig" class="tsd-kind-icon">wallet<wbr>Config</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#creategaiaconfig" class="tsd-kind-icon">create<wbr>Gaia<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#createnewidentity" class="tsd-kind-icon">create<wbr>New<wbr>Identity</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#fetchconfig" class="tsd-kind-icon">fetch<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#getorcreateconfig" class="tsd-kind-icon">get<wbr>OrCreate<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#getsigner" class="tsd-kind-icon">get<wbr>Signer</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#restoreidentities" class="tsd-kind-icon">restore<wbr>Identities</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#updateconfig" class="tsd-kind-icon">update<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#updateconfigforreusewarning" class="tsd-kind-icon">update<wbr>Config<wbr>For<wbr>Reuse<wbr>Warning</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="wallet.html#updateconfigwithauth" class="tsd-kind-icon">update<wbr>Config<wbr>With<wbr>Auth</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="wallet.html#createaccount" class="tsd-kind-icon">create<wbr>Account</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="wallet.html#generate" class="tsd-kind-icon">generate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="wallet.html#generatefactory" class="tsd-kind-icon">generate<wbr>Factory</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="wallet.html#generatestrong" class="tsd-kind-icon">generate<wbr>Strong</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="wallet.html#restore" class="tsd-kind-icon">restore</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Wallet<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>bitcoinPublicKeychain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">; </span>configPrivateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>encryptedBackupPhrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>firstBitcoinAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>identities<span class="tsd-signature-symbol">: </span><a href="identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>identityAddresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>identityKeypairs<span class="tsd-signature-symbol">: </span><a href="../interfaces/identitykeypair.html" class="tsd-signature-type">IdentityKeyPair</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>identityPublicKeychain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>stacksPrivateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>walletConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="wallet.html" class="tsd-signature-type">Wallet</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L79">packages/keychain/src/wallet/index.ts:79</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>bitcoinPublicKeychain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">; </span>configPrivateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>encryptedBackupPhrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>firstBitcoinAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>identities<span class="tsd-signature-symbol">: </span><a href="identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>identityAddresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>identityKeypairs<span class="tsd-signature-symbol">: </span><a href="../interfaces/identitykeypair.html" class="tsd-signature-type">IdentityKeyPair</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>identityPublicKeychain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>stacksPrivateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>walletConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>bitcoin<wbr>Public<wbr>Keychain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>config<wbr>Private<wbr>Key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>encrypted<wbr>Backup<wbr>Phrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>first<wbr>Bitcoin<wbr>Address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>identities<span class="tsd-signature-symbol">: </span><a href="identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">[]</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>identity<wbr>Addresses<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>identity<wbr>Keypairs<span class="tsd-signature-symbol">: </span><a href="../interfaces/identitykeypair.html" class="tsd-signature-type">IdentityKeyPair</a><span class="tsd-signature-symbol">[]</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>identity<wbr>Public<wbr>Keychain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>stacks<wbr>Private<wbr>Key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>wallet<wbr>Config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="wallet.html" class="tsd-signature-type">Wallet</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="bitcoinpublickeychain" class="tsd-anchor"></a>
+					<h3>bitcoin<wbr>Public<wbr>Keychain</h3>
+					<div class="tsd-signature tsd-kind-icon">bitcoin<wbr>Public<wbr>Keychain<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L71">packages/keychain/src/wallet/index.ts:71</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="chain" class="tsd-anchor"></a>
+					<h3>chain</h3>
+					<div class="tsd-signature tsd-kind-icon">chain<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ChainID</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L69">packages/keychain/src/wallet/index.ts:69</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="configprivatekey" class="tsd-anchor"></a>
+					<h3>config<wbr>Private<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">config<wbr>Private<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L77">packages/keychain/src/wallet/index.ts:77</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="encryptedbackupphrase" class="tsd-anchor"></a>
+					<h3>encrypted<wbr>Backup<wbr>Phrase</h3>
+					<div class="tsd-signature tsd-kind-icon">encrypted<wbr>Backup<wbr>Phrase<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L70">packages/keychain/src/wallet/index.ts:70</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="firstbitcoinaddress" class="tsd-anchor"></a>
+					<h3>first<wbr>Bitcoin<wbr>Address</h3>
+					<div class="tsd-signature tsd-kind-icon">first<wbr>Bitcoin<wbr>Address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L72">packages/keychain/src/wallet/index.ts:72</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="identities" class="tsd-anchor"></a>
+					<h3>identities</h3>
+					<div class="tsd-signature tsd-kind-icon">identities<span class="tsd-signature-symbol">:</span> <a href="identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L76">packages/keychain/src/wallet/index.ts:76</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="identityaddresses" class="tsd-anchor"></a>
+					<h3>identity<wbr>Addresses</h3>
+					<div class="tsd-signature tsd-kind-icon">identity<wbr>Addresses<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L74">packages/keychain/src/wallet/index.ts:74</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="identitykeypairs" class="tsd-anchor"></a>
+					<h3>identity<wbr>Keypairs</h3>
+					<div class="tsd-signature tsd-kind-icon">identity<wbr>Keypairs<span class="tsd-signature-symbol">:</span> <a href="../interfaces/identitykeypair.html" class="tsd-signature-type">IdentityKeyPair</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L73">packages/keychain/src/wallet/index.ts:73</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="identitypublickeychain" class="tsd-anchor"></a>
+					<h3>identity<wbr>Public<wbr>Keychain</h3>
+					<div class="tsd-signature tsd-kind-icon">identity<wbr>Public<wbr>Keychain<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L75">packages/keychain/src/wallet/index.ts:75</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="stacksprivatekey" class="tsd-anchor"></a>
+					<h3>stacks<wbr>Private<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">stacks<wbr>Private<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L78">packages/keychain/src/wallet/index.ts:78</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="walletconfig" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> wallet<wbr>Config</h3>
+					<div class="tsd-signature tsd-kind-icon">wallet<wbr>Config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L79">packages/keychain/src/wallet/index.ts:79</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="creategaiaconfig" class="tsd-anchor"></a>
+					<h3>create<wbr>Gaia<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Gaia<wbr>Config<span class="tsd-signature-symbol">(</span>gaiaHubUrl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L226">packages/keychain/src/wallet/index.ts:226</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>gaiaHubUrl: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="createnewidentity" class="tsd-anchor"></a>
+					<h3>create<wbr>New<wbr>Identity</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>New<wbr>Identity<span class="tsd-signature-symbol">(</span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L214">packages/keychain/src/wallet/index.ts:214</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>password: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="identity.html" class="tsd-signature-type">Identity</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="fetchconfig" class="tsd-anchor"></a>
+					<h3>fetch<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">fetch<wbr>Config<span class="tsd-signature-symbol">(</span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L230">packages/keychain/src/wallet/index.ts:230</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>gaiaConfig: <span class="tsd-signature-type">GaiaHubConfig</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getorcreateconfig" class="tsd-anchor"></a>
+					<h3>get<wbr>OrCreate<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>OrCreate<wbr>Config<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">; </span>skipUpload<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L247">packages/keychain/src/wallet/index.ts:247</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">; </span>skipUpload<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>gaia<wbr>Config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>skip<wbr>Upload<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/walletconfig.html" class="tsd-signature-type">WalletConfig</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getsigner" class="tsd-anchor"></a>
+					<h3>get<wbr>Signer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Signer<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="walletsigner.html" class="tsd-signature-type">WalletSigner</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L325">packages/keychain/src/wallet/index.ts:325</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="walletsigner.html" class="tsd-signature-type">WalletSigner</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="restoreidentities" class="tsd-anchor"></a>
+					<h3>restore<wbr>Identities</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">restore<wbr>Identities<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>gaiaReadURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>rootNode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BIP32Interface</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L180">packages/keychain/src/wallet/index.ts:180</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Restore all previously used identities. This is meant to be used when &#39;restoring&#39; a wallet.
+										First, it will check for a <code>walletConfig</code>. If present, then we use that to determine how
+									many identities to generate, and auto-populate their username.</p>
+								</div>
+								<p>If <code>walletConfig</code> is empty, then this is being restored from an authenticator that doesn&#39;t
+									support <code>walletConfig</code>. In that case, we will recursively generate identities, and check for
+								on-chain names.</p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>gaiaReadURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>rootNode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BIP32Interface</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>gaia<wbr>ReadURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>root<wbr>Node<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BIP32Interface</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="updateconfig" class="tsd-anchor"></a>
+					<h3>update<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Config<span class="tsd-signature-symbol">(</span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L275">packages/keychain/src/wallet/index.ts:275</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>gaiaConfig: <span class="tsd-signature-type">GaiaHubConfig</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="updateconfigforreusewarning" class="tsd-anchor"></a>
+					<h3>update<wbr>Config<wbr>For<wbr>Reuse<wbr>Warning</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Config<wbr>For<wbr>Reuse<wbr>Warning<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L317">packages/keychain/src/wallet/index.ts:317</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>gaia<wbr>Config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="updateconfigwithauth" class="tsd-anchor"></a>
+					<h3>update<wbr>Config<wbr>With<wbr>Auth</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Config<wbr>With<wbr>Auth<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>app<span class="tsd-signature-symbol">: </span><a href="../interfaces/configapp.html" class="tsd-signature-type">ConfigApp</a><span class="tsd-signature-symbol">; </span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">; </span>identityIndex<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L281">packages/keychain/src/wallet/index.ts:281</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>app<span class="tsd-signature-symbol">: </span><a href="../interfaces/configapp.html" class="tsd-signature-type">ConfigApp</a><span class="tsd-signature-symbol">; </span>gaiaConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span><span class="tsd-signature-symbol">; </span>identityIndex<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>app<span class="tsd-signature-symbol">: </span><a href="../interfaces/configapp.html" class="tsd-signature-type">ConfigApp</a></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>gaia<wbr>Config<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GaiaHubConfig</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>identity<wbr>Index<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="createaccount" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> create<wbr>Account</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Account<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">; </span>encryptedBackupPhrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>identitiesToGenerate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>rootNode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BIP32Interface</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L142">packages/keychain/src/wallet/index.ts:142</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">; </span>encryptedBackupPhrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>identitiesToGenerate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>rootNode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BIP32Interface</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>encrypted<wbr>Backup<wbr>Phrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>identities<wbr>ToGenerate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>root<wbr>Node<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">BIP32Interface</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="generate" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> generate</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">generate<span class="tsd-signature-symbol">(</span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L121">packages/keychain/src/wallet/index.ts:121</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>password: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>chain: <span class="tsd-signature-type">ChainID</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="generatefactory" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> generate<wbr>Factory</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">generate<wbr>Factory<span class="tsd-signature-symbol">(</span>bitsEntropy<span class="tsd-signature-symbol">: </span><a href="../globals.html#allowedkeyentropybits" class="tsd-signature-type">AllowedKeyEntropyBits</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L107">packages/keychain/src/wallet/index.ts:107</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>bitsEntropy: <a href="../globals.html#allowedkeyentropybits" class="tsd-signature-type">AllowedKeyEntropyBits</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">(Anonymous function)</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="generatestrong" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> generate<wbr>Strong</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">generate<wbr>Strong<span class="tsd-signature-symbol">(</span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L125">packages/keychain/src/wallet/index.ts:125</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>password: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>chain: <span class="tsd-signature-type">ChainID</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="restore" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> restore</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">restore<span class="tsd-signature-symbol">(</span>password<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, seedPhrase<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, chain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChainID</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/blockstack.js/blob/master/packages/keychain/src/wallet/index.ts#L129">packages/keychain/src/wallet/index.ts:129</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>password: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>seedPhrase: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>chain: <span class="tsd-signature-type">ChainID</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="wallet.html" class="tsd-signature-type">Wallet</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class">
+						<a href="wallet.html" class="tsd-kind-icon">Wallet</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="wallet.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#bitcoinpublickeychain" class="tsd-kind-icon">bitcoin<wbr>Public<wbr>Keychain</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#chain" class="tsd-kind-icon">chain</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#configprivatekey" class="tsd-kind-icon">config<wbr>Private<wbr>Key</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#encryptedbackupphrase" class="tsd-kind-icon">encrypted<wbr>Backup<wbr>Phrase</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#firstbitcoinaddress" class="tsd-kind-icon">first<wbr>Bitcoin<wbr>Address</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#identities" class="tsd-kind-icon">identities</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#identityaddresses" class="tsd-kind-icon">identity<wbr>Addresses</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#identitykeypairs" class="tsd-kind-icon">identity<wbr>Keypairs</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#identitypublickeychain" class="tsd-kind-icon">identity<wbr>Public<wbr>Keychain</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#stacksprivatekey" class="tsd-kind-icon">stacks<wbr>Private<wbr>Key</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="wallet.html#walletconfig" class="tsd-kind-icon">wallet<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#creategaiaconfig" class="tsd-kind-icon">create<wbr>Gaia<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#createnewidentity" class="tsd-kind-icon">create<wbr>New<wbr>Identity</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#fetchconfig" class="tsd-kind-icon">fetch<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#getorcreateconfig" class="tsd-kind-icon">get<wbr>OrCreate<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#getsigner" class="tsd-kind-icon">get<wbr>Signer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#restoreidentities" class="tsd-kind-icon">restore<wbr>Identities</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#updateconfig" class="tsd-kind-icon">update<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#updateconfigforreusewarning" class="tsd-kind-icon">update<wbr>Config<wbr>For<wbr>Reuse<wbr>Warning</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="wallet.html#updateconfigwithauth" class="tsd-kind-icon">update<wbr>Config<wbr>With<wbr>Auth</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="wallet.html#createaccount" class="tsd-kind-icon">create<wbr>Account</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="wallet.html#generate" class="tsd-kind-icon">generate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="wallet.html#generatefactory" class="tsd-kind-icon">generate<wbr>Factory</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="wallet.html#generatestrong" class="tsd-kind-icon">generate<wbr>Strong</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="wallet.html#restore" class="tsd-kind-icon">restore</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

@@ -57,7 +57,7 @@ export class BufferReader extends SmartBuffer {
 
   readBigUIntLE(length: number): bigint {
     const buffer = Buffer.from(this.readBuffer(length)).reverse();
-    const hex = buffer.toString('hex');
+    const hex = buffer.toString();
     const num = BigInt(`0x${hex}`);
     return num;
   }

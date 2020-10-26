@@ -44,7 +44,8 @@
     "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "codecovUpload": "codecov"
+    "codecovUpload": "codecov",
+    "build:docs": "rimraf docs && cross-env typedoc --name \"$npm_package_name $npm_package_version Library Reference\" --tsconfig ../../tsconfig.typedoc.json --out docs --json docs/docs.json src"
   },
   "devDependencies": {
     "@babel/compat-data": "^7.10.1",

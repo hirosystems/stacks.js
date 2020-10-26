@@ -1,15 +1,39 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "jsx": "react",
+    "importHelpers": true,
     "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "pretty": true,
+    "removeComments": true,
     "noImplicitAny": true,
-    "outDir": "lib",
-    "sourceMap": true
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "stripInternal": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "emitDecoratorMetadata": false,
+    "noEmit": false,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
   },
   "include": [
-    "src",
+    "packages/**/src",
   ],
   "typedocOptions": {
     "readme": "overview.md",
@@ -22,6 +46,6 @@
     "includeDeclarations": false,
     "gitRevision": "master",
     "listInvalidSymbolLinks": true,
-    "theme": "docs-theme"
+    "theme": "../../docs-theme"
   }
 }

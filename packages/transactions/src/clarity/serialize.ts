@@ -104,7 +104,7 @@ function serializeStringCV(cv: StringAsciiCV | StringUtf8CV, encoding: 'ascii' |
 
   const str = Buffer.from(cv.data, encoding);
   const len = Buffer.alloc(4);
-  len.writeUInt32BE(str.length);
+  len.writeUInt32BE(str.length, 0);
 
   buffers.push(len);
   buffers.push(str);

@@ -1,0 +1,1586 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@stacks/transactions 1.0.0-beta.7 Library Reference</title>
+	<meta name="description" content="Documentation for @stacks/transactions 1.0.0-beta.7 Library Reference">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<link rel="stylesheet" href="assets/css/custom-style.css">
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@stacks/transactions 1.0.0-beta.7 Library Reference</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@stacks/transactions 1.0.0-beta.7 Library Reference</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#stackstransactions-" id="stackstransactions-" style="color: inherit; text-decoration: none;">
+					<h1>@stacks/transactions <a href="https://www.npmjs.com/package/@stacks/transactions"><img src="https://img.shields.io/npm/v/@stacks/transactions?color=red" alt="npm"></a></h1>
+				</a>
+				<p>Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
+				<pre><code><span class="hljs-built_in">npm</span> install @stacks/transactions</code></pre>
+				<a href="#overview" id="overview" style="color: inherit; text-decoration: none;">
+					<h2>Overview</h2>
+				</a>
+				<p>This library supports the creation of the following Stacks transaction types:</p>
+				<ol>
+					<li>STX token transfer</li>
+					<li>Smart contract deploy</li>
+					<li>Smart contract function call</li>
+				</ol>
+				<a href="#key-generation" id="key-generation" style="color: inherit; text-decoration: none;">
+					<h2>Key Generation</h2>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { createStacksPrivateKey, makeRandomPrivKey, getPublicKey } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@stacks/transactions&#x27;</span>;
+
+<span class="hljs-comment">// Random key</span>
+<span class="hljs-keyword">const</span> privateKey = makeRandomPrivKey();
+<span class="hljs-comment">// Get public key from private</span>
+<span class="hljs-keyword">const</span> publicKey = getPublicKey(privateKey);
+
+<span class="hljs-comment">// Private key from hex string</span>
+<span class="hljs-keyword">const</span> key = <span class="hljs-string">&#x27;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#x27;</span>;
+<span class="hljs-keyword">const</span> privateKey = createStacksPrivateKey(key);</code></pre>
+				<a href="#stx-token-transfer-transaction" id="stx-token-transfer-transaction" style="color: inherit; text-decoration: none;">
+					<h2>STX Token Transfer Transaction</h2>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {
+  makeSTXTokenTransfer, 
+  makeStandardSTXPostCondition, 
+  StacksMainnet, 
+  broadcastTransaction
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@stacks/transactions&#x27;</span>;
+<span class="hljs-keyword">const</span> BigNum = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;bn.js&#x27;</span>);
+
+<span class="hljs-keyword">const</span> network = <span class="hljs-keyword">new</span> StacksMainnet();
+
+<span class="hljs-keyword">const</span> txOptions = {
+  <span class="hljs-attr">recipient</span>: <span class="hljs-string">&#x27;SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159&#x27;</span>,
+  <span class="hljs-attr">amount</span>: <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">12345</span>),
+  <span class="hljs-attr">senderKey</span>: <span class="hljs-string">&#x27;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#x27;</span>,
+  network,
+  <span class="hljs-attr">memo</span>: <span class="hljs-string">&quot;test memo&quot;</span>,
+  <span class="hljs-attr">nonce</span>: <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">0</span>), <span class="hljs-comment">// set a nonce manually if you don&#x27;t want builder to fetch from a Stacks node</span>
+  <span class="hljs-attr">fee</span>: <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">200</span>), <span class="hljs-comment">// set a tx fee if you don&#x27;t want the builder to estimate</span>
+};
+
+<span class="hljs-keyword">const</span> transaction = <span class="hljs-keyword">await</span> makeSTXTokenTransfer(txOptions);
+
+<span class="hljs-comment">// to see the raw serialized tx</span>
+<span class="hljs-keyword">const</span> serializedTx = transaction.serialize().toString(<span class="hljs-string">&#x27;hex&#x27;</span>); 
+
+<span class="hljs-comment">// broadcasting transaction to the specified network</span>
+broadcastTransaction(transaction, network);</code></pre>
+				<a href="#smart-contract-deploy-transaction" id="smart-contract-deploy-transaction" style="color: inherit; text-decoration: none;">
+					<h2>Smart Contract Deploy Transaction</h2>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { makeContractDeploy, StacksMainnet, broadcastTransaction } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@stacks/transactions&#x27;</span>;
+<span class="hljs-keyword">const</span> BigNum = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;bn.js&#x27;</span>);
+
+<span class="hljs-keyword">const</span> network = <span class="hljs-keyword">new</span> StacksMainnet();
+
+<span class="hljs-keyword">const</span> txOptions = {
+  <span class="hljs-attr">contractName</span>: <span class="hljs-string">&#x27;contract_name&#x27;</span>,
+  <span class="hljs-attr">codeBody</span>: fs.readFileSync(<span class="hljs-string">&#x27;/path/to/contract.clar&#x27;</span>).toString(),
+  <span class="hljs-attr">senderKey</span>: <span class="hljs-string">&#x27;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#x27;</span>,
+  network,
+};
+
+<span class="hljs-keyword">const</span> transaction = <span class="hljs-keyword">await</span> makeContractDeploy(txOptions);
+
+broadcastTransaction(transaction, network);</code></pre>
+				<a href="#smart-contract-function-call" id="smart-contract-function-call" style="color: inherit; text-decoration: none;">
+					<h2>Smart Contract Function Call</h2>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { makeContractCall, BufferCV, StacksMainnet, broadcastTransaction } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@stacks/transactions&#x27;</span>;
+<span class="hljs-keyword">const</span> BigNum = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;bn.js&#x27;</span>);
+
+<span class="hljs-keyword">const</span> network = <span class="hljs-keyword">new</span> StacksMainnet();
+
+<span class="hljs-comment">// Add an optional post condition</span>
+<span class="hljs-comment">// See below for details on constructing post conditions</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = FungibleConditionCode.GreaterEqual;
+<span class="hljs-keyword">const</span> postConditionAmount = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">1000000</span>);
+<span class="hljs-keyword">const</span> postConditions = [
+  makeStandardSTXPostCondition(
+    postConditionAddress, 
+    postConditionCode, 
+    postConditionAmount
+  )
+];
+
+<span class="hljs-keyword">const</span> txOptions = {
+  <span class="hljs-attr">contractAddress</span>: <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>,
+  <span class="hljs-attr">contractName</span>: <span class="hljs-string">&#x27;contract_name&#x27;</span>,
+  <span class="hljs-attr">functionName</span>: <span class="hljs-string">&#x27;contract_function&#x27;</span>,
+  <span class="hljs-attr">functionArgs</span>: [bufferCVFromString(<span class="hljs-string">&#x27;foo&#x27;</span>)],
+  <span class="hljs-attr">senderKey</span>: <span class="hljs-string">&#x27;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#x27;</span>,
+  <span class="hljs-attr">validateWithAbi</span>: <span class="hljs-literal">true</span>,
+  network,
+  postConditions,
+};
+
+<span class="hljs-keyword">const</span> transaction = <span class="hljs-keyword">await</span> makeContractCall(txOptions);
+
+broadcastTransaction(transaction, network);</code></pre>
+				<p>In this example we construct a <code>contract-call</code> transaction with a post condition. We have set the <code>validateWithAbi</code> option to <code>true</code>, so the <code>makeContractCall</code> builder will attempt to fetch this contracts ABI from the specified Stacks network, and validate that the provided functionArgs match what is described in the ABI. This should help you avoid constructing invalid contract-call transactions. If you would prefer to provide your own ABI instead of fetching it from the network, the <code>validateWithABI</code> option also accepts <a href="https://github.com/blockstack/stacks-transactions-js/blob/master/src/contract-abi.ts#L231">ClarityABI</a> objects, which can be constructed from ABI files like so:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;fs&#x27;</span>;
+
+<span class="hljs-keyword">const</span> abi: ClarityAbi = <span class="hljs-built_in">JSON</span>.parse(readFileSync(<span class="hljs-string">&#x27;abi.json&#x27;</span>).toString());</code></pre>
+				<a href="#sponsoring-transactions" id="sponsoring-transactions" style="color: inherit; text-decoration: none;">
+					<h2>Sponsoring Transactions</h2>
+				</a>
+				<p>To generate a sponsored transaction, first create and sign the transaction as the origin. The <code>sponsored</code> property in the options object must be set to true.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { makeContractCall, BufferCV } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@stacks/transactions&#x27;</span>;
+<span class="hljs-keyword">const</span> BigNum = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;bn.js&#x27;</span>);
+
+<span class="hljs-keyword">const</span> txOptions = {
+  <span class="hljs-attr">contractAddress</span>: <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>,
+  <span class="hljs-attr">contractName</span>: <span class="hljs-string">&#x27;contract_name&#x27;</span>,
+  <span class="hljs-attr">functionName</span>: <span class="hljs-string">&#x27;contract_function&#x27;</span>,
+  <span class="hljs-attr">functionArgs</span>: [bufferCVFromString(<span class="hljs-string">&#x27;foo&#x27;</span>)],
+  <span class="hljs-attr">senderKey</span>: <span class="hljs-string">&#x27;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#x27;</span>,
+  <span class="hljs-attr">validateWithAbi</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">sponsored</span>: <span class="hljs-literal">true</span>,
+};
+
+<span class="hljs-keyword">const</span> transaction = <span class="hljs-keyword">await</span> makeContractCall(txOptions);
+<span class="hljs-keyword">const</span> serializedTx = transaction.serialize().toString(<span class="hljs-string">&#x27;hex&#x27;</span>); </code></pre>
+				<p>The serialized transaction can now be passed to the sponsoring party which will sign the sponsor portion of the transaction and set the fee.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { sponsorTransaction, BufferReader, deserializeTransaction, broadcastTransaction } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@stacks/transactions&#x27;</span>;
+<span class="hljs-keyword">const</span> BigNum = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;bn.js&#x27;</span>);
+
+<span class="hljs-keyword">const</span> bufferReader = <span class="hljs-keyword">new</span> BufferReader(Buffer.from(serializedTx));
+<span class="hljs-keyword">const</span> deserializedTx = deserializeTransaction(bufferReader);
+<span class="hljs-keyword">const</span> sponsorKey = <span class="hljs-string">&#x27;b244296d5907de9864c0b0d51f98a13c52890be0404e83f273144cd5b9960eed01&#x27;</span>;
+<span class="hljs-keyword">const</span> fee = BigNum(<span class="hljs-number">1000</span>);
+
+<span class="hljs-keyword">const</span> sponsorOptions = {
+  <span class="hljs-attr">transaction</span>: deserializedTx,
+  <span class="hljs-attr">sponsorPrivateKey</span>: sponsorKey,
+  fee,
+}
+
+<span class="hljs-keyword">const</span> sponsoredTx = <span class="hljs-keyword">await</span> sponsorTransaction(sponsorOptions);
+
+<span class="hljs-keyword">const</span> network = <span class="hljs-keyword">new</span> StacksMainnet();
+broadcastTransaction(sponsoredTx, network);</code></pre>
+				<a href="#supporting-multi-signature-transactions" id="supporting-multi-signature-transactions" style="color: inherit; text-decoration: none;">
+					<h2>Supporting multi-signature transactions</h2>
+				</a>
+				<p>To generate a multi-sig transaction, first create an unsigned transaction.
+				The <code>numSignatures</code> and <code>publicKeys</code> properties in the options object must be set:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {
+  makeUnsignedSTXTokenTransfer,
+  createStacksPrivateKey,
+  pubKeyfromPrivKey,
+  publicKeyToString,
+  TransactionSigner,
+  standardPrincipalCV,
+  BufferReader,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;@stacks/transactions&quot;</span>;
+<span class="hljs-keyword">const</span> BigNum = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;bn.js&quot;</span>);
+
+<span class="hljs-keyword">const</span> recipient = standardPrincipalCV(<span class="hljs-string">&quot;SP3FGQ8...&quot;</span>);
+<span class="hljs-keyword">const</span> amount = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">2500000</span>);
+<span class="hljs-keyword">const</span> fee = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">0</span>);
+<span class="hljs-keyword">const</span> nonce = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">0</span>);
+<span class="hljs-keyword">const</span> memo = <span class="hljs-string">&quot;test memo&quot;</span>;
+
+<span class="hljs-comment">// private keys of the participants in the transaction</span>
+<span class="hljs-keyword">const</span> privKeyStrings = [ <span class="hljs-string">&quot;6d430bb9...&quot;</span>, <span class="hljs-string">&quot;2a584d89...&quot;</span>, <span class="hljs-string">&quot;d5200dee...&quot;</span>];
+
+<span class="hljs-comment">// create private key objects from string array</span>
+<span class="hljs-keyword">const</span> privKeys = privKeyStrings.map(createStacksPrivateKey);
+
+<span class="hljs-comment">// corresponding public keys</span>
+<span class="hljs-keyword">const</span> pubKeys = privKeyStrings.map(pubKeyfromPrivKey);
+
+<span class="hljs-comment">// create public key string array from objects</span>
+<span class="hljs-keyword">const</span> pubKeyStrings = pubKeys.map(publicKeyToString);
+
+<span class="hljs-keyword">const</span> transaction = <span class="hljs-keyword">await</span> makeUnsignedSTXTokenTransfer({
+  recipient,
+  amount,
+  fee,
+  nonce,
+  memo,
+  <span class="hljs-attr">numSignatures</span>: <span class="hljs-number">2</span>, <span class="hljs-comment">// number of signature required</span>
+  <span class="hljs-attr">publicKeys</span>: pubKeyStrings, <span class="hljs-comment">// public key string array with &gt;= numSignatures elements</span>
+});
+
+<span class="hljs-keyword">const</span> serializedTx = transaction.serialize();</code></pre>
+				<p>This transaction payload can be passed along to other participants to sign. In addition to
+					meeting the numSignatures requirement, the public keys of the parties who did not sign the
+				transaction must be appended to the signature.</p>
+				<pre><code class="language-typescript"><span class="hljs-comment">// deserialize and sign transaction</span>
+<span class="hljs-keyword">const</span> bufferReader = <span class="hljs-keyword">new</span> BufferReader(serializedTx);
+<span class="hljs-keyword">const</span> deserializedTx = deserializeTransaction(bufferReader);
+
+<span class="hljs-keyword">const</span> signer = <span class="hljs-keyword">new</span> TransactionSigner(deserializedTx);
+
+<span class="hljs-comment">// first signature</span>
+signer.signOrigin(privKeys[<span class="hljs-number">0</span>]);
+
+<span class="hljs-comment">// second signature</span>
+signer.signOrigin(privKeys[<span class="hljs-number">1</span>]);
+
+<span class="hljs-comment">// after meeting the numSignatures requirement, the public </span>
+<span class="hljs-comment">// keys of the participants who did not sign must be appended</span>
+signer.appendOrigin(pubKeys[<span class="hljs-number">2</span>]);
+
+<span class="hljs-comment">// the serialized multi-sig tx</span>
+<span class="hljs-keyword">const</span> serializedSignedTx = deserializedTx.serialize();</code></pre>
+				<a href="#calling-read-only-contract-functions" id="calling-read-only-contract-functions" style="color: inherit; text-decoration: none;">
+					<h2>Calling Read-only Contract Functions</h2>
+				</a>
+				<p>Read-only contract functions can be called without generating or broadcasting a transaction. Instead it works via a direct API call to a Stacks node.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;kv-store&#x27;</span>;
+<span class="hljs-keyword">const</span> functionName = <span class="hljs-string">&#x27;get-value&#x27;</span>;
+<span class="hljs-keyword">const</span> buffer = bufferCVFromString(<span class="hljs-string">&#x27;foo&#x27;</span>);
+<span class="hljs-keyword">const</span> network = <span class="hljs-keyword">new</span> StacksTestnet();
+<span class="hljs-keyword">const</span> senderAddress = <span class="hljs-string">&#x27;ST2F4BK4GZH6YFBNHYDDGN4T1RKBA7DA1BJZPJEJJ&#x27;</span>;
+
+<span class="hljs-keyword">const</span> options = {
+  contractAddress,
+  contractName,
+  functionName,
+  <span class="hljs-attr">functionArgs</span>: [buffer],
+  network,
+  senderAddress,
+};
+
+<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> callReadOnlyFunction(options);</code></pre>
+				<a href="#constructing-clarity-values" id="constructing-clarity-values" style="color: inherit; text-decoration: none;">
+					<h2>Constructing Clarity Values</h2>
+				</a>
+				<p>Building transactions that call functions in deployed clarity contracts requires you to construct valid Clarity Values to pass to the function as arguments. The <a href="https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-002-smart-contract-language.md#clarity-type-system">Clarity type system</a> contains the following types:</p>
+				<ul>
+					<li><code>(tuple (key-name-0 key-type-0) (key-name-1 key-type-1) ...)</code><ul>
+							<li>a typed tuple with named fields.</li>
+						</ul>
+					</li>
+					<li><code>(list max-len entry-type)</code><ul>
+							<li>a list of maximum length max-len, with entries of type entry-type</li>
+						</ul>
+					</li>
+					<li><code>(response ok-type err-type)</code><ul>
+							<li>object used by public functions to commit their changes or abort. May be returned or used by other functions as well, however, only public functions have the commit/abort behavior.</li>
+						</ul>
+					</li>
+					<li><code>(optional some-type)</code><ul>
+							<li>an option type for objects that can either be (some value) or none</li>
+						</ul>
+					</li>
+					<li><code>(buff max-len)</code><ul>
+							<li>byte buffer or maximum length max-len.</li>
+						</ul>
+					</li>
+					<li><code>principal</code><ul>
+							<li>object representing a principal (whether a contract principal or standard principal).</li>
+						</ul>
+					</li>
+					<li><code>bool</code><ul>
+							<li>boolean value (&#39;true or &#39;false)</li>
+						</ul>
+					</li>
+					<li><code>int</code><ul>
+							<li>signed 128-bit integer</li>
+						</ul>
+					</li>
+					<li><code>uint</code><ul>
+							<li>unsigned 128-bit integer</li>
+						</ul>
+					</li>
+				</ul>
+				<p>This library contains Typescript types and classes that map to the Clarity types, in order to make it easy to construct well-typed Clarity values in Javascript. These types all extend the abstract class <code>ClarityValue</code>.</p>
+				<pre><code class="language-javascript">
+<span class="hljs-comment">// construct boolean clarity values</span>
+<span class="hljs-keyword">const</span> t = trueCV();
+<span class="hljs-keyword">const</span> f = falseCV();
+
+<span class="hljs-comment">// construct optional clarity values</span>
+<span class="hljs-keyword">const</span> nothing = noneCV();
+<span class="hljs-keyword">const</span> something = someCV(t);
+
+<span class="hljs-comment">// construct a buffer clarity value from an existing Buffer</span>
+<span class="hljs-keyword">const</span> buffer = Buffer.from(<span class="hljs-string">&#x27;foo&#x27;</span>);
+<span class="hljs-keyword">const</span> bufCV = bufferCV(buffer);
+
+<span class="hljs-comment">// construct signed and unsigned integer clarity values</span>
+<span class="hljs-keyword">const</span> i = intCV(-<span class="hljs-number">10</span>);
+<span class="hljs-keyword">const</span> u = uintCV(<span class="hljs-number">10</span>);
+
+<span class="hljs-comment">// construct principal clarity values</span>
+<span class="hljs-keyword">const</span> address = <span class="hljs-string">&#x27;SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;contract-name&#x27;</span>;
+<span class="hljs-keyword">const</span> spCV = standardPrincipalCV(address);
+<span class="hljs-keyword">const</span> cpCV = contractPrincipalCV(address, contractName);
+
+<span class="hljs-comment">// construct response clarity values</span>
+<span class="hljs-keyword">const</span> errCV = responseErrorCV(trueCV());
+<span class="hljs-keyword">const</span> okCV = responseOkCV(falseCV());
+
+<span class="hljs-comment">// construct tuple clarity values</span>
+<span class="hljs-keyword">const</span> tupCV = tupleCV({
+  <span class="hljs-string">&#x27;a&#x27;</span>: intCV(<span class="hljs-number">1</span>),
+  <span class="hljs-string">&#x27;b&#x27;</span>: trueCV(),
+  <span class="hljs-string">&#x27;c&#x27;</span>: falseCV()
+})
+
+<span class="hljs-comment">// construct list clarity values</span>
+<span class="hljs-keyword">const</span> l = listCV([trueCV(), falseCV()])</code></pre>
+				<p>If you develop in Typescript, the type checker can help prevent you from creating wrongly-typed Clarity values. For example, the following code won&#39;t compile since in Clarity lists are homogeneous, meaning they can only contain values of a single type. It is important to include the type variable <code>BooleanCV</code> in this example, otherwise the typescript type checker won&#39;t know which type the list is of and won&#39;t enforce homogeneity.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">const</span> l = listCV&lt;BooleanCV&gt;([trueCV(), intCV(<span class="hljs-number">1</span>)]);</code></pre>
+				<a href="#post-conditions" id="post-conditions" style="color: inherit; text-decoration: none;">
+					<h2>Post Conditions</h2>
+				</a>
+				<p>Three types of post conditions can be added to transactions: </p>
+				<ol>
+					<li>STX post condition</li>
+					<li>Fungible token post condition</li>
+					<li>Non-Fungible token post condition</li>
+				</ol>
+				<p>For details see: <a href="https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-005-blocks-and-transactions.md#transaction-post-conditions">https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-005-blocks-and-transactions.md#transaction-post-conditions</a></p>
+				<a href="#stx-post-condition" id="stx-post-condition" style="color: inherit; text-decoration: none;">
+					<h3>STX post condition</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-comment">// With a standard principal</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = FungibleConditionCode.GreaterEqual;
+<span class="hljs-keyword">const</span> postConditionAmount = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">12345</span>);
+
+<span class="hljs-keyword">const</span> standardSTXPostCondition = makeStandardSTXPostCondition(
+  postConditionAddress,
+  postConditionCode,
+  postConditionAmount
+);
+
+<span class="hljs-comment">// With a contract principal</span>
+<span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;test-contract&#x27;</span>;
+
+<span class="hljs-keyword">const</span> contractSTXPostCondition = makeContractSTXPostCondition(
+  contractAddress,
+  contractName,
+  postConditionCode,
+  postConditionAmount
+);</code></pre>
+				<a href="#fungible-token-post-condition" id="fungible-token-post-condition" style="color: inherit; text-decoration: none;">
+					<h3>Fungible token post condition</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-comment">// With a standard principal</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = FungibleConditionCode.GreaterEqual;
+<span class="hljs-keyword">const</span> postConditionAmount = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">12345</span>);
+<span class="hljs-keyword">const</span> assetAddress = <span class="hljs-string">&#x27;SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ&#x27;</span>;
+<span class="hljs-keyword">const</span> assetContractName = <span class="hljs-string">&#x27;test-asset-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> fungibleAssetInfo = createAssetInfo(
+  assetAddress,
+  assetContractName
+);
+
+<span class="hljs-keyword">const</span> standardFungiblePostCondition = makeStandardFungiblePostCondition(
+  postConditionAddress,
+  postConditionCode,
+  postConditionAmount,
+  fungibleAssetInfo 
+);
+
+<span class="hljs-comment">// With a contract principal</span>
+<span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;test-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> assetAddress = <span class="hljs-string">&#x27;SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ&#x27;</span>;
+<span class="hljs-keyword">const</span> assetContractName = <span class="hljs-string">&#x27;test-asset-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> fungibleAssetInfo = createAssetInfo(
+  assetAddress,
+  assetContractName
+);
+
+<span class="hljs-keyword">const</span> contractFungiblePostCondition = makeContractFungiblePostCondition(
+  contractAddress,
+  contractName,
+  postConditionCode,
+  postConditionAmount,
+  fungibleAssetInfo
+);</code></pre>
+				<a href="#non-fungible-token-post-condition" id="non-fungible-token-post-condition" style="color: inherit; text-decoration: none;">
+					<h3>Non-fungible token post condition</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-comment">// With a standard principal</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = NonFungibleConditionCode.Owns;
+<span class="hljs-keyword">const</span> assetAddress = <span class="hljs-string">&#x27;SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ&#x27;</span>;
+<span class="hljs-keyword">const</span> assetContractName = <span class="hljs-string">&#x27;test-asset-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> assetName = <span class="hljs-string">&#x27;test-asset&#x27;</span>;
+<span class="hljs-keyword">const</span> tokenAssetName = <span class="hljs-string">&#x27;test-token-asset&#x27;</span>;
+<span class="hljs-keyword">const</span> nonFungibleAssetInfo = createAssetInfo(
+  assetAddress,
+  assetContractName,
+  assetName
+)
+
+<span class="hljs-keyword">const</span> standardNonFungiblePostCondition = makeStandardNonFungiblePostCondition(
+  postConditionAddress,
+  postConditionCode,
+  nonFungibleAssetInfo,
+  tokenAssetName
+);
+
+<span class="hljs-comment">// With a contract principal</span>
+<span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;test-contract&#x27;</span>;
+
+<span class="hljs-keyword">const</span> contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
+  contractAddress,
+  contractName,
+  postConditionCode,
+  nonFungibleAssetInfo,
+  tokenAssetName
+);</code></pre>
+				<a href="#post-conditions-1" id="post-conditions-1" style="color: inherit; text-decoration: none;">
+					<h2>Post Conditions</h2>
+				</a>
+				<p>Three types of post conditions can be added to transactions: </p>
+				<ol>
+					<li>STX post condition</li>
+					<li>Fungible token post condition</li>
+					<li>Non-Fungible token post condition</li>
+				</ol>
+				<p>For details see: <a href="https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-005-blocks-and-transactions.md#transaction-post-conditions">https://github.com/blockstack/stacks-blockchain/blob/master/sip/sip-005-blocks-and-transactions.md#transaction-post-conditions</a></p>
+				<a href="#stx-post-condition-1" id="stx-post-condition-1" style="color: inherit; text-decoration: none;">
+					<h3>STX post condition</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-comment">// With a standard principal</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = FungibleConditionCode.GreaterEqual;
+<span class="hljs-keyword">const</span> postConditionAmount = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">12345</span>);
+
+<span class="hljs-keyword">const</span> standardSTXPostCondition = makeStandardSTXPostCondition(
+  postConditionAddress,
+  postConditionCode,
+  postConditionAmount
+);
+
+<span class="hljs-comment">// With a contract principal</span>
+<span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;test-contract&#x27;</span>;
+
+<span class="hljs-keyword">const</span> contractSTXPostCondition = makeContractSTXPostCondition(
+  contractAddress,
+  contractName,
+  postConditionCode,
+  postConditionAmount
+);</code></pre>
+				<a href="#fungible-token-post-condition-1" id="fungible-token-post-condition-1" style="color: inherit; text-decoration: none;">
+					<h3>Fungible token post condition</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-comment">// With a standard principal</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = FungibleConditionCode.GreaterEqual;
+<span class="hljs-keyword">const</span> postConditionAmount = <span class="hljs-keyword">new</span> BigNum(<span class="hljs-number">12345</span>);
+<span class="hljs-keyword">const</span> assetAddress = <span class="hljs-string">&#x27;SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ&#x27;</span>;
+<span class="hljs-keyword">const</span> assetContractName = <span class="hljs-string">&#x27;test-asset-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> fungibleAssetInfo = createAssetInfo(
+  assetAddress,
+  assetContractName
+)
+
+<span class="hljs-keyword">const</span> standardFungiblePostCondition = makeStandardFungiblePostCondition(
+  postConditionAddress,
+  postConditionCode,
+  postConditionAmount,
+  fungibleAssetInfo 
+);
+
+<span class="hljs-comment">// With a contract principal</span>
+<span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;test-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> assetAddress = <span class="hljs-string">&#x27;SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ&#x27;</span>;
+<span class="hljs-keyword">const</span> assetContractName = <span class="hljs-string">&#x27;test-asset-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> fungibleAssetInfo = createAssetInfo(
+  assetAddress,
+  assetContractName
+)
+
+<span class="hljs-keyword">const</span> contractFungiblePostCondition = makeContractFungiblePostCondition(
+  contractAddress,
+  contractName,
+  postConditionCode,
+  postConditionAmount,
+  fungibleAssetInfo
+);</code></pre>
+				<a href="#non-fungible-token-post-condition-1" id="non-fungible-token-post-condition-1" style="color: inherit; text-decoration: none;">
+					<h3>Non-fungible token post condition</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-comment">// With a standard principal</span>
+<span class="hljs-keyword">const</span> postConditionAddress = <span class="hljs-string">&#x27;SP2ZD731ANQZT6J4K3F5N8A40ZXWXC1XFXHVVQFKE&#x27;</span>;
+<span class="hljs-keyword">const</span> postConditionCode = NonFungibleConditionCode.Owns;
+<span class="hljs-keyword">const</span> assetAddress = <span class="hljs-string">&#x27;SP62M8MEFH32WGSB7XSF9WJZD7TQB48VQB5ANWSJ&#x27;</span>;
+<span class="hljs-keyword">const</span> assetContractName = <span class="hljs-string">&#x27;test-asset-contract&#x27;</span>;
+<span class="hljs-keyword">const</span> assetName = <span class="hljs-string">&#x27;test-asset&#x27;</span>;
+<span class="hljs-keyword">const</span> tokenAssetName = <span class="hljs-string">&#x27;test-token-asset&#x27;</span>;
+<span class="hljs-keyword">const</span> nonFungibleAssetInfo = createAssetInfo(
+  assetAddress,
+  assetContractName,
+  assetName
+)
+
+<span class="hljs-keyword">const</span> standardNonFungiblePostCondition = makeStandardNonFungiblePostCondition(
+  postConditionAddress,
+  postConditionCode,
+  nonFungibleAssetInfo,
+  tokenAssetName
+);
+
+<span class="hljs-comment">// With a contract principal</span>
+<span class="hljs-keyword">const</span> contractAddress = <span class="hljs-string">&#x27;SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X&#x27;</span>;
+<span class="hljs-keyword">const</span> contractName = <span class="hljs-string">&#x27;test-contract&#x27;</span>;
+
+<span class="hljs-keyword">const</span> contractNonFungiblePostCondition = makeContractNonFungiblePostCondition(
+  contractAddress,
+  contractName,
+  postConditionCode,
+  nonFungibleAssetInfo,
+  tokenAssetName
+);</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/addresshashmode.html" class="tsd-kind-icon">Address<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/addressversion.html" class="tsd-kind-icon">Address<wbr>Version</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/anchormode.html" class="tsd-kind-icon">Anchor<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/assettype.html" class="tsd-kind-icon">Asset<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/authfieldtype.html" class="tsd-kind-icon">Auth<wbr>Field<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/authtype.html" class="tsd-kind-icon">Auth<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/chainid.html" class="tsd-kind-icon">ChainID</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/clarityabitypeid.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/claritytype.html" class="tsd-kind-icon">Clarity<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/fungibleconditioncode.html" class="tsd-kind-icon">Fungible<wbr>Condition<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/nonfungibleconditioncode.html" class="tsd-kind-icon">Non<wbr>Fungible<wbr>Condition<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/payloadtype.html" class="tsd-kind-icon">Payload<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/postconditionmode.html" class="tsd-kind-icon">Post<wbr>Condition<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/postconditionprincipalid.html" class="tsd-kind-icon">Post<wbr>Condition<wbr>PrincipalID</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/postconditiontype.html" class="tsd-kind-icon">Post<wbr>Condition<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/pubkeyencoding.html" class="tsd-kind-icon">Pub<wbr>Key<wbr>Encoding</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/stacksmessagetype.html" class="tsd-kind-icon">Stacks<wbr>Message<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/transactionversion.html" class="tsd-kind-icon">Transaction<wbr>Version</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/txrejectedreason.html" class="tsd-kind-icon">Tx<wbr>Rejected<wbr>Reason</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/authorization.html" class="tsd-kind-icon">Authorization</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/bufferarray.html" class="tsd-kind-icon">Buffer<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/bufferreader.html" class="tsd-kind-icon">Buffer<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/deserializable.html" class="tsd-kind-icon">Deserializable</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/deserializationerror.html" class="tsd-kind-icon">Deserialization<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/notimplementederror.html" class="tsd-kind-icon">Not<wbr>Implemented<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/serializationerror.html" class="tsd-kind-icon">Serialization<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/signingerror.html" class="tsd-kind-icon">Signing<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/sponsoredauthorization.html" class="tsd-kind-icon">Sponsored<wbr>Authorization</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stackstransaction.html" class="tsd-kind-icon">Stacks<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stackstransactionerror.html" class="tsd-kind-icon">Stacks<wbr>Transaction<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/standardauthorization.html" class="tsd-kind-icon">Standard<wbr>Authorization</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/transactionsigner.html" class="tsd-kind-icon">Transaction<wbr>Signer</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/verificationerror.html" class="tsd-kind-icon">Verification<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/sha512_256.html" class="tsd-kind-icon">sha512_<wbr>256</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/address.html" class="tsd-kind-icon">Address</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/assetinfo.html" class="tsd-kind-icon">Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/buffercv.html" class="tsd-kind-icon">BufferCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabi.html" class="tsd-kind-icon">Clarity<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabifunction.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabimap.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabitypefungibletoken.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Fungible<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabitypenonfungibletoken.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Non<wbr>Fungible<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabivariable.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Variable</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/coinbasepayload.html" class="tsd-kind-icon">Coinbase<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractcalloptions.html" class="tsd-kind-icon">Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractcallpayload.html" class="tsd-kind-icon">Contract<wbr>Call<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractdeployoptions.html" class="tsd-kind-icon">Contract<wbr>Deploy<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractprincipal.html" class="tsd-kind-icon">Contract<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractprincipalcv.html" class="tsd-kind-icon">Contract<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/falsecv.html" class="tsd-kind-icon">FalseCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/fungiblepostcondition.html" class="tsd-kind-icon">Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/intcv.html" class="tsd-kind-icon">IntCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/lengthprefixedlist.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/lengthprefixedstring.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/listcv.html" class="tsd-kind-icon">ListCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/memostring.html" class="tsd-kind-icon">Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/messagesignature.html" class="tsd-kind-icon">Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/multisigoptions.html" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/multisigspendingcondition.html" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/nonfungiblepostcondition.html" class="tsd-kind-icon">Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/nonecv.html" class="tsd-kind-icon">NoneCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/poisonpayload.html" class="tsd-kind-icon">Poison<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/readonlyfunctionoptions.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/readonlyfunctionresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/responseerrorcv.html" class="tsd-kind-icon">Response<wbr>ErrorCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/responseokcv.html" class="tsd-kind-icon">Response<wbr>OkCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stxpostcondition.html" class="tsd-kind-icon">STXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedcontractcalloptions.html" class="tsd-kind-icon">Signed<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedmultisigcontractcalloptions.html" class="tsd-kind-icon">Signed<wbr>Multi<wbr>Sig<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedmultisigtokentransferoptions.html" class="tsd-kind-icon">Signed<wbr>Multi<wbr>Sig<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedtokentransferoptions.html" class="tsd-kind-icon">Signed<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/singlesigspendingcondition.html" class="tsd-kind-icon">Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/smartcontractpayload.html" class="tsd-kind-icon">Smart<wbr>Contract<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/somecv.html" class="tsd-kind-icon">SomeCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/sponsoroptions.html" class="tsd-kind-icon">Sponsor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stacksprivatekey.html" class="tsd-kind-icon">Stacks<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stackspublickey.html" class="tsd-kind-icon">Stacks<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/standardprincipal.html" class="tsd-kind-icon">Standard<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/standardprincipalcv.html" class="tsd-kind-icon">Standard<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stringasciicv.html" class="tsd-kind-icon">String<wbr>AsciiCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stringutf8cv.html" class="tsd-kind-icon">String<wbr>Utf8CV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tokentransferoptions.html" class="tsd-kind-icon">Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tokentransferpayload.html" class="tsd-kind-icon">Token<wbr>Transfer<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/transactionauthfield.html" class="tsd-kind-icon">Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/truecv.html" class="tsd-kind-icon">TrueCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tuplecv.html" class="tsd-kind-icon">TupleCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/uintcv.html" class="tsd-kind-icon">UIntCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedcontractcalloptions.html" class="tsd-kind-icon">Unsigned<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedmultisigcontractcalloptions.html" class="tsd-kind-icon">Unsigned<wbr>Multi<wbr>Sig<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedmultisigtokentransferoptions.html" class="tsd-kind-icon">Unsigned<wbr>Multi<wbr>Sig<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedtokentransferoptions.html" class="tsd-kind-icon">Unsigned<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#booleancv" class="tsd-kind-icon">BooleanCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitype" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypebool" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Bool</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypebuffer" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Buffer</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeint128" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Int128</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypelist" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypenone" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>None</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeoptional" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Optional</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeprimitive" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Primitive</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeprincipal" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabityperesponse" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypestringascii" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>String<wbr>Ascii</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypestringutf8" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>String<wbr>Utf8</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypetuple" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Tuple</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeuint128" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>TypeUInt128</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeunion" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Union</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityvalue" class="tsd-kind-icon">Clarity<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#multisighashmode" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#optionalcv" class="tsd-kind-icon">OptionalCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#payload" class="tsd-kind-icon">Payload</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#postcondition" class="tsd-kind-icon">Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#postconditionprincipal" class="tsd-kind-icon">Post<wbr>Condition<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#principalcv" class="tsd-kind-icon">PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#responsecv" class="tsd-kind-icon">ResponseCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#singlesighashmode" class="tsd-kind-icon">Single<wbr>Sig<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#spendingcondition" class="tsd-kind-icon">Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#stacksmessage" class="tsd-kind-icon">Stacks<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#transactionauthfieldcontents" class="tsd-kind-icon">Transaction<wbr>Auth<wbr>Field<wbr>Contents</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#tupledata" class="tsd-kind-icon">Tuple<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#txbroadcastresult" class="tsd-kind-icon">Tx<wbr>Broadcast<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#txbroadcastresultok" class="tsd-kind-icon">Tx<wbr>Broadcast<wbr>Result<wbr>Ok</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#txbroadcastresultrejected" class="tsd-kind-icon">Tx<wbr>Broadcast<wbr>Result<wbr>Rejected</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#clarity_int_size" class="tsd-kind-icon">CLARITY_<wbr>INT_<wbr>SIZE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#coinbase_buffer_length_bytes" class="tsd-kind-icon">COINBASE_<wbr>BUFFER_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#compressed_pubkey_length_bytes" class="tsd-kind-icon">COMPRESSED_<wbr>PUBKEY_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_chain_id" class="tsd-kind-icon">DEFAULT_<wbr>CHAIN_<wbr>ID</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_core_node_api_url" class="tsd-kind-icon">DEFAULT_<wbr>CORE_<wbr>NODE_<wbr>API_<wbr>URL</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_transaction_version" class="tsd-kind-icon">DEFAULT_<wbr>TRANSACTION_<wbr>VERSION</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#max_string_length_bytes" class="tsd-kind-icon">MAX_<wbr>STRING_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#memo_max_length_bytes" class="tsd-kind-icon">MEMO_<wbr>MAX_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#recoverable_ecdsa_sig_length_bytes" class="tsd-kind-icon">RECOVERABLE_<wbr>ECDSA_<wbr>SIG_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#uncompressed_pubkey_length_bytes" class="tsd-kind-icon">UNCOMPRESSED_<wbr>PUBKEY_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#enumcheckfunctions" class="tsd-kind-icon">enum<wbr>Check<wbr>Functions</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#abifunctiontostring" class="tsd-kind-icon">abi<wbr>Function<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressfromhashmode" class="tsd-kind-icon">address<wbr>From<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressfrompublickeys" class="tsd-kind-icon">address<wbr>From<wbr>Public<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressfromversionhash" class="tsd-kind-icon">address<wbr>From<wbr>Version<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addresshashmodetoversion" class="tsd-kind-icon">address<wbr>Hash<wbr>Mode<wbr>ToVersion</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addresstostring" class="tsd-kind-icon">address<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#broadcastrawtransaction" class="tsd-kind-icon">broadcast<wbr>Raw<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#broadcasttransaction" class="tsd-kind-icon">broadcast<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#buffercv" class="tsd-kind-icon">bufferCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#buffercvfromstring" class="tsd-kind-icon">bufferCVFrom<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#bufferwithtypeid" class="tsd-kind-icon">buffer<wbr>With<wbr>TypeID</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#callreadonlyfunction" class="tsd-kind-icon">call<wbr>Read<wbr>Only<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clearcondition" class="tsd-kind-icon">clear<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#clonedeep" class="tsd-kind-icon">clone<wbr>Deep</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#codebodystring" class="tsd-kind-icon">code<wbr>Body<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractprincipalcv" class="tsd-kind-icon">contract<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractprincipalcvfromaddress" class="tsd-kind-icon">contract<wbr>PrincipalCVFrom<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractprincipalcvfromstandard" class="tsd-kind-icon">contract<wbr>PrincipalCVFrom<wbr>Standard</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createaddress" class="tsd-kind-icon">create<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createassetinfo" class="tsd-kind-icon">create<wbr>Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcoinbasepayload" class="tsd-kind-icon">create<wbr>Coinbase<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcontractcallpayload" class="tsd-kind-icon">create<wbr>Contract<wbr>Call<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcontractprincipal" class="tsd-kind-icon">create<wbr>Contract<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createemptyaddress" class="tsd-kind-icon">create<wbr>Empty<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#createenumchecker" class="tsd-kind-icon">create<wbr>Enum<wbr>Checker</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createfungiblepostcondition" class="tsd-kind-icon">create<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#createlplist" class="tsd-kind-icon">createLPList</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createlpstring" class="tsd-kind-icon">createLPString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#creatememostring" class="tsd-kind-icon">create<wbr>Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createmessagesignature" class="tsd-kind-icon">create<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createmultisigspendingcondition" class="tsd-kind-icon">create<wbr>Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createnonfungiblepostcondition" class="tsd-kind-icon">create<wbr>Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createpoisonpayload" class="tsd-kind-icon">create<wbr>Poison<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstxpostcondition" class="tsd-kind-icon">createSTXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createsinglesigspendingcondition" class="tsd-kind-icon">create<wbr>Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createsmartcontractpayload" class="tsd-kind-icon">create<wbr>Smart<wbr>Contract<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstacksprivatekey" class="tsd-kind-icon">create<wbr>Stacks<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstackspublickey" class="tsd-kind-icon">create<wbr>Stacks<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstandardprincipal" class="tsd-kind-icon">create<wbr>Standard<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createtokentransferpayload" class="tsd-kind-icon">create<wbr>Token<wbr>Transfer<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createtransactionauthfield" class="tsd-kind-icon">create<wbr>Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cvtohex" class="tsd-kind-icon">cv<wbr>ToHex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cvtostring" class="tsd-kind-icon">cv<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializeaddress" class="tsd-kind-icon">deserialize<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializeassetinfo" class="tsd-kind-icon">deserialize<wbr>Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializecv" class="tsd-kind-icon">deserializeCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializelplist" class="tsd-kind-icon">deserializeLPList</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializelpstring" class="tsd-kind-icon">deserializeLPString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializememostring" class="tsd-kind-icon">deserialize<wbr>Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializemessagesignature" class="tsd-kind-icon">deserialize<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializemultisigspendingcondition" class="tsd-kind-icon">deserialize<wbr>Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializepayload" class="tsd-kind-icon">deserialize<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializepostcondition" class="tsd-kind-icon">deserialize<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializeprincipal" class="tsd-kind-icon">deserialize<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializepublickey" class="tsd-kind-icon">deserialize<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializesinglesigspendingcondition" class="tsd-kind-icon">deserialize<wbr>Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializespendingcondition" class="tsd-kind-icon">deserialize<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializestacksmessage" class="tsd-kind-icon">deserialize<wbr>Stacks<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializetransaction" class="tsd-kind-icon">deserialize<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializetransactionauthfield" class="tsd-kind-icon">deserialize<wbr>Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#emptymessagesignature" class="tsd-kind-icon">empty<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encodeclarityvalue" class="tsd-kind-icon">encode<wbr>Clarity<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#estimatecontractdeploy" class="tsd-kind-icon">estimate<wbr>Contract<wbr>Deploy</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#estimatecontractfunctioncall" class="tsd-kind-icon">estimate<wbr>Contract<wbr>Function<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#estimatetransfer" class="tsd-kind-icon">estimate<wbr>Transfer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#exceedsmaxlengthbytes" class="tsd-kind-icon">exceeds<wbr>Max<wbr>Length<wbr>Bytes</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#falsecv" class="tsd-kind-icon">falseCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getabi" class="tsd-kind-icon">get<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getaddressfromprivatekey" class="tsd-kind-icon">get<wbr>Address<wbr>From<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getaddressfrompublickey" class="tsd-kind-icon">get<wbr>Address<wbr>From<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcvtypestring" class="tsd-kind-icon">getCVType<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getnonce" class="tsd-kind-icon">get<wbr>Nonce</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getpublickey" class="tsd-kind-icon">get<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getsignaturerecoveryparam" class="tsd-kind-icon">get<wbr>Signature<wbr>Recovery<wbr>Param</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gettypestring" class="tsd-kind-icon">get<wbr>Type<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gettypeunion" class="tsd-kind-icon">get<wbr>Type<wbr>Union</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hash160" class="tsd-kind-icon">hash160</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hashp2pkh" class="tsd-kind-icon">hash<wbr>P2PKH</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hashp2sh" class="tsd-kind-icon">hash<wbr>P2SH</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hexstringtoint" class="tsd-kind-icon">hex<wbr>String<wbr>ToInt</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hextocv" class="tsd-kind-icon">hex<wbr>ToCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#intcv" class="tsd-kind-icon">intCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#inttohexstring" class="tsd-kind-icon">int<wbr>ToHex<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabibuffer" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Buffer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabilist" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabioptional" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Optional</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabiprimitive" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Primitive</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabiresponse" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabistringascii" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>String<wbr>Ascii</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabistringutf8" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>String<wbr>Utf8</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabituple" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Tuple</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityname" class="tsd-kind-icon">is<wbr>Clarity<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#iscompressed" class="tsd-kind-icon">is<wbr>Compressed</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#isenum" class="tsd-kind-icon">is<wbr>Enum</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#issinglesig" class="tsd-kind-icon">is<wbr>Single<wbr>Sig</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#leftpadhex" class="tsd-kind-icon">left<wbr>Pad<wbr>Hex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#leftpadhextolength" class="tsd-kind-icon">left<wbr>Pad<wbr>Hex<wbr>ToLength</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#listcv" class="tsd-kind-icon">listCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractcall" class="tsd-kind-icon">make<wbr>Contract<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractdeploy" class="tsd-kind-icon">make<wbr>Contract<wbr>Deploy</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractfungiblepostcondition" class="tsd-kind-icon">make<wbr>Contract<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractnonfungiblepostcondition" class="tsd-kind-icon">make<wbr>Contract<wbr>Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractstxpostcondition" class="tsd-kind-icon">make<wbr>ContractSTXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makerandomprivkey" class="tsd-kind-icon">make<wbr>Random<wbr>Priv<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestxtokentransfer" class="tsd-kind-icon">makeSTXToken<wbr>Transfer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makesighashpostsign" class="tsd-kind-icon">make<wbr>Sig<wbr>Hash<wbr>Post<wbr>Sign</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makesighashpresign" class="tsd-kind-icon">make<wbr>Sig<wbr>Hash<wbr>Pre<wbr>Sign</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestandardfungiblepostcondition" class="tsd-kind-icon">make<wbr>Standard<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestandardnonfungiblepostcondition" class="tsd-kind-icon">make<wbr>Standard<wbr>Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestandardstxpostcondition" class="tsd-kind-icon">make<wbr>StandardSTXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeunsignedcontractcall" class="tsd-kind-icon">make<wbr>Unsigned<wbr>Contract<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeunsignedstxtokentransfer" class="tsd-kind-icon">make<wbr>UnsignedSTXToken<wbr>Transfer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#matchtype" class="tsd-kind-icon">match<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#newinitialsighash" class="tsd-kind-icon">new<wbr>Initial<wbr>Sig<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#nextsignature" class="tsd-kind-icon">next<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#nextverification" class="tsd-kind-icon">next<wbr>Verification</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#nonecv" class="tsd-kind-icon">noneCV</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#omit" class="tsd-kind-icon">omit</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#optionalcvof" class="tsd-kind-icon">optionalCVOf</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseassetinfostring" class="tsd-kind-icon">parse<wbr>Asset<wbr>Info<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseprincipalstring" class="tsd-kind-icon">parse<wbr>Principal<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsereadonlyresponse" class="tsd-kind-icon">parse<wbr>Read<wbr>Only<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parserecoverablesignature" class="tsd-kind-icon">parse<wbr>Recoverable<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsetocv" class="tsd-kind-icon">parse<wbr>ToCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#principalcv" class="tsd-kind-icon">principalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#principaltostring" class="tsd-kind-icon">principal<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#privatekeytostring" class="tsd-kind-icon">private<wbr>Key<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#pubkeyfromprivkey" class="tsd-kind-icon">pub<wbr>Keyfrom<wbr>Priv<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeyfrombuffer" class="tsd-kind-icon">public<wbr>Key<wbr>From<wbr>Buffer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeyfromsignature" class="tsd-kind-icon">public<wbr>Key<wbr>From<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeytoaddress" class="tsd-kind-icon">public<wbr>Key<wbr>ToAddress</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeytostring" class="tsd-kind-icon">public<wbr>Key<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#responseerrorcv" class="tsd-kind-icon">response<wbr>ErrorCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#responseokcv" class="tsd-kind-icon">response<wbr>OkCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#rightpadhextolength" class="tsd-kind-icon">right<wbr>Pad<wbr>Hex<wbr>ToLength</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeaddress" class="tsd-kind-icon">serialize<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeassetinfo" class="tsd-kind-icon">serialize<wbr>Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeboolcv" class="tsd-kind-icon">serialize<wbr>BoolCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializebuffercv" class="tsd-kind-icon">serialize<wbr>BufferCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializecv" class="tsd-kind-icon">serializeCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializecontractprincipalcv" class="tsd-kind-icon">serialize<wbr>Contract<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeintcv" class="tsd-kind-icon">serialize<wbr>IntCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializelplist" class="tsd-kind-icon">serializeLPList</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializelpstring" class="tsd-kind-icon">serializeLPString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializelistcv" class="tsd-kind-icon">serialize<wbr>ListCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializememostring" class="tsd-kind-icon">serialize<wbr>Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializemessagesignature" class="tsd-kind-icon">serialize<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializemultisigspendingcondition" class="tsd-kind-icon">serialize<wbr>Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeoptionalcv" class="tsd-kind-icon">serialize<wbr>OptionalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializepayload" class="tsd-kind-icon">serialize<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializepostcondition" class="tsd-kind-icon">serialize<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeprincipal" class="tsd-kind-icon">serialize<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializepublickey" class="tsd-kind-icon">serialize<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeresponsecv" class="tsd-kind-icon">serialize<wbr>ResponseCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializesinglesigspendingcondition" class="tsd-kind-icon">serialize<wbr>Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializespendingcondition" class="tsd-kind-icon">serialize<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestacksmessage" class="tsd-kind-icon">serialize<wbr>Stacks<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestandardprincipalcv" class="tsd-kind-icon">serialize<wbr>Standard<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestringasciicv" class="tsd-kind-icon">serialize<wbr>String<wbr>AsciiCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestringcv" class="tsd-kind-icon">serialize<wbr>StringCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestringutf8cv" class="tsd-kind-icon">serialize<wbr>String<wbr>Utf8CV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializetransactionauthfield" class="tsd-kind-icon">serialize<wbr>Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializetuplecv" class="tsd-kind-icon">serialize<wbr>TupleCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#signwithkey" class="tsd-kind-icon">sign<wbr>With<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#somecv" class="tsd-kind-icon">someCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sponsortransaction" class="tsd-kind-icon">sponsor<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#standardprincipalcv" class="tsd-kind-icon">standard<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#standardprincipalcvfromaddress" class="tsd-kind-icon">standard<wbr>PrincipalCVFrom<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stringasciicv" class="tsd-kind-icon">string<wbr>AsciiCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stringcv" class="tsd-kind-icon">stringCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stringutf8cv" class="tsd-kind-icon">string<wbr>Utf8CV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#truecv" class="tsd-kind-icon">trueCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tuplecv" class="tsd-kind-icon">tupleCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#txidfromdata" class="tsd-kind-icon">txid<wbr>From<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#uintcv" class="tsd-kind-icon">uintCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatecontractcall" class="tsd-kind-icon">validate<wbr>Contract<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatestacksaddress" class="tsd-kind-icon">validate<wbr>Stacks<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#verify" class="tsd-kind-icon">verify</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#verifysinglesig" class="tsd-kind-icon">verify<wbr>Single<wbr>Sig</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

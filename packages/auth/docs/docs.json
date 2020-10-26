@@ -1,0 +1,3188 @@
+{
+	"id": 0,
+	"name": "@stacks/auth 1.0.0-beta.7 Library Reference",
+	"kind": 0,
+	"flags": {},
+	"children": [
+		{
+			"id": 1,
+			"name": "AuthScope",
+			"kind": 4,
+			"kindString": "Enumeration",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": "Non-exhaustive list of common permission scopes."
+			},
+			"children": [
+				{
+					"id": 4,
+					"name": "email",
+					"kind": 16,
+					"kindString": "Enumeration member",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Request the user's email if available."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/constants.ts",
+							"line": 40,
+							"character": 7
+						}
+					],
+					"defaultValue": "\"email\""
+				},
+				{
+					"id": 3,
+					"name": "publish_data",
+					"kind": 16,
+					"kindString": "Enumeration member",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Publish data so that other users of the app can discover and interact with the user.\nThe user's files stored on Gaia hub are made visible to others via the `apps` property in the\nuser’s `profile.json` file."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/constants.ts",
+							"line": 36,
+							"character": 14
+						}
+					],
+					"defaultValue": "\"publish_data\""
+				},
+				{
+					"id": 2,
+					"name": "store_write",
+					"kind": 16,
+					"kindString": "Enumeration member",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Read and write data to the user's Gaia hub in an app-specific storage bucket.\nThis is the default scope."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/constants.ts",
+							"line": 30,
+							"character": 13
+						}
+					],
+					"defaultValue": "\"store_write\""
+				}
+			],
+			"groups": [
+				{
+					"title": "Enumeration members",
+					"kind": 16,
+					"children": [
+						4,
+						3,
+						2
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/constants.ts",
+					"line": 25,
+					"character": 27
+				}
+			]
+		},
+		{
+			"id": 16,
+			"name": "AppConfig",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": "Configuration data for the current app.",
+				"text": "On browser platforms, creating an instance of this\nclass without any arguments will use\n`window.location.origin` as the app domain.\nOn non-browser platforms, you need to\nspecify an app domain as the second argument.\n\n"
+			},
+			"children": [
+				{
+					"id": 23,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {},
+					"signatures": [
+						{
+							"id": 24,
+							"name": "new AppConfig",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {},
+							"parameters": [
+								{
+									"id": 25,
+									"name": "scopes",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "permissions this app is requesting"
+									},
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "intrinsic",
+											"name": "string"
+										}
+									},
+									"defaultValue": "DEFAULT_SCOPE.slice()"
+								},
+								{
+									"id": 26,
+									"name": "appDomain",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "the app domain"
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											}
+										]
+									},
+									"defaultValue": "getGlobalObject('location', { returnEmptyObject: true })\n      ?.origin"
+								},
+								{
+									"id": 27,
+									"name": "redirectPath",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "path on app domain to redirect users to after authentication"
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									},
+									"defaultValue": "\"\""
+								},
+								{
+									"id": 28,
+									"name": "manifestPath",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "path relative to app domain of app's manifest file"
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									},
+									"defaultValue": "\"/manifest.json\""
+								},
+								{
+									"id": 29,
+									"name": "coreNode",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "override the default or user selected core node"
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											}
+										]
+									},
+									"defaultValue": "undefined"
+								},
+								{
+									"id": 30,
+									"name": "authenticatorURL",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"shortText": "the web-based fall back authenticator\n([[DEFAULT_BLOCKSTACK_HOST]])\n"
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									},
+									"defaultValue": "DEFAULT_BLOCKSTACK_HOST"
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 16,
+								"name": "AppConfig"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 57,
+							"character": 28
+						}
+					]
+				},
+				{
+					"id": 17,
+					"name": "appDomain",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "Blockstack apps are uniquely identified by their app domain."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 19,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 22,
+					"name": "authenticatorURL",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "The URL of a web-based Blockstack Authenticator to use in the event\nthe user doesn't have Blockstack installed on their machine. If this\nis not specified, the current default in this library will be used."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 57,
+							"character": 18
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 21,
+					"name": "coreNode",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"comment": {
+						"shortText": "The URL of Blockstack core node to use for this app. If this is\n`null`, the core node specified by the user or default core node\nwill be used."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 49,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 20,
+					"name": "manifestPath",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Path relative to app domain of app's manifest file.",
+						"text": "This file needs to have CORS headers set so that it can be fetched\nfrom any origin. Typically this means return the header `Access-Control-Allow-Origin: *`.\n\n"
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 41,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 19,
+					"name": "redirectPath",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Path on app domain to redirect users to after authentication. The\nauthentication response token will be postpended in a query."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 32,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 18,
+					"name": "scopes",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "An array of string representing permissions requested by the app."
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 25,
+							"character": 8
+						}
+					],
+					"type": {
+						"type": "array",
+						"elementType": {
+							"type": "union",
+							"types": [
+								{
+									"type": "reference",
+									"id": 1,
+									"name": "AuthScope"
+								},
+								{
+									"type": "intrinsic",
+									"name": "string"
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 33,
+					"name": "manifestURI",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 34,
+							"name": "manifestURI",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "The location of the app's manifest file.",
+								"returns": "- URI\n"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 98,
+							"character": 13
+						}
+					]
+				},
+				{
+					"id": 31,
+					"name": "redirectURI",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 32,
+							"name": "redirectURI",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "The location to which the authenticator should\nredirect the user.",
+								"returns": "- URI\n"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/appConfig.ts",
+							"line": 90,
+							"character": 13
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						23
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						17,
+						22,
+						21,
+						20,
+						19,
+						18
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						33,
+						31
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/appConfig.ts",
+					"line": 14,
+					"character": 22
+				}
+			]
+		},
+		{
+			"id": 162,
+			"name": "SessionDataStore",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": "An abstract class representing the SessionDataStore interface."
+			},
+			"children": [
+				{
+					"id": 163,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 164,
+							"name": "new SessionDataStore",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 165,
+									"name": "sessionOptions",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "reference",
+										"id": 135,
+										"name": "SessionOptions"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 162,
+								"name": "SessionDataStore"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionStore.ts",
+							"line": 9,
+							"character": 31
+						}
+					]
+				},
+				{
+					"id": 171,
+					"name": "deleteSessionData",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 172,
+							"name": "deleteSessionData",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionStore.ts",
+							"line": 28,
+							"character": 19
+						}
+					]
+				},
+				{
+					"id": 166,
+					"name": "getSessionData",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 167,
+							"name": "getSessionData",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "reference",
+								"name": "SessionData"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionStore.ts",
+							"line": 17,
+							"character": 16
+						}
+					]
+				},
+				{
+					"id": 168,
+					"name": "setSessionData",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 169,
+							"name": "setSessionData",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 170,
+									"name": "session",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "SessionData"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionStore.ts",
+							"line": 24,
+							"character": 16
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						163
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						171,
+						166,
+						168
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/sessionStore.ts",
+					"line": 9,
+					"character": 29
+				}
+			]
+		},
+		{
+			"id": 205,
+			"name": "UserSession",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": "Represents an instance of a signed in user for a particular app.",
+				"text": "A signed in user has access to two major pieces of information\nabout the user, the user's private key for that app and the location\nof the user's gaia storage bucket for the app.\n\nA user can be signed in either directly through the interactive\nsign in process or by directly providing the app private key.\n\n\n\n"
+			},
+			"children": [
+				{
+					"id": 208,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Creates a UserSession object"
+					},
+					"signatures": [
+						{
+							"id": 209,
+							"name": "new UserSession",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Creates a UserSession object"
+							},
+							"parameters": [
+								{
+									"id": 210,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"shortText": "\n"
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 211,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 212,
+															"name": "appConfig",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "packages/auth/src/userSession.ts",
+																	"line": 57,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 16,
+																"name": "AppConfig"
+															}
+														},
+														{
+															"id": 214,
+															"name": "sessionOptions",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "packages/auth/src/userSession.ts",
+																	"line": 59,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 135,
+																"name": "SessionOptions"
+															}
+														},
+														{
+															"id": 213,
+															"name": "sessionStore",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "packages/auth/src/userSession.ts",
+																	"line": 58,
+																	"character": 16
+																}
+															],
+															"type": {
+																"type": "reference",
+																"id": 162,
+																"name": "SessionDataStore"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																212,
+																214,
+																213
+															]
+														}
+													]
+												}
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 205,
+								"name": "UserSession"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 49,
+							"character": 26
+						}
+					]
+				},
+				{
+					"id": 206,
+					"name": "appConfig",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 47,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 16,
+						"name": "AppConfig"
+					}
+				},
+				{
+					"id": 207,
+					"name": "store",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 49,
+							"character": 7
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 162,
+						"name": "SessionDataStore"
+					}
+				},
+				{
+					"id": 241,
+					"name": "decryptContent",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 242,
+							"name": "decryptContent",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Decrypts data encrypted with `encryptContent` with the\ntransit private key.",
+								"returns": "decrypted content.\n"
+							},
+							"parameters": [
+								{
+									"id": 243,
+									"name": "content",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"text": "encrypted content."
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 244,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "reflection",
+												"declaration": {
+													"id": 245,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {
+														"isExported": true
+													},
+													"children": [
+														{
+															"id": 246,
+															"name": "privateKey",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isExported": true,
+																"isOptional": true
+															},
+															"comment": {
+																"text": "The hex string of the ECDSA private\nkey to use for decryption. If not provided, will use user's appPrivateKey."
+															},
+															"sources": [
+																{
+																	"fileName": "packages/auth/src/userSession.ts",
+																	"line": 389,
+																	"character": 56
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "intrinsic",
+																		"name": "undefined"
+																	},
+																	{
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																246
+															]
+														}
+													]
+												}
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"name": "Buffer"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 389,
+							"character": 16
+						}
+					]
+				},
+				{
+					"id": 237,
+					"name": "encryptContent",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 238,
+							"name": "encryptContent",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Encrypts the data provided with the app public key.",
+								"returns": "Stringified ciphertext object\n"
+							},
+							"parameters": [
+								{
+									"id": 239,
+									"name": "content",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"text": "the data to encrypt"
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "string"
+											},
+											{
+												"type": "reference",
+												"name": "Buffer"
+											}
+										]
+									}
+								},
+								{
+									"id": 240,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {},
+									"type": {
+										"type": "reference",
+										"name": "EncryptContentOptions"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 372,
+							"character": 16
+						}
+					]
+				},
+				{
+					"id": 224,
+					"name": "generateAndStoreTransitKey",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 225,
+							"name": "generateAndStoreTransitKey",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Generates a ECDSA keypair to\nuse as the ephemeral app transit private key\nand store in the session.",
+								"returns": "the hex encoded private key\n\n"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 149,
+							"character": 28
+						}
+					]
+				},
+				{
+					"id": 226,
+					"name": "getAuthResponseToken",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 227,
+							"name": "getAuthResponseToken",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Retrieve the authentication token from the URL query",
+								"returns": "the authentication token if it exists otherwise `null`\n"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 161,
+							"character": 22
+						}
+					]
+				},
+				{
+					"id": 232,
+					"name": "handlePendingSignIn",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 233,
+							"name": "handlePendingSignIn",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Try to process any pending sign in request by returning a `Promise` that resolves\nto the user data object if the sign in succeeds.",
+								"returns": "that resolves to the user data object if successful and rejects\nif handling the sign in request fails or there was no pending sign in request.\n"
+							},
+							"parameters": [
+								{
+									"id": 234,
+									"name": "authResponseToken",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"text": "the signed authentication response token"
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									},
+									"defaultValue": "this.getAuthResponseToken()"
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"id": 122,
+										"name": "UserData"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 212,
+							"character": 27
+						}
+					]
+				},
+				{
+					"id": 228,
+					"name": "isSignInPending",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 229,
+							"name": "isSignInPending",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Check if there is a authentication request that hasn't been handled.",
+								"text": "Also checks for a protocol echo reply (which if detected then the page\nwill be automatically redirected after this call).\n",
+								"returns": "`true` if there is a pending sign in, otherwise `false`\n"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 181,
+							"character": 17
+						}
+					]
+				},
+				{
+					"id": 230,
+					"name": "isUserSignedIn",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 231,
+							"name": "isUserSignedIn",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Check if a user is currently signed in.",
+								"returns": "`true` if the user is signed in, `false` if not.\n"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 200,
+							"character": 16
+						}
+					]
+				},
+				{
+					"id": 235,
+					"name": "loadUserData",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 236,
+							"name": "loadUserData",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Retrieves the user data object. The user's profile is stored in the key [[Profile]].",
+								"returns": "User data object.\n"
+							},
+							"type": {
+								"type": "reference",
+								"id": 122,
+								"name": "UserData"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 355,
+							"character": 14
+						}
+					]
+				},
+				{
+					"id": 215,
+					"name": "makeAuthRequest",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 216,
+							"name": "makeAuthRequest",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Generates an authentication request that can be sent to the Blockstack\nbrowser for the user to approve sign in. This authentication request can\nthen be used for sign in by passing it to the [[redirectToSignInWithAuthRequest]]\nmethod.",
+								"text": "*Note*: This method should only be used if you want to use a customized authentication\nflow. Typically, you'd use [[redirectToSignIn]] which is the default sign in method.\n",
+								"returns": "the authentication request\n"
+							},
+							"parameters": [
+								{
+									"id": 217,
+									"name": "transitKey",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"text": "A HEX encoded transit private key."
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								},
+								{
+									"id": 218,
+									"name": "redirectURI",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"text": "Location to redirect the user to after sign in approval."
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								},
+								{
+									"id": 219,
+									"name": "manifestURI",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"text": "Location of this app's manifest file."
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								},
+								{
+									"id": 220,
+									"name": "scopes",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"text": "The permissions this app is requesting. The default is `store_write`."
+									},
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "union",
+											"types": [
+												{
+													"type": "reference",
+													"id": 1,
+													"name": "AuthScope"
+												},
+												{
+													"type": "intrinsic",
+													"name": "string"
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 221,
+									"name": "appDomain",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"text": "The origin of the app."
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								},
+								{
+									"id": 222,
+									"name": "expiresAt",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"text": "The time at which this request is no longer valid."
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									},
+									"defaultValue": "nextHour().getTime()"
+								},
+								{
+									"id": 223,
+									"name": "extraParams",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"comment": {
+										"text": "Any extra parameters to pass to the authenticator. Use this to\npass options that aren't part of the Blockstack authentication specification,\nbut might be supported by special authenticators.\n"
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									},
+									"defaultValue": "{}"
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 112,
+							"character": 17
+						}
+					]
+				},
+				{
+					"id": 247,
+					"name": "signUserOut",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isExported": true
+					},
+					"signatures": [
+						{
+							"id": 248,
+							"name": "signUserOut",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"shortText": "Sign the user out and optionally redirect to given location."
+							},
+							"parameters": [
+								{
+									"id": 249,
+									"name": "redirectURL",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true,
+										"isOptional": true
+									},
+									"comment": {
+										"text": "\nLocation to redirect user to after sign out.\nOnly used in environments with `window` available\n"
+									},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "intrinsic",
+												"name": "undefined"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "void"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userSession.ts",
+							"line": 404,
+							"character": 13
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						208
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						206,
+						207
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						241,
+						237,
+						224,
+						226,
+						232,
+						228,
+						230,
+						235,
+						215,
+						247
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/userSession.ts",
+					"line": 46,
+					"character": 24
+				}
+			]
+		},
+		{
+			"id": 250,
+			"name": "ProfileLookupOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 253,
+					"name": "network",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/profile.ts",
+							"line": 8,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "reference",
+						"name": "StacksNetwork"
+					}
+				},
+				{
+					"id": 251,
+					"name": "username",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/profile.ts",
+							"line": 6,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 252,
+					"name": "zoneFileLookupURL",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/profile.ts",
+							"line": 7,
+							"character": 19
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						253,
+						251,
+						252
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/profile.ts",
+					"line": 5,
+					"character": 37
+				}
+			]
+		},
+		{
+			"id": 135,
+			"name": "SessionOptions",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"children": [
+				{
+					"id": 136,
+					"name": "coreNode",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 9,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 139,
+					"name": "etags",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 12,
+							"character": 7
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 158,
+						"name": "EtagMap"
+					}
+				},
+				{
+					"id": 140,
+					"name": "localStorageKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 13,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 141,
+					"name": "storeOptions",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 14,
+							"character": 14
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "reflection",
+								"declaration": {
+									"id": 142,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {
+										"isExported": true
+									},
+									"children": [
+										{
+											"id": 143,
+											"name": "localStorageKey",
+											"kind": 32,
+											"kindString": "Variable",
+											"flags": {
+												"isExported": true,
+												"isOptional": true
+											},
+											"sources": [
+												{
+													"fileName": "packages/auth/src/sessionData.ts",
+													"line": 15,
+													"character": 19
+												}
+											],
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "undefined"
+													},
+													{
+														"type": "intrinsic",
+														"name": "string"
+													}
+												]
+											}
+										}
+									],
+									"groups": [
+										{
+											"title": "Variables",
+											"kind": 32,
+											"children": [
+												143
+											]
+										}
+									]
+								}
+							}
+						]
+					}
+				},
+				{
+					"id": 138,
+					"name": "transitKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 11,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 137,
+					"name": "userData",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 10,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 122,
+						"name": "UserData"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						136,
+						139,
+						140,
+						141,
+						138,
+						137
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/sessionData.ts",
+					"line": 8,
+					"character": 31
+				}
+			]
+		},
+		{
+			"id": 122,
+			"name": "UserData",
+			"kind": 256,
+			"kindString": "Interface",
+			"flags": {
+				"isExported": true
+			},
+			"comment": {
+				"shortText": " Returned from the [[UserSession.loadUserData]] function."
+			},
+			"children": [
+				{
+					"id": 127,
+					"name": "appPrivateKey",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 23,
+							"character": 15
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 130,
+					"name": "authResponseToken",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 29,
+							"character": 19
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 129,
+					"name": "coreNode",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 27,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 131,
+					"name": "coreSessionToken",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 31,
+							"character": 18
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 125,
+					"name": "decentralizedID",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 16,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 124,
+					"name": "email",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 13,
+							"character": 7
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 132,
+					"name": "gaiaAssociationToken",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 33,
+							"character": 22
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 134,
+					"name": "gaiaHubConfig",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 38,
+							"character": 15
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "any"
+					}
+				},
+				{
+					"id": 128,
+					"name": "hubUrl",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 26,
+							"character": 8
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				},
+				{
+					"id": 126,
+					"name": "identityAddress",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 19,
+							"character": 17
+						}
+					],
+					"type": {
+						"type": "union",
+						"types": [
+							{
+								"type": "intrinsic",
+								"name": "undefined"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						]
+					}
+				},
+				{
+					"id": 133,
+					"name": "profile",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 36,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "any"
+					}
+				},
+				{
+					"id": 123,
+					"name": "username",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/userData.ts",
+							"line": 6,
+							"character": 10
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						127,
+						130,
+						129,
+						131,
+						125,
+						124,
+						132,
+						134,
+						128,
+						126,
+						133,
+						123
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/userData.ts",
+					"line": 4,
+					"character": 25
+				}
+			]
+		},
+		{
+			"id": 48,
+			"name": "AuthMetadata",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/messages.ts",
+					"line": 17,
+					"character": 17
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 49,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 50,
+							"name": "email",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "packages/auth/src/messages.ts",
+									"line": 18,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 51,
+							"name": "profileUrl",
+							"kind": 32,
+							"kindString": "Variable",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "packages/auth/src/messages.ts",
+									"line": 19,
+									"character": 12
+								}
+							],
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Variables",
+							"kind": 32,
+							"children": [
+								50,
+								51
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/messages.ts",
+							"line": 17,
+							"character": 19
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 158,
+			"name": "EtagMap",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {
+				"isExported": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/sessionData.ts",
+					"line": 6,
+					"character": 12
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 159,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {
+						"isExported": true
+					},
+					"indexSignature": [
+						{
+							"id": 160,
+							"name": "__index",
+							"kind": 8192,
+							"kindString": "Index signature",
+							"flags": {
+								"isExported": true
+							},
+							"parameters": [
+								{
+									"id": 161,
+									"name": "key",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExported": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "packages/auth/src/sessionData.ts",
+							"line": 6,
+							"character": 14
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 199,
+			"name": "AUTH_CONTINUATION_PARAM",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/protocolEchoDetection.ts",
+					"line": 10,
+					"character": 29
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "authContinuation"
+			},
+			"defaultValue": "\"authContinuation\""
+		},
+		{
+			"id": 7,
+			"name": "DEFAULT_BLOCKSTACK_HOST",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"comment": {
+				"shortText": "This constant is used in the [[redirectToSignInWithAuthRequest]]"
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/constants.ts",
+					"line": 12,
+					"character": 36
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "https://browser.blockstack.org/auth"
+			},
+			"defaultValue": "\"https://browser.blockstack.org/auth\""
+		},
+		{
+			"id": 198,
+			"name": "ECHO_REPLY_PARAM",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/protocolEchoDetection.ts",
+					"line": 9,
+					"character": 22
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "echoReply"
+			},
+			"defaultValue": "\"echoReply\""
+		},
+		{
+			"id": 197,
+			"name": "GLOBAL_DETECTION_CACHE_KEY",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"comment": {
+				"shortText": "This logic is in a separate file with no dependencies so that it can be\nloaded and executed as soon as possible to fulfill the purpose of the protocol\ndetection technique. The effectiveness of this is obviously subject to how web\napps bundle/consume the blockstack.js lib."
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/protocolEchoDetection.ts",
+					"line": 8,
+					"character": 32
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "_blockstackDidCheckEchoReply"
+			},
+			"defaultValue": "\"_blockstackDidCheckEchoReply\""
+		},
+		{
+			"id": 157,
+			"name": "SESSION_VERSION",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/sessionData.ts",
+					"line": 4,
+					"character": 21
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "1.0.0"
+			},
+			"defaultValue": "\"1.0.0\""
+		},
+		{
+			"id": 47,
+			"name": "VERSION",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"sources": [
+				{
+					"fileName": "packages/auth/src/messages.ts",
+					"line": 15,
+					"character": 13
+				}
+			],
+			"type": {
+				"type": "stringLiteral",
+				"value": "1.3.1"
+			},
+			"defaultValue": "\"1.3.1\""
+		},
+		{
+			"id": 200,
+			"name": "getQueryStringParams",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 201,
+					"name": "getQueryStringParams",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"parameters": [
+						{
+							"id": 202,
+							"name": "query",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "intrinsic",
+								"name": "string"
+							},
+							{
+								"type": "intrinsic",
+								"name": "string"
+							}
+						],
+						"name": "Record"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/protocolEchoDetection.ts",
+					"line": 13,
+					"character": 29
+				}
+			]
+		},
+		{
+			"id": 254,
+			"name": "lookupProfile",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 255,
+					"name": "lookupProfile",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Look up a user profile by blockstack ID",
+						"returns": "that resolves to a profile object\n"
+					},
+					"parameters": [
+						{
+							"id": 256,
+							"name": "options",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"type": {
+								"type": "reference",
+								"id": 250,
+								"name": "ProfileLookupOptions"
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "string"
+									},
+									{
+										"type": "intrinsic",
+										"name": "any"
+									}
+								],
+								"name": "Record"
+							}
+						],
+						"name": "Promise"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/profile.ts",
+					"line": 20,
+					"character": 29
+				}
+			]
+		},
+		{
+			"id": 54,
+			"name": "makeAuthRequest",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {
+				"isExported": true
+			},
+			"signatures": [
+				{
+					"id": 55,
+					"name": "makeAuthRequest",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {
+						"isExported": true
+					},
+					"comment": {
+						"shortText": "Generates an authentication request that can be sent to the Blockstack\nbrowser for the user to approve sign in. This authentication request can\nthen be used for sign in by passing it to the `redirectToSignInWithAuthRequest`\nmethod.",
+						"text": "*Note: This method should only be used if you want to roll your own authentication\nflow. Typically you'd use `redirectToSignIn` which takes care of this\nunder the hood.*\n",
+						"returns": "the authentication request\n"
+					},
+					"parameters": [
+						{
+							"id": 56,
+							"name": "transitPrivateKey",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"text": "hex encoded transit private key"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 57,
+							"name": "redirectURI",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"text": "location to redirect user to after sign in approval"
+							},
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 58,
+							"name": "manifestURI",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"text": "location of this app's manifest file"
+							},
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 59,
+							"name": "scopes",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"text": "the permissions this app is requesting"
+							},
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "union",
+									"types": [
+										{
+											"type": "reference",
+											"id": 1,
+											"name": "AuthScope"
+										},
+										{
+											"type": "intrinsic",
+											"name": "string"
+										}
+									]
+								}
+							},
+							"defaultValue": "DEFAULT_SCOPE.slice()"
+						},
+						{
+							"id": 60,
+							"name": "appDomain",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true,
+								"isOptional": true
+							},
+							"comment": {
+								"text": "the origin of this app"
+							},
+							"type": {
+								"type": "union",
+								"types": [
+									{
+										"type": "intrinsic",
+										"name": "undefined"
+									},
+									{
+										"type": "intrinsic",
+										"name": "string"
+									}
+								]
+							}
+						},
+						{
+							"id": 61,
+							"name": "expiresAt",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"text": "the time at which this request is no longer valid"
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							},
+							"defaultValue": "nextMonth().getTime()"
+						},
+						{
+							"id": 62,
+							"name": "extraParams",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {
+								"isExported": true
+							},
+							"comment": {
+								"text": "Any extra parameters you'd like to pass to the authenticator.\nUse this to pass options that aren't part of the Blockstack auth spec, but might be supported\nby special authenticators."
+							},
+							"type": {
+								"type": "intrinsic",
+								"name": "any"
+							},
+							"defaultValue": "{}"
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					}
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/messages.ts",
+					"line": 56,
+					"character": 31
+				}
+			]
+		},
+		{
+			"id": 8,
+			"name": "DEFAULT_PROFILE",
+			"kind": 2097152,
+			"kindString": "Object literal",
+			"flags": {
+				"isExported": true,
+				"isConst": true
+			},
+			"comment": {
+				"shortText": "Default user profile object"
+			},
+			"children": [
+				{
+					"id": 10,
+					"name": "@context",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/constants.ts",
+							"line": 19,
+							"character": 12
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"defaultValue": "\"http://schema.org\""
+				},
+				{
+					"id": 9,
+					"name": "@type",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {
+						"isExported": true
+					},
+					"sources": [
+						{
+							"fileName": "packages/auth/src/constants.ts",
+							"line": 18,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"defaultValue": "\"Person\""
+				}
+			],
+			"groups": [
+				{
+					"title": "Variables",
+					"kind": 32,
+					"children": [
+						10,
+						9
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "packages/auth/src/constants.ts",
+					"line": 17,
+					"character": 28
+				}
+			],
+			"type": {
+				"type": "intrinsic",
+				"name": "object"
+			}
+		}
+	],
+	"groups": [
+		{
+			"title": "Enumerations",
+			"kind": 4,
+			"children": [
+				1
+			]
+		},
+		{
+			"title": "Classes",
+			"kind": 128,
+			"children": [
+				16,
+				162,
+				205
+			]
+		},
+		{
+			"title": "Interfaces",
+			"kind": 256,
+			"children": [
+				250,
+				135,
+				122
+			]
+		},
+		{
+			"title": "Type aliases",
+			"kind": 4194304,
+			"children": [
+				48,
+				158
+			]
+		},
+		{
+			"title": "Variables",
+			"kind": 32,
+			"children": [
+				199,
+				7,
+				198,
+				197,
+				157,
+				47
+			]
+		},
+		{
+			"title": "Functions",
+			"kind": 64,
+			"children": [
+				200,
+				254,
+				54
+			]
+		},
+		{
+			"title": "Object literals",
+			"kind": 2097152,
+			"children": [
+				8
+			]
+		}
+	]
+}
