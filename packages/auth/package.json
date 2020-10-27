@@ -39,8 +39,7 @@
     "prepublishOnly": "yarn test && yarn build",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
-    "codecovUpload": "codecov",
-    "build:docs": "rimraf docs && cross-env typedoc --name \"$npm_package_name $npm_package_version Library Reference\" --tsconfig ../../tsconfig.typedoc.json --out docs --json docs/docs.json src"
+    "codecovUpload": "codecov"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js/issues"

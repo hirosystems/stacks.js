@@ -90,8 +90,7 @@
     "typecheck:watch": "npm run typecheck -- --watch",
     "test": "jest --coverage",
     "prepublishOnly": "yarn test && yarn build",
-    "codecovUpload": "codecov",
-    "build:docs": "rimraf docs && cross-env typedoc --name \"$npm_package_name $npm_package_version Library Reference\" --tsconfig ../../tsconfig.typedoc.json --out docs --json docs/docs.json src"
+    "codecovUpload": "codecov"
   },
   "bugs": {
     "url": "https://github.com/blockstack/blockstack.js.gi/issues"

@@ -46,6 +46,6 @@
     "includeDeclarations": false,
     "gitRevision": "master",
     "listInvalidSymbolLinks": true,
-    "theme": "../../docs-theme"
+    "theme": "docs-theme"
   }
 }
