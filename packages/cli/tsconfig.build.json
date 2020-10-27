@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+      "target": "es2018",
+      "module": "commonjs",
+      "esModuleInterop": false,
+      "allowSyntheticDefaultImports": false,
+      "moduleResolution": "node",
+      "declaration": true,
+      "noImplicitAny": true,
+      "outDir": "lib",
+      "sourceMap": true,
+      "skipLibCheck": true,
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules/**/*"
+  ]
+}

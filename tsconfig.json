@@ -1,16 +1,27 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "target": "esnext",
+    "module": "esnext",
     "moduleResolution": "node",
     "declaration": true,
-    "noImplicitAny": true,
     "sourceMap": true,
     "noEmit": true,
-    "importHelpers": true
+    "importHelpers": true,
+    "baseUrl": "./src",
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "lib": ["dom", "esnext"],
+    "paths": {
+      "@stacks/auth": ["./packages/auth/src"],
+      "@stacks/cli": ["./packages/cli/src"],
+      "@stacks/common": ["./packages/common/src"],
+      "@stacks/encryption": ["./packages/encryption/src"],
+      "@stacks/keychain": ["./packages/keychain/src"],
+      "@stacks/network": ["./packages/network/src"],
+      "@stacks/profile": ["./packages/profile/src"],
+      "@stacks/storage": ["./packages/storage/src"],
+      "@stacks/transactions": ["./packages/transactions/src"]
+    }
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*"
-  ]
+  "include": ["packages/**/src/**/*", "packages/**/test/**/*", "src/**/*", "tests/**/*"]
 }

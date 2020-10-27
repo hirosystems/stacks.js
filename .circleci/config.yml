@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:10.15.1
+      - image: circleci/node:14.6.0
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -20,27 +20,27 @@ jobs:
       - checkout
 
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+      # - restore_cache:
+      #     keys:
+      #     - v1-dependencies-{{ checksum "package.json" }}
+      #     # fallback to using the latest cache if no exact match is found
+      #     - v1-dependencies-
 
-      - run: npm install
+      - run: npx lerna bootstrap
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+      # - save_cache:
+      #     paths:
+      #       - node_modules
+      #     key: v1-dependencies-{{ checksum "package.json" }}
 
-      # run tests!
-      - run: npm run lint:formatting
+      # run tests!  
+      #- run: npm run lint:formatting
 
-      - run: npm test
+      - run: npx lerna run build
 
-      - run: npm run build
+      - run: npx lerna run test
 
-      - run: npm run codecovUpload
+      - run: npx lerna run codecovUpload
 
       - store_artifacts:
           path: docs

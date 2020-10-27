@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>blockstack.js 21.1.1 Library Reference</title>
-	<meta name="description" content="">
+	<title>Stacks.js 1.0.0 Library Reference</title>
+	<meta name="description" content="Documentation for Stacks.js 1.0.0 Library Reference">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -14,7 +14,7 @@
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">blockstack.js 21.1.1 Library Reference</a>
+					<a href="index.html" class="title">Stacks.js 1.0.0 Library Reference</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -55,7 +55,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> blockstack.js 21.1.1 Library Reference</h1>
+			<h1>Stacks.js 1.0.0 Library Reference</h1>
 		</div>
 	</div>
 </header>
@@ -63,76 +63,47 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<a href="#using-the-library" id="using-the-library" style="color: inherit; text-decoration: none;">
-					<h1>Using the library</h1>
+				<a href="#stacksjs-monorepo-" id="stacksjs-monorepo-" style="color: inherit; text-decoration: none;">
+					<h1>Stacks.js Monorepo <a href="https://circleci.com/gh/blockstack/blockstack.js/tree/master"><img src="https://img.shields.io/circleci/project/blockstack/blockstack.js/master.svg" alt="CircleCI"></a></h1>
 				</a>
-				<p>This reference describes the Blockstack Javascript Software Developer Kit (SDK) reference. For complete Blockstack documentation, see <a href="https://docs.blockstack.org/">docs.blockstack.org</a>. There is also reference material available for both the <a href="https://blockstack.github.io/blockstack-ios/">iOS SDK</a> and <a href="https://blockstack.github.io/blockstack-android/">Android SDK</a>.</p>
-				<a href="#install-the-library" id="install-the-library" style="color: inherit; text-decoration: none;">
-					<h2>Install the Library</h2>
+				<p>This repo is home to the Stacks.js libraries which provide everything you need to work with the Stacks blockchain.</p>
+				<ul>
+					<li><a href="./packages/auth"><code>@stacks/auth</code></a> Construct and decode authentication requests for Stacks apps.</li>
+					<li><a href="./packages/storage"><code>@stacks/storage</code></a> Store and fetch files with Gaia, the decentralized storage system.</li>
+					<li><a href="./packages/transactions"><code>@stacks/transactions</code></a> Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.</li>
+					<li><a href="./packages/cli"><code>@stacks/cli</code></a> Command line interface to interact with auth, storage and Stacks transactions.</li>
+					<li><a href="./packages/keychain"><code>@stacks/keychain</code></a> Create and manage keys/wallets for the Stacks blockchain.</li>
+					<li><a href="./packages/network"><code>@stacks/network</code></a> Network and API library for working with Stacks blockchain nodes.</li>
+					<li><a href="./packages/encryption"><code>@stacks/encryption</code></a> Encryption functions used by Stacks.js packages.</li>
+					<li><a href="./packages/profile"><code>@stacks/profile</code></a> Functions for manipulating user profiles.</li>
+					<li><a href="./packages/common"><code>@stacks/common</code></a> Common utilities used by Stacks.js packages.</li>
+				</ul>
+				<p>See <code>README</code> in each package directory for installation instructions and usage.</p>
+				<a href="#migrating-from-blockstackjs" id="migrating-from-blockstackjs" style="color: inherit; text-decoration: none;">
+					<h2>Migrating from blockstack.js</h2>
 				</a>
-				<pre><code>$ npm <span class="hljs-keyword">install</span> blockstack</code></pre>
-				<a href="#quickstart-build-an-application" id="quickstart-build-an-application" style="color: inherit; text-decoration: none;">
-					<h2>Quickstart: Build an application</h2>
+				<p>To migrate your app from blockstack.js to stacks.js follow the steps in the <a href="./migration-guide.md">migration guide</a>.</p>
+				<a href="#development-environment-setup" id="development-environment-setup" style="color: inherit; text-decoration: none;">
+					<h2>Development environment setup</h2>
 				</a>
+				<p>To setup the development environment for this repository, follow these steps:</p>
 				<ol>
-					<li><p>Install <code>blockstack.js</code> with <code>npm</code>.</p>
-						<pre><code class="language-bash">npm install blockstack --save</code></pre>
-					</li>
-					<li><p>Import Blockstack into your project.</p>
-						<pre><code class="language-js"> <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> blockstack <span class="hljs-keyword">from</span> <span class="hljs-string">'blockstack'</span></code></pre>
-					</li>
-					<li><p>Wire up a sign in button.</p>
-						<pre><code class="language-js"> <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'signin-button'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-   blockstack.redirectToSignIn()
- })</code></pre>
-					</li>
-					<li><p>Wire up a sign out button.</p>
-						<pre><code class="language-js"> <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'signout-button'</span>).addEventListener(<span class="hljs-string">'click'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-   blockstack.signUserOut(<span class="hljs-built_in">window</span>.location.origin)
- })</code></pre>
-					</li>
-					<li><p>Include the logic to load user data and to handle the authentication
-						response.</p>
-						<pre><code class="language-js"> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showProfile</span>(<span class="hljs-params">profile</span>) </span>{
-   <span class="hljs-keyword">var</span> person = <span class="hljs-keyword">new</span> blockstack.Person(profile)
-   <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'heading-name'</span>).innerHTML = person.name()
-   <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'avatar-image'</span>).setAttribute(<span class="hljs-string">'src'</span>, person.avatarUrl())
-   <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'section-1'</span>).style.display = <span class="hljs-string">'none'</span>
-   <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'section-2'</span>).style.display = <span class="hljs-string">'block'</span>
- }
-
- <span class="hljs-keyword">if</span> (blockstack.isUserSignedIn()) {
-  <span class="hljs-keyword">const</span> userData = blockstack.loadUserData()
-   showProfile(userData.profile)
- } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (blockstack.isSignInPending()) {
-   blockstack.handlePendingSignIn()
-   .then(<span class="hljs-function"><span class="hljs-params">userData</span> =&gt;</span> {
-     showProfile(userData.profile)
-   })
- }</code></pre>
-					</li>
-					<li><p>Create a <code>manifest.json</code> file</p>
-						<pre><code class="language-json"> {
-   <span class="hljs-attr">"name"</span>: <span class="hljs-string">"Hello, Blockstack"</span>,
-   <span class="hljs-attr">"start_url"</span>: <span class="hljs-string">"localhost:5000"</span>,
-   <span class="hljs-attr">"description"</span>: <span class="hljs-string">"A simple demo of Blockstack Auth"</span>,
-   <span class="hljs-attr">"icons"</span>: [{
-     <span class="hljs-attr">"src"</span>: <span class="hljs-string">"https://helloblockstack.com/icon-192x192.png"</span>,
-     <span class="hljs-attr">"sizes"</span>: <span class="hljs-string">"192x192"</span>,
-     <span class="hljs-attr">"type"</span>: <span class="hljs-string">"image/png"</span>
-   }]
- }</code></pre>
-						<p> Make sure your <code>manifest.json</code> file has appropriate CORS headers so that it
-						can be fetched via an http <code>GET</code> from any origin.</p>
-					</li>
-					<li><p>Serve your application</p>
-					</li>
+					<li>Clone this package.</li>
+					<li>Run <code>lerna bootstrap</code> to install dependencies</li>
+					<li>Run <code>lerna run build</code> to build packages</li>
+					<li>Run <code>lerna run test</code> to run tests</li>
 				</ol>
-				<a href="#add-the-library-without-a-package-manager" id="add-the-library-without-a-package-manager" style="color: inherit; text-decoration: none;">
-					<h2>Add the library without a package manager</h2>
+				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+					<h2>Documentation</h2>
 				</a>
-				<p>You can import <code>blockstack.js</code> as a script without using a package manager. To securely use the latest distribution of <code>blockstack.js</code> from a CDN, add the following <code>script</code> declaration in your application. </p>
-				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://unpkg.com/blockstack@19.4.0-beta.1/dist/blockstack.js"</span> <span class="hljs-attr">integrity</span>=<span class="hljs-string">"sha384-SB5ZTUxSxlrMk3QBbqtewpVzllKVRD3JeT5RuZ3Tj4/1MuXaMphMCFCz1ht2qG80"</span> <span class="hljs-attr">crossorigin</span>=<span class="hljs-string">"anonymous"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+				<p><a href="https://docs.blockstack.org/"><img src="/docs-button.png" alt="Documentation"></a></p>
+				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+					<h2>Contributing</h2>
+				</a>
+				<p>Github issues marked <a href="https://github.com/blockstack/stacks.js/labels/help-wanted">help-wanted</a>
+					are great places to start. Please ask in a github issue or discord before embarking
+					on larger issues that aren&#39;t labeled as help wanted or adding additional
+				functionality so that we can make sure your contribution can be included!</p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -146,28 +117,103 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum">
+						<a href="enums/addresshashmode.html" class="tsd-kind-icon">Address<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/addressversion.html" class="tsd-kind-icon">Address<wbr>Version</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/anchormode.html" class="tsd-kind-icon">Anchor<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/assettype.html" class="tsd-kind-icon">Asset<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/authfieldtype.html" class="tsd-kind-icon">Auth<wbr>Field<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
 						<a href="enums/authscope.html" class="tsd-kind-icon">Auth<wbr>Scope</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/authtype.html" class="tsd-kind-icon">Auth<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/chainid.html" class="tsd-kind-icon">ChainID</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/clarityabitypeid.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/claritytype.html" class="tsd-kind-icon">Clarity<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/fungibleconditioncode.html" class="tsd-kind-icon">Fungible<wbr>Condition<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/identitynamevalidityerror.html" class="tsd-kind-icon">Identity<wbr>Name<wbr>Validity<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/nonfungibleconditioncode.html" class="tsd-kind-icon">Non<wbr>Fungible<wbr>Condition<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/payloadtype.html" class="tsd-kind-icon">Payload<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/postconditionmode.html" class="tsd-kind-icon">Post<wbr>Condition<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/postconditionprincipalid.html" class="tsd-kind-icon">Post<wbr>Condition<wbr>PrincipalID</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/postconditiontype.html" class="tsd-kind-icon">Post<wbr>Condition<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/pubkeyencoding.html" class="tsd-kind-icon">Pub<wbr>Key<wbr>Encoding</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/stacksmessagetype.html" class="tsd-kind-icon">Stacks<wbr>Message<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/subdomains.html" class="tsd-kind-icon">Subdomains</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/transactionversion.html" class="tsd-kind-icon">Transaction<wbr>Version</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/txrejectedreason.html" class="tsd-kind-icon">Tx<wbr>Rejected<wbr>Reason</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/appconfig.html" class="tsd-kind-icon">App<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/blockstacknetwork.html" class="tsd-kind-icon">Blockstack<wbr>Network</a>
+						<a href="classes/authorization.html" class="tsd-kind-icon">Authorization</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
-						<a href="classes/facebook.html" class="tsd-kind-icon">Facebook</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/bufferarray.html" class="tsd-kind-icon">Buffer<wbr>Array</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
-						<a href="classes/github.html" class="tsd-kind-icon">Github</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/bufferreader.html" class="tsd-kind-icon">Buffer<wbr>Reader</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
-						<a href="classes/hackernews.html" class="tsd-kind-icon">Hacker<wbr>News</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/clinetworkadapter.html" class="tsd-kind-icon">CLINetwork<wbr>Adapter</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
-						<a href="classes/instagram.html" class="tsd-kind-icon">Instagram</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/clitransactionsigner.html" class="tsd-kind-icon">CLITransaction<wbr>Signer</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
-						<a href="classes/linkedin.html" class="tsd-kind-icon">Linked<wbr>In</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/deserializable.html" class="tsd-kind-icon">Deserializable</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/deserializationerror.html" class="tsd-kind-icon">Deserialization<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/identity.html" class="tsd-kind-icon">Identity</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/identityaddressownernode.html" class="tsd-kind-icon">Identity<wbr>Address<wbr>Owner<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/multisigkeysigner.html" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Key<wbr>Signer</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/nodecryptoaescipher.html" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Aes<wbr>Cipher</a>
@@ -184,7 +230,13 @@
 					<li class=" tsd-kind-class">
 						<a href="classes/nodecryptosha2hash.html" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Sha2<wbr>Hash</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
+					<li class=" tsd-kind-class">
+						<a href="classes/notimplementederror.html" class="tsd-kind-icon">Not<wbr>Implemented<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/nullsigner.html" class="tsd-kind-icon">Null<wbr>Signer</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/passworderror.html" class="tsd-kind-icon">Password<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-class">
@@ -194,13 +246,58 @@
 						<a href="classes/ripemd160polyfilldigest.html" class="tsd-kind-icon">Ripemd160<wbr>Polyfill<wbr>Digest</a>
 					</li>
 					<li class=" tsd-kind-class">
+						<a href="classes/safetyerror.html" class="tsd-kind-icon">Safety<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/segwitp2shkeysigner.html" class="tsd-kind-icon">Segwit<wbr>P2SHKey<wbr>Signer</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/serializationerror.html" class="tsd-kind-icon">Serialization<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
 						<a href="classes/sessiondatastore.html" class="tsd-kind-icon">Session<wbr>Data<wbr>Store</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-not-exported">
-						<a href="classes/twitter.html" class="tsd-kind-icon">Twitter</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/signingerror.html" class="tsd-kind-icon">Signing<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/sponsoredauthorization.html" class="tsd-kind-icon">Sponsored<wbr>Authorization</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stacksmainnet.html" class="tsd-kind-icon">Stacks<wbr>Mainnet</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stacksmocknet.html" class="tsd-kind-icon">Stacks<wbr>Mocknet</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stackstestnet.html" class="tsd-kind-icon">Stacks<wbr>Testnet</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stackstransaction.html" class="tsd-kind-icon">Stacks<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/stackstransactionerror.html" class="tsd-kind-icon">Stacks<wbr>Transaction<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/standardauthorization.html" class="tsd-kind-icon">Standard<wbr>Authorization</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/storage.html" class="tsd-kind-icon">Storage</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/transactionsigner.html" class="tsd-kind-icon">Transaction<wbr>Signer</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/usersession.html" class="tsd-kind-icon">User<wbr>Session</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/verificationerror.html" class="tsd-kind-icon">Verification<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/wallet.html" class="tsd-kind-icon">Wallet</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/walletsigner.html" class="tsd-kind-icon">Wallet<wbr>Signer</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/webcryptoaescipher.html" class="tsd-kind-icon">Web<wbr>Crypto<wbr>Aes<wbr>Cipher</a>
@@ -217,20 +314,122 @@
 					<li class=" tsd-kind-class">
 						<a href="classes/webcryptosha2hash.html" class="tsd-kind-icon">Web<wbr>Crypto<wbr>Sha2<wbr>Hash</a>
 					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/accountproofinfo.html" class="tsd-kind-icon">Account<wbr>Proof<wbr>Info</a>
+					<li class=" tsd-kind-class">
+						<a href="classes/sha512_256.html" class="tsd-kind-icon">sha512_<wbr>256</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/accounttokens.html" class="tsd-kind-icon">Account<wbr>Tokens</a>
+						<a href="interfaces/address.html" class="tsd-kind-icon">Address</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/aescipher.html" class="tsd-kind-icon">Aes<wbr>Cipher</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/assetinfo.html" class="tsd-kind-icon">Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/authrequesttype.html" class="tsd-kind-icon">Auth<wbr>Request<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/buffercv.html" class="tsd-kind-icon">BufferCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_command_group.html" class="tsd-kind-icon">CLI_<wbr>COMMAND_<wbr>GROUP</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_command_group_item.html" class="tsd-kind-icon">CLI_<wbr>COMMAND_<wbr>GROUP_<wbr>ITEM</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_command_help.html" class="tsd-kind-icon">CLI_<wbr>COMMAND_<wbr>HELP</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_config_type.html" class="tsd-kind-icon">CLI_<wbr>CONFIG_<wbr>TYPE</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_log_config_type.html" class="tsd-kind-icon">CLI_<wbr>LOG_<wbr>CONFIG_<wbr>TYPE</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_network_opts.html" class="tsd-kind-icon">CLI_<wbr>NETWORK_<wbr>OPTS</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_opts.html" class="tsd-kind-icon">CLI_<wbr>OPTS</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_prop.html" class="tsd-kind-icon">CLI_<wbr>PROP</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cli_prop_item.html" class="tsd-kind-icon">CLI_<wbr>PROP_<wbr>ITEM</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/checkargsfailtype.html" class="tsd-kind-icon">Check<wbr>Args<wbr>Fail<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/checkargssuccesstype.html" class="tsd-kind-icon">Check<wbr>Args<wbr>Success<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabi.html" class="tsd-kind-icon">Clarity<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabifunction.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabimap.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabitypefungibletoken.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Fungible<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabitypenonfungibletoken.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Non<wbr>Fungible<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityabivariable.html" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Variable</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/clarityfunctionarg.html" class="tsd-kind-icon">Clarity<wbr>Function<wbr>Arg</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/coinbasepayload.html" class="tsd-kind-icon">Coinbase<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/configapp.html" class="tsd-kind-icon">Config<wbr>App</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/configidentity.html" class="tsd-kind-icon">Config<wbr>Identity</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/connecttogaiaoptions.html" class="tsd-kind-icon">Connect<wbr>ToGaia<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/constructoroptions.html" class="tsd-kind-icon">Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractcalloptions.html" class="tsd-kind-icon">Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractcallpayload.html" class="tsd-kind-icon">Contract<wbr>Call<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractdeployoptions.html" class="tsd-kind-icon">Contract<wbr>Deploy<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractprincipal.html" class="tsd-kind-icon">Contract<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contractprincipalcv.html" class="tsd-kind-icon">Contract<wbr>PrincipalCV</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/encryptcontentoptions.html" class="tsd-kind-icon">Encrypt<wbr>Content<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/encryptionoptions.html" class="tsd-kind-icon">Encryption<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/falsecv.html" class="tsd-kind-icon">FalseCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/fungiblepostcondition.html" class="tsd-kind-icon">Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/gaiaauthpayload.html" class="tsd-kind-icon">Gaia<wbr>Auth<wbr>Payload</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/gaiahubconfig.html" class="tsd-kind-icon">Gaia<wbr>Hub<wbr>Config</a>
@@ -241,7 +440,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/getfileurloptions.html" class="tsd-kind-icon">Get<wbr>File<wbr>Url<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-not-exported">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/getglobalobjectoptions.html" class="tsd-kind-icon">Get<wbr>Global<wbr>Object<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -251,19 +450,112 @@
 						<a href="interfaces/huberrordetails.html" class="tsd-kind-icon">Hub<wbr>Error<wbr>Details</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/hubinfo.html" class="tsd-kind-icon">Hub<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/idappkeys.html" class="tsd-kind-icon">IDApp<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/identityconstructoroptions.html" class="tsd-kind-icon">Identity<wbr>Constructor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/identitykeypair.html" class="tsd-kind-icon">Identity<wbr>Key<wbr>Pair</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/inquirerprompt.html" class="tsd-kind-icon">Inquirer<wbr>Prompt</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/intcv.html" class="tsd-kind-icon">IntCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/lengthprefixedlist.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/lengthprefixedstring.html" class="tsd-kind-icon">Length<wbr>Prefixed<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/listcv.html" class="tsd-kind-icon">ListCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/memostring.html" class="tsd-kind-icon">Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/messagesignature.html" class="tsd-kind-icon">Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/multisigoptions.html" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/multisigspendingcondition.html" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/nameinforesponse.html" class="tsd-kind-icon">Name<wbr>Info<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/namedidentitytype.html" class="tsd-kind-icon">Named<wbr>Identity<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/nodecryptolib.html" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Lib</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/nonfungiblepostcondition.html" class="tsd-kind-icon">Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/nonecv.html" class="tsd-kind-icon">NoneCV</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/pbkdf2.html" class="tsd-kind-icon">Pbkdf2</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/priceinfo.html" class="tsd-kind-icon">Price<wbr>Info</a>
+						<a href="interfaces/poisonpayload.html" class="tsd-kind-icon">Poison<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/pricetype.html" class="tsd-kind-icon">Price<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/profileimage.html" class="tsd-kind-icon">Profile<wbr>Image</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/profilelookupoptions.html" class="tsd-kind-icon">Profile<wbr>Lookup<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/putfileoptions.html" class="tsd-kind-icon">Put<wbr>File<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/readonlyfunctionoptions.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/readonlyfunctionresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/readonlygaiaconfigoptions.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Gaia<wbr>Config<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/recursivemakeidentitiesoptions.html" class="tsd-kind-icon">Recursive<wbr>Make<wbr>Identities<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/refreshoptions.html" class="tsd-kind-icon">Refresh<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/registerparams.html" class="tsd-kind-icon">Register<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/responseerrorcv.html" class="tsd-kind-icon">Response<wbr>ErrorCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/responseokcv.html" class="tsd-kind-icon">Response<wbr>OkCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/ripemd160digest.html" class="tsd-kind-icon">Ripemd160<wbr>Digest</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stxpostcondition.html" class="tsd-kind-icon">STXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stxtransferoptions.html" class="tsd-kind-icon">STXTransfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/sendtoregistrarparams.html" class="tsd-kind-icon">Send<wbr>ToRegistrar<wbr>Params</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/sessionoptions.html" class="tsd-kind-icon">Session<wbr>Options</a>
@@ -272,166 +564,670 @@
 						<a href="interfaces/sha2hash.html" class="tsd-kind-icon">Sha2<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/transactioninfo.html" class="tsd-kind-icon">Transaction<wbr>Info</a>
+						<a href="interfaces/signedcontractcalloptions.html" class="tsd-kind-icon">Signed<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedmultisigcontractcalloptions.html" class="tsd-kind-icon">Signed<wbr>Multi<wbr>Sig<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedmultisigtokentransferoptions.html" class="tsd-kind-icon">Signed<wbr>Multi<wbr>Sig<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/signedtokentransferoptions.html" class="tsd-kind-icon">Signed<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/singlesigspendingcondition.html" class="tsd-kind-icon">Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/smartcontractpayload.html" class="tsd-kind-icon">Smart<wbr>Contract<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/somecv.html" class="tsd-kind-icon">SomeCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/sponsoroptions.html" class="tsd-kind-icon">Sponsor<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stacksnetwork.html" class="tsd-kind-icon">Stacks<wbr>Network</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stacksprivatekey.html" class="tsd-kind-icon">Stacks<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stackspublickey.html" class="tsd-kind-icon">Stacks<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/standardprincipal.html" class="tsd-kind-icon">Standard<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/standardprincipalcv.html" class="tsd-kind-icon">Standard<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/storageoptions.html" class="tsd-kind-icon">Storage<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stringasciicv.html" class="tsd-kind-icon">String<wbr>AsciiCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/stringutf8cv.html" class="tsd-kind-icon">String<wbr>Utf8CV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tokentransferoptions.html" class="tsd-kind-icon">Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tokentransferpayload.html" class="tsd-kind-icon">Token<wbr>Transfer<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/transactionauthfield.html" class="tsd-kind-icon">Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/truecv.html" class="tsd-kind-icon">TrueCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tuplecv.html" class="tsd-kind-icon">TupleCV</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/uintcv.html" class="tsd-kind-icon">UIntCV</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/utxo.html" class="tsd-kind-icon">UTXO</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-not-exported">
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedcontractcalloptions.html" class="tsd-kind-icon">Unsigned<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedmultisigcontractcalloptions.html" class="tsd-kind-icon">Unsigned<wbr>Multi<wbr>Sig<wbr>Contract<wbr>Call<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedmultisigtokentransferoptions.html" class="tsd-kind-icon">Unsigned<wbr>Multi<wbr>Sig<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/unsignedtokentransferoptions.html" class="tsd-kind-icon">Unsigned<wbr>Token<wbr>Transfer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/uploadresponse.html" class="tsd-kind-icon">Upload<wbr>Response</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/userdata.html" class="tsd-kind-icon">User<wbr>Data</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/walletconfig.html" class="tsd-kind-icon">Wallet<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/webcryptolib.html" class="tsd-kind-icon">Web<wbr>Crypto<wbr>Lib</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#amounttype" class="tsd-kind-icon">Amount<wbr>Type</a>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/whoisinfotype.html" class="tsd-kind-icon">Whois<wbr>Info<wbr>Type</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#amounttypev1" class="tsd-kind-icon">Amount<wbr>Type<wbr>V1</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#allowedkeyentropybits" class="tsd-kind-icon">Allowed<wbr>Key<wbr>Entropy<wbr>Bits</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#amounttypev2" class="tsd-kind-icon">Amount<wbr>Type<wbr>V2</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#anyjson" class="tsd-kind-icon">Any<wbr>Json</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#appkeyinfotype" class="tsd-kind-icon">App<wbr>Key<wbr>Info<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#authmetadata" class="tsd-kind-icon">Auth<wbr>Metadata</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#cheeriomoduletype" class="tsd-kind-icon">Cheerio<wbr>Module<wbr>Type</a>
+						<a href="globals.html#booleancv" class="tsd-kind-icon">BooleanCV</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#cipheralgorithm" class="tsd-kind-icon">Cipher<wbr>Algorithm</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitype" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypebool" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Bool</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypebuffer" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Buffer</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeint128" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Int128</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypelist" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypenone" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>None</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeoptional" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Optional</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeprimitive" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Primitive</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeprincipal" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabityperesponse" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypestringascii" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>String<wbr>Ascii</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypestringutf8" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>String<wbr>Utf8</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypetuple" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Tuple</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeuint128" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>TypeUInt128</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityabitypeunion" class="tsd-kind-icon">Clarity<wbr>Abi<wbr>Type<wbr>Union</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#clarityvalue" class="tsd-kind-icon">Clarity<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#commandfunction" class="tsd-kind-icon">Command<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#docsargstype" class="tsd-kind-icon">Docs<wbr>Args<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#etagmap" class="tsd-kind-icon">Etag<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#formatteddocstype" class="tsd-kind-icon">Formatted<wbr>Docs<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#getrandombytes" class="tsd-kind-icon">Get<wbr>Random<wbr>Bytes</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#multisighashmode" class="tsd-kind-icon">Multi<wbr>Sig<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#nameinfotype" class="tsd-kind-icon">Name<wbr>Info<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#nodecryptocreatecipher" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Create<wbr>Cipher</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#nodecryptocreatedecipher" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Create<wbr>Decipher</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#nodecryptocreatehash" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Create<wbr>Hash</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#nodecryptocreatehmac" class="tsd-kind-icon">Node<wbr>Crypto<wbr>Create<wbr>Hmac</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#nodepbkdf2fn" class="tsd-kind-icon">Node<wbr>Pbkdf2<wbr>Fn</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#optionalcv" class="tsd-kind-icon">OptionalCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ownerkeyinfotype" class="tsd-kind-icon">Owner<wbr>Key<wbr>Info<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#payload" class="tsd-kind-icon">Payload</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#paymentkeyinfotype" class="tsd-kind-icon">Payment<wbr>Key<wbr>Info<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#pbkdf2digests" class="tsd-kind-icon">Pbkdf2<wbr>Digests</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#postcondition" class="tsd-kind-icon">Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#postconditionprincipal" class="tsd-kind-icon">Post<wbr>Condition<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#principalcv" class="tsd-kind-icon">PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#putfilecontent" class="tsd-kind-icon">Put<wbr>File<wbr>Content</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#responsecv" class="tsd-kind-icon">ResponseCV</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#singlesighashmode" class="tsd-kind-icon">Single<wbr>Sig<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#spendingcondition" class="tsd-kind-icon">Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#stackskeyinfotype" class="tsd-kind-icon">Stacks<wbr>Key<wbr>Info<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#stacksmessage" class="tsd-kind-icon">Stacks<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#transactionauthfieldcontents" class="tsd-kind-icon">Transaction<wbr>Auth<wbr>Field<wbr>Contents</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#triplesecdecryptsignature" class="tsd-kind-icon">Triplesec<wbr>Decrypt<wbr>Signature</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#txpoint" class="tsd-kind-icon">tx<wbr>Point</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#tupledata" class="tsd-kind-icon">Tuple<wbr>Data</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#txbroadcastresult" class="tsd-kind-icon">Tx<wbr>Broadcast<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#txbroadcastresultok" class="tsd-kind-icon">Tx<wbr>Broadcast<wbr>Result<wbr>Ok</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#txbroadcastresultrejected" class="tsd-kind-icon">Tx<wbr>Broadcast<wbr>Result<wbr>Rejected</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#address_chars" class="tsd-kind-icon">ADDRESS_<wbr>CHARS</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#address_pattern" class="tsd-kind-icon">ADDRESS_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#apps_node_index" class="tsd-kind-icon">APPS_<wbr>NODE_<wbr>INDEX</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#auth_continuation_param" class="tsd-kind-icon">AUTH_<wbr>CONTINUATION_<wbr>PARAM</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#bitcoin_account_index" class="tsd-kind-icon">BITCOIN_<wbr>ACCOUNT_<wbr>INDEX</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#bitcoin_bip_44_purpose" class="tsd-kind-icon">BITCOIN_<wbr>BIP_<wbr>44_<wbr>PURPOSE</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#bitcoin_coin_type" class="tsd-kind-icon">BITCOIN_<wbr>COIN_<wbr>TYPE</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#blockstack_on_bitcoin" class="tsd-kind-icon">BLOCKSTACK_<wbr>ON_<wbr>BITCOIN</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#blockstack_test" class="tsd-kind-icon">BLOCKSTACK_<wbr>TEST</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#bn" class="tsd-kind-icon">BN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#boolean_pattern" class="tsd-kind-icon">BOOLEAN_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#c32_address_chars" class="tsd-kind-icon">C32_<wbr>ADDRESS_<wbr>CHARS</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#change_address" class="tsd-kind-icon">CHANGE_<wbr>ADDRESS</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#clarity_int_size" class="tsd-kind-icon">CLARITY_<wbr>INT_<wbr>SIZE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#coinbase_buffer_length_bytes" class="tsd-kind-icon">COINBASE_<wbr>BUFFER_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#compressed_pubkey_length_bytes" class="tsd-kind-icon">COMPRESSED_<wbr>PUBKEY_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#config_index" class="tsd-kind-icon">CONFIG_<wbr>INDEX</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#context" class="tsd-kind-icon">CONTEXT</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#default_blockstack_host" class="tsd-kind-icon">DEFAULT_<wbr>BLOCKSTACK_<wbr>HOST</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_chain_id" class="tsd-kind-icon">DEFAULT_<wbr>CHAIN_<wbr>ID</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_config_path" class="tsd-kind-icon">DEFAULT_<wbr>CONFIG_<wbr>PATH</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_config_regtest_path" class="tsd-kind-icon">DEFAULT_<wbr>CONFIG_<wbr>REGTEST_<wbr>PATH</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_config_testnet_path" class="tsd-kind-icon">DEFAULT_<wbr>CONFIG_<wbr>TESTNET_<wbr>PATH</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_core_node_api_url" class="tsd-kind-icon">DEFAULT_<wbr>CORE_<wbr>NODE_<wbr>API_<wbr>URL</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_gaia_hub" class="tsd-kind-icon">DEFAULT_<wbr>GAIA_<wbr>HUB</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_max_id_search_index" class="tsd-kind-icon">DEFAULT_<wbr>MAX_<wbr>ID_<wbr>SEARCH_<wbr>INDEX</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_profile_file_name" class="tsd-kind-icon">DEFAULT_<wbr>PROFILE_<wbr>FILE_<wbr>NAME</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#default_transaction_version" class="tsd-kind-icon">DEFAULT_<wbr>TRANSACTION_<wbr>VERSION</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#derivation_path" class="tsd-kind-icon">DERIVATION_<wbr>PATH</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#echo_reply_param" class="tsd-kind-icon">ECHO_<wbr>REPLY_<wbr>PARAM</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#encryption_node_index" class="tsd-kind-icon">ENCRYPTION_<wbr>NODE_<wbr>INDEX</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#external_address" class="tsd-kind-icon">EXTERNAL_<wbr>ADDRESS</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#global_detection_cache_key" class="tsd-kind-icon">GLOBAL_<wbr>DETECTION_<wbr>CACHE_<wbr>KEY</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#identity_keychain" class="tsd-kind-icon">IDENTITY_<wbr>KEYCHAIN</a>
 					</li>
 					<li class=" tsd-kind-variable">
-						<a href="globals.html#mainnet_default" class="tsd-kind-icon">MAINNET_<wbr>DEFAULT</a>
+						<a href="globals.html#id_address_pattern" class="tsd-kind-icon">ID_<wbr>ADDRESS_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#image_type" class="tsd-kind-icon">IMAGE_<wbr>TYPE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#int_pattern" class="tsd-kind-icon">INT_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#max_string_length_bytes" class="tsd-kind-icon">MAX_<wbr>STRING_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#memo_max_length_bytes" class="tsd-kind-icon">MEMO_<wbr>MAX_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#namespace_pattern" class="tsd-kind-icon">NAMESPACE_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#name_pattern" class="tsd-kind-icon">NAME_<wbr>PATTERN</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#no_crypto_lib" class="tsd-kind-icon">NO_<wbr>CRYPTO_<wbr>LIB</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#person_type" class="tsd-kind-icon">PERSON_<wbr>TYPE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#private_key_multisig_pattern" class="tsd-kind-icon">PRIVATE_<wbr>KEY_<wbr>MULTISIG_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#private_key_nosign_pattern" class="tsd-kind-icon">PRIVATE_<wbr>KEY_<wbr>NOSIGN_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#private_key_pattern" class="tsd-kind-icon">PRIVATE_<wbr>KEY_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#private_key_pattern_any" class="tsd-kind-icon">PRIVATE_<wbr>KEY_<wbr>PATTERN_<wbr>ANY</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#private_key_segwit_p2sh_pattern" class="tsd-kind-icon">PRIVATE_<wbr>KEY_<wbr>SEGWIT_<wbr><wbr>P2SH_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#private_key_uncompressed_pattern" class="tsd-kind-icon">PRIVATE_<wbr>KEY_<wbr>UNCOMPRESSED_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#public_key_pattern" class="tsd-kind-icon">PUBLIC_<wbr>KEY_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#public_testnet_host" class="tsd-kind-icon">PUBLIC_<wbr>TESTNET_<wbr>HOST</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#recoverable_ecdsa_sig_length_bytes" class="tsd-kind-icon">RECOVERABLE_<wbr>ECDSA_<wbr>SIG_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#satoshis_per_btc" class="tsd-kind-icon">SATOSHIS_<wbr>PER_<wbr>BTC</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#session_version" class="tsd-kind-icon">SESSION_<wbr>VERSION</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#signature_file_suffix" class="tsd-kind-icon">SIGNATURE_<wbr>FILE_<wbr>SUFFIX</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_broadcast_service_registration_endpoint" class="tsd-kind-icon">TX_<wbr>BROADCAST_<wbr>SERVICE_<wbr>REGISTRATION_<wbr>ENDPOINT</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signing_node_index" class="tsd-kind-icon">SIGNING_<wbr>NODE_<wbr>INDEX</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_broadcast_service_tx_endpoint" class="tsd-kind-icon">TX_<wbr>BROADCAST_<wbr>SERVICE_<wbr>TX_<wbr>ENDPOINT</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_css" class="tsd-kind-icon">SIGNIN_<wbr>CSS</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_broadcast_service_zone_file_endpoint" class="tsd-kind-icon">TX_<wbr>BROADCAST_<wbr>SERVICE_<wbr>ZONE_<wbr>FILE_<wbr>ENDPOINT</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_desc" class="tsd-kind-icon">SIGNIN_<wbr>DESC</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_empty_size" class="tsd-kind-icon">TX_<wbr>EMPTY_<wbr>SIZE</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_fmt_id" class="tsd-kind-icon">SIGNIN_<wbr>FMT_<wbr>ID</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_input_base" class="tsd-kind-icon">TX_<wbr>INPUT_<wbr>BASE</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_fmt_name" class="tsd-kind-icon">SIGNIN_<wbr>FMT_<wbr>NAME</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_input_pubkeyhash" class="tsd-kind-icon">TX_<wbr>INPUT_<wbr>PUBKEYHASH</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_footer" class="tsd-kind-icon">SIGNIN_<wbr>FOOTER</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_output_base" class="tsd-kind-icon">TX_<wbr>OUTPUT_<wbr>BASE</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_header" class="tsd-kind-icon">SIGNIN_<wbr>HEADER</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#tx_output_pubkeyhash" class="tsd-kind-icon">TX_<wbr>OUTPUT_<wbr>PUBKEYHASH</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#signin_scopes" class="tsd-kind-icon">SIGNIN_<wbr>SCOPES</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#stacks_address_pattern" class="tsd-kind-icon">STACKS_<wbr>ADDRESS_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#strength" class="tsd-kind-icon">STRENGTH</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#stx_node_index" class="tsd-kind-icon">STX_<wbr>NODE_<wbr>INDEX</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#stx_wallet_compatible_seed_strength" class="tsd-kind-icon">STX_<wbr>WALLET_<wbr>COMPATIBLE_<wbr>SEED_<wbr>STRENGTH</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#subdomain_pattern" class="tsd-kind-icon">SUBDOMAIN_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#txid_pattern" class="tsd-kind-icon">TXID_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#uncompressed_pubkey_length_bytes" class="tsd-kind-icon">UNCOMPRESSED_<wbr>PUBKEY_<wbr>LENGTH_<wbr>BYTES</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#url_pattern" class="tsd-kind-icon">URL_<wbr>PATTERN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#usage" class="tsd-kind-icon">USAGE</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#version" class="tsd-kind-icon">VERSION</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#dummyconsensushash" class="tsd-kind-icon">dummy<wbr>Consensus<wbr>Hash</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#zonefile_hash_pattern" class="tsd-kind-icon">ZONEFILE_<wbr>HASH_<wbr>PATTERN</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
-						<a href="globals.html#dummyzonefilehash" class="tsd-kind-icon">dummy<wbr>Zonefile<wbr>Hash</a>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#zonefile" class="tsd-kind-icon">Zone<wbr>File</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#authtransitnonce" class="tsd-kind-icon">auth<wbr>Transit<wbr>Nonce</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#c32check" class="tsd-kind-icon">c32check</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#ecurve" class="tsd-kind-icon">ecurve</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#enumcheckfunctions" class="tsd-kind-icon">enum<wbr>Check<wbr>Functions</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#estimateonly" class="tsd-kind-icon">estimate<wbr>Only</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#global" class="tsd-kind-icon">global</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#graceperiod" class="tsd-kind-icon">grace<wbr>Period</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#inttolevel" class="tsd-kind-icon">int<wbr>ToLevel</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#leveltoint" class="tsd-kind-icon">level<wbr>ToInt</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#levels" class="tsd-kind-icon">levels</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#localstorageram" class="tsd-kind-icon">local<wbr>StorageRAM</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#maxidsearchindex" class="tsd-kind-icon">maxIDSearch<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#networkderivationpath" class="tsd-kind-icon">network<wbr>Derivation<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noexit" class="tsd-kind-icon">no<wbr>Exit</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#receivefeesperiod" class="tsd-kind-icon">receive<wbr>Fees<wbr>Period</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#safetychecks" class="tsd-kind-icon">safety<wbr>Checks</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#txonly" class="tsd-kind-icon">tx<wbr>Only</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#climain" class="tsd-kind-icon">CLIMain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clioptasbool" class="tsd-kind-icon">CLIOpt<wbr>AsBool</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clioptasstring" class="tsd-kind-icon">CLIOpt<wbr>AsString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clioptasstringarray" class="tsd-kind-icon">CLIOpt<wbr>AsString<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#jsonstringify" class="tsd-kind-icon">JSONStringify</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#abifunctiontostring" class="tsd-kind-icon">abi<wbr>Function<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressconvert" class="tsd-kind-icon">address<wbr>Convert</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressfromhashmode" class="tsd-kind-icon">address<wbr>From<wbr>Hash<wbr>Mode</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressfrompublickeys" class="tsd-kind-icon">address<wbr>From<wbr>Public<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addressfromversionhash" class="tsd-kind-icon">address<wbr>From<wbr>Version<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addresshashmodetoversion" class="tsd-kind-icon">address<wbr>Hash<wbr>Mode<wbr>ToVersion</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#addresstostring" class="tsd-kind-icon">address<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#answertoclarityvalue" class="tsd-kind-icon">answer<wbr>ToClarity<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#argtoprompt" class="tsd-kind-icon">arg<wbr>ToPrompt</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#assertistruthy" class="tsd-kind-icon">assert<wbr>IsTruthy</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#authdaemon" class="tsd-kind-icon">auth<wbr>Daemon</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#balance" class="tsd-kind-icon">balance</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#batchify" class="tsd-kind-icon">batchify</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#broadcastrawtransaction" class="tsd-kind-icon">broadcast<wbr>Raw<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#broadcasttransaction" class="tsd-kind-icon">broadcast<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#broadcasttransactionandzonefile" class="tsd-kind-icon">broadcast<wbr>Transaction<wbr>And<wbr>Zone<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#buffercv" class="tsd-kind-icon">bufferCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#buffercvfromstring" class="tsd-kind-icon">bufferCVFrom<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#bufferwithtypeid" class="tsd-kind-icon">buffer<wbr>With<wbr>TypeID</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#callreadonlyfunction" class="tsd-kind-icon">call<wbr>Read<wbr>Only<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#canonicalprivatekey" class="tsd-kind-icon">canonical<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#checkargs" class="tsd-kind-icon">check<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#checkurl" class="tsd-kind-icon">check<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clearcondition" class="tsd-kind-icon">clear<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#clonedeep" class="tsd-kind-icon">clone<wbr>Deep</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#codebodystring" class="tsd-kind-icon">code<wbr>Body<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#connecttogaiahubwithconfig" class="tsd-kind-icon">connect<wbr>ToGaia<wbr>Hub<wbr>With<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#containslegalcharacters" class="tsd-kind-icon">contains<wbr>Legal<wbr>Characters</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractdeploy" class="tsd-kind-icon">contract<wbr>Deploy</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractfunctioncall" class="tsd-kind-icon">contract<wbr>Function<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractprincipalcv" class="tsd-kind-icon">contract<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractprincipalcvfromaddress" class="tsd-kind-icon">contract<wbr>PrincipalCVFrom<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#contractprincipalcvfromstandard" class="tsd-kind-icon">contract<wbr>PrincipalCVFrom<wbr>Standard</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createaddress" class="tsd-kind-icon">create<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createassetinfo" class="tsd-kind-icon">create<wbr>Asset<wbr>Info</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#createcipher" class="tsd-kind-icon">create<wbr>Cipher</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcoinbasepayload" class="tsd-kind-icon">create<wbr>Coinbase<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcontractcallpayload" class="tsd-kind-icon">create<wbr>Contract<wbr>Call<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createcontractprincipal" class="tsd-kind-icon">create<wbr>Contract<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createemptyaddress" class="tsd-kind-icon">create<wbr>Empty<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#createenumchecker" class="tsd-kind-icon">create<wbr>Enum<wbr>Checker</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createfungiblepostcondition" class="tsd-kind-icon">create<wbr>Fungible<wbr>Post<wbr>Condition</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#createhashripemd160" class="tsd-kind-icon">create<wbr>Hash<wbr>Ripemd160</a>
@@ -439,119 +1235,410 @@
 					<li class=" tsd-kind-function">
 						<a href="globals.html#createhmacsha256" class="tsd-kind-icon">create<wbr>Hmac<wbr>Sha256</a>
 					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#createlplist" class="tsd-kind-icon">createLPList</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createlpstring" class="tsd-kind-icon">createLPString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#creatememostring" class="tsd-kind-icon">create<wbr>Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createmessagesignature" class="tsd-kind-icon">create<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createmultisigspendingcondition" class="tsd-kind-icon">create<wbr>Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createnonfungiblepostcondition" class="tsd-kind-icon">create<wbr>Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#createpbkdf2" class="tsd-kind-icon">create<wbr>Pbkdf2</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createpoisonpayload" class="tsd-kind-icon">create<wbr>Poison<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstxpostcondition" class="tsd-kind-icon">createSTXPost<wbr>Condition</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#createsha2hash" class="tsd-kind-icon">create<wbr>Sha2<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#decryptcontent" class="tsd-kind-icon">decrypt<wbr>Content</a>
+						<a href="globals.html#createsinglesigspendingcondition" class="tsd-kind-icon">create<wbr>Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#deletefile" class="tsd-kind-icon">delete<wbr>File</a>
+						<a href="globals.html#createsmartcontractpayload" class="tsd-kind-icon">create<wbr>Smart<wbr>Contract<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstacksprivatekey" class="tsd-kind-icon">create<wbr>Stacks<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstackspublickey" class="tsd-kind-icon">create<wbr>Stacks<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createstandardprincipal" class="tsd-kind-icon">create<wbr>Standard<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createtokentransferpayload" class="tsd-kind-icon">create<wbr>Token<wbr>Transfer<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createtransactionauthfield" class="tsd-kind-icon">create<wbr>Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cvtohex" class="tsd-kind-icon">cv<wbr>ToHex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cvtostring" class="tsd-kind-icon">cv<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decodeprivatekey" class="tsd-kind-icon">decode<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decrypt" class="tsd-kind-icon">decrypt</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decryptbackupphrase" class="tsd-kind-icon">decrypt<wbr>Backup<wbr>Phrase</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decryptcontent" class="tsd-kind-icon">decrypt<wbr>Content</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#deletefromgaiahub" class="tsd-kind-icon">delete<wbr>From<wbr>Gaia<wbr>Hub</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#deriveidentitykeypair" class="tsd-kind-icon">derive<wbr>Identity<wbr>Key<wbr>Pair</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deriverootkeychainfrommnemonic" class="tsd-kind-icon">derive<wbr>Root<wbr>Keychain<wbr>From<wbr>Mnemonic</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#derivestxaddresschain" class="tsd-kind-icon">derive<wbr>Stx<wbr>Address<wbr>Chain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializeaddress" class="tsd-kind-icon">deserialize<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializeassetinfo" class="tsd-kind-icon">deserialize<wbr>Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializecv" class="tsd-kind-icon">deserializeCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializelplist" class="tsd-kind-icon">deserializeLPList</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializelpstring" class="tsd-kind-icon">deserializeLPString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializememostring" class="tsd-kind-icon">deserialize<wbr>Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializemessagesignature" class="tsd-kind-icon">deserialize<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializemultisigspendingcondition" class="tsd-kind-icon">deserialize<wbr>Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializepayload" class="tsd-kind-icon">deserialize<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializepostcondition" class="tsd-kind-icon">deserialize<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializeprincipal" class="tsd-kind-icon">deserialize<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializepublickey" class="tsd-kind-icon">deserialize<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializesinglesigspendingcondition" class="tsd-kind-icon">deserialize<wbr>Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializespendingcondition" class="tsd-kind-icon">deserialize<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializestacksmessage" class="tsd-kind-icon">deserialize<wbr>Stacks<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializetransaction" class="tsd-kind-icon">deserialize<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deserializetransactionauthfield" class="tsd-kind-icon">deserialize<wbr>Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#emptymessagesignature" class="tsd-kind-icon">empty<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encodeclarityvalue" class="tsd-kind-icon">encode<wbr>Clarity<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encrypt" class="tsd-kind-icon">encrypt</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encryptbackupphrase" class="tsd-kind-icon">encrypt<wbr>Backup<wbr>Phrase</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#encryptcontent" class="tsd-kind-icon">encrypt<wbr>Content</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimateannounce" class="tsd-kind-icon">estimate<wbr>Announce</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encryptmnemonicformatted" class="tsd-kind-icon">encrypt<wbr>Mnemonic<wbr>Formatted</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimatenameimport" class="tsd-kind-icon">estimate<wbr>Name<wbr>Import</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#estimatecontractdeploy" class="tsd-kind-icon">estimate<wbr>Contract<wbr>Deploy</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimatenamespacepreorder" class="tsd-kind-icon">estimate<wbr>Namespace<wbr>Preorder</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#estimatecontractfunctioncall" class="tsd-kind-icon">estimate<wbr>Contract<wbr>Function<wbr>Call</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimatenamespaceready" class="tsd-kind-icon">estimate<wbr>Namespace<wbr>Ready</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimatenamespacereveal" class="tsd-kind-icon">estimate<wbr>Namespace<wbr>Reveal</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimatepreorder" class="tsd-kind-icon">estimate<wbr>Preorder</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimateregister" class="tsd-kind-icon">estimate<wbr>Register</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimaterenewal" class="tsd-kind-icon">estimate<wbr>Renewal</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimaterevoke" class="tsd-kind-icon">estimate<wbr>Revoke</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimatetokentransfer" class="tsd-kind-icon">estimate<wbr>Token<wbr>Transfer</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
+					<li class=" tsd-kind-function">
 						<a href="globals.html#estimatetransfer" class="tsd-kind-icon">estimate<wbr>Transfer</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#estimateupdate" class="tsd-kind-icon">estimate<wbr>Update</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#exceedsmaxlengthbytes" class="tsd-kind-icon">exceeds<wbr>Max<wbr>Length<wbr>Bytes</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#extractappkey" class="tsd-kind-icon">extract<wbr>App<wbr>Key</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#extractprofile" class="tsd-kind-icon">extract<wbr>Profile</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
+					<li class=" tsd-kind-function">
+						<a href="globals.html#falsecv" class="tsd-kind-icon">falseCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fetchprofile" class="tsd-kind-icon">fetch<wbr>Profile</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#findidentityindex" class="tsd-kind-icon">find<wbr>Identity<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#formatcommandhelplines" class="tsd-kind-icon">format<wbr>Command<wbr>Help<wbr>Lines</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#formathelpstring" class="tsd-kind-icon">format<wbr>Help<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiaauth" class="tsd-kind-icon">gaia<wbr>Auth</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiaconnect" class="tsd-kind-icon">gaia<wbr>Connect</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiadeletefile" class="tsd-kind-icon">gaia<wbr>Delete<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiadumpbucket" class="tsd-kind-icon">gaia<wbr>Dump<wbr>Bucket</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiafindprofilename" class="tsd-kind-icon">gaia<wbr>Find<wbr>Profile<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiagetfile" class="tsd-kind-icon">gaia<wbr>Get<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaialistfiles" class="tsd-kind-icon">gaia<wbr>List<wbr>Files</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiaputfile" class="tsd-kind-icon">gaia<wbr>Put<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiarestorebucket" class="tsd-kind-icon">gaia<wbr>Restore<wbr>Bucket</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiasethub" class="tsd-kind-icon">gaia<wbr>Set<wbr>Hub</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiauploadprofile" class="tsd-kind-icon">gaia<wbr>Upload<wbr>Profile</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gaiauploadprofileall" class="tsd-kind-icon">gaia<wbr>Upload<wbr>Profile<wbr>All</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#generateencryptedmnemonicrootkeychain" class="tsd-kind-icon">generate<wbr>Encrypted<wbr>Mnemonic<wbr>Root<wbr>Keychain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#generateexplorertxpageurl" class="tsd-kind-icon">generate<wbr>Explorer<wbr>TxPage<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#generatemnemonicrootkeychain" class="tsd-kind-icon">generate<wbr>Mnemonic<wbr>Root<wbr>Keychain</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#getapiusageerrormessage" class="tsd-kind-icon">getAPIUsage<wbr>Error<wbr>Message</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#getappbucketurl" class="tsd-kind-icon">get<wbr>App<wbr>Bucket<wbr>Url</a>
+						<a href="globals.html#getabi" class="tsd-kind-icon">get<wbr>Abi</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#getauthresponsetoken" class="tsd-kind-icon">get<wbr>Auth<wbr>Response<wbr>Token</a>
+						<a href="globals.html#getaccounthistory" class="tsd-kind-icon">get<wbr>Account<wbr>History</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getaddressfromprivatekey" class="tsd-kind-icon">get<wbr>Address<wbr>From<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getaddressfrompublickey" class="tsd-kind-icon">get<wbr>Address<wbr>From<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getappkeys" class="tsd-kind-icon">get<wbr>App<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getappprivatekey" class="tsd-kind-icon">get<wbr>App<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getapplicationkeyinfo" class="tsd-kind-icon">get<wbr>Application<wbr>Key<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getbackupphrase" class="tsd-kind-icon">get<wbr>Backup<wbr>Phrase</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#getbase64outputlength" class="tsd-kind-icon">get<wbr>Base64<wbr>Output<wbr>Length</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#getbitcoinaddressnode" class="tsd-kind-icon">get<wbr>Bitcoin<wbr>Address<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getbitcoinprivatekeychain" class="tsd-kind-icon">get<wbr>Bitcoin<wbr>Private<wbr>Keychain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getblockchainidentities" class="tsd-kind-icon">get<wbr>Blockchain<wbr>Identities</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#getblockstackerrorfromresponse" class="tsd-kind-icon">get<wbr>Blockstack<wbr>Error<wbr>From<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcliopts" class="tsd-kind-icon">getCLIOpts</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcvtypestring" class="tsd-kind-icon">getCVType<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcommandargs" class="tsd-kind-icon">get<wbr>Command<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcommandgroups" class="tsd-kind-icon">get<wbr>Command<wbr>Groups</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#getcryptolib" class="tsd-kind-icon">get<wbr>Crypto<wbr>Lib</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#getfile" class="tsd-kind-icon">get<wbr>File</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#getfilecontents" class="tsd-kind-icon">get<wbr>File<wbr>Contents</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#getfilesignedunencrypted" class="tsd-kind-icon">get<wbr>File<wbr>Signed<wbr>Unencrypted</a>
+						<a href="globals.html#getderivationpath" class="tsd-kind-icon">get<wbr>Derivation<wbr>Path</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#getfileurl" class="tsd-kind-icon">get<wbr>File<wbr>Url</a>
+						<a href="globals.html#getgaiaaddressfromprofile" class="tsd-kind-icon">get<wbr>Gaia<wbr>Address<wbr>From<wbr>Profile</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#getgaiaaddress" class="tsd-kind-icon">get<wbr>Gaia<wbr>Address</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getgaiaaddressfromurl" class="tsd-kind-icon">get<wbr>Gaia<wbr>Address<wbr>FromURL</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
+					<li class=" tsd-kind-function">
 						<a href="globals.html#getgaiaerrorresponse" class="tsd-kind-icon">get<wbr>Gaia<wbr>Error<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gethubinfo" class="tsd-kind-icon">get<wbr>Hub<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gethubprefix" class="tsd-kind-icon">get<wbr>Hub<wbr>Prefix</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getidaddress" class="tsd-kind-icon">getIDAddress</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getidappkeys" class="tsd-kind-icon">getIDApp<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getidentityinfo" class="tsd-kind-icon">get<wbr>Identity<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getidentityowneraddressnode" class="tsd-kind-icon">get<wbr>Identity<wbr>Owner<wbr>Address<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getidentityprivatekeychain" class="tsd-kind-icon">get<wbr>Identity<wbr>Private<wbr>Keychain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getkeyaddress" class="tsd-kind-icon">get<wbr>Key<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getmaxidsearchindex" class="tsd-kind-icon">get<wbr>MaxIDSearch<wbr>Index</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#getname" class="tsd-kind-icon">get<wbr>Name</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#getnameinfo" class="tsd-kind-icon">get<wbr>Name<wbr>Info</a>
+						<a href="globals.html#getnameinfoeasy" class="tsd-kind-icon">get<wbr>Name<wbr>Info<wbr>Easy</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getnetwork" class="tsd-kind-icon">get<wbr>Network</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getnodeprivatekey" class="tsd-kind-icon">get<wbr>Node<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getnonce" class="tsd-kind-icon">get<wbr>Nonce</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getownerkeyfromidaddress" class="tsd-kind-icon">get<wbr>Owner<wbr>Key<wbr>FromIDAddress</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getownerkeyinfo" class="tsd-kind-icon">get<wbr>Owner<wbr>Key<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getownerkeys" class="tsd-kind-icon">get<wbr>Owner<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getpaymentkey" class="tsd-kind-icon">get<wbr>Payment<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getpaymentkeyinfo" class="tsd-kind-icon">get<wbr>Payment<wbr>Key<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getprivatekeyaddress" class="tsd-kind-icon">get<wbr>Private<wbr>Key<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getprofileurlfromzonefile" class="tsd-kind-icon">get<wbr>ProfileURLFrom<wbr>Zone<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getpublickey" class="tsd-kind-icon">get<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getpublickeyfromprivatekey" class="tsd-kind-icon">get<wbr>Public<wbr>Key<wbr>From<wbr>Private<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#getquerystringparams" class="tsd-kind-icon">get<wbr>Query<wbr>String<wbr>Params</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#gettransaction" class="tsd-kind-icon">get<wbr>Transaction</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getsignaturerecoveryparam" class="tsd-kind-icon">get<wbr>Signature<wbr>Recovery<wbr>Param</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#getuserappfileurl" class="tsd-kind-icon">get<wbr>User<wbr>App<wbr>File<wbr>Url</a>
+						<a href="globals.html#getstackswalletkey" class="tsd-kind-icon">get<wbr>Stacks<wbr>Wallet<wbr>Key</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#handlependingsignin" class="tsd-kind-icon">handle<wbr>Pending<wbr>Sign<wbr>In</a>
+						<a href="globals.html#getstackswalletkeyinfo" class="tsd-kind-icon">get<wbr>Stacks<wbr>Wallet<wbr>Key<wbr>Info</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#handlesignedencryptedcontents" class="tsd-kind-icon">handle<wbr>Signed<wbr>Encrypted<wbr>Contents</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gettypestring" class="tsd-kind-icon">get<wbr>Type<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#gettypeunion" class="tsd-kind-icon">get<wbr>Type<wbr>Union</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getpass" class="tsd-kind-icon">getpass</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#handleauth" class="tsd-kind-icon">handle<wbr>Auth</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#handlesignin" class="tsd-kind-icon">handle<wbr>Sign<wbr>In</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#haskeys" class="tsd-kind-icon">has<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hash160" class="tsd-kind-icon">hash160</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hashp2pkh" class="tsd-kind-icon">hash<wbr>P2PKH</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hashp2sh" class="tsd-kind-icon">hash<wbr>P2SH</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#hashripemd160" class="tsd-kind-icon">hash<wbr>Ripemd160</a>
@@ -562,107 +1649,512 @@
 					<li class=" tsd-kind-function">
 						<a href="globals.html#hashsha512sync" class="tsd-kind-icon">hash<wbr>Sha512<wbr>Sync</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#inputbytes" class="tsd-kind-icon">input<wbr>Bytes</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hexstringtoint" class="tsd-kind-icon">hex<wbr>String<wbr>ToInt</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hextocv" class="tsd-kind-icon">hex<wbr>ToCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#intcv" class="tsd-kind-icon">intCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#inttohexstring" class="tsd-kind-icon">int<wbr>ToHex<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclitransactionsigner" class="tsd-kind-icon">isCLITransaction<wbr>Signer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabibuffer" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Buffer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabilist" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabioptional" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Optional</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabiprimitive" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Primitive</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabiresponse" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabistringascii" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>String<wbr>Ascii</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabistringutf8" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>String<wbr>Utf8</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityabituple" class="tsd-kind-icon">is<wbr>Clarity<wbr>Abi<wbr>Tuple</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isclarityname" class="tsd-kind-icon">is<wbr>Clarity<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#iscompressed" class="tsd-kind-icon">is<wbr>Compressed</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#isenum" class="tsd-kind-icon">is<wbr>Enum</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter">
 						<a href="globals.html#isnodecryptoavailable" class="tsd-kind-icon">is<wbr>Node<wbr>Crypto<wbr>Available</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
+					<li class=" tsd-kind-function">
 						<a href="globals.html#isrecoverablegaiaerror" class="tsd-kind-icon">is<wbr>Recoverable<wbr>Gaia<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#issigninpending" class="tsd-kind-icon">is<wbr>Sign<wbr>InPending</a>
+						<a href="globals.html#issinglesig" class="tsd-kind-icon">is<wbr>Single<wbr>Sig</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isstringarray" class="tsd-kind-icon">is<wbr>String<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#issubdomain" class="tsd-kind-icon">is<wbr>Subdomain</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#issubtlecryptoavailable" class="tsd-kind-icon">is<wbr>Subtle<wbr>Crypto<wbr>Available</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#launchcustomprotocol" class="tsd-kind-icon">launch<wbr>Custom<wbr>Protocol</a>
+						<a href="globals.html#leftpadhex" class="tsd-kind-icon">left<wbr>Pad<wbr>Hex</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#listfiles" class="tsd-kind-icon">list<wbr>Files</a>
+						<a href="globals.html#leftpadhextolength" class="tsd-kind-icon">left<wbr>Pad<wbr>Hex<wbr>ToLength</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#listcv" class="tsd-kind-icon">listCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#loadconfig" class="tsd-kind-icon">load<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#loadnamedidentities" class="tsd-kind-icon">load<wbr>Named<wbr>Identities</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#loadnamedidentitiesloop" class="tsd-kind-icon">load<wbr>Named<wbr>Identities<wbr>Loop</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#loadunnamedidentity" class="tsd-kind-icon">load<wbr>Unnamed<wbr>Identity</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#lookupprofile" class="tsd-kind-icon">lookup<wbr>Profile</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makeannounce" class="tsd-kind-icon">make<wbr>Announce</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeallcommandshelp" class="tsd-kind-icon">make<wbr>All<wbr>Commands<wbr>Help</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeallcommandslist" class="tsd-kind-icon">make<wbr>All<wbr>Commands<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeassociationtoken" class="tsd-kind-icon">make<wbr>Association<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeauthpage" class="tsd-kind-icon">make<wbr>Auth<wbr>Page</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#makeauthrequest" class="tsd-kind-icon">make<wbr>Auth<wbr>Request</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makebitcoinspend" class="tsd-kind-icon">make<wbr>Bitcoin<wbr>Spend</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makenameimport" class="tsd-kind-icon">make<wbr>Name<wbr>Import</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makenamespaceready" class="tsd-kind-icon">make<wbr>Namespace<wbr>Ready</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makenamespacereveal" class="tsd-kind-icon">make<wbr>Namespace<wbr>Reveal</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makepreorder" class="tsd-kind-icon">make<wbr>Preorder</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makeregister" class="tsd-kind-icon">make<wbr>Register</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makerenewal" class="tsd-kind-icon">make<wbr>Renewal</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makerevoke" class="tsd-kind-icon">make<wbr>Revoke</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#maketokentransfer" class="tsd-kind-icon">make<wbr>Token<wbr>Transfer</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#maketransfer" class="tsd-kind-icon">make<wbr>Transfer</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-private tsd-is-not-exported">
-						<a href="globals.html#makeupdate" class="tsd-kind-icon">make<wbr>Update</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#outputbytes" class="tsd-kind-icon">output<wbr>Bytes</a>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecommandusagestring" class="tsd-kind-icon">make<wbr>Command<wbr>Usage<wbr>String</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#putfile" class="tsd-kind-icon">put<wbr>File</a>
+						<a href="globals.html#makecontractcall" class="tsd-kind-icon">make<wbr>Contract<wbr>Call</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#redirecttosigninwithauthrequest" class="tsd-kind-icon">redirect<wbr>ToSign<wbr>InWith<wbr>Auth<wbr>Request</a>
+						<a href="globals.html#makecontractdeploy" class="tsd-kind-icon">make<wbr>Contract<wbr>Deploy</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#signinputs" class="tsd-kind-icon">sign<wbr>Inputs</a>
+						<a href="globals.html#makecontractfungiblepostcondition" class="tsd-kind-icon">make<wbr>Contract<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractnonfungiblepostcondition" class="tsd-kind-icon">make<wbr>Contract<wbr>Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makecontractstxpostcondition" class="tsd-kind-icon">make<wbr>ContractSTXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makedidconfiguration" class="tsd-kind-icon">makeDIDConfiguration</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makefakeauthresponsetoken" class="tsd-kind-icon">make<wbr>Fake<wbr>Auth<wbr>Response<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makegaiaassociationtoken" class="tsd-kind-icon">make<wbr>Gaia<wbr>Association<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makegaiaauthtoken" class="tsd-kind-icon">make<wbr>Gaia<wbr>Auth<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeidentity" class="tsd-kind-icon">make<wbr>Identity</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makekeychain" class="tsd-kind-icon">make<wbr>Keychain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeprofilejwt" class="tsd-kind-icon">make<wbr>ProfileJWT</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makepromptsfromarglist" class="tsd-kind-icon">make<wbr>Prompts<wbr>From<wbr>Arg<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makerandomprivkey" class="tsd-kind-icon">make<wbr>Random<wbr>Priv<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makereadonlygaiaconfig" class="tsd-kind-icon">make<wbr>Read<wbr>Only<wbr>Gaia<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestxtokentransfer" class="tsd-kind-icon">makeSTXToken<wbr>Transfer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makesighashpostsign" class="tsd-kind-icon">make<wbr>Sig<wbr>Hash<wbr>Post<wbr>Sign</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makesighashpresign" class="tsd-kind-icon">make<wbr>Sig<wbr>Hash<wbr>Pre<wbr>Sign</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makesigninlink" class="tsd-kind-icon">make<wbr>Sign<wbr>InLink</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestandardfungiblepostcondition" class="tsd-kind-icon">make<wbr>Standard<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestandardnonfungiblepostcondition" class="tsd-kind-icon">make<wbr>Standard<wbr>Non<wbr>Fungible<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makestandardstxpostcondition" class="tsd-kind-icon">make<wbr>StandardSTXPost<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeunsignedcontractcall" class="tsd-kind-icon">make<wbr>Unsigned<wbr>Contract<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeunsignedstxtokentransfer" class="tsd-kind-icon">make<wbr>UnsignedSTXToken<wbr>Transfer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makeusagestring" class="tsd-kind-icon">make<wbr>Usage<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#makezonefilefromgaiaurl" class="tsd-kind-icon">make<wbr>Zone<wbr>File<wbr>From<wbr>Gaia<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#matchtype" class="tsd-kind-icon">match<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#mkdirs" class="tsd-kind-icon">mkdirs</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#namelookup" class="tsd-kind-icon">name<wbr>Lookup</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#newinitialsighash" class="tsd-kind-icon">new<wbr>Initial<wbr>Sig<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#nextsignature" class="tsd-kind-icon">next<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#nextverification" class="tsd-kind-icon">next<wbr>Verification</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#nonecv" class="tsd-kind-icon">noneCV</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#omit" class="tsd-kind-icon">omit</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#optionalcvof" class="tsd-kind-icon">optionalCVOf</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseassetinfostring" class="tsd-kind-icon">parse<wbr>Asset<wbr>Info<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseclarityfunctionarganswers" class="tsd-kind-icon">parse<wbr>Clarity<wbr>Function<wbr>Arg<wbr>Answers</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsemultisigkeys" class="tsd-kind-icon">parse<wbr>Multi<wbr>Sig<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsenullsigner" class="tsd-kind-icon">parse<wbr>Null<wbr>Signer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseprincipalstring" class="tsd-kind-icon">parse<wbr>Principal<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsereadonlyresponse" class="tsd-kind-icon">parse<wbr>Read<wbr>Only<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parserecoverablesignature" class="tsd-kind-icon">parse<wbr>Recoverable<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsesegwitp2shkeys" class="tsd-kind-icon">parse<wbr>Segwit<wbr>P2SHKeys</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parsetocv" class="tsd-kind-icon">parse<wbr>ToCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#principalcv" class="tsd-kind-icon">principalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#principaltostring" class="tsd-kind-icon">principal<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#printdocs" class="tsd-kind-icon">print<wbr>Docs</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#printusage" class="tsd-kind-icon">print<wbr>Usage</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#privatekeytostring" class="tsd-kind-icon">private<wbr>Key<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#profilesign" class="tsd-kind-icon">profile<wbr>Sign</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#profilestore" class="tsd-kind-icon">profile<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#profileverify" class="tsd-kind-icon">profile<wbr>Verify</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#pubkeyfromprivkey" class="tsd-kind-icon">pub<wbr>Keyfrom<wbr>Priv<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeyfrombuffer" class="tsd-kind-icon">public<wbr>Key<wbr>From<wbr>Buffer</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeyfromsignature" class="tsd-kind-icon">public<wbr>Key<wbr>From<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publickeytostring" class="tsd-kind-icon">public<wbr>Key<wbr>ToString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#readonlycontractfunctioncall" class="tsd-kind-icon">read<wbr>Only<wbr>Contract<wbr>Function<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#recursiverestoreidentities" class="tsd-kind-icon">recursive<wbr>Restore<wbr>Identities</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#registersubdomain" class="tsd-kind-icon">register<wbr>Subdomain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#responseerrorcv" class="tsd-kind-icon">response<wbr>ErrorCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#responseokcv" class="tsd-kind-icon">response<wbr>OkCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#rightpadhextolength" class="tsd-kind-icon">right<wbr>Pad<wbr>Hex<wbr>ToLength</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sendjson" class="tsd-kind-icon">sendJSON</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sendtokens" class="tsd-kind-icon">send<wbr>Tokens</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sendusernametoregistrar" class="tsd-kind-icon">send<wbr>Username<wbr>ToRegistrar</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeaddress" class="tsd-kind-icon">serialize<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeassetinfo" class="tsd-kind-icon">serialize<wbr>Asset<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeboolcv" class="tsd-kind-icon">serialize<wbr>BoolCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializebuffercv" class="tsd-kind-icon">serialize<wbr>BufferCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializecv" class="tsd-kind-icon">serializeCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializecontractprincipalcv" class="tsd-kind-icon">serialize<wbr>Contract<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeintcv" class="tsd-kind-icon">serialize<wbr>IntCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializelplist" class="tsd-kind-icon">serializeLPList</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializelpstring" class="tsd-kind-icon">serializeLPString</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializelistcv" class="tsd-kind-icon">serialize<wbr>ListCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializememostring" class="tsd-kind-icon">serialize<wbr>Memo<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializemessagesignature" class="tsd-kind-icon">serialize<wbr>Message<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializemultisigspendingcondition" class="tsd-kind-icon">serialize<wbr>Multi<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeoptionalcv" class="tsd-kind-icon">serialize<wbr>OptionalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializepayload" class="tsd-kind-icon">serialize<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializepostcondition" class="tsd-kind-icon">serialize<wbr>Post<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeprincipal" class="tsd-kind-icon">serialize<wbr>Principal</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializepublickey" class="tsd-kind-icon">serialize<wbr>Public<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeresponsecv" class="tsd-kind-icon">serialize<wbr>ResponseCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializesinglesigspendingcondition" class="tsd-kind-icon">serialize<wbr>Single<wbr>Sig<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializespendingcondition" class="tsd-kind-icon">serialize<wbr>Spending<wbr>Condition</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestacksmessage" class="tsd-kind-icon">serialize<wbr>Stacks<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestandardprincipalcv" class="tsd-kind-icon">serialize<wbr>Standard<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestringasciicv" class="tsd-kind-icon">serialize<wbr>String<wbr>AsciiCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestringcv" class="tsd-kind-icon">serialize<wbr>StringCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializestringutf8cv" class="tsd-kind-icon">serialize<wbr>String<wbr>Utf8CV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializetransactionauthfield" class="tsd-kind-icon">serialize<wbr>Transaction<wbr>Auth<wbr>Field</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializetuplecv" class="tsd-kind-icon">serialize<wbr>TupleCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#signanduploadprofile" class="tsd-kind-icon">sign<wbr>And<wbr>Upload<wbr>Profile</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#signprofileforupload" class="tsd-kind-icon">sign<wbr>Profile<wbr>For<wbr>Upload</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#signprofiletoken" class="tsd-kind-icon">sign<wbr>Profile<wbr>Token</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#signuserout" class="tsd-kind-icon">sign<wbr>User<wbr>Out</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#transactionbytes" class="tsd-kind-icon">transaction<wbr>Bytes</a>
+						<a href="globals.html#signwithkey" class="tsd-kind-icon">sign<wbr>With<wbr>Key</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#validateproofs" class="tsd-kind-icon">validate<wbr>Proofs</a>
+						<a href="globals.html#somecv" class="tsd-kind-icon">someCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sponsortransaction" class="tsd-kind-icon">sponsor<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#standardprincipalcv" class="tsd-kind-icon">standard<wbr>PrincipalCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#standardprincipalcvfromaddress" class="tsd-kind-icon">standard<wbr>PrincipalCVFrom<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stringasciicv" class="tsd-kind-icon">string<wbr>AsciiCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stringcv" class="tsd-kind-icon">stringCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stringutf8cv" class="tsd-kind-icon">string<wbr>Utf8CV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sumutxos" class="tsd-kind-icon">sumUTXOs</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#truecv" class="tsd-kind-icon">trueCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tuplecv" class="tsd-kind-icon">tupleCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#txidfromdata" class="tsd-kind-icon">txid<wbr>From<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#uintcv" class="tsd-kind-icon">uintCV</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#updateprofileapisettings" class="tsd-kind-icon">update<wbr>ProfileAPISettings</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#updateprofileapps" class="tsd-kind-icon">update<wbr>Profile<wbr>Apps</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#uploadprofile" class="tsd-kind-icon">upload<wbr>Profile</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatecontractcall" class="tsd-kind-icon">validate<wbr>Contract<wbr>Call</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatestacksaddress" class="tsd-kind-icon">validate<wbr>Stacks<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatesubdomain" class="tsd-kind-icon">validate<wbr>Subdomain</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatesubdomainavailability" class="tsd-kind-icon">validate<wbr>Subdomain<wbr>Availability</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validatesubdomainformat" class="tsd-kind-icon">validate<wbr>Subdomain<wbr>Format</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#verify" class="tsd-kind-icon">verify</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#verifyprofiletoken" class="tsd-kind-icon">verify<wbr>Profile<wbr>Token</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#verifysinglesig" class="tsd-kind-icon">verify<wbr>Single<wbr>Sig</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#walletfrommnemonic" class="tsd-kind-icon">wallet<wbr>From<wbr>Mnemonic</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#wrapprofiletoken" class="tsd-kind-icon">wrap<wbr>Profile<wbr>Token</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-is-not-exported">
-						<a href="globals.html#default_profile" class="tsd-kind-icon">DEFAULT_<wbr>PROFILE</a>
-					</li>
-					<li class=" tsd-kind-object-literal tsd-is-not-exported">
-						<a href="globals.html#schemadefinition" class="tsd-kind-icon">schema<wbr>Definition</a>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#cli_args" class="tsd-kind-icon">CLI_<wbr>ARGS</a>
 					</li>
 					<li class=" tsd-kind-object-literal">
-						<a href="globals.html#transactions" class="tsd-kind-icon">transactions</a>
+						<a href="globals.html#commands" class="tsd-kind-icon">COMMANDS</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#config_defaults" class="tsd-kind-icon">CONFIG_<wbr>DEFAULTS</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#config_regtest_defaults" class="tsd-kind-icon">CONFIG_<wbr>REGTEST_<wbr>DEFAULTS</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#config_testnet_defaults" class="tsd-kind-icon">CONFIG_<wbr>TESTNET_<wbr>DEFAULTS</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#default_profile" class="tsd-kind-icon">DEFAULT_<wbr>PROFILE</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#log_config_defaults" class="tsd-kind-icon">LOG_<wbr>CONFIG_<wbr>DEFAULTS</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#derivationpaths" class="tsd-kind-icon">derivation<wbr>Paths</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#personschemadefinition" class="tsd-kind-icon">person<wbr>Schema<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#registrars" class="tsd-kind-icon">registrars</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#schemadefinition" class="tsd-kind-icon">schema<wbr>Definition</a>
 					</li>
 				</ul>
 			</nav>
@@ -674,57 +2166,22 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
-				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
-				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
-				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>
@@ -734,6 +2191,5 @@
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>
