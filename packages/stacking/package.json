@@ -1,0 +1,69 @@
+{
+  "name": "@stacks/stacking",
+  "version": "1.0.0-beta.8",
+  "description": "Library for Stacking.",
+  "keywords": [
+    "Stacks",
+    "Stacking"
+  ],
+  "author": "yknl <yukanliao@gmail.com>",
+  "homepage": "https://blockstack.org",
+  "license": "GPL-3.0-or-later",
+  "directories": {
+    "lib": "lib",
+    "dist": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockstack/blockstack.js.git"
+  },
+  "scripts": {
+    "dev": "yarn start",
+    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\" -f unix",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" -f unix --fix",
+    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
+    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
+    "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
+    "build": "tsdx build --format cjs,esm,umd",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "npm run typecheck -- --watch",
+    "prepublishOnly": "yarn test && yarn build",
+    "test": "jest",
+    "test:watch": "jest --watch --coverage=false",
+    "codecovUpload": "codecov"
+  },
+  "bugs": {
+    "url": "https://github.com/blockstack/blockstack.js/issues"
+  },
+  "dependencies": {
+    "@stacks/network": "^1.0.0-beta.8",
+    "@stacks/transactions": "^1.0.0-beta.8",
+    "axios": "^0.21.0",
+    "bignumber.js": "^9.0.1",
+    "bitcoinjs-lib": "^5.2.0",
+    "bn.js": "^4.11.6",
+    "c32check": "^1.1.1",
+    "url-join": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^4.11.6",
+    "@types/jest": "^24.9.0",
+    "codecov": "^3.7.2",
+    "jest": "^24.9.0",
+    "jest-fetch-mock": "^3.0.3",
+    "ts-jest": "^26.4.1",
+    "tsdx": "^0.14.0"
+  },
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "typings": "dist/auth/src/index.d.ts",
+  "umd:main": "dist/auth.umd.production.js",
+  "unpkg": "dist/auth.cjs.production.min.js",
+  "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce"
+}
