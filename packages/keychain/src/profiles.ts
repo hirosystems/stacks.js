@@ -1,13 +1,15 @@
 import {
+  connectToGaiaHub,
+} from '@stacks/storage';
+import {
   signProfileToken,
   wrapProfileToken,
-  connectToGaiaHub,
   makeProfileZoneFile,
-} from 'blockstack';
+} from '@stacks/profile';
 import { IdentityKeyPair } from './utils';
 import { uploadToGaiaHub } from './utils/gaia';
 import Identity from './identity';
-import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
+import { GaiaHubConfig } from '@stacks/storage';
 
 const PERSON_TYPE = 'Person';
 const CONTEXT = 'http://schema.org';

@@ -3,7 +3,7 @@ import randomBytes from 'randombytes';
 import { bip32 } from 'bitcoinjs-lib';
 
 import { encrypt } from '../encryption/encrypt';
-import { encryptMnemonic } from 'blockstack';
+import { encryptMnemonic } from '@stacks/encryption';
 
 export type AllowedKeyEntropyBits = 128 | 256;
 

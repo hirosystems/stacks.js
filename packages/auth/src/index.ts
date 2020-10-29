@@ -1,5 +1,5 @@
 export { AppConfig } from './appConfig';
-export { makeAuthRequest, makeAuthResponse } from './messages';
+export { makeAuthRequest, makeAuthResponse, decryptPrivateKey } from './messages';
 export { getAuthRequestFromURL, fetchAppManifest } from './provider';
 export {
   verifyAuthRequest,

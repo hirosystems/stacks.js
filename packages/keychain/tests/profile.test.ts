@@ -8,7 +8,7 @@ import {
 } from '../src/profiles';
 import { getIdentity, getNewIdentity } from './helpers';
 import { decodeToken, TokenVerifier } from 'jsontokens';
-import { makeProfileZoneFile } from 'blockstack';
+import { makeProfileZoneFile } from '@stacks/profile';
 
 describe('signProfileForUpload', () => {
   it('should create a signed JSON string', async () => {

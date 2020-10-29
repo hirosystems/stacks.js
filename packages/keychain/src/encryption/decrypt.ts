@@ -1,5 +1,5 @@
 import { decrypt as triplesecDecrypt } from 'triplesec';
-import { decryptMnemonic } from 'blockstack/lib/encryption/wallet';
+import { decryptMnemonic } from '@stacks/encryption';
 
 /**
  * Decrypt an encrypted mnemonic phrase with a password.
