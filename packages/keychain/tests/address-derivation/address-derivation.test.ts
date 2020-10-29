@@ -1,4 +1,4 @@
-import { ChainID } from '@blockstack/stacks-transactions';
+import { ChainID } from '@stacks/transactions';
 import { BIP32Interface } from 'bitcoinjs-lib';
 
 import { deriveStxAddressChain } from '../../src/address-derivation';

@@ -10,7 +10,7 @@ import { Subdomains, registrars, Wallet, decrypt } from '../src';
 import { mnemonicToSeed } from 'bip39';
 import { bip32 } from 'bitcoinjs-lib';
 import { profileResponse, nameInfoResponse } from './helpers';
-import { ChainID } from '@blockstack/stacks-transactions';
+import { ChainID } from '@stacks/transactions';
 
 describe(validateSubdomainFormat.name, () => {
   it('returns error state when string less than 8 characters', () => {

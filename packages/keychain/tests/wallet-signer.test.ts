@@ -1,6 +1,6 @@
 import './setup';
 import { getWallet } from './helpers';
-import { TransactionVersion } from '@blockstack/stacks-transactions';
+import { TransactionVersion } from '@stacks/transactions';
 
 const getSigner = async () => {
   const wallet = await getWallet();

@@ -1,6 +1,6 @@
 import { bip32, ECPair } from 'bitcoinjs-lib';
-import { getPublicKeyFromPrivate } from 'blockstack/lib/keys';
-import { makeAuthResponse } from 'blockstack/lib/auth/authMessages';
+import { getPublicKeyFromPrivate } from '@stacks/encryption';
+import { makeAuthResponse } from '@stacks//auth';
 import { getProfileURLFromZoneFile } from './utils';
 
 import { IdentityKeyPair } from './utils/index';
@@ -12,7 +12,7 @@ import {
 } from './utils/gaia';
 import IdentityAddressOwnerNode from './nodes/identity-address-owner-node';
 import { Profile, fetchProfile, DEFAULT_PROFILE, signAndUploadProfile } from './profiles';
-import { ecPairToAddress } from 'blockstack';
+import { ecPairToAddress } from '@stacks/encryption';
 
 interface IdentityConstructorOptions {
   keyPair: IdentityKeyPair;

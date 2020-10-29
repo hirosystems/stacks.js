@@ -1,8 +1,11 @@
 import { TokenSigner, Json } from 'jsontokens';
-import { getPublicKeyFromPrivate } from 'blockstack/lib/keys';
+import { 
+  getPublicKeyFromPrivate,
+  ecPairToAddress,
+  hexStringToECPair
+ } from '@stacks/encryption';
 import randomBytes from 'randombytes';
-import { ecPairToAddress, hexStringToECPair } from 'blockstack';
-import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
+import { GaiaHubConfig } from '@stacks/storage';
 
 export const DEFAULT_GAIA_HUB = 'https://gaia.blockstack.org/hub/';
 
