@@ -47,3 +47,5 @@ dist
 .rts2_cache_umd/
 .idea
 
+.yarnrc
+.yarn
