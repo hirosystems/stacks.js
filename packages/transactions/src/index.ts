@@ -1,10 +1,16 @@
-export { StacksTransaction } from './transaction';
+export { StacksTransaction, deserializeTransaction } from './transaction';
+
+export { BufferReader } from './bufferReader';
 
 export {
   Authorization,
   StandardAuthorization,
   SponsoredAuthorization,
   SpendingCondition,
+  MessageSignature,
+  createMessageSignature,
+  emptyMessageSignature,
+  isSingleSig,
 } from './authorization';
 
 export {
