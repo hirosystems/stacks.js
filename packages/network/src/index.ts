@@ -9,6 +9,7 @@ export interface StacksNetwork {
   accountEndpoint: string;
   contractAbiEndpoint: string;
   readOnlyFunctionCallEndpoint: string;
+  isMainnet(): boolean;
   getBroadcastApiUrl: () => string;
   getTransferFeeEstimateApiUrl: () => string;
   getAccountApiUrl: (address: string) => string;
@@ -17,6 +18,13 @@ export interface StacksNetwork {
     contractAddress: string,
     contractName: string,
     functionName: string
+  ) => string;
+  getInfoUrl:() => string;
+  getBlockTimeInfoUrl:() => string;
+  getPoxInfoUrl: () => string;
+  getStackerInfoUrl: (
+    contractAddress: string,
+    contractName: string,
   ) => string;
 
   /**
@@ -39,6 +47,8 @@ export class StacksMainnet implements StacksNetwork {
   accountEndpoint = '/v2/accounts';
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
+
+  isMainnet= () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
   getAccountApiUrl = (address: string) =>
@@ -53,6 +63,12 @@ export class StacksMainnet implements StacksNetwork {
     `${this.coreApiUrl}${
       this.readOnlyFunctionCallEndpoint
     }/${contractAddress}/${contractName}/${encodeURIComponent(functionName)}`;
+  getInfoUrl = () => `${this.coreApiUrl}/v2/info`;
+  getBlockTimeInfoUrl = () => `${this.coreApiUrl}/extended/v1/info/network_block_times`;
+  getPoxInfoUrl = () => `${this.coreApiUrl}/v2/pox`;
+  getStackerInfoUrl = (contractAddress: string, contractName: string) => 
+    `${this.coreApiUrl}${this.readOnlyFunctionCallEndpoint}
+    ${contractAddress}/${contractName}/get-stacker-info`;
   getNameInfo(fullyQualifiedName: string) {
     /*
       TODO: Update to v2 API URL for name lookups
