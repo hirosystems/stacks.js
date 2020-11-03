@@ -18,4 +18,4 @@ export { UserSession } from './userSession';
 export * from './constants';
 export * from './profile';
 export * from './userData';
-export * from '@blockstack/connect';
+export * from '@stacks/connect';
