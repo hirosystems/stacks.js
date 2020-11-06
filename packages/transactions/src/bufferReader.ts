@@ -42,28 +42,46 @@ export function isEnum<T extends string, TEnumValue extends number>(
   return isEnum(enumVariable, value);
 }
 
-export class BufferReader extends SmartBuffer {
+export class BufferReader {
+  smartBuffer: SmartBuffer;
+
   static fromBuffer(buffer: Buffer): BufferReader {
     return new BufferReader({ buff: buffer });
   }
 
   constructor(options?: SmartBufferOptions | Buffer) {
     if (Buffer.isBuffer(options)) {
-      super({ buff: options });
+      this.smartBuffer = new SmartBuffer({ buff: options });
     } else {
-      super(options);
+      this.smartBuffer = new SmartBuffer(options );
     }
   }
 
+  readBuffer(length: number): Buffer {
+    return this.smartBuffer.readBuffer(length);
+  }
+
+  readUInt32BE(offset?: number): number {
+    return this.smartBuffer.readUInt32BE(offset);
+  }
+
+  readUInt8(): number {
+    return this.smartBuffer.readUInt8();
+  }
+
+  readUInt16BE(): number {
+    return this.smartBuffer.readUInt16BE();
+  }
+
   readBigUIntLE(length: number): bigint {
-    const buffer = Buffer.from(this.readBuffer(length)).reverse();
+    const buffer = Buffer.from(this.smartBuffer.readBuffer(length)).reverse();
     const hex = buffer.toString();
     const num = BigInt(`0x${hex}`);
     return num;
   }
 
   readBigUIntBE(length: number): bigint {
-    const buffer = this.readBuffer(length);
+    const buffer = this.smartBuffer.readBuffer(length);
     const hex = buffer.toString('hex');
     const num = BigInt(`0x${hex}`);
     return num;
@@ -73,7 +91,7 @@ export class BufferReader extends SmartBuffer {
     enumVariable: { [key in T]: TEnumValue },
     invalidEnumErrorFormatter: (val: number) => Error
   ): TEnumValue {
-    const num = this.readUInt8();
+    const num = this.smartBuffer.readUInt8();
     if (isEnum(enumVariable, num)) {
       return num;
     } else {
