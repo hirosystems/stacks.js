@@ -100,7 +100,7 @@ export class StacksMainnet implements StacksNetwork {
 export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
-  coreApiUrl = 'http://stacks-node-api.blockstack.org';
+  coreApiUrl = 'https://stacks-node-api.blockstack.org';
 }
 
 export class StacksMocknet extends StacksMainnet implements StacksNetwork {
