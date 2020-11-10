@@ -21,4 +21,4 @@ const optionalCVOf = (value?: ClarityValue): OptionalCV => {
   }
 };
 
-export { OptionalCV, noneCV, someCV, optionalCVOf };
+export { OptionalCV, NoneCV, SomeCV, noneCV, someCV, optionalCVOf };
