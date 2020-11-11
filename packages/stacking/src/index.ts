@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { BigNumber } from 'bignumber.js';
+// import axios from 'axios';
+// import { BigNumber } from 'bignumber.js';
 import {
   makeContractCall,
   bufferCV,
@@ -8,45 +8,26 @@ import {
   ClarityType,
   broadcastTransaction,
   standardPrincipalCV,
-  serializeCV,
-  deserializeCV,
   ContractCallOptions,
   UIntCV,
   BufferCV,
   ContractCallPayload,
   StacksTransaction,
-  ReadOnlyFunctionOptions,
-  callReadOnlyFunction
+  callReadOnlyFunction,
+  cvToString,
+  ClarityValue,
+  ResponseErrorCV,
+  SomeCV,
+  TupleCV
 } from '@stacks/transactions';
 import {
   StacksNetwork,
   StacksMainnet
 } from '@stacks/network';
 import BN from 'bn.js';
-import { address } from 'bitcoinjs-lib';
-import { c32addressDecode } from 'c32check';
-
-enum StackingErrors {
-  ERR_STACKING_UNREACHABLE = 255,
-  ERR_STACKING_INSUFFICIENT_FUNDS = 1,
-  ERR_STACKING_INVALID_LOCK_PERIOD = 2,
-  ERR_STACKING_ALREADY_STACKED = 3,
-  ERR_STACKING_NO_SUCH_PRINCIPAL = 4,
-  ERR_STACKING_EXPIRED = 5,
-  ERR_STACKING_STX_LOCKED = 6,
-  ERR_STACKING_PERMISSION_DENIED = 9,
-  ERR_STACKING_THRESHOLD_NOT_MET = 11,
-  ERR_STACKING_POX_ADDRESS_IN_USE = 12,
-  ERR_STACKING_INVALID_POX_ADDRESS = 13,
-  ERR_STACKING_ALREADY_REJECTED = 17,
-  ERR_STACKING_INVALID_AMOUNT = 18,
-  ERR_NOT_ALLOWED = 19,
-  ERR_STACKING_ALREADY_DELEGATED = 20,
-  ERR_DELEGATION_EXPIRES_DURING_LOCK = 21,
-  ERR_DELEGATION_TOO_MUCH_LOCKED = 22,
-  ERR_DELEGATION_POX_ADDR_REQUIRED = 23,
-  ERR_INVALID_START_BURN_HEIGHT = 24,
-}
+import { StackingErrors } from './constants';
+import { fetchPrivate } from '@stacks/common';
+import { convertBTCAddress } from './utils';
 
 export interface PoxInfo {
   contract_id: string;
@@ -63,23 +44,11 @@ export interface StackerInfo {
   amountMicroStx: string;
   firstRewardCycle: number;
   lockPeriod: number;
-  poxAddr: {
+  poxAddress: {
     version: Buffer;
     hashbytes: Buffer;
   };
   btcAddress: string;
-}
-
-interface StackerInfoCV {
-  'amount-ustx': UIntCV;
-  'first-reward-cycle': UIntCV;
-  'pox-addr': {
-    data: {
-      version: BufferCV;
-      hashbytes: BufferCV;
-    };
-  };
-  'lock-period': UIntCV;
 }
 
 export interface BlockTimeInfo {
@@ -91,151 +60,235 @@ export interface BlockTimeInfo {
   }
 }
 
-interface CoreInfo {
+export interface CoreInfo {
   burn_block_height: number;
+  stable_pox_consensus : string;
 }
 
-interface BalanceInfo {
+export interface BalanceInfo {
   balance: string;
+  nonce: number;
+}
+
+export interface StackingEligibility {
+  eligible: boolean,
+  reason?: string
+}
+
+/**
+ * Lock stx check options
+ *
+ * @param  {String} poxAddress - the reward Bitcoin address
+ * @param  {number} cycles - number of cycles to lock
+ */
+export interface CanLockStxOptions {
+  poxAddress: string, 
+  cycles: number
+}
+
+/**
+ * Lock stx options
+ *
+ * @param  {String} key - private key to sign transaction
+ * @param  {String} poxAddress - the reward Bitcoin address
+ * @param  {number} cycles - number of cycles to lock
+ * @param  {BigNum} amountMicroStx - number of microstacks to lock
+ * @param  {number} burnBlockHeight -the burnchain block height to begin lock
+ */
+export interface LockStxOptions {
+  key: string;
+  cycles: number;
+  poxAddress: string;
+  amountMicroStx: BN;
+  burnBlockHeight: number;
 }
 
 export class Stacker {
-  constructor(public address: string, public network: StacksNetwork = new StacksMainnet()) {
-  }
+  constructor(
+    public address: string, 
+    public network: StacksNetwork = new StacksMainnet()) {}
 
+  /**
+   * Get stacks node info
+   * 
+   * @returns {Promise<CoreInfo>} that resolves to a CoreInfo response if the operation succeeds
+   */
   async getCoreInfo(): Promise<CoreInfo> {
     const url = this.network.getInfoUrl(); 
-    const res = await axios.get<CoreInfo>(url);
-    return res.data;
+    return fetchPrivate(url)
+      .then((res) => res.json());
   }
 
+  /**
+   * Get stacks node pox info
+   * 
+   * @returns {Promise<PoxInfo>} that resolves to a PoxInfo response if the operation succeeds
+   */
   async getPoxInfo(): Promise<PoxInfo> {
     const url = this.network.getPoxInfoUrl(); 
-    const res = await axios.get<PoxInfo>(url);
-    return res.data;
+    return fetchPrivate(url)
+      .then((res) => res.json());
   }
 
-  async getTargetBlockTimeInfo(): Promise<number>{
+  /**
+   * Get stacks node target block time
+   * 
+   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   */
+  async getTargetBlockTime(): Promise<number>{
     const url = this.network.getBlockTimeInfoUrl();
-    const res = await axios.get<BlockTimeInfo>(url);
+    const res = await fetchPrivate(url).then((res) => res.json());
+    
     if (this.network.isMainnet()) {
-      return res.data.mainnet.target_block_time;
+      return res.mainnet.target_block_time;
     } else {
-      return res.data.testnet.target_block_time;
+      return res.testnet.target_block_time;
     }
   }
-
-  async getStackerInfo(address: string): Promise<StackerInfo> {
-    const info = await this.getPoxInfo();
-    const args = [`0x${serializeCV(standardPrincipalCV(address)).toString('hex')}`];
-    const [contractAddress, contractName] = info.contract_id.split('.');
-    const url = this.network.getStackerInfoUrl(contractAddress, contractName);
-    const body = {
-      sender: 'ST384HBMC97973427QMM58NY2R9TTTN4M599XM5TD',
-      arguments: args,
-    };
-    const response = await axios.post(url, body, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const res = response.data.result as string;
-
-    console.log({ ...info });
-    const cv = deserializeCV(Buffer.from(res.slice(2), 'hex')) as any; //TupleCV;
-    console.log({ cv });
-    if (!cv.value) throw new Error(`Failed to fetch stacker info. ${StackingErrors[cv.type]}`);
-    const data = cv.value.data as StackerInfoCV;
-    const version = data['pox-addr'].data.version.buffer;
-    const hashbytes = data['pox-addr'].data.hashbytes.buffer;
-    return {
-      lockPeriod: data['lock-period'].value.toNumber(),
-      amountMicroStx: data['amount-ustx'].value.toString(10),
-      firstRewardCycle: data['first-reward-cycle'].value.toNumber(),
-      poxAddr: {
-        version,
-        hashbytes,
-      },
-      btcAddress: this.getBTCAddress(version, hashbytes),
-    };
-  }
   
-  async getAccountBalance(): Promise<BigNumber> {
+  /**
+   * Get account balance
+   * 
+   * @returns {Promise<BN>} that resolves to a BigNum if the operation succeeds
+   */
+  async getAccountBalance(): Promise<BN> {
     const url = this.network.getAccountApiUrl(this.address); 
-    const res = await axios.get<BalanceInfo>(url);
-    return new BigNumber(res.data.balance);
+    return fetchPrivate(url)
+      .then((res) => res.json())
+      .then((res) => new BN(res.balance));
   }
 
-  async blocksUntilNextCycle(): Promise<number> {
-    const poxInfo = await this.getPoxInfo();
-    // const targetBlockTime = await this.getTargetBlockTimeInfo();
-    const coreInfo = await this.getCoreInfo();
-    // const cycleDuration = poxInfo.reward_cycle_length * targetBlockTime;
-    const blocksToNextCycle =
-    (poxInfo.reward_cycle_length -
-      ((coreInfo.burn_block_height - poxInfo.first_burnchain_block_height) %
-        poxInfo.reward_cycle_length));
-    return blocksToNextCycle;
+  /**
+   * Get reward cycle duration in seconds
+   * 
+   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   */
+  async getCycleDuration(): Promise<number> {
+    const poxInfoPromise = this.getPoxInfo();
+    const targetBlockTimePromise = await this.getTargetBlockTime();
+
+    return Promise.all([poxInfoPromise, targetBlockTimePromise])
+      .then(([poxInfo, targetBlockTime]) => {
+        return poxInfo.reward_cycle_length * targetBlockTime;
+      })
+  }
+
+  /**
+   * Get number of seconds until next reward cycle
+   * 
+   * @returns {Promise<number>} that resolves to a number if the operation succeeds
+   */
+  async secondsUntilNextCycle(): Promise<number> {
+    const poxInfoPromise = this.getPoxInfo();
+    const targetBlockTimePromise = await this.getTargetBlockTime();
+    const coreInfoPromise = this.getCoreInfo();
+
+    return Promise.all([poxInfoPromise, targetBlockTimePromise, coreInfoPromise])
+      .then(([poxInfo, targetBlockTime, coreInfo]) => {
+        const blocksToNextCycle =
+        (poxInfo.reward_cycle_length -
+          ((coreInfo.burn_block_height - poxInfo.first_burnchain_block_height) %
+            poxInfo.reward_cycle_length));
+        const cycleDuration = poxInfo.reward_cycle_length * targetBlockTime;
+        return blocksToNextCycle * cycleDuration;
+      })
   } 
 
+  /**
+   * Check if stacking is enabled for next reward cycle
+   * 
+   * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
+   */
   async stackingEnabledNextCycle(): Promise<boolean> {
     return (await this.getPoxInfo()).rejection_votes_left_required > 0;
   }
 
-  async canParticipate(): Promise<boolean> {
-    const balance: BigNumber = await this.getAccountBalance();
+  /**
+   * Check if account has minimum require amount of Stacks for stacking
+   * 
+   * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
+   */
+  async hasMinimumRequiredStxAmount(): Promise<boolean> {
+    const balance: BN = await this.getAccountBalance();
     // TODO pox info should use string type instead of number
-    const min: BigNumber = new BigNumber((await this.getPoxInfo()).min_amount_ustx.toString());
-    return balance.isGreaterThanOrEqualTo(min);
+    const min: BN = new BN((await this.getPoxInfo()).min_amount_ustx.toString());
+    return balance.gte(min);
   }
 
-  async canStackStx(cycles: number): Promise<boolean> {
-    const balance: BigNumber = await this.getAccountBalance();
-    const poxInfo = await this.getPoxInfo();
-    // derive bitcoin address from Stacks account and convert into required format
-    const hashbytes = bufferCV(Buffer.from(c32addressDecode(this.address)[1], 'hex'));
-    const version = bufferCV(Buffer.from('01', 'hex'));
+  /**
+   * Check if account can lock stx
+   * 
+   * @param {CanLockStxOptions} options - a required lock STX options object 
+   * 
+   * @returns {Promise<StackingEligibility>} that resolves to a StackingEligibility object if the operation succeeds
+   */
+  async canLockStx({
+    poxAddress, 
+    cycles
+  }: CanLockStxOptions
+  ): Promise<StackingEligibility> {
+    const balancePromise: Promise<BN> = this.getAccountBalance();
+    const poxInfoPromise = this.getPoxInfo();
 
-    const [contractAddress, contractName] = (await this.getPoxInfo()).contract_id.split('.');
+    return Promise.all([balancePromise, poxInfoPromise])
+      .then(([balance, poxInfo]) => {
+        const { hashMode, data } = convertBTCAddress(poxAddress);
+        const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
+        const hashbytes = bufferCV(data);
+        const poxAddressCV = tupleCV({
+          hashbytes,
+          version: hashModeBuffer,
+        });
 
-    // read-only contract call
-    const options: ReadOnlyFunctionOptions = {
-      contractName,
-      contractAddress,
-      functionName: 'can-stack-stx',
-      senderAddress: this.address,
-      functionArgs: [
-          tupleCV({
-            hashbytes,
-            version,
-          }),
-          uintCV(balance.toString()),
-          // explicilty check eligibility for next cycle
-          uintCV(poxInfo.reward_cycle_id),
-          uintCV(cycles)
-        ],
-    }
+        const [contractAddress, contractName] = poxInfo.contract_id.split('.');
 
-    const isEligibleCV = await callReadOnlyFunction(options);
-
-    return isEligibleCV.type === ClarityType.BoolTrue;
+        return callReadOnlyFunction({
+          network: this.network,
+          contractName,
+          contractAddress,
+          functionName: 'can-stack-stx',
+          senderAddress: this.address,
+          functionArgs: [
+              poxAddressCV,
+              uintCV(balance.toString()),
+              uintCV(poxInfo.reward_cycle_id),
+              uintCV(cycles.toString())
+            ],
+        });
+      })
+      .then((responseCV: ClarityValue) => {
+        if(responseCV.type === ClarityType.ResponseOk) {
+          return {
+            eligible: true
+          };
+        } else {
+          const errorCV = responseCV as ResponseErrorCV;
+          return {
+            eligible: false,
+            reason: StackingErrors[+cvToString(errorCV.value)]
+          };
+        }
+      })
   }
 
+  /**
+   * Generate and broadcast a stacking transaction to lock STX
+   * 
+   * @param {LockStxOptions} options - a required lock STX options object 
+   * 
+   * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
+   */
   async lockStx({
     amountMicroStx,
     poxAddress,
     cycles,
     key,
-    contract,
     burnBlockHeight,
-  }: {
-    key: string;
-    cycles: number;
-    poxAddress: string;
-    amountMicroStx: BigNumber;
-    contract: string;
-    burnBlockHeight: number;
-  }) {
+  }: LockStxOptions
+  ) {
+    const poxInfo = await this.getPoxInfo();
+    const contract = poxInfo.contract_id;
+
     const txOptions = this.getLockTxOptions({
       amountMicroStx,
       cycles,
@@ -247,6 +300,7 @@ export class Stacker {
       ...txOptions,
       senderKey: key,
     });
+
     const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
     if (typeof res === 'string') {
       return res;
@@ -263,16 +317,16 @@ export class Stacker {
   }: {
     cycles: number;
     poxAddress: string;
-    amountMicroStx: BigNumber;
+    amountMicroStx: BN;
     contract: string;
     burnBlockHeight: number;
   }) {
-    const { version, hash } = this.convertBTCAddress(poxAddress);
-    const versionBuffer = bufferCV(new BN(version, 10).toBuffer());
-    const hashbytes = bufferCV(hash);
+    const { hashMode, data } = convertBTCAddress(poxAddress);
+    const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
+    const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
-      version: versionBuffer,
+      version: hashModeBuffer,
     });
     const [contractAddress, contractName] = contract.split('.');
     const network = this.network; 
@@ -293,20 +347,64 @@ export class Stacker {
     return txOptions;
   }
 
-  modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: BigNumber }) {
+  /**
+   * Check stacking status
+   * 
+   * @returns {Promise<StackerInfo>} that resolves to a StackerInfo object if the operation succeeds
+   */
+  async getStatus(): Promise<StackerInfo> {
+    const [contractAddress, contractName] = (await this.getPoxInfo()).contract_id.split('.');
+    const functionName = 'get-stacker-info';
+
+    return callReadOnlyFunction({
+      contractAddress,
+      contractName,
+      functionName,
+      senderAddress: this.address,
+      functionArgs: [
+        standardPrincipalCV(this.address)
+      ],
+      network: this.network
+    })
+    .then((responseCV: ClarityValue) => {
+      if (responseCV.type === ClarityType.OptionalSome) {
+        const someCV = responseCV as SomeCV;
+        const tupleCV: TupleCV = someCV.value as TupleCV;
+        const poxAddress: TupleCV = tupleCV.data["pox-addr"] as TupleCV;
+        const amountMicroStx: UIntCV = tupleCV.data["amount-ustx"] as UIntCV;
+        const firstRewardCycle: UIntCV = tupleCV.data["first-reward-cycle"] as UIntCV;
+        const lockPeriod: UIntCV = tupleCV.data["lock-period"] as UIntCV;
+        const version: BufferCV = poxAddress.data['version'] as BufferCV;
+        const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
+      
+        return {
+          amountMicroStx: amountMicroStx.value.toString(),
+          firstRewardCycle: firstRewardCycle.value.toNumber(),
+          lockPeriod: lockPeriod.value.toNumber(),
+          poxAddress: {
+            version: version.buffer,
+            hashbytes: hashbytes.buffer
+          },
+          btcAddress: '',
+        }
+      } else if (responseCV.type === ClarityType.OptionalNone) {
+        throw new Error(`No stacking status found for ${this.address}`);
+      } else {
+        throw new Error(`Error fetching stacker info`);
+      }
+    });
+  }
+
+  /**
+   * Adjust microstacks amount for locking after taking into account transaction fees
+   * 
+   * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
+   */
+  modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: BN }) {
     const fee = tx.auth.getFee() as BN;
     (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
       new BN(amountMicroStx.toString(10), 10).sub(fee).toBuffer()
     );
     return tx;
-  }
-
-  convertBTCAddress(btcAddress: string) {
-    return address.fromBase58Check(btcAddress);
-  }
-
-  getBTCAddress(version: Buffer, checksum: Buffer) {
-    const btcAddress = address.toBase58Check(checksum, new BN(version).toNumber());
-    return btcAddress;
   }
 }
