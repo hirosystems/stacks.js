@@ -253,6 +253,47 @@ export const CLI_ARGS = {
         '    }\n',
       group: 'Account Management',
     },
+    can_stack: {
+      type: 'array',
+      items: [
+        {
+          name: 'amount',
+          type: 'string',
+          realtype: 'integer',
+          pattern: '^[0-9]+$',
+        },
+        {
+          name: 'cycles',
+          type: 'string',
+          realtype: 'integer',
+          pattern: '^[0-9]+$',
+        },
+        {
+          name: 'pox_address',
+          type: 'string',
+          realtype: 'address',
+          pattern: `${ADDRESS_PATTERN}`,
+        },
+        {
+          name: 'stx_address',
+          type: 'string',
+          realtype: 'address',
+          pattern: `${STACKS_ADDRESS_PATTERN}`,
+        },
+      ],
+      minItems: 4,
+      maxItems: 4,
+      help:
+        'Check if specified account can stack a number of Stacks tokens for given number of cycles.\n' +
+        '\n' +
+        'Example:\n' +
+        '\n' +
+        '    $ stx can_stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0\n' +
+        '    {\n' +
+        '      "eligible": true\n' +
+        '    }\n',
+      group: 'Account Management',
+    },
     call_contract_func: {
       type: 'array',
       items: [
@@ -489,6 +530,31 @@ export const CLI_ARGS = {
       ],
       minItems: 1,
       maxItems: 2,
+      help:
+        'Encrypt a 12-word backup phrase, which can be decrypted later with the ' +
+        '`decrypt_backup_phrase` command.  The password will be prompted if not given.\n' +
+        '\n' +
+        'Example:\n' +
+        '\n' +
+        '     $ # password is "asdf"\n' +
+        '     $ blockstack-cli encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
+        '     Enter password:\n' +
+        '     Enter password again:\n' +
+        '     M+DnBHYb1fgw4N3oZ+5uTEAua5bAWkgTW/SjmmBhGGbJtjOtqVV+RrLJEJOgT35hBon4WKdGWye2vTdgqDo7+HIobwJwkQtN2YF9g3zPsKk=',
+      group: 'Key Management',
+    },
+    faucet: {
+      type: 'array',
+      items: [
+        {
+          name: 'address',
+          type: 'string',
+          realtype: 'address',
+          pattern: `${ADDRESS_PATTERN}|${STACKS_ADDRESS_PATTERN}`,
+        }
+      ],
+      minItems: 1,
+      maxItems: 1,
       help:
         'Encrypt a 12-word backup phrase, which can be decrypted later with the ' +
         '`decrypt_backup_phrase` command.  The password will be prompted if not given.\n' +
@@ -2230,6 +2296,79 @@ export const CLI_ARGS = {
         '      "STACKS": "12345"\n' +
         '    }\n' +
         '\n',
+      group: 'Account Management',
+    },
+    stack: {
+      type: 'array',
+      items: [
+        {
+          name: 'amount',
+          type: 'string',
+          realtype: 'integer',
+          pattern: '^[0-9]+$',
+        },
+        {
+          name: 'cycles',
+          type: 'string',
+          realtype: 'integer',
+          pattern: '^[0-9]+$',
+        },
+        {
+          name: 'pox_address',
+          type: 'string',
+          realtype: 'integer',
+          pattern: `${ADDRESS_PATTERN}`,
+        },
+        {
+          name: 'private_key',
+          type: 'string',
+          realtype: 'private_key',
+          pattern: `${PRIVATE_KEY_PATTERN_ANY}`,
+        },
+        {
+          name: 'fee',
+          type: 'string',
+          realtype: 'integer',
+          pattern: '^[0-9]+$',
+        },
+        {
+          name: 'nonce',
+          type: 'string',
+          realtype: 'integer',
+          pattern: '^[0-9]+$',
+        },
+      ],
+      minItems: 4,
+      maxItems: 6,
+      help:
+        'Stack the specified number of Stacks tokens for given number of cycles.\n' +
+        '\n' +
+        'Example:\n' +
+        '\n' +
+        '    $ stx stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01\n' +
+        '    {\n' +
+        '      "txid": true\n' +
+        '    }\n',
+      group: 'Account Management',
+    },
+    stacking_status: {
+      type: 'array',
+      items: [
+        {
+          name: 'pox_address',
+          type: 'string',
+          realtype: 'integer',
+          pattern: `${STACKS_ADDRESS_PATTERN}`,
+        },
+      ],
+      minItems: 1,
+      maxItems: 1,
+      help:
+        'Get stacking status for specified address.\n' +
+        '\n' +
+        'Example:\n' +
+        '\n' +
+        '    $ stx stacking_status SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0\n',
       group: 'Account Management',
     },
     transfer: {
