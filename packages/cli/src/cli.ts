@@ -33,7 +33,9 @@ import {
   PostConditionMode,
   cvToString,
   StacksTransaction,
-  TxBroadcastResult
+  TxBroadcastResult,
+  getAddressFromPrivateKey,
+  TransactionVersion
 } from '@stacks/transactions';
 
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -41,6 +43,13 @@ import { StacksMainnet, StacksTestnet } from '@stacks/network';
 const c32check = require('c32check');
 
 import { UserData } from '@stacks/auth';
+import crossfetch from 'cross-fetch';
+
+// @ts-ignore
+import { Stacker, CoreInfo, PoxInfo, hasMinimumRequiredStxAmount, StackerInfo } from '@stacks/stacking';
+
+// @ts-ignore
+import { FaucetsApi, AccountsApi, Configuration } from '@stacks/blockchain-api-client';
 
 import { GaiaHubConfig } from '@stacks/storage';
 
@@ -1461,6 +1470,177 @@ function decryptMnemonic(network: CLINetworkAdapter, args: string[]): Promise<st
     });
 }
 
+async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  let stxAddress = args[0];
+
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const stacker = new Stacker(stxAddress, txNetwork);
+
+  return stacker.getStatus().then((status: StackerInfo) => {
+    return {
+      amount_microstx: status.amountMicroStx,
+      first_reward_cycle: status.firstRewardCycle,
+      lock_period: status.lockPeriod,
+      pox_address: {
+        version: status.poxAddress.version.toString('hex'),
+        hashbytes: status.poxAddress.hashbytes.toString('hex')
+      }
+    };
+  }).catch((error) => {
+    return error.toString();
+  });
+}
+
+async function canStack(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  let amount = new BN(args[0]);
+  let cycles = Number(args[1]);
+  let poxAddress = args[2];
+  let stxAddress = args[3];
+
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+
+  const apiConfig = new Configuration({
+    fetchApi: crossfetch,
+    basePath: txNetwork.coreApiUrl,
+  });
+  const accounts = new AccountsApi(apiConfig);
+
+  const balancePromise = accounts.getAccountBalance({
+    principal: stxAddress,
+  });
+
+  const stacker = new Stacker(stxAddress, txNetwork);
+
+  const poxInfoPromise = stacker.getPoxInfo();
+
+  const stackingEligiblePromise = stacker.canLockStx({poxAddress, cycles});
+
+  return Promise.all([balancePromise, poxInfoPromise, stackingEligiblePromise])
+    .then(([balance, poxInfo, stackingEligible]) => {
+      const minAmount = new BN(poxInfo.min_amount_ustx);
+      const balanceBN = new BN(balance.stx.balance);
+
+      if (minAmount.gt(amount)) {
+        throw new Error(`Stacking amount less than required minimum of ${minAmount.toString()} microstacks`);
+      }
+
+      if (amount.gt(balanceBN)) {
+        throw new Error(`Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`);
+      }
+
+      if (!stackingEligible.eligible) {
+        throw new Error(`Account cannot participate in stacking. ${stackingEligible.reason}`);
+      }
+
+      return stackingEligible;
+    })
+    .catch((error) => {
+      return error;
+    })
+}
+
+async function stack(network: CLINetworkAdapter, args: string[]): Promise<string> {
+  let amount = new BN(args[0]);
+  let cycles = Number(args[1]);
+  let poxAddress = args[2];
+  let privateKey = args[3];
+
+  // let fee = new BN(0);
+  // let nonce = new BN(0);
+
+  // if (args.length > 3 && !!args[4]) {
+  //   fee = new BN(args[4]);
+  // }
+
+  // if (args.length > 4 && !!args[5]) {
+  //   nonce = new BN(args[5]);
+  // }
+
+  const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
+  const txVersion = txNetwork.isMainnet() ? TransactionVersion.Mainnet : TransactionVersion.Testnet;
+
+  const apiConfig = new Configuration({
+    fetchApi: crossfetch,
+    basePath: txNetwork.coreApiUrl,
+  });
+  const accounts = new AccountsApi(apiConfig);
+
+  const stxAddress = getAddressFromPrivateKey(privateKey, txVersion);
+
+  const balancePromise = accounts.getAccountBalance({
+    principal: stxAddress,
+  });
+
+  const stacker = new Stacker(stxAddress, txNetwork);
+
+  const poxInfoPromise = stacker.getPoxInfo();
+
+  const coreInfoPromise = stacker.getCoreInfo();
+
+  const stackingEligiblePromise = stacker.canLockStx({poxAddress, cycles});
+
+  return Promise.all([balancePromise, poxInfoPromise, coreInfoPromise, stackingEligiblePromise])
+    .then(([balance, poxInfo, coreInfo, stackingEligible]) => {
+      const minAmount = new BN(poxInfo.min_amount_ustx);
+      const balanceBN = new BN(balance.stx.balance);
+      const burnChainBlockHeight = coreInfo.burn_block_height;
+      const startBurnBlock = burnChainBlockHeight + 2;
+
+      if (minAmount.gt(amount)) {
+        throw new Error(`Stacking amount less than required minimum of ${minAmount.toString()} microstacks`);
+      }
+
+      if (amount.gt(balanceBN)) {
+        throw new Error(`Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`);
+      }
+
+      if (!stackingEligible.eligible) {
+        throw new Error(`Account cannot participate in stacking. ${stackingEligible.reason}`);
+      }
+
+      return stacker.lockStx({
+        amountMicroStx: amount,
+        poxAddress,
+        cycles,
+        key: privateKey,
+        burnBlockHeight: startBurnBlock,
+      });
+    })
+    .then((response: TxBroadcastResult) => {
+      if (response.hasOwnProperty('error')) {
+        return response;
+      }
+      return {
+        txid: `0x${response}`,
+        transaction: generateExplorerTxPageUrl(response as string, txNetwork),
+      };
+    })
+    .catch((error) => {
+      return error;
+    })
+}
+
+function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
+  let address = args[0];
+  // console.log(address);
+
+  const apiConfig = new Configuration({
+    fetchApi: crossfetch,
+    basePath: 'https://stacks-node-api.blockstack.org',
+  });
+
+  const faucets = new FaucetsApi(apiConfig);
+
+  return faucets.runFaucetStx({ address })
+   .then((faucetTx) => {
+    return JSONStringify({
+      txid: faucetTx.txId!,
+      transaction: generateExplorerTxPageUrl(faucetTx.txId!, new StacksTestnet()),
+    });
+   })
+   .catch(error => error.toString());
+} 
+
 /* Print out all documentation on usage in JSON
  */
 type DocsArgsType = {
@@ -1521,6 +1701,7 @@ const COMMANDS: Record<string, CommandFunction> = {
   authenticator: authDaemon,
   // 'announce': announce,
   balance: balance,
+  can_stack: canStack,
   call_contract_func: contractFunctionCall,
   call_read_only_contract_func: readOnlyContractFunctionCall,
   convert_address: addressConvert,
@@ -1547,6 +1728,9 @@ const COMMANDS: Record<string, CommandFunction> = {
   profile_verify: profileVerify,
   // 'send_btc': sendBTC,
   send_tokens: sendTokens,
+  stack: stack,
+  stacking_status: stackingStatus,
+  faucet: faucetCall,
 };
 
 /*

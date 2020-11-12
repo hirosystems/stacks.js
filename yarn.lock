@@ -958,6 +958,11 @@
     "@blockstack/stacks-transactions" "0.5.1"
     cross-fetch "^3.0.4"
 
+"@blockstack/stacks-blockchain-api-types@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@blockstack/stacks-blockchain-api-types/-/stacks-blockchain-api-types-0.5.3.tgz#d828dd73eca0526bccb1e27685fc2104e67b5ef6"
+  integrity sha512-M2SU4C5IK15iTt+n34TGeX29aDdiKJq7gkEls7o8KWRe6hkBOA0LnF8+6g3q9t+ZXTBd49a4oiiWrFY0RgvGag==
+
 "@blockstack/stacks-transactions@0.5.1":
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@blockstack/stacks-transactions/-/stacks-transactions-0.5.1.tgz#b58057d52567406ce26669ba0abcaf583cf2d21c"
@@ -2350,6 +2355,18 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
+"@stacks/blockchain-api-client@^0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@stacks/blockchain-api-client/-/blockchain-api-client-0.29.2.tgz#682f74502be4fdaadd0ac880fc881b8f55c9f7ab"
+  integrity sha512-ixaNS6DAe4wY7OqbINF6sctdT6TgOYdK+LrKJxb46eVcWpNuvGDhOxmBXB0g/p3Bd+vqfBqSoC/W4JBqjzC20Q==
+  dependencies:
+    "@blockstack/stacks-blockchain-api-types" "^0.5.3"
+    "@types/ws" "^7.2.6"
+    cross-fetch "^3.0.5"
+    eventemitter3 "^4.0.4"
+    jsonrpc-lite "^2.2.0"
+    ws "^7.3.1"
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -2769,6 +2786,13 @@
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/triplesec/-/triplesec-3.0.0.tgz#709d45908503b7027525daeeeaaaa3176acda758"
   integrity sha512-8tFHnI6FEOcUh2NpUwxjEwrtLDmybKpnvWYe09DQ52O21yphEZCdzDsjzd8NMysqmeOqGoQEIokMJP92Hvz1Bg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/ws@^7.2.6":
+  version "7.2.9"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.2.9.tgz#cadfac473acfab192678a487c3ecbb13a503547f"
+  integrity sha512-gmXYAXr7G4BrRMnkGQGkGonc3ArVro9VZd//C1uns/qqsJyl2dxaJdlPMhZbcq5MTxFFC+ttFWtHSfVW5+hlRA==
   dependencies:
     "@types/node" "*"
 
@@ -6105,6 +6129,11 @@ eventemitter3@^3.1.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
 
+eventemitter3@^4.0.4:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
+  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
+
 events@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.2.0.tgz#93b87c18f8efcd4202a461aec4dfc0556b639379"
@@ -8839,6 +8868,11 @@ jsonparse@^1.2.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
   integrity sha1-P02uSpH6wxX3EGL4UhzCOfE2YoA=
+
+jsonrpc-lite@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/jsonrpc-lite/-/jsonrpc-lite-2.2.0.tgz#fb3aa9d292c8970eb7f83c6040c6554767bbc6a6"
+  integrity sha512-/cbbSxtZWs1O7R4tWqabrCM/t3N8qKUZMAg9IUqpPvUs6UyRvm6pCNYkskyKN/XU0UgffW+NY2ZRr8t0AknX7g==
 
 jsontokens@3.0.0, jsontokens@^3.0.0:
   version "3.0.0"
@@ -13799,7 +13833,7 @@ ws@^6.0.0:
   dependencies:
     async-limiter "~1.0.0"
 
-ws@^7.0.0:
+ws@^7.0.0, ws@^7.3.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.3.1.tgz#d0547bf67f7ce4f12a72dfe31262c68d7dc551c8"
   integrity sha512-D3RuNkynyHmEJIpD2qrgVkc9DQ23OrN/moAwZX4L8DfvszsJxpjQuUq3LMx6HoYji9fbIOBY18XWBsAux1ZZUA==
