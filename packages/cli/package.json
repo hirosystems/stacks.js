@@ -66,9 +66,8 @@
     "url": "git+https://github.com/blockstack/blockstack.js.git"
   },
   "scripts": {
-    "build2": "rimraf lib && tsc -b tsconfig.build.json",
     "build": "tsdx build --format cjs,esm,umd",
-    "dev": "ts-node src/index.ts",
+    "dev": "ts-node --project ./tsconfig.dev.json src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch --coverage=false",
     "codecovUpload": "codecov",
