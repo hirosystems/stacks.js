@@ -1160,7 +1160,7 @@ export class BlockchainInfoApi extends BitcoinNetwork {
   }
 
   getNetworkedUTXOs(address: string): Promise<Array<UTXO>> {
-    return fetchPrivate(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true`)
+    return fetchPrivate(`${this.utxoProviderUrl}/unspent?format=json&active=${address}&cors=true&limit=1000`)
       .then((resp) => {
         if (resp.status === 500) {
           Logger.debug('UTXO provider 500 usually means no UTXOs: returning []')
