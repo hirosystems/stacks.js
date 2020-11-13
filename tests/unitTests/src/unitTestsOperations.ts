@@ -325,9 +325,9 @@ function utilsTests() {
 
     FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
 
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress1}&cors=true&limit=1000`,
                   { unspent_outputs: utxoSet1 })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddress2}&cors=true&limit=1000`,
                   { unspent_outputs: utxoSet2 })
 
     Promise.all([config.network.getUTXOs(testAddress1),
@@ -451,17 +451,17 @@ function transactionTests() {
   function setupMocks() {
     FetchMock.restore()
     FetchMock.get('https://bitcoinfees.earn.com/api/v1/fees/recommended', { fastestFee: 1000 })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[1].address}&cors=true&limit=1000`,
                   { unspent_outputs: utxoSet })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[0].address}&cors=true&limit=1000`,
                   { unspent_outputs: utxoSet2 })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[2].address}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[2].address}&cors=true&limit=1000`,
                   { unspent_outputs: namespaceUtxoSet })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[3].address}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[3].address}&cors=true&limit=1000`,
                   { unspent_outputs: namespaceUtxoSet2 })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[4].address}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[4].address}&cors=true&limit=1000`,
                   { unspent_outputs: tokenUtxoSet })
-    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[5].address}&cors=true`,
+    FetchMock.get(`https://blockchain.info/unspent?format=json&active=${testAddresses[5].address}&cors=true&limit=1000`,
                   { unspent_outputs: tokenUtxoSet2 })
     FetchMock.get('https://core.blockstack.org/v2/prices/names/foo.test',
                   { name_price: { units: 'BTC', amount: String(BURN_AMT) } })
