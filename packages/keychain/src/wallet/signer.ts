@@ -14,8 +14,6 @@ import {
 } from '@stacks/network';
 
 import RPCClient from '@blockstack/rpc-client';
-import { bip32 } from 'bitcoinjs-lib';
-import { assertIsTruthy } from '../utils';
 import BN from 'bn.js';
 
 interface ContractCallOptions {
@@ -51,9 +49,9 @@ interface STXTransferOptions {
 }
 
 export class WalletSigner {
-  privateKey: string;
+  privateKey: Buffer;
 
-  constructor({ privateKey }: { privateKey: string }) {
+  constructor({ privateKey }: { privateKey: Buffer }) {
     this.privateKey = privateKey;
   }
 
@@ -61,10 +59,8 @@ export class WalletSigner {
     return getAddressFromPrivateKey(this.getSTXPrivateKey(), version);
   }
 
-  getSTXPrivateKey() {
-    const node = bip32.fromBase58(this.privateKey);
-    assertIsTruthy<Buffer>(node.privateKey);
-    return node.privateKey;
+  getSTXPrivateKey(): Buffer {
+    return this.privateKey;
   }
 
   getNetwork() {
