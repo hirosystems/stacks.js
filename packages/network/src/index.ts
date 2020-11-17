@@ -48,7 +48,7 @@ export class StacksMainnet implements StacksNetwork {
   contractAbiEndpoint = '/v2/contracts/interface';
   readOnlyFunctionCallEndpoint = '/v2/contracts/call-read';
 
-  isMainnet= () => this.version === TransactionVersion.Mainnet;
+  isMainnet = () => this.version === TransactionVersion.Mainnet;
   getBroadcastApiUrl = () => `${this.coreApiUrl}${this.broadcastEndpoint}`;
   getTransferFeeEstimateApiUrl = () => `${this.coreApiUrl}${this.transferFeeEstimateEndpoint}`;
   getAccountApiUrl = (address: string) =>

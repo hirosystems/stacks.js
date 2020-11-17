@@ -1,4 +1,3 @@
-// import { Stacker } from '../src';
 import { StacksTestnet } from '@stacks/network';
 import fetchMock from 'jest-fetch-mock';
 import BN from 'bn.js';
@@ -80,8 +79,8 @@ test('check stacking eligibility true', async () => {
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
   }))
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
   
   fetchMock.mockResponse(request => {
     const url = request.url;
@@ -99,7 +98,7 @@ test('check stacking eligibility true', async () => {
   })
 
   const cycles = 3;
-  const stackingEligibility = await stacker.canLockStx({poxAddress, cycles});
+  const stackingEligibility = await client.canStack({poxAddress, cycles});
 
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
@@ -128,8 +127,8 @@ test('check stacking eligibility false bad cycles', async () => {
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
   }))
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
   
   fetchMock.mockResponse(request => {
     const url = request.url;
@@ -147,7 +146,7 @@ test('check stacking eligibility false bad cycles', async () => {
   })
 
   const invalidCycles = 150;
-  const stackingEligibility = await stacker.canLockStx({poxAddress, cycles: invalidCycles});
+  const stackingEligibility = await client.canStack({poxAddress, cycles: invalidCycles});
 
   expect(fetchMock.mock.calls.length).toEqual(2);
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
@@ -156,13 +155,13 @@ test('check stacking eligibility false bad cycles', async () => {
   expect(stackingEligibility.reason).toBe(expectedErrorString);
 })
 
-test('lock stx', async () => {
+test('stack stx', async () => {
   const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
   const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
   const network = new StacksTestnet();
   const amountMicroStx = new BN(100000000000);
   const cycles = 10;
-  const key = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
+  const privateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
   const burnBlockHeight = 2000;
 
   const transaction = { serialize: () => 'mocktxhex'} 
@@ -186,14 +185,14 @@ test('lock stx', async () => {
     })
   })
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
 
-  const stackingResults = await stacker.lockStx({ 
+  const stackingResults = await client.stack({ 
     amountMicroStx,
     poxAddress,
     cycles,
-    key,
+    privateKey,
     burnBlockHeight
   });
 
@@ -217,7 +216,7 @@ test('lock stx', async () => {
     ],
     validateWithAbi: true,
     network,
-    senderKey: key
+    senderKey: privateKey
   };
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
@@ -263,10 +262,10 @@ test('get stacking status', async () => {
     })
   })
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
 
-  const stackingStatus = await stacker.getStatus();
+  const stackingStatus = await client.getStatus();
 
   const expectedReadOnlyFunctionCallOptions = {
     contractAddress: poxInfo.contract_id.split('.')[0],
@@ -299,10 +298,10 @@ test('get core info', async () => {
     })
   })
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
 
-  const responseCoreInfo = await stacker.getCoreInfo();
+  const responseCoreInfo = await client.getCoreInfo();
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getInfoUrl());
   expect(responseCoreInfo).toEqual(coreInfo);
@@ -319,10 +318,10 @@ test('get pox info', async () => {
     })
   })
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
 
-  const responsePoxInfo = await stacker.getPoxInfo();
+  const responsePoxInfo = await client.getPoxInfo();
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
   expect(responsePoxInfo).toEqual(poxInfo);
@@ -339,10 +338,10 @@ test('get target block time info', async () => {
     })
   })
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
 
-  const responseBlockTimeInfo = await stacker.getTargetBlockTime();
+  const responseBlockTimeInfo = await client.getTargetBlockTime();
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getBlockTimeInfoUrl());
   expect(responseBlockTimeInfo).toEqual(blocktimeInfo.testnet.target_block_time);
@@ -359,10 +358,10 @@ test('get account balance', async () => {
     })
   })
 
-  const { Stacker } = require('../src');
-  const stacker = new Stacker(address, network);
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
 
-  const responseBalanceInfo = await stacker.getAccountBalance();
+  const responseBalanceInfo = await client.getAccountBalance();
 
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
   expect(responseBalanceInfo.toString()).toEqual(balanceInfo.balance);
