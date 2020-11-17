@@ -2,15 +2,15 @@
 
 This repo is home to the Stacks.js libraries which provide everything you need to work with the Stacks blockchain.
 
-- [`@stacks/auth`](./packages/auth) Construct and decode authentication requests for Stacks apps.
-- [`@stacks/storage`](./packages/storage) Store and fetch files with Gaia, the decentralized storage system.
-- [`@stacks/transactions`](./packages/transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
-- [`@stacks/cli`](./packages/cli) Command line interface to interact with auth, storage and Stacks transactions.
-- [`@stacks/keychain`](./packages/keychain) Create and manage keys/wallets for the Stacks blockchain.
-- [`@stacks/network`](./packages/network) Network and API library for working with Stacks blockchain nodes.
-- [`@stacks/encryption`](./packages/encryption) Encryption functions used by Stacks.js packages.
-- [`@stacks/profile`](./packages/profile) Functions for manipulating user profiles.
-- [`@stacks/common`](./packages/common) Common utilities used by Stacks.js packages.
+- [`@stacks/auth`](https://github.com/blockstack/stacks.js/tree/master/packages/auth) Construct and decode authentication requests for Stacks apps.
+- [`@stacks/storage`](https://github.com/blockstack/stacks.js/tree/master/packages/storage) Store and fetch files with Gaia, the decentralized storage system.
+- [`@stacks/transactions`](https://github.com/blockstack/stacks.js/tree/master/packages/transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
+- [`@stacks/cli`](https://github.com/blockstack/stacks.js/tree/master/packages/cli) Command line interface to interact with auth, storage and Stacks transactions.
+- [`@stacks/keychain`](https://github.com/blockstack/stacks.js/tree/master/packages/keychain) Create and manage keys/wallets for the Stacks blockchain.
+- [`@stacks/network`](https://github.com/blockstack/stacks.js/tree/master/packages/network) Network and API library for working with Stacks blockchain nodes.
+- [`@stacks/encryption`](https://github.com/blockstack/stacks.js/tree/master/packages/encryption) Encryption functions used by Stacks.js packages.
+- [`@stacks/profile`](https://github.com/blockstack/stacks.js/tree/master/packages/profile) Functions for manipulating user profiles.
+- [`@stacks/common`](https://github.com/blockstack/stacks.js/tree/master/packages/common) Common utilities used by Stacks.js packages.
 
 See `README` in each package directory for installation instructions and usage.
 
