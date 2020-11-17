@@ -57,7 +57,7 @@ export interface ConstructorOptions {
   encryptedBackupPhrase: string;
   identities: Identity[];
   configPrivateKey: string;
-  stacksPrivateKey: string;
+  stacksPrivateKey: Buffer;
   walletConfig?: WalletConfig;
 }
 
@@ -71,7 +71,7 @@ export class Wallet {
   identityPublicKeychain: string;
   identities: Identity[];
   configPrivateKey: string;
-  stacksPrivateKey: string;
+  stacksPrivateKey: Buffer;
   walletConfig?: WalletConfig;
 
   constructor({
@@ -151,14 +151,15 @@ export class Wallet {
       throw new TypeError('Unable to derive config key for wallet identities');
     }
     const configPrivateKey = derivedIdentitiesKey.toString('hex');
-    const { childKey: stxAddressKeychain } = deriveStxAddressChain(chain)(rootNode);
+    const stacksPrivateKey = Buffer.from(deriveStxAddressChain(chain)(rootNode).privateKey, 'hex');
+
     const walletAttrs = await getBlockchainIdentities(rootNode, identitiesToGenerate);
 
     return new Wallet({
       ...walletAttrs,
       chain,
       configPrivateKey,
-      stacksPrivateKey: stxAddressKeychain.toBase58(),
+      stacksPrivateKey,
       encryptedBackupPhrase,
     });
   }

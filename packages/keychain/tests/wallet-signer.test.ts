@@ -10,9 +10,9 @@ const getSigner = async () => {
 test('can get a STX address', async () => {
   const signer = await getSigner();
   expect(signer.getSTXAddress(TransactionVersion.Mainnet)).toEqual(
-    'SP1GZ804XH4240T4JT2GQ34GG0DMT6B3BQ5NV18PD'
+    'SP384CVPNDTYA0E92TKJZQTYXQHNZSWGCAG7SAPVB'
   );
   expect(signer.getSTXAddress(TransactionVersion.Testnet)).toEqual(
-    'ST1GZ804XH4240T4JT2GQ34GG0DMT6B3BQ5YQX2WX'
+    'ST384CVPNDTYA0E92TKJZQTYXQHNZSWGCAH0ER64E'
   );
 });
