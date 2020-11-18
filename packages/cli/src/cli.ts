@@ -369,13 +369,21 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   return fetch(txNetwork.getAccountApiUrl(address))
     .then(response => response.json())
     .then(response => {
-      let balanceHex = response.balance;
-      if (balanceHex.startsWith('0x')) {
-        balanceHex = balanceHex.substr(2);
+      let balanceHex;
+      if (response.balance.startsWith('0x')) {
+        balanceHex = response.balance.substr(2);
       }
+      let lockedHex;
+      if (response.locked.startsWith('0x')) {
+        lockedHex = response.locked.substr(2);
+      }
+      let unlockHeight = response.unlock_height;
       const balance = new BN(balanceHex, 16);
+      const locked = new BN(lockedHex, 16);
       const res = {
         balance: balance.toString(10),
+        locked: locked.toString(10),
+        unlock_height: unlockHeight,
         nonce: response.nonce,
       };
       return Promise.resolve(JSONStringify(res));
@@ -1479,19 +1487,18 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
   return stacker.getStatus().then((status: StackerInfo) => {
     if (status.stacked) {
       return {
-        amount_microstx: status.details!.amountMicroStx,
-        first_reward_cycle: status.details!.firstRewardCycle,
-        lock_period: status.details!.lockPeriod,
-        unlock_burn_block: status.details!.unlockBurnBlock,
+        amount_microstx: status.details!.amount_microstx,
+        first_reward_cycle: status.details!.first_reward_cycle,
+        lock_period: status.details!.lock_period,
+        unlock_height: status.details!.unlock_height,
         pox_address: {
-          version: status.details!.poxAddress.version.toString('hex'),
-          hashbytes: status.details!.poxAddress.hashbytes.toString('hex')
+          version: status.details!.pox_address.version.toString('hex'),
+          hashbytes: status.details!.pox_address.hashbytes.toString('hex')
         }
       };
     } else {
       return 'Account not actively participating in Stacking';
     }
-
   }).catch((error: any) => {
     return error.toString();
   });
