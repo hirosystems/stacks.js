@@ -40,14 +40,17 @@ export interface PoxInfo {
 }
 
 export interface StackerInfo {
-  amountMicroStx: string;
-  firstRewardCycle: number;
-  lockPeriod: number;
-  poxAddress: {
-    version: Buffer;
-    hashbytes: Buffer;
-  };
-  btcAddress: string;
+  stacked: boolean;
+  details?: {
+    amountMicroStx: string;
+    firstRewardCycle: number;
+    lockPeriod: number;
+    poxAddress: {
+      version: Buffer;
+      hashbytes: Buffer;
+    };
+    btcAddress: string;
+  }
 }
 
 export interface BlockTimeInfo {
@@ -377,17 +380,22 @@ export class StackingClient {
         const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
       
         return {
-          amountMicroStx: amountMicroStx.value.toString(),
-          firstRewardCycle: firstRewardCycle.value.toNumber(),
-          lockPeriod: lockPeriod.value.toNumber(),
-          poxAddress: {
-            version: version.buffer,
-            hashbytes: hashbytes.buffer
-          },
-          btcAddress: '',
+          stacked: true,
+          details: {
+            amountMicroStx: amountMicroStx.value.toString(),
+            firstRewardCycle: firstRewardCycle.value.toNumber(),
+            lockPeriod: lockPeriod.value.toNumber(),
+            poxAddress: {
+              version: version.buffer,
+              hashbytes: hashbytes.buffer
+            },
+            btcAddress: '',
+          }
         }
       } else if (responseCV.type === ClarityType.OptionalNone) {
-        throw new Error(`No stacking status found for ${this.address}`);
+        return { 
+          stacked: false
+        }
       } else {
         throw new Error(`Error fetching stacker info`);
       }

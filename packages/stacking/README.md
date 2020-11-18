@@ -92,6 +92,23 @@ const poxInfo = await client.getPoxInfo();
 ## Get Stacks node info
 ```typescript
 const coreInfo = await client.getCoreInfo();
+
+// coreInfo:
+// {
+//   peer_version: 385875968,
+//   pox_consensus: 'bb88a6e6e65fa7c974d3f6e91a941d05cc3dff8e',
+//   burn_block_height: 2133,
+//   stable_pox_consensus: '2284451c3e623237def1f8caed1c11fa46b6f0cc',
+//   stable_burn_block_height: 2132,
+//   server_version: 'blockstack-core 0.0.1 => 23.0.0.0 (HEAD:a4deb7a+, release build, linux [x86_64])',
+//   network_id: 2147483648,
+//   parent_network_id: 3669344250,
+//   stacks_tip_height: 1797,
+//   stacks_tip: '016df36c6a154cb6114c469a28cc0ce8b415a7af0527f13f15e66e27aa480f94',
+//   stacks_tip_consensus_hash: 'bb88a6e6e65fa7c974d3f6e91a941d05cc3dff8e',
+//   unanchored_tip: '6b93d2c62fc07cf44302d4928211944d2debf476e5c71fb725fb298a037323cc',
+//   exit_at_block_height: null
+// }
 ```
 
 ## Get account balance
@@ -115,12 +132,15 @@ const stackingStatus = await client.getStatus();
 
 // stackingStatus:
 // {
-//   amount_microstx: '80000000000000',
-//   first_reward_cycle: 18,
-//   lock_period: 10,
-//   pox_address: {
-//     version: '00',
-//     hashbytes: '05cf52a44bf3e6829b4f8c221cc675355bf83b7d'
+//   stacked: true,
+//   details: {
+//     amount_microstx: '80000000000000',
+//     first_reward_cycle: 18,
+//     lock_period: 10,
+//     pox_address: {
+//       version: '00',
+//       hashbytes: '05cf52a44bf3e6829b4f8c221cc675355bf83b7d'
+//     }
 //   }
 // }
 ```
