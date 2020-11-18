@@ -131,17 +131,17 @@ const hasMinStxAmount = await client.hasMinimumStx();
 const stackingStatus = await client.getStatus();
 
 stackingStatus:
-{
-  stacked: true,
-  details: {
-    amount_microstx: '80000000000000',
-    first_reward_cycle: 18,
-    lock_period: 10,
-    unlock_burn_block: 3020,
-    pox_address: {
-      version: '00',
-      hashbytes: '05cf52a44bf3e6829b4f8c221cc675355bf83b7d'
-    }
-  }
-}
+// {
+//   stacked: true,
+//   details: {
+//     amount_microstx: '80000000000000',
+//     first_reward_cycle: 18,
+//     lock_period: 10,
+//     unlock_height: 3020,
+//     pox_address: {
+//       version: '00',
+//       hashbytes: '05cf52a44bf3e6829b4f8c221cc675355bf83b7d'
+//     }
+//   }
+// }
 ```
