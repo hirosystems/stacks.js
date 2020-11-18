@@ -1482,6 +1482,7 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
         amount_microstx: status.details!.amountMicroStx,
         first_reward_cycle: status.details!.firstRewardCycle,
         lock_period: status.details!.lockPeriod,
+        unlock_burn_block: status.details!.unlockBurnBlock,
         pox_address: {
           version: status.details!.poxAddress.version.toString('hex'),
           hashbytes: status.details!.poxAddress.hashbytes.toString('hex')
