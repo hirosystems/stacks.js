@@ -46,7 +46,7 @@ import { UserData } from '@stacks/auth';
 import crossfetch from 'cross-fetch';
 
 // @ts-ignore
-import { Stacker, CoreInfo, PoxInfo, hasMinimumRequiredStxAmount, StackerInfo } from '@stacks/stacking';
+import { StackingClient, CoreInfo, PoxInfo, hasMinimumStx, StackerInfo } from '@stacks/stacking';
 
 // @ts-ignore
 import { FaucetsApi, AccountsApi, Configuration } from '@stacks/blockchain-api-client';
@@ -1474,19 +1474,24 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
   let stxAddress = args[0];
 
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
-  const stacker = new Stacker(stxAddress, txNetwork);
+  const stacker = new StackingClient(stxAddress, txNetwork);
 
   return stacker.getStatus().then((status: StackerInfo) => {
-    return {
-      amount_microstx: status.amountMicroStx,
-      first_reward_cycle: status.firstRewardCycle,
-      lock_period: status.lockPeriod,
-      pox_address: {
-        version: status.poxAddress.version.toString('hex'),
-        hashbytes: status.poxAddress.hashbytes.toString('hex')
-      }
-    };
-  }).catch((error) => {
+    if (status.stacked) {
+      return {
+        amount_microstx: status.details!.amountMicroStx,
+        first_reward_cycle: status.details!.firstRewardCycle,
+        lock_period: status.details!.lockPeriod,
+        pox_address: {
+          version: status.details!.poxAddress.version.toString('hex'),
+          hashbytes: status.details!.poxAddress.hashbytes.toString('hex')
+        }
+      };
+    } else {
+      return 'Account not actively participating in Stacking';
+    }
+
+  }).catch((error: any) => {
     return error.toString();
   });
 }
@@ -1509,11 +1514,11 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
     principal: stxAddress,
   });
 
-  const stacker = new Stacker(stxAddress, txNetwork);
+  const stacker = new StackingClient(stxAddress, txNetwork);
 
   const poxInfoPromise = stacker.getPoxInfo();
 
-  const stackingEligiblePromise = stacker.canLockStx({poxAddress, cycles});
+  const stackingEligiblePromise = stacker.canStack({poxAddress, cycles});
 
   return Promise.all([balancePromise, poxInfoPromise, stackingEligiblePromise])
     .then(([balance, poxInfo, stackingEligible]) => {
@@ -1571,13 +1576,13 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
     principal: stxAddress,
   });
 
-  const stacker = new Stacker(stxAddress, txNetwork);
+  const stacker = new StackingClient(stxAddress, txNetwork);
 
   const poxInfoPromise = stacker.getPoxInfo();
 
   const coreInfoPromise = stacker.getCoreInfo();
 
-  const stackingEligiblePromise = stacker.canLockStx({poxAddress, cycles});
+  const stackingEligiblePromise = stacker.canStack({poxAddress, cycles});
 
   return Promise.all([balancePromise, poxInfoPromise, coreInfoPromise, stackingEligiblePromise])
     .then(([balance, poxInfo, coreInfo, stackingEligible]) => {
@@ -1598,11 +1603,11 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
         throw new Error(`Account cannot participate in stacking. ${stackingEligible.reason}`);
       }
 
-      return stacker.lockStx({
+      return stacker.stack({
         amountMicroStx: amount,
         poxAddress,
         cycles,
-        key: privateKey,
+        privateKey,
         burnBlockHeight: startBurnBlock,
       });
     })
@@ -1632,13 +1637,13 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
   const faucets = new FaucetsApi(apiConfig);
 
   return faucets.runFaucetStx({ address })
-   .then((faucetTx) => {
+   .then((faucetTx: any) => {
     return JSONStringify({
       txid: faucetTx.txId!,
       transaction: generateExplorerTxPageUrl(faucetTx.txId!, new StacksTestnet()),
     });
    })
-   .catch(error => error.toString());
+   .catch((error: any) => error.toString());
 } 
 
 /* Print out all documentation on usage in JSON
