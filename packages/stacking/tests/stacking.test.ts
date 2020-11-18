@@ -280,11 +280,12 @@ test('get stacking status', async () => {
 
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
-  expect(stackingStatus.amountMicroStx).toEqual(amountMicrostx.toString());
-  expect(stackingStatus.firstRewardCycle).toEqual(firstRewardCycle);
-  expect(stackingStatus.lockPeriod).toEqual(lockPeriod);
-  expect(stackingStatus.poxAddress.version.toString()).toEqual(version);
-  expect(stackingStatus.poxAddress.hashbytes.toString()).toEqual(hashbytes);
+  expect(stackingStatus.stacked).toEqual(true);
+  expect(stackingStatus.details.amountMicroStx).toEqual(amountMicrostx.toString());
+  expect(stackingStatus.details.firstRewardCycle).toEqual(firstRewardCycle);
+  expect(stackingStatus.details.lockPeriod).toEqual(lockPeriod);
+  expect(stackingStatus.details.poxAddress.version.toString()).toEqual(version);
+  expect(stackingStatus.details.poxAddress.hashbytes.toString()).toEqual(hashbytes);
 })
 
 test('get core info', async () => {
