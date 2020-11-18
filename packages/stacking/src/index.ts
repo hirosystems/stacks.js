@@ -21,13 +21,12 @@ import {
   TupleCV
 } from '@stacks/transactions';
 import {
-  StacksNetwork,
-  StacksMainnet
+  StacksNetwork
 } from '@stacks/network';
 import BN from 'bn.js';
 import { StackingErrors } from './constants';
 import { fetchPrivate } from '@stacks/common';
-import { convertBTCAddress } from './utils';
+import { decodeBtcAddress } from './utils';
 
 export interface PoxInfo {
   contract_id: string;
@@ -41,14 +40,17 @@ export interface PoxInfo {
 }
 
 export interface StackerInfo {
-  amountMicroStx: string;
-  firstRewardCycle: number;
-  lockPeriod: number;
-  poxAddress: {
-    version: Buffer;
-    hashbytes: Buffer;
-  };
-  btcAddress: string;
+  stacked: boolean;
+  details?: {
+    amountMicroStx: string;
+    firstRewardCycle: number;
+    lockPeriod: number;
+    poxAddress: {
+      version: Buffer;
+      hashbytes: Buffer;
+    };
+    btcAddress: string;
+  }
 }
 
 export interface BlockTimeInfo {
@@ -93,20 +95,20 @@ export interface CanLockStxOptions {
  * @param  {String} poxAddress - the reward Bitcoin address
  * @param  {number} cycles - number of cycles to lock
  * @param  {BigNum} amountMicroStx - number of microstacks to lock
- * @param  {number} burnBlockHeight -the burnchain block height to begin lock
+ * @param  {number} burnBlockHeight - the burnchain block height to begin lock
  */
 export interface LockStxOptions {
-  key: string;
+  privateKey: string;
   cycles: number;
   poxAddress: string;
   amountMicroStx: BN;
   burnBlockHeight: number;
 }
 
-export class Stacker {
+export class StackingClient {
   constructor(
     public address: string, 
-    public network: StacksNetwork = new StacksMainnet()) {}
+    public network: StacksNetwork) {}
 
   /**
    * Get stacks node info
@@ -178,7 +180,7 @@ export class Stacker {
    * 
    * @returns {Promise<number>} that resolves to a number if the operation succeeds
    */
-  async secondsUntilNextCycle(): Promise<number> {
+  async getSecondsUntilNextCycle(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
     const targetBlockTimePromise = await this.getTargetBlockTime();
     const coreInfoPromise = this.getCoreInfo();
@@ -199,7 +201,7 @@ export class Stacker {
    * 
    * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
    */
-  async stackingEnabledNextCycle(): Promise<boolean> {
+  async isStackingEnabledNextCycle(): Promise<boolean> {
     return (await this.getPoxInfo()).rejection_votes_left_required > 0;
   }
 
@@ -208,7 +210,7 @@ export class Stacker {
    * 
    * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
    */
-  async hasMinimumRequiredStxAmount(): Promise<boolean> {
+  async hasMinimumStx(): Promise<boolean> {
     const balance: BN = await this.getAccountBalance();
     // TODO pox info should use string type instead of number
     const min: BN = new BN((await this.getPoxInfo()).min_amount_ustx.toString());
@@ -222,7 +224,7 @@ export class Stacker {
    * 
    * @returns {Promise<StackingEligibility>} that resolves to a StackingEligibility object if the operation succeeds
    */
-  async canLockStx({
+  async canStack({
     poxAddress, 
     cycles
   }: CanLockStxOptions
@@ -232,7 +234,7 @@ export class Stacker {
 
     return Promise.all([balancePromise, poxInfoPromise])
       .then(([balance, poxInfo]) => {
-        const { hashMode, data } = convertBTCAddress(poxAddress);
+        const { hashMode, data } = decodeBtcAddress(poxAddress);
         const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
         const hashbytes = bufferCV(data);
         const poxAddressCV = tupleCV({
@@ -278,18 +280,18 @@ export class Stacker {
    * 
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async lockStx({
+  async stack({
     amountMicroStx,
     poxAddress,
     cycles,
-    key,
+    privateKey,
     burnBlockHeight,
   }: LockStxOptions
   ) {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
-    const txOptions = this.getLockTxOptions({
+    const txOptions = this.getStackOptions({
       amountMicroStx,
       cycles,
       poxAddress,
@@ -298,7 +300,7 @@ export class Stacker {
     });
     const tx = await makeContractCall({
       ...txOptions,
-      senderKey: key,
+      senderKey: privateKey,
     });
 
     const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
@@ -308,7 +310,7 @@ export class Stacker {
     throw new Error(`${res.error} - ${res.reason}`);
   }
 
-  getLockTxOptions({
+  getStackOptions({
     amountMicroStx,
     poxAddress,
     cycles,
@@ -321,7 +323,7 @@ export class Stacker {
     contract: string;
     burnBlockHeight: number;
   }) {
-    const { hashMode, data } = convertBTCAddress(poxAddress);
+    const { hashMode, data } = decodeBtcAddress(poxAddress);
     const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
     const hashbytes = bufferCV(data);
     const address = tupleCV({
@@ -378,17 +380,22 @@ export class Stacker {
         const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
       
         return {
-          amountMicroStx: amountMicroStx.value.toString(),
-          firstRewardCycle: firstRewardCycle.value.toNumber(),
-          lockPeriod: lockPeriod.value.toNumber(),
-          poxAddress: {
-            version: version.buffer,
-            hashbytes: hashbytes.buffer
-          },
-          btcAddress: '',
+          stacked: true,
+          details: {
+            amountMicroStx: amountMicroStx.value.toString(),
+            firstRewardCycle: firstRewardCycle.value.toNumber(),
+            lockPeriod: lockPeriod.value.toNumber(),
+            poxAddress: {
+              version: version.buffer,
+              hashbytes: hashbytes.buffer
+            },
+            btcAddress: '',
+          }
         }
       } else if (responseCV.type === ClarityType.OptionalNone) {
-        throw new Error(`No stacking status found for ${this.address}`);
+        return { 
+          stacked: false
+        }
       } else {
         throw new Error(`Error fetching stacker info`);
       }
