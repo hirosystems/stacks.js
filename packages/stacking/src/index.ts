@@ -42,14 +42,14 @@ export interface PoxInfo {
 export interface StackerInfo {
   stacked: boolean;
   details?: {
-    amountMicroStx: string;
-    firstRewardCycle: number;
-    lockPeriod: number;
-    poxAddress: {
+    amount_microstx: string;
+    first_reward_cycle: number;
+    lock_period: number;
+    unlock_burn_block: number;
+    pox_address: {
       version: Buffer;
       hashbytes: Buffer;
     };
-    btcAddress: string;
   }
 }
 
@@ -356,6 +356,7 @@ export class StackingClient {
    */
   async getStatus(): Promise<StackerInfo> {
     const [contractAddress, contractName] = (await this.getPoxInfo()).contract_id.split('.');
+    const { burn_block_height } = await this.getCoreInfo();
     const functionName = 'get-stacker-info';
 
     return callReadOnlyFunction({
@@ -382,14 +383,14 @@ export class StackingClient {
         return {
           stacked: true,
           details: {
-            amountMicroStx: amountMicroStx.value.toString(),
-            firstRewardCycle: firstRewardCycle.value.toNumber(),
-            lockPeriod: lockPeriod.value.toNumber(),
-            poxAddress: {
+            amount_microstx: amountMicroStx.value.toString(),
+            first_reward_cycle: firstRewardCycle.value.toNumber(),
+            lock_period: lockPeriod.value.toNumber(),
+            unlock_burn_block: burn_block_height + lockPeriod.value.toNumber(),
+            pox_address: {
               version: version.buffer,
               hashbytes: hashbytes.buffer
-            },
-            btcAddress: '',
+            }
           }
         }
       } else if (responseCV.type === ClarityType.OptionalNone) {
