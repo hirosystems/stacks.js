@@ -45,7 +45,7 @@ export interface StackerInfo {
     amount_microstx: string;
     first_reward_cycle: number;
     lock_period: number;
-    unlock_burn_block: number;
+    unlock_height: number;
     pox_address: {
       version: Buffer;
       hashbytes: Buffer;
@@ -148,15 +148,19 @@ export class StackingClient {
     }
   }
   
+  async getAccountStatus(): Promise<any> {
+    const url = this.network.getAccountApiUrl(this.address); 
+    return fetchPrivate(url)
+      .then((res) => res.json())
+  }
+
   /**
    * Get account balance
    * 
    * @returns {Promise<BN>} that resolves to a BigNum if the operation succeeds
    */
   async getAccountBalance(): Promise<BN> {
-    const url = this.network.getAccountApiUrl(this.address); 
-    return fetchPrivate(url)
-      .then((res) => res.json())
+    return this.getAccountStatus()
       .then((res) => new BN(res.balance));
   }
 
@@ -356,7 +360,7 @@ export class StackingClient {
    */
   async getStatus(): Promise<StackerInfo> {
     const [contractAddress, contractName] = (await this.getPoxInfo()).contract_id.split('.');
-    const { burn_block_height } = await this.getCoreInfo();
+    const account = await this.getAccountStatus();
     const functionName = 'get-stacker-info';
 
     return callReadOnlyFunction({
@@ -386,7 +390,7 @@ export class StackingClient {
             amount_microstx: amountMicroStx.value.toString(),
             first_reward_cycle: firstRewardCycle.value.toNumber(),
             lock_period: lockPeriod.value.toNumber(),
-            unlock_burn_block: burn_block_height + lockPeriod.value.toNumber(),
+            unlock_height: account.unlock_height,
             pox_address: {
               version: version.buffer,
               hashbytes: hashbytes.buffer

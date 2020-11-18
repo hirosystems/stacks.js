@@ -33,7 +33,8 @@ const poxInfo = {
 const balanceInfo = {
   balance: "90000000000000",
   total_sent: "0",
-  total_received: "90000000000000"
+  total_received: "90000000000000",
+  unlock_height: 1000
 }
 
 const coreInfo = {
@@ -255,11 +256,19 @@ test('get stacking status', async () => {
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType
   }))
 
-  fetchMock.mockResponse(() => {
-    return Promise.resolve({
-      body: JSON.stringify(poxInfo),
-      status: 200
-    })
+  fetchMock.mockResponse(request => {
+    const url = request.url;
+    if (url.endsWith('pox')) {
+      return Promise.resolve({
+        body: JSON.stringify(poxInfo),
+        status: 200
+      })
+    } else {
+      return Promise.resolve({
+        body: JSON.stringify(balanceInfo),
+        status: 200
+      })
+    }
   })
 
   const { StackingClient } = require('../src');
@@ -281,11 +290,12 @@ test('get stacking status', async () => {
   expect(callReadOnlyFunction).toHaveBeenCalledTimes(1);
   expect(callReadOnlyFunction).toHaveBeenCalledWith(expectedReadOnlyFunctionCallOptions);
   expect(stackingStatus.stacked).toEqual(true);
-  expect(stackingStatus.details.amountMicroStx).toEqual(amountMicrostx.toString());
-  expect(stackingStatus.details.firstRewardCycle).toEqual(firstRewardCycle);
-  expect(stackingStatus.details.lockPeriod).toEqual(lockPeriod);
-  expect(stackingStatus.details.poxAddress.version.toString()).toEqual(version);
-  expect(stackingStatus.details.poxAddress.hashbytes.toString()).toEqual(hashbytes);
+  expect(stackingStatus.details.amount_microstx).toEqual(amountMicrostx.toString());
+  expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
+  expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
+  expect(stackingStatus.details.unlock_height).toEqual(balanceInfo.unlock_height);
+  expect(stackingStatus.details.pox_address.version.toString()).toEqual(version);
+  expect(stackingStatus.details.pox_address.hashbytes.toString()).toEqual(hashbytes);
 })
 
 test('get core info', async () => {
