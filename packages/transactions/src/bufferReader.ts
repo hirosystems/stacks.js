@@ -87,6 +87,10 @@ export class BufferReader {
     return num;
   }
 
+  readBigUInt64BE(): bigint {
+    return this.smartBuffer.readBigUInt64BE();
+  }
+
   readUInt8Enum<T extends string, TEnumValue extends number>(
     enumVariable: { [key in T]: TEnumValue },
     invalidEnumErrorFormatter: (val: number) => Error
