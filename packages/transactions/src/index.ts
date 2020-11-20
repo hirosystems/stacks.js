@@ -35,5 +35,6 @@ export * from './types';
 export * from './constants';
 export * from './contract-abi';
 export * from './signer';
+export * from './authorization';
 
 export { cvToHex, parseReadOnlyResponse, hexToCV } from './utils';
