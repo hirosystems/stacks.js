@@ -53,7 +53,7 @@ export class BufferReader {
     if (Buffer.isBuffer(options)) {
       this.smartBuffer = new SmartBuffer({ buff: options });
     } else {
-      this.smartBuffer = new SmartBuffer(options );
+      this.smartBuffer = new SmartBuffer(options);
     }
   }
 
@@ -89,6 +89,22 @@ export class BufferReader {
 
   readBigUInt64BE(): bigint {
     return this.smartBuffer.readBigUInt64BE();
+  }
+
+  readString(arg?: number | BufferEncoding, encoding?: BufferEncoding): string {
+    return this.smartBuffer.readString(arg, encoding);
+  }
+
+  get readOffset(): number {
+    return this.smartBuffer.readOffset;
+  }
+
+  set readOffset(val: number) {
+    this.smartBuffer.readOffset = val;
+  }
+
+  get internalBuffer(): Buffer {
+    return this.smartBuffer.internalBuffer;
   }
 
   readUInt8Enum<T extends string, TEnumValue extends number>(
