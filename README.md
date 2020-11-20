@@ -6,6 +6,7 @@ This repo is home to the Stacks.js libraries which provide everything you need t
 - [`@stacks/storage`](https://github.com/blockstack/stacks.js/tree/master/packages/storage) Store and fetch files with Gaia, the decentralized storage system.
 - [`@stacks/transactions`](https://github.com/blockstack/stacks.js/tree/master/packages/transactions) Construct, decode transactions and work with Clarity smart contracts on the Stacks blockchain.
 - [`@stacks/cli`](https://github.com/blockstack/stacks.js/tree/master/packages/cli) Command line interface to interact with auth, storage and Stacks transactions.
+- [`@stacks/stacking`](https://github.com/blockstack/stacks.js/tree/master/packages/stacking) Library for PoX stacking.
 - [`@stacks/keychain`](https://github.com/blockstack/stacks.js/tree/master/packages/keychain) Create and manage keys/wallets for the Stacks blockchain.
 - [`@stacks/network`](https://github.com/blockstack/stacks.js/tree/master/packages/network) Network and API library for working with Stacks blockchain nodes.
 - [`@stacks/encryption`](https://github.com/blockstack/stacks.js/tree/master/packages/encryption) Encryption functions used by Stacks.js packages.
