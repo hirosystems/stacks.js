@@ -3,13 +3,16 @@ import {
   makeContractDeploy,
   TransactionVersion,
   ClarityValue,
-  StacksTestnet,
   makeSTXTokenTransfer,
   PostConditionMode,
   getAddressFromPrivateKey,
-  PostCondition,
-  StacksNetwork,
-} from '@blockstack/stacks-transactions';
+  PostCondition
+} from '@stacks/transactions';
+import {
+  StacksTestnet,
+  StacksNetwork
+} from '@stacks/network';
+
 import RPCClient from '@blockstack/rpc-client';
 import { bip32 } from 'bitcoinjs-lib';
 import { assertIsTruthy } from '../utils';

@@ -2,9 +2,9 @@ import {
   ChainID,
   getAddressFromPrivateKey,
   TransactionVersion,
-} from '@blockstack/stacks-transactions';
+} from '@stacks/transactions';
 import { BIP32Interface, ECPair } from 'bitcoinjs-lib';
-import { ecPairToHexString } from 'blockstack';
+import { ecPairToHexString } from '@stacks/encryption';
 
 const networkDerivationPath = `m/44'/5757'/0'/0/0`;
 

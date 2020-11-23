@@ -2,10 +2,10 @@ import './setup';
 import Wallet, { WalletConfig, ConfigApp } from '../src/wallet';
 import { decrypt } from '../src/encryption/decrypt';
 import { ECPair, bip32 } from 'bitcoinjs-lib';
-import { decryptContent, encryptContent, getPublicKeyFromPrivate } from 'blockstack';
+import { decryptContent, encryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
 import { DEFAULT_GAIA_HUB } from '../src/utils/gaia';
 import { mnemonicToSeed } from 'bip39';
-import { ChainID } from '@blockstack/stacks-transactions';
+import { ChainID } from '@stacks/transactions';
 
 describe('Restoring a wallet', () => {
   test('restores an existing wallet and keychain', async () => {

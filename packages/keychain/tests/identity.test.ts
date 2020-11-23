@@ -1,9 +1,8 @@
 import './setup';
-import { makeECPrivateKey, getPublicKeyFromPrivate } from 'blockstack/lib/keys';
-import { decryptPrivateKey } from 'blockstack/lib/auth/authMessages';
+import { makeECPrivateKey, getPublicKeyFromPrivate, ecPairToAddress } from '@stacks/encryption';
+import { decryptPrivateKey } from '@stacks/auth';
 import { decodeToken } from 'jsontokens';
 import { getIdentity, profileResponse, nameInfoResponse } from './helpers';
-import { ecPairToAddress } from 'blockstack';
 import { ECPair } from 'bitcoinjs-lib';
 
 interface Decoded {

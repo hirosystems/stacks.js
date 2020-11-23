@@ -1,6 +1,6 @@
 import { mnemonicToSeed } from 'bip39';
 import { bip32, BIP32Interface } from 'bitcoinjs-lib';
-import { ChainID } from '@blockstack/stacks-transactions';
+import { ChainID } from '@stacks/transactions';
 
 import {
   getBlockchainIdentities,
@@ -12,11 +12,15 @@ import {
 import Identity from '../identity';
 import { decrypt } from '../encryption/decrypt';
 import {
-  connectToGaiaHub,
+  GaiaHubConfig,
+  connectToGaiaHub
+} from '@stacks/storage';
+import {
   encryptContent,
-  getPublicKeyFromPrivate,
   decryptContent,
-} from 'blockstack';
+  getPublicKeyFromPrivate
+} from '@stacks/encryption';
+
 import {
   AllowedKeyEntropyBits,
   generateEncryptedMnemonicRootKeychain,
@@ -24,7 +28,6 @@ import {
   encryptMnemonicFormatted,
 } from '../mnemonic';
 import { deriveStxAddressChain } from '../address-derivation';
-import { GaiaHubConfig } from 'blockstack/lib/storage/hub';
 import { makeReadOnlyGaiaConfig, DEFAULT_GAIA_HUB, uploadToGaiaHub } from '../utils/gaia';
 import { WalletSigner } from './signer';
 

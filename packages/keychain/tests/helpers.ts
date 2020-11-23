@@ -1,5 +1,5 @@
 import Wallet from '../src/wallet';
-import { ChainID } from '@blockstack/stacks-transactions';
+import { ChainID } from '@stacks/transactions';
 
 const defaultSeed =
   'sound idle panel often situate develop unit text design antenna ' +

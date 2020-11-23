@@ -1,4 +1,4 @@
-import { encryptMnemonic } from 'blockstack/lib/encryption/wallet';
+import { encryptMnemonic } from '@stacks/encryption';
 
 /**
  * Encrypt a raw mnemonic phrase to be password protected
