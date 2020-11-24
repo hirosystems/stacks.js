@@ -394,22 +394,22 @@ describe('Clarity Types', () => {
             (f (optional none)) (g principal) (h principal) (i (response bool UnknownType)) 
             (j (response UnknownType bool)) (k (list 2 bool)) (l (tuple (a bool) (b bool))) 
             (m (string-ascii 11)) (n (string-utf8 9)))",
-            "value":[
-              {"name":"a","type":"int","value":-1},
-              {"name":"b","type":"uint","value":1},
-              {"name":"c","type":"(buff 4)","value":"0x74657374"},
-              {"name":"d","type":"bool","value":true},
-              {"name":"e","type":"(optional bool)","value":{"type":"bool","value":true}},
-              {"name":"f","type":"(optional none)","value":null},
-              {"name":"g","type":"principal","value":"SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B"},
-              {"name":"h","type":"principal","value":"SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B.test"},
-              {"name":"i","type":"(response bool UnknownType)","value":{"type":"bool","value":true},"success":true},
-              {"name":"j","type":"(response UnknownType bool)","value":{"type":"bool","value":false},"success":false},
-              {"name":"k","type":"(list 2 bool)","value":[{"type":"bool","value":true},{"type":"bool","value":false}]},
-              {"name":"l","type":"(tuple (a bool) (b bool))",
-                "value":[{"name":"a","type":"bool","value":true},{"name":"b","type":"bool","value":false}]},
-              {"name":"m","type":"(string-ascii 11)","value":"hello world"},
-              {"name":"n","type":"(string-utf8 9)","value":"hello \u{1234}"}]
+            "value":{
+              "a":{"type":"int","value":-1},
+              "b":{"type":"uint","value":1},
+              "c":{"type":"(buff 4)","value":"0x74657374"},
+              "d":{"type":"bool","value":true},
+              "e":{"type":"(optional bool)","value":{"type":"bool","value":true}},
+              "f":{"type":"(optional none)","value":null},
+              "g":{"type":"principal","value":"SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B"},
+              "h":{"type":"principal","value":"SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B.test"},
+              "i":{"type":"(response bool UnknownType)","value":{"type":"bool","value":true},"success":true},
+              "j":{"type":"(response UnknownType bool)","value":{"type":"bool","value":false},"success":false},
+              "k":{"type":"(list 2 bool)","value":[{"type":"bool","value":true},{"type":"bool","value":false}]},
+              "l":{"type":"(tuple (a bool) (b bool))",
+                "value":{"a":{"type":"bool","value":true},"b":{"type":"bool","value":false}}},
+              "m":{"type":"(string-ascii 11)","value":"hello world"},
+              "n":{"type":"(string-utf8 9)","value":"hello \u{1234}"}}
             }`
       );
     });

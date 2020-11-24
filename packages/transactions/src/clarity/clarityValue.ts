@@ -122,7 +122,11 @@ function cvToValue(val: ClarityValue): any {
     case ClarityType.List:
       return val.list.map(v => cvToJSON(v));
     case ClarityType.Tuple:
-      return Object.keys(val.data).map(key => cvToJSON(val.data[key], key));
+      const result: { [key: string]: any } = {};
+      Object.keys(val.data).forEach(key => {
+        result[key] = cvToJSON(val.data[key]);
+      });
+      return result;
     case ClarityType.StringASCII:
       return val.data;
     case ClarityType.StringUTF8:
@@ -130,14 +134,14 @@ function cvToValue(val: ClarityValue): any {
   }
 }
 
-export function cvToJSON(val: ClarityValue, name?: string): any {
+export function cvToJSON(val: ClarityValue): any {
   switch (val.type) {
     case ClarityType.ResponseErr:
-      return { name, type: getCVTypeString(val), value: cvToValue(val), success: false };
+      return { type: getCVTypeString(val), value: cvToValue(val), success: false };
     case ClarityType.ResponseOk:
-      return { name, type: getCVTypeString(val), value: cvToValue(val), success: true };
+      return { type: getCVTypeString(val), value: cvToValue(val), success: true };
     default:
-      return { name, type: getCVTypeString(val), value: cvToValue(val) };
+      return { type: getCVTypeString(val), value: cvToValue(val) };
   }
 }
 
