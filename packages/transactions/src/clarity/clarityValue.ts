@@ -96,7 +96,7 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
   }
 }
 
-export function cvToValue(val: ClarityValue): any {
+function cvToValue(val: ClarityValue): any {
   switch (val.type) {
     case ClarityType.BoolTrue:
       return true;
