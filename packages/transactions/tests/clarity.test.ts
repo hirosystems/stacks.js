@@ -28,7 +28,7 @@ import {
   StringUtf8CV,
 } from '../src/clarity';
 import { BufferReader } from '../src/bufferReader';
-import { cvToString } from '../src/clarity/clarityValue';
+import { cvToString, cvToJSON } from '../src/clarity/clarityValue';
 
 const ADDRESS = 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B';
 
@@ -291,7 +291,7 @@ describe('Clarity Types', () => {
     test('Ascii String Escaped Length', () => {
       const strings = [
         stringAsciiCV('\\'),
-        stringAsciiCV('\"'),
+        stringAsciiCV('"'),
         stringAsciiCV('\n'),
         stringAsciiCV('\t'),
         stringAsciiCV('\r'),
@@ -303,7 +303,7 @@ describe('Clarity Types', () => {
         const serializedStringLenByte = reader.readBuffer(5)[4];
         expect(serializedStringLenByte).toEqual(1);
         expect(ser.length).toEqual(6);
-      })
+      });
     });
 
     test('Utf8 String Vector', () => {
@@ -361,6 +361,66 @@ describe('Clarity Types', () => {
       expect(cvToString(bufferCV(Buffer.from('\n', 'ascii')))).toEqual('0x0a');
       expect(cvToString(bufferCV(Buffer.from('00', 'hex')))).toEqual('0x00');
       expect(cvToString(bufferCV(Buffer.from([127])))).toEqual('0x7f');
+    });
+  });
+
+  describe('Clarity value to JSON', () => {
+    test('Complex Tuple', () => {
+      const tuple = tupleCV({
+        a: intCV(-1),
+        b: uintCV(1),
+        c: bufferCV(Buffer.from('test')),
+        d: trueCV(),
+        e: someCV(trueCV()),
+        f: noneCV(),
+        g: standardPrincipalCV(ADDRESS),
+        h: contractPrincipalCV(ADDRESS, 'test'),
+        i: responseOkCV(trueCV()),
+        j: responseErrorCV(falseCV()),
+        k: listCV([trueCV(), falseCV()]),
+        l: tupleCV({
+          a: trueCV(),
+          b: falseCV(),
+        }),
+        m: stringAsciiCV('hello world'),
+        n: stringUtf8CV('hello \u{1234}'),
+      });
+
+      const tupleString = JSON.stringify(cvToJSON(tuple));
+
+      expect(tupleString).toEqual(
+        oneLineTrim`
+          {"type":"(tuple (a int) (b uint) (c (buff 4)) (d bool) (e (optional bool)) 
+            (f (optional none)) (g principal) (h principal) (i (response bool UnknownType)) 
+            (j (response UnknownType bool)) (k (list 2 bool)) (l (tuple (a bool) (b bool))) 
+            (m (string-ascii 11)) (n (string-utf8 9)))",
+            "value":[
+              {"name":"a","type":"int","value":-1},
+              {"name":"b","type":"uint","value":1},
+              {"name":"c","type":"(buff 4)","value":"0x74657374"},
+              {"name":"d","type":"bool","value":true},
+              {"name":"e","type":"(optional bool)","value":{"type":"bool","value":true}},
+              {"name":"f","type":"(optional none)","value":null},
+              {"name":"g","type":"principal","value":"SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B"},
+              {"name":"h","type":"principal","value":"SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B.test"},
+              {"name":"i","type":"(response bool UnknownType)","value":{"type":"bool","value":true},"success":true},
+              {"name":"j","type":"(response UnknownType bool)","value":{"type":"bool","value":false},"success":false},
+              {"name":"k","type":"(list 2 bool)","value":[{"type":"bool","value":true},{"type":"bool","value":false}]},
+              {"name":"l","type":"(tuple (a bool) (b bool))",
+                "value":[{"name":"a","type":"bool","value":true},{"name":"b","type":"bool","value":false}]},
+              {"name":"m","type":"(string-ascii 11)","value":"hello world"},
+              {"name":"n","type":"(string-utf8 9)","value":"hello \u{1234}"}]
+            }`
+      );
+    });
+
+    test('Hex Buffer', () => {
+      expect(JSON.stringify(cvToJSON(bufferCV(Buffer.from('\n', 'ascii'))))).toEqual(
+        oneLineTrim`
+        {"type":"(buff 1)",
+        "value":"0x0a"}
+        `
+      );
     });
   });
 });

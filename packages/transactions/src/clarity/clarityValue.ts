@@ -96,6 +96,51 @@ export function cvToString(val: ClarityValue, encoding: 'tryAscii' | 'hex' = 'he
   }
 }
 
+export function cvToValue(val: ClarityValue): any {
+  switch (val.type) {
+    case ClarityType.BoolTrue:
+      return true;
+    case ClarityType.BoolFalse:
+      return false;
+    case ClarityType.Int:
+      return val.value.fromTwos(CLARITY_INT_SIZE).toNumber();
+    case ClarityType.UInt:
+      return val.value.toNumber();
+    case ClarityType.Buffer:
+      return `0x${val.buffer.toString('hex')}`;
+    case ClarityType.OptionalNone:
+      return null;
+    case ClarityType.OptionalSome:
+      return cvToJSON(val.value);
+    case ClarityType.ResponseErr:
+      return cvToJSON(val.value);
+    case ClarityType.ResponseOk:
+      return cvToJSON(val.value);
+    case ClarityType.PrincipalStandard:
+    case ClarityType.PrincipalContract:
+      return principalToString(val);
+    case ClarityType.List:
+      return val.list.map(v => cvToJSON(v));
+    case ClarityType.Tuple:
+      return Object.keys(val.data).map(key => cvToJSON(val.data[key], key));
+    case ClarityType.StringASCII:
+      return val.data;
+    case ClarityType.StringUTF8:
+      return val.data;
+  }
+}
+
+export function cvToJSON(val: ClarityValue, name?: string): any {
+  switch (val.type) {
+    case ClarityType.ResponseErr:
+      return { name, type: getCVTypeString(val), value: cvToValue(val), success: false };
+    case ClarityType.ResponseOk:
+      return { name, type: getCVTypeString(val), value: cvToValue(val), success: true };
+    default:
+      return { name, type: getCVTypeString(val), value: cvToValue(val) };
+  }
+}
+
 export function getCVTypeString(val: ClarityValue): string {
   switch (val.type) {
     case ClarityType.BoolTrue:
@@ -112,9 +157,9 @@ export function getCVTypeString(val: ClarityValue): string {
     case ClarityType.OptionalSome:
       return `(optional ${getCVTypeString(val.value)})`;
     case ClarityType.ResponseErr:
-      return `(responseError ${getCVTypeString(val.value)})`;
+      return `(response UnknownType ${getCVTypeString(val.value)})`;
     case ClarityType.ResponseOk:
-      return `(responseOk ${getCVTypeString(val.value)})`;
+      return `(response ${getCVTypeString(val.value)} UnknownType)`;
     case ClarityType.PrincipalStandard:
     case ClarityType.PrincipalContract:
       return 'principal';
