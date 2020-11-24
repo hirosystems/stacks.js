@@ -34,7 +34,11 @@ const balanceInfo = {
   balance: "90000000000000",
   total_sent: "0",
   total_received: "90000000000000",
-  unlock_height: 1000
+  lock_tx_id: "0xec94e7d20af8979b44d17a0520c126bf742b999a0fc7ddbcbe0ab21b228ecc8c",
+  locked: "50000",
+  lock_height: 100,
+  burnchain_lock_height: 100,
+  burnchain_unlock_height: 200
 }
 
 const coreInfo = {
@@ -293,7 +297,7 @@ test('get stacking status', async () => {
   expect(stackingStatus.details.amount_microstx).toEqual(amountMicrostx.toString());
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
   expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
-  expect(stackingStatus.details.unlock_height).toEqual(balanceInfo.unlock_height);
+  expect(stackingStatus.details.burnchain_unlock_height).toEqual(balanceInfo.burnchain_unlock_height);
   expect(stackingStatus.details.pox_address.version.toString()).toEqual(version);
   expect(stackingStatus.details.pox_address.hashbytes.toString()).toEqual(hashbytes);
 })
