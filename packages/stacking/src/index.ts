@@ -45,7 +45,7 @@ export interface StackerInfo {
     amount_microstx: string;
     first_reward_cycle: number;
     lock_period: number;
-    unlock_height: number;
+    burnchain_unlock_height: number;
     pox_address: {
       version: Buffer;
       hashbytes: Buffer;
@@ -390,7 +390,7 @@ export class StackingClient {
             amount_microstx: amountMicroStx.value.toString(),
             first_reward_cycle: firstRewardCycle.value.toNumber(),
             lock_period: lockPeriod.value.toNumber(),
-            unlock_height: account.unlock_height,
+            burnchain_unlock_height: account.burnchain_unlock_height,
             pox_address: {
               version: version.buffer,
               hashbytes: hashbytes.buffer
