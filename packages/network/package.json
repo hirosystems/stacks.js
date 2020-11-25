@@ -1,6 +1,6 @@
 {
   "name": "@stacks/network",
-  "version": "1.0.0-beta.12",
+  "version": "1.0.0-beta.13",
   "description": "Library for Stacks network operations",
   "keywords": [
     "stacks",
@@ -44,7 +44,7 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0-beta.12"
+    "@stacks/common": "^1.0.0-beta.13"
   },
   "devDependencies": {
     "@types/jest": "^24.9.0",
