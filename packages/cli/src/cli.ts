@@ -369,11 +369,11 @@ function balance(network: CLINetworkAdapter, args: string[]): Promise<string> {
   return fetch(txNetwork.getAccountApiUrl(address))
     .then(response => response.json())
     .then(response => {
-      let balanceHex;
+      let balanceHex = response.balance;
       if (response.balance.startsWith('0x')) {
         balanceHex = response.balance.substr(2);
       }
-      let lockedHex;
+      let lockedHex = response.locked;
       if (response.locked.startsWith('0x')) {
         lockedHex = response.locked.substr(2);
       }
@@ -1597,7 +1597,7 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
       const minAmount = new BN(poxInfo.min_amount_ustx);
       const balanceBN = new BN(balance.stx.balance);
       const burnChainBlockHeight = coreInfo.burn_block_height;
-      const startBurnBlock = burnChainBlockHeight + 2;
+      const startBurnBlock = burnChainBlockHeight + 3;
 
       if (minAmount.gt(amount)) {
         throw new Error(`Stacking amount less than required minimum of ${minAmount.toString()} microstacks`);

@@ -45,7 +45,7 @@ export interface StackerInfo {
     amount_microstx: string;
     first_reward_cycle: number;
     lock_period: number;
-    burnchain_unlock_height: number;
+    unlock_height: number;
     pox_address: {
       version: Buffer;
       hashbytes: Buffer;
@@ -161,7 +161,13 @@ export class StackingClient {
    */
   async getAccountBalance(): Promise<BN> {
     return this.getAccountStatus()
-      .then((res) => new BN(res.balance));
+      .then((res) => { 
+        let balanceHex = res.balance;
+        if (res.balance.startsWith('0x')) {
+          balanceHex = res.balance.substr(2);
+        }
+        return new BN(balanceHex, 'hex')
+    });
   }
 
   /**
@@ -216,7 +222,6 @@ export class StackingClient {
    */
   async hasMinimumStx(): Promise<boolean> {
     const balance: BN = await this.getAccountBalance();
-    // TODO pox info should use string type instead of number
     const min: BN = new BN((await this.getPoxInfo()).min_amount_ustx.toString());
     return balance.gte(min);
   }
@@ -383,14 +388,14 @@ export class StackingClient {
         const lockPeriod: UIntCV = tupleCV.data["lock-period"] as UIntCV;
         const version: BufferCV = poxAddress.data['version'] as BufferCV;
         const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
-      
+
         return {
           stacked: true,
           details: {
             amount_microstx: amountMicroStx.value.toString(),
             first_reward_cycle: firstRewardCycle.value.toNumber(),
             lock_period: lockPeriod.value.toNumber(),
-            burnchain_unlock_height: account.burnchain_unlock_height,
+            unlock_height: account.unlock_height,
             pox_address: {
               version: version.buffer,
               hashbytes: hashbytes.buffer
