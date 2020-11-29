@@ -45,10 +45,8 @@ const c32check = require('c32check');
 import { UserData } from '@stacks/auth';
 import crossfetch from 'cross-fetch';
 
-// @ts-ignore
-import { StackingClient, CoreInfo, PoxInfo, hasMinimumStx, StackerInfo } from '@stacks/stacking';
+import { StackingClient, StackerInfo } from '@stacks/stacking';
 
-// @ts-ignore
 import { FaucetsApi, AccountsApi, Configuration } from '@stacks/blockchain-api-client';
 
 import { GaiaHubConfig } from '@stacks/storage';
