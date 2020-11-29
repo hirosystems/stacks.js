@@ -2374,14 +2374,14 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@stacks/blockchain-api-client@^0.29.2":
-  version "0.29.5"
-  resolved "https://registry.yarnpkg.com/@stacks/blockchain-api-client/-/blockchain-api-client-0.29.5.tgz#ba0fe03a653eb671740efa9e0186e66626d52d66"
-  integrity sha512-/4E8yMXKWaV+A9XfIAONyFZP2kXz/3HIXMRee6MkvHlVOejhxg73s7dmlwjB+1R6SOMCUd5LJZsyaHbRu+bh3A==
+"@stacks/blockchain-api-client@^0.34.1":
+  version "0.34.1"
+  resolved "https://registry.yarnpkg.com/@stacks/blockchain-api-client/-/blockchain-api-client-0.34.1.tgz#e079dac704ddcf5cdffebec48cde89adcdcbde4e"
+  integrity sha512-dmLrE465/cPFkLMFIwdx2tWyLLM9dLQH/9ocrH5kLIj7/dnVSemUdMZr2Izyvttz9oQAUFH2aIBrUgAjNNDSrw==
   dependencies:
     "@blockstack/stacks-blockchain-api-types" "^0.5.3"
     "@types/ws" "^7.2.6"
-    cross-fetch "^3.0.5"
+    cross-fetch "^3.0.6"
     eventemitter3 "^4.0.4"
     jsonrpc-lite "^2.2.0"
     ws "^7.3.1"
@@ -5047,7 +5047,7 @@ cross-fetch@^2.2.2:
     node-fetch "2.1.2"
     whatwg-fetch "2.0.4"
 
-cross-fetch@^3.0.4, cross-fetch@^3.0.5:
+cross-fetch@^3.0.4, cross-fetch@^3.0.5, cross-fetch@^3.0.6:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.0.6.tgz#3a4040bc8941e653e0e9cf17f29ebcd177d3365c"
   integrity sha512-KBPUbqgFjzWlVcURG+Svp9TlhA5uliYtiNx/0r8nv0pdypeQCRJ9IaSIc3q/x3q8t3F75cHuwxVql1HFGHCNJQ==
