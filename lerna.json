@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "version": "1.0.0-beta.17",
+=======
+  "version": "1.0.0-beta.15",
+>>>>>>> v1.0.0-beta.15
   "registry": "https://registry.npmjs.org/",
   "publishConfig": {
     "access": "public"
