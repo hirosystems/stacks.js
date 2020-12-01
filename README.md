@@ -1,4 +1,4 @@
-# Stacks.js Monorepo [![CircleCI](https://img.shields.io/circleci/project/blockstack/blockstack.js/master.svg)](https://circleci.com/gh/blockstack/blockstack.js/tree/master)
+# Stacks.js Monorepo [![CircleCI](https://img.shields.io/circleci/project/blockstack/stacks.js/master.svg)](https://circleci.com/gh/blockstack/stacks.js/tree/master)
 
 This repo is home to the Stacks.js libraries which provide everything you need to work with the Stacks blockchain.
 
@@ -17,7 +17,7 @@ See `README` in each package directory for installation instructions and usage.
 
 ## Migrating from blockstack.js
 
-To migrate your app from blockstack.js to stacks.js follow the steps in the [migration guide](./migration-guide.md).
+To migrate your app from blockstack.js to stacks.js follow the steps in the [migration guide](https://github.com/blockstack/stacks.js/tree/master/migration-guide.md).
 
 ## Development environment setup
 
