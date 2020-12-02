@@ -35,7 +35,7 @@ import {
   StacksTransaction,
   TxBroadcastResult,
   getAddressFromPrivateKey,
-  TransactionVersion
+  TransactionVersion,
 } from '@stacks/transactions';
 
 import { StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -630,7 +630,7 @@ async function contractDeploy(network: CLINetworkAdapter, args: string[]): Promi
   }
 
   return broadcastTransaction(tx, txNetwork)
-    .then((response) => {
+    .then(response => {
       if (response.hasOwnProperty('error')) {
         return response;
       }
@@ -715,7 +715,7 @@ async function contractFunctionCall(network: CLINetworkAdapter, args: string[]):
       }
 
       return broadcastTransaction(tx, txNetwork)
-        .then((response) => {
+        .then(response => {
           if (response.hasOwnProperty('error')) {
             return response;
           }

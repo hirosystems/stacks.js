@@ -1,11 +1,5 @@
-import {
-  connectToGaiaHub,
-} from '@stacks/storage';
-import {
-  signProfileToken,
-  wrapProfileToken,
-  makeProfileZoneFile,
-} from '@stacks/profile';
+import { connectToGaiaHub } from '@stacks/storage';
+import { signProfileToken, wrapProfileToken, makeProfileZoneFile } from '@stacks/profile';
 import { IdentityKeyPair } from './utils';
 import { uploadToGaiaHub } from './utils/gaia';
 import Identity from './identity';

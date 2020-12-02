@@ -242,7 +242,12 @@ export class Storage {
 
     let readUrl: string | undefined;
     if (opts.username) {
-      readUrl = await this.getUserAppFileUrl(path, opts.username, opts.app!, opts.zoneFileLookupURL);
+      readUrl = await this.getUserAppFileUrl(
+        path,
+        opts.username,
+        opts.app!,
+        opts.zoneFileLookupURL
+      );
     } else {
       const gaiaHubConfig = await this.getOrSetLocalGaiaHubConnection();
       readUrl = await getFullReadUrl(path, gaiaHubConfig);

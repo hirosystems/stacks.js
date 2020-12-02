@@ -6,12 +6,9 @@ import {
   makeSTXTokenTransfer,
   PostConditionMode,
   getAddressFromPrivateKey,
-  PostCondition
+  PostCondition,
 } from '@stacks/transactions';
-import {
-  StacksTestnet,
-  StacksNetwork
-} from '@stacks/network';
+import { StacksTestnet, StacksNetwork } from '@stacks/network';
 
 import RPCClient from '@blockstack/rpc-client';
 import { bip32 } from 'bitcoinjs-lib';

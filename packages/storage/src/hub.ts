@@ -191,7 +191,7 @@ function makeV1GaiaAuthToken(
     hubUrl,
     iss,
     salt,
-    associationToken: associationToken!
+    associationToken: associationToken!,
   };
 
   const token = new TokenSigner('ES256K', signerKeyHex).sign(payload);

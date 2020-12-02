@@ -171,25 +171,27 @@ export class UserSession {
   }
 
   /**
-   * Check if there is a authentication request that hasn't been handled. 
+   * Check if there is a authentication request that hasn't been handled.
    *
    * Also checks for a protocol echo reply (which if detected then the page
-   * will be automatically redirected after this call). 
-   * 
+   * will be automatically redirected after this call).
+   *
    * @return {Boolean} `true` if there is a pending sign in, otherwise `false`
    */
   isSignInPending() {
     try {
-      const isProtocolEcho = protocolEchoReplyDetection()
+      const isProtocolEcho = protocolEchoReplyDetection();
       if (isProtocolEcho) {
-        Logger.info('protocolEchoReply detected from isSignInPending call, the page is about to redirect.')
-        return true
+        Logger.info(
+          'protocolEchoReply detected from isSignInPending call, the page is about to redirect.'
+        );
+        return true;
       }
     } catch (error) {
-      Logger.error(`Error checking for protocol echo reply isSignInPending: ${error}`)
+      Logger.error(`Error checking for protocol echo reply isSignInPending: ${error}`);
     }
-    
-    return !!this.getAuthResponseToken()
+
+    return !!this.getAuthResponseToken();
   }
 
   /**
@@ -402,7 +404,7 @@ export class UserSession {
    */
 
   signUserOut(
-    redirectURL?: string,
+    redirectURL?: string
     // TODO: this is not used?
     // caller?: UserSession
   ) {

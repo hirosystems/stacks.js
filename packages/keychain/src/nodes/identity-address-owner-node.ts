@@ -1,9 +1,5 @@
 import { BIP32Interface } from 'bitcoinjs-lib';
-import { 
-  publicKeyToAddress, 
-  hashSha256Sync,
-  hashCode
-} from '@stacks/encryption';
+import { publicKeyToAddress, hashSha256Sync, hashCode } from '@stacks/encryption';
 import { getAddress } from '../utils';
 import bip32 from 'bip32';
 
@@ -62,12 +58,12 @@ export default class IdentityAddressOwnerNode {
   }
 
   getAppNode(appDomain: string) {
-
-    const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${this.salt}`))
-    const hash = hashBuffer.toString('hex')
-    const appIndex = hashCode(hash)
-    const appNodeInstance = typeof this.hdNode === 'string' ? bip32.fromBase58(this.hdNode) : this.hdNode
-    return appNodeInstance.deriveHardened(appIndex)
+    const hashBuffer = hashSha256Sync(Buffer.from(`${appDomain}${this.salt}`));
+    const hash = hashBuffer.toString('hex');
+    const appIndex = hashCode(hash);
+    const appNodeInstance =
+      typeof this.hdNode === 'string' ? bip32.fromBase58(this.hdNode) : this.hdNode;
+    return appNodeInstance.deriveHardened(appIndex);
   }
 
   getAppPrivateKey(appDomain: string) {

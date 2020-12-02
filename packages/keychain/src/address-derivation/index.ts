@@ -1,8 +1,4 @@
-import {
-  ChainID,
-  getAddressFromPrivateKey,
-  TransactionVersion,
-} from '@stacks/transactions';
+import { ChainID, getAddressFromPrivateKey, TransactionVersion } from '@stacks/transactions';
 import { BIP32Interface, ECPair } from 'bitcoinjs-lib';
 import { ecPairToHexString } from '@stacks/encryption';
 

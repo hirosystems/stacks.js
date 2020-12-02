@@ -18,11 +18,9 @@ import {
   ClarityValue,
   ResponseErrorCV,
   SomeCV,
-  TupleCV
+  TupleCV,
 } from '@stacks/transactions';
-import {
-  StacksNetwork
-} from '@stacks/network';
+import { StacksNetwork } from '@stacks/network';
 import BN from 'bn.js';
 import { StackingErrors } from './constants';
 import { fetchPrivate } from '@stacks/common';
@@ -50,21 +48,21 @@ export interface StackerInfo {
       version: Buffer;
       hashbytes: Buffer;
     };
-  }
+  };
 }
 
 export interface BlockTimeInfo {
   mainnet: {
     target_block_time: number;
-  },
+  };
   testnet: {
     target_block_time: number;
-  }
+  };
 }
 
 export interface CoreInfo {
   burn_block_height: number;
-  stable_pox_consensus : string;
+  stable_pox_consensus: string;
 }
 
 export interface BalanceInfo {
@@ -73,8 +71,8 @@ export interface BalanceInfo {
 }
 
 export interface StackingEligibility {
-  eligible: boolean,
-  reason?: string
+  eligible: boolean;
+  reason?: string;
 }
 
 /**
@@ -84,8 +82,8 @@ export interface StackingEligibility {
  * @param  {number} cycles - number of cycles to lock
  */
 export interface CanLockStxOptions {
-  poxAddress: string, 
-  cycles: number
+  poxAddress: string;
+  cycles: number;
 }
 
 /**
@@ -106,57 +104,52 @@ export interface LockStxOptions {
 }
 
 export class StackingClient {
-  constructor(
-    public address: string, 
-    public network: StacksNetwork) {}
+  constructor(public address: string, public network: StacksNetwork) {}
 
   /**
    * Get stacks node info
-   * 
+   *
    * @returns {Promise<CoreInfo>} that resolves to a CoreInfo response if the operation succeeds
    */
   async getCoreInfo(): Promise<CoreInfo> {
-    const url = this.network.getInfoUrl(); 
-    return fetchPrivate(url)
-      .then((res) => res.json());
+    const url = this.network.getInfoUrl();
+    return fetchPrivate(url).then(res => res.json());
   }
 
   /**
    * Get stacks node pox info
-   * 
+   *
    * @returns {Promise<PoxInfo>} that resolves to a PoxInfo response if the operation succeeds
    */
   async getPoxInfo(): Promise<PoxInfo> {
-    const url = this.network.getPoxInfoUrl(); 
-    return fetchPrivate(url)
-      .then((res) => res.json());
+    const url = this.network.getPoxInfoUrl();
+    return fetchPrivate(url).then(res => res.json());
   }
 
   /**
    * Get stacks node target block time
-   * 
+   *
    * @returns {Promise<number>} that resolves to a number if the operation succeeds
    */
-  async getTargetBlockTime(): Promise<number>{
+  async getTargetBlockTime(): Promise<number> {
     const url = this.network.getBlockTimeInfoUrl();
-    const res = await fetchPrivate(url).then((res) => res.json());
-    
+    const res = await fetchPrivate(url).then(res => res.json());
+
     if (this.network.isMainnet()) {
       return res.mainnet.target_block_time;
     } else {
       return res.testnet.target_block_time;
     }
   }
-  
+
   async getAccountStatus(): Promise<any> {
-    const url = this.network.getAccountApiUrl(this.address); 
-    return fetchPrivate(url)
-      .then((res) => res.json())
+    const url = this.network.getAccountApiUrl(this.address);
+    return fetchPrivate(url).then(res => res.json());
   }
 
   /**
    * Get account balance
-   * 
+   *
    * @returns {Promise<BN>} that resolves to a BigNum if the operation succeeds
    */
   async getAccountBalance(): Promise<BN> {
@@ -172,22 +165,23 @@ export class StackingClient {
 
   /**
    * Get reward cycle duration in seconds
-   * 
+   *
    * @returns {Promise<number>} that resolves to a number if the operation succeeds
    */
   async getCycleDuration(): Promise<number> {
     const poxInfoPromise = this.getPoxInfo();
     const targetBlockTimePromise = await this.getTargetBlockTime();
 
-    return Promise.all([poxInfoPromise, targetBlockTimePromise])
-      .then(([poxInfo, targetBlockTime]) => {
+    return Promise.all([poxInfoPromise, targetBlockTimePromise]).then(
+      ([poxInfo, targetBlockTime]) => {
         return poxInfo.reward_cycle_length * targetBlockTime;
-      })
+      }
+    );
   }
 
   /**
    * Get number of seconds until next reward cycle
-   * 
+   *
    * @returns {Promise<number>} that resolves to a number if the operation succeeds
    */
   async getSecondsUntilNextCycle(): Promise<number> {
@@ -195,20 +189,21 @@ export class StackingClient {
     const targetBlockTimePromise = await this.getTargetBlockTime();
     const coreInfoPromise = this.getCoreInfo();
 
-    return Promise.all([poxInfoPromise, targetBlockTimePromise, coreInfoPromise])
-      .then(([poxInfo, targetBlockTime, coreInfo]) => {
+    return Promise.all([poxInfoPromise, targetBlockTimePromise, coreInfoPromise]).then(
+      ([poxInfo, targetBlockTime, coreInfo]) => {
         const blocksToNextCycle =
-        (poxInfo.reward_cycle_length -
+          poxInfo.reward_cycle_length -
           ((coreInfo.burn_block_height - poxInfo.first_burnchain_block_height) %
-            poxInfo.reward_cycle_length));
+            poxInfo.reward_cycle_length);
         const cycleDuration = poxInfo.reward_cycle_length * targetBlockTime;
         return blocksToNextCycle * cycleDuration;
-      })
-  } 
+      }
+    );
+  }
 
   /**
    * Check if stacking is enabled for next reward cycle
-   * 
+   *
    * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
    */
   async isStackingEnabledNextCycle(): Promise<boolean> {
@@ -217,7 +212,7 @@ export class StackingClient {
 
   /**
    * Check if account has minimum require amount of Stacks for stacking
-   * 
+   *
    * @returns {Promise<boolean>} that resolves to a bool if the operation succeeds
    */
   async hasMinimumStx(): Promise<boolean> {
@@ -228,16 +223,12 @@ export class StackingClient {
 
   /**
    * Check if account can lock stx
-   * 
-   * @param {CanLockStxOptions} options - a required lock STX options object 
-   * 
+   *
+   * @param {CanLockStxOptions} options - a required lock STX options object
+   *
    * @returns {Promise<StackingEligibility>} that resolves to a StackingEligibility object if the operation succeeds
    */
-  async canStack({
-    poxAddress, 
-    cycles
-  }: CanLockStxOptions
-  ): Promise<StackingEligibility> {
+  async canStack({ poxAddress, cycles }: CanLockStxOptions): Promise<StackingEligibility> {
     const balancePromise: Promise<BN> = this.getAccountBalance();
     const poxInfoPromise = this.getPoxInfo();
 
@@ -260,43 +251,36 @@ export class StackingClient {
           functionName: 'can-stack-stx',
           senderAddress: this.address,
           functionArgs: [
-              poxAddressCV,
-              uintCV(balance.toString()),
-              uintCV(poxInfo.reward_cycle_id),
-              uintCV(cycles.toString())
-            ],
+            poxAddressCV,
+            uintCV(balance.toString()),
+            uintCV(poxInfo.reward_cycle_id),
+            uintCV(cycles.toString()),
+          ],
         });
       })
       .then((responseCV: ClarityValue) => {
-        if(responseCV.type === ClarityType.ResponseOk) {
+        if (responseCV.type === ClarityType.ResponseOk) {
           return {
-            eligible: true
+            eligible: true,
           };
         } else {
           const errorCV = responseCV as ResponseErrorCV;
           return {
             eligible: false,
-            reason: StackingErrors[+cvToString(errorCV.value)]
+            reason: StackingErrors[+cvToString(errorCV.value)],
           };
         }
-      })
+      });
   }
 
   /**
    * Generate and broadcast a stacking transaction to lock STX
-   * 
-   * @param {LockStxOptions} options - a required lock STX options object 
-   * 
+   *
+   * @param {LockStxOptions} options - a required lock STX options object
+   *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async stack({
-    amountMicroStx,
-    poxAddress,
-    cycles,
-    privateKey,
-    burnBlockHeight,
-  }: LockStxOptions
-  ) {
+  async stack({ amountMicroStx, poxAddress, cycles, privateKey, burnBlockHeight }: LockStxOptions) {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -340,7 +324,7 @@ export class StackingClient {
       version: hashModeBuffer,
     });
     const [contractAddress, contractName] = contract.split('.');
-    const network = this.network; 
+    const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
       contractName,
@@ -360,7 +344,7 @@ export class StackingClient {
 
   /**
    * Check stacking status
-   * 
+   *
    * @returns {Promise<StackerInfo>} that resolves to a StackerInfo object if the operation succeeds
    */
   async getStatus(): Promise<StackerInfo> {
@@ -373,19 +357,16 @@ export class StackingClient {
       contractName,
       functionName,
       senderAddress: this.address,
-      functionArgs: [
-        standardPrincipalCV(this.address)
-      ],
-      network: this.network
-    })
-    .then((responseCV: ClarityValue) => {
+      functionArgs: [standardPrincipalCV(this.address)],
+      network: this.network,
+    }).then((responseCV: ClarityValue) => {
       if (responseCV.type === ClarityType.OptionalSome) {
         const someCV = responseCV as SomeCV;
         const tupleCV: TupleCV = someCV.value as TupleCV;
-        const poxAddress: TupleCV = tupleCV.data["pox-addr"] as TupleCV;
-        const amountMicroStx: UIntCV = tupleCV.data["amount-ustx"] as UIntCV;
-        const firstRewardCycle: UIntCV = tupleCV.data["first-reward-cycle"] as UIntCV;
-        const lockPeriod: UIntCV = tupleCV.data["lock-period"] as UIntCV;
+        const poxAddress: TupleCV = tupleCV.data['pox-addr'] as TupleCV;
+        const amountMicroStx: UIntCV = tupleCV.data['amount-ustx'] as UIntCV;
+        const firstRewardCycle: UIntCV = tupleCV.data['first-reward-cycle'] as UIntCV;
+        const lockPeriod: UIntCV = tupleCV.data['lock-period'] as UIntCV;
         const version: BufferCV = poxAddress.data['version'] as BufferCV;
         const hashbytes: BufferCV = poxAddress.data['hashbytes'] as BufferCV;
 
@@ -398,14 +379,14 @@ export class StackingClient {
             unlock_height: account.unlock_height,
             pox_address: {
               version: version.buffer,
-              hashbytes: hashbytes.buffer
-            }
-          }
-        }
+              hashbytes: hashbytes.buffer,
+            },
+          },
+        };
       } else if (responseCV.type === ClarityType.OptionalNone) {
-        return { 
-          stacked: false
-        }
+        return {
+          stacked: false,
+        };
       } else {
         throw new Error(`Error fetching stacker info`);
       }
@@ -414,7 +395,7 @@ export class StackingClient {
 
   /**
    * Adjust microstacks amount for locking after taking into account transaction fees
-   * 
+   *
    * @returns {StacksTransaction} that resolves to a transaction object if the operation succeeds
    */
   modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: BN }) {

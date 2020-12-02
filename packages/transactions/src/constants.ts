@@ -169,5 +169,5 @@ export {
   FungibleConditionCode,
   NonFungibleConditionCode,
   AssetType,
-  TxRejectedReason
+  TxRejectedReason,
 };
