@@ -1482,24 +1482,27 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
   const txNetwork = network.isMainnet() ? new StacksMainnet() : new StacksTestnet();
   const stacker = new StackingClient(stxAddress, txNetwork);
 
-  return stacker.getStatus().then((status: StackerInfo) => {
-    if (status.stacked) {
-      return {
-        amount_microstx: status.details!.amount_microstx,
-        first_reward_cycle: status.details!.first_reward_cycle,
-        lock_period: status.details!.lock_period,
-        unlock_height: status.details!.unlock_height,
-        pox_address: {
-          version: status.details!.pox_address.version.toString('hex'),
-          hashbytes: status.details!.pox_address.hashbytes.toString('hex')
-        }
-      };
-    } else {
-      return 'Account not actively participating in Stacking';
-    }
-  }).catch((error: any) => {
-    return error.toString();
-  });
+  return stacker
+    .getStatus()
+    .then((status: StackerInfo) => {
+      if (status.stacked) {
+        return {
+          amount_microstx: status.details!.amount_microstx,
+          first_reward_cycle: status.details!.first_reward_cycle,
+          lock_period: status.details!.lock_period,
+          unlock_height: status.details!.unlock_height,
+          pox_address: {
+            version: status.details!.pox_address.version.toString('hex'),
+            hashbytes: status.details!.pox_address.hashbytes.toString('hex'),
+          },
+        };
+      } else {
+        return 'Account not actively participating in Stacking';
+      }
+    })
+    .catch((error: any) => {
+      return error.toString();
+    });
 }
 
 async function canStack(network: CLINetworkAdapter, args: string[]): Promise<string> {
@@ -1524,7 +1527,7 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
 
   const poxInfoPromise = stacker.getPoxInfo();
 
-  const stackingEligiblePromise = stacker.canStack({poxAddress, cycles});
+  const stackingEligiblePromise = stacker.canStack({ poxAddress, cycles });
 
   return Promise.all([balancePromise, poxInfoPromise, stackingEligiblePromise])
     .then(([balance, poxInfo, stackingEligible]) => {
@@ -1532,11 +1535,15 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
       const balanceBN = new BN(balance.stx.balance);
 
       if (minAmount.gt(amount)) {
-        throw new Error(`Stacking amount less than required minimum of ${minAmount.toString()} microstacks`);
+        throw new Error(
+          `Stacking amount less than required minimum of ${minAmount.toString()} microstacks`
+        );
       }
 
       if (amount.gt(balanceBN)) {
-        throw new Error(`Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`);
+        throw new Error(
+          `Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`
+        );
       }
 
       if (!stackingEligible.eligible) {
@@ -1545,9 +1552,9 @@ async function canStack(network: CLINetworkAdapter, args: string[]): Promise<str
 
       return stackingEligible;
     })
-    .catch((error) => {
+    .catch(error => {
       return error;
-    })
+    });
 }
 
 async function stack(network: CLINetworkAdapter, args: string[]): Promise<string> {
@@ -1588,7 +1595,7 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
 
   const coreInfoPromise = stacker.getCoreInfo();
 
-  const stackingEligiblePromise = stacker.canStack({poxAddress, cycles});
+  const stackingEligiblePromise = stacker.canStack({ poxAddress, cycles });
 
   return Promise.all([balancePromise, poxInfoPromise, coreInfoPromise, stackingEligiblePromise])
     .then(([balance, poxInfo, coreInfo, stackingEligible]) => {
@@ -1598,11 +1605,15 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
       const startBurnBlock = burnChainBlockHeight + 3;
 
       if (minAmount.gt(amount)) {
-        throw new Error(`Stacking amount less than required minimum of ${minAmount.toString()} microstacks`);
+        throw new Error(
+          `Stacking amount less than required minimum of ${minAmount.toString()} microstacks`
+        );
       }
 
       if (amount.gt(balanceBN)) {
-        throw new Error(`Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`);
+        throw new Error(
+          `Stacking amount greater than account balance of ${balanceBN.toString()} microstacks`
+        );
       }
 
       if (!stackingEligible.eligible) {
@@ -1626,9 +1637,9 @@ async function stack(network: CLINetworkAdapter, args: string[]): Promise<string
         transaction: generateExplorerTxPageUrl(response as string, txNetwork),
       };
     })
-    .catch((error) => {
+    .catch(error => {
       return error;
-    })
+    });
 }
 
 function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
@@ -1642,15 +1653,16 @@ function faucetCall(_: CLINetworkAdapter, args: string[]): Promise<string> {
 
   const faucets = new FaucetsApi(apiConfig);
 
-  return faucets.runFaucetStx({ address })
-   .then((faucetTx: any) => {
-    return JSONStringify({
-      txid: faucetTx.txId!,
-      transaction: generateExplorerTxPageUrl(faucetTx.txId!, new StacksTestnet()),
-    });
-   })
-   .catch((error: any) => error.toString());
-} 
+  return faucets
+    .runFaucetStx({ address })
+    .then((faucetTx: any) => {
+      return JSONStringify({
+        txid: faucetTx.txId!,
+        transaction: generateExplorerTxPageUrl(faucetTx.txId!, new StacksTestnet()),
+      });
+    })
+    .catch((error: any) => error.toString());
+}
 
 /* Print out all documentation on usage in JSON
  */

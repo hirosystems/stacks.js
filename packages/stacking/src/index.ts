@@ -153,13 +153,12 @@ export class StackingClient {
    * @returns {Promise<BN>} that resolves to a BigNum if the operation succeeds
    */
   async getAccountBalance(): Promise<BN> {
-    return this.getAccountStatus()
-      .then((res) => { 
-        let balanceHex = res.balance;
-        if (res.balance.startsWith('0x')) {
-          balanceHex = res.balance.substr(2);
-        }
-        return new BN(balanceHex, 'hex')
+    return this.getAccountStatus().then(res => {
+      let balanceHex = res.balance;
+      if (res.balance.startsWith('0x')) {
+        balanceHex = res.balance.substr(2);
+      }
+      return new BN(balanceHex, 'hex');
     });
   }
 
