@@ -31,6 +31,7 @@ export type ClarityAbiTypeUInt128 = 'uint128';
 export type ClarityAbiTypeInt128 = 'int128';
 export type ClarityAbiTypeBool = 'bool';
 export type ClarityAbiTypePrincipal = 'principal';
+export type ClarityAbiTypeTraitReference = 'trait_reference';
 export type ClarityAbiTypeNone = 'none';
 
 export type ClarityAbiTypePrimitive =
@@ -38,6 +39,7 @@ export type ClarityAbiTypePrimitive =
   | ClarityAbiTypeInt128
   | ClarityAbiTypeBool
   | ClarityAbiTypePrincipal
+  | ClarityAbiTypeTraitReference
   | ClarityAbiTypeNone;
 
 export type ClarityAbiType =
@@ -48,7 +50,8 @@ export type ClarityAbiType =
   | ClarityAbiTypeTuple
   | ClarityAbiTypeList
   | ClarityAbiTypeStringAscii
-  | ClarityAbiTypeStringUtf8;
+  | ClarityAbiTypeStringUtf8
+  | ClarityAbiTypeTraitReference;
 
 export enum ClarityAbiTypeId {
   ClarityAbiTypeUInt128 = 1,
@@ -63,6 +66,7 @@ export enum ClarityAbiTypeId {
   ClarityAbiTypeList = 10,
   ClarityAbiTypeStringAscii = 11,
   ClarityAbiTypeStringUtf8 = 12,
+  ClarityAbiTypeTraitReference = 13,
 }
 
 export const isClarityAbiPrimitive = (val: ClarityAbiType): val is ClarityAbiTypePrimitive =>
@@ -87,6 +91,7 @@ export type ClarityAbiTypeUnion =
   | { id: ClarityAbiTypeId.ClarityAbiTypeInt128; type: ClarityAbiTypeInt128 }
   | { id: ClarityAbiTypeId.ClarityAbiTypeBool; type: ClarityAbiTypeBool }
   | { id: ClarityAbiTypeId.ClarityAbiTypePrincipal; type: ClarityAbiTypePrincipal }
+  | { id: ClarityAbiTypeId.ClarityAbiTypeTraitReference; type: ClarityAbiTypeTraitReference }
   | { id: ClarityAbiTypeId.ClarityAbiTypeNone; type: ClarityAbiTypeNone }
   | { id: ClarityAbiTypeId.ClarityAbiTypeBuffer; type: ClarityAbiTypeBuffer }
   | { id: ClarityAbiTypeId.ClarityAbiTypeResponse; type: ClarityAbiTypeResponse }
@@ -106,6 +111,8 @@ export function getTypeUnion(val: ClarityAbiType): ClarityAbiTypeUnion {
       return { id: ClarityAbiTypeId.ClarityAbiTypeBool, type: val };
     } else if (val === 'principal') {
       return { id: ClarityAbiTypeId.ClarityAbiTypePrincipal, type: val };
+    } else if (val === 'trait_reference') {
+      return { id: ClarityAbiTypeId.ClarityAbiTypeTraitReference, type: val };
     } else if (val === 'none') {
       return { id: ClarityAbiTypeId.ClarityAbiTypeNone, type: val };
     } else {
@@ -158,6 +165,9 @@ function encodeClarityValue(
       } else {
         return standardPrincipalCV(val);
       }
+    case ClarityAbiTypeId.ClarityAbiTypeTraitReference:
+      const [addr, name] = val.split('.');
+      return contractPrincipalCV(addr, name);
     case ClarityAbiTypeId.ClarityAbiTypeNone:
       return noneCV();
     case ClarityAbiTypeId.ClarityAbiTypeBuffer:
@@ -308,6 +318,10 @@ function matchType(cv: ClarityValue, abiType: ClarityAbiType): boolean {
         matchType(cv.value, union.type.response.ok)
       );
     case ClarityType.PrincipalContract:
+      return (
+        union.id === ClarityAbiTypeId.ClarityAbiTypePrincipal ||
+        union.id === ClarityAbiTypeId.ClarityAbiTypeTraitReference
+      );
     case ClarityType.PrincipalStandard:
       return union.id === ClarityAbiTypeId.ClarityAbiTypePrincipal;
     case ClarityType.List:
