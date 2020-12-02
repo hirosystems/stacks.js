@@ -551,7 +551,7 @@ export const CLI_ARGS = {
           type: 'string',
           realtype: 'address',
           pattern: `${ADDRESS_PATTERN}|${STACKS_ADDRESS_PATTERN}`,
-        }
+        },
       ],
       minItems: 1,
       maxItems: 1,
