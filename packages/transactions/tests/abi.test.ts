@@ -86,6 +86,29 @@ test('ABI validation buffer', () => {
   );
 });
 
+test('ABI validation trait reference', () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'test';
+  const functionName = 'trait-test';
+
+  const payloadCorrectTrait = createContractCallPayload(
+    contractAddress,
+    contractName,
+    functionName,
+    [contractPrincipalCV('ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE', 'test')]
+  );
+
+  validateContractCall(payloadCorrectTrait, TEST_ABI);
+
+  const payloadWrongTrait = createContractCallPayload(contractAddress, contractName, functionName, [
+    standardPrincipalCV('ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE'),
+  ]);
+
+  expect(() => validateContractCall(payloadWrongTrait, TEST_ABI)).toThrow(
+    'Clarity function `trait-test` expects argument 1 to be of type trait_reference, not principal'
+  );
+});
+
 test('ABI validation fail, tuple mistyped', () => {
   const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
   const contractName = 'test';
