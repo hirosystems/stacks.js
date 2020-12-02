@@ -568,31 +568,6 @@ export const CLI_ARGS = {
         '     M+DnBHYb1fgw4N3oZ+5uTEAua5bAWkgTW/SjmmBhGGbJtjOtqVV+RrLJEJOgT35hBon4WKdGWye2vTdgqDo7+HIobwJwkQtN2YF9g3zPsKk=',
       group: 'Key Management',
     },
-    faucet: {
-      type: 'array',
-      items: [
-        {
-          name: 'address',
-          type: 'string',
-          realtype: 'address',
-          pattern: `${ADDRESS_PATTERN}|${STACKS_ADDRESS_PATTERN}`,
-        },
-      ],
-      minItems: 1,
-      maxItems: 1,
-      help:
-        'Encrypt a 12-word backup phrase, which can be decrypted later with the ' +
-        '`decrypt_backup_phrase` command.  The password will be prompted if not given.\n' +
-        '\n' +
-        'Example:\n' +
-        '\n' +
-        '     $ # password is "asdf"\n' +
-        '     $ blockstack-cli encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
-        '     Enter password:\n' +
-        '     Enter password again:\n' +
-        '     M+DnBHYb1fgw4N3oZ+5uTEAua5bAWkgTW/SjmmBhGGbJtjOtqVV+RrLJEJOgT35hBon4WKdGWye2vTdgqDo7+HIobwJwkQtN2YF9g3zPsKk=',
-      group: 'Key Management',
-    },
     gaia_dump_bucket: {
       type: 'array',
       items: [
