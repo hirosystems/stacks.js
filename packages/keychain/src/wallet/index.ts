@@ -11,15 +11,8 @@ import {
 } from '../utils';
 import Identity from '../identity';
 import { decrypt } from '../encryption/decrypt';
-import {
-  GaiaHubConfig,
-  connectToGaiaHub
-} from '@stacks/storage';
-import {
-  encryptContent,
-  decryptContent,
-  getPublicKeyFromPrivate
-} from '@stacks/encryption';
+import { GaiaHubConfig, connectToGaiaHub } from '@stacks/storage';
+import { encryptContent, decryptContent, getPublicKeyFromPrivate } from '@stacks/encryption';
 
 import {
   AllowedKeyEntropyBits,

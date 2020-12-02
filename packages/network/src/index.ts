@@ -19,13 +19,10 @@ export interface StacksNetwork {
     contractName: string,
     functionName: string
   ) => string;
-  getInfoUrl:() => string;
-  getBlockTimeInfoUrl:() => string;
+  getInfoUrl: () => string;
+  getBlockTimeInfoUrl: () => string;
   getPoxInfoUrl: () => string;
-  getStackerInfoUrl: (
-    contractAddress: string,
-    contractName: string,
-  ) => string;
+  getStackerInfoUrl: (contractAddress: string, contractName: string) => string;
 
   /**
    * Get WHOIS-like information for a name, including the address that owns it,
@@ -66,7 +63,7 @@ export class StacksMainnet implements StacksNetwork {
   getInfoUrl = () => `${this.coreApiUrl}/v2/info`;
   getBlockTimeInfoUrl = () => `${this.coreApiUrl}/extended/v1/info/network_block_times`;
   getPoxInfoUrl = () => `${this.coreApiUrl}/v2/pox`;
-  getStackerInfoUrl = (contractAddress: string, contractName: string) => 
+  getStackerInfoUrl = (contractAddress: string, contractName: string) =>
     `${this.coreApiUrl}${this.readOnlyFunctionCallEndpoint}
     ${contractAddress}/${contractName}/get-stacker-info`;
   getNameInfo(fullyQualifiedName: string) {

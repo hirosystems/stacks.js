@@ -22,7 +22,7 @@ export function getAddressHashMode(btcAddress: string) {
         return AddressHashMode.SerializeP2SH;
       case 196:
         return AddressHashMode.SerializeP2SH;
-      default: 
+      default:
         throw new Error('Invalid pox address version');
     }
   }
@@ -34,14 +34,14 @@ export function decodeBtcAddress(btcAddress: string) {
     const { data } = address.fromBech32(btcAddress);
     return {
       hashMode,
-      data
-    }
+      data,
+    };
   } else {
     const { hash } = address.fromBase58Check(btcAddress);
     return {
       hashMode,
-      data: hash
-    }
+      data: hash,
+    };
   }
 }
 
@@ -51,7 +51,7 @@ export function getBTCAddress(version: Buffer, checksum: Buffer) {
 }
 
 export function getErrorString(error: StackingErrors): string {
-  switch(error) {
+  switch (error) {
     case StackingErrors.ERR_STACKING_UNREACHABLE:
       return 'Stacking unreachable';
     case StackingErrors.ERR_STACKING_INSUFFICIENT_FUNDS:
@@ -73,7 +73,7 @@ export function getErrorString(error: StackingErrors): string {
     case StackingErrors.ERR_STACKING_POX_ADDRESS_IN_USE:
       return 'PoX address already in use';
     case StackingErrors.ERR_STACKING_INVALID_POX_ADDRESS:
-      return 'Invalid PoX address'; 
+      return 'Invalid PoX address';
     case StackingErrors.ERR_STACKING_ALREADY_REJECTED:
       return 'Stacking already rejected';
     case StackingErrors.ERR_STACKING_INVALID_AMOUNT:
@@ -83,7 +83,7 @@ export function getErrorString(error: StackingErrors): string {
     case StackingErrors.ERR_STACKING_ALREADY_DELEGATED:
       return 'Already delegated';
     case StackingErrors.ERR_DELEGATION_EXPIRES_DURING_LOCK:
-      return 'Delegation expires during lock period'
+      return 'Delegation expires during lock period';
     case StackingErrors.ERR_DELEGATION_TOO_MUCH_LOCKED:
       return 'Delegation too much locked';
     case StackingErrors.ERR_DELEGATION_POX_ADDR_REQUIRED:

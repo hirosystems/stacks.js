@@ -129,8 +129,8 @@ export function gaiaConnect(
     associationToken = makeAssociationToken(privateKey, ownerPrivateKey);
   }
 
-  return connectToGaiaHub(gaiaHubUrl, canonicalPrivateKey(privateKey), associationToken)
-    .then(hubConfig => {
+  return connectToGaiaHub(gaiaHubUrl, canonicalPrivateKey(privateKey), associationToken).then(
+    hubConfig => {
       // ensure that hubConfig always has a mainnet address, even if we're in testnet
       if (network.coerceMainnetAddress(hubConfig.address) === addressMainnet) {
         hubConfig.address = addressMainnet;
@@ -144,7 +144,8 @@ export function gaiaConnect(
         );
       }
       return hubConfig;
-    });
+    }
+  );
 }
 
 /*

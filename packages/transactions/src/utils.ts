@@ -182,9 +182,7 @@ export interface ReadOnlyFunctionResponse {
  * Converts the response of a read-only function call into its Clarity Value
  * @param param
  */
-export const parseReadOnlyResponse = ({
-  result
-}: ReadOnlyFunctionResponse): ClarityValue => {
+export const parseReadOnlyResponse = ({ result }: ReadOnlyFunctionResponse): ClarityValue => {
   return hexToCV(result);
 };
 

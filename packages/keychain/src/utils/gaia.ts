@@ -1,9 +1,5 @@
 import { TokenSigner, Json } from 'jsontokens';
-import { 
-  getPublicKeyFromPrivate,
-  ecPairToAddress,
-  hexStringToECPair
- } from '@stacks/encryption';
+import { getPublicKeyFromPrivate, ecPairToAddress, hexStringToECPair } from '@stacks/encryption';
 import randomBytes from 'randombytes';
 import { GaiaHubConfig } from '@stacks/storage';
 

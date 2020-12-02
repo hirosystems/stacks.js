@@ -1,9 +1,6 @@
 import { BIP32Interface } from 'bitcoinjs-lib';
 import IdentityAddressOwnerNode from '../nodes/identity-address-owner-node';
-import { 
-  createSha2Hash,
-  publicKeyToAddress 
-} from '@stacks/encryption';
+import { createSha2Hash, publicKeyToAddress } from '@stacks/encryption';
 import { parseZoneFile } from 'zone-file';
 import Identity from '../identity';
 import { AssertionError } from 'assert';
