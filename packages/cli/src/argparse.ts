@@ -165,11 +165,11 @@ export const CLI_ARGS = {
         '\n' +
         '    $ # Tip: You can obtain the owner key with the get_owner_keys command\n' +
         '    $ export OWNER_KEY="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
-        '    $ blockstack-cli announce 737c631c7c5d911c6617993c21fba731363f1cfe "$OWNER_KEY"\n' +
+        '    $ stx announce 737c631c7c5d911c6617993c21fba731363f1cfe "$OWNER_KEY"\n' +
         '    d51749aeec2803e91a2f8bdec8d3e413491fd816b4962372b214ab74acb0bba8\n' +
         '\n' +
         '    $ export OWNER_KEY="2,136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01,1885cba486a42960499d1f137ef3a475725ceb11f45d74631f9928280196f67401,2418981c7f3a91d4467a65a518e14fafa30e07e6879c11fab7106ea72b49a7cb01"\n' +
-        '    $ blockstack-cli announce 737c631c7c5d911c6617993c21fba731363f1cfe "$OWNER_KEY"\n' +
+        '    $ stx announce 737c631c7c5d911c6617993c21fba731363f1cfe "$OWNER_KEY"\n' +
         '    8136a1114098893b28a693e8d84451abf99ee37ef8766f4bc59808eed76968c9\n' +
         '\n',
       group: 'Peer Services',
@@ -217,7 +217,7 @@ export const CLI_ARGS = {
         '    $ export BACKUP_PHRASE="oak indicate inside poet please share dinner monitor glow hire source perfect"\n' +
         '    $ export APP_GAIA_HUB="https://1.2.3.4"\n' +
         '    $ export PROFILE_GAIA_HUB="https://hub.blockstack.org"\n' +
-        '    $ blockstack-cli authenticator "$APP_GAIA_HUB" "$BACKUP_PHRASE" "$PROFILE_GAIA_HUB" 8888\n' +
+        '    $ stx authenticator "$APP_GAIA_HUB" "$BACKUP_PHRASE" "$PROFILE_GAIA_HUB" 8888\n' +
         '    Press Ctrl+C to exit\n' +
         '    Authentication server started on 8888\n',
       group: 'Authentication',
@@ -241,12 +241,12 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli balance 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4\n' +
+        '    $ stx balance 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4\n' +
         '    {\n' +
         '      "BTC": "123456"\n' +
         '      "STACKS": "123456"\n' +
         '    }\n' +
-        '    $ blockstack-cli balance SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0\n' +
+        '    $ stx balance SPZY1V53Z4TVRHHW9Z7SFG8CZNRAG7BD8WJ6SXD0\n' +
         '    {\n' +
         '      "BTC": "123456"\n' +
         '      "STACKS": "123456"\n' +
@@ -343,7 +343,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
+        '    $ stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '      contract_function 1 0 "$PAYMENT"\n' +
         '    a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456\n' +
         '\n',
@@ -385,7 +385,7 @@ export const CLI_ARGS = {
         'If the command succeeds, it prints out a Clarity value.' +
         '\n' +
         'Example:\n' +
-        '    $ blockstack-cli call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
+        '    $ stx call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '     contract_function SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X\n' +
         '\n',
       group: 'Account Management',
@@ -407,12 +407,12 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli convert_address 12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD\n' +
+        '    $ stx convert_address 12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD\n' +
         '    {\n' +
         '      "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
         '      "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
         '    }\n' +
-        '    $ blockstack-cli convert_address SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW\n' +
+        '    $ stx convert_address SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW\n' +
         '    {\n' +
         '      "STACKS": "SPA2MZWV9N67TBYVWTE0PSSKMJ2F6YXW7CBE6YPW",\n' +
         '      "BTC": "12qdRgXxgNBNPnDeEChy3fYTbSHQ8nfZfD"\n' +
@@ -444,7 +444,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ # password is "asdf"\n' +
-        '    $ blockstack-cli decrypt_keychain "bfMDtOucUGcJXjZo6vkrZWgEzue9fzPsZ7A6Pl4LQuxLI1xsVF0VPgBkMsnSLCmYS5YHh7R3mNtMmX45Bq9sNGPfPsseQMR0fD9XaHi+tBg=\n' +
+        '    $ stx decrypt_keychain "bfMDtOucUGcJXjZo6vkrZWgEzue9fzPsZ7A6Pl4LQuxLI1xsVF0VPgBkMsnSLCmYS5YHh7R3mNtMmX45Bq9sNGPfPsseQMR0fD9XaHi+tBg=\n' +
         '    Enter password:\n' +
         '    section amount spend resemble spray verify night immune tattoo best emotion parrot',
       group: 'Key Management',
@@ -492,7 +492,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"\n' +
+        '    $ stx deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"\n' +
         '    a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456\n' +
         '\n',
       group: 'Account Management',
@@ -537,7 +537,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '     $ # password is "asdf"\n' +
-        '     $ blockstack-cli encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
+        '     $ stx encrypt_keychain "section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
         '     Enter password:\n' +
         '     Enter password again:\n' +
         '     M+DnBHYb1fgw4N3oZ+5uTEAua5bAWkgTW/SjmmBhGGbJtjOtqVV+RrLJEJOgT35hBon4WKdGWye2vTdgqDo7+HIobwJwkQtN2YF9g3zPsKk=',
@@ -611,7 +611,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ export BACKUP_PHRASE="section amount spend resemble spray verify night immune tattoo best emotion parrot\n' +
-        '    $ blockstack-cli gaia_dump_bucket hello.id.blockstack https://sample.app https://hub.blockstack.org "$BACKUP_PHRASE" ./backups\n' +
+        '    $ stx gaia_dump_bucket hello.id.blockstack https://sample.app https://hub.blockstack.org "$BACKUP_PHRASE" ./backups\n' +
         '    Download 3 files...\n' +
         '    Download hello_world to ./backups/hello_world\n' +
         '    Download dir/format to ./backups/dir\\x2fformat\n' +
@@ -678,18 +678,18 @@ export const CLI_ARGS = {
         'Example without encryption:\n' +
         '\n' +
         '    $ # Get an unencrypted, unsigned file\n' +
-        '    $ blockstack-cli gaia_getfile ryan.id http://public.ykliao.com statuses.json\n' +
+        '    $ stx gaia_getfile ryan.id http://public.ykliao.com statuses.json\n' +
         '    [{"id":0,"text":"Hello, Blockstack!","created_at":1515786983492}]\n' +
         '\n' +
         'Example with encryption:\n' +
         '\n' +
         '    $ # Get an encrypted file without decrypting\n' +
-        '    $ blockstack-cli gaia_getfile ryan.id https://app.graphitedocs.com documentscollection.json\n' +
+        '    $ stx gaia_getfile ryan.id https://app.graphitedocs.com documentscollection.json\n' +
         '    ' +
         '    $ # Get an encrypted file, and decrypt it\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
-        '    $ blockstack-cli gaia_getfile ryan.id https://app.graphitedocs.com documentscollection.json "$APP_KEY" 1 0\n',
+        '    $ stx gaia_getfile ryan.id https://app.graphitedocs.com documentscollection.json "$APP_KEY" 1 0\n',
       group: 'Gaia',
     },
     gaia_putfile: {
@@ -750,19 +750,19 @@ export const CLI_ARGS = {
         '    $ # Store 4 versions of a file: plaintext, encrypted, signed, and encrypted+signed\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command.\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
-        '    $ blockstack-cli gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file.txt\n' +
+        '    $ stx gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file.txt\n' +
         '    {\n' +
         '       "urls": "https://gaia.blockstack.org/hub/19KAzYp4kSKozeAGMUsnuqkEGdgQQLEvwo/file.txt"\n' +
         '    }\n' +
-        '    $ blockstack-cli gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file-encrypted.txt 1\n' +
+        '    $ stx gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file-encrypted.txt 1\n' +
         '    {\n' +
         '       "urls": "https://gaia.blockstack.org/hub/19KAzYp4kSKozeAGMUsnuqkEGdgQQLEvwo/file-encrypted.txt"\n' +
         '    }\n' +
-        '    $ blockstack-cli gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file-signed.txt 0 1\n' +
+        '    $ stx gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file-signed.txt 0 1\n' +
         '    {\n' +
         '       "urls": "https://gaia.blockstack.org/hub/19KAzYp4kSKozeAGMUsnuqkEGdgQQLEvwo/file-signed.txt"\n' +
         '    }\n' +
-        '    $ blockstack-cli gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file-encrypted-signed.txt 1 1\n' +
+        '    $ stx gaia_putfile https://hub.blockstack.org "$APP_KEY" /path/to/file.txt file-encrypted-signed.txt 1 1\n' +
         '    {\n' +
         '       "urls": "https://gaia.blockstack.org/hub/19KAzYp4kSKozeAGMUsnuqkEGdgQQLEvwo/file-encrypted-signed.txt"\n' +
         '    }\n',
@@ -805,7 +805,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command.\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
-        '    $ blockstack-cli gaia_deletefile https://hub.blockstack.org "$APP_KEY" file.txt false\n' +
+        '    $ stx gaia_deletefile https://hub.blockstack.org "$APP_KEY" file.txt false\n' +
         '    ok',
       group: 'Gaia',
     },
@@ -836,7 +836,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ # Tip: You can obtain the app key with the get_app_keys command.\n' +
         '    $ export APP_KEY="3ac770e8c3d88b1003bf4a0a148ceb920a6172bdade8e0325a1ed1480ab4fb19"\n' +
-        '    $ blockstack-cli gaia_listfiles "https://hub.blockstack.org" "$APP_KEY"\n' +
+        '    $ stx gaia_listfiles "https://hub.blockstack.org" "$APP_KEY"\n' +
         '    hello_world\n' +
         '    dir/format\n' +
         '    /.dotfile\n' +
@@ -887,7 +887,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ export BACKUP_PHRASE="section amount spend resemble spray verify night immune tattoo best emotion parrot"\n' +
-        '    $ blockstack-cli gaia_restore_bucket hello.id.blockstack https://sample.app https://new.gaia.hub "$BACKUP_PHRASE" ./backups\n' +
+        '    $ stx gaia_restore_bucket hello.id.blockstack https://sample.app https://new.gaia.hub "$BACKUP_PHRASE" ./backups\n' +
         '    Uploaded ./backups/hello_world to https://new.gaia.hub/hub/1Lr8ggSgdmfcb4764woYutUfFqQMjEoKHc/hello_world\n' +
         '    Uploaded ./backups/dir\\x2fformat to https://new.gaia.hub/hub/1Lr8ggSgdmfcb4764woYutUfFqQMjEoKHc/dir/format\n' +
         '    Uploaded ./backups/\\x2f.dotfile to https://new.gaia.hub/hub/1Lr8ggSgdmfcb4764woYutUfFqQMjEoKHc//.dotfile\n' +
@@ -942,7 +942,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ export BACKUP_PHRASE="soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
-        '    $ blockstack-cli gaia_sethub hello_world.id https://hub.blockstack.org https://my.cool.app https://my.app.gaia.hub "$BACKUP_PHRASE"\n' +
+        '    $ stx gaia_sethub hello_world.id https://hub.blockstack.org https://my.cool.app https://my.app.gaia.hub "$BACKUP_PHRASE"\n' +
         '    {\n' +
         '      "profileUrls": {\n' +
         '        "error": null,\n' +
@@ -985,7 +985,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli get_account_history SP2H7VMY13ESQDAD5808QEY1EMGESMHZWBJRTN2YA 0\n' +
+        '    $ stx get_account_history SP2H7VMY13ESQDAD5808QEY1EMGESMHZWBJRTN2YA 0\n' +
         '    [\n' +
         '      {\n' +
         '        "address": "SP2H7VMY13ESQDAD5808QEY1EMGESMHZWBJRTN2YA",\n' +
@@ -1055,7 +1055,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '    $ blockstack-cli -t get_account_at SP2NTAQFECYGSTE1W47P71FG21H8F00KZZWFGEVKQ 56789\n' +
+        '    $ stx -t get_account_at SP2NTAQFECYGSTE1W47P71FG21H8F00KZZWFGEVKQ 56789\n' +
         '    [\n' +
         '      {\n' +
         '        "debit_value": "0",\n' +
@@ -1088,12 +1088,12 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli get_address f5185b9ca93bdcb5753fded3b097dab8547a8b47d2be578412d0687a9a0184cb01\n' +
+        '    $ stx get_address f5185b9ca93bdcb5753fded3b097dab8547a8b47d2be578412d0687a9a0184cb01\n' +
         '    {\n' +
         '      "BTC": "1JFhWyVPpZQjbPcXFtpGtTmU22u4fhBVmq",\n' +
         '      "STACKS": "SP2YM3J4KQK09V670TD6ZZ1XYNYCNGCWCVVKSDFWQ"\n' +
         '    }\n' +
-        '    $ blockstack-cli get_address 1,f5185b9ca93bdcb5753fded3b097dab8547a8b47d2be578412d0687a9a0184cb01,ff2ff4f4e7f8a1979ffad4fc869def1657fd5d48fc9cf40c1924725ead60942c01\n' +
+        '    $ stx get_address 1,f5185b9ca93bdcb5753fded3b097dab8547a8b47d2be578412d0687a9a0184cb01,ff2ff4f4e7f8a1979ffad4fc869def1657fd5d48fc9cf40c1924725ead60942c01\n' +
         '    {\n' +
         '      "BTC": "363pKBhc5ipDws1k5181KFf6RSxhBZ7e3p",\n' +
         '      "STACKS": "SMQWZ30EXVG6XEC1K4QTDP16C1CAWSK1JSWMS0QN"\n' +
@@ -1158,7 +1158,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
+        '    $ stx get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
         '    {\n' +
         '      "blockHeight": 567890,\n' +
         '      "confirmations": 7,\n' +
@@ -1224,7 +1224,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ export BACKUP_PHRASE="one race buffalo dynamic icon drip width lake extra forest fee kit"\n' +
-        '    $ blockstack-cli get_app_keys "$BACKUP_PHRASE" example.id.blockstack https://my.cool.dapp\n' +
+        '    $ stx get_app_keys "$BACKUP_PHRASE" example.id.blockstack https://my.cool.dapp\n' +
         '    {\n' +
         '      "keyInfo": {\n' +
         '        "privateKey": "TODO",\n' +
@@ -1265,7 +1265,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ # get the first 3 owner keys and addresses for a backup phrase\n' +
         '    $ export BACKUP_PHRASE="soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
-        '    $ blockstack-cli get_owner_keys "$BACKUP_PHRASE" 3\n' +
+        '    $ stx get_owner_keys "$BACKUP_PHRASE" 3\n' +
         '    [\n' +
         '      {\n' +
         '        "privateKey": "14b0811d5cd3486d47279d8f3a97008647c64586b121e99862c18863e2a4183501",\n' +
@@ -1307,7 +1307,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '    $ blockstack-cli get_payment_key "soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
+        '    $ stx get_payment_key "soap fog wealth upon actual blossom neither timber phone exile monkey vocal"\n' +
         '    [\n' +
         '      {\n' +
         '        "privateKey": "4023435e33da4aff0775f33e7b258f257fb20ecff039c919b5782313ab73afb401",\n' +
@@ -1339,7 +1339,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example\n' +
         '\n' +
-        '    $ blockstack-cli get_stacks_payment_key "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise"\n' +
+        '    $ stx get_stacks_payment_key "toast canal educate tissue express melody produce later gospel victory meadow outdoor hollow catch liberty annual gasp hat hello april equip thank neck cruise"\n' +
         '    [\n' +
         '      {\n' +
         '        "privateKey": "a25cea8d310ce656c6d427068c77bad58327334f73e39c296508b06589bc4fa201",\n' +
@@ -1370,7 +1370,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli get_zonefile ee77ad484b7b229f09461e4c2b6d3bd3e152ba95\n' +
+        '    $ stx get_zonefile ee77ad484b7b229f09461e4c2b6d3bd3e152ba95\n' +
         '    $ORIGIN ryanshea.id\n' +
         '    $TTL 3600\n' +
         '    _http._tcp URI 10 1 "https://gaia.blockstack.org/hub/15BcxePn59Y6mYD2fRLCLCaaHScefqW2No/1/profile.json"\n' +
@@ -1408,7 +1408,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli lookup example.id\n' +
+        '    $ stx lookup example.id\n' +
         '\n',
       group: 'Querying Blockstack IDs',
     },
@@ -1429,7 +1429,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli names ID-1FpBChfzHG3TdQQRKWAipbLragCUArueG9\n' +
+        '    $ stx names ID-1FpBChfzHG3TdQQRKWAipbLragCUArueG9\n' +
         '\n',
       group: 'Querying Blockstack IDs',
     },
@@ -1451,7 +1451,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli make_keychain\n' +
+        '    $ stx make_keychain\n' +
         '    {\n' +
         '      "mnemonic": "apart spin rich leader siren foil dish sausage fee pipe ethics bundle",\n' +
         '      "keyInfo": {\n' +
@@ -1504,7 +1504,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '     $ blockstack-cli make_zonefile example.id ID-1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82 https://my.gaia.hub/hub\n' +
+        '     $ stx make_zonefile example.id ID-1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82 https://my.gaia.hub/hub\n' +
         '     $ORIGIN example.id\n' +
         '     $TTL 3600\n' +
         '     _http._tcp      IN      URI     10      1       "https://my.gaia.hub/hub/1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82/profile.json"\n' +
@@ -1580,7 +1580,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ export REVEAL_KEY="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ export ID_ADDRESS="ID-18e1bqU7B5qUPY3zJgMLxDnexyStTeSnvV"\n' +
-        '    $ blockstack-cli name_import example.id "$ID_ADDRESS" https://gaia.blockstack.org/hub "$REVEAL_KEY"\n' +
+        '    $ stx name_import example.id "$ID_ADDRESS" https://gaia.blockstack.org/hub "$REVEAL_KEY"\n' +
         '    f726309cea7a9db364307466dc0e0e759d5c0d6bad1405e2fd970740adc7dc45\n' +
         '\n',
       group: 'Namespace Operations',
@@ -1734,7 +1734,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli price example.id\n' +
+        '    $ stx price example.id\n' +
         '    {\n' +
         '      "units": "BTC",\n' +
         '      "amount": "5500"\n' +
@@ -1760,7 +1760,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ # get the price of the .hello namespace\n' +
-        '    $ blockstack-cli price_namespace hello\n' +
+        '    $ stx price_namespace hello\n' +
         '    {\n' +
         '      "units": "BTC",\n' +
         '      "amount": "40000000"\n' +
@@ -1791,7 +1791,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ # Tip: you can get the owner key from your 12-word backup phrase using the get_owner_keys command\n' +
-        '    $ blockstack-cli profile_sign /path/to/profile.json 0ffd299af9c257173be8486ef54a4dd1373407d0629ca25ca68ff24a76be09fb01\n' +
+        '    $ stx profile_sign /path/to/profile.json 0ffd299af9c257173be8486ef54a4dd1373407d0629ca25ca68ff24a76be09fb01\n' +
         '\n',
       group: 'Profiles',
     },
@@ -1855,7 +1855,7 @@ export const CLI_ARGS = {
         '    $ # get the raw profile JWT\n' +
         '    $ curl -sL https://raw.githubusercontent.com/jcnelson/profile/master/judecn.id > /tmp/judecn.id.jwt\n' +
         '    $ # Tip: you can get the ID-address for a name with the "whois" command\n' +
-        '    $ blockstack-cli profile_verify /tmp/judecn.id.jwt ID-16EMaNw3pkn3v6f2BgnSSs53zAKH4Q8YJg\n' +
+        '    $ stx profile_verify /tmp/judecn.id.jwt ID-16EMaNw3pkn3v6f2BgnSSs53zAKH4Q8YJg\n' +
         '\n',
       group: 'Profiles',
     },
@@ -1917,26 +1917,26 @@ export const CLI_ARGS = {
         '    $ # Tip: you can get your payment key from your backup phrase with "get_payment_key".\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli renew hello_world.id "$OWNER" "$PAYMENT"\n' +
+        '    $ stx renew hello_world.id "$OWNER" "$PAYMENT"\n' +
         '    3d8945ce76d4261678d76592b472ed639a10d4298f9d730af4edbbc3ec02882e\n' +
         '\n' +
         '    $ # Renew with a new owner\n' +
         '    $ export NEW_OWNER="ID-141BcmFVbEuuMb7Bd6umXyV6ZD1WYomYDE"\n' +
-        '    $ blockstack-cli renew hello_world.id "$OWNER" "$PAYMENT" "$NEW_OWNER"\n' +
+        '    $ stx renew hello_world.id "$OWNER" "$PAYMENT" "$NEW_OWNER"\n' +
         '    33865625ef3f1b607111c0dfba9e58604927173bd2e299a343e19aa6d2cfb263\n' +
         '\n' +
         '    $ # Renew with a new zone file.\n' +
         '    $ # Tip: you can create a new zonefile with the "make_zonefile" command.\n' +
         '    $ export ZONEFILE_PATH="/path/to/new/zonefile.txt"\n' +
-        '    $ blockstack-cli renew hello_world.id "$OWNER" "$PAYMENT" --zonefile "$ZONEFILE_PATH"\n' +
+        '    $ stx renew hello_world.id "$OWNER" "$PAYMENT" --zonefile "$ZONEFILE_PATH"\n' +
         '    e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
         '    $ # wait 7 confirmations\n' +
-        '    $ blockstack-cli get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
+        '    $ stx get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
         '    {\n' +
         '      "blockHeight": 567890,\n' +
         '      "confirmations": 7,\n' +
         '    }\n' +
-        '    $ blockstack-cli -H https://core.blockstack.org zonefile_push "$ZONEFILE_PATH"\n' +
+        '    $ stx -H https://core.blockstack.org zonefile_push "$ZONEFILE_PATH"\n' +
         '    [\n' +
         '      "https://core.blockstack.org"\n' +
         '    ]\n' +
@@ -2006,7 +2006,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli register example.id "$OWNER" "$PAYMENT" https://hub.blockstack.org\n' +
+        '    $ stx register example.id "$OWNER" "$PAYMENT" https://hub.blockstack.org\n' +
         '    9bb908bfd4ab221f0829167a461229172184fc825a012c4e551533aa283207b1\n' +
         '\n',
       group: 'Blockstack ID Management',
@@ -2078,7 +2078,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ export ID_ADDRESS="ID-18e1bqU7B5qUPY3zJgMLxDnexyStTeSnvV"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli register_addr example.id "$ID_ADDRESS" "$PAYMENT" https://gaia.blockstack.org/hub',
+        '    $ stx register_addr example.id "$ID_ADDRESS" "$PAYMENT" https://gaia.blockstack.org/hub',
       group: 'Blockstack ID Management',
     },
     register_subdomain: {
@@ -2130,7 +2130,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
         '    $ # NOTE: https://registrar.blockstack.org is the registrar for personal.id!\n' +
-        '    $ blockstack-cli register_subdomain hello.personal.id "$OWNER" https://hub.blockstack.org https://registrar.blockstack.org\n',
+        '    $ stx register_subdomain hello.personal.id "$OWNER" https://hub.blockstack.org https://registrar.blockstack.org\n',
       group: 'Blockstack ID Management',
     },
     revoke: {
@@ -2168,7 +2168,7 @@ export const CLI_ARGS = {
         '    $ # Tip: you can get your owner and payment keys from your 12-word backup phrase using the get_owner_keys and get_payment_key commands.\n' +
         '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli revoke example.id "$OWNER" "$PAYMENT"\n' +
+        '    $ stx revoke example.id "$OWNER" "$PAYMENT"\n' +
         '    233b559c97891affa010567bd582110508d0236b4e3f88d3b1d0731629e030b0\n' +
         '\n',
       group: 'Blockstack ID Management',
@@ -2212,7 +2212,7 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli send_btc 18qTSE5PPQmypwKKej7QX5Db2XAttgYeA1 123456 "$PAYMENT"\n' +
+        '    $ stx send_btc 18qTSE5PPQmypwKKej7QX5Db2XAttgYeA1 123456 "$PAYMENT"\n' +
         '    c7e239fd24da30e36e011e6bc7db153574a5b40a3a8dc3b727adb54ad038acc5\n' +
         '\n',
       group: 'Account Management',
@@ -2272,26 +2272,26 @@ export const CLI_ARGS = {
         '    $ # check balances of sender and recipient before sending.\n' +
         '    $ # address of the key below is SP2SC16ASH76GX549PT7J5WQZA4GHMFBKYMBQFF9V\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli balance SP2SC16ASH76GX549PT7J5WQZA4GHMFBKYMBQFF9V\n' +
+        '    $ stx balance SP2SC16ASH76GX549PT7J5WQZA4GHMFBKYMBQFF9V\n' +
         '    {\n' +
         '      "STACKS": "10000000"\n' +
         '    }\n' +
-        '    $ blockstack-cli balance SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY\n' +
+        '    $ stx balance SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY\n' +
         '    {\n' +
         '      "STACKS": "0"\n' +
         '    }\n' +
         '\n' +
         '    $ # send tokens\n' +
-        '    $ blockstack-cli send_tokens SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY 12345 1 0 "$PAYMENT"\n' +
+        '    $ stx send_tokens SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY 12345 1 0 "$PAYMENT"\n' +
         '    a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456\n' +
         '\n' +
         '    $ # wait for transaction to be confirmed\n' +
         '\n' +
-        '    $ blockstack-cli balance SP2SC16ASH76GX549PT7J5WQZA4GHMFBKYMBQFF9V\n' +
+        '    $ stx balance SP2SC16ASH76GX549PT7J5WQZA4GHMFBKYMBQFF9V\n' +
         '    {\n' +
         '      "STACKS": "9987655"\n' +
         '    }\n' +
-        '    $ blockstack-cli balance SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY\n' +
+        '    $ stx balance SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY\n' +
         '    {\n' +
         '      "STACKS": "12345"\n' +
         '    }\n' +
@@ -2425,7 +2425,7 @@ export const CLI_ARGS = {
         '    $ # Tip: you can get your payment key from your backup phrase with "get_payment_key".\n' +
         '    $ export OWNER="136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
-        '    $ blockstack-cli transfer example.id ID-1HJA1AJvWef21XbQVL2AcTv71b6JHGPfDX true "$OWNER" "$PAYMENT"\n' +
+        '    $ stx transfer example.id ID-1HJA1AJvWef21XbQVL2AcTv71b6JHGPfDX true "$OWNER" "$PAYMENT"\n' +
         '    e09dc158e586d0c09dbcdcba917ec394e6c6ac2b9c91c4b55f32f5973e4f08fc\n' +
         '\n',
       group: 'Blockstack ID Management',
@@ -2565,21 +2565,21 @@ export const CLI_ARGS = {
         '    $ export OWNER="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ # make a new zone file\n' +
-        '    $ blockstack-cli make_zonefile example.id ID-1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82 https://my.gaia.hub/hub > /tmp/zonefile.txt\n' +
+        '    $ stx make_zonefile example.id ID-1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82 https://my.gaia.hub/hub > /tmp/zonefile.txt\n' +
         '    \n' +
         '    $ # update the name to reference this new zone file\n' +
-        '    $ blockstack-cli update example.id /tmp/zonefile.txt "$OWNER" "$PAYMENT"\n' +
+        '    $ stx update example.id /tmp/zonefile.txt "$OWNER" "$PAYMENT"\n' +
         '    8e94a5b6647276727a343713d3213d587836e1322b1e38bc158406f5f8ebe3fd\n' +
         '    \n' +
         '    $ # check confirmations\n' +
-        '    $ blockstack-cli get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
+        '    $ stx get_confirmations e41ce043ab64fd5a5fd382fba21acba8c1f46cbb1d7c08771ada858ce7d29eea\n' +
         '    {\n' +
         '      "blockHeight": 567890,\n' +
         '      "confirmations": 7,\n' +
         '    }\n' +
         '    \n' +
         '    $ # send out the new zone file to a Blockstack peer\n' +
-        '    $ blockstack-cli -H https://core.blockstack.org zonefile_push /tmp/zonefile.txt\n' +
+        '    $ stx -H https://core.blockstack.org zonefile_push /tmp/zonefile.txt\n' +
         '    [\n' +
         '      "https://core.blockstack.org"\n' +
         '    ]\n' +
@@ -2603,7 +2603,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli whois example.id\n' +
+        '    $ stx whois example.id\n' +
         '    {\n' +
         '      "address": "1ArdkA2oLaKnbNbLccBaFhEV4pYju8hJ82",\n' +
         '      "block_renewed_at": 567890,\n' +
@@ -2640,7 +2640,7 @@ export const CLI_ARGS = {
         '\n' +
         'Example:\n' +
         '\n' +
-        '    $ blockstack-cli -H https://core.blockstack.org zonefile_push /path/to/zonefile.txt\n' +
+        '    $ stx -H https://core.blockstack.org zonefile_push /path/to/zonefile.txt\n' +
         '    [\n' +
         '      "https://core.blockstack.org"\n' +
         '    ]\n' +
@@ -2680,7 +2680,7 @@ export const CLI_ARGS = {
         '\n' +
         '    $ # Tip: you can get your owner keys from your 12-word backup phrase using the get_owner_keys command.\n' +
         '    $ export PRIVATE_OWNER_KEY="6e50431b955fe73f079469b24f06480aee44e4519282686433195b3c4b5336ef01"\n' +
-        '    $ blockstack-cli get_did_configuration public_profile_for_testing.id.blockstack helloblockstack.com PRIVATE_OWNER_KEY\n' +
+        '    $ stx get_did_configuration public_profile_for_testing.id.blockstack helloblockstack.com PRIVATE_OWNER_KEY\n' +
         '    {\n' +
         '       "entries": [\n' +
         '          {\n' +
