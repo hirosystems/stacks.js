@@ -984,25 +984,6 @@
     sha.js "^2.4.11"
     smart-buffer "^4.1.0"
 
-"@blockstack/stacks-transactions@0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@blockstack/stacks-transactions/-/stacks-transactions-0.7.0.tgz#c587f69879b1903bada87769f1d6d1217479336a"
-  integrity sha512-9IUR641PJpigYDCWdtKFgBIk0Oxyoc2M2XVdyaEOEcRhI+4lcacDhsuseAmGbkB9FhJgJcNicWPujUPNFl1XCw==
-  dependencies:
-    "@types/bn.js" "^4.11.6"
-    "@types/elliptic" "^6.4.12"
-    "@types/randombytes" "^2.0.0"
-    "@types/sha.js" "^2.4.0"
-    bn.js "^4.11.9"
-    c32check "^1.1.1"
-    cross-fetch "^3.0.5"
-    elliptic "^6.5.2"
-    lodash "^4.17.20"
-    randombytes "^2.1.0"
-    ripemd160-min "^0.0.6"
-    sha.js "^2.4.11"
-    smart-buffer "^4.1.0"
-
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
@@ -2385,29 +2366,6 @@
     eventemitter3 "^4.0.4"
     jsonrpc-lite "^2.2.0"
     ws "^7.3.1"
-
-"@stacks/connect-ui@^2.14.0":
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/@stacks/connect-ui/-/connect-ui-2.14.0.tgz#d5fbbb8622a8117038a500430f93e2073d118afa"
-  integrity sha512-hASEJIjRtl0sNi1yl5v3KjPP73xaletz5dOzhVQDufrPjl27+HLum3pEuCUnd1K+vfdsUfybk9Jbwx+lfejDTA==
-  dependencies:
-    "@stencil/core" "^1.17.3"
-
-"@stacks/connect@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@stacks/connect/-/connect-4.0.0.tgz#2c351600d711a2d36431b60117d00e0572057da8"
-  integrity sha512-gfpy39fYAL5L/Q2NmwkHqRGEF3saPDy6F8uRpclkbAQBQHQrCQbYkI9kCToJb1lOuU248KqviM6aOIxZBGaxZg==
-  dependencies:
-    "@blockstack/stacks-transactions" "0.7.0"
-    "@stacks/connect-ui" "^2.14.0"
-    jsontokens "^3.0.0"
-
-"@stencil/core@^1.17.3":
-  version "1.17.4"
-  resolved "https://registry.yarnpkg.com/@stencil/core/-/core-1.17.4.tgz#f7beb16ecb3344c80e053fece013ae499adc7c54"
-  integrity sha512-dmuNYM6fnHPvE2ptHoUBQtjcpXqrHnkDtdyUD6/JrZWcJt6jBtrykewObOxzpDCMLs+NT7668ussRagdVL03gQ==
-  dependencies:
-    typescript "3.9.7"
 
 "@tootallnate/once@1":
   version "1.1.2"
@@ -13199,7 +13157,7 @@ typeforce@^1.11.3, typeforce@^1.11.5:
   resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.18.0.tgz#d7416a2c5845e085034d70fcc5b6cc4a90edbfdc"
   integrity sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==
 
-typescript@3.9.7, typescript@^3.7.2, typescript@^3.7.3, typescript@^3.9.7:
+typescript@^3.7.2, typescript@^3.7.3, typescript@^3.9.7:
   version "3.9.7"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.7.tgz#98d600a5ebdc38f40cb277522f12dc800e9e25fa"
   integrity sha512-BLbiRkiBzAwsjut4x/dsibSTB6yWpwT5qWmC2OfuCg3GgVQCSgMs4vEctYPhsaGtd0AeuuHMkjZ2h2WG8MSzRw==
