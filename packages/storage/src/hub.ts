@@ -1,25 +1,25 @@
-import { Transaction, script, ECPair } from 'bitcoinjs-lib';
+import { ECPair, script, Transaction } from 'bitcoinjs-lib';
 import { TokenSigner } from 'jsontokens';
 import {
-  randomBytes,
-  hashSha256Sync,
-  getPublicKeyFromPrivate,
   ecPairToAddress,
+  getPublicKeyFromPrivate,
+  hashSha256Sync,
   hexStringToECPair,
+  randomBytes,
 } from '@stacks/encryption';
 
 import {
-  Logger,
-  fetchPrivate,
-  megabytesToBytes,
   BadPathError,
   ConflictError,
   DoesNotExist,
+  fetchPrivate,
   GaiaHubErrorResponse,
+  Logger,
+  megabytesToBytes,
   NotEnoughProofError,
   PayloadTooLargeError,
-  ValidationError,
   PreconditionFailedError,
+  ValidationError,
 } from '@stacks/common';
 
 /**
@@ -49,16 +49,19 @@ interface UploadResponse {
  * @param contents
  * @param hubConfig
  * @param contentType
- *
+ * @param newFile
+ * @param etag
+ * @param dangerouslyIgnoreEtag
  * @ignore
  */
 export async function uploadToGaiaHub(
   filename: string,
   contents: Blob | Buffer | ArrayBufferView | string,
   hubConfig: GaiaHubConfig,
-  contentType: string = 'application/octet-stream',
-  newFile: boolean = true,
-  etag?: string
+  contentType = 'application/octet-stream',
+  newFile = true,
+  etag?: string,
+  dangerouslyIgnoreEtag?: boolean
 ): Promise<UploadResponse> {
   Logger.debug(`uploadToGaiaHub: uploading ${filename} to ${hubConfig.server}`);
 
@@ -67,10 +70,12 @@ export async function uploadToGaiaHub(
     Authorization: `bearer ${hubConfig.token}`,
   };
 
-  if (newFile) {
-    headers['If-None-Match'] = '*';
-  } else if (etag) {
-    headers['If-Match'] = etag;
+  if (!dangerouslyIgnoreEtag) {
+    if (newFile) {
+      headers['If-None-Match'] = '*';
+    } else if (etag) {
+      headers['If-Match'] = etag;
+    }
   }
 
   const response = await fetchPrivate(
@@ -89,11 +94,13 @@ export async function uploadToGaiaHub(
     );
   }
   const responseText = await response.text();
-  const responseJSON = JSON.parse(responseText);
-
-  return responseJSON;
+  return JSON.parse(responseText);
 }
 
+/**
+ * @param filename
+ * @param hubConfig
+ */
 export async function deleteFromGaiaHub(filename: string, hubConfig: GaiaHubConfig): Promise<void> {
   Logger.debug(`deleteFromGaiaHub: deleting ${filename} from ${hubConfig.server}`);
   const response = await fetchPrivate(
@@ -288,7 +295,10 @@ export async function getBlockstackErrorFromResponse(
   } else if (gaiaResponse.status === 412) {
     return new PreconditionFailedError(errorMsg, gaiaResponse);
   } else if (gaiaResponse.status === 413) {
-    const maxBytes = hubConfig ? megabytesToBytes(hubConfig!.max_file_upload_size_megabytes!) : 0;
+    const maxBytes =
+      hubConfig && hubConfig.max_file_upload_size_megabytes
+        ? megabytesToBytes(hubConfig.max_file_upload_size_megabytes)
+        : 0;
     return new PayloadTooLargeError(errorMsg, gaiaResponse, maxBytes);
   } else {
     return new Error(errorMsg);
