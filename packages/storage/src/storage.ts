@@ -1,37 +1,37 @@
 import {
+  connectToGaiaHub,
+  deleteFromGaiaHub,
+  GaiaHubConfig,
+  getBlockstackErrorFromResponse,
+  getBucketUrl,
   getFullReadUrl,
   uploadToGaiaHub,
-  connectToGaiaHub,
-  getBucketUrl,
-  GaiaHubConfig,
-  deleteFromGaiaHub,
-  getBlockstackErrorFromResponse,
 } from './hub';
 
 import {
-  signECDSA,
-  verifyECDSA,
   eciesGetJsonStringLength,
+  EncryptionOptions,
   getPublicKeyFromPrivate,
   publicKeyToAddress,
-  EncryptionOptions,
+  signECDSA,
+  verifyECDSA,
 } from '@stacks/encryption';
 
 import {
-  InvalidStateError,
-  SignatureVerificationError,
+  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
   DoesNotExist,
-  PayloadTooLargeError,
+  fetchPrivate,
   GaiaHubError,
   getGlobalObject,
+  InvalidStateError,
   megabytesToBytes,
-  fetchPrivate,
-  BLOCKSTACK_DEFAULT_GAIA_HUB_URL,
+  PayloadTooLargeError,
+  SignatureVerificationError,
 } from '@stacks/common';
 
 import { FileContentLoader } from './fileContentLoader';
 
-import { UserSession, NAME_LOOKUP_PATH, lookupProfile } from '@stacks/auth';
+import { lookupProfile, NAME_LOOKUP_PATH, UserSession } from '@stacks/auth';
 
 /**
  * Specify a valid MIME type, encryption options, and whether to sign the [[UserSession.putFile]].
@@ -51,6 +51,10 @@ export interface PutFileOptions extends EncryptionOptions {
    * @default true
    */
   encrypt?: boolean | string;
+  /**
+   * Ignore etag for concurrency control and force file to be written.
+   */
+  dangerouslyIgnoreEtag?: boolean;
 }
 
 const SIGNATURE_FILE_SUFFIX = '.sig';
@@ -465,6 +469,7 @@ export class Storage {
       encrypt: true,
       sign: false,
       cipherTextEncoding: 'hex',
+      dangerouslyIgnoreEtag: false,
     };
     const opt = Object.assign({}, defaults, options);
 
@@ -502,11 +507,13 @@ export class Storage {
 
     let etag: string;
     let newFile = true;
-
     const sessionData = this.userSession.store.getSessionData();
-    if (sessionData.etags![path]) {
-      newFile = false;
-      etag = sessionData.etags![path];
+
+    if (!opt.dangerouslyIgnoreEtag) {
+      if (sessionData.etags?.[path]) {
+        newFile = false;
+        etag = sessionData.etags?.[path];
+      }
     }
 
     let uploadFn: (hubConfig: GaiaHubConfig) => Promise<string>;
@@ -526,7 +533,15 @@ export class Storage {
       uploadFn = async (hubConfig: GaiaHubConfig) => {
         const writeResponse = (
           await Promise.all([
-            uploadToGaiaHub(path, contentData, hubConfig, contentType, newFile, etag),
+            uploadToGaiaHub(
+              path,
+              contentData,
+              hubConfig,
+              contentType,
+              newFile,
+              etag,
+              opt.dangerouslyIgnoreEtag
+            ),
             uploadToGaiaHub(
               `${path}${SIGNATURE_FILE_SUFFIX}`,
               signatureContent,
@@ -535,7 +550,7 @@ export class Storage {
             ),
           ])
         )[0];
-        if (writeResponse.etag) {
+        if (!opt.dangerouslyIgnoreEtag && writeResponse.etag) {
           sessionData.etags![path] = writeResponse.etag;
           this.userSession.store.setSessionData(sessionData);
         }
@@ -576,7 +591,8 @@ export class Storage {
           hubConfig,
           contentType,
           newFile,
-          etag
+          etag,
+          opt.dangerouslyIgnoreEtag
         );
         if (writeResponse.etag) {
           sessionData.etags![path] = writeResponse.etag;

@@ -51,7 +51,7 @@
   },
   "sideEffects": false,
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/storage.esm.js",
   "typings": "dist/storage/src/index.d.ts",
   "umd:main": "dist/storage.umd.production.js",
   "unpkg": "dist/storage.cjs.production.min.js",
