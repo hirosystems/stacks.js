@@ -134,7 +134,7 @@ test('ABI validation fail, tuple mistyped', () => {
         (key4 principal) 
         (key5 (buff 3)) 
         (key6 (optional none)) 
-        (key7 (responseError bool)) 
+        (key7 (response UnknownType bool)) 
         (key8 bool) 
         (key9 (string-ascii 11)) 
         (key10 (string-utf8 11)))`
@@ -187,7 +187,7 @@ test('ABI validation fail, tuple wrong key', () => {
       (key4 principal) 
       (key5 (buff 3)) 
       (key6 (optional bool)) 
-      (key7 (responseOk bool)) 
+      (key7 (response bool UnknownType)) 
       (key9 (list 2 bool)))
     `
   );
