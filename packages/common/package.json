@@ -40,7 +40,7 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "cross-fetch": "^3.0.5"
+    "cross-fetch": "^3.0.6"
   },
   "devDependencies": {
     "@types/jest": "^24.9.0",
