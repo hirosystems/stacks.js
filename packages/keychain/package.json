@@ -14,7 +14,7 @@
   "unpkg": "dist/keychain.cjs.production.min.js",
   "gitHead": "77b4d6d531b74996e4b7a0cbd1cf5b8358a690ce",
   "author": "Hank Stoever",
-  "typings": "./dist/index.d.ts",
+  "typings": "./dist/keychain/src/index.d.ts",
   "homepage": "https://blockstack.org",
   "contributors": [
     {
