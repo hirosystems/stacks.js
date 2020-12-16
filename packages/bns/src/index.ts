@@ -6,6 +6,7 @@ import {
   standardPrincipalCV,
   ClarityValue,
   ClarityType,
+  ResponseErrorCV,
   bufferCV,
   privateKeyToString,
   getAddressFromPrivateKey,
@@ -166,8 +167,87 @@ export async function canRegisterName(
   })
 }
 
-export async function getNamePrice() {
+/**
+ * Get price of namespace registration in microstacks
+ *
+ * @param {string} namespace - the namespace
+ * @param {StacksNetwork} network - the Stacks network to use
+ *
+ * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
+ */
+export async function getNamespacePrice(
+  namespace: string, 
+  network?: StacksNetwork
+): Promise<BN> {
+  const bnsFunctionName = 'get-namespace-price';
 
+  // Create a random address as input to read-only function call
+  // Not used by BNS contract function but required by core node API
+  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1760
+  // TODO: Remove once fixed on core node API
+  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
+  const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
+
+  return callReadOnlyBNSFunction({
+    functionName: bnsFunctionName,
+    senderAddress: randomAddress,
+    functionArgs: [
+      bufferCVFromString(namespace)
+    ],
+    network: network || new StacksMainnet()
+  })
+  .then((responseCV: ClarityValue) => {
+    if (responseCV.type === ClarityType.ResponseOk) {
+      return new BN(responseCV.value.toString());
+    } else {
+      const errorResponse = responseCV as ResponseErrorCV;
+      throw new Error(errorResponse.value.toString());
+    }
+  })
+}
+
+/**
+ * Get price of name registration in microstacks
+ *
+ * @param {string} fullyQualifiedName - the fully qualified name
+ * @param {StacksNetwork} network - the Stacks network to use
+ *
+ * @returns {Promise} that resolves to a BN object number of microstacks if the operation succeeds
+ */
+export async function getNamePrice(
+  fullyQualifiedName: string, 
+  network?: StacksNetwork
+): Promise<BN> {
+  const bnsFunctionName = 'get-name-price';
+  const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
+  if (subdomain) {
+    throw new Error('Cannot get subdomain name price');
+  }
+
+  // Create a random address as input to read-only function call
+  // Not used by BNS contract function but required by core node API
+  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1760
+  // TODO: Remove once fixed on core node API
+  const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
+  const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
+
+  return callReadOnlyBNSFunction({
+    functionName: bnsFunctionName,
+    senderAddress: randomAddress,
+    functionArgs: [
+      bufferCVFromString(namespace),
+      bufferCVFromString(name)
+    ],
+    network: network || new StacksMainnet()
+  })
+  .then((responseCV: ClarityValue) => {
+    if (responseCV.type === ClarityType.ResponseOk) {
+      return new BN(responseCV.value.toString());
+    } else {
+      const errorResponse = responseCV as ResponseErrorCV;
+      throw new Error(errorResponse.value.toString());
+    }
+  })
 }
 
 /**
