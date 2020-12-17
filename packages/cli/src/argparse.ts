@@ -345,7 +345,10 @@ export const CLI_ARGS = {
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx call_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '      contract_function 1 0 "$PAYMENT"\n' +
-        '    a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456\n' +
+        '     {\n' +
+        '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
+        '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
+        '     }\n',
         '\n',
       group: 'Account Management',
     },
@@ -387,6 +390,10 @@ export const CLI_ARGS = {
         'Example:\n' +
         '    $ stx call_read_only_contract_func SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X contract_name' +
         '     contract_function SPBMRFRPPGCDE3F384WCJPK8PQJGZ8K9QKK7F59X\n' +
+        '     {\n' +
+        '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
+        '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
+        '     }\n',
         '\n',
       group: 'Account Management',
     },
@@ -493,7 +500,10 @@ export const CLI_ARGS = {
         'Example:\n' +
         '    $ export PAYMENT="bfeffdf57f29b0cc1fab9ea197bb1413da2561fe4b83e962c7f02fbbe2b1cd5401"\n' +
         '    $ stx deploy_contract ./my_contract.clar my_contract 1 0 "$PAYMENT"\n' +
-        '    a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456\n' +
+        '     {\n' +
+        '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
+        '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
+        '     }\n',
         '\n',
       group: 'Account Management',
     },
@@ -2283,6 +2293,10 @@ export const CLI_ARGS = {
         '\n' +
         '    $ # send tokens\n' +
         '    $ stx send_tokens SP1P10PS2T517S4SQGZT5WNX8R00G1ECTRKYCPMHY 12345 1 0 "$PAYMENT"\n' +
+        '     {\n' +
+        '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
+        '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
+        '     }\n' +
         '    a9d387a925fb0ba7a725fb1e11f2c3f1647473699dd5a147c312e6453d233456\n' +
         '\n' +
         '    $ # wait for transaction to be confirmed\n' +
@@ -2346,9 +2360,10 @@ export const CLI_ARGS = {
         'Example:\n' +
         '\n' +
         '    $ stx stack 10000000 20 16pm276FpJYpm7Dv3GEaRqTVvGPTdceoY4 136ff26efa5db6f06b28f9c8c7a0216a1a52598045162abfe435d13036154a1b01\n' +
-        '    {\n' +
-        '      "txid": true\n' +
-        '    }\n',
+        '     {\n' +
+        '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
+        '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
+        '     }\n',
       group: 'Account Management',
     },
     stacking_status: {

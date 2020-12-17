@@ -892,7 +892,7 @@ export function answerToClarityValue(answer: any, arg: ClarityFunctionArg): Clar
 
 export function generateExplorerTxPageUrl(txid: string, network: StacksNetwork): string {
   if (network.version === TransactionVersion.Testnet) {
-    return `https://testnet-explorer.now.sh/txid/0x${txid}`;
+    return `https://testnet-explorer.blockstack.org/txid/0x${txid}`;
   } else {
     return `https://explorer.blockstack.org/txid/0x${txid}`;
   }
