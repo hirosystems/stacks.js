@@ -348,7 +348,7 @@ export const CLI_ARGS = {
         '     {\n' +
         '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
         '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
-        '     }\n',
+        '     }\n' +
         '\n',
       group: 'Account Management',
     },
@@ -393,7 +393,7 @@ export const CLI_ARGS = {
         '     {\n' +
         '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
         '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
-        '     }\n',
+        '     }\n' +
         '\n',
       group: 'Account Management',
     },
@@ -503,7 +503,7 @@ export const CLI_ARGS = {
         '     {\n' +
         '       txid: \'0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\',' +
         '       transaction: \'https://explorer.blockstack.org/txid/0x2e33ad647a9cedacb718ce247967dc705bc0c878db899fdba5eae2437c6fa1e1\'' +
-        '     }\n',
+        '     }\n' +
         '\n',
       group: 'Account Management',
     },
