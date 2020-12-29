@@ -10,4 +10,4 @@ npm install @stacks/cli
 
 ## Usage
 
-See [documentation](https://docs.blockstack.org/references/blockstack-cli)
+See [documentation](https://docs.blockstack.org/references/stacks-cli)
