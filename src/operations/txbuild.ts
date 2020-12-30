@@ -1081,7 +1081,7 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
 
   const txPromise = network.getConsensusHash()
     .then(consensusHash =>  makeTokenTransferSkeleton(
-      recipientAddress, consensusHash, tokenType, tokenAmount, scratchArea))
+      recipientAddress, null, tokenType, tokenAmount, scratchArea))
 
   return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
     .then(([senderAddress, btcAddress]) => {

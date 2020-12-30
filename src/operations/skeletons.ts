@@ -751,7 +751,11 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
   const tokenValueHexPadded = `0000000000000000${tokenValueHex}`.slice(-16)
 
   opReturnBuffer.write(opEncode('$'), 0, 3, 'ascii')
-  opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex')
+  if (!consensusHash) {
+    opReturnBuffer.write('0', 3, 16, 'hex')
+  } else {
+    opReturnBuffer.write(consensusHash, 3, consensusHash.length / 2, 'hex')
+  }
   opReturnBuffer.write(tokenTypeHexPadded, 19, tokenTypeHexPadded.length / 2, 'hex')
   opReturnBuffer.write(tokenValueHexPadded, 38, tokenValueHexPadded.length / 2, 'hex')
   opReturnBuffer.write(scratchArea, 46, scratchArea.length, 'ascii')
