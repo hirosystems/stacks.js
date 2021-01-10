@@ -1,0 +1,56 @@
+{
+  "name": "@stacks/wallet-sdk",
+  "version": "1.0.0-beta.21",
+  "description": "A library for building Stacks blockchain wallets",
+  "main": "./dist/index.js",
+  "umd:main": "./dist/wallet-sdk.umd.production.js",
+  "module": "./dist/wallet-sdk.esm.js",
+  "author": "Hank Stoever",
+  "types": "./dist/wallet-sdk/src/index.d.ts",
+  "scripts": {
+    "clean": "shx rm -rf ./lib*/",
+    "dev": "cross-env NODE_ENV=development tsdx watch",
+    "build": "cross-env NODE_ENV=production tsdx build --format=cjs,esm,umd",
+    "build-all": "run-p build:*",
+    "build:cjs": "tsc --outDir ./lib -m commonjs -t es2017",
+    "build:esm": "tsc --outDir ./lib-esm -m es6 -t es2017",
+    "build:cjs:watch": "tsc --outDir ./lib -m commonjs -t es2017 --watch",
+    "build:esm:watch": "tsc --outDir ./lib-esm -m es6 -t es2017 --watch",
+    "test": "jest",
+    "test:watch": "jest --watch --coverage=false",
+    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint:eslint": "eslint \"src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\" *.js",
+    "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
+    "depcheck": "depcheck --ignores='@types/*,eslint*,safe-buffer,codecov,@typescript-eslint/*,@blockstack/*'",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "yarn build"
+  },
+  "unpkg": "./dist/wallet-sdk.cjs.production.min.js",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^13.13.10",
+    "yalc": "1.0.0-pre.49"
+  },
+  "dependencies": {
+    "@stacks/encryption": "^1.0.1",
+    "@stacks/profile": "^1.1.1-alpha.0",
+    "@stacks/storage": "^1.1.1-alpha.0",
+    "@stacks/transactions": "^1.1.1-alpha.0",
+    "bip32": "2.0.6",
+    "bip39": "^3.0.2",
+    "bitcoinjs-lib": "^5.1.6",
+    "bn.js": "^5.1.1",
+    "c32check": "^1.0.1",
+    "jsontokens": "^3.0.0",
+    "triplesec": "^3.0.27",
+    "zone-file": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
