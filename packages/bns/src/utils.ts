@@ -1,6 +1,7 @@
 import {
   bufferCV,
-  uintCV
+  uintCV,
+  hash160
 } from '@stacks/transcations';
 
 import BN from 'bn.js';
@@ -33,3 +34,5 @@ export function decodeFQN(fqdn: string): {
 export const bufferCVFromString = (string: string) => bufferCV(Buffer.from(string));
 
 export const uintCVFromBN = (int: BN) => uintCV(int.toString(10));
+
+export const getZonefileHash = (zonefile: string) => hash160(Buffer.from(zonefile).toString('hex'));
