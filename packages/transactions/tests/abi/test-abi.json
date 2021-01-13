@@ -33,6 +33,11 @@
       "args": [{ "name": "arg1", "type": { "buffer": { "length": 6 } } }]
     },
     {
+      "name": "optional-uint-test",
+      "access": "public",
+      "args": [{ "name": "arg1", "type": { "optional": "uint128" } }]
+    },
+    {
       "name": "trait-test",
       "access": "public",
       "args": [{ "name": "arg1", "type": "trait_reference" }],

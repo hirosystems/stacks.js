@@ -28,6 +28,7 @@ import {
 } from '../src/contract-abi';
 
 import { oneLineTrim } from 'common-tags';
+import { optionalCVOf } from '../src/clarity/types/optionalCV';
 
 const TEST_ABI: ClarityAbi = JSON.parse(readFileSync('./tests/abi/test-abi.json').toString());
 
@@ -49,6 +50,22 @@ test('ABI validation', () => {
       key10: stringUtf8CV('Hello World'),
     }),
   ];
+
+  const payload = createContractCallPayload(
+    contractAddress,
+    contractName,
+    functionName,
+    functionArgs
+  );
+
+  validateContractCall(payload, TEST_ABI);
+});
+
+test.only('ABI validation optional uint', () => {
+  const contractAddress = 'ST3KC0MTNW34S1ZXD36JYKFD3JJMWA01M55DSJ4JE';
+  const contractName = 'test';
+  const functionName = 'optional-uint-test';
+  const functionArgs = [ optionalCVOf(uintCV(10)) ];
 
   const payload = createContractCallPayload(
     contractAddress,
