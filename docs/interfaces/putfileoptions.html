@@ -94,6 +94,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="putfileoptions.html#ciphertextencoding" class="tsd-kind-icon">cipher<wbr>Text<wbr>Encoding</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#contenttype" class="tsd-kind-icon">content<wbr>Type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#dangerouslyignoreetag" class="tsd-kind-icon">dangerously<wbr>Ignore<wbr>Etag</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="putfileoptions.html#encrypt" class="tsd-kind-icon">encrypt</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="putfileoptions.html#sign" class="tsd-kind-icon">sign</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="putfileoptions.html#wasstring" class="tsd-kind-icon">was<wbr>String</a></li>
@@ -130,6 +131,21 @@
 								If the <code>encrypt</code> is enabled, this option is ignored, and the
 								Content-Type header is set to <code>application/json</code> for the ciphertext
 							JSON envelope.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="dangerouslyignoreetag" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> dangerously<wbr>Ignore<wbr>Etag</h3>
+					<div class="tsd-signature tsd-kind-icon">dangerously<wbr>Ignore<wbr>Etag<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/storage/src/storage.ts#L57">packages/storage/src/storage.ts:57</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Ignore etag for concurrency control and force file to be written.</p>
 						</div>
 					</div>
 				</section>
@@ -199,6 +215,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="putfileoptions.html#contenttype" class="tsd-kind-icon">content<wbr>Type</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="putfileoptions.html#dangerouslyignoreetag" class="tsd-kind-icon">dangerously<wbr>Ignore<wbr>Etag</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="putfileoptions.html#encrypt" class="tsd-kind-icon">encrypt</a>
