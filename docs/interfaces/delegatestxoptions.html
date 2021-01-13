@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ReadOnlyGaiaConfigOptions | Stacks.js 1.0.0 Library Reference</title>
+	<title>DelegateStxOptions | Stacks.js 1.0.0 Library Reference</title>
 	<meta name="description" content="Documentation for Stacks.js 1.0.0 Library Reference">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,21 +55,45 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="readonlygaiaconfigoptions.html">ReadOnlyGaiaConfigOptions</a>
+					<a href="delegatestxoptions.html">DelegateStxOptions</a>
 				</li>
 			</ul>
-			<h1>Interface ReadOnlyGaiaConfigOptions</h1>
+			<h1>Interface DelegateStxOptions</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Delegate stx options</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>param</dt>
+						<dd><p>number of microstacks to delegate</p>
+						</dd>
+						<dt>param</dt>
+						<dd><p>the STX address of the delegatee</p>
+						</dd>
+						<dt>param</dt>
+						<dd><p>the burnchain block height after which delegation is revoked</p>
+						</dd>
+						<dt>param</dt>
+						<dd><p>the reward Bitcoin address of the delegator</p>
+						</dd>
+						<dt>param</dt>
+						<dd><p>private key to sign transaction</p>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ReadOnlyGaiaConfigOptions</span>
+						<span class="target">DelegateStxOptions</span>
 					</li>
 				</ul>
 			</section>
@@ -80,8 +104,11 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="readonlygaiaconfigoptions.html#privatekey" class="tsd-kind-icon">private<wbr>Key</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="readonlygaiaconfigoptions.html#readurl" class="tsd-kind-icon">readURL</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="delegatestxoptions.html#amountmicrostx" class="tsd-kind-icon">amount<wbr>Micro<wbr>Stx</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="delegatestxoptions.html#delegateto" class="tsd-kind-icon">delegate<wbr>To</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="delegatestxoptions.html#poxaddress" class="tsd-kind-icon">pox<wbr>Address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="delegatestxoptions.html#privatekey" class="tsd-kind-icon">private<wbr>Key</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="delegatestxoptions.html#untilburnblockheight" class="tsd-kind-icon">until<wbr>Burn<wbr>Block<wbr>Height</a></li>
 							</ul>
 						</section>
 					</div>
@@ -90,22 +117,52 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="amountmicrostx" class="tsd-anchor"></a>
+					<h3>amount<wbr>Micro<wbr>Stx</h3>
+					<div class="tsd-signature tsd-kind-icon">amount<wbr>Micro<wbr>Stx<span class="tsd-signature-symbol">:</span> <a href="../globals.html#bn" class="tsd-signature-type">BN</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L118">packages/stacking/src/index.ts:118</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="delegateto" class="tsd-anchor"></a>
+					<h3>delegate<wbr>To</h3>
+					<div class="tsd-signature tsd-kind-icon">delegate<wbr>To<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L119">packages/stacking/src/index.ts:119</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="poxaddress" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> pox<wbr>Address</h3>
+					<div class="tsd-signature tsd-kind-icon">pox<wbr>Address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L121">packages/stacking/src/index.ts:121</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="privatekey" class="tsd-anchor"></a>
 					<h3>private<wbr>Key</h3>
 					<div class="tsd-signature tsd-kind-icon">private<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/keychain/src/utils/gaia.ts#L72">packages/keychain/src/utils/gaia.ts:72</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L122">packages/stacking/src/index.ts:122</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="readurl" class="tsd-anchor"></a>
-					<h3>readURL</h3>
-					<div class="tsd-signature tsd-kind-icon">readURL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="untilburnblockheight" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> until<wbr>Burn<wbr>Block<wbr>Height</h3>
+					<div class="tsd-signature tsd-kind-icon">until<wbr>Burn<wbr>Block<wbr>Height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/keychain/src/utils/gaia.ts#L71">packages/keychain/src/utils/gaia.ts:71</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L120">packages/stacking/src/index.ts:120</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -124,13 +181,22 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="readonlygaiaconfigoptions.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Gaia<wbr>Config<wbr>Options</a>
+						<a href="delegatestxoptions.html" class="tsd-kind-icon">Delegate<wbr>Stx<wbr>Options</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="readonlygaiaconfigoptions.html#privatekey" class="tsd-kind-icon">private<wbr>Key</a>
+								<a href="delegatestxoptions.html#amountmicrostx" class="tsd-kind-icon">amount<wbr>Micro<wbr>Stx</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="readonlygaiaconfigoptions.html#readurl" class="tsd-kind-icon">readURL</a>
+								<a href="delegatestxoptions.html#delegateto" class="tsd-kind-icon">delegate<wbr>To</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="delegatestxoptions.html#poxaddress" class="tsd-kind-icon">pox<wbr>Address</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="delegatestxoptions.html#privatekey" class="tsd-kind-icon">private<wbr>Key</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="delegatestxoptions.html#untilburnblockheight" class="tsd-kind-icon">until<wbr>Burn<wbr>Block<wbr>Height</a>
 							</li>
 						</ul>
 					</li>
