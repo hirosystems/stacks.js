@@ -1,5 +1,5 @@
 import { sha256, sha512 } from 'sha.js';
-import { ClarityValue, serializeCV } from './clarity';
+import { ClarityValue, noneCV, responseErrorCV, serializeCV } from './clarity';
 import RIPEMD160 from 'ripemd160-min';
 import randombytes from 'randombytes';
 import { deserializeCV } from './clarity';
@@ -182,8 +182,12 @@ export interface ReadOnlyFunctionResponse {
  * Converts the response of a read-only function call into its Clarity Value
  * @param param
  */
-export const parseReadOnlyResponse = ({ result }: ReadOnlyFunctionResponse): ClarityValue => {
-  return hexToCV(result);
+export const parseReadOnlyResponse = ({ okay, result }: ReadOnlyFunctionResponse): ClarityValue => {
+  if (okay) {
+    return hexToCV(result);
+  } else {
+    return responseErrorCV(noneCV());
+  }
 };
 
 export const validateStacksAddress = (stacksAddress: string): boolean => {
