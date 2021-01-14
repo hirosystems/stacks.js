@@ -78,9 +78,9 @@ const LOG_CONFIG_DEFAULTS: CLI_LOG_CONFIG_TYPE = {
 };
 
 const CONFIG_DEFAULTS: CLI_CONFIG_TYPE = {
-  blockstackAPIUrl: 'http://core.blockstack.org:20443',
-  blockstackNodeUrl: 'http://core.blockstack.org:20443',
-  broadcastServiceUrl: 'http://core.blockstack.org:20443/v2/transactions',
+  blockstackAPIUrl: 'http://stacks-node-api.stacks.co',
+  blockstackNodeUrl: 'http://stacks-node-api.stacks.co',
+  broadcastServiceUrl: 'http://stacks-node-api.stacks.co/v2/transactions',
   utxoServiceUrl: 'https://blockchain.info',
   logConfig: LOG_CONFIG_DEFAULTS,
 };
