@@ -14,7 +14,7 @@ const RECOVERABLE_ECDSA_SIG_LENGTH_BYTES = 65;
 const COMPRESSED_PUBKEY_LENGTH_BYTES = 32;
 const UNCOMPRESSED_PUBKEY_LENGTH_BYTES = 64;
 const MEMO_MAX_LENGTH_BYTES = 34;
-const DEFAULT_CORE_NODE_API_URL = 'https://core.blockstack.org';
+const DEFAULT_CORE_NODE_API_URL = 'https://stacks-node-api.mainnet.stacks.co';
 
 enum StacksMessageType {
   Address,
