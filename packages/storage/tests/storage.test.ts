@@ -263,7 +263,7 @@ test('core node preferences respected for name lookups', async () => {
     gaiaHubConfig
   }
 
-  const defaultCoreNode = 'https://core.blockstack.org'
+  const defaultCoreNode = 'https://stacks-node-api.mainnet.stacks.co'
   const appSpecifiedCoreNode = 'https://app-specified-core-node.local'
   const userSpecifiedCoreNode = 'https://user-specified-core-node.local'
 
