@@ -38,7 +38,7 @@ export interface StacksNetwork {
 export class StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
-  coreApiUrl = 'https://core.blockstack.org';
+  coreApiUrl = 'https://stacks-node-api.mainnet.stacks.co';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
   accountEndpoint = '/v2/accounts';
@@ -97,7 +97,7 @@ export class StacksMainnet implements StacksNetwork {
 export class StacksTestnet extends StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Testnet;
   chainId = ChainID.Testnet;
-  coreApiUrl = 'https://stacks-node-api.blockstack.org';
+  coreApiUrl = 'https://stacks-node-api.testnet.stacks.co';
 }
 
 export class StacksMocknet extends StacksMainnet implements StacksNetwork {
