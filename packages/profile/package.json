@@ -1,6 +1,6 @@
 {
   "name": "@stacks/profile",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Library for Stacks profiles",
   "keywords": [
     "stacks",
@@ -41,9 +41,9 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.0",
-    "@stacks/encryption": "^1.0.0",
-    "@stacks/network": "^1.0.0",
+    "@stacks/common": "^1.0.1",
+    "@stacks/encryption": "^1.0.1",
+    "@stacks/network": "^1.0.1",
     "bitcoinjs-lib": "^5.1.10",
     "jsontokens": "^3.0.0",
     "schema-inspector": "^1.7.0",
