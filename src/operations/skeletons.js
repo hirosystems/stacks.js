@@ -755,7 +755,7 @@ export function makeV2TokenTransferSkeleton(
 }
 
 export function makeV2PreStxOpSkeleton(
-  prepareAddress: string, 
+  // prepareAddress: string, 
 ) {
   /*
   Format:
@@ -774,7 +774,7 @@ export function makeV2PreStxOpSkeleton(
   const tx = makeTXbuilder()
 
   tx.addOutput(nullOutput, 0)
-  tx.addOutput(prepareAddress, DUST_MINIMUM)
+  // tx.addOutput(prepareAddress, DUST_MINIMUM)
 
   return tx.buildIncomplete()
 }

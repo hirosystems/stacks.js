@@ -1173,8 +1173,7 @@ function makeV2PreStxOp(
   const senderKey = getTransactionSigner(senderKeyIn)
   const btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey
 
-  const txPromise = senderKey.getAddress()
-    .then(senderAddress => makeV2PreStxOpSkeleton(senderAddress))
+  const txPromise = makeV2PreStxOpSkeleton()
 
   return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
     .then(([senderAddress, btcAddress]) => {
