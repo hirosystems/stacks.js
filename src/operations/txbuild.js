@@ -12,8 +12,8 @@ import {
   makeUpdateSkeleton, makeTransferSkeleton, makeRenewalSkeleton,
   makeRevokeSkeleton, makeNamespacePreorderSkeleton,
   makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
-  makeNameImportSkeleton, makeAnnounceSkeleton,
-  makeTokenTransferSkeleton, BlockstackNamespace
+  makeNameImportSkeleton, makeAnnounceSkeleton, BlockstackNamespace,
+  makeTokenTransferSkeleton, makeV2TokenTransferSkeleton, makeV2PreStxOpSkeleton
 } from './skeletons'
 
 import { config } from '../config'
@@ -457,6 +457,38 @@ function estimateTokenTransfer(recipientAddress: string,
     .then((feeRate) => {
       const outputsValue = sumOutputValues(tokenTransferTX)
       const txFee = feeRate * estimateTXBytes(tokenTransferTX, senderUtxos, additionalOutputs)
+      return txFee + outputsValue
+    })
+}
+
+function estimateV2TokenTransfer(recipientAddress: string,
+                                 tokenAmount: BigInteger,
+                                 scratchArea: string,
+                                 senderUtxos: number = 1,
+                                 additionalOutputs: number = 1
+) {
+  const network = config.network
+  const tokenTransferTX = makeV2TokenTransferSkeleton(recipientAddress, tokenAmount, scratchArea)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(tokenTransferTX)
+      const txFee = feeRate * estimateTXBytes(tokenTransferTX, senderUtxos, additionalOutputs)
+      return txFee + outputsValue
+    })
+}
+
+function estimateV2PreStxOp(senderAddress: string,
+                            senderUtxos: number = 1,
+                            additionalOutputs: number = 1
+) {
+  const network = config.network
+  const preStxOpTx = makeV2PreStxOpSkeleton(senderAddress)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(preStxOpTx)
+      const txFee = feeRate * estimateTXBytes(preStxOpTx, senderUtxos, additionalOutputs)
       return txFee + outputsValue
     })
 }
@@ -1090,6 +1122,86 @@ function makeTokenTransfer(recipientAddress: string, tokenType: string,
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
+function makeV2TokenTransfer(recipientAddress: string,
+                             tokenAmount: BigInteger, scratchArea: string,
+                             senderKeyIn: string | TransactionSigner,
+                             btcFunderKeyIn?: string | TransactionSigner,
+                             buildIncomplete?: boolean = false
+) {
+  const network = config.network
+  const separateFunder = !!btcFunderKeyIn
+
+  const senderKey = getTransactionSigner(senderKeyIn)
+  const btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey
+
+  const txPromise = makeV2TokenTransferSkeleton(recipientAddress, tokenAmount, scratchArea)
+
+  return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
+    .then(([senderAddress, btcAddress]) => {
+      const btcUTXOsPromise = separateFunder
+        ? network.getUTXOs(btcAddress) : Promise.resolve([])
+      const networkPromises = [network.getUTXOs(senderAddress),
+                               btcUTXOsPromise,
+                               network.getFeeRate(),
+                               txPromise]
+      return Promise.all(networkPromises)
+        .then(([senderUTXOs, btcUTXOs, feeRate, tokenTransferTX]) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+
+          if (separateFunder) {
+            const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
+            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
+            return signInputs(signingTxB, btcKey,
+                              [{ index: payerInput.index, signer: senderKey }])
+          } else {
+            const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
+            return signInputs(signingTxB, senderKey)
+          }
+        })
+    })
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
+}
+
+function makeV2PreStxOp(
+  senderKeyIn: string | TransactionSigner,
+  btcFunderKeyIn?: string | TransactionSigner,
+  buildIncomplete?: boolean = false
+) {
+  const network = config.network
+  const separateFunder = !!btcFunderKeyIn
+
+  const senderKey = getTransactionSigner(senderKeyIn)
+  const btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey
+
+  const txPromise = senderKey.getAddress()
+    .then(senderAddress => makeV2PreStxOpSkeleton(senderAddress))
+
+  return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
+    .then(([senderAddress, btcAddress]) => {
+      const btcUTXOsPromise = separateFunder
+        ? network.getUTXOs(btcAddress) : Promise.resolve([])
+      const networkPromises = [network.getUTXOs(senderAddress),
+                               btcUTXOsPromise,
+                               network.getFeeRate(),
+                               txPromise]
+      return Promise.all(networkPromises)
+        .then(([senderUTXOs, btcUTXOs, feeRate, preStxOpTx]) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(preStxOpTx, network.layer1)
+
+          if (separateFunder) {
+            const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
+            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
+            return signInputs(signingTxB, btcKey,
+                              [{ index: payerInput.index, signer: senderKey }])
+          } else {
+            const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
+            return signInputs(signingTxB, senderKey)
+          }
+        })
+    })
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
+}
+
 /**
  * Generates a bitcoin spend to a specified address. This will fund up to `amount`
  *   of satoshis from the payer's UTXOs. It will generate a change output if and only
@@ -1187,6 +1299,8 @@ export const transactions = {
   makeNameImport,
   makeAnnounce,
   makeTokenTransfer,
+  makeV2TokenTransfer,
+  makeV2PreStxOp,
   BlockstackNamespace,
   estimatePreorder,
   estimateRegister,
@@ -1199,5 +1313,7 @@ export const transactions = {
   estimateNamespaceReady,
   estimateNameImport,
   estimateAnnounce,
-  estimateTokenTransfer
+  estimateTokenTransfer,
+  estimateV2TokenTransfer,
+  estimateV2PreStxOp
 }

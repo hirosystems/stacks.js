@@ -710,3 +710,71 @@ export function makeTokenTransferSkeleton(recipientAddress: string, consensusHas
 
   return tx.buildIncomplete()
 }
+
+export function makeV2TokenTransferSkeleton(
+  recipientAddress: string, 
+  tokenAmount: BigInteger,
+  scratchArea: string
+) {
+  /*
+  Format:
+
+  0      2  3                             19        80
+  |------|--|-----------------------------|---------|
+    magic  op     uSTX to transfer (u128)     memo (up to 61 bytes)
+
+  output 0: token transfer code
+  output 1: recipient address
+  */
+  if (scratchArea.length > 34) {
+    throw new Error('Invalid scratch area: must be no more than 34 bytes')
+  }
+
+  const opReturnBuffer = Buffer.alloc(19 + scratchArea.length)
+
+  const tokenValueHex = tokenAmount.toHex()
+
+  if (tokenValueHex.length > 32) {
+  // exceeds 2**64; can't fit
+    throw new Error(`Cannot send tokens: cannot fit ${tokenAmount.toString()} into 16 bytes`)
+  }
+
+  const tokenValueHexPadded = `0000000000000000000000000000000000000000${tokenValueHex}`.slice(-32)
+
+  opReturnBuffer.write('X2$', 0, 3, 'ascii')
+  opReturnBuffer.write(tokenValueHexPadded, 3, tokenValueHexPadded.length / 2, 'hex')
+  opReturnBuffer.write(scratchArea, 19, scratchArea.length, 'ascii')
+
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const tx = makeTXbuilder()
+
+  tx.addOutput(nullOutput, 0)
+  tx.addOutput(recipientAddress, DUST_MINIMUM)
+
+  return tx.buildIncomplete()
+}
+
+export function makeV2PreStxOpSkeleton(
+  prepareAddress: string, 
+) {
+  /*
+  Format:
+
+  0      2  3
+  |------|--|
+   magic  op 
+
+  */
+
+  const opReturnBuffer = Buffer.alloc(3)
+
+  opReturnBuffer.write('X2p', 0, 3, 'ascii')
+
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const tx = makeTXbuilder()
+
+  tx.addOutput(nullOutput, 0)
+  tx.addOutput(prepareAddress, DUST_MINIMUM)
+
+  return tx.buildIncomplete()
+}
