@@ -754,6 +754,52 @@ export function makeV2TokenTransferSkeleton(
   return tx.buildIncomplete()
 }
 
+export function makeStackingSkeleton(
+  poxAddress: string,
+  tokenAmount: BigInteger,
+  cycles: BigInteger
+) {
+  /*
+  Format:
+
+  0      2  3                             19        20
+  |------|--|-----------------------------|---------|
+    magic  op         uSTX to lock (u128)     cycles (u8)
+
+  */
+ 
+  const opReturnBuffer = Buffer.alloc(20)
+
+  const tokenValueHex = tokenAmount.toHex()
+
+
+  if (tokenValueHex.length > 32) {
+  // exceeds 2**64; can't fit
+    throw new Error(`Cannot stack tokens: cannot fit amount ${tokenAmount.toString()} into 16 bytes`)
+  }
+
+  const tokenValueHexPadded = `0000000000000000000000000000000000000000${tokenValueHex}`.slice(-32)
+
+  const cyclesValueHex = cycles.toHex()
+
+  if (cyclesValueHex.length > 2) {
+    // exceeds 2**64; can't fit
+    throw new Error(`Cannot stack tokens: cannot fit cycle count ${cycles.toString()} into 1 byte`)
+  }
+
+  opReturnBuffer.write('X2x', 0, 3, 'ascii')
+  opReturnBuffer.write(tokenValueHexPadded, 3, tokenValueHexPadded.length / 2, 'hex')
+  opReturnBuffer.write(cyclesValueHex, 19, cyclesValueHex.length / 2, 'hex')
+
+  const nullOutput = bitcoin.payments.embed({ data: [opReturnBuffer] }).output
+  const tx = makeTXbuilder()
+
+  tx.addOutput(nullOutput, 0)
+  tx.addOutput(poxAddress, DUST_MINIMUM)
+
+  return tx.buildIncomplete()
+}
+
 export function makeV2PreStxOpSkeleton(
   // prepareAddress: string, 
 ) {

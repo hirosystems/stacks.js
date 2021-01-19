@@ -13,7 +13,8 @@ import {
   makeRevokeSkeleton, makeNamespacePreorderSkeleton,
   makeNamespaceRevealSkeleton, makeNamespaceReadySkeleton,
   makeNameImportSkeleton, makeAnnounceSkeleton, BlockstackNamespace,
-  makeTokenTransferSkeleton, makeV2TokenTransferSkeleton, makeV2PreStxOpSkeleton
+  makeTokenTransferSkeleton, makeV2TokenTransferSkeleton, makeV2PreStxOpSkeleton,
+  makeStackingSkeleton
 } from './skeletons'
 
 import { config } from '../config'
@@ -478,12 +479,29 @@ function estimateV2TokenTransfer(recipientAddress: string,
     })
 }
 
+function estimateStacking(poxAddress: string,
+                          tokenAmount: BigInteger,
+                          cycles: BigInteger,
+                          senderUtxos: number = 1,
+                          additionalOutputs: number = 1
+) {
+  const network = config.network
+  const stackingTX = makeStackingSkeleton(poxAddress, tokenAmount, cycles)
+
+  return network.getFeeRate()
+    .then((feeRate) => {
+      const outputsValue = sumOutputValues(stackingTX)
+      const txFee = feeRate * estimateTXBytes(stackingTX, senderUtxos, additionalOutputs)
+      return txFee + outputsValue
+    })
+}
+
 function estimateV2PreStxOp(senderAddress: string,
                             senderUtxos: number = 1,
                             additionalOutputs: number = 1
 ) {
   const network = config.network
-  const preStxOpTx = makeV2PreStxOpSkeleton(senderAddress)
+  const preStxOpTx = makeV2PreStxOpSkeleton()
 
   return network.getFeeRate()
     .then((feeRate) => {
@@ -1162,6 +1180,46 @@ function makeV2TokenTransfer(recipientAddress: string,
     .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
 }
 
+function makeStacking(poxAddress: string,
+                      tokenAmount: BigInteger, cycles: BigInteger,
+                      senderKeyIn: string | TransactionSigner,
+                      btcFunderKeyIn?: string | TransactionSigner,
+                      buildIncomplete?: boolean = false
+) {
+  const network = config.network
+  const separateFunder = !!btcFunderKeyIn
+
+  const senderKey = getTransactionSigner(senderKeyIn)
+  const btcKey = btcFunderKeyIn ? getTransactionSigner(btcFunderKeyIn) : senderKey
+
+  const txPromise = makeStackingSkeleton(poxAddress, tokenAmount, cycles)
+
+  return Promise.all([senderKey.getAddress(), btcKey.getAddress()])
+    .then(([senderAddress, btcAddress]) => {
+      const btcUTXOsPromise = separateFunder
+        ? network.getUTXOs(btcAddress) : Promise.resolve([])
+      const networkPromises = [network.getUTXOs(senderAddress),
+                               btcUTXOsPromise,
+                               network.getFeeRate(),
+                               txPromise]
+      return Promise.all(networkPromises)
+        .then(([senderUTXOs, btcUTXOs, feeRate, tokenTransferTX]) => {
+          const txB = bitcoinjs.TransactionBuilder.fromTransaction(tokenTransferTX, network.layer1)
+
+          if (separateFunder) {
+            const payerInput = addOwnerInput(senderUTXOs, senderAddress, txB)
+            const signingTxB = fundTransaction(txB, btcAddress, btcUTXOs, feeRate, payerInput.value)
+            return signInputs(signingTxB, btcKey,
+                              [{ index: payerInput.index, signer: senderKey }])
+          } else {
+            const signingTxB = fundTransaction(txB, senderAddress, senderUTXOs, feeRate, 0)
+            return signInputs(signingTxB, senderKey)
+          }
+        })
+    })
+    .then(signingTxB => returnTransactionHex(signingTxB, buildIncomplete))
+}
+
 function makeV2PreStxOp(
   senderKeyIn: string | TransactionSigner,
   btcFunderKeyIn?: string | TransactionSigner,
@@ -1300,6 +1358,7 @@ export const transactions = {
   makeTokenTransfer,
   makeV2TokenTransfer,
   makeV2PreStxOp,
+  makeStacking,
   BlockstackNamespace,
   estimatePreorder,
   estimateRegister,
@@ -1314,5 +1373,6 @@ export const transactions = {
   estimateAnnounce,
   estimateTokenTransfer,
   estimateV2TokenTransfer,
-  estimateV2PreStxOp
+  estimateV2PreStxOp,
+  estimateStacking
 }
