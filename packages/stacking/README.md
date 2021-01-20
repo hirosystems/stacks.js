@@ -1,4 +1,5 @@
 # @stacks/stacking [![npm](https://img.shields.io/npm/v/@stacks/stacking?color=red)](https://www.npmjs.com/package/@stacks/stacking)
+
 Library for PoX Stacking.
 
 ## Installation
@@ -8,18 +9,21 @@ npm install @stacks/stacking
 ```
 
 ## Initialization
+
 ```typescript
-import { StacksTestnet } from '@stacks/network';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 
 const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
+// for mainnet, use `StacksMainnet()`
 const network = new StacksTestnet();
 const stacker = new Stacker(address, network);
 ```
 
 ## Check stacking eligibility
-```typescript  
-const stackingEligibility = await client.canStack({poxAddress, cycles});
+
+```typescript
+const stackingEligibility = await client.canStack({ poxAddress, cycles });
 
 // stackingEligibility:
 // {
@@ -29,6 +33,7 @@ const stackingEligibility = await client.canStack({poxAddress, cycles});
 ```
 
 ## Stack STX
+
 ```typescript
 const poxAddress = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
 const amountMicroStx = new BN(100000000000);
@@ -36,12 +41,12 @@ const cycles = 10;
 const key = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
 const burnBlockHeight = 2000;
 
-const stackingResults = await client.stack({ 
+const stackingResults = await client.stack({
   amountMicroStx,
   poxAddress,
   cycles,
   key,
-  burnBlockHeight
+  burnBlockHeight,
 });
 
 // stackingResults:
@@ -51,6 +56,7 @@ const stackingResults = await client.stack({
 ```
 
 ## Will Stacking be executed in the next cycle?
+
 ```typescript
 const stackingEnabledNextCycle = await client.isStackingEnabledNextCycle();
 
@@ -58,6 +64,7 @@ const stackingEnabledNextCycle = await client.isStackingEnabledNextCycle();
 ```
 
 ## How long (in seconds) is a Stacking cycle?
+
 ```typescript
 const cycleDuration = await client.getCycleDuration();
 
@@ -65,6 +72,7 @@ const cycleDuration = await client.getCycleDuration();
 ```
 
 ## How much time is left (in seconds) until the next cycle begins?
+
 ```typescript
 const secondsUntilNextCycle = await client.getSecondsUntilNextCycle();
 
@@ -72,6 +80,7 @@ const secondsUntilNextCycle = await client.getSecondsUntilNextCycle();
 ```
 
 ## Get PoX info
+
 ```typescript
 const poxInfo = await client.getPoxInfo();
 
@@ -90,6 +99,7 @@ const poxInfo = await client.getPoxInfo();
 ```
 
 ## Get Stacks node info
+
 ```typescript
 const coreInfo = await client.getCoreInfo();
 
@@ -112,21 +122,23 @@ const coreInfo = await client.getCoreInfo();
 ```
 
 ## Get account balance
+
 ```typescript
 const responseBalanceInfo = await client.getAccountBalance();
 
-// 800000000000 
+// 800000000000
 ```
 
 ## Does account have sufficient STX to meet minimum threshold?
+
 ```js
 const hasMinStxAmount = await client.hasMinimumStx();
 
 // true or false
 ```
 
-
 ## Get account stacking status
+
 ```typescript
 const stackingStatus = await client.getStatus();
 
