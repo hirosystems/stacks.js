@@ -37,12 +37,13 @@ const privateKey = createStacksPrivateKey(key);
 import {
   makeSTXTokenTransfer,
   makeStandardSTXPostCondition,
-  StacksMainnet,
   broadcastTransaction,
 } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const BigNum = require('bn.js');
 
-const network = new StacksMainnet();
+// for mainnet, use `StacksMainnet()`
+const network = new StacksTestnet();
 
 const txOptions = {
   recipient: 'SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159',
@@ -66,10 +67,12 @@ broadcastTransaction(transaction, network);
 ## Smart Contract Deploy Transaction
 
 ```javascript
-import { makeContractDeploy, StacksMainnet, broadcastTransaction } from '@stacks/transactions';
+import { makeContractDeploy, broadcastTransaction } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const BigNum = require('bn.js');
 
-const network = new StacksMainnet();
+// for mainnet, use `StacksMainnet()`
+const network = new StacksTestnet();
 
 const txOptions = {
   contractName: 'contract_name',
@@ -86,15 +89,12 @@ broadcastTransaction(transaction, network);
 ## Smart Contract Function Call
 
 ```javascript
-import {
-  makeContractCall,
-  BufferCV,
-  StacksMainnet,
-  broadcastTransaction,
-} from '@stacks/transactions';
+import { makeContractCall, BufferCV, broadcastTransaction } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const BigNum = require('bn.js');
 
-const network = new StacksMainnet();
+// for mainnet, use `StacksMainnet()`
+const network = new StacksTestnet();
 
 // Add an optional post condition
 // See below for details on constructing post conditions
@@ -160,6 +160,7 @@ import {
   deserializeTransaction,
   broadcastTransaction,
 } from '@stacks/transactions';
+import { StacksTestnet, StacksMainnet } from '@stacks/network';
 const BigNum = require('bn.js');
 
 const bufferReader = new BufferReader(Buffer.from(serializedTx));
@@ -175,7 +176,8 @@ const sponsorOptions = {
 
 const sponsoredTx = await sponsorTransaction(sponsorOptions);
 
-const network = new StacksMainnet();
+// for mainnet, use `StacksMainnet()`
+const network = new StacksTestnet();
 broadcastTransaction(sponsoredTx, network);
 ```
 
