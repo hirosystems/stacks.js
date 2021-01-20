@@ -132,11 +132,12 @@ export async function getPaymentKeyInfo(
  */
 export async function getStacksWalletKeyInfo(
   network: CLINetworkAdapter,
-  mnemonic: string
+  mnemonic: string,
+  derivationPath = "m/44'/5757'/0'/0/0"
 ): Promise<StacksKeyInfoType> {
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const master = bip32.fromSeed(seed);
-  const child = master.derivePath("m/44'/5757'/0'/0/0"); // taken from stacks-wallet. See https://github.com/blockstack/stacks-wallet
+  const child = master.derivePath(derivationPath); // taken from stacks-wallet. See https://github.com/blockstack/stacks-wallet
   const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey!);
   const privkey = blockstack.ecPairToHexString(ecPair);
 

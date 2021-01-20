@@ -339,7 +339,12 @@ async function makeKeychain(network: CLINetworkAdapter, args: string[]): Promise
     );
   }
 
-  const stacksKeyInfo = await getStacksWalletKeyInfo(network, mnemonic);
+  let derivationPath: string | undefined;
+  if (arg[1]) {
+    derivationPath = arg[1]
+  }
+
+  const stacksKeyInfo = await getStacksWalletKeyInfo(network, mnemonic, derivationPath);
   return JSONStringify({
     mnemonic: mnemonic,
     keyInfo: stacksKeyInfo,
