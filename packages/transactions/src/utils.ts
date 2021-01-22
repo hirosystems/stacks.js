@@ -173,20 +173,29 @@ export function hexToCV(hex: string) {
  * @param {string} result - serialized hex clarity value
  */
 
-export interface ReadOnlyFunctionResponse {
-  okay: boolean;
+export interface ReadOnlyFunctionSuccessResponse {
+  okay: true;
   result: string;
 }
+
+export interface ReadOnlyFunctionErrorResponse {
+  okay: false;
+  cause: string;
+}
+
+export type ReadOnlyFunctionResponse =
+  | ReadOnlyFunctionSuccessResponse
+  | ReadOnlyFunctionErrorResponse;
 
 /**
  * Converts the response of a read-only function call into its Clarity Value
  * @param param
  */
-export const parseReadOnlyResponse = ({ okay, result }: ReadOnlyFunctionResponse): ClarityValue => {
-  if (okay) {
-    return hexToCV(result);
+export const parseReadOnlyResponse = (response: ReadOnlyFunctionResponse): ClarityValue => {
+  if (response.okay) {
+    return hexToCV(response.result);
   } else {
-    return responseErrorCV(noneCV());
+    throw new Error(response.cause);
   }
 };
 
