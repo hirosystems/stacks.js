@@ -1487,13 +1487,13 @@ async function stackingStatus(network: CLINetworkAdapter, args: string[]): Promi
     .then((status: StackerInfo) => {
       if (status.stacked) {
         return {
-          amount_microstx: status.details!.amount_microstx,
-          first_reward_cycle: status.details!.first_reward_cycle,
-          lock_period: status.details!.lock_period,
-          unlock_height: status.details!.unlock_height,
+          amount_microstx: status.details.amount_microstx,
+          first_reward_cycle: status.details.first_reward_cycle,
+          lock_period: status.details.lock_period,
+          unlock_height: status.details.unlock_height,
           pox_address: {
-            version: status.details!.pox_address.version.toString('hex'),
-            hashbytes: status.details!.pox_address.hashbytes.toString('hex'),
+            version: status.details.pox_address.version.toString('hex'),
+            hashbytes: status.details.pox_address.hashbytes.toString('hex'),
           },
         };
       } else {

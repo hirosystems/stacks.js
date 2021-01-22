@@ -37,19 +37,23 @@ export interface PoxInfo {
   rejection_votes_left_required: number;
 }
 
-export interface StackerInfo {
-  stacked: boolean;
-  details?: {
-    amount_microstx: string;
-    first_reward_cycle: number;
-    lock_period: number;
-    unlock_height: number;
-    pox_address: {
-      version: Buffer;
-      hashbytes: Buffer;
+export type StackerInfo =
+  | {
+      stacked: false;
+    }
+  | {
+      stacked: true;
+      details: {
+        amount_microstx: string;
+        first_reward_cycle: number;
+        lock_period: number;
+        unlock_height: number;
+        pox_address: {
+          version: Buffer;
+          hashbytes: Buffer;
+        };
+      };
     };
-  };
-}
 
 export interface BlockTimeInfo {
   mainnet: {
