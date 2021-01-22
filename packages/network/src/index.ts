@@ -4,6 +4,7 @@ export interface StacksNetwork {
   version: TransactionVersion;
   chainId: ChainID;
   coreApiUrl: string;
+  bnsLookupUrl: string;
   broadcastEndpoint: string;
   transferFeeEstimateEndpoint: string;
   accountEndpoint: string;
@@ -39,6 +40,8 @@ export class StacksMainnet implements StacksNetwork {
   version = TransactionVersion.Mainnet;
   chainId = ChainID.Mainnet;
   coreApiUrl = 'https://stacks-node-api.mainnet.stacks.co';
+  // TODO: change this when mainnet is live. BNS endpoints are not live yet.
+  bnsLookupUrl = 'https://core.blockstack.org';
   broadcastEndpoint = '/v2/transactions';
   transferFeeEstimateEndpoint = '/v2/fees/transfer';
   accountEndpoint = '/v2/accounts';
@@ -70,7 +73,7 @@ export class StacksMainnet implements StacksNetwork {
     /*
       TODO: Update to v2 API URL for name lookups
     */
-    const nameLookupURL = `${this.coreApiUrl}/v1/names/${fullyQualifiedName}`;
+    const nameLookupURL = `${this.bnsLookupUrl}/v1/names/${fullyQualifiedName}`;
     return fetchPrivate(nameLookupURL)
       .then(resp => {
         if (resp.status === 404) {

@@ -13,6 +13,7 @@ import { Storage } from '../src'
 
 import { UserSession, AppConfig, UserData } from '@stacks/auth'
 import { DoesNotExist, getAesCbcOutputLength, getBase64OutputLength} from '@stacks/common'
+import { StacksMainnet } from '@stacks/network';
 import * as util from 'util'
 import * as jsdom from 'jsdom'
 import { 
@@ -263,7 +264,7 @@ test('core node preferences respected for name lookups', async () => {
     gaiaHubConfig
   }
 
-  const defaultCoreNode = 'https://stacks-node-api.mainnet.stacks.co'
+  const defaultCoreNode = new StacksMainnet().bnsLookupUrl;
   const appSpecifiedCoreNode = 'https://app-specified-core-node.local'
   const userSpecifiedCoreNode = 'https://user-specified-core-node.local'
 
