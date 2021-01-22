@@ -226,7 +226,7 @@ export class UserSession {
     let coreNode = this.appConfig && this.appConfig.coreNode;
     if (!coreNode) {
       const network = new StacksMainnet();
-      coreNode = network.coreApiUrl;
+      coreNode = network.bnsLookupUrl;
     }
 
     const tokenPayload = decodeToken(authResponseToken).payload;
