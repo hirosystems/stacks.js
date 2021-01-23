@@ -1,5 +1,5 @@
 import { sha256, sha512 } from 'sha.js';
-import { ClarityValue, noneCV, responseErrorCV, serializeCV } from './clarity';
+import { ClarityValue, serializeCV } from './clarity';
 import RIPEMD160 from 'ripemd160-min';
 import randombytes from 'randombytes';
 import { deserializeCV } from './clarity';
