@@ -11,7 +11,7 @@ npm install @stacks/stacking bn.js
 ## Initialization
 
 ```typescript
-import { getNonce } from "@stacks/transactions";
+import { getNonce } from '@stacks/transactions';
 import { StacksTestnet, StacksMainnet } from '@stacks/network';
 import { StackingClient } from '@stacks/stacking';
 import BN from 'bn.js';
@@ -212,23 +212,23 @@ If you are the delegator, you can stack / lock up tokens for your delegatees and
 const delegatorAddress = 'ST22X605P0QX2BJC3NXEENXDPFCNJPHE02DTX5V74';
 // delegator private key for transaction signing
 const delegatorPrivateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
-// a BTC address for reward payouts to the delegator
-const deletagorPoxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+// the BTC address for reward payouts; either to the delegator or to the BTC address set by the account holder
+const delegatePoxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 
 // if you call this method multiple times in the same block, you need to increase the nonce manually
-  let nonce = getNonce(delegatorAddress, network);
-  nonce = nonce.add(new BN(1));
+let nonce = getNonce(delegatorAddress, network);
+nonce = nonce.add(new BN(1));
 
 const delegatorClient = new StackingClient(delegatorAddress, network);
 
 const delegetateStackResponses = await delegatorClient.delegateStackStx({
   stacker: address,
   amountMicroStx,
-  poxAddress: deletagorPoxAddress,
+  poxAddress: delegatePoxAddress,
   burnBlockHeight,
   cycles,
   privateKey: delegatorPrivateKey,
-  nonce // optional
+  nonce, // optional
 });
 
 //   {
@@ -243,7 +243,7 @@ const delegetateStackResponses = await delegatorClient.delegateStackStx({
 const rewardCycle = 12;
 
 const delegetateCommitResponse = await delegatorClient.stackAggregationCommit({
-  poxAddress: deletagorPoxAddress,
+  poxAddress: delegatePoxAddress,
   rewardCycle,
   privateKey: privateKeyDelegate,
 });
