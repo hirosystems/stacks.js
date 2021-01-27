@@ -278,35 +278,29 @@ test('core node preferences respected for name lookups', async () => {
 
   var storage = new Storage({ userSession })
 
-  await new Promise((resolve) => {
-    fetchMock.once('_')
-    return storage.getFile(path, options)
-      .then(() => resolve())
-      .catch(() => resolve())
-  })
+  fetchMock.once('_')
+  try {
+    await storage.getFile(path, options)
+  } catch {}
   expect(fetchMock.mock.calls[0][0]).toEqual(defaultCoreNode + nameLookupPath)
   fetchMock.resetMocks()
 
   userSession.appConfig.coreNode = appSpecifiedCoreNode
   storage = new Storage({ userSession })
 
-  await new Promise((resolve) => {
-    fetchMock.once('_')
-    return storage.getFile(path, options)      
-      .then(() => resolve())
-      .catch(() => resolve())
-  })
+  fetchMock.once('_')
+  try {
+    await storage.getFile(path, options)      
+  } catch {}
   expect(fetchMock.mock.calls[0][0]).toEqual(appSpecifiedCoreNode + nameLookupPath)
   fetchMock.resetMocks()
 
   userSession.store.getSessionData().userData!.coreNode = userSpecifiedCoreNode
   storage = new Storage({ userSession })
-  await new Promise((resolve) => {
-    fetchMock.once('_')
-    return storage.getFile(path, options)      
-      .then(() => resolve())
-      .catch(() => resolve())
-  })
+  fetchMock.once('_')
+  try {
+    await storage.getFile(path, options)
+  } catch {}
   expect(fetchMock.mock.calls[0][0]).toEqual(userSpecifiedCoreNode + nameLookupPath)
 })
 

@@ -5,6 +5,8 @@ module.exports = {
   collectCoverage: true,
   globals: {
     'ts-jest': {
+      tsConfig: './tsconfig.json',
+      babelConfig: false,
       diagnostics: {
         ignoreCodes: ['TS151001'],
       },

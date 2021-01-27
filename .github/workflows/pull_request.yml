@@ -1,0 +1,41 @@
+name: Pull Request
+
+on: [pull_request]
+
+jobs:
+  code_checks:
+    name: Code Checks
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Node Version
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: 14.15.1
+      
+      - name: Restore lerna cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install yarn dependencies
+        run: yarn --frozen-lockfile --ignore-scripts
+      - name: Bootstrap
+        run: yarn lerna bootstrap
+      - name: Lint
+        run: yarn lint:prettier
+      - name: Typecheck
+        run: yarn typecheck
+      - name: Build
+        run: yarn build
+      - name: Tests
+        run: yarn lerna run test --stream --parallel -- -- --coverage=false
+      # TODO: setup jest for a lerna monorepo, 
+      # - name: Upload code coverage
+      #   run: yarn lerna run codecovUpload --stream

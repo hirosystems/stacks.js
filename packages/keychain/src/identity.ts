@@ -1,6 +1,6 @@
 import { bip32, ECPair } from 'bitcoinjs-lib';
 import { getPublicKeyFromPrivate } from '@stacks/encryption';
-import { makeAuthResponse } from '@stacks//auth';
+import { makeAuthResponse } from '@stacks/auth';
 import { getProfileURLFromZoneFile } from './utils';
 
 import { IdentityKeyPair } from './utils/index';
