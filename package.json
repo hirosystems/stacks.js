@@ -73,7 +73,7 @@
     "tape": "^4.11.0",
     "tape-promise": "^4.0.0",
     "triplesec": "^4.0.3",
-    "ts-jest": "^24.3.0",
+    "ts-jest": "^26.4.1",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.10.2",
     "typedoc": "^0.19.2",
@@ -120,12 +120,13 @@
   },
   "scripts": {
     "bootstrap": "lerna run bootstrap",
-    "build": "lerna run build",
+    "build": "lerna run build --stream",
     "lint": "yarn lint:eslint && yarn lint:prettier",
     "lint:eslint": "eslint \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" -f unix",
     "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" -f unix --fix",
     "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
     "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx|!(d.ts)}\" *.js",
-    "build:docs": "rimraf docs && cross-env typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src"
+    "build:docs": "rimraf docs && cross-env typedoc --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json packages/**/src",
+    "typecheck": "lerna run typecheck --parallel --no-bail --stream"
   }
 }

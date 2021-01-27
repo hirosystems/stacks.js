@@ -10,3 +10,4 @@ webpack.config.js
 typedoc.js
 **/*.d.ts
 docs-theme/
+node_modules
