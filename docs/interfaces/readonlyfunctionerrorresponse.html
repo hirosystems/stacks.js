@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ReadOnlyFunctionResponse | Stacks.js 1.0.0 Library Reference</title>
+	<title>ReadOnlyFunctionErrorResponse | Stacks.js 1.0.0 Library Reference</title>
 	<meta name="description" content="Documentation for Stacks.js 1.0.0 Library Reference">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,36 +55,21 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="readonlyfunctionresponse.html">ReadOnlyFunctionResponse</a>
+					<a href="readonlyfunctionerrorresponse.html">ReadOnlyFunctionErrorResponse</a>
 				</li>
 			</ul>
-			<h1>Interface ReadOnlyFunctionResponse</h1>
+			<h1>Interface ReadOnlyFunctionErrorResponse</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Read only function response object</p>
-					</div>
-					<dl class="tsd-comment-tags">
-						<dt>param</dt>
-						<dd><p>the status of the response</p>
-						</dd>
-						<dt>param</dt>
-						<dd><p>serialized hex clarity value</p>
-						</dd>
-					</dl>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ReadOnlyFunctionResponse</span>
+						<span class="target">ReadOnlyFunctionErrorResponse</span>
 					</li>
 				</ul>
 			</section>
@@ -95,8 +80,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="readonlyfunctionresponse.html#okay" class="tsd-kind-icon">okay</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="readonlyfunctionresponse.html#result" class="tsd-kind-icon">result</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="readonlyfunctionerrorresponse.html#cause" class="tsd-kind-icon">cause</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="readonlyfunctionerrorresponse.html#okay" class="tsd-kind-icon">okay</a></li>
 							</ul>
 						</section>
 					</div>
@@ -105,22 +90,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="okay" class="tsd-anchor"></a>
-					<h3>okay</h3>
-					<div class="tsd-signature tsd-kind-icon">okay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<a name="cause" class="tsd-anchor"></a>
+					<h3>cause</h3>
+					<div class="tsd-signature tsd-kind-icon">cause<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L177">packages/transactions/src/utils.ts:177</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L183">packages/transactions/src/utils.ts:183</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="result" class="tsd-anchor"></a>
-					<h3>result</h3>
-					<div class="tsd-signature tsd-kind-icon">result<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="okay" class="tsd-anchor"></a>
+					<h3>okay</h3>
+					<div class="tsd-signature tsd-kind-icon">okay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L178">packages/transactions/src/utils.ts:178</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/transactions/src/utils.ts#L182">packages/transactions/src/utils.ts:182</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -139,13 +124,13 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="readonlyfunctionresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Response</a>
+						<a href="readonlyfunctionerrorresponse.html" class="tsd-kind-icon">Read<wbr>Only<wbr>Function<wbr>Error<wbr>Response</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="readonlyfunctionresponse.html#okay" class="tsd-kind-icon">okay</a>
+								<a href="readonlyfunctionerrorresponse.html#cause" class="tsd-kind-icon">cause</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="readonlyfunctionresponse.html#result" class="tsd-kind-icon">result</a>
+								<a href="readonlyfunctionerrorresponse.html#okay" class="tsd-kind-icon">okay</a>
 							</li>
 						</ul>
 					</li>
