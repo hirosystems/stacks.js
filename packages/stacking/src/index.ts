@@ -1,5 +1,3 @@
-// import axios from 'axios';
-// import { BigNumber } from 'bignumber.js';
 import {
   makeContractCall,
   bufferCV,
@@ -9,6 +7,7 @@ import {
   broadcastTransaction,
   standardPrincipalCV,
   ContractCallOptions,
+  TxBroadcastResult,
   UIntCV,
   BufferCV,
   ContractCallPayload,
@@ -21,6 +20,7 @@ import {
   TupleCV,
   noneCV,
   someCV,
+  validateStacksAddress,
 } from '@stacks/transactions';
 import { StacksNetwork } from '@stacks/network';
 import BN from 'bn.js';
@@ -84,7 +84,7 @@ export interface StackingEligibility {
 /**
  * Lock stx check options
  *
- * @param  {String} poxAddress - the reward Bitcoin address
+ * @param  {string} poxAddress - the reward Bitcoin address
  * @param  {number} cycles - number of cycles to lock
  */
 export interface CanLockStxOptions {
@@ -95,10 +95,10 @@ export interface CanLockStxOptions {
 /**
  * Lock stx options
  *
- * @param  {String} key - private key to sign transaction
- * @param  {String} poxAddress - the reward Bitcoin address
+ * @param  {string} key - private key to sign transaction
+ * @param  {string} poxAddress - the reward Bitcoin address
  * @param  {number} cycles - number of cycles to lock
- * @param  {BigNum} amountMicroStx - number of microstacks to lock
+ * @param  {BN} amountMicroStx - number of microstacks to lock
  * @param  {number} burnBlockHeight - the burnchain block height to begin lock
  */
 export interface LockStxOptions {
@@ -112,11 +112,11 @@ export interface LockStxOptions {
 /**
  * Delegate stx options
  *
- * @param  {BigNum} amountMicroStx - number of microstacks to delegate
- * @param  {String} delegateTo - the STX address of the delegatee
- * @param  {number} untilBurnBlockHeight - the burnchain block height after which delegation is revoked
- * @param  {String} poxAddress - the reward Bitcoin address of the delegator
- * @param  {String} privateKey - private key to sign transaction
+ * @param  {BN} amountMicroStx - number of microstacks to delegate
+ * @param  {string} delegateTo - the STX address of the delegatee
+ * @param  {number | optional} untilBurnBlockHeight - the burnchain block height after which delegation is revoked
+ * @param  {string | optional} poxAddress - the reward Bitcoin address of the delegator
+ * @param  {string} privateKey - private key to sign transaction
  */
 export interface DelegateStxOptions {
   amountMicroStx: BN;
@@ -129,12 +129,13 @@ export interface DelegateStxOptions {
 /**
  * Delegate stack stx options
  *
- * @param  {String} stacker - the STX address of the delegator
- * @param  {BigNum} amountMicroStx - number of microstacks to lock
- * @param  {String} poxAddress - the reward Bitcoin address
+ * @param  {string} stacker - the STX address of the delegator
+ * @param  {BN} amountMicroStx - number of microstacks to lock
+ * @param  {string} poxAddress - the reward Bitcoin address of the delegator
  * @param  {number} burnBlockHeight - the burnchain block height to begin lock
  * @param  {number} cycles - number of cycles to lock
- * @param  {String} privateKey - private key to sign transaction
+ * @param  {string} privateKey - private key to sign transaction
+ * @param  {BN | optional} nonce - nonce for the transaction
  */
 export interface DelegateStackStxOptions {
   stacker: string;
@@ -290,7 +291,7 @@ export class StackingClient {
           version: hashModeBuffer,
         });
 
-        const [contractAddress, contractName] = poxInfo.contract_id.split('.');
+        const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
 
         return callReadOnlyFunction({
           network: this.network,
@@ -328,7 +329,13 @@ export class StackingClient {
    *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async stack({ amountMicroStx, poxAddress, cycles, privateKey, burnBlockHeight }: LockStxOptions) {
+  async stack({
+    amountMicroStx,
+    poxAddress,
+    cycles,
+    privateKey,
+    burnBlockHeight,
+  }: LockStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -344,11 +351,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
-    if (typeof res === 'string') {
-      return res;
-    }
-    throw new Error(`${res.error} - ${res.reason}`);
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
   }
 
   /**
@@ -364,7 +367,7 @@ export class StackingClient {
     untilBurnBlockHeight,
     poxAddress,
     privateKey,
-  }: DelegateStxOptions) {
+  }: DelegateStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -380,11 +383,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
-    if (typeof res === 'string') {
-      return res;
-    }
-    throw new Error(`${res.error} - ${res.reason}`);
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
   }
 
   /**
@@ -402,7 +401,7 @@ export class StackingClient {
     cycles,
     privateKey,
     nonce,
-  }: DelegateStackStxOptions) {
+  }: DelegateStackStxOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -420,11 +419,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
-    if (typeof res === 'string') {
-      return res;
-    }
-    throw new Error(`${res.error} - ${res.reason}`);
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
   }
 
   /**
@@ -438,7 +433,7 @@ export class StackingClient {
     poxAddress,
     rewardCycle,
     privateKey,
-  }: StackAggregationCommitOptions) {
+  }: StackAggregationCommitOptions): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -452,11 +447,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
-    if (typeof res === 'string') {
-      return res;
-    }
-    throw new Error(`${res.error} - ${res.reason}`);
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
   }
 
   /**
@@ -466,7 +457,7 @@ export class StackingClient {
    *
    * @returns {Promise<string>} that resolves to a broadcasted txid if the operation succeeds
    */
-  async revokeDelegateStx(privateKey: string) {
+  async revokeDelegateStx(privateKey: string): Promise<TxBroadcastResult> {
     const poxInfo = await this.getPoxInfo();
     const contract = poxInfo.contract_id;
 
@@ -477,11 +468,7 @@ export class StackingClient {
       senderKey: privateKey,
     });
 
-    const res = await broadcastTransaction(tx, txOptions.network as StacksNetwork);
-    if (typeof res === 'string') {
-      return res;
-    }
-    throw new Error(`${res.error} - ${res.reason}`);
+    return broadcastTransaction(tx, txOptions.network as StacksNetwork);
   }
 
   getStackOptions({
@@ -504,7 +491,7 @@ export class StackingClient {
       hashbytes,
       version: hashModeBuffer,
     });
-    const [contractAddress, contractName] = contract.split('.');
+    const [contractAddress, contractName] = this.parseContractId(contract);
     const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
@@ -550,7 +537,7 @@ export class StackingClient {
       );
     }
 
-    const [contractAddress, contractName] = contract.split('.');
+    const [contractAddress, contractName] = this.parseContractId(contract);
     const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
@@ -593,7 +580,7 @@ export class StackingClient {
       version: hashModeBuffer,
     });
 
-    const [contractAddress, contractName] = contract.split('.');
+    const [contractAddress, contractName] = this.parseContractId(contract);
     const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
@@ -634,7 +621,7 @@ export class StackingClient {
       version: hashModeBuffer,
     });
 
-    const [contractAddress, contractName] = contract.split('.');
+    const [contractAddress, contractName] = this.parseContractId(contract);
     const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
@@ -648,7 +635,7 @@ export class StackingClient {
   }
 
   getRevokeDelegateStxOptions(contract: string) {
-    const [contractAddress, contractName] = contract.split('.');
+    const [contractAddress, contractName] = this.parseContractId(contract);
     const network = this.network;
     const txOptions: ContractCallOptions = {
       contractAddress,
@@ -667,7 +654,8 @@ export class StackingClient {
    * @returns {Promise<StackerInfo>} that resolves to a StackerInfo object if the operation succeeds
    */
   async getStatus(): Promise<StackerInfo> {
-    const [contractAddress, contractName] = (await this.getPoxInfo()).contract_id.split('.');
+    const poxInfo = await this.getPoxInfo();
+    const [contractAddress, contractName] = this.parseContractId(poxInfo.contract_id);
     const account = await this.getAccountStatus();
     const functionName = 'get-stacker-info';
 
@@ -723,5 +711,20 @@ export class StackingClient {
       new BN(amountMicroStx.toString(10), 10).sub(fee).toBuffer()
     );
     return tx;
+  }
+
+  /**
+   * Parses a contract identifier and ensures it is formatted correctly
+   *
+   * @returns {Array<string>} a contract address and name
+   */
+  parseContractId(contract: string): Array<string> {
+    const parts = contract.split('.');
+
+    if (parts.length !== 2 || !validateStacksAddress(parts[0]) || parts[1] !== 'pox') {
+      throw new Error('Stacking contract ID is malformed');
+    }
+
+    return parts;
   }
 }

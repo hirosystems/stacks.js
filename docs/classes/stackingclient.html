@@ -112,6 +112,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#hasminimumstx" class="tsd-kind-icon">has<wbr>Minimum<wbr>Stx</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#isstackingenablednextcycle" class="tsd-kind-icon">is<wbr>Stacking<wbr>Enabled<wbr>Next<wbr>Cycle</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#modifylocktxfee" class="tsd-kind-icon">modify<wbr>Lock<wbr>TxFee</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#parsecontractid" class="tsd-kind-icon">parse<wbr>Contract<wbr>Id</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#revokedelegatestx" class="tsd-kind-icon">revoke<wbr>Delegate<wbr>Stx</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#stack" class="tsd-kind-icon">stack</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="stackingclient.html#stackaggregationcommit" class="tsd-kind-icon">stack<wbr>Aggregation<wbr>Commit</a></li>
@@ -132,7 +133,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L151">packages/stacking/src/index.ts:151</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L152">packages/stacking/src/index.ts:152</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -157,7 +158,7 @@
 					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L152">packages/stacking/src/index.ts:152</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L153">packages/stacking/src/index.ts:153</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -167,7 +168,7 @@
 					<div class="tsd-signature tsd-kind-icon">network<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">StacksNetwork</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L152">packages/stacking/src/index.ts:152</a></li>
+							<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L153">packages/stacking/src/index.ts:153</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -184,7 +185,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L275">packages/stacking/src/index.ts:275</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L276">packages/stacking/src/index.ts:276</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -215,13 +216,13 @@
 					<a name="delegatestackstx" class="tsd-anchor"></a>
 					<h3>delegate<wbr>Stack<wbr>Stx</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">delegate<wbr>Stack<wbr>Stx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amountMicroStx<span class="tsd-signature-symbol">: </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>burnBlockHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>cycles<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>nonce<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>stacker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">delegate<wbr>Stack<wbr>Stx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amountMicroStx<span class="tsd-signature-symbol">: </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>burnBlockHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>cycles<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>nonce<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>stacker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L393">packages/stacking/src/index.ts:393</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L392">packages/stacking/src/index.ts:392</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -258,7 +259,7 @@
 									</ul>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to a broadcasted txid if the operation succeeds</p>
 						</li>
 					</ul>
@@ -267,13 +268,13 @@
 					<a name="delegatestx" class="tsd-anchor"></a>
 					<h3>delegate<wbr>Stx</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">delegate<wbr>Stx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amountMicroStx<span class="tsd-signature-symbol">: </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>delegateTo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>untilBurnBlockHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">delegate<wbr>Stx<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amountMicroStx<span class="tsd-signature-symbol">: </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>delegateTo<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>untilBurnBlockHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L357">packages/stacking/src/index.ts:357</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L360">packages/stacking/src/index.ts:360</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -304,7 +305,7 @@
 									</ul>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to a broadcasted txid if the operation succeeds</p>
 						</li>
 					</ul>
@@ -319,7 +320,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L200">packages/stacking/src/index.ts:200</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L201">packages/stacking/src/index.ts:201</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -342,7 +343,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L190">packages/stacking/src/index.ts:190</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L191">packages/stacking/src/index.ts:191</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -359,7 +360,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L159">packages/stacking/src/index.ts:159</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L160">packages/stacking/src/index.ts:160</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -382,7 +383,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L215">packages/stacking/src/index.ts:215</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L216">packages/stacking/src/index.ts:216</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -405,7 +406,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L522">packages/stacking/src/index.ts:522</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L509">packages/stacking/src/index.ts:509</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -445,7 +446,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L567">packages/stacking/src/index.ts:567</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L554">packages/stacking/src/index.ts:554</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -491,7 +492,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L169">packages/stacking/src/index.ts:169</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L170">packages/stacking/src/index.ts:170</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -514,7 +515,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L646">packages/stacking/src/index.ts:646</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L633">packages/stacking/src/index.ts:633</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -537,7 +538,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L231">packages/stacking/src/index.ts:231</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L232">packages/stacking/src/index.ts:232</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -560,7 +561,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L616">packages/stacking/src/index.ts:616</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L603">packages/stacking/src/index.ts:603</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -594,7 +595,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L483">packages/stacking/src/index.ts:483</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L470">packages/stacking/src/index.ts:470</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -634,7 +635,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L665">packages/stacking/src/index.ts:665</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L652">packages/stacking/src/index.ts:652</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -657,7 +658,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L179">packages/stacking/src/index.ts:179</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L180">packages/stacking/src/index.ts:180</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -680,7 +681,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L262">packages/stacking/src/index.ts:262</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L263">packages/stacking/src/index.ts:263</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -703,7 +704,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L253">packages/stacking/src/index.ts:253</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L254">packages/stacking/src/index.ts:254</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -726,7 +727,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L716">packages/stacking/src/index.ts:716</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L704">packages/stacking/src/index.ts:704</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -754,16 +755,45 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="revokedelegatestx" class="tsd-anchor"></a>
-					<h3>revoke<wbr>Delegate<wbr>Stx</h3>
+					<a name="parsecontractid" class="tsd-anchor"></a>
+					<h3>parse<wbr>Contract<wbr>Id</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">revoke<wbr>Delegate<wbr>Stx<span class="tsd-signature-symbol">(</span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Contract<wbr>Id<span class="tsd-signature-symbol">(</span>contract<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L465">packages/stacking/src/index.ts:465</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L717">packages/stacking/src/index.ts:717</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Parses a contract identifier and ensures it is formatted correctly</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>contract: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>a contract address and name</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="revokedelegatestx" class="tsd-anchor"></a>
+					<h3>revoke<wbr>Delegate<wbr>Stx</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">revoke<wbr>Delegate<wbr>Stx<span class="tsd-signature-symbol">(</span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L456">packages/stacking/src/index.ts:456</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -780,7 +810,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to a broadcasted txid if the operation succeeds</p>
 						</li>
 					</ul>
@@ -789,13 +819,13 @@
 					<a name="stack" class="tsd-anchor"></a>
 					<h3>stack</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">stack<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amountMicroStx<span class="tsd-signature-symbol">: </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>burnBlockHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>cycles<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">stack<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>amountMicroStx<span class="tsd-signature-symbol">: </span><a href="../globals.html#bn" class="tsd-signature-type">BN</a><span class="tsd-signature-symbol">; </span>burnBlockHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>cycles<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L327">packages/stacking/src/index.ts:327</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L328">packages/stacking/src/index.ts:328</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -826,7 +856,7 @@
 									</ul>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to a broadcasted txid if the operation succeeds</p>
 						</li>
 					</ul>
@@ -835,13 +865,13 @@
 					<a name="stackaggregationcommit" class="tsd-anchor"></a>
 					<h3>stack<wbr>Aggregation<wbr>Commit</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">stack<wbr>Aggregation<wbr>Commit<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>rewardCycle<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">stack<wbr>Aggregation<wbr>Commit<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>poxAddress<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>privateKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>rewardCycle<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L433">packages/stacking/src/index.ts:433</a></li>
+									<li>Defined in <a href="https://github.com/blockstack/stacks.js/blob/master/packages/stacking/src/index.ts#L428">packages/stacking/src/index.ts:428</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -866,7 +896,7 @@
 									</ul>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#txbroadcastresult" class="tsd-signature-type">TxBroadcastResult</a><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>that resolves to a broadcasted txid if the operation succeeds</p>
 						</li>
 					</ul>
@@ -953,6 +983,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="stackingclient.html#modifylocktxfee" class="tsd-kind-icon">modify<wbr>Lock<wbr>TxFee</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="stackingclient.html#parsecontractid" class="tsd-kind-icon">parse<wbr>Contract<wbr>Id</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="stackingclient.html#revokedelegatestx" class="tsd-kind-icon">revoke<wbr>Delegate<wbr>Stx</a>

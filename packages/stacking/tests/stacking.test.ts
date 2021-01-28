@@ -84,6 +84,7 @@ test('check stacking eligibility true', async () => {
     responseOkCV: jest.requireActual('@stacks/transactions').responseOkCV,
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }))
 
   const { StackingClient } = require('../src');
@@ -132,6 +133,7 @@ test('check stacking eligibility false bad cycles', async () => {
     ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
     cvToString: jest.requireActual('@stacks/transactions').cvToString,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }))
 
   const { StackingClient } = require('../src');
@@ -183,6 +185,7 @@ test('stack stx', async () => {
     tupleCV: jest.requireActual('@stacks/transactions').tupleCV,
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }))
 
   fetchMock.mockResponse(() => {
@@ -257,6 +260,7 @@ test('delegate stx', async () => {
     someCV: jest.requireActual('@stacks/transactions').someCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
 
   fetchMock.mockResponse(() => {
@@ -329,6 +333,7 @@ test('delegate stx with empty optional parameters', async () => {
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     noneCV: jest.requireActual('@stacks/transactions').noneCV,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
 
   fetchMock.mockResponse(() => {
@@ -399,6 +404,7 @@ test('delegate stack stx with one delegator', async () => {
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     getAddressFromPrivateKey: jest.requireActual('@stacks/transactions').getAddressFromPrivateKey,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
 
   fetchMock.mockResponse(request => {
@@ -486,6 +492,7 @@ test('delegate stack stx with set nonce', async () => {
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
     getAddressFromPrivateKey: jest.requireActual('@stacks/transactions').getAddressFromPrivateKey,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
 
   fetchMock.mockResponse(request => {
@@ -569,6 +576,7 @@ test('delegator commit', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
 
   fetchMock.mockResponse(() => {
@@ -634,6 +642,7 @@ test('revoke delegate stx', async () => {
     uintCV: jest.requireActual('@stacks/transactions').uintCV,
     AddressHashMode: jest.requireActual('@stacks/transactions').AddressHashMode,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }));
 
   fetchMock.mockResponse(() => {
@@ -693,7 +702,8 @@ test('get stacking status', async () => {
     callReadOnlyFunction,
     cvToString: jest.requireActual('@stacks/transactions').cvToString,
     standardPrincipalCV: jest.requireActual('@stacks/transactions').standardPrincipalCV,
-    ClarityType: jest.requireActual('@stacks/transactions').ClarityType
+    ClarityType: jest.requireActual('@stacks/transactions').ClarityType,
+    validateStacksAddress: jest.requireActual('@stacks/transactions').validateStacksAddress,
   }))
 
   fetchMock.mockResponse(request => {
@@ -733,7 +743,6 @@ test('get stacking status', async () => {
   expect(stackingStatus.details.amount_microstx).toEqual(amountMicrostx.toString());
   expect(stackingStatus.details.first_reward_cycle).toEqual(firstRewardCycle);
   expect(stackingStatus.details.lock_period).toEqual(lockPeriod);
-  // expect(stackingStatus.details.burnchain_unlock_height).toEqual(balanceInfo.burnchain_unlock_height);
   expect(stackingStatus.details.pox_address.version.toString()).toEqual(version);
   expect(stackingStatus.details.pox_address.hashbytes.toString()).toEqual(hashbytes);
 })
