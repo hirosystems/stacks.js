@@ -167,7 +167,7 @@ There are four methods available for delegation, two for the delegators and two 
 
 ### Delegatee
 
-If you are the account owner / stacker / delegatee, you can delegate or revoke delegation rights.
+If you are the account owner ("stacker"), you can delegate or revoke delegation rights.
 
 #### Delegate STX
 
@@ -181,7 +181,6 @@ const delegetateResponse = await client.delegateStx({
   amountMicroStx,
   delegateTo,
   untilBurnBlockHeight, // optional
-  poxAddress, // optional
   privateKey,
 });
 
@@ -203,7 +202,7 @@ const revokeResponse = await client.revokeDelegateStx(privateKey);
 
 ### Delegator
 
-If you are the delegator, you can stack / lock up tokens for your delegatees and commit to stacking participation for upcoming reward cycles.
+If you are the delegator, you can stack ("lock up") tokens for your users and commit to stacking participation for upcoming reward cycles.
 
 #### Stack delegated STX
 
@@ -212,8 +211,8 @@ If you are the delegator, you can stack / lock up tokens for your delegatees and
 const delegatorAddress = 'ST22X605P0QX2BJC3NXEENXDPFCNJPHE02DTX5V74';
 // delegator private key for transaction signing
 const delegatorPrivateKey = 'd48f215481c16cbe6426f8e557df9b78895661971d71735126545abddcd5377001';
-// the BTC address for reward payouts; either to the delegator or to the BTC address set by the account holder
-const delegatePoxAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
+// the BTC address for reward payouts
+const delegatorBtcAddress = 'msiYwJCvXEzjgq6hDwD9ueBka6MTfN962Z';
 
 // if you call this method multiple times in the same block, you need to increase the nonce manually
 let nonce = getNonce(delegatorAddress, network);
@@ -224,7 +223,7 @@ const delegatorClient = new StackingClient(delegatorAddress, network);
 const delegetateStackResponses = await delegatorClient.delegateStackStx({
   stacker: address,
   amountMicroStx,
-  poxAddress: delegatePoxAddress,
+  poxAddress: delegatorBtcAddress,
   burnBlockHeight,
   cycles,
   privateKey: delegatorPrivateKey,
@@ -243,7 +242,7 @@ const delegetateStackResponses = await delegatorClient.delegateStackStx({
 const rewardCycle = 12;
 
 const delegetateCommitResponse = await delegatorClient.stackAggregationCommit({
-  poxAddress: delegatePoxAddress,
+  poxAddress: delegatorBtcAddress,
   rewardCycle,
   privateKey: privateKeyDelegate,
 });
