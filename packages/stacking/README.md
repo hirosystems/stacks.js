@@ -17,7 +17,7 @@ import { StackingClient } from '@stacks/stacking';
 const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
 // for mainnet, use `StacksMainnet()`
 const network = new StacksTestnet();
-const stacker = new Stacker(address, network);
+const client = new StackingClient(address, network);
 ```
 
 ## Check stacking eligibility
