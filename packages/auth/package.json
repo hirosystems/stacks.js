@@ -1,6 +1,6 @@
 {
   "name": "@stacks/auth",
-  "version": "1.1.0",
+  "version": "1.1.1-alpha.0",
   "description": "Authentication for Stacks apps.",
   "keywords": [
     "Stacks",
@@ -47,8 +47,8 @@
   "dependencies": {
     "@stacks/common": "^1.0.1",
     "@stacks/encryption": "^1.0.1",
-    "@stacks/network": "^1.0.2",
-    "@stacks/profile": "^1.0.2",
+    "@stacks/network": "^1.1.1-alpha.0",
+    "@stacks/profile": "^1.1.1-alpha.0",
     "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "jsontokens": "^3.0.0",
