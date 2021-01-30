@@ -26,6 +26,8 @@ export {
   createFungiblePostCondition,
   createNonFungiblePostCondition,
   createSTXPostCondition,
+  serializePostCondition,
+  deserializePostCondition,
 } from './postcondition';
 
 export * from './clarity';
