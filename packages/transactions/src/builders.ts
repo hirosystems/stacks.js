@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { StacksTransaction } from './transaction';
 
 import { StacksNetwork, StacksMainnet, StacksTestnet } from '@stacks/network';
@@ -185,7 +187,7 @@ export async function broadcastRawTransaction(
   };
 
   if (attachment) {
-    options = Object.assign(options, {
+    options = _.assign(options, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -195,7 +197,7 @@ export async function broadcastRawTransaction(
       })
     })
   } else {
-    options = Object.assign(options, {
+    options = _.assign(options, {
       headers: {
         'Content-Type': 'application/octet-stream',
       },
