@@ -939,6 +939,39 @@ test('Transaction broadcast success', async () => {
   expect(response as TxBroadcastResultOk).toEqual('success');
 });
 
+test.only('Transaction broadcast with attachment', async () => {
+  const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
+  const amount = new BigNum(12345);
+  const fee = new BigNum(0);
+  const nonce = new BigNum(0);
+  const senderKey = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc01';
+  const memo = 'test memo';
+  const attachment = Buffer.from('this is an attachment...');
+
+  const network = new StacksMainnet();
+
+  const transaction = await makeSTXTokenTransfer({
+    recipient,
+    amount,
+    senderKey,
+    fee,
+    nonce,
+    memo,
+  });
+
+  fetchMock.mockOnce('success');
+
+  const response: TxBroadcastResult = await broadcastTransaction(transaction, network, attachment);
+
+  expect(fetchMock.mock.calls.length).toEqual(1);
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getBroadcastApiUrl());
+  expect(fetchMock.mock.calls[0][1]?.body).toEqual(JSON.stringify({
+    tx: transaction.serialize().toString('hex'),
+    attachment: attachment.toString('hex')
+  }));
+  expect(response as TxBroadcastResultOk).toEqual('success');
+});
+
 test('Transaction broadcast returns error', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = new BigNum(12345);
