@@ -157,12 +157,13 @@ export type TxBroadcastResult = TxBroadcastResultOk | TxBroadcastResultRejected;
  */
 export async function broadcastTransaction(
   transaction: StacksTransaction,
-  network: StacksNetwork
+  network: StacksNetwork,
+  attachment?: Buffer
 ): Promise<TxBroadcastResult> {
   const rawTx = transaction.serialize();
   const url = network.getBroadcastApiUrl();
 
-  return broadcastRawTransaction(rawTx, url);
+  return broadcastRawTransaction(rawTx, url, attachment);
 }
 
 /**
@@ -175,17 +176,32 @@ export async function broadcastTransaction(
  */
 export async function broadcastRawTransaction(
   rawTx: Buffer,
-  url: string
+  url: string,
+  attachment?: Buffer
 ): Promise<TxBroadcastResult> {
-  const requestHeaders = {
-    'Content-Type': 'application/octet-stream',
+
+  let options = {
+    method: 'POST',
   };
 
-  const options = {
-    method: 'POST',
-    headers: requestHeaders,
-    body: rawTx,
-  };
+  if (attachment) {
+    options = Object.assign(options, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tx: rawTx.toString('hex'),
+        attachment: attachment.toString('hex')
+      })
+    })
+  } else {
+    options = Object.assign(options, {
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+      body: rawTx,
+    })
+  }
 
   const response = await fetchPrivate(url, options);
   if (!response.ok) {
