@@ -45,21 +45,14 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/common": "^1.0.1",
-    "@stacks/encryption": "^1.0.1",
-    "@stacks/network": "^1.1.1-alpha.0",
-    "@stacks/profile": "^1.1.1-alpha.0",
+    "@stacks/common": "file:../common",
+    "@stacks/encryption": "file:../encryption",
+    "@stacks/network": "file:../network",
+    "@stacks/profile": "file:../profile",
     "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "jsontokens": "^3.0.0",
     "query-string": "^6.13.1"
-  },
-  "devDependencies": {
-    "@types/jest": "^24.9.0",
-    "jest": "^24.9.0",
-    "jest-fetch-mock": "^3.0.3",
-    "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0"
   },
   "sideEffects": false,
   "main": "dist/index.js",
