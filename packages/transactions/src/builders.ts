@@ -181,7 +181,6 @@ export async function broadcastRawTransaction(
   url: string,
   attachment?: Buffer
 ): Promise<TxBroadcastResult> {
-
   let options = {
     method: 'POST',
   };
@@ -193,16 +192,16 @@ export async function broadcastRawTransaction(
       },
       body: JSON.stringify({
         tx: rawTx.toString('hex'),
-        attachment: attachment.toString('hex')
-      })
-    })
+        attachment: attachment.toString('hex'),
+      }),
+    });
   } else {
     options = _.assign(options, {
       headers: {
         'Content-Type': 'application/octet-stream',
       },
       body: rawTx,
-    })
+    });
   }
 
   const response = await fetchPrivate(url, options);
