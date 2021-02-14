@@ -244,8 +244,7 @@ export class StackingClient {
           poxInfo.reward_cycle_length -
           ((coreInfo.burn_block_height - poxInfo.first_burnchain_block_height) %
             poxInfo.reward_cycle_length);
-        const cycleDuration = poxInfo.reward_cycle_length * targetBlockTime;
-        return blocksToNextCycle * cycleDuration;
+        return blocksToNextCycle * targetBlockTime;
       }
     );
   }

@@ -826,6 +826,41 @@ test('get account balance', async () => {
   expect(fetchMock.mock.calls[0][0]).toEqual(network.getAccountApiUrl(address));
   expect(responseBalanceInfo.toString()).toEqual(new BN(balanceInfo.balance.substr(2), 'hex').toString());
 })
+test('get seconds until next cycle', async () => {
+  const address = 'ST3XKKN4RPV69NN1PHFDNX3TYKXT7XPC4N8KC1ARH';
+  const network = new StacksTestnet();
+
+  fetchMock
+    .mockResponseOnce(() => {
+      return Promise.resolve({
+        body: JSON.stringify(poxInfo),
+        status: 200,
+      });
+    })
+    .mockResponseOnce(() => {
+      return Promise.resolve({
+        body: JSON.stringify(blocktimeInfo),
+        status: 200,
+      });
+    })
+    .mockResponseOnce(() => {
+      return Promise.resolve({
+        body: JSON.stringify(coreInfo),
+        status: 200,
+      });
+    });
+
+  const { StackingClient } = require('../src');
+  const client = new StackingClient(address, network);
+
+  const responseSecondsUntilNextCycle = await client.getSecondsUntilNextCycle();
+  expect(fetchMock.mock.calls[0][0]).toEqual(network.getPoxInfoUrl());
+  expect(fetchMock.mock.calls[1][0]).toEqual(network.getBlockTimeInfoUrl());
+  expect(fetchMock.mock.calls[2][0]).toEqual(network.getInfoUrl());
+
+  // next reward cycle in 10 blocks
+  expect(responseSecondsUntilNextCycle.toString()).toEqual((10 * 120).toString());
+});
 
 test('pox address hash mode', async () => {
   const p2pkh = '1Xik14zRm29UsyS6DjhYg4iZeZqsDa8D3';
