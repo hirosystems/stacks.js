@@ -1,6 +1,6 @@
 {
   "name": "@stacks/keychain",
-  "version": "1.1.1-alpha.0",
+  "version": "1.2.0",
   "description": "A package for managing Stacks keychains",
   "keywords": [
     "Stacks",
@@ -79,8 +79,8 @@
     "@blockstack/rpc-client": "^0.3.0-alpha.11",
     "@stacks/common": "^1.0.1",
     "@stacks/encryption": "^1.0.1",
-    "@stacks/storage": "^1.1.1-alpha.0",
-    "@stacks/transactions": "^1.1.1-alpha.0",
+    "@stacks/storage": "^1.2.0",
+    "@stacks/transactions": "^1.2.0",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.6",
