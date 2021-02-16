@@ -1,6 +1,6 @@
 {
   "name": "@stacks/stacking",
-  "version": "1.2.2-alpha.0",
+  "version": "1.2.2",
   "description": "Library for Stacking.",
   "keywords": [
     "Stacks",
@@ -41,8 +41,8 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/network": "^1.2.2-alpha.0",
-    "@stacks/transactions": "^1.2.2-alpha.0",
+    "@stacks/network": "^1.2.2",
+    "@stacks/transactions": "^1.2.2",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "bitcoinjs-lib": "^5.2.0",
