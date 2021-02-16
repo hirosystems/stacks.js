@@ -179,27 +179,14 @@ export async function broadcastRawTransaction(
   url: string,
   attachment?: Buffer
 ): Promise<TxBroadcastResult> {
-  let options = {
-    method: 'POST',
-  };
 
-  if (attachment) {
-    options = Object.assign(options, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        tx: rawTx.toString('hex'),
-        attachment: attachment.toString('hex'),
-      }),
-    });
-  } else {
-    options = Object.assign(options, {
-      headers: {
-        'Content-Type': 'application/octet-stream',
-      },
-      body: rawTx,
-    });
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': attachment ? 'application/json' : 'application/octet-stream' },
+    body: attachment ? JSON.stringify({
+      tx: rawTx.toString('hex'),
+      attachment: attachment.toString('hex'),
+    }) : rawTx,
   }
 
   const response = await fetchPrivate(url, options);
