@@ -37,7 +37,7 @@
     "url": "https://github.com/blockstack/blockstack.js/issues"
   },
   "dependencies": {
-    "@stacks/auth": "^1.2.2",
+    "@stacks/auth": "^1.0.0",
     "@stacks/common": "^1.2.2",
     "@stacks/encryption": "^1.2.2"
   },
