@@ -378,7 +378,7 @@ export class StackingClient {
       untilBurnBlockHeight,
       poxAddress,
     });
-    
+
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
