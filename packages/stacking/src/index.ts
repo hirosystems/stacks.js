@@ -378,6 +378,7 @@ export class StackingClient {
       untilBurnBlockHeight,
       poxAddress,
     });
+    
     const tx = await makeContractCall({
       ...txOptions,
       senderKey: privateKey,
@@ -546,7 +547,7 @@ export class StackingClient {
       functionArgs: [
         uintCV(amountMicroStx.toString(10)),
         standardPrincipalCV(delegateTo),
-        untilBurnBlockHeight ? uintCV(untilBurnBlockHeight) : noneCV(),
+        untilBurnBlockHeight ? someCV(uintCV(untilBurnBlockHeight)) : noneCV(),
         address ? address : noneCV(),
       ],
       validateWithAbi: true,
