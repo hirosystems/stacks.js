@@ -296,7 +296,7 @@ test('delegate stx', async () => {
     functionArgs: [
       uintCV(amountMicroStx.toString(10)),
       standardPrincipalCV(delegateTo),
-      uintCV(untilBurnBlockHeight),
+      someCV(uintCV(untilBurnBlockHeight)),
       someCV(poxAddressCV),
     ],
     validateWithAbi: true,
