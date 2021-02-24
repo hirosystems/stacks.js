@@ -16,9 +16,7 @@ export class NodeCryptoSha2Hash {
 
   async digest(data: Buffer, algorithm = 'sha256'): Promise<Buffer> {
     try {
-      const result = this.createHash(algorithm)
-        .update(data)
-        .digest();
+      const result = this.createHash(algorithm).update(data).digest();
       return Promise.resolve(result);
     } catch (error) {
       console.log(error);

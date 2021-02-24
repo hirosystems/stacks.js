@@ -29,14 +29,10 @@ export class NodeCryptoRipemd160Digest implements Ripemd160Digest {
 
   digest(data: Buffer): Buffer {
     try {
-      return this.nodeCryptoCreateHash('rmd160')
-        .update(data)
-        .digest();
+      return this.nodeCryptoCreateHash('rmd160').update(data).digest();
     } catch (error) {
       try {
-        return this.nodeCryptoCreateHash('ripemd160')
-          .update(data)
-          .digest();
+        return this.nodeCryptoCreateHash('ripemd160').update(data).digest();
       } catch (_err) {
         console.log(error);
         console.log(
