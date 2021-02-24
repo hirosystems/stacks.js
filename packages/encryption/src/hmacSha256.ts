@@ -14,9 +14,7 @@ export class NodeCryptoHmacSha256 implements Hmac {
   }
 
   async digest(key: Buffer, data: Buffer): Promise<Buffer> {
-    const result = this.createHmac('sha256', key)
-      .update(data)
-      .digest();
+    const result = this.createHmac('sha256', key).update(data).digest();
     return Promise.resolve(result);
   }
 }
