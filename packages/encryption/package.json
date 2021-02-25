@@ -1,6 +1,6 @@
 {
   "name": "@stacks/encryption",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Encryption utilities for Stacks",
   "author": "yknl <yukanliao@gmail.com>",
   "homepage": "https://blockstack.org",

@@ -1,6 +1,6 @@
 {
   "name": "@stacks/stacking",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Library for Stacking.",
   "keywords": [
     "Stacks",
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@stacks/network": "^1.2.2",
-    "@stacks/transactions": "^1.2.2",
+    "@stacks/transactions": "^1.2.3",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "bitcoinjs-lib": "^5.2.0",

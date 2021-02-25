@@ -1,6 +1,6 @@
 {
   "name": "@stacks/profile",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Library for Stacks profiles",
   "keywords": [
     "stacks",
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@stacks/common": "^1.2.2",
-    "@stacks/encryption": "^1.2.2",
+    "@stacks/encryption": "^1.2.3",
     "@stacks/network": "^1.2.2",
     "bitcoinjs-lib": "^5.1.10",
     "jsontokens": "^3.0.0",
