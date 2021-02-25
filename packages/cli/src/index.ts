@@ -15,13 +15,13 @@ global['window'] = {
     origin: 'localhost',
   },
   localStorage: {
-    getItem: function(itemName: string) {
+    getItem: function (itemName: string) {
       return localStorageRAM[itemName];
     },
-    setItem: function(itemName: string, itemValue: any) {
+    setItem: function (itemName: string, itemValue: any) {
       localStorageRAM[itemName] = itemValue;
     },
-    removeItem: function(itemName: string) {
+    removeItem: function (itemName: string) {
       delete localStorageRAM[itemName];
     },
   },
