@@ -1,4 +1,4 @@
-module.exports = function(api) {
+module.exports = function (api) {
   // TODO: Should cache on api.caller and api.env for faster build times.
   api.cache.invalidate(() => true);
 
