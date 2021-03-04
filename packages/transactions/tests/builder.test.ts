@@ -939,7 +939,7 @@ test('Transaction broadcast success', async () => {
   expect(response as TxBroadcastResultOk).toEqual('success');
 });
 
-test.only('Transaction broadcast with attachment', async () => {
+test('Transaction broadcast with attachment', async () => {
   const recipient = standardPrincipalCV('SP3FGQ8Z7JY9BWYZ5WM53E0M9NK7WHJF0691NZ159');
   const amount = new BigNum(12345);
   const fee = new BigNum(0);
