@@ -1,23 +1,19 @@
 import {
-  SingleSigSpendingCondition,
-  createSingleSigSpendingCondition,
-  serializeSpendingCondition,
-  deserializeSpendingCondition,
   createMessageSignature,
-  emptyMessageSignature,
   createMultiSigSpendingCondition,
+  createSingleSigSpendingCondition,
   createTransactionAuthField,
+  deserializeSpendingCondition,
+  emptyMessageSignature,
+  serializeSpendingCondition,
+  SingleSigSpendingCondition,
 } from '../src/authorization';
 
-import { AddressHashMode, PubKeyEncoding } from '../src/constants';
+import {AddressHashMode, PubKeyEncoding} from '../src/constants';
 
 import BigNum from 'bn.js';
-import { BufferReader } from '../src/bufferReader';
-import {
-  createStacksPrivateKey,
-  signWithKey,
-  createStacksPublicKey,
-} from '../src/keys';
+import {BufferReader} from '../src/bufferReader';
+import {createStacksPrivateKey, createStacksPublicKey, signWithKey,} from '../src/keys';
 
 test('ECDSA recoverable signature', () => {
   const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
@@ -106,7 +102,7 @@ test('Multi sig spending condition uncompressed', () => {
 
   const signature = createMessageSignature('ff'.repeat(65));
   const fields = [signature, signature, createStacksPublicKey(pubKeys[2])];
-  spendingCondition.fields = fields.map(createTransactionAuthField);
+  spendingCondition.fields = fields.map(sig => createTransactionAuthField(PubKeyEncoding.Compressed, sig));
 
   const serializedSpendingCondition = serializeSpendingCondition(spendingCondition);
 

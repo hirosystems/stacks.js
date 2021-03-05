@@ -1,31 +1,32 @@
 import {
-  DEFAULT_CHAIN_ID,
-  TransactionVersion,
-  PayloadType,
   AnchorMode,
-  PostConditionMode,
   AuthType,
-  StacksMessageType,
   ChainID,
+  DEFAULT_CHAIN_ID,
+  PayloadType,
+  PostConditionMode,
+  PubKeyEncoding,
+  StacksMessageType,
+  TransactionVersion,
 } from './constants';
 
 import {
   Authorization,
-  SpendingCondition,
-  nextSignature,
-  isSingleSig,
-  SingleSigSpendingCondition,
-  createTransactionAuthField,
   createMessageSignature,
+  createTransactionAuthField,
+  isSingleSig,
+  nextSignature,
+  SingleSigSpendingCondition,
+  SpendingCondition,
 } from './authorization';
 
-import { BufferArray, txidFromData, cloneDeep } from './utils';
+import { BufferArray, cloneDeep, txidFromData } from './utils';
 
-import { Payload, serializePayload, deserializePayload } from './payload';
+import { deserializePayload, Payload, serializePayload } from './payload';
 
-import { LengthPrefixedList, serializeLPList, deserializeLPList, createLPList } from './types';
+import { createLPList, deserializeLPList, LengthPrefixedList, serializeLPList } from './types';
 
-import { StacksPrivateKey, StacksPublicKey } from './keys';
+import { isCompressed, StacksPrivateKey, StacksPublicKey } from './keys';
 
 import { BufferReader } from './bufferReader';
 
@@ -132,7 +133,13 @@ export class StacksTransaction {
   appendPubkey(publicKey: StacksPublicKey) {
     const cond = this.auth.spendingCondition;
     if (cond && !isSingleSig(cond)) {
-      cond.fields.push(createTransactionAuthField(publicKey));
+      const compressed = isCompressed(publicKey);
+      cond.fields.push(
+        createTransactionAuthField(
+          compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+          publicKey
+        )
+      );
     } else {
       throw new Error(`Can't append public key to a singlesig condition`);
     }
@@ -154,7 +161,13 @@ export class StacksTransaction {
     if (isSingleSig(condition)) {
       condition.signature = nextSig;
     } else {
-      condition.fields.push(createTransactionAuthField(nextSig));
+      const compressed = privateKey.data.toString('hex').endsWith('01');
+      condition.fields.push(
+        createTransactionAuthField(
+          compressed ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed,
+          nextSig
+        )
+      );
     }
 
     return nextSigHash;
