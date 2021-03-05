@@ -101,6 +101,13 @@ export function pubKeyfromPrivKey(privateKey: string | Buffer): StacksPublicKey 
   return createStacksPublicKey(pubKey);
 }
 
+export function compressPublicKey(publicKey: string | Buffer): StacksPublicKey {
+  const ec = new EC('secp256k1');
+  const key = ec.keyFromPublic(publicKey);
+  const pubKey = key.getPublic(true, 'hex');
+  return createStacksPublicKey(pubKey);
+}
+
 export function deserializePublicKey(bufferReader: BufferReader): StacksPublicKey {
   const fieldId = bufferReader.readUInt8();
   const keyLength =
@@ -156,8 +163,7 @@ export function signWithKey(privateKey: StacksPrivateKey, input: string): Messag
   }
   const recoveryParam = intToHexString(signature.recoveryParam, 1);
   const recoverableSignatureString = recoveryParam + r + s;
-  const recoverableSignature = createMessageSignature(recoverableSignatureString);
-  return recoverableSignature;
+  return createMessageSignature(recoverableSignatureString);
 }
 
 export function getSignatureRecoveryParam(signature: string) {
