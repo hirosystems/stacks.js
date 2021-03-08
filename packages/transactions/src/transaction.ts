@@ -246,7 +246,22 @@ export class StacksTransaction {
   }
 }
 
-export function deserializeTransaction(bufferReader: BufferReader) {
+/**
+ * @param data Buffer or hex string
+ */
+export function deserializeTransaction(data: BufferReader | Buffer | string) {
+  let bufferReader: BufferReader;
+  if (typeof data === 'string') {
+    if (data.slice(0, 2).toLowerCase() === '0x') {
+      bufferReader = new BufferReader(Buffer.from(data.slice(2), 'hex'));
+    } else {
+      bufferReader = new BufferReader(Buffer.from(data, 'hex'));
+    }
+  } else if (Buffer.isBuffer(data)) {
+    bufferReader = new BufferReader(data);
+  } else {
+    bufferReader = data;
+  }
   const version = bufferReader.readUInt8Enum(TransactionVersion, n => {
     throw new Error(`Could not parse ${n} as TransactionVersion`);
   });

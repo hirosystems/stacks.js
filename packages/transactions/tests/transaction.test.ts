@@ -91,6 +91,13 @@ test('STX token transfer transaction serialization and deserialization', () => {
 
   const serialized = transaction.serialize();
   const deserialized = deserializeTransaction(new BufferReader(serialized));
+  
+  const serializedHexString = serialized.toString('hex');
+  expect(deserializeTransaction(serializedHexString).serialize().toString('hex')).toEqual(serialized.toString('hex'));
+
+  const serializedHexStringPrefixed = '0x' + serializedHexString;
+  expect(deserializeTransaction(serializedHexStringPrefixed).serialize().toString('hex')).toEqual(serialized.toString('hex'));
+
   expect(deserialized.version).toBe(transactionVersion);
   expect(deserialized.chainId).toBe(chainId);
   expect(deserialized.auth.authType).toBe(authType);
