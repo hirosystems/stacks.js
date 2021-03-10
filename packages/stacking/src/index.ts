@@ -527,7 +527,7 @@ export class StackingClient {
 
     if (poxAddress) {
       const { hashMode, data } = decodeBtcAddress(poxAddress);
-      const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
+      const hashModeBuffer = bufferCV(new BN(hashMode, 10).toArrayLike(Buffer));
       const hashbytes = bufferCV(data);
       address = someCV(
         tupleCV({
@@ -573,7 +573,7 @@ export class StackingClient {
     nonce?: BN;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
+    const hashModeBuffer = bufferCV(new BN(hashMode, 10).toArrayLike(Buffer));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
