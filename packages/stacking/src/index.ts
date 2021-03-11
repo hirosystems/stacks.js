@@ -614,7 +614,7 @@ export class StackingClient {
     rewardCycle: number;
   }) {
     const { hashMode, data } = decodeBtcAddress(poxAddress);
-    const hashModeBuffer = bufferCV(new BN(hashMode, 10).toBuffer());
+    const hashModeBuffer = bufferCV(new BN(hashMode, 10).toArrayLike(Buffer));
     const hashbytes = bufferCV(data);
     const address = tupleCV({
       hashbytes,
@@ -708,7 +708,7 @@ export class StackingClient {
   modifyLockTxFee({ tx, amountMicroStx }: { tx: StacksTransaction; amountMicroStx: BN }) {
     const fee = tx.auth.getFee() as BN;
     (tx.payload as ContractCallPayload).functionArgs[0] = uintCV(
-      new BN(amountMicroStx.toString(10), 10).sub(fee).toBuffer()
+      new BN(amountMicroStx.toString(10), 10).sub(fee).toArrayLike(Buffer)
     );
     return tx;
   }
