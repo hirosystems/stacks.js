@@ -1,4 +1,11 @@
-import { ClarityValue, ClarityType, getCVTypeString, cvToString, cvToJSON } from './clarityValue';
+import {
+  ClarityValue,
+  ClarityType,
+  getCVTypeString,
+  cvToString,
+  cvToJSON,
+  cvToValue,
+} from './clarityValue';
 import { BooleanCV, TrueCV, FalseCV, trueCV, falseCV } from './types/booleanCV';
 import { IntCV, UIntCV, intCV, uintCV } from './types/intCV';
 import { BufferCV, bufferCV, bufferCVFromString } from './types/bufferCV';
@@ -82,4 +89,4 @@ export {
 export { serializeCV, deserializeCV };
 
 // toString
-export { cvToString, cvToJSON };
+export { cvToString, cvToJSON, cvToValue };
