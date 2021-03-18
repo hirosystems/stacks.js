@@ -35,4 +35,4 @@ export const bufferCVFromString = (string: string) => bufferCV(Buffer.from(strin
 
 export const uintCVFromBN = (int: BN) => uintCV(int.toString(10));
 
-export const getZonefileHash = (zonefile: string) => hash160(Buffer.from(zonefile).toString('hex'));
+export const getZonefileHash = (zonefile: string) => hash160(Buffer.from(zonefile));
