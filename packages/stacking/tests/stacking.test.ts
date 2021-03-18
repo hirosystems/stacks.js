@@ -16,7 +16,7 @@ import {
   intCV,
 } from '@stacks/transactions';
 import { address as btcAddress } from 'bitcoinjs-lib';
-import { getAddressHashMode } from '../src/utils';
+import { decodeBtcAddress, getAddressHashMode, InvalidAddressError } from '../src/utils';
 
 beforeEach(() => {
   fetchMock.resetMocks();
@@ -867,27 +867,29 @@ test('pox address hash mode', async () => {
   const p2pkhTestnet = 'n4RKBLKb6n9v68yMRUYm6xRCx2YkkxpSQm';
   const p2sh = '3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX';
   const p2shTestnet = '2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc';
-  const p2wpkh = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4';
-  const p2wpkhTestnet = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx';
-  const p2wsh = 'bc1qup6umurcl7s6zw42gcxfzl346psazws74x72ty6gmlvkaxz6kv4sqsth99';
-  const p2wshTestnet = 'tb1qup6umurcl7s6zw42gcxfzl346psazws74x72ty6gmlvkaxz6kv4shcacl2';
 
   const p2pkhAddrHashmode = getAddressHashMode(p2pkh);
   const p2pkhTestnetAddrHashmode = getAddressHashMode(p2pkhTestnet);
   const p2shAddrHashmode = getAddressHashMode(p2sh);
   const p2shTestnetAddrHashmode = getAddressHashMode(p2shTestnet);
-  const p2wpkhAddrHashmode = getAddressHashMode(p2wpkh);
-  const p2wpkhTestnetAddrHashmode = getAddressHashMode(p2wpkhTestnet);
-  const p2wshAddrHashmode = getAddressHashMode(p2wsh);
-  const p2wshTestnetAddrHashmode = getAddressHashMode(p2wshTestnet);
 
   expect(p2pkhAddrHashmode).toEqual(AddressHashMode.SerializeP2PKH);
   expect(p2pkhTestnetAddrHashmode).toEqual(AddressHashMode.SerializeP2PKH);
   expect(p2shAddrHashmode).toEqual(AddressHashMode.SerializeP2SH);
   expect(p2shTestnetAddrHashmode).toEqual(AddressHashMode.SerializeP2SH);
 
-  expect(p2wpkhAddrHashmode).toEqual(AddressHashMode.SerializeP2WPKH);
-  expect(p2wpkhTestnetAddrHashmode).toEqual(AddressHashMode.SerializeP2WPKH);
-  expect(p2wshAddrHashmode).toEqual(AddressHashMode.SerializeP2WSH);
-  expect(p2wshTestnetAddrHashmode).toEqual(AddressHashMode.SerializeP2WSH);
+  const p2wpkh = 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4';
+  const p2wpkhTestnet = 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx';
+  const p2wsh = 'bc1qup6umurcl7s6zw42gcxfzl346psazws74x72ty6gmlvkaxz6kv4sqsth99';
+  const p2wshTestnet = 'tb1qup6umurcl7s6zw42gcxfzl346psazws74x72ty6gmlvkaxz6kv4shcacl2';
+  
+  expect(() => getAddressHashMode(p2wpkh)).toThrowError(InvalidAddressError);
+  expect(() => getAddressHashMode(p2wpkhTestnet)).toThrowError(InvalidAddressError);
+  expect(() => getAddressHashMode(p2wsh)).toThrowError(InvalidAddressError);
+  expect(() => getAddressHashMode(p2wshTestnet)).toThrowError(InvalidAddressError);
+
+  expect(() => decodeBtcAddress(p2wpkh)).toThrowError(InvalidAddressError);
+  expect(() => decodeBtcAddress(p2wpkhTestnet)).toThrowError(InvalidAddressError);
+  expect(() => decodeBtcAddress(p2wsh)).toThrowError(InvalidAddressError);
+  expect(() => decodeBtcAddress(p2wshTestnet)).toThrowError(InvalidAddressError);
 })
