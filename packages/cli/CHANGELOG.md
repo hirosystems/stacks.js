@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.4](https://github.com/blockstack/blockstack.js/compare/v1.3.3...v1.3.4) (2021-03-18)
+
+
+### Reverts
+
+* Revert "v1.4.0" ([4356ddb](https://github.com/blockstack/blockstack.js/commit/4356ddbc8d83a83c97efaf6d8d1a7abefbc4f6d9))
+
+
+
+
+
 ## [1.3.3](https://github.com/blockstack/blockstack.js/compare/v1.3.2...v1.3.3) (2021-03-18)
 
 **Note:** Version bump only for package @stacks/cli
