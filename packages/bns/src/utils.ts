@@ -2,7 +2,7 @@ import {
   bufferCV,
   uintCV,
   hash160
-} from '@stacks/transcations';
+} from '@stacks/transactions';
 
 import BN from 'bn.js';
 
