@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.3](https://github.com/blockstack/blockstack.js/compare/v1.3.2...v1.3.3) (2021-03-18)
+
+
+### Bug Fixes
+
+* [#973](https://github.com/blockstack/blockstack.js/issues/973) stacking lib only allow p2pkh and p2sh btc addresses ([af00bd5](https://github.com/blockstack/blockstack.js/commit/af00bd5f315a4877f6af0fd71e6373d664afbe6a))
+* export cvToValue function ([42c138b](https://github.com/blockstack/blockstack.js/commit/42c138b975ea08e75fea78db39b77166c08f193b))
+* package.json to reduce vulnerabilities ([48a72fb](https://github.com/blockstack/blockstack.js/commit/48a72fba2eda7e5f0bc7dbd649f274f88d01bd1d))
+
+
+
+
+
 ## [1.3.2](https://github.com/blockstack/blockstack.js/compare/v1.3.1...v1.3.2) (2021-03-11)
 
 **Note:** Version bump only for package stacks.js
