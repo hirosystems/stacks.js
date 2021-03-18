@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/blockstack/blockstack.js/compare/v1.3.3...v1.4.0) (2021-03-18)
+
+
+### Features
+
+* export stacking/utils functions ([24c7314](https://github.com/blockstack/blockstack.js/commit/24c73148afafceb5be9e172a8bc325e1ad54a800))
+
+
+
+
+
 ## [1.3.3](https://github.com/blockstack/blockstack.js/compare/v1.3.2...v1.3.3) (2021-03-18)
 
 
