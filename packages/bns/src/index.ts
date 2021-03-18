@@ -550,7 +550,7 @@ export interface RegisterNameOptions {
  * Generates and broadcasts a name registration transaction. 
  * Second and final step in registering a name. 
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Returns a Result object which will indicate if the transaction was successfully broadcast
  *
  * @param  {RegisterNameOptions} options - an options object for the registration
  *
