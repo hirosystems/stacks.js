@@ -27,6 +27,7 @@ import BN from 'bn.js';
 import { StackingErrors } from './constants';
 import { fetchPrivate } from '@stacks/common';
 import { decodeBtcAddress } from './utils';
+export * from './utils';
 
 export interface PoxInfo {
   contract_id: string;
