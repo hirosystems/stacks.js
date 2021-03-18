@@ -3,46 +3,56 @@ import { address } from 'bitcoinjs-lib';
 import BN from 'bn.js';
 import { StackingErrors } from './constants';
 
-export function getAddressHashMode(btcAddress: string) {
-  if (btcAddress.startsWith('bc1') || btcAddress.startsWith('tb1')) {
-    const { data } = address.fromBech32(btcAddress);
-    if (data.length === 32) {
-      return AddressHashMode.SerializeP2WSH;
-    } else {
-      return AddressHashMode.SerializeP2WPKH;
-    }
-  } else {
-    const { version } = address.fromBase58Check(btcAddress);
-    switch (version) {
-      case 0:
-        return AddressHashMode.SerializeP2PKH;
-      case 111:
-        return AddressHashMode.SerializeP2PKH;
-      case 5:
-        return AddressHashMode.SerializeP2SH;
-      case 196:
-        return AddressHashMode.SerializeP2SH;
-      default:
-        throw new Error('Invalid pox address version');
+export class InvalidAddressError extends Error {
+  innerError?: Error;
+  constructor(address: string, innerError?: Error) {
+    const msg = `${address} is not a valid P2PKH or P2SH address -- native P2WPKH and native P2WSH are not supported in PoX.`;
+    super(msg);
+    this.message = msg;
+    this.name = this.constructor.name;
+    this.innerError = innerError;
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
     }
   }
 }
 
-export function decodeBtcAddress(btcAddress: string) {
-  const hashMode = getAddressHashMode(btcAddress);
-  if (btcAddress.startsWith('bc1') || btcAddress.startsWith('tb1')) {
-    const { data } = address.fromBech32(btcAddress);
-    return {
-      hashMode,
-      data,
-    };
-  } else {
-    const { hash } = address.fromBase58Check(btcAddress);
-    return {
-      hashMode,
-      data: hash,
-    };
+export function btcAddressVersionToHashMode(btcAddressVersion: number): AddressHashMode {
+  switch (btcAddressVersion) {
+    case 0: // btc mainnet P2PKH
+      return AddressHashMode.SerializeP2PKH;
+    case 111: // btc mainnet P2PKH
+      return AddressHashMode.SerializeP2PKH;
+    case 5: // btc mainnet P2SH
+      return AddressHashMode.SerializeP2SH;
+    case 196: // btc testnet P2SH
+      return AddressHashMode.SerializeP2SH;
+    default:
+      throw new Error('Invalid pox address version');
   }
+}
+
+export function getAddressHashMode(btcAddress: string) {
+  try {
+    const { version } = address.fromBase58Check(btcAddress);
+    return btcAddressVersionToHashMode(version);
+  } catch (error) {
+    throw new InvalidAddressError(btcAddress, error);
+  }
+}
+
+export function decodeBtcAddress(btcAddress: string) {
+  let b58Result: address.Base58CheckResult;
+  try {
+    b58Result = address.fromBase58Check(btcAddress);
+  } catch (error) {
+    throw new InvalidAddressError(btcAddress, error);
+  }
+  const hashMode = btcAddressVersionToHashMode(b58Result.version);
+  return {
+    hashMode,
+    data: b58Result.hash,
+  };
 }
 
 export function getBTCAddress(version: Buffer, checksum: Buffer) {
