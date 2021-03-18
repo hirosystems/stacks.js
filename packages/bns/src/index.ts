@@ -29,7 +29,7 @@ import {
 
 import BN from 'bn.js';
 
-export const BNS_CONTRACT_ADDRESS = 'S1G2081040G2081040G2081040G208105NK8PE5';
+export const BNS_CONTRACT_ADDRESS = 'ST000000000000000000002AMW42H';
 export const BNS_CONTRACT_NAME = 'bns';
 
 export type Result = {
