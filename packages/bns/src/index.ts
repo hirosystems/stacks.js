@@ -61,29 +61,27 @@ export type PriceFunction = {
   noVowelDiscount: BN
 }
 
-async function makeBNSContractCall({
-  functionName, 
-  functionArgs, 
-  senderKey, 
-  network
-} : {
-  functionName: string,
-  functionArgs: ClarityValue[], 
-  senderKey: string, 
-  network: StacksNetwork
-}): Promise<Result> {
+export interface BNSContractCallOptions {
+  functionName: string;
+  functionArgs: ClarityValue[];
+  senderKey: string;
+  network: StacksNetwork;
+  attachment?: Buffer;
+}
+
+async function makeBNSContractCall(options: BNSContractCallOptions): Promise<Result> {
   const txOptions: SignedContractCallOptions = {
     contractAddress: BNS_CONTRACT_ADDRESS,
     contractName: BNS_CONTRACT_NAME,
-    functionName,
-    functionArgs,
+    functionName: options.functionName,
+    functionArgs: options.functionArgs,
     validateWithAbi: false,
-    senderKey,
-    network,
+    senderKey: options.senderKey,
+    network: options.network,
   };
 
   const tx = await makeContractCall(txOptions);
-  return broadcastTransaction(tx, network)
+  return broadcastTransaction(tx, options.network, options.attachment)
     .then((result: TxBroadcastResult) => {
       if (result.hasOwnProperty('error')) {
         const errorResult = result as TxBroadcastResultRejected
@@ -103,24 +101,21 @@ async function makeBNSContractCall({
     });
 }
 
-async function callReadOnlyBNSFunction({
-  functionName, 
-  senderAddress, 
-  functionArgs, 
-  network
-}: {
-  functionName: string, 
-  senderAddress: string, 
-  functionArgs: ClarityValue[], 
-  network: StacksNetwork
-}): Promise<ClarityValue> {
+export interface BNSReadOnlyOptions {
+  functionName: string;
+  functionArgs: ClarityValue[];
+  senderAddress: string;
+  network: StacksNetwork;
+}
+
+async function callReadOnlyBNSFunction(options: BNSReadOnlyOptions): Promise<ClarityValue> {
   return callReadOnlyFunction({
     contractAddress: BNS_CONTRACT_ADDRESS,
     contractName: BNS_CONTRACT_NAME,
-    functionName,
-    senderAddress,
-    functionArgs,
-    network
+    functionName: options.functionName,
+    senderAddress: options.senderAddress,
+    functionArgs: options.functionArgs,
+    network: options.network
   })
 }
 
@@ -144,8 +139,7 @@ export async function canRegisterName(
 
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
-  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1760
-  // TODO: Remove once fixed on core node API
+  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
   const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
@@ -183,8 +177,7 @@ export async function getNamespacePrice(
 
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
-  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1760
-  // TODO: Remove once fixed on core node API
+  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
   const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
@@ -226,8 +219,7 @@ export async function getNamePrice(
 
   // Create a random address as input to read-only function call
   // Not used by BNS contract function but required by core node API
-  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1760
-  // TODO: Remove once fixed on core node API
+  // https://github.com/blockstack/stacks-blockchain/blob/master/src/net/http.rs#L1796
   const randomPrivateKey = privateKeyToString(makeRandomPrivKey());
   const randomAddress = getAddressFromPrivateKey(randomPrivateKey);
 
@@ -534,14 +526,14 @@ export async function preorderName({
  * @param  {String} fullyQualifiedName - the fully qualified name to preorder including the 
  *                                        namespace (myName.id)
  * @param  {String} salt - salt used to generate the preorder name hash
- * @param  {String} zonefileHash - the zonefile hash to register with the name
+ * @param  {String} zonefile - the zonefile to register with the name
  * @param  {String} privateKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RegisterNameOptions {
   fullyQualifiedName: string,
   salt: string,
-  zonefileHash: string,
+  zonefile: string,
   privateKey: string,
   network?: StacksNetwork
 }
@@ -559,7 +551,7 @@ export interface RegisterNameOptions {
 export async function registerName({
   fullyQualifiedName,
   salt,
-  zonefileHash,
+  zonefile,
   privateKey,
   network
 }: RegisterNameOptions): Promise<Result> {
@@ -570,16 +562,19 @@ export async function registerName({
   }
   const txNetwork = network || new StacksMainnet();
 
+  const zonefileHash = hash160(Buffer.from(zonefile));
+
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       bufferCVFromString(salt),
-      bufferCVFromString(zonefileHash)
+      bufferCV(zonefileHash)
     ],
     senderKey: privateKey,
-    network: txNetwork
+    network: txNetwork,
+    attachment: Buffer.from(zonefile)
   });
 }
 
