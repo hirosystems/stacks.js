@@ -10,10 +10,9 @@ import {
   bufferCV,
   privateKeyToString,
   getAddressFromPrivateKey,
-  hash160,
   broadcastTransaction,
   TxBroadcastResultRejected,
-  TxBroadcastResult
+  TxBroadcastResult, hash160
 } from '@stacks/transactions';
 
 import { 
@@ -24,7 +23,7 @@ import {
 import {
   decodeFQN,
   bufferCVFromString,
-  uintCVFromBN
+  uintCVFromBN, getZonefileHash
 } from './utils'
 
 import BN from 'bn.js';
@@ -562,7 +561,7 @@ export async function registerName({
   }
   const txNetwork = network || new StacksMainnet();
 
-  const zonefileHash = hash160(Buffer.from(zonefile));
+  const zonefileHash = getZonefileHash(zonefile);
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
