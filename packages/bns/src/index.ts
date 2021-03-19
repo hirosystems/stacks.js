@@ -382,7 +382,7 @@ export interface ImportNameOptions {
   namespace: string, 
   name: string,
   beneficiary: string,
-  zonefileHash: string,
+  zonefile: string,
   privateKey: string,
   network?: StacksNetwork
 }
@@ -401,12 +401,13 @@ export async function importName({
   namespace, 
   name,
   beneficiary,
-  zonefileHash,
+  zonefile,
   privateKey,
   network
 }: ImportNameOptions): Promise<Result> {
   const bnsFunctionName = 'name-import';
   const txNetwork = network || new StacksMainnet();
+  const zonefileHash = getZonefileHash(zonefile);
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
@@ -414,10 +415,11 @@ export async function importName({
       bufferCVFromString(namespace),
       bufferCVFromString(name),
       standardPrincipalCV(beneficiary),
-      bufferCVFromString(zonefileHash)
+      bufferCV(zonefileHash)
     ],
     senderKey: privateKey,
-    network: txNetwork
+    network: txNetwork,
+    attachment: Buffer.from(zonefile)
   });
 }
 
@@ -588,7 +590,7 @@ export async function registerName({
  */
 export interface UpdateNameOptions {
   fullyQualifiedName: string,
-  zonefileHash: string,
+  zonefile: string,
   privateKey: string,
   network?: StacksNetwork
 }
@@ -605,7 +607,7 @@ export interface UpdateNameOptions {
  */
 export async function updateName({
   fullyQualifiedName,
-  zonefileHash,
+  zonefile,
   privateKey,
   network
 }: UpdateNameOptions): Promise<Result> {
@@ -615,16 +617,18 @@ export async function updateName({
     throw new Error('Cannot update a subdomain using updateName()');
   }
   const txNetwork = network || new StacksMainnet();
+  const zonefileHash = getZonefileHash(zonefile);
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs: [
       bufferCVFromString(namespace),
       bufferCVFromString(name),
-      bufferCVFromString(zonefileHash)
+      bufferCV(zonefileHash)
     ],
     senderKey: privateKey,
-    network: txNetwork
+    network: txNetwork,
+    attachment: Buffer.from(zonefile)
   });
 }
 
@@ -751,7 +755,7 @@ export interface RenewNameOptions {
   stxToBurn: BN,
   privateKey: string,
   newOwnerAddress?: string,
-  zonefileHash?: string,
+  zonefile?: string,
   network?: StacksNetwork
 }
 
@@ -770,7 +774,7 @@ export async function renewName({
   stxToBurn,
   privateKey,
   newOwnerAddress,
-  zonefileHash,
+  zonefile,
   network
 }: RenewNameOptions): Promise<Result> {
   const bnsFunctionName = 'name-renewal';
@@ -790,14 +794,16 @@ export async function renewName({
     functionArgs.push(bufferCVFromString(newOwnerAddress));
   }
 
-  if (zonefileHash) {
-    functionArgs.push(bufferCVFromString(zonefileHash));
+  if (zonefile) {
+    const zonefileHash = getZonefileHash(zonefile);
+    functionArgs.push(bufferCV(zonefileHash));
   }
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs,
     senderKey: privateKey,
-    network: txNetwork
+    network: txNetwork,
+    attachment: zonefile ? Buffer.from(zonefile) : undefined
   });
 }
