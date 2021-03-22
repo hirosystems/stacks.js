@@ -1,30 +1,25 @@
 import {
-  makeRandomPrivKey,
+  broadcastTransaction,
+  bufferCV,
   callReadOnlyFunction,
+  ClarityType,
+  ClarityValue,
+  cvToString,
+  getAddressFromPrivateKey,
+  hash160,
   makeContractCall,
+  makeRandomPrivKey,
+  privateKeyToString,
+  ResponseErrorCV,
   SignedContractCallOptions,
   standardPrincipalCV,
-  ClarityValue,
-  ClarityType,
-  ResponseErrorCV,
-  bufferCV,
-  privateKeyToString,
-  getAddressFromPrivateKey,
-  broadcastTransaction,
-  TxBroadcastResultRejected,
-  TxBroadcastResult, hash160
+  TxBroadcastResult,
+  TxBroadcastResultRejected
 } from '@stacks/transactions';
 
-import { 
-  StacksNetwork,
-  StacksMainnet
-} from '@stacks/network';
+import {StacksMainnet, StacksNetwork} from '@stacks/network';
 
-import {
-  decodeFQN,
-  bufferCVFromString,
-  uintCVFromBN, getZonefileHash
-} from './utils'
+import {bufferCVFromString, decodeFQN, getZonefileHash, uintCVFromBN} from './utils'
 
 import BN from 'bn.js';
 
@@ -190,10 +185,15 @@ export async function getNamespacePrice(
   })
   .then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
-      return new BN(responseCV.value.toString());
+      if (responseCV.value.type === ClarityType.Int ||
+        responseCV.value.type === ClarityType.UInt) {
+        return responseCV.value.value;
+      } else {
+        throw new Error('Response did not contain a number');
+      }
     } else {
       const errorResponse = responseCV as ResponseErrorCV;
-      throw new Error(errorResponse.value.toString());
+      throw new Error(cvToString(errorResponse.value));
     }
   })
 }
@@ -233,10 +233,15 @@ export async function getNamePrice(
   })
   .then((responseCV: ClarityValue) => {
     if (responseCV.type === ClarityType.ResponseOk) {
-      return new BN(responseCV.value.toString());
+      if (responseCV.value.type === ClarityType.Int ||
+          responseCV.value.type === ClarityType.UInt) {
+        return responseCV.value.value;
+      } else {
+        throw new Error('Response did not contain a number');
+      }
     } else {
       const errorResponse = responseCV as ResponseErrorCV;
-      throw new Error(errorResponse.value.toString());
+      throw new Error(cvToString(errorResponse.value));
     }
   })
 }
