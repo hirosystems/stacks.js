@@ -3,6 +3,7 @@ import { getAddressFromDID } from './dids';
 import { publicKeyToAddress } from '@stacks/encryption';
 import { fetchPrivate, isSameOriginAbsoluteUrl } from '@stacks/common';
 import { fetchAppManifest } from './provider';
+import { c32ToB58 } from 'c32check';
 
 /**
  * Checks if the ES256k signature on passed `token` match the claimed public key
@@ -106,8 +107,9 @@ export async function doPublicKeysMatchUsername(
     const responseJSON = JSON.parse(responseText);
     if (responseJSON.hasOwnProperty('address')) {
       const nameOwningAddress = responseJSON.address;
+      const nameOwningAddressBtc = c32ToB58(nameOwningAddress);
       const addressFromIssuer = getAddressFromDID(payload.iss);
-      if (nameOwningAddress === addressFromIssuer) {
+      if (nameOwningAddressBtc === addressFromIssuer) {
         return true;
       } else {
         return false;

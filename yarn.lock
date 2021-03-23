@@ -4601,15 +4601,7 @@ bytes@3.1.0:
   resolved "https://registry.npmjs.org/bytes/-/bytes-3.1.0.tgz"
   integrity sha512-zauLjrfCG+xvoyaqLoV8bLVXXNGC4JqlxFCutSDWA6fJrTo2ZuvLYTqZ7aHBLZSMOopbzwv8f+wZcVzfVTI2Dg==
 
-c32check@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.npmjs.org/c32check/-/c32check-0.0.6.tgz"
-  integrity sha512-aXUFQML0sRvR/aBn9cpBGmP/m8t5JmfgaQ4O4/zdphTpLTEaDx0+RbuzDGkps2rAk3Ck69nswR8fknIZSI5rUg==
-  dependencies:
-    base58check "^2.0.0"
-    ripemd160 "^2.0.1"
-
-c32check@^1.0.1, c32check@^1.1.1:
+c32check@1.1.2, c32check@^1.0.1, c32check@^1.1.1:
   version "1.1.2"
   resolved "https://registry.npmjs.org/c32check/-/c32check-1.1.2.tgz"
   integrity sha512-YgmbvOQ9HfoH7ptW80JP6WJdgoHJFGqFjxaFYvwD+bU5i3dJ44a1LI0yxdiA2n/tVKq9W92tYcFjTP5hGlvhcg==
@@ -4617,6 +4609,14 @@ c32check@^1.0.1, c32check@^1.1.1:
     base-x "^3.0.8"
     buffer "^5.6.0"
     cross-sha256 "^1.1.2"
+
+c32check@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/c32check/-/c32check-0.0.6.tgz#9b5bac1c6b73fc12f5ec7114d372daa079cf5509"
+  integrity sha512-aXUFQML0sRvR/aBn9cpBGmP/m8t5JmfgaQ4O4/zdphTpLTEaDx0+RbuzDGkps2rAk3Ck69nswR8fknIZSI5rUg==
+  dependencies:
+    base58check "^2.0.0"
+    ripemd160 "^2.0.1"
 
 cacache@^12.0.0, cacache@^12.0.2, cacache@^12.0.3:
   version "12.0.4"
