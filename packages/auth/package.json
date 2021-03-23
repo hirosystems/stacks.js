@@ -49,6 +49,7 @@
     "@stacks/encryption": "^1.2.3",
     "@stacks/network": "^1.2.2",
     "@stacks/profile": "^1.2.3",
+    "c32check": "1.1.2",
     "codecov": "^3.7.2",
     "cross-fetch": "^3.0.5",
     "jsontokens": "^3.0.0",
