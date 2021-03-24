@@ -1,26 +1,27 @@
 import {
+  AddressHashMode,
+  AddressVersion,
   COMPRESSED_PUBKEY_LENGTH_BYTES,
   UNCOMPRESSED_PUBKEY_LENGTH_BYTES,
   StacksMessageType,
-  AddressHashMode,
   TransactionVersion,
+  PubKeyEncoding,
 } from './constants';
 
 import {
   BufferArray,
-  leftPadHexToLength,
-  intToHexString,
-  randomBytes,
   hash160,
   hashP2PKH,
   hexStringToInt,
+  intToHexString,
+  leftPadHexToLength,
+  randomBytes,
 } from './utils';
 
 import { ec as EC } from 'elliptic';
 
 import { MessageSignature, createMessageSignature } from './authorization';
 import { BufferReader } from './bufferReader';
-import { AddressVersion } from './constants';
 import { c32address } from 'c32check';
 import { addressHashModeToVersion, addressFromVersionHash, addressToString } from './types';
 
@@ -59,7 +60,7 @@ export function createStacksPublicKey(key: string): StacksPublicKey {
   };
 }
 
-export function publicKeyFromSignature(message: string, messageSignature: MessageSignature) {
+export function publicKeyFromSignature(message: string, messageSignature: MessageSignature, pubKeyEncoding = PubKeyEncoding.Compressed) {
   const ec = new EC('secp256k1');
   const messageBN = ec.keyFromPrivate(message, 'hex').getPrivate().toString(10);
 
@@ -70,7 +71,11 @@ export function publicKeyFromSignature(message: string, messageSignature: Messag
     parsedSignature,
     parsedSignature.recoveryParam,
     'hex'
-  ) as { encodeCompressed: (enc: string) => string };
+  );
+
+  if (pubKeyEncoding == PubKeyEncoding.Uncompressed) {
+    return publicKey.encode('hex');
+  }
 
   return publicKey.encodeCompressed('hex');
 }

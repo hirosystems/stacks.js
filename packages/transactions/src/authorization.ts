@@ -367,7 +367,7 @@ export function makeSigHashPreSign(
 
 function makeSigHashPostSign(
   curSigHash: string,
-  pubKeyEncoding: PubKeyEncoding,
+  pubKey: StacksPublicKey,
   signature: MessageSignature
 ): string {
   // new hash combines the previous hash and all the new data this signature will add.  This
@@ -376,13 +376,16 @@ function makeSigHashPostSign(
   // * the signature
   const hashLength = 32 + 1 + RECOVERABLE_ECDSA_SIG_LENGTH_BYTES;
 
+  const pubKeyEncoding = isCompressed(pubKey) ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed;
+
   const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature.data;
 
-  if (Buffer.from(sigHash, 'hex').byteLength > hashLength) {
+  const sigHashBuffer = Buffer.from(sigHash, 'hex')
+  if (sigHashBuffer.byteLength > hashLength) {
     throw Error('Invalid signature hash length');
   }
 
-  return txidFromData(Buffer.from(sigHash, 'hex'));
+  return txidFromData(sigHashBuffer);
 }
 
 export function nextSignature(
@@ -399,10 +402,7 @@ export function nextSignature(
 
   const signature = signWithKey(privateKey, sigHashPreSign);
   const publicKey = getPublicKey(privateKey);
-  const publicKeyEncoding = isCompressed(publicKey)
-    ? PubKeyEncoding.Compressed
-    : PubKeyEncoding.Uncompressed;
-  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKeyEncoding, signature);
+  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
 
   return {
     nextSig: signature,
@@ -421,9 +421,9 @@ export function nextVerification(
 ) {
   const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
 
-  const publicKey = createStacksPublicKey(publicKeyFromSignature(sigHashPreSign, signature));
+  const publicKey = createStacksPublicKey(publicKeyFromSignature(sigHashPreSign, signature, pubKeyEncoding));
 
-  const nextSigHash = makeSigHashPostSign(sigHashPreSign, PubKeyEncoding.Compressed, signature);
+  const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
 
   return {
     pubKey: publicKey,
