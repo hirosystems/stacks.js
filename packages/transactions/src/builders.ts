@@ -1136,7 +1136,7 @@ export async function sponsorTransaction(
         break;
       default:
         throw new Error(
-          `Spnsored transactions not supported for transaction type ${
+          `Sponsored transactions not supported for transaction type ${
             PayloadType[options.transaction.payload.payloadType]
           }`
         );
