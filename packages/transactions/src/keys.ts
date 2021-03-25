@@ -60,7 +60,11 @@ export function createStacksPublicKey(key: string): StacksPublicKey {
   };
 }
 
-export function publicKeyFromSignature(message: string, messageSignature: MessageSignature, pubKeyEncoding = PubKeyEncoding.Compressed) {
+export function publicKeyFromSignature(
+  message: string,
+  messageSignature: MessageSignature,
+  pubKeyEncoding = PubKeyEncoding.Compressed
+) {
   const ec = new EC('secp256k1');
   const messageBN = ec.keyFromPrivate(message, 'hex').getPrivate().toString(10);
 
