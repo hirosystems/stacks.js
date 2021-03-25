@@ -1,17 +1,22 @@
 import {
-  pubKeyfromPrivKey,
-  publicKeyToString,
-  StacksPublicKey,
-  makeRandomPrivKey,
+  compressPublicKey,
   createStacksPrivateKey,
-  getPublicKey,
-  privateKeyToString,
   getAddressFromPrivateKey,
   getAddressFromPublicKey,
-} from '../src/keys';
+  getPublicKey,
+  makeRandomPrivKey,
+  privateKeyToString,
+  pubKeyfromPrivKey,
+  publicKeyFromSignature,
+  publicKeyToString,
+  signWithKey,
+  StacksPublicKey,
+  PubKeyEncoding,
+  StacksMessageType,
+  TransactionVersion
+} from '../src';
 
 import { serializeDeserialize } from './macros';
-import { StacksMessageType, TransactionVersion } from '../src/constants';
 
 test('Stacks public key and private keys', () => {
   const privKeyString = 'edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc';
@@ -53,4 +58,23 @@ test('Stacks public key and private keys', () => {
   expect(
     getAddressFromPublicKey(Buffer.from(pubKeyString, 'hex'), TransactionVersion.Testnet)
   ).toBe('STZG6BAY4JVR9RNAB1HY92B7Q208ZYY4HZG8ZXFM');
+
+  const compressedPubKey = compressPublicKey(pubKey.data).data.toString('hex');
+  expect(compressedPubKey).toBe('03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab');
 });
+
+test('Retrieve public key from signature', () => {
+  const privKey = createStacksPrivateKey('edf9aee84d9b7abc145504dde6726c64f369d37ee34ded868fabd876c26570bc');
+  const uncompressedPubKey =
+    '04ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab5b435d20ea91337cdd8c30dd7427bb098a5355e9c9bfad43797899b8137237cf';
+  const compressedPubKey = '03ef788b3830c00abe8f64f62dc32fc863bc0b2cafeb073b6c8e1c7657d9c2c3ab';
+
+  const message = 'hello world';
+  const sig = signWithKey(privKey, message);
+
+  const uncompressedPubKeyFromSig = publicKeyFromSignature(message, sig, PubKeyEncoding.Uncompressed)
+  const compressedPubKeyFromSig = publicKeyFromSignature(message, sig, PubKeyEncoding.Compressed)
+
+  expect(uncompressedPubKeyFromSig).toBe(uncompressedPubKey);
+  expect(compressedPubKeyFromSig).toBe(compressedPubKey);
+})
