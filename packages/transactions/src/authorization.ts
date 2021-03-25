@@ -376,11 +376,13 @@ function makeSigHashPostSign(
   // * the signature
   const hashLength = 32 + 1 + RECOVERABLE_ECDSA_SIG_LENGTH_BYTES;
 
-  const pubKeyEncoding = isCompressed(pubKey) ? PubKeyEncoding.Compressed : PubKeyEncoding.Uncompressed;
+  const pubKeyEncoding = isCompressed(pubKey)
+    ? PubKeyEncoding.Compressed
+    : PubKeyEncoding.Uncompressed;
 
   const sigHash = curSigHash + leftPadHex(pubKeyEncoding.toString(16)) + signature.data;
 
-  const sigHashBuffer = Buffer.from(sigHash, 'hex')
+  const sigHashBuffer = Buffer.from(sigHash, 'hex');
   if (sigHashBuffer.byteLength > hashLength) {
     throw Error('Invalid signature hash length');
   }
@@ -421,7 +423,9 @@ export function nextVerification(
 ) {
   const sigHashPreSign = makeSigHashPreSign(initialSigHash, authType, fee, nonce);
 
-  const publicKey = createStacksPublicKey(publicKeyFromSignature(sigHashPreSign, signature, pubKeyEncoding));
+  const publicKey = createStacksPublicKey(
+    publicKeyFromSignature(sigHashPreSign, signature, pubKeyEncoding)
+  );
 
   const nextSigHash = makeSigHashPostSign(sigHashPreSign, publicKey, signature);
 
