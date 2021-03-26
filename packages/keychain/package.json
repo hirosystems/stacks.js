@@ -1,6 +1,6 @@
 {
   "name": "@stacks/keychain",
-  "version": "1.3.3",
+  "version": "1.3.5",
   "description": "A package for managing Stacks keychains",
   "keywords": [
     "Stacks",
@@ -79,7 +79,7 @@
     "@stacks/common": "^1.2.2",
     "@stacks/encryption": "^1.2.3",
     "@stacks/storage": "^1.3.3",
-    "@stacks/transactions": "^1.3.3",
+    "@stacks/transactions": "^1.3.5",
     "bip32": "^2.0.4",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.6",
