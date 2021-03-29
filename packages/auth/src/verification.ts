@@ -107,7 +107,7 @@ export async function doPublicKeysMatchUsername(
     const responseJSON = JSON.parse(responseText);
     if (responseJSON.hasOwnProperty('address')) {
       const nameOwningAddress = responseJSON.address;
-      const nameOwningAddressBtc = c32ToB58(nameOwningAddress);
+      const nameOwningAddressBtc = c32ToB58(nameOwningAddress, 0);
       const addressFromIssuer = getAddressFromDID(payload.iss);
       if (nameOwningAddressBtc === addressFromIssuer) {
         return true;
