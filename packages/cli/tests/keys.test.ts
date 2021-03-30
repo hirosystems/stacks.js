@@ -9,15 +9,14 @@ const wrappedNetwork = getNetwork(configData, false);
 const blockstackNetwork = new CLINetworkAdapter(wrappedNetwork, {} as CLI_NETWORK_OPTS);
 
 test('getStacksWalletKeyInfo', async () => {
-  const mnemonic =
-    'injury oxygen river foot pelican divert proud venture divert tired tomato middle frozen task news bullet love mimic expect share sunset equip absent hub';
+  const mnemonic = 'apart spin rich leader siren foil dish sausage fee pipe ethics bundle';
   const info = await getStacksWalletKeyInfo(blockstackNetwork, mnemonic);
 
   expect(info).toEqual({
-    privateKey: 'c6776f323c7f50100777472079fd754b706bacdbb8932a6485fb2040ec6df18801',
-    address: 'SP2QJ66HRQK5A9FMVPJPW72Z0AWRHMNXZ4PQXWZ1M',
-    btcAddress: '1Gy3JXjEWJNejnfVVeznbZwcd4iDCk9TB2',
-    wif: 'L3sWBNt3Ft3XV1E587CgqWgTDHbFtxcWQ1W8eke8SeY1i1SK942d',
+    privateKey: '25899fab1b9b95cc2d1692529f00fb788e85664df3d14db1a660f33c5f96d8ab01',
+    address: 'SP3RBZ4TZ3EK22SZRKGFZYBCKD7WQ5B8FFS0AYVF7',
+    btcAddress: '1Nwxfx7VoYAg2mEN35dTRw4H7gte8ajFki',
+    wif: 'KxUgLbeVeFZEUUQpc3ncYn5KFB3WH5MVRv3SJ2g5yPwkrXs3QRaP',
     index: 0,
   });
 });
