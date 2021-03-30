@@ -40,6 +40,7 @@ export type StacksKeyInfoType = {
   privateKey: string;
   address: string;
   btcAddress: string;
+  wif: string;
   index: number;
 };
 
@@ -139,6 +140,7 @@ export async function getStacksWalletKeyInfo(
   const child = master.derivePath("m/44'/5757'/0'/0/0"); // taken from stacks-wallet. See https://github.com/blockstack/stacks-wallet
   const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey!);
   const privkey = blockstack.ecPairToHexString(ecPair);
+  const wif = child.toWIF();
 
   const addr = getPrivateKeyAddress(network, privkey);
   let btcAddress: string;
@@ -160,6 +162,7 @@ export async function getStacksWalletKeyInfo(
     privateKey: privkey,
     address: c32check.b58ToC32(addr),
     btcAddress,
+    wif,
     index: 0,
   };
   return result;
