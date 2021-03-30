@@ -1465,9 +1465,10 @@ export const CLI_ARGS = {
         '    {\n' +
         '      "mnemonic": "apart spin rich leader siren foil dish sausage fee pipe ethics bundle",\n' +
         '      "keyInfo": {\n' +
-        '        "privateKey": "56d30f2b605ed114c7dc45599ae521c525d07e1286fbab67452a6586ea49332a01"\n' +
-        '        "address": "SP3G19B6J50FH6JGXAKS06N6WA1XPJCKKM4JCHC2D"\n' +
-        '        "btcAddress": "1Nixy2aB3miBreDTGTjieyh2hGng55k1rw"\n' +
+        '        "privateKey": "25899fab1b9b95cc2d1692529f00fb788e85664df3d14db1a660f33c5f96d8ab01"\n' +
+        '        "address": "SP3RBZ4TZ3EK22SZRKGFZYBCKD7WQ5B8FFS0AYVF7"\n' +
+        '        "btcAddress": "1Nwxfx7VoYAg2mEN35dTRw4H7gte8ajFki"\n' +
+        '        "wif": "KxUgLbeVeFZEUUQpc3ncYn5KFB3WH5MVRv3SJ2g5yPwkrXs3QRaP"\n' +
         '        "index": 0,\n' +
         '      }\n' +
         '    }\n' +
