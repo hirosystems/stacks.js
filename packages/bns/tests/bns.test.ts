@@ -372,7 +372,7 @@ test('preorderNamespace', async () => {
       bufferCV(hash160(Buffer.from(`0x${namespace}${salt}`))),
       uintCVFromBN(stxToBurn)
     ],
-    validateWithAbi: false,
+    validateWithAbi: true,
     senderKey: privateKey,
     network: network
   };
@@ -475,7 +475,7 @@ test('revealNamespace', async () => {
       uintCVFromBN(lifetime),
       standardPrincipalCV(namespaceImportAddress),
     ],
-    validateWithAbi: false,
+    validateWithAbi: true,
     senderKey: privateKey,
     network: network
   };
@@ -536,7 +536,7 @@ test('importName', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -583,7 +583,7 @@ test('readyNamespace', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -636,7 +636,7 @@ test('preorderName', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -692,7 +692,7 @@ test('registerName', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -746,7 +746,7 @@ test('updateName', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -787,7 +787,7 @@ test('transferName', async () => {
     network
   });
 
-  const bnsFunctionName = 'name-update';
+  const bnsFunctionName = 'name-transfer';
 
   const { namespace, name } = decodeFQN(fullyQualifiedName);
 
@@ -798,11 +798,12 @@ test('transferName', async () => {
     functionArgs: [
       bufferCVFromString(namespace),
       bufferCVFromString(name),
-      bufferCV(getZonefileHash(zonefile))
+      bufferCVFromString(newOwnerAddress),
+      bufferCV(getZonefileHash(zonefile)),
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -853,7 +854,7 @@ test('revokeName', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
@@ -913,7 +914,7 @@ test('renewName', async () => {
     ],
     senderKey: privateKey,
     network: network,
-    validateWithAbi: false,
+    validateWithAbi: true,
   };
 
   expect(result).toEqual({
