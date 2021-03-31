@@ -69,7 +69,7 @@ async function makeBNSContractCall(options: BNSContractCallOptions): Promise<Res
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     functionArgs: options.functionArgs,
-    validateWithAbi: false,
+    validateWithAbi: true,
     senderKey: options.senderKey,
     network: options.network,
   };
@@ -312,7 +312,7 @@ export interface RevealNamespaceOptions {
   namespace: string, 
   salt: string,
   priceFunction: PriceFunction,
-  lifeTime: BN,
+  lifetime: BN,
   namespaceImportAddress: string,
   privateKey: string,
   network?: StacksNetwork
@@ -332,7 +332,7 @@ export async function revealNamespace({
   namespace, 
   salt,
   priceFunction,
-  lifeTime,
+  lifetime,
   namespaceImportAddress,
   privateKey,
   network
@@ -365,7 +365,7 @@ export async function revealNamespace({
       uintCVFromBN(priceFunction.b16),
       uintCVFromBN(priceFunction.nonAlphaDiscount),
       uintCVFromBN(priceFunction.noVowelDiscount),
-      uintCVFromBN(lifeTime),
+      uintCVFromBN(lifetime),
       standardPrincipalCV(namespaceImportAddress),
     ],
     senderKey: privateKey,
@@ -589,7 +589,7 @@ export async function registerName({
  *
  * @param  {String} fullyQualifiedName - the fully qualified name to update including the 
  *                                        namespace (myName.id)
- * @param  {String} zonefileHash - the zonefile hash to register with the name
+ * @param  {String} zonefile - the zonefile to register with the name
  * @param  {String} privateKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
@@ -643,7 +643,7 @@ export async function updateName({
  * @param  {String} fullyQualifiedName - the fully qualified name to transfer including the 
  *                                        namespace (myName.id)
  * @param  {String} newOwnerAddress - the recipient address of the name transfer
- * @param  {String} zonefileHash - the optional zonefile hash to register with the name
+ * @param  {String} zonefile - the optional zonefile to register with the name
  * @param  {String} privateKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
@@ -651,7 +651,7 @@ export interface TransferNameOptions {
   fullyQualifiedName: string,
   newOwnerAddress: string,
   privateKey: string,
-  zonefileHash?: string,
+  zonefile?: string,
   network?: StacksNetwork
 }
 
@@ -668,8 +668,8 @@ export interface TransferNameOptions {
 export async function transferName({
   fullyQualifiedName,
   newOwnerAddress,
+  zonefile,
   privateKey,
-  zonefileHash,
   network
 }: TransferNameOptions): Promise<Result> {
   const bnsFunctionName = 'name-transfer';
@@ -685,15 +685,16 @@ export async function transferName({
     bufferCVFromString(newOwnerAddress)
   ];
 
-  if (zonefileHash) {
-    functionArgs.push(bufferCVFromString(zonefileHash));
+  if (zonefile) {
+    functionArgs.push(bufferCV(getZonefileHash(zonefile)));
   }
 
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs,
     senderKey: privateKey,
-    network: txNetwork
+    network: txNetwork,
+    attachment: zonefile ? Buffer.from(zonefile) : undefined
   });
 }
 
@@ -777,9 +778,9 @@ export interface RenewNameOptions {
 export async function renewName({
   fullyQualifiedName,
   stxToBurn,
-  privateKey,
   newOwnerAddress,
   zonefile,
+  privateKey,
   network
 }: RenewNameOptions): Promise<Result> {
   const bnsFunctionName = 'name-renewal';
