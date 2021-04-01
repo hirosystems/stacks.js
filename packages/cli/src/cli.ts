@@ -1027,7 +1027,7 @@ function gaiaDumpBucket(network: CLINetworkAdapter, args: string[]): Promise<str
 
   mkdirs(dumpDir);
 
-  function downloadFile(hubConfig: GaiaHubConfig, fileName: string): Promise<any> {
+  function downloadFile(hubConfig: GaiaHubConfig, fileName: string): Promise<void> {
     const gaiaReadUrl = `${hubConfig.url_prefix.replace(/\/+$/, '')}/${hubConfig.address}`;
     const fileUrl = `${gaiaReadUrl}/${fileName}`;
     const destPath = `${dumpDir}/${fileName.replace(/\//g, '\\x2f')}`;
