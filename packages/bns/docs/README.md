@@ -1,5 +1,3 @@
-Stacks.js 1.0.0-beta.13 Library Reference / [Exports](modules.md)
-
 # `@stacks/bns`
 
 A package for interacting with the [BNS contract](https://explorer.stacks.co/txid/SP000000000000000000002Q6VF78.bns?chain=mainnet)
