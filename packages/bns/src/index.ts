@@ -1,5 +1,4 @@
 import {
-  broadcastTransaction,
   bufferCV,
   callReadOnlyFunction,
   ClarityType,
@@ -7,14 +6,13 @@ import {
   cvToString,
   getAddressFromPrivateKey,
   hash160,
-  makeContractCall,
   makeRandomPrivKey,
+  makeUnsignedContractCall,
   privateKeyToString,
   ResponseErrorCV,
-  SignedContractCallOptions,
+  StacksTransaction,
   standardPrincipalCV,
-  TxBroadcastResult,
-  TxBroadcastResultRejected
+  UnsignedContractCallOptions,
 } from '@stacks/transactions';
 
 import {StacksMainnet, StacksNetwork} from '@stacks/network';
@@ -58,41 +56,23 @@ export type PriceFunction = {
 export interface BNSContractCallOptions {
   functionName: string;
   functionArgs: ClarityValue[];
-  senderKey: string;
+  publicKey: string;
   network: StacksNetwork;
   attachment?: Buffer;
 }
 
-async function makeBNSContractCall(options: BNSContractCallOptions): Promise<Result> {
-  const txOptions: SignedContractCallOptions = {
+async function makeBNSContractCall(options: BNSContractCallOptions): Promise<StacksTransaction> {
+  const txOptions: UnsignedContractCallOptions = {
     contractAddress: BNS_CONTRACT_ADDRESS,
     contractName: BNS_CONTRACT_NAME,
     functionName: options.functionName,
     functionArgs: options.functionArgs,
+    publicKey: options.publicKey,
     validateWithAbi: true,
-    senderKey: options.senderKey,
-    network: options.network,
+    network: options.network
   };
 
-  const tx = await makeContractCall(txOptions);
-  return broadcastTransaction(tx, options.network, options.attachment)
-    .then((result: TxBroadcastResult) => {
-      if (result.hasOwnProperty('error')) {
-        const errorResult = result as TxBroadcastResultRejected
-        return {
-          success: false,
-          data: {},
-          error: errorResult.error as string
-        }
-      } else {
-        return {
-          success: true,
-          data: {
-            txid: result as string
-          }
-        }
-      }
-    });
+  return makeUnsignedContractCall(txOptions);
 }
 
 export interface BNSReadOnlyOptions {
@@ -252,35 +232,35 @@ export async function getNamePrice(
  * @param  {String} namespace - the namespace to preorder
  * @param  {String} salt - salt used to generate the preorder namespace hash
  * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface PreorderNamespaceOptions {
   namespace: string, 
   salt: string,
   stxToBurn: BN,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a namespace preorder transaction. 
+ * Generates a namespace preorder transaction.
  * First step in registering a namespace. This transaction does not reveal the namespace that is 
  * about to be registered. And it sets the amount of STX to be burned for the registration.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Resolves to the generated StacksTransaction
  *
  * @param  {PreorderNamespaceOptions} options - an options object for the preorder
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function preorderNamespace({
+export async function buildPreorderNamespaceTX({
   namespace, 
   salt,
   stxToBurn,
-  privateKey,
+  publicKey,
   network
-}: PreorderNamespaceOptions): Promise<Result> {
+}: PreorderNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-preorder';
   const saltedNamespaceBuffer = Buffer.from(`0x${namespace}${salt}`);
   const hashedSaltedNamespace = hash160(saltedNamespaceBuffer);
@@ -292,7 +272,7 @@ export async function preorderNamespace({
       bufferCV(hashedSaltedNamespace),
       uintCVFromBN(stxToBurn)
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork
   });
 }
@@ -305,7 +285,7 @@ export async function preorderNamespace({
  * @param  {PriceFunction} priceFunction - an object containing the price function for the namespace
  * @param  {BigNum} lifeTime - the number of blocks name registrations are valid for in the namespace
  * @param  {String} namespaceImportAddress - the STX address used for name imports
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RevealNamespaceOptions {
@@ -314,29 +294,29 @@ export interface RevealNamespaceOptions {
   priceFunction: PriceFunction,
   lifetime: BN,
   namespaceImportAddress: string,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a namespace reveal transaction. 
+ * Generates a namespace reveal transaction.
  * Second step in registering a namespace.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted.
+ * Resolves to the generated StacksTransaction
  *
  * @param  {RevealNamespaceOptions} options - an options object for the reveal
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function revealNamespace({
+export async function buildRevealNamespaceTX({
   namespace, 
   salt,
   priceFunction,
   lifetime,
   namespaceImportAddress,
-  privateKey,
+  publicKey,
   network
-}: RevealNamespaceOptions): Promise<Result> {
+}: RevealNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-reveal';
   const txNetwork = network || new StacksMainnet();
 
@@ -368,7 +348,7 @@ export async function revealNamespace({
       uintCVFromBN(lifetime),
       standardPrincipalCV(namespaceImportAddress),
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork
   });
 }
@@ -380,7 +360,7 @@ export async function revealNamespace({
  * @param  {String} name - the name to import
  * @param  {String} beneficiary - the address to register the name to
  * @param  {String} zonefileHash - the zonefile hash to register
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface ImportNameOptions {
@@ -388,28 +368,28 @@ export interface ImportNameOptions {
   name: string,
   beneficiary: string,
   zonefile: string,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a namespace name import transaction. 
+ * Generates a namespace name import transaction.
  * An optional step in namespace registration.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted.
+ * Resolves to the generated StacksTransaction
  *
  * @param  {ImportNameOptions} options - an options object for the name import
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function importName({
+export async function buildImportNameTX({
   namespace, 
   name,
   beneficiary,
   zonefile,
-  privateKey,
+  publicKey,
   network
-}: ImportNameOptions): Promise<Result> {
+}: ImportNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-import';
   const txNetwork = network || new StacksMainnet();
   const zonefileHash = getZonefileHash(zonefile);
@@ -422,7 +402,7 @@ export async function importName({
       standardPrincipalCV(beneficiary),
       bufferCV(zonefileHash)
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork,
     attachment: Buffer.from(zonefile)
   });
@@ -432,31 +412,31 @@ export async function importName({
  * Ready namespace options
  *
  * @param  {String} namespace - the namespace to ready
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface ReadyNamespaceOptions {
   namespace: string,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a ready namespace transaction. 
+ * Generates a ready namespace transaction.
  * Final step in namespace registration. This completes the namespace registration and
  * makes the namespace available for name registrations.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted.
+ * Resolves to the generated StacksTransaction
  *
  * @param  {ReadyNamespaceOptions} options - an options object for the namespace ready transaction
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function readyNamespace({
+export async function buildReadyNamespaceTX({
   namespace,
-  privateKey,
+  publicKey,
   network
-}: ReadyNamespaceOptions): Promise<Result> {
+}: ReadyNamespaceOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'namespace-ready';
   const txNetwork = network || new StacksMainnet();
 
@@ -465,7 +445,7 @@ export async function readyNamespace({
     functionArgs: [
       bufferCVFromString(namespace)
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork
   });
 }
@@ -477,35 +457,35 @@ export async function readyNamespace({
  *                                        namespace (myName.id)
  * @param  {String} salt - salt used to generate the preorder name hash
  * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface PreorderNameOptions {
   fullyQualifiedName: string,
   salt: string,
   stxToBurn: BN,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a name preorder transaction. 
+ * Generates a name preorder transaction.
  * First step in registering a name. This transaction does not reveal the name that is 
  * about to be registered. And it sets the amount of STX to be burned for the registration.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Resolves to the generated StacksTransaction
  *
  * @param  {PreorderNameOptions} options - an options object for the preorder
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function preorderName({
+export async function buildPreorderNameTX({
   fullyQualifiedName,
   salt,
   stxToBurn,
-  privateKey,
+  publicKey,
   network
-}: PreorderNameOptions): Promise<Result> {
+}: PreorderNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-preorder';
   const { subdomain } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -521,7 +501,7 @@ export async function preorderName({
       bufferCV(hashedSaltedName),
       uintCVFromBN(stxToBurn)
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork
   });
 }
@@ -533,34 +513,34 @@ export async function preorderName({
  *                                        namespace (myName.id)
  * @param  {String} salt - salt used to generate the preorder name hash
  * @param  {String} zonefile - the zonefile to register with the name
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RegisterNameOptions {
   fullyQualifiedName: string,
   salt: string,
   zonefile: string,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a name registration transaction. 
+ * Generates a name registration transaction.
  * Second and final step in registering a name. 
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcast
+ * Resolves to the generated StacksTransaction
  *
  * @param  {RegisterNameOptions} options - an options object for the registration
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function registerName({
+export async function buildRegisterNameTX({
   fullyQualifiedName,
   salt,
   zonefile,
-  privateKey,
+  publicKey,
   network
-}: RegisterNameOptions): Promise<Result> {
+}: RegisterNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-register';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -578,8 +558,8 @@ export async function registerName({
       bufferCVFromString(salt),
       bufferCV(zonefileHash)
     ],
-    senderKey: privateKey,
     network: txNetwork,
+    publicKey,
     attachment: Buffer.from(zonefile)
   });
 }
@@ -590,32 +570,32 @@ export async function registerName({
  * @param  {String} fullyQualifiedName - the fully qualified name to update including the 
  *                                        namespace (myName.id)
  * @param  {String} zonefile - the zonefile to register with the name
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface UpdateNameOptions {
   fullyQualifiedName: string,
   zonefile: string,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a name update transaction. 
+ * Generates a name update transaction.
  * This changes the zonefile for the registered name.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Resolves to the generated StacksTransaction
  *
  * @param  {UpdateNameOptions} options - an options object for the update
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function updateName({
+export async function buildUpdateNameTX({
   fullyQualifiedName,
   zonefile,
-  privateKey,
+  publicKey,
   network
-}: UpdateNameOptions): Promise<Result> {
+}: UpdateNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-update';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -631,7 +611,7 @@ export async function updateName({
       bufferCVFromString(name),
       bufferCV(zonefileHash)
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork,
     attachment: Buffer.from(zonefile)
   });
@@ -644,34 +624,34 @@ export async function updateName({
  *                                        namespace (myName.id)
  * @param  {String} newOwnerAddress - the recipient address of the name transfer
  * @param  {String} zonefile - the optional zonefile to register with the name
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface TransferNameOptions {
   fullyQualifiedName: string,
   newOwnerAddress: string,
-  privateKey: string,
+  publicKey: string,
   zonefile?: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a name transfer transaction. 
+ * Generates a name transfer transaction.
  * This changes the owner of the registered name.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Resolves to the generated StacksTransaction
  *
  * @param  {TransferNameOptions} options - an options object for the transfer
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function transferName({
+export async function buildTransferNameTX({
   fullyQualifiedName,
   newOwnerAddress,
   zonefile,
-  privateKey,
+  publicKey,
   network
-}: TransferNameOptions): Promise<Result> {
+}: TransferNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-transfer';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -692,7 +672,7 @@ export async function transferName({
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs,
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork,
     attachment: zonefile ? Buffer.from(zonefile) : undefined
   });
@@ -703,30 +683,30 @@ export async function transferName({
  *
  * @param  {String} fullyQualifiedName - the fully qualified name to revoke including the 
  *                                        namespace (myName.id)
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
  */
 export interface RevokeNameOptions {
   fullyQualifiedName: string,
-  privateKey: string,
+  publicKey: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a name revoke transaction. 
+ * Generates a name revoke transaction.
  * This revokes a name registration.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Resolves to the generated StacksTransaction
  *
  * @param  {RevokeNameOptions} options - an options object for the revoke
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function revokeName({
+export async function buildRevokeNameTX({
   fullyQualifiedName,
-  privateKey,
+  publicKey,
   network
-}: RevokeNameOptions): Promise<Result> {
+}: RevokeNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-revoke';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -740,7 +720,7 @@ export async function revokeName({
       bufferCVFromString(namespace),
       bufferCVFromString(name)
     ],
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork
   });
 }
@@ -751,7 +731,7 @@ export async function revokeName({
  * @param  {String} fullyQualifiedName - the fully qualified name to renew including the 
  *                                        namespace (myName.id)
  * @param  {BigNum} stxToBurn - amount of STX to burn for the registration
- * @param  {String} privateKey - the private key to sign the transaction
+ * @param  {String} publicKey - the private key to sign the transaction
  * @param  {String} newOwnerAddress - optionally choose a new owner address
  * @param  {String} zonefileHash - optionally update the zonefile hash
  * @param  {StacksNetwork} network - the Stacks blockchain network to register on
@@ -759,30 +739,30 @@ export async function revokeName({
 export interface RenewNameOptions {
   fullyQualifiedName: string,
   stxToBurn: BN,
-  privateKey: string,
+  publicKey: string,
   newOwnerAddress?: string,
   zonefile?: string,
   network?: StacksNetwork
 }
 
 /**
- * Generates and broadcasts a name renew transaction. 
+ * Generates a name renew transaction.
  * This renews a name registration.
  *
- * Returns a Result object which will indicate if the transaction was successfully broadcasted
+ * Resolves to the generated StacksTransaction
  *
  * @param  {RenewNameOptions} options - an options object for the renew
  *
- * @return {Promise<Result>}
+ * @return {Promise<StacksTransaction>}
  */
-export async function renewName({
+export async function buildRenewNameTX({
   fullyQualifiedName,
   stxToBurn,
   newOwnerAddress,
   zonefile,
-  privateKey,
+  publicKey,
   network
-}: RenewNameOptions): Promise<Result> {
+}: RenewNameOptions): Promise<StacksTransaction> {
   const bnsFunctionName = 'name-renewal';
   const { subdomain, namespace, name } = decodeFQN(fullyQualifiedName);
   if (subdomain) {
@@ -808,7 +788,7 @@ export async function renewName({
   return makeBNSContractCall({
     functionName: bnsFunctionName,
     functionArgs,
-    senderKey: privateKey,
+    publicKey,
     network: txNetwork,
     attachment: zonefile ? Buffer.from(zonefile) : undefined
   });
