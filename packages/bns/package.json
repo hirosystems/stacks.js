@@ -34,6 +34,7 @@
     "lint:prettier:fix": "prettier --write \"src/**/*.{ts,tsx}\" *.js",
     "start": "tsdx watch --verbose --noClean --onSuccess yalc publish --push",
     "build": "tsdx build --format cjs,esm,umd",
+    "build:docs": "rimraf docs && cross-env typedoc --plugin typedoc-plugin-markdown --name \"Stacks.js $npm_package_version Library Reference\" --readme ./readme.md --tsconfig tsconfig.typedoc.json --out docs --json docs/docs.json ./src/index.ts",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "npm run typecheck -- --watch",
     "prepublishOnly": "yarn test && yarn build",
@@ -52,7 +53,9 @@
   "devDependencies": {
     "@types/bn.js": "^4.11.6",
     "codecov": "^3.7.2",
-    "tsdx": "^0.14.0"
+    "tsdx": "^0.14.0",
+    "typedoc": "^0.20.34",
+    "typedoc-plugin-markdown": "^3.6.0"
   },
   "sideEffects": false,
   "main": "dist/index.js",
